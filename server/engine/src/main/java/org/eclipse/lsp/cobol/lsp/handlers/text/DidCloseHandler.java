@@ -28,9 +28,7 @@ import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 
-/**
- * LSP DidClose Handler
- */
+/** LSP DidClose Handler */
 @Slf4j
 public class DidCloseHandler {
   private final DisposableLSPStateService disposableLSPStateService;
@@ -41,8 +39,13 @@ public class DidCloseHandler {
   private final SourceUnitGraph sourceUnitGraph;
 
   @Inject
-  public DidCloseHandler(DisposableLSPStateService disposableLSPStateService,
-                         AsyncAnalysisService asyncAnalysisService, DocumentModelService documentModelService, WatcherService watcherService, CopybookService copybookService, SourceUnitGraph sourceUnitGraph) {
+  public DidCloseHandler(
+      DisposableLSPStateService disposableLSPStateService,
+      AsyncAnalysisService asyncAnalysisService,
+      DocumentModelService documentModelService,
+      WatcherService watcherService,
+      CopybookService copybookService,
+      SourceUnitGraph sourceUnitGraph) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.asyncAnalysisService = asyncAnalysisService;
     this.documentModelService = documentModelService;
@@ -53,6 +56,7 @@ public class DidCloseHandler {
 
   /**
    * Handle LSP didClose request.
+   *
    * @param params DidCloseTextDocumentParams.
    */
   public void didClose(DidCloseTextDocumentParams params) throws InterruptedException {
@@ -68,7 +72,7 @@ public class DidCloseHandler {
     watcherService.removeRuntimeWatchers(uri);
     documentModelService.closeDocument(uri);
     // sourceUnitGraph.remove(uri);
-    //TODO: check if sourceUnitGraph could be used update copybook cache
+    // TODO: check if sourceUnitGraph could be used update copybook cache
     if (copybookService instanceof CopybookServiceImpl) {
       CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
       copybookServiceImpl.getCopybookUsage(uri).stream()

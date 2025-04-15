@@ -17,11 +17,11 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.ObsoleteNode;
 
-/** The class represents the Sort Table Node. **/
+/** The class represents the Sort Table Node. * */
 @ToString(callSuper = true)
 public class SortTableNode extends ObsoleteNode {
 
-    public SortTableNode(Locality locality) {
-        super(locality);
-    }
+  public SortTableNode(Locality locality) {
+    super(locality);
+  }
 }

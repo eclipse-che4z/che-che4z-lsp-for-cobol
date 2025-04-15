@@ -14,20 +14,17 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.CompletableFuture;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * This test checks the entry points of the {@link SubroutineServiceImpl} implementation.
- */
+import com.google.common.collect.ImmutableList;
+import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.junit.jupiter.api.Test;
+
+/** This test checks the entry points of the {@link SubroutineServiceImpl} implementation. */
 public class SubroutineServiceImplTest {
   private static final String NAME = "NAME";
   private static final String PRESENT_FILE = "existing";
@@ -57,8 +54,10 @@ public class SubroutineServiceImplTest {
   @Test
   void subroutinesCachedEmptyResult() {
     CobolLanguageClient languageClient = mock(CobolLanguageClient.class);
-    when(languageClient.resolveSubroutine(PRESENT_FILE)).thenReturn(CompletableFuture.completedFuture("URI"));
-    when(languageClient.resolveSubroutine(MISSING_FILE)).thenReturn(CompletableFuture.completedFuture(null));
+    when(languageClient.resolveSubroutine(PRESENT_FILE))
+        .thenReturn(CompletableFuture.completedFuture("URI"));
+    when(languageClient.resolveSubroutine(MISSING_FILE))
+        .thenReturn(CompletableFuture.completedFuture(null));
 
     SubroutineService subroutineService =
         new SubroutineServiceImpl(() -> languageClient, 3, 3, "HOURS");

@@ -53,7 +53,8 @@ public class LangServerBootstrap {
   public static boolean cliMode = false;
   private static final Integer LSP_PORT = 1044;
   private static final String PIPE_ARG = "pipeEnabled";
-  // It's need to be static, so it will be initialized after cliMode mode calculated (it is used in logger setup)
+  // It's need to be static, so it will be initialized after cliMode mode calculated (it is used in
+  // logger setup)
   private final Logger logger = LoggerFactory.getLogger(LangServerBootstrap.class);
 
   /**
@@ -62,7 +63,7 @@ public class LangServerBootstrap {
    * @param args command line arguments
    */
   public static void main(String[] args)
-          throws ExecutionException, InterruptedException, IOException {
+      throws ExecutionException, InterruptedException, IOException {
     if (isCliMode(args)) {
       cliMode = true;
       int exitCode = new CommandLine(new Cli()).execute(args);
@@ -88,15 +89,16 @@ public class LangServerBootstrap {
   }
 
   private void start(
-          @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
-          throws IOException, InterruptedException, ExecutionException {
+      @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
+      throws IOException, InterruptedException, ExecutionException {
     logger.info(String.format("Java version: %s", System.getProperty("java.version")));
     try {
       if (isPipeEnabled(args)) {
         launchServerWithPipes(server, provider);
       } else {
         // Enable logging
-        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        ch.qos.logback.classic.Logger rootLogger =
+            (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<>();
         ca.setContext(rootLogger.getLoggerContext());
         ca.setName("console");
@@ -114,12 +116,12 @@ public class LangServerBootstrap {
   }
 
   private void launchServerWithSocket(LanguageServer server, ClientProvider provider)
-          throws IOException, InterruptedException, ExecutionException {
+      throws IOException, InterruptedException, ExecutionException {
     logger.info("Language server awaiting socket communication on port [{}]", LSP_PORT);
     try (ServerSocket serverSocket = new ServerSocket(LSP_PORT);
-         Socket socket = serverSocket.accept();
-         InputStream input = socket.getInputStream();
-         OutputStream output = socket.getOutputStream()) {
+        Socket socket = serverSocket.accept();
+        InputStream input = socket.getInputStream();
+        OutputStream output = socket.getOutputStream()) {
       logger.info("Connection established successfully");
       Launcher<CobolLanguageClient> launcher = createServerLauncher(server, input, output);
       provider.setClient(launcher.getRemoteProxy());
@@ -130,8 +132,8 @@ public class LangServerBootstrap {
 
   @SuppressWarnings("squid:S106")
   private void launchServerWithPipes(
-          @NonNull LanguageServer server, @NonNull ClientProvider provider)
-          throws InterruptedException, ExecutionException {
+      @NonNull LanguageServer server, @NonNull ClientProvider provider)
+      throws InterruptedException, ExecutionException {
     logger.info("Language server started using pipe communication");
     Launcher<CobolLanguageClient> launcher = createServerLauncher(server, System.in, System.out);
     provider.setClient(launcher.getRemoteProxy());
@@ -144,20 +146,21 @@ public class LangServerBootstrap {
   }
 
   static Launcher<CobolLanguageClient> createServerLauncher(
-          @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
-    ThreadFactory tf = new ThreadFactory() {
-      private int counter = 0;
+      @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
+    ThreadFactory tf =
+        new ThreadFactory() {
+          private int counter = 0;
 
-      public Thread newThread(Runnable r) {
-        return new Thread(r, "LSP" + "-" + counter++);
-      }
-    };
+          public Thread newThread(Runnable r) {
+            return new Thread(r, "LSP" + "-" + counter++);
+          }
+        };
     return new LSPLauncher.Builder<CobolLanguageClient>()
-            .setLocalService(server)
-            .setExecutorService(Executors.newCachedThreadPool(tf))
-            .setRemoteInterface(CobolLanguageClient.class)
-            .setInput(in)
-            .setOutput(out)
-            .create();
+        .setLocalService(server)
+        .setExecutorService(Executors.newCachedThreadPool(tf))
+        .setRemoteInterface(CobolLanguageClient.class)
+        .setInput(in)
+        .setOutput(out)
+        .create();
   }
 }

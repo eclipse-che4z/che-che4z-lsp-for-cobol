@@ -17,12 +17,11 @@ package org.eclipse.lsp.cobol.usecases.sql;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 /** This test checks if sql INSERT statement works correctly. */
 class TestSqlInsertStatement {
@@ -143,9 +142,7 @@ class TestSqlInsertStatement {
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5,
-             INSERT6,
-            INSERT7, INSERT8, INSERT9, INSERT10);
+        INSERT1, INSERT2, INSERT3, INSERT4, INSERT5, INSERT6, INSERT7, INSERT8, INSERT9, INSERT10);
   }
 
   @ParameterizedTest

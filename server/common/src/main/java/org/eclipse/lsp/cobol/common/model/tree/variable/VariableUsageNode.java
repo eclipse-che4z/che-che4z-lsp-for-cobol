@@ -15,6 +15,9 @@
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -25,34 +28,25 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-/**
- * The class represents variable usage in COBOL program.
- */
+/** The class represents variable usage in COBOL program. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class VariableUsageNode extends Node implements DefinedAndUsedStructure, Describable {
   private final String name;
-  @EqualsAndHashCode.Exclude @ToString.Exclude private final List<VariableNode> definitions = new ArrayList<>();
+
+  @EqualsAndHashCode.Exclude @ToString.Exclude
+  private final List<VariableNode> definitions = new ArrayList<>();
+
   private final boolean isDefinitionMandatory;
 
-  public VariableUsageNode(
-      String dataName,
-      Locality locality) {
+  public VariableUsageNode(String dataName, Locality locality) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.name = dataName;
     this.isDefinitionMandatory = true;
   }
 
-  public VariableUsageNode(
-          String dataName,
-          Locality locality,
-          boolean isDefinitionMandatory) {
+  public VariableUsageNode(String dataName, Locality locality, boolean isDefinitionMandatory) {
     super(locality, NodeType.VARIABLE_USAGE);
     this.name = dataName;
     this.isDefinitionMandatory = isDefinitionMandatory;
@@ -60,19 +54,20 @@ public class VariableUsageNode extends Node implements DefinedAndUsedStructure, 
 
   @Override
   public List<Location> getDefinitions() {
-      List<Location> result = new ArrayList<>(definitions.size());
-      for (VariableNode definition : definitions) {
-          result.add(definition.getLocality().toLocation());
-      }
-      return result;
+    List<Location> result = new ArrayList<>(definitions.size());
+    for (VariableNode definition : definitions) {
+      result.add(definition.getLocality().toLocation());
+    }
+    return result;
   }
 
   /**
    * Add a definition to the node.
+   *
    * @param definition the definition node
    */
   public void addDefinition(VariableNode definition) {
-      definitions.add(definition);
+    definitions.add(definition);
   }
 
   public Optional<VariableNode> getDefinition() {
@@ -82,15 +77,11 @@ public class VariableUsageNode extends Node implements DefinedAndUsedStructure, 
 
   @Override
   public List<Location> getUsages() {
-    return getDefinition()
-        .map(VariableNode::getUsages)
-        .orElseGet(ImmutableList::of);
+    return getDefinition().map(VariableNode::getUsages).orElseGet(ImmutableList::of);
   }
 
   @Override
   public String getFormattedDisplayString() {
-    return getDefinition()
-        .map(VariableNode::getFullVariableDescription)
-        .orElse("");
+    return getDefinition().map(VariableNode::getFullVariableDescription).orElse("");
   }
 }

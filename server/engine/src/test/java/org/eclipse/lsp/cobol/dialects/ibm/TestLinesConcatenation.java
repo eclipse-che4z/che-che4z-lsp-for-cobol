@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
@@ -65,7 +64,8 @@ class TestLinesConcatenation {
     when(store.getCodeLayout()).thenReturn(Optional.empty());
 
     CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(messageService, store);
-    ExtendedText extendedText = textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
+    ExtendedText extendedText =
+        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll);
     assertEquals(EXPECTED, extendedText.toString());
     assertTrue(accumulatedErrors.isEmpty());
   }

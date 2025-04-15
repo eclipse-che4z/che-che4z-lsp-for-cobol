@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
@@ -56,26 +55,23 @@ class CFASTBuilderTest {
   @MethodSource("casesToTest")
   void cfastBuilderTest(String src, String jsonTree, String caseName) {
     AnalysisResult analysisResult =
-        UseCaseUtils.analyze(
-            UseCase.builder()
-                .documentUri("fake/path")
-                .text(src)
-                .build());
+        UseCaseUtils.analyze(UseCase.builder().documentUri("fake/path").text(src).build());
     DocumentModelService documentModelService = new DocumentModelService();
 
     documentModelService.openDocument("fake/path", src, "COBOL");
     CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
     MessageJsonHandler handler = new MessageJsonHandler(ImmutableMap.of());
     Gson gson = handler.getGson();
-    gson = gson.newBuilder()
-        .setPrettyPrinting()
-        .create();
+    gson = gson.newBuilder().setPrettyPrinting().create();
 
     Assertions.assertEquals(
         gson.toJson(gson.fromJson(jsonTree, List.class)),
         gson.toJson(
             gson.fromJson(
-                gson.toJson(builder.build(analysisResult.getRootNode().findFirstProgramNode()).getControlFlowAST()),
+                gson.toJson(
+                    builder
+                        .build(analysisResult.getRootNode().findFirstProgramNode())
+                        .getControlFlowAST()),
                 List.class)));
   }
 

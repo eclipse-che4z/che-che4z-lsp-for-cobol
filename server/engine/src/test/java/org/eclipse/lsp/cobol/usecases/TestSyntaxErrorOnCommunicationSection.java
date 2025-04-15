@@ -44,6 +44,6 @@ class TestSyntaxErrorOnCommunicationSection {
                 new Range(),
                 "Syntax error on 'COMMUNICATION'",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

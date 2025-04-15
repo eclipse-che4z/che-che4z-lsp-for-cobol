@@ -15,6 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -23,9 +26,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-import static org.eclipse.lsp4j.DiagnosticSeverity.Information;
 
 /**
  * This test checks the error shown if the copybook that is used in the COBOL file contains a link
@@ -60,7 +60,10 @@ class TestCopybookWithIndirectRecursiveDependencyIsDetected {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), MESSAGE_RECURSION + INDIRECT_NAME, Error, ErrorSource.COPYBOOK.getText()),
+                new Range(),
+                MESSAGE_RECURSION + INDIRECT_NAME,
+                Error,
+                ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(
                 new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),

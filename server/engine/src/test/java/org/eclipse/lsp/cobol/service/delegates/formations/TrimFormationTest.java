@@ -15,21 +15,18 @@
 
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test {@link TrimFormation}
- */
+/** Test {@link TrimFormation} */
 class TrimFormationTest {
   private static final String TEXT =
       "A sample text line-0 \r\n"
@@ -41,7 +38,8 @@ class TrimFormationTest {
   @Test
   void WhenFormatIsCalledWithNullParam_thenIllegalArgumentException() {
     TrimFormation trimFormation = new TrimFormation();
-    Assertions.assertThrows(IllegalArgumentException.class, () -> trimFormation.format(null, ImmutableList.of()));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> trimFormation.format(null, ImmutableList.of()));
   }
 
   @Test

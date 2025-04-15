@@ -47,20 +47,22 @@ public class AnalysisConfig {
    */
   public static AnalysisConfig defaultConfig(CopybookProcessingMode mode) {
     return new AnalysisConfig(
-            mode,
-            ImmutableList.of(),
-            true,
-            false,
-            ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        mode,
+        ImmutableList.of(),
+        true,
+        false,
+        ImmutableList.of(),
+        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
-  public static AnalysisConfig defaultConfig(CopybookProcessingMode mode, boolean collectAstChanges) {
+
+  public static AnalysisConfig defaultConfig(
+      CopybookProcessingMode mode, boolean collectAstChanges) {
     return new AnalysisConfig(
-            mode,
-            ImmutableList.of(),
-            true,
-            collectAstChanges,
-            ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        mode,
+        ImmutableList.of(),
+        true,
+        collectAstChanges,
+        ImmutableList.of(),
+        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

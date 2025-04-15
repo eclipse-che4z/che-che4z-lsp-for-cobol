@@ -15,10 +15,9 @@
 package org.eclipse.lsp.cobol.service.copybooks;
 
 import com.google.inject.Singleton;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /** Identifies a copybook based on the file extensions */
 @Singleton
@@ -38,12 +37,9 @@ public class CopybookIdentificationBasedOnExtension implements CopybookIdentific
     String fileNameWithExtension = uriAsArray[uriAsArray.length - 1];
     String[] split = fileNameWithExtension.split("\\.");
     String extension = split.length > 1 ? "." + split[split.length - 1] : "";
-    if (Objects.isNull(config)
-        || config.size() == 0
-        || StringUtils.isBlank(extension)) {
+    if (Objects.isNull(config) || config.size() == 0 || StringUtils.isBlank(extension)) {
       return false;
     }
-    return config.size() > 0
-        && config.contains(extension);
+    return config.size() > 0 && config.contains(extension);
   }
 }

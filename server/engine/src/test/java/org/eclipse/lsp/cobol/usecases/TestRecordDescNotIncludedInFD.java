@@ -14,21 +14,20 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** This test checks that the FS/SD entry locality doesn't include records entries. */
 public class TestRecordDescNotIncludedInFD {
@@ -188,7 +187,7 @@ public class TestRecordDescNotIncludedInFD {
         UseCaseEngine.runTest(
             PGM, ImmutableList.of(new CobolText("ACCFILE1", COPYBOOK)), ImmutableMap.of());
 
-      SymbolsRepository repo = new SymbolsRepository(result.getSymbolTableMap());
+    SymbolsRepository repo = new SymbolsRepository(result.getSymbolTableMap());
     ProgramNode programNode =
         result
             .getRootNode()

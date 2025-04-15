@@ -24,9 +24,10 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/** Test UTF picture clause
- *  ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=clause-symbols-used-in-picture
- * */
+/**
+ * Test UTF picture clause ref -
+ * https://www.ibm.com/docs/en/cobol-zos/6.3?topic=clause-symbols-used-in-picture
+ */
 public class TestUTFPicClause {
   public static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

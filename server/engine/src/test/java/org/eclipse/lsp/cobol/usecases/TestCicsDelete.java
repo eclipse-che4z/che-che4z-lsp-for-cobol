@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -25,54 +26,63 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 /**
  * Test CICS DELETE command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-delete">DELETE
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-delete">DELETE Command</a>
  *
  * <p>This class tests all variations of the DELETE command found in the link above.
  */
 public class TestCicsDelete {
   private static final String GROUP_ONE_ALL_OPTIONS_VALID_ONE =
-          "DELETE FILE({$varFour}) TOKEN({$varFive}) SYSID({$varSix}) NOSUSPEND RBA";
+      "DELETE FILE({$varFour}) TOKEN({$varFive}) SYSID({$varSix}) NOSUSPEND RBA";
 
   private static final String GROUP_ONE_ALL_OPTIONS_VALID_TWO =
-          "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) GENERIC RRN";
+      "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) GENERIC RRN";
   private static final String GROUP_ONE_NUMREC_INVALID =
-          "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) {NUMREC|error1}({$varSix})";
+      "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) {NUMREC|error1}({$varSix})";
 
   private static final String GROUP_ONE_ALL_OPTIONS_VALID_THREE =
-          "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) GENERIC NUMREC({$varSix}) RRN";
+      "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) GENERIC NUMREC({$varSix})"
+          + " RRN";
 
   private static final String GROUP_ONE_ALL_OPTIONS_VALID_FOUR =
-          "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) GENERIC SYSID({$varSix}) NOSUSPEND RBA";
+      "DELETE FILE({$varFour}) RIDFLD({$varFive}) KEYLENGTH({$varSix}) GENERIC SYSID({$varSix})"
+          + " NOSUSPEND RBA";
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_ONE = "DELETE FILE({$varFour})";
   private static final String GROUP_ONE_DELETE_TOKEN_INVALID = "DELETE {TOKEN(123)|error1}";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TWO = "DELETE FILE({$varFour}) TOKEN({$varFive})";
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_INVALID = "DELETE FILE({$varFour}) {TOKEN|error1}({$varFive}) {RIDFLD|error2}({$varFive})";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TWO =
+      "DELETE FILE({$varFour}) TOKEN({$varFive})";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_INVALID =
+      "DELETE FILE({$varFour}) {TOKEN|error1}({$varFive}) {RIDFLD|error2}({$varFive})";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_THREE = "DELETE FILE({$varFour}) RIDFLD({$varFive})";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_THREE =
+      "DELETE FILE({$varFour}) RIDFLD({$varFive})";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_FOUR = "DELETE FILE({$varFour}) SYSID({$varFive}) RRN";
-  private static final String GROUP_ONE_RBA_RRN_INVALID = "DELETE FILE({$varFour}) SYSID({$varFive}) {RBA|error1} {RRN|error2}";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_FOUR =
+      "DELETE FILE({$varFour}) SYSID({$varFive}) RRN";
+  private static final String GROUP_ONE_RBA_RRN_INVALID =
+      "DELETE FILE({$varFour}) SYSID({$varFive}) {RBA|error1} {RRN|error2}";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_FIVE = "DELETE FILE({$varFour}) SYSID({$varFive}) RBA";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_FIVE =
+      "DELETE FILE({$varFour}) SYSID({$varFive}) RBA";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_SIX = "DELETE FILE({$varFour}) SYSID({$varFive}) NOSUSPEND";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_SIX =
+      "DELETE FILE({$varFour}) SYSID({$varFive}) NOSUSPEND";
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_SEVEN = "DELETE FILE({$varFour}) RBA";
 
   private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_EIGHT = "DELETE FILE({$varFour}) RRN";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_NINE = "DELETE FILE({$varFour}) NOSUSPEND RBA";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_NINE =
+      "DELETE FILE({$varFour}) NOSUSPEND RBA";
 
-  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN = "DELETE FILE({$varFour}) NOSUSPEND RRN";
+  private static final String GROUP_ONE_PARTIAL_OPTIONS_VALID_TEN =
+      "DELETE FILE({$varFour}) NOSUSPEND RRN";
 
-  private static final String GROUP_TWO_ACTIVITY_INVALID = "DELETE {ACTIVITY|error1}({$varFour}) {CHANNEL|error2}(123)";
+  private static final String GROUP_TWO_ACTIVITY_INVALID =
+      "DELETE {ACTIVITY|error1}({$varFour}) {CHANNEL|error2}(123)";
 
   private static final String GROUP_TWO_CHANNEL_VALID = "DELETE CHANNEL({$varFour})";
 
@@ -82,36 +92,49 @@ public class TestCicsDelete {
 
   private static final String GROUP_THREE_CONTAINER_BTS_VALID = "DELETE CONTAINER({$varFour})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACTIVITY({$varFive})";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACTIVITY_VALID =
+      "DELETE CONTAINER({$varFour}) ACTIVITY({$varFive})";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACQACTIVITY_VALID = "DELETE CONTAINER({$varFour}) ACQACTIVITY";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACQACTIVITY_VALID =
+      "DELETE CONTAINER({$varFour}) ACQACTIVITY";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_PROCESS_VALID = "DELETE CONTAINER({$varFour}) PROCESS";
+  private static final String GROUP_THREE_CONTAINER_BTS_PROCESS_VALID =
+      "DELETE CONTAINER({$varFour}) PROCESS";
 
-  private static final String GROUP_THREE_CONTAINER_BTS_ACQPROCESS_VALID = "DELETE CONTAINER({$varFour}) ACQPROCESS ";
+  private static final String GROUP_THREE_CONTAINER_BTS_ACQPROCESS_VALID =
+      "DELETE CONTAINER({$varFour}) ACQPROCESS ";
 
-  private static final String GROUP_THREE_CONTAINER_CHANNEL_VALID = "DELETE CONTAINER({$varFour}) CHANNEL({$varSix})";
+  private static final String GROUP_THREE_CONTAINER_CHANNEL_VALID =
+      "DELETE CONTAINER({$varFour}) CHANNEL({$varSix})";
 
   private static final String GROUP_FOUR_DELETE_COUNTER_VALID = "DELETE COUNTER({$varFour})";
 
-  private static final String GROUP_FOUR_DELETE_COUNTER_POOL_VALID = "DELETE COUNTER({$varFour}) POOL({$varFive})";
+  private static final String GROUP_FOUR_DELETE_COUNTER_POOL_VALID =
+      "DELETE COUNTER({$varFour}) POOL({$varFive})";
 
-  private static final String GROUP_FOUR_DELETE_COUNTER_NOSUSPEND_VALID = "DELETE COUNTER({$varFour}) NOSUSPEND";
+  private static final String GROUP_FOUR_DELETE_COUNTER_NOSUSPEND_VALID =
+      "DELETE COUNTER({$varFour}) NOSUSPEND";
 
-  private static final String GROUP_FOUR_DELETE_COUNTER_POOL_NOSUSPEND_VALID = "DELETE COUNTER({$varFour}) POOL({$varFive}) NOSUSPEND";
+  private static final String GROUP_FOUR_DELETE_COUNTER_POOL_NOSUSPEND_VALID =
+      "DELETE COUNTER({$varFour}) POOL({$varFive}) NOSUSPEND";
 
   private static final String GROUP_FOUR_DCOUNTER_VALID = "DELETE DCOUNTER({$varFour})";
-  private static final String GROUP_FOUR_DCOUNTER_INVALID = "DELETE DCOUNTER({$varFour}) {DCOUNTER|error1}({$varFour})";
+  private static final String GROUP_FOUR_DCOUNTER_INVALID =
+      "DELETE DCOUNTER({$varFour}) {DCOUNTER|error1}({$varFour})";
 
-  private static final String GROUP_FOUR_DCOUNTER_POOL_VALID = "DELETE DCOUNTER({$varFour}) POOL({$varFive})";
+  private static final String GROUP_FOUR_DCOUNTER_POOL_VALID =
+      "DELETE DCOUNTER({$varFour}) POOL({$varFive})";
 
-  private static final String GROUP_FOUR_DCOUNTER_NOSUSPEND_VALID = "DELETE DCOUNTER({$varFour}) NOSUSPEND";
+  private static final String GROUP_FOUR_DCOUNTER_NOSUSPEND_VALID =
+      "DELETE DCOUNTER({$varFour}) NOSUSPEND";
 
-  private static final String GROUP_FOUR_DCOUNTER_POOL_NOSUSPEND_VALID = "DELETE DCOUNTER({$varFour}) POOL({$varFive}) NOSUSPEND";
+  private static final String GROUP_FOUR_DCOUNTER_POOL_NOSUSPEND_VALID =
+      "DELETE DCOUNTER({$varFour}) POOL({$varFive}) NOSUSPEND";
 
-  private static final String GROUP_FOUR_COUNTER_DCOUNTER_POOL_NOSUSPEND_INVALID = "DELETE {COUNTER|error1}(123) {DCOUNTER|error2}(123) POOL({$varFive}) NOSUSPEND";
+  private static final String GROUP_FOUR_COUNTER_DCOUNTER_POOL_NOSUSPEND_INVALID =
+      "DELETE {COUNTER|error1}(123) {DCOUNTER|error2}(123) POOL({$varFive}) NOSUSPEND";
 
-   @Test
+  @Test
   void testGroupOneDeleteCICSCommand_withAllOptionsValidOne() {
     CICSTestUtils.noErrorTest(GROUP_ONE_ALL_OPTIONS_VALID_ONE);
   }
@@ -124,13 +147,13 @@ public class TestCicsDelete {
   @Test
   void testGroupOneNumrecInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Invalid option provided: NUMREC",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Invalid option provided: NUMREC",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_ONE_NUMREC_INVALID, expectedDiagnostic);
   }
 
@@ -152,13 +175,13 @@ public class TestCicsDelete {
   @Test
   void testGroupOneDeleteTokenInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FILE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FILE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_ONE_DELETE_TOKEN_INVALID, expectedDiagnostic);
   }
 
@@ -170,19 +193,19 @@ public class TestCicsDelete {
   @Test
   void testGroupOnePartialOptionsInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: TOKEN or RIDFLD",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: TOKEN or RIDFLD",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: TOKEN or RIDFLD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: TOKEN or RIDFLD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_ONE_PARTIAL_OPTIONS_INVALID, expectedDiagnostic);
   }
 
@@ -199,19 +222,19 @@ public class TestCicsDelete {
   @Test
   void testGroupOneRbaRrnInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA or RRN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA or RRN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: RBA or RRN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: RBA or RRN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_ONE_RBA_RRN_INVALID, expectedDiagnostic);
   }
 
@@ -248,19 +271,21 @@ public class TestCicsDelete {
   @Test
   void testGroupTwoActivityInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CHANNEL or EVENT or TIMER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CHANNEL or EVENT or TIMER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or CHANNEL"
+                    + " or EVENT or TIMER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or CHANNEL"
+                    + " or EVENT or TIMER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_TWO_ACTIVITY_INVALID, expectedDiagnostic);
   }
 
@@ -337,13 +362,13 @@ public class TestCicsDelete {
   @Test
   void testGroupFourDcounterInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: DCOUNTER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_FOUR_DCOUNTER_INVALID, expectedDiagnostic);
   }
 
@@ -365,19 +390,19 @@ public class TestCicsDelete {
   @Test
   void testGroupFourCounterDcounterPoolNosuspendInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: COUNTER or DCOUNTER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: COUNTER or DCOUNTER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: COUNTER or DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: COUNTER or DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GROUP_FOUR_COUNTER_DCOUNTER_POOL_NOSUSPEND_INVALID, expectedDiagnostic);
   }
 
@@ -402,12 +427,13 @@ public class TestCicsDelete {
     UseCaseEngine.runTest(
         text,
         ImmutableList.of(new CobolText("ABC", copybookText)),
-        ImmutableMap.of("error1",
-                new Diagnostic(
-                        new Range(),
-                        "Exactly one option required, none provided: COUNTER or DCOUNTER",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.PARSING.getText())));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: COUNTER or DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -421,29 +447,31 @@ public class TestCicsDelete {
             + "       PROCEDURE DIVISION.\n"
             + "       {_copy {~abcd}.|error_main_}";
     String copybookText =
-            "       01 {$*varOne}   PIC S9 VALUE +10.\n"
-                    + "       01 {$*varTwo}   PIC S9 VALUE +100.\n"
-                    + "       01 {$*varThree} PIC S9 VALUE +1000.\n"
-                    + "       01 {$*varFour}  PIC X VALUE 'NAME_ONE'.\n"
-                    + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
-                    + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
+        "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+            + "       01 {$*varTwo}   PIC S9 VALUE +100.\n"
+            + "       01 {$*varThree} PIC S9 VALUE +1000.\n"
+            + "       01 {$*varFour}  PIC X VALUE 'NAME_ONE'.\n"
+            + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
+            + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
 
-    String execTextInCopybook = "           EXEC CICS DELETE {_POOL(123)|error1_}\n"
-            + "           END-EXEC.";
+    String execTextInCopybook =
+        "           EXEC CICS DELETE {_POOL(123)|error1_}\n" + "           END-EXEC.";
     UseCaseEngine.runTest(
-            text,
-            ImmutableList.of(new CobolText("ABC", copybookText), new CobolText("ABCD", execTextInCopybook)),
-            ImmutableMap.of("error_main",
-                    new Diagnostic(
-                            new Range(),
-                            "Errors inside the copybook",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.COPYBOOK.getText()),
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, none provided: COUNTER or DCOUNTER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        text,
+        ImmutableList.of(
+            new CobolText("ABC", copybookText), new CobolText("ABCD", execTextInCopybook)),
+        ImmutableMap.of(
+            "error_main",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText()),
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: COUNTER or DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

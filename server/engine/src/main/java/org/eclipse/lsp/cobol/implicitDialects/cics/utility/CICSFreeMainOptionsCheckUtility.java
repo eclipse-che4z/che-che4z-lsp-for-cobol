@@ -14,55 +14,53 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-        import org.antlr.v4.runtime.ParserRuleContext;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_freemain;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_freemain_opts;
 
-        import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-        import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-        import org.eclipse.lsp.cobol.common.error.SyntaxError;
-        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
-        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
-
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_freemain;
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_freemain_opts;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 /** Checks CICS Freemain rules for required and invalid options */
 public class CICSFreeMainOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_cics_freemain;
+  public static final int RULE_INDEX = RULE_cics_freemain;
 
-    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<Integer, ErrorSeverity>() {
-                {
-                    put(CICSLexer.DATA, ErrorSeverity.ERROR);
-                    put(CICSLexer.DATAPOINTER, ErrorSeverity.ERROR);
-                }
-            };
-
-    public CICSFreeMainOptionsCheckUtility(
-            DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
-    }
-
-    /**
-     * Entrypoint to check CICS Freemain rule options
-     *
-     * @param ctx ParserRuleContext subclass containing options
-     * @param <E> A subclass of ParserRuleContext
-     */
-    public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_freemain_opts) {
-            checkOpts((CICSParser.Cics_freemain_optsContext) ctx);
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.DATA, ErrorSeverity.ERROR);
+          put(CICSLexer.DATAPOINTER, ErrorSeverity.ERROR);
         }
-        checkDuplicates(ctx);
-    }
-    private void checkOpts(CICSParser.Cics_freemain_optsContext ctx) {
-        CICSParser.Cics_freemainContext parentCtx = (CICSParser.Cics_freemainContext) ctx.getParent();
-        checkHasIllegalOptions(parentCtx.FREEMAIN64(), "FREEMAIN64 is only available in Assembly");
-        checkHasExactlyOneOption("DATA or DATAPOINTER", ctx, ctx.DATA(), ctx.DATAPOINTER());
-    }
+      };
 
+  public CICSFreeMainOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  }
+
+  /**
+   * Entrypoint to check CICS Freemain rule options
+   *
+   * @param ctx ParserRuleContext subclass containing options
+   * @param <E> A subclass of ParserRuleContext
+   */
+  public <E extends ParserRuleContext> void checkOptions(E ctx) {
+    if (ctx.getRuleIndex() == RULE_cics_freemain_opts) {
+      checkOpts((CICSParser.Cics_freemain_optsContext) ctx);
+    }
+    checkDuplicates(ctx);
+  }
+
+  private void checkOpts(CICSParser.Cics_freemain_optsContext ctx) {
+    CICSParser.Cics_freemainContext parentCtx = (CICSParser.Cics_freemainContext) ctx.getParent();
+    checkHasIllegalOptions(parentCtx.FREEMAIN64(), "FREEMAIN64 is only available in Assembly");
+    checkHasExactlyOneOption("DATA or DATAPOINTER", ctx, ctx.DATA(), ctx.DATAPOINTER());
+  }
 }

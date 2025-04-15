@@ -16,18 +16,17 @@ package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 /** These test for variations of valid CHANGE PRIORITY statements */
 class TestChangePriority {
@@ -68,10 +67,7 @@ class TestChangePriority {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                MESSAGE_1,
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
+                new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }

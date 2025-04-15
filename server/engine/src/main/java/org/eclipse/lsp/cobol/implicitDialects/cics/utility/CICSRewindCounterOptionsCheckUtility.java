@@ -15,53 +15,54 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-        import org.antlr.v4.runtime.ParserRuleContext;
-        import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-        import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-        import org.eclipse.lsp.cobol.common.error.SyntaxError;
-        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
-        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_rewind;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_rewind_opts;
 
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
-
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_rewind;
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_rewind_opts;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 /** Checks CICS REWIND COUNTER rules for required and invalid options */
 public class CICSRewindCounterOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_cics_rewind;
+  public static final int RULE_INDEX = RULE_cics_rewind;
 
-    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<Integer, ErrorSeverity>() {
-                {
-                    put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
-                    put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
-                    put(CICSLexer.POOL, ErrorSeverity.ERROR);
-                    put(CICSLexer.INCREMENT, ErrorSeverity.ERROR);
-                    put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
-                }
-            };
-
-    public CICSRewindCounterOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
-    }
-
-    /**
-     * Entrypoint to check CICS REWIND COUNTER rule options
-     *
-     * @param ctx ParserRuleContext subclass containing options
-     * @param <E> A subclass of ParserRuleContext
-     */
-    public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_rewind_opts) {
-            checkOpts((CICSParser.Cics_rewind_optsContext) ctx);
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.COUNTER, ErrorSeverity.ERROR);
+          put(CICSLexer.DCOUNTER, ErrorSeverity.ERROR);
+          put(CICSLexer.POOL, ErrorSeverity.ERROR);
+          put(CICSLexer.INCREMENT, ErrorSeverity.ERROR);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
         }
-        checkDuplicates(ctx);
+      };
+
+  public CICSRewindCounterOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  }
+
+  /**
+   * Entrypoint to check CICS REWIND COUNTER rule options
+   *
+   * @param ctx ParserRuleContext subclass containing options
+   * @param <E> A subclass of ParserRuleContext
+   */
+  public <E extends ParserRuleContext> void checkOptions(E ctx) {
+    if (ctx.getRuleIndex() == RULE_cics_rewind_opts) {
+      checkOpts((CICSParser.Cics_rewind_optsContext) ctx);
     }
-    private void checkOpts(CICSParser.Cics_rewind_optsContext ctx) {
-        checkHasExactlyOneOption("COUNTER or DCOUNTER", ctx, ctx.COUNTER(), ctx.DCOUNTER());
-    }
+    checkDuplicates(ctx);
+  }
+
+  private void checkOpts(CICSParser.Cics_rewind_optsContext ctx) {
+    checkHasExactlyOneOption("COUNTER or DCOUNTER", ctx, ctx.COUNTER(), ctx.DCOUNTER());
+  }
 }

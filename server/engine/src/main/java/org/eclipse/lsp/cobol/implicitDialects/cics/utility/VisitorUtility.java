@@ -14,14 +14,14 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
+
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
-
-import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
 /***
  * Utility class for CICS antlr visitor
@@ -36,7 +36,10 @@ public class VisitorUtility {
    * @return locality
    */
   public Locality constructLocality(ParserRuleContext ctx, DialectProcessingContext context) {
-    return Locality.builder().uri(context.getExtendedDocument().getUri()).range(constructRange(ctx)).build();
+    return Locality.builder()
+        .uri(context.getExtendedDocument().getUri())
+        .range(constructRange(ctx))
+        .build();
   }
 
   /**

@@ -23,8 +23,8 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 
 /**
- * Represents a DB2 code block which can be inside a Data division or Procedure Division.
- * For example, cursor declaration.
+ * Represents a DB2 code block which can be inside a Data division or Procedure Division. For
+ * example, cursor declaration.
  */
 @Getter
 @ToString(callSuper = true)

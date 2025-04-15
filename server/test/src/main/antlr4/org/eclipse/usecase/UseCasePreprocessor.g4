@@ -85,8 +85,8 @@ constantUsage
    ;
 
 paragraphStatement
-   : (paragraphUsage (INOF sectionUsage STOP)?
-   | paragraphDefinition) diagnostic* STOP
+   : paragraphUsage diagnostic* STOP (INOF sectionUsage diagnostic* STOP)?
+   | paragraphDefinition diagnostic* STOP
    ;
 
 sectionStatement

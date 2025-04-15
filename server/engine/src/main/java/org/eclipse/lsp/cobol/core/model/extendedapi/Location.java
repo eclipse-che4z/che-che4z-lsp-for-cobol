@@ -17,9 +17,7 @@ package org.eclipse.lsp.cobol.core.model.extendedapi;
 import lombok.Value;
 import org.eclipse.lsp4j.Position;
 
-/**
- * Data transport object of CF AST. Location type stores location binding of CF AST nodes.
- */
+/** Data transport object of CF AST. Location type stores location binding of CF AST nodes. */
 @Value
 public class Location {
   String uri;

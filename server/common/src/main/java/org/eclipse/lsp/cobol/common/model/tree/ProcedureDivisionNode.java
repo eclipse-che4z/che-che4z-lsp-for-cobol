@@ -14,10 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
-import lombok.ToString;
-
 import java.util.Optional;
-
+import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 

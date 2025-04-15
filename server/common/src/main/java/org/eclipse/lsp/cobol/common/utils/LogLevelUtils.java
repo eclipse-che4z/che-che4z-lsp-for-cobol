@@ -16,13 +16,12 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.JsonPrimitive;
-import lombok.experimental.UtilityClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import lombok.experimental.UtilityClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Update the log level for the application.

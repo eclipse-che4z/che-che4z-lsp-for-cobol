@@ -14,28 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.semantics;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.Collection;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-
-/**
- * Test for GroupContext class
- */
+/** Test for GroupContext class */
 class GroupContextTest {
 
   @Test
   void testSectionUsages() {
-    Locality locality = Locality.builder()
-        .token("test")
-        .build();
+    Locality locality = Locality.builder().token("test").build();
 
     GroupContext groupContext = prepareGroup(locality);
 
@@ -45,9 +40,7 @@ class GroupContextTest {
 
   @Test
   void testParagraphUsages() {
-    Locality locality = Locality.builder()
-        .token("test")
-        .build();
+    Locality locality = Locality.builder().token("test").build();
 
     GroupContext groupContext = prepareGroup(locality);
 

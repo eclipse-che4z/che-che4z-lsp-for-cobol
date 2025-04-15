@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
@@ -24,8 +26,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /**
  * This test checks the insertion of IDENTIFICATION DIVISION statement that contains a syntax error
@@ -58,7 +58,8 @@ class TestIdentificationDivisionInCopybookWithError {
         ImmutableList.of(new CobolText(IDDIV_NAME, IDDIV), new CobolText(STRUCT1_NAME, STRUCT1)),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),
+            new Diagnostic(
+                new Range(), "Errors inside the copybook", Error, ErrorSource.COPYBOOK.getText()),
             "2",
             new Diagnostic(new Range(), MESSAGE, Error, ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);

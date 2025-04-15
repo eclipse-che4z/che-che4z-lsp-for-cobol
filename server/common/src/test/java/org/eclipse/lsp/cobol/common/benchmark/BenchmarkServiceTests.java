@@ -1,14 +1,12 @@
 package org.eclipse.lsp.cobol.common.benchmark;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.google.gson.JsonElement;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Test;
 
 class BenchmarkServiceTests {
   private static final String ID = "test.data";

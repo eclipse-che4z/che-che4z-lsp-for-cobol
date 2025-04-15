@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.service;
 
-import org.eclipse.lsp.cobol.common.SubroutineService;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -25,13 +23,14 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.common.SubroutineService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 
 /**
  * This service processes subroutine requests and returns URI by its name. The service also caches
@@ -47,15 +46,17 @@ public class SubroutineServiceImpl implements SubroutineService {
       @Named("CACHE-MAX-SIZE") int cacheSize,
       @Named("CACHE-DURATION") int duration,
       @Named("CACHE-TIME-UNIT") String timeUnitName) {
-    cache = CacheBuilder.newBuilder()
-        .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
-        .maximumSize(cacheSize)
-        .build(new CacheLoader<String, Optional<String>>() {
-          @Override
-          public Optional<String> load(String key) throws Exception {
-            return Optional.ofNullable(clientProvider.get().resolveSubroutine(key).get());
-          }
-        });
+    cache =
+        CacheBuilder.newBuilder()
+            .expireAfterWrite(duration, TimeUnit.valueOf(timeUnitName))
+            .maximumSize(cacheSize)
+            .build(
+                new CacheLoader<String, Optional<String>>() {
+                  @Override
+                  public Optional<String> load(String key) throws Exception {
+                    return Optional.ofNullable(clientProvider.get().resolveSubroutine(key).get());
+                  }
+                });
   }
 
   @Override

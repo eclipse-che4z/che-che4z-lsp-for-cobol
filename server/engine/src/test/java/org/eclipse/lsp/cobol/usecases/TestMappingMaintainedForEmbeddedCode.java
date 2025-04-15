@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -22,8 +24,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Tests that the mapping for the embedded code is maintained. */
 public class TestMappingMaintainedForEmbeddedCode {
@@ -116,10 +116,7 @@ public class TestMappingMaintainedForEmbeddedCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                "Extraneous input DUMMY-CMD",
-                Error,
-                ErrorSource.PARSING.getText())));
+                new Range(), "Extraneous input DUMMY-CMD", Error, ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -130,6 +127,9 @@ public class TestMappingMaintainedForEmbeddedCode {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Syntax error on 'PERFORM'", Error, ErrorSource.PREPROCESSING.getText())));
+                new Range(),
+                "Syntax error on 'PERFORM'",
+                Error,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

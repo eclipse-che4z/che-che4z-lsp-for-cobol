@@ -24,33 +24,34 @@ import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 
-/**
- * Enrich symbolic table with predefined variables
- */
+/** Enrich symbolic table with predefined variables */
 @AllArgsConstructor
 public class ImplicitVariablesProcessor implements Processor<SectionNode> {
 
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext ctx) {
-      if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
-          return;
-      }
-      if (ctx.getCurrentProgramNode() == null) {
-        throw new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found");
-      }
-      VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
-      registerVariables(variableAccumulator, ctx.getCurrentProgramNode(), SRImplicitVariablesGenerator.generate());
+    if (sectionNode.getSectionType() != SectionType.WORKING_STORAGE) {
+      return;
+    }
+    if (ctx.getCurrentProgramNode() == null) {
+      throw new RuntimeException(
+          "Program for section " + sectionNode.getSectionType() + " not found");
+    }
+    VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
+    registerVariables(
+        variableAccumulator, ctx.getCurrentProgramNode(), SRImplicitVariablesGenerator.generate());
   }
 
-  private void registerVariables(VariableAccumulator variableAccumulator, ProgramNode programNode, List<VariableNode> nodes) {
+  private void registerVariables(
+      VariableAccumulator variableAccumulator, ProgramNode programNode, List<VariableNode> nodes) {
     nodes.forEach(n -> registerVariable(variableAccumulator, programNode, n));
   }
 
-  private void registerVariable(VariableAccumulator variableAccumulator, ProgramNode programNode, VariableNode variable) {
+  private void registerVariable(
+      VariableAccumulator variableAccumulator, ProgramNode programNode, VariableNode variable) {
     variableAccumulator.addVariableDefinition(programNode, variable);
-    variable.getChildren()
-            .stream()
-            .map(VariableNode.class::cast)
-            .forEach(c -> variableAccumulator.addVariableDefinition(programNode, c));
+    variable.getChildren().stream()
+        .map(VariableNode.class::cast)
+        .forEach(c -> variableAccumulator.addVariableDefinition(programNode, c));
   }
 }

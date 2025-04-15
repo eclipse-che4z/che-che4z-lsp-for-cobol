@@ -15,10 +15,10 @@
 
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.lsp4j.MarkupContent;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /** This test asserts the logic of the {@link DocumentationUtils} class */
 class DocumentationUtilsTest {

@@ -65,7 +65,8 @@ public class DaCoMaidProcessor {
 
   private final Pattern dataDescriptionEntryWithCopyFromPattern =
       Pattern.compile(
-          "^(?<indent>\\s*)(?<lvl>\\d+)\\s+(?!copy maid)(?<entryName>\\w+(-\\w+)?)?.*(?<copyfrom>COPY-FROM)\\s+(?<protoSuffix>\\w+)\\..*$",
+          "^(?<indent>\\s*)(?<lvl>\\d+)\\s+(?!copy"
+              + " maid)(?<entryName>\\w+(-\\w+)?)?.*(?<copyfrom>COPY-FROM)\\s+(?<protoSuffix>\\w+)\\..*$",
           Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
   private final Pattern copyMaidPattern =
       Pattern.compile(
@@ -137,7 +138,10 @@ public class DaCoMaidProcessor {
 
     Location originalLocation = context.getExtendedDocument().mapLocation(range);
     Locality locality =
-        Locality.builder().uri(originalLocation.getUri()).range(originalLocation.getRange()).build();
+        Locality.builder()
+            .uri(originalLocation.getUri())
+            .range(originalLocation.getRange())
+            .build();
 
     return new DaCoCopyFromNode(
         locality, prototypeName, newSuffix.orElse(""), Integer.parseInt(copyFrom.group("lvl")));
@@ -199,14 +203,19 @@ public class DaCoMaidProcessor {
       Range nameRange,
       List<SyntaxError> errors) {
     Locality statementLocality =
-        Locality.builder().uri(context.getExtendedDocument().getUri()).range(statementRange).build();
+        Locality.builder()
+            .uri(context.getExtendedDocument().getUri())
+            .range(statementRange)
+            .build();
 
-    Locality nameLocality = Locality.builder().uri(context.getExtendedDocument().getUri()).range(nameRange).build();
+    Locality nameLocality =
+        Locality.builder().uri(context.getExtendedDocument().getUri()).range(nameRange).build();
 
     CopybookName copybookName =
         new CopybookName(
             makeCopybookFileName(startingLevel, layoutId, layoutUsage), DaCoDialect.NAME);
-    ResultWithErrors<CopybookModel> resolvedCopybook = copybookService.resolve(
+    ResultWithErrors<CopybookModel> resolvedCopybook =
+        copybookService.resolve(
             copybookName.toCopybookId(context.getExtendedDocument().getUri()),
             copybookName,
             context.getExtendedDocument().getUri(),
@@ -228,8 +237,7 @@ public class DaCoMaidProcessor {
       errors.addAll(resolvedCopybook.getErrors());
       checkWrkSuffix(cbNode, layoutUsage, errors);
       String suffix = calculateSuffix(layoutUsage, cbNode);
-      parseCopybookContent(copybookModel, startingLevel, suffix)
-          .forEach(cbNode::addChild);
+      parseCopybookContent(copybookModel, startingLevel, suffix).forEach(cbNode::addChild);
     } else {
       SyntaxError error =
           SyntaxError.syntaxError()
@@ -292,7 +300,11 @@ public class DaCoMaidProcessor {
     parser.addParseListener(treeListener);
 
     DaCoCopybookVisitor visitor =
-        new DaCoCopybookVisitor(copybookModel.getUri(), startingLevel, suffix, copybookModel.getCopybookId().toString());
+        new DaCoCopybookVisitor(
+            copybookModel.getUri(),
+            startingLevel,
+            suffix,
+            copybookModel.getCopybookId().toString());
     ParserRuleContext ctx = parser.dataDescriptionEntries();
     return visitor.visit(ctx);
   }

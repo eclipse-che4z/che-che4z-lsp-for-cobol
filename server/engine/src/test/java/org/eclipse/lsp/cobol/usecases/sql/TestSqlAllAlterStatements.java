@@ -16,12 +16,11 @@ package org.eclipse.lsp.cobol.usecases.sql;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 /**
  * This PARAMETERIZED test checks if all below sql ALTER statements works correctly.
@@ -72,7 +71,10 @@ class TestSqlAllAlterStatements {
           + "             INTEGER) RETURNS NULL ON NULL INPUT END-EXEC.";
 
   /**
-   * This compiles even though <a href="https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-alter-function-external">doc</a> says it otherwise.
+   * This compiles even though <a
+   * href="https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-alter-function-external">doc</a>
+   * says it otherwise.
+   *
    * <pre>CARDINALITY is not supported for external scalar functions.</pre>
    */
   public static final String ALTER_FUNCTION_EXT3 =
@@ -93,29 +95,29 @@ class TestSqlAllAlterStatements {
           + "            END-EXEC.";
 
   private static final String ALTER_FUNCTION_COMPILED2 =
-          TEXT
-                  + "            EXEC SQL ALTER FUNCTION REVERSE\n"
-                  + "            ALTER ACTIVE VERSION\n"
-                  + "            NOT DETERMINISTIC\n"
-                  + "            ALLOW DEBUG MODE END-EXEC.";
+      TEXT
+          + "            EXEC SQL ALTER FUNCTION REVERSE\n"
+          + "            ALTER ACTIVE VERSION\n"
+          + "            NOT DETERMINISTIC\n"
+          + "            ALLOW DEBUG MODE END-EXEC.";
 
   private static final String ALTER_FUNCTION_COMPILED5 =
-          TEXT
-                  + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-                  + "            ACTIVATE VERSION V3\n"
-                  + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
+          + "            ACTIVATE VERSION V3\n"
+          + "            END-EXEC.";
 
   private static final String ALTER_FUNCTION_COMPILED6 =
-          TEXT
-                  + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
-                  + "            REGENERATE ACTIVE VERSION\n"
-                  + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL ALTER FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
+          + "            REGENERATE ACTIVE VERSION\n"
+          + "            END-EXEC.";
 
   private static final String ALTER_FUNCTION_SQL_TABLE =
-          TEXT
-                  + "            EXEC SQL ALTER FUNCTION GET_TABLE\n"
-                  + "            RESTRICT CARDINALITY 10000\n"
-                  + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL ALTER FUNCTION GET_TABLE\n"
+          + "            RESTRICT CARDINALITY 10000\n"
+          + "            END-EXEC.";
 
   // ALTER FUNCTION (inlined SQL scalar)
   private static final String ALTER_FUNCTION_INLINED =
@@ -124,7 +126,7 @@ class TestSqlAllAlterStatements {
           + "            DETERMINISTIC;\n"
           + "            END-EXEC.";
 
-    // ALTER INDEX
+  // ALTER INDEX
   private static final String ALTER_INDEX =
       TEXT
           + "            EXEC SQL ALTER INDEX DSN8C10.XEMP1\n"
@@ -204,29 +206,29 @@ class TestSqlAllAlterStatements {
 
   // ALTER PROCEDURE SQL external
   private static final String ALTER_PROCEDURE_SQL_NATIVE =
-          TEXT
-                  + "            EXEC SQL\n"
-                  + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-                  + "            ALTER ACTIVE VERSION\n"
-                  + "            NOT DETERMINISTIC\n"
-                  + "            CALLED ON NULL INPUT\n"
-                  + "            ALLOW DEBUG MODE\n"
-                  + "            ASUTIME LIMIT 10\n"
-                  + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL\n"
+          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
+          + "            ALTER ACTIVE VERSION\n"
+          + "            NOT DETERMINISTIC\n"
+          + "            CALLED ON NULL INPUT\n"
+          + "            ALLOW DEBUG MODE\n"
+          + "            ASUTIME LIMIT 10\n"
+          + "            END-EXEC.";
 
   private static final String ALTER_PROCEDURE_SQL_NATIVE4 =
-          TEXT
-                  + "            EXEC SQL\n"
-                  + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-                  + "            ACTIVATE VERSION V3\n"
-                  + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL\n"
+          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
+          + "            ACTIVATE VERSION V3\n"
+          + "            END-EXEC.";
 
   private static final String ALTER_PROCEDURE_SQL_NATIVE5 =
-          TEXT
-                  + "            EXEC SQL\n"
-                  + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
-                  + "            REGENERATE ACTIVE VERSION\n"
-                  + "            END-EXEC.";
+      TEXT
+          + "            EXEC SQL\n"
+          + "            ALTER PROCEDURE UPDATE_SALARY_1\n"
+          + "            REGENERATE ACTIVE VERSION\n"
+          + "            END-EXEC.";
 
   // ALTER SEQUENCE
   private static final String ALTER_SEQUENCE =
@@ -337,39 +339,45 @@ class TestSqlAllAlterStatements {
           + "              KEY LABEL SECUREKEY01;\n"
           + "            END-EXEC.";
 
-  public static final String ALTER_TABLE11 = TEXT
+  public static final String ALTER_TABLE11 =
+      TEXT
           + "           exec sql\n"
           + "           alter TABLE DSN8C10.DEPT ADD PARTITION BY\n"
           + "            (col asc, col2 desc) (PARTITION 3 ending (MAXVALUE))\n"
           + "           end-exec.";
 
-  public static final String ALTER_TABLE12 = TEXT
+  public static final String ALTER_TABLE12 =
+      TEXT
           + "           exec sql\n"
           + "           alter TABLE DSN8C10.DEPT add column abc 'xyz.join'\n"
           + "           end-exec.";
 
-  public static final String ALTER_TABLE13 = TEXT
+  public static final String ALTER_TABLE13 =
+      TEXT
           + "           exec sql\n"
           + "           ALTER TABLE DSN8C10.DEPT\n"
           + "           ADD CONSTRAINT CHK_DEPT_DEPTNO\n"
           + "           CHECK (DEPTNO BETWEEN 'A00' AND 'Z99')\n"
           + "           end-exec.";
 
-  public static final String ALTER_TABLE14 = TEXT
+  public static final String ALTER_TABLE14 =
+      TEXT
           + "           exec sql\n"
           + "           alter TABLE DSN8C10.DEPT\n"
           + "            CONSTRAINT xyz \n"
           + "           UNIQUE (col1, BUSINESS_TIME WITHOUT OVERLAPS)\n"
           + "           end-exec.";
 
-  public static final String ALTER_TABLE15 = TEXT
+  public static final String ALTER_TABLE15 =
+      TEXT
           + "           exec sql\n"
           + "           alter TABLE DSN8C10.DEPT\n"
           + "           ALTER PARTITIONING TO PARTITION BY range (col1 desc) \n"
           + "           (PARTITION 3 ending (MAXVALUE))\n"
           + "           end-exec.";
 
-  public static final String ALTER_TABLE16 = TEXT
+  public static final String ALTER_TABLE16 =
+      TEXT
           + "           exec sql\n"
           + "             alter TABLE DSN8C10.DEPT\n"
           + "             ALTER PARTITION 3 ending (MAXVALUE)\n"

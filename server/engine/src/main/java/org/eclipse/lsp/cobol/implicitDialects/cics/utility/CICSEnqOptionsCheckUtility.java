@@ -14,58 +14,56 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-        import org.antlr.v4.runtime.ParserRuleContext;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_enq;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_enq_opts;
 
-        import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-        import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-        import org.eclipse.lsp.cobol.common.error.SyntaxError;
-        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
-        import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
-
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_enq;
-        import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_enq_opts;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 /** Checks CICS ENQ rules for required and invalid options */
 public class CICSEnqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
-    public static final int RULE_INDEX = RULE_cics_enq;
+  public static final int RULE_INDEX = RULE_cics_enq;
 
-    private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-            new HashMap<Integer, ErrorSeverity>() {
-                {
-                    put(CICSLexer.ENQ, ErrorSeverity.ERROR);
-                    put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
-                    put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-                    put(CICSLexer.UOW, ErrorSeverity.WARNING);
-                    put(CICSLexer.MAXLIFETIME, ErrorSeverity.ERROR);
-                    put(CICSLexer.TASK, ErrorSeverity.WARNING);
-                    put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
-                }
-            };
+  private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.ENQ, ErrorSeverity.ERROR);
+          put(CICSLexer.RESOURCE, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.UOW, ErrorSeverity.WARNING);
+          put(CICSLexer.MAXLIFETIME, ErrorSeverity.ERROR);
+          put(CICSLexer.TASK, ErrorSeverity.WARNING);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+        }
+      };
 
-    public CICSEnqOptionsCheckUtility(
-            DialectProcessingContext context, List<SyntaxError> errors) {
-        super(context, errors, DUPLICATE_CHECK_OPTIONS);
-    }
+  public CICSEnqOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  }
 
-    /**
-     * Entrypoint to check CICS ENQ rule options
-     *
-     * @param ctx ParserRuleContext subclass containing options
-     * @param <E> A subclass of ParserRuleContext
-     */
-    public <E extends ParserRuleContext> void checkOptions(E ctx) {
-        if (ctx.getRuleIndex() == RULE_cics_enq_opts)
-            checkEnq((CICSParser.Cics_enq_optsContext) ctx);
+  /**
+   * Entrypoint to check CICS ENQ rule options
+   *
+   * @param ctx ParserRuleContext subclass containing options
+   * @param <E> A subclass of ParserRuleContext
+   */
+  public <E extends ParserRuleContext> void checkOptions(E ctx) {
+    if (ctx.getRuleIndex() == RULE_cics_enq_opts) checkEnq((CICSParser.Cics_enq_optsContext) ctx);
 
-        checkDuplicates(ctx);
-    }
-    private void checkEnq(CICSParser.Cics_enq_optsContext ctx) {
-        checkHasMandatoryOptions(ctx.RESOURCE(), ctx, "RESOURCE");
-        checkHasMutuallyExclusiveOptions("UOW or MAXLIFETIME or TASK", ctx.UOW(), ctx.MAXLIFETIME(), ctx.TASK());
-    }
+    checkDuplicates(ctx);
+  }
+
+  private void checkEnq(CICSParser.Cics_enq_optsContext ctx) {
+    checkHasMandatoryOptions(ctx.RESOURCE(), ctx, "RESOURCE");
+    checkHasMutuallyExclusiveOptions(
+        "UOW or MAXLIFETIME or TASK", ctx.UOW(), ctx.MAXLIFETIME(), ctx.TASK());
+  }
 }

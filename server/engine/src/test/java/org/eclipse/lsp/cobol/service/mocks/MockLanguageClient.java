@@ -19,13 +19,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp4j.*;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp4j.*;
 
 /**
  * Mock implementation of language client. Only for testing purposes. Collects the received messages
@@ -56,8 +55,7 @@ public class MockLanguageClient implements CobolLanguageClient {
   }
 
   @Override
-  public void notifyProgress(ProgressParams params) {
-  }
+  public void notifyProgress(ProgressParams params) {}
 
   @Override
   public void showMessage(MessageParams messageParams) {
@@ -86,12 +84,15 @@ public class MockLanguageClient implements CobolLanguageClient {
    * @return - config value
    */
   public CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
-      return CompletableFuture.completedFuture(ImmutableList.of("",
-          new JsonObject(),
-          new JsonArray(),
-          new JsonNull(),
-          new JsonNull(),
-          new JsonArray(), ""));
+    return CompletableFuture.completedFuture(
+        ImmutableList.of(
+            "",
+            new JsonObject(),
+            new JsonArray(),
+            new JsonNull(),
+            new JsonNull(),
+            new JsonArray(),
+            ""));
   }
 
   /** Clean the client state. */

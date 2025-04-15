@@ -14,15 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.strategy;
 
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-
-import static org.mockito.Mockito.*;
 
 /**
  * Testing that the errors that are recognized at the end of file analysis are showing messages as
@@ -70,15 +69,12 @@ class CobolErrorStrategyTest {
     when(recognizer.getVocabulary()).thenReturn(vocab);
     when(intervalSet.toString(vocab)).thenReturn("text");
     when(errorMock.getOffendingToken()).thenReturn(token);
-    when(messageService.getMessage(
-            matches("ErrorStrategy.rulereportInputMismatch"), anyString()))
+    when(messageService.getMessage(matches("ErrorStrategy.rulereportInputMismatch"), anyString()))
         .thenReturn("ErrorStrategy.rulereportInputMismatch");
-    when(messageService.getMessage(
-            matches("ErrorStrategy.reportInputMismatch"), anyString()))
+    when(messageService.getMessage(matches("ErrorStrategy.reportInputMismatch"), anyString()))
         .thenReturn("Syntax error on '<0>'");
     strategy.reportError(recognizer, errorMock);
-    verify(recognizer)
-        .notifyErrorListeners(token, "Syntax error on '<0>'", errorMock);
+    verify(recognizer).notifyErrorListeners(token, "Syntax error on '<0>'", errorMock);
   }
 
   @Test

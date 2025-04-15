@@ -57,7 +57,7 @@ class TestVariableRedefineLevel {
                 new Range(),
                 "The redefining and redefined items must have the same level: WS-DATA-A",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test

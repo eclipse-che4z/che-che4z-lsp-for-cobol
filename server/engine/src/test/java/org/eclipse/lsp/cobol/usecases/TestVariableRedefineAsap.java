@@ -78,7 +78,7 @@ class TestVariableRedefineAsap {
                 new Range(),
                 "REDEFINES line must immediately follow redefined item: WS-DATA-A",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 
   @Test

@@ -15,14 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.engine.directives;
 
-import org.eclipse.lsp.cobol.common.processor.*;
-import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
+import org.eclipse.lsp.cobol.common.processor.*;
 
 /** Compiler Directives processor */
 @Deprecated
@@ -38,10 +37,7 @@ public class CompilerDirectiveProcess implements Processor<CompilerDirectiveNode
   public void accept(
       CompilerDirectiveNode compilerDirectiveNode, ProcessingContext processingContext) {
     String directiveText =
-            compilerDirectiveNode
-            .getDirectiveText()
-            .replaceAll("\\s+", "")
-            .toUpperCase(Locale.ROOT);
+        compilerDirectiveNode.getDirectiveText().replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
     List<CompilerDirectiveOption> directiveOptionsList =
         Arrays.stream(CompilerDirectiveName.values())
             .map(val -> val.getDirectiveOption(directiveText))

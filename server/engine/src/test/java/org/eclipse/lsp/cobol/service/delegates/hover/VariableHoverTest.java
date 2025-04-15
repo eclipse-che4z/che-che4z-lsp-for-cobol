@@ -31,14 +31,14 @@ import org.junit.jupiter.api.Test;
 
 /** Test {@link VariableHover} */
 class VariableHoverTest {
-    private final VariableHover variableHover = new VariableHover();
-    SourceUnitGraph documentGraph;
+  private final VariableHover variableHover = new VariableHover();
+  SourceUnitGraph documentGraph;
 
   @BeforeEach
   void setUp() {
     this.documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
-    }
+  }
 
   private static final String HEADER =
       "       Identification Division.\n"
@@ -46,17 +46,18 @@ class VariableHoverTest {
           + "       Data Division.\n"
           + "       Working-Storage Section.\n";
 
-  private static final String FULL_TEXT = HEADER
-      + "       01 {$*TEST2} PIC 9.\n"
-      + "       01 {$*TOP2}.\n"
-      + "           05 {$*MIDDLE-1}.\n"
-      + "           10 {$*LEAF-1} PIC 9.\n"
-      + "           05 {$*MIDDLE-2}.\n"
-      + "           10 {$*LEAF-2} PIC 9.\n"
-      + "           88 {$*COND-ITEM1} VALUE 0.\n"
-      + "           88 {$*COND-ITEM2} VALUES 1 THRU 3\n"
-      + "                                4 THROUGH 5.\n"
-      + "       01 {$*ANOTHER} PIC X(6) USAGE UTF-8.";
+  private static final String FULL_TEXT =
+      HEADER
+          + "       01 {$*TEST2} PIC 9.\n"
+          + "       01 {$*TOP2}.\n"
+          + "           05 {$*MIDDLE-1}.\n"
+          + "           10 {$*LEAF-1} PIC 9.\n"
+          + "           05 {$*MIDDLE-2}.\n"
+          + "           10 {$*LEAF-2} PIC 9.\n"
+          + "           88 {$*COND-ITEM1} VALUE 0.\n"
+          + "           88 {$*COND-ITEM2} VALUES 1 THRU 3\n"
+          + "                                4 THROUGH 5.\n"
+          + "       01 {$*ANOTHER} PIC X(6) USAGE UTF-8.";
 
   @Test
   void getHoverForNullDocument() {
@@ -109,10 +110,12 @@ class VariableHoverTest {
   }
 
   private CobolDocumentModel getModel(String text) {
-    return new CobolDocumentModel(DOCUMENT_URI, text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
+    return new CobolDocumentModel(
+        DOCUMENT_URI, text, UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of()));
   }
 
   private TextDocumentPositionParams getPosition(int line, int character) {
-    return new TextDocumentPositionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(line, character));
+    return new TextDocumentPositionParams(
+        new TextDocumentIdentifier(DOCUMENT_URI), new Position(line, character));
   }
 }

@@ -47,7 +47,8 @@ public class TestProcedureDivisonHeadersArgumentsOriginCheck {
           + "       01 {$*num2} pic x.\n"
           + "       LINKAGE SECTION.\n"
           + "       01 {$*num3} pic x.\n"
-          + "       PROCEDURE DIVISION using {_{$num}|1_} {_{$num2}|2_} {$$hexof|3} {$num3} RETURNING {_{$num}|4_}.\n"
+          + "       PROCEDURE DIVISION using {_{$num}|1_} {_{$num2}|2_} {$$hexof|3} {$num3}"
+          + " RETURNING {_{$num}|4_}.\n"
           + "           display function {$$HEXOF}.\n"
           + "       END PROGRAM PGM.";
 

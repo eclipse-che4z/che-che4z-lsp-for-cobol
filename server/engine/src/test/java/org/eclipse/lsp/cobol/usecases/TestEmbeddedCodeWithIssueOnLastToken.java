@@ -66,7 +66,7 @@ public class TestEmbeddedCodeWithIssueOnLastToken {
             "1",
             new Diagnostic(
                 new Range(),
-                    "Unexpected end of line",
+                "Unexpected end of line",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }

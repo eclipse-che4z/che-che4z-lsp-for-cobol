@@ -30,7 +30,8 @@ class CopybookIdentificationBasedOnExtensionTest {
     CopybookIdentificationBasedOnExtension service = new CopybookIdentificationBasedOnExtension();
     TextDocumentItem doc = new TextDocumentItem();
     doc.setUri("blah/blah1/copy.txt.cpy");
-    Assertions.assertTrue(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of(".cpy")));
+    Assertions.assertTrue(
+        service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of(".cpy")));
   }
 
   @Test
@@ -38,6 +39,7 @@ class CopybookIdentificationBasedOnExtensionTest {
     CopybookIdentificationBasedOnExtension service = new CopybookIdentificationBasedOnExtension();
     TextDocumentItem doc = new TextDocumentItem();
     doc.setUri("blah/blah1/copy.cpy");
-    Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of("cpyy")));
+    Assertions.assertFalse(
+        service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of("cpyy")));
   }
 }

@@ -23,17 +23,13 @@ import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * Code Action Language Server event
- */
+/** Code Action Language Server event */
 public class CodeActionQuery implements LspQuery<List<Either<Command, CodeAction>>> {
   final CompletableFuture<List<Either<Command, CodeAction>>> result;
   private final CodeActionParams params;
   private final CodeActionHandler codeActionHandler;
 
-  public CodeActionQuery(
-      CodeActionParams params,
-      CodeActionHandler codeActionHandler) {
+  public CodeActionQuery(CodeActionParams params, CodeActionHandler codeActionHandler) {
     this.params = params;
     this.codeActionHandler = codeActionHandler;
     result = new CompletableFuture<>();

@@ -15,14 +15,13 @@
 package org.eclipse.lsp.cobol.common.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
-
-import java.util.List;
 
 /**
  * Class for all File Description Entry (FD) or Sort File Description (SD) Entry variables. These

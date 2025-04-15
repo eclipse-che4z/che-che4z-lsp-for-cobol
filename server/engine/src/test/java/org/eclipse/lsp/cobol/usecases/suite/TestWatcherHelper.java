@@ -14,9 +14,6 @@
  */
 package org.eclipse.lsp.cobol.usecases.suite;
 
-import lombok.experimental.UtilityClass;
-import org.junit.jupiter.api.extension.ExtensionContext;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,18 +24,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.experimental.UtilityClass;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-/**
- * Utility class for TestWatchers
- */
+/** Utility class for TestWatchers */
 @UtilityClass
 public class TestWatcherHelper {
   private static final Pattern UNIT_TEST_ID_PATTERN =
       Pattern.compile("\\[.*?\\]/\\[.*?\\]/\\[.*?\\]/\\[.*?:(.*?)\\]");
   static final String ROOT_DIRECTORY_PROPERTY = "usecase.test.repo.dir";
 
-  Path fetchTargetPath(ExtensionContext context, String rootFolder)
-      throws IOException {
+  Path fetchTargetPath(ExtensionContext context, String rootFolder) throws IOException {
     String className = context.getTestClass().get().getSimpleName();
     String methodName = context.getRequiredTestMethod().getName();
     Optional<String> parameterInvocation = getParameterInvocation(context);

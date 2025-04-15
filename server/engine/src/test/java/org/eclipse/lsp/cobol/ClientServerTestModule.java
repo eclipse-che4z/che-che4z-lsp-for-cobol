@@ -75,7 +75,6 @@ public class ClientServerTestModule extends AbstractModule {
   private static final String RESOURCE_FILE_LOCATION = "resourceFileLocation";
   private static final String RESOURCE_BUNDLE_MESSAGE = "resourceBundles/messages";
 
-
   @Override
   protected void configure() {
     bind(CobolLanguageClient.class).to(MockLanguageClient.class);
@@ -102,14 +101,14 @@ public class ClientServerTestModule extends AbstractModule {
     bind(Occurrences.class).to(ElementOccurrences.class);
     bind(CFASTBuilder.class).to(CFASTBuilderImpl.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("contentStrategy"))
-            .to(CopybookIdentificationServiceBasedOnContent.class);
+        .annotatedWith(Names.named("contentStrategy"))
+        .to(CopybookIdentificationServiceBasedOnContent.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("suffixStrategy"))
-            .to(CopybookIdentificationBasedOnExtension.class);
+        .annotatedWith(Names.named("suffixStrategy"))
+        .to(CopybookIdentificationBasedOnExtension.class);
     bind(CopybookIdentificationService.class)
-            .annotatedWith(Names.named("combinedStrategy"))
-            .to(CopybookIdentificationCombinedStrategy.class);
+        .annotatedWith(Names.named("combinedStrategy"))
+        .to(CopybookIdentificationCombinedStrategy.class);
     bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
     bindHoverActions();
@@ -119,7 +118,8 @@ public class ClientServerTestModule extends AbstractModule {
   }
 
   private void bindHoverActions() {
-    Multibinder<HoverProvider> hoverProviderMultibinder = newSetBinder(binder(), HoverProvider.class);
+    Multibinder<HoverProvider> hoverProviderMultibinder =
+        newSetBinder(binder(), HoverProvider.class);
     hoverProviderMultibinder.addBinding().to(VariableHover.class);
     hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }

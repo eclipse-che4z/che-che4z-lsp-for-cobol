@@ -52,6 +52,6 @@ class Test66RenamingReturnError {
                 new Range(),
                 "No data definition entry found for rename",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

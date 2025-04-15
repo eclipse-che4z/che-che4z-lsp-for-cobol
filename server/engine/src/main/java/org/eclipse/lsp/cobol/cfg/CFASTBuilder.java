@@ -17,14 +17,13 @@ package org.eclipse.lsp.cobol.cfg;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 
-/**
- * CF AST builder interface.
- */
+/** CF AST builder interface. */
 public interface CFASTBuilder {
-    /**
-     * Build Abstract Syntax Tree with Control Flow related nodes.
-     * @param programNode a program node
-     * @return CF ASTs wrapped in ExtendedApiResult
-     */
-    ExtendedApiResult build(ProgramNode programNode);
+  /**
+   * Build Abstract Syntax Tree with Control Flow related nodes.
+   *
+   * @param programNode a program node
+   * @return CF ASTs wrapped in ExtendedApiResult
+   */
+  ExtendedApiResult build(ProgramNode programNode);
 }

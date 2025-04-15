@@ -14,6 +14,12 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variables;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_88;
+
+import java.util.List;
+import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,13 +28,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
-
-import java.util.List;
-import java.util.function.Function;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
-import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_88;
 
 /**
  * This value class represents a conditional data name entry, that has a level number 88. It cannot

@@ -15,18 +15,17 @@
 
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * This delegates resolves code actions using a set of providers that may process specific types of
@@ -42,11 +41,13 @@ public class CodeActions {
 
   /**
    * Registers a new provider for code Actions
-   * @param providers  list of {@link CodeActionProvider}
+   *
+   * @param providers list of {@link CodeActionProvider}
    */
   public void registerNewProviders(List<CodeActionProvider> providers) {
     this.providers.addAll(providers);
   }
+
   /**
    * Collect a list of either commands or code actions according to the given params. May return an
    * empty list if the diagnostics cannot be processed with the existing providers.

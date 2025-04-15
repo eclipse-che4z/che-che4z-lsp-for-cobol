@@ -14,19 +14,16 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
-
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
-
-import com.google.common.collect.ImmutableList;
 
 @ToString(callSuper = true)
 @Getter

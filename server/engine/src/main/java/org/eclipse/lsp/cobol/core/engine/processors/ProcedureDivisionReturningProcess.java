@@ -14,14 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureDivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureDivisionReturningNode;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
 
 /** Propagate information about presence of a returning clause */
-public class ProcedureDivisionReturningProcess implements Processor<ProcedureDivisionReturningNode> {
+public class ProcedureDivisionReturningProcess
+    implements Processor<ProcedureDivisionReturningNode> {
   @Override
   public void accept(ProcedureDivisionReturningNode node, ProcessingContext ctx) {
     node.getNearestParentByType(NodeType.DIVISION)

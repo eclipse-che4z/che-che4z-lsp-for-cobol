@@ -14,17 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic.implicit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.SRImplicitVariablesGenerator;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for SRImplicitVariablesGenerator
- */
+/** Test for SRImplicitVariablesGenerator */
 class CICSSRImplicitVariablesGeneratorTest {
   @Test
   void test() {

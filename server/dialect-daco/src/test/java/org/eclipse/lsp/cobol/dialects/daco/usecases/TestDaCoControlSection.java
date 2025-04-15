@@ -14,6 +14,8 @@
 package org.eclipse.lsp.cobol.dialects.daco.usecases;
 
 import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -22,13 +24,10 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /** A test case for DACO-CONTROL section statements */
 class TestDaCoControlSection {
-    private static final String TEXT =
-    "        IDENTIFICATION DIVISION. \r\n"
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
           + "        ENVIRONMENT DIVISION.\r\n"
           + "        DACO-CONTROL SECTION.\r\n"
@@ -47,8 +46,8 @@ class TestDaCoControlSection {
           + "        PROCEDURE DIVISION. \r\n"
           + "            DISPLAY {$TBLLAY-XW4}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
     Map<String, Diagnostic> diagnosticMap = new HashMap<>();
     diagnosticMap.put(
@@ -59,6 +58,10 @@ class TestDaCoControlSection {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
-    }
+        TEXT,
+        ImmutableList.of(),
+        diagnosticMap,
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

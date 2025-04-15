@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variables;
 
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_66;
+
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,10 +27,6 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.GroupItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
-
-import java.util.Optional;
-
-import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_66;
 
 /**
  * This value class represents a renaming data name entry, that has a level number 66. It may be one
@@ -41,8 +40,7 @@ public class RenameItemNode extends VariableWithLevelNode {
 
   @EqualsAndHashCode.Exclude @ToString.Exclude @Getter @Setter private GroupItemNode varGroupParent;
 
-  public RenameItemNode(
-      Locality location, String name, boolean redefines, boolean global) {
+  public RenameItemNode(Locality location, String name, boolean redefines, boolean global) {
     super(location, LEVEL_66, name, redefines, VariableType.RENAME_ITEM, global);
   }
 

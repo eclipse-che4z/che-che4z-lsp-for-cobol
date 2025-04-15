@@ -31,5 +31,6 @@ public interface GrammarPreprocessor {
    * @return extended document with copybooks and related errors
    */
   @NonNull
-  ResultWithErrors<CopybooksRepository> preprocess(@NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor);
+  ResultWithErrors<CopybooksRepository> preprocess(
+      @NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor);
 }

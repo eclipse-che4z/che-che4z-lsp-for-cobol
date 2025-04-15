@@ -32,8 +32,7 @@ public class CICSImplicitVariablesProcessor implements Processor<SectionNode> {
     final SectionType st = sectionNode.getSectionType();
     final boolean lstor = st == SectionType.LINKAGE;
     final boolean wstor = st == SectionType.WORKING_STORAGE;
-    if (!lstor && !wstor)
-      return;
+    if (!lstor && !wstor) return;
 
     final VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
     if (ctx.getCurrentProgramNode() == null) {
@@ -43,7 +42,8 @@ public class CICSImplicitVariablesProcessor implements Processor<SectionNode> {
     final ProgramNode programNode = ctx.getCurrentProgramNode();
 
     if (lstor)
-      registerVariable(variableAccumulator, programNode, CICSBulkImplicitVariablesGenerator.generate());
+      registerVariable(
+          variableAccumulator, programNode, CICSBulkImplicitVariablesGenerator.generate());
     if (wstor) {
       for (VariableNode vn : CICSSRImplicitVariablesGenerator.generate())
         registerVariable(variableAccumulator, programNode, vn);

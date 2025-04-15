@@ -32,29 +32,40 @@ public class DialectConfigs {
 
   /**
    * Provides DaCo dialect configuration
+   *
    * @return DaCo dialect configuration
    */
   public AnalysisConfig getDaCoAnalysisConfig() {
     return new AnalysisConfig(
-            CopybookProcessingMode.DISABLED,
-            ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME), true, false,
-            ImmutableList.of(),
-            createPredefinedSectionsConfig(ImmutableList.of("S930", "S940", "S950",
-                "S990", "S991", "S997", "S999")));
+        CopybookProcessingMode.DISABLED,
+        ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
+        true,
+        false,
+        ImmutableList.of(),
+        createPredefinedSectionsConfig(
+            ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")));
   }
 
   /**
    * Provides DaCo dialect configuration with specified copybook configuration
+   *
    * @param copybookProcessingMode a copybook configuration
    * @param predefinedSections a predefined sections list
    * @return DaCo dialect configuration
    */
-  public AnalysisConfig getDaCoAnalysisConfig(CopybookProcessingMode copybookProcessingMode, List<String> predefinedSections) {
-    return new AnalysisConfig(copybookProcessingMode, ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
-        true, false, ImmutableList.of(), createPredefinedSectionsConfig(predefinedSections));
+  public AnalysisConfig getDaCoAnalysisConfig(
+      CopybookProcessingMode copybookProcessingMode, List<String> predefinedSections) {
+    return new AnalysisConfig(
+        copybookProcessingMode,
+        ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
+        true,
+        false,
+        ImmutableList.of(),
+        createPredefinedSectionsConfig(predefinedSections));
   }
 
   private Map<String, JsonElement> createPredefinedSectionsConfig(List<String> predefinedSections) {
-    return ImmutableMap.of(DaCoDialect.DACO_PREDEFINED_SECTIONS, new Gson().toJsonTree(predefinedSections));
+    return ImmutableMap.of(
+        DaCoDialect.DACO_PREDEFINED_SECTIONS, new Gson().toJsonTree(predefinedSections));
   }
 }

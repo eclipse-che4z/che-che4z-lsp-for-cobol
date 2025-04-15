@@ -16,12 +16,11 @@ package org.eclipse.lsp.cobol.test;
 
 import com.google.inject.Injector;
 
-/**
- * Initializer for use case engine
- */
+/** Initializer for use case engine */
 public interface UseCaseInitializer {
   /**
    * Creates injector for testing purposes
+   *
    * @return injector object
    */
   Injector createInjector();

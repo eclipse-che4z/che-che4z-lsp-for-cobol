@@ -13,7 +13,8 @@
  *
  */
 package org.eclipse.lsp.cobol.dialects.daco;
-/** Representation of DaCo preprocessing state*/
+
+/** Representation of DaCo preprocessing state */
 public enum DaCoMaidProcessingState {
   START,
   DATA_DIVISION,

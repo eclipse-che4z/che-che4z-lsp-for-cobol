@@ -22,8 +22,8 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 
 /** The utility class for CobolLine operations, e.g. copy in different ways */
 @UtilityClass
@@ -45,6 +45,7 @@ public class CobolLineUtils {
     cobolLine.setContentAreaB(extractContentAreaB(contentArea, layout));
     return cobolLine;
   }
+
   /**
    * Copy a given CobolLine and put there the given content and indicator area
    *
@@ -57,7 +58,10 @@ public class CobolLineUtils {
    */
   @NonNull
   public CobolLine copyCobolLineWithIndicatorAndContentArea(
-      @NonNull String indicatorArea, @NonNull String contentArea, @NonNull CobolLine line, @NonNull CobolProgramLayout layout) {
+      @NonNull String indicatorArea,
+      @NonNull String contentArea,
+      @NonNull CobolLine line,
+      @NonNull CobolProgramLayout layout) {
     CobolLine cobolLine = copyCobolLine(line);
     cobolLine.setIndicatorArea(extractIndicatorArea(indicatorArea, layout));
     cobolLine.setContentAreaA(extractContentAreaA(contentArea, layout));
@@ -66,8 +70,10 @@ public class CobolLineUtils {
   }
 
   private static String extractIndicatorArea(String indicatorArea, CobolProgramLayout layout) {
-    return indicatorArea.length() > layout.getIndicatorLength() ? indicatorArea.substring(0, layout.getIndicatorLength())
-            : (indicatorArea + StringUtils.repeat(WS, (layout.getIndicatorLength() - indicatorArea.length())));
+    return indicatorArea.length() > layout.getIndicatorLength()
+        ? indicatorArea.substring(0, layout.getIndicatorLength())
+        : (indicatorArea
+            + StringUtils.repeat(WS, (layout.getIndicatorLength() - indicatorArea.length())));
   }
 
   /**
@@ -101,12 +107,16 @@ public class CobolLineUtils {
   }
 
   @NonNull
-  private String extractContentAreaA(@NonNull String contentArea, @NonNull CobolProgramLayout layout) {
-    return contentArea.length() > layout.getAreaALength() ? contentArea.substring(0, layout.getAreaALength()) : contentArea;
+  private String extractContentAreaA(
+      @NonNull String contentArea, @NonNull CobolProgramLayout layout) {
+    return contentArea.length() > layout.getAreaALength()
+        ? contentArea.substring(0, layout.getAreaALength())
+        : contentArea;
   }
 
   @NonNull
-  private String extractContentAreaB(@NonNull String contentArea, @NonNull CobolProgramLayout layout) {
+  private String extractContentAreaB(
+      @NonNull String contentArea, @NonNull CobolProgramLayout layout) {
     return contentArea.length() > layout.getAreaALength()
         ? contentArea.substring(layout.getAreaALength())
         : "";

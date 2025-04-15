@@ -15,17 +15,16 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** This test exec cics handle abend */
 class TestExecCicsHandleAbend {
@@ -71,10 +70,13 @@ class TestExecCicsHandleAbend {
           + "           END-EXEC.\n";
 
   private void checkNode(AnalysisResult result, ExecCicsHandleNode.HandleAbendType type) {
-    Optional<ExecCicsHandleNode> node = result.getRootNode().getDepthFirstStream()
-        .filter(n -> n instanceof ExecCicsHandleNode)
-        .map(ExecCicsHandleNode.class::cast)
-        .findFirst();
+    Optional<ExecCicsHandleNode> node =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n instanceof ExecCicsHandleNode)
+            .map(ExecCicsHandleNode.class::cast)
+            .findFirst();
 
     assertTrue(node.isPresent());
     assertEquals(type, node.get().getType());
@@ -109,5 +111,4 @@ class TestExecCicsHandleAbend {
     AnalysisResult result = UseCaseEngine.runTest(TEXT4, ImmutableList.of(), ImmutableMap.of());
     checkNode(result, ExecCicsHandleNode.HandleAbendType.RESET);
   }
-
 }

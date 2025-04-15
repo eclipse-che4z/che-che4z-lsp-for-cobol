@@ -14,13 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 
 /**
  * This class represents a structure for a COBOL code line that is used for parsing. The format is

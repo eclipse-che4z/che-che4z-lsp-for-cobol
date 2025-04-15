@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 import com.google.common.collect.ImmutableList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
@@ -36,48 +35,46 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Test for AnalysisService
- */
+/** Test for AnalysisService */
 @ExtendWith(MockitoExtension.class)
 class AnalysisServiceTest {
   private AnalysisService service;
-  @Mock
-  private LanguageEngineFacade engine;
-  @Mock
-  private ConfigurationService configurationService;
-  @Mock
-  private CopybookIdentificationService copybookIdentificationService;
-  @Mock
-  private Communications communications;
-  @Mock
-  private DocumentModelService documentService;
-  @Mock
-  private CopybookService copybookService;
-  @Mock
-  private CFASTBuilder cfastBuilder;
+  @Mock private LanguageEngineFacade engine;
+  @Mock private ConfigurationService configurationService;
+  @Mock private CopybookIdentificationService copybookIdentificationService;
+  @Mock private Communications communications;
+  @Mock private DocumentModelService documentService;
+  @Mock private CopybookService copybookService;
+  @Mock private CFASTBuilder cfastBuilder;
 
   @BeforeEach
   void init() {
     service =
-            new AnalysisService(engine,
-                    configurationService,
-                    copybookIdentificationService,
-                    copybookService, documentService, cfastBuilder, new MockCobolClientProvider()
-            );
+        new AnalysisService(
+            engine,
+            configurationService,
+            copybookIdentificationService,
+            copybookService,
+            documentService,
+            cfastBuilder,
+            new MockCobolClientProvider());
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
     service =
-            new AnalysisService(engine,
-                    configurationService,
-                    copybookIdentificationService,
-                    copybookService, documentService, cfastBuilder, new MockCobolClientProvider()
-            );
+        new AnalysisService(
+            engine,
+            configurationService,
+            copybookIdentificationService,
+            copybookService,
+            documentService,
+            cfastBuilder,
+            new MockCobolClientProvider());
 
-    CompletableFuture<Boolean> booleanCompletableFuture = CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
+    CompletableFuture<Boolean> booleanCompletableFuture =
+        CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
 
     Thread.sleep(10);
     verify(copybookIdentificationService, times(0)).isCopybook(any(), any(), any());

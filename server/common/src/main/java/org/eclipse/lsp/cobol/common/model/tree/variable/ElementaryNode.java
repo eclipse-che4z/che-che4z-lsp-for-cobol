@@ -15,14 +15,13 @@
 
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
+import static org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType.UNDETERMINED;
+
+import java.util.Arrays;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
-
-import java.util.Arrays;
-
-import static org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType.UNDETERMINED;
 
 /**
  * Abstract class for all elementary variables. These variables actually has space allocations and

@@ -83,9 +83,9 @@ class WorkspaceFileServiceTest {
         "AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl",
         new WorkspaceFileService()
             .getNameFromURI(
-                uriPrefix() + "workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
+                uriPrefix()
+                    + "workspace/POSITIVE_TESTS/.e4e/AD1DEV.PUBLIC.COTPA01.COBOL(TSTJUST).cbl"));
   }
-
 
   static Stream<Arguments> listFilesSource() {
     return Stream.of(
@@ -104,32 +104,25 @@ class WorkspaceFileServiceTest {
         Arguments.of(
             pathPrefix() + "workspace/POSITIVE_TESTS/${placeholder}/SUBFOLDER",
             uriPrefix() + "workspace/POSITIVE_TESTS/",
-            3)
-    );
+            3));
   }
 
   @ParameterizedTest
   @MethodSource("listFilesSource")
-  void listFilesInDirectory(
-      String searchUri,
-      String uriToTheFolder,
-      int maxDepth
-  ) {
+  void listFilesInDirectory(String searchUri, String uriToTheFolder, int maxDepth) {
     FileSystemService fileSystemService = new WorkspaceFileService();
     try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
       Path pathToTheFolder = fileSystemService.getPathFromURI(uriToTheFolder);
 
       filesMock.when(() -> Files.isDirectory(pathToTheFolder)).thenReturn(true);
 
-      filesMock.when(() -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()))
-              .thenReturn(Stream.of(fileSystemService.getPathFromURI("file:///")));
+      filesMock
+          .when(() -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()))
+          .thenReturn(Stream.of(fileSystemService.getPathFromURI("file:///")));
 
       fileSystemService.listFilesInDirectory(searchUri);
 
-      filesMock.verify(
-          () -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()),
-          times(1)
-      );
+      filesMock.verify(() -> Files.find(eq(pathToTheFolder), eq(maxDepth), any()), times(1));
     }
   }
 
@@ -161,8 +154,8 @@ class WorkspaceFileServiceTest {
     String normalizedURI = "file:///c:/workspace/path/wi%20th/spe%26cial%21%40%23chars";
     Path expectedPath = Paths.get("c:", "workspace", "path", "wi th", "spe&cial!@#chars");
     Path actualPath = workspaceFileService.getPathFromURI(normalizedURI);
-      assert actualPath != null;
-      String actualPathString = actualPath.toString();
+    assert actualPath != null;
+    String actualPathString = actualPath.toString();
 
     // adjust path as per fs
     if (actualPath.startsWith("/")) {

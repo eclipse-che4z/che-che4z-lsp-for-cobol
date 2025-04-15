@@ -15,15 +15,14 @@
 package org.eclipse.lsp.cobol.service.utils;
 
 import com.google.common.collect.ImmutableList;
-import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.common.model.tree.*;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
-import org.eclipse.lsp4j.DocumentSymbol;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
+import org.eclipse.lsp.cobol.common.model.tree.*;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp4j.DocumentSymbol;
 
 /** This class is used for converting nodes from Syntax tree to outline tree */
 @UtilityClass

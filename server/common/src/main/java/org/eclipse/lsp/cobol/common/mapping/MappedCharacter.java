@@ -14,19 +14,15 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Mapped character class with original position information
- */
+/** Mapped character class with original position information */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -39,12 +35,12 @@ public class MappedCharacter {
   private Map<String, Location> initialLocationMap;
 
   MappedCharacter shadowCopy() {
-    return new MappedCharacter(character, originalPosition, uri, parent, instantLocation, initialLocationMap);
+    return new MappedCharacter(
+        character, originalPosition, uri, parent, instantLocation, initialLocationMap);
   }
 
   Map<String, Location> getOrCreateInitialLocationMap() {
-    if (initialLocationMap == null)
-      initialLocationMap = new HashMap<>();
+    if (initialLocationMap == null) initialLocationMap = new HashMap<>();
     return initialLocationMap;
   }
 }

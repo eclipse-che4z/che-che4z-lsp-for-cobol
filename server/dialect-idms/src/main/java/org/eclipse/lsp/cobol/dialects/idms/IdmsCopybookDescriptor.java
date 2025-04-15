@@ -19,9 +19,7 @@ import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Description of IDMS copybook
- */
+/** Description of IDMS copybook */
 @Data
 class IdmsCopybookDescriptor {
   private String name;
@@ -33,11 +31,13 @@ class IdmsCopybookDescriptor {
 
   /**
    * Factory method for copybook description object
+   *
    * @param ctx IDMS copybook rule context
    * @param programDocumentUri uri of file
    * @return copybook descriptor
    */
-  public static IdmsCopybookDescriptor from(IdmsCopyParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
+  public static IdmsCopybookDescriptor from(
+      IdmsCopyParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
@@ -47,26 +47,23 @@ class IdmsCopybookDescriptor {
       result.level = extractLevel(ctx.LEVEL_NUMBER().getSymbol());
     }
 
-    result.usage = Locality.builder()
-            .uri(programDocumentUri)
-            .range(range)
-            .build();
+    result.usage = Locality.builder().uri(programDocumentUri).range(range).build();
 
-    result.statement = Locality.builder()
-        .uri(programDocumentUri)
-        .range(DialectUtils.constructRange(ctx))
-        .build();
+    result.statement =
+        Locality.builder().uri(programDocumentUri).range(DialectUtils.constructRange(ctx)).build();
 
     return result;
   }
 
   /**
    * Factory method for copybook description object
+   *
    * @param ctx IDMS copybook rule context
    * @param programDocumentUri uri of file
    * @return copybook descriptor
    */
-  public static IdmsCopybookDescriptor from(IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
+  public static IdmsCopybookDescriptor from(
+      IdmsParser.CopyIdmsStatementContext ctx, String programDocumentUri) {
     IdmsCopybookDescriptor result = new IdmsCopybookDescriptor();
     result.name = getName(ctx);
     Range range = DialectUtils.constructRange(ctx.copyIdmsOptions().copyIdmsSource());
@@ -76,15 +73,10 @@ class IdmsCopybookDescriptor {
       result.level = extractLevel(ctx.LEVEL_NUMBER().getSymbol());
     }
 
-    result.usage = Locality.builder()
-        .uri(programDocumentUri)
-        .range(range)
-        .build();
+    result.usage = Locality.builder().uri(programDocumentUri).range(range).build();
 
-    result.statement = Locality.builder()
-        .uri(programDocumentUri)
-        .range(DialectUtils.constructRange(ctx))
-        .build();
+    result.statement =
+        Locality.builder().uri(programDocumentUri).range(DialectUtils.constructRange(ctx)).build();
 
     return result;
   }
@@ -94,7 +86,8 @@ class IdmsCopybookDescriptor {
   }
 
   private static String getName(IdmsCopyParser.CopyIdmsStatementContext ctx) {
-    IdmsCopyParser.CopySourceContext copySourceContext = ctx.copyIdmsOptions().copyIdmsSource().copySource();
+    IdmsCopyParser.CopySourceContext copySourceContext =
+        ctx.copyIdmsOptions().copyIdmsSource().copySource();
     if (copySourceContext.literal() != null) {
       return copySourceContext.literal().getText();
     }
@@ -110,7 +103,8 @@ class IdmsCopybookDescriptor {
   }
 
   private static String getName(IdmsParser.CopyIdmsStatementContext ctx) {
-    IdmsParser.CopySourceContext copySourceContext = ctx.copyIdmsOptions().copyIdmsSource().copySource();
+    IdmsParser.CopySourceContext copySourceContext =
+        ctx.copyIdmsOptions().copyIdmsSource().copySource();
     if (copySourceContext.literal() != null) {
       return copySourceContext.literal().getText();
     }
@@ -124,5 +118,4 @@ class IdmsCopybookDescriptor {
     }
     return null;
   }
-
 }

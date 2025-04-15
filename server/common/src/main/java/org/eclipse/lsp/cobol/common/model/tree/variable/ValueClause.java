@@ -14,10 +14,9 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
+import java.util.List;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.Locality;
-
-import java.util.List;
 
 /** The class represents value clause in COBOL. */
 @Value

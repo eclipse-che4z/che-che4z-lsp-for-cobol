@@ -15,8 +15,11 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
+import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
+
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -27,10 +30,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-
-import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 
 /**
  * ANTLR listener, which deals only with the REPLACE compiler directives. So, that the rest of the
@@ -56,9 +55,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     this.hierarchy = hierarchy;
   }
 
-  /**
-   * Apply pending replacing
-   */
+  /** Apply pending replacing */
   public void applyReplacing() {
     if (hierarchy.requiresReplacing()) {
       replace();
@@ -74,20 +71,25 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     restartReplace(ctx.getStart());
     if (!ctx.replacePseudoText().isEmpty()) {
       applyReplacing();
-      currentTextReplaceData = new ReplaceData(new ArrayList<>(), extendedDocument.getUri(), new Range());
+      currentTextReplaceData =
+          new ReplaceData(new ArrayList<>(), extendedDocument.getUri(), new Range());
     }
   }
 
   @Override
   public void exitReplacePseudoText(ReplacePseudoTextContext ctx) {
     if ((ctx.getParent() instanceof ReplaceAreaStartOrOffStatementContext)) {
-      currentTextReplaceData.getRange(extendedDocument.getUri()).setStart(new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
+      currentTextReplaceData
+          .getRange(extendedDocument.getUri())
+          .setStart(
+              new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
       replacingService
-          .retrievePseudoTextReplacingPattern(ReplacementHelper.createClause(ctx), retrieveLocality(ctx))
-          .processIfNoErrorsFound(pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);
+          .retrievePseudoTextReplacingPattern(
+              ReplacementHelper.createClause(ctx), retrieveLocality(ctx))
+          .processIfNoErrorsFound(
+              pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);
     }
   }
-
 
   private void replace() {
     hierarchy.replaceText(extendedDocument, replacingService::applyReplacing);
@@ -100,8 +102,14 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   @Override
   public void exitStartRule(StartRuleContext ctx) {
     if (currentTextReplaceData != null) {
-      currentTextReplaceData.getReplacePatterns().forEach(p ->
-              hierarchy.addTextReplacing(p, extendedDocument.getUri(), currentTextReplaceData.getRange(extendedDocument.getUri())));
+      currentTextReplaceData
+          .getReplacePatterns()
+          .forEach(
+              p ->
+                  hierarchy.addTextReplacing(
+                      p,
+                      extendedDocument.getUri(),
+                      currentTextReplaceData.getRange(extendedDocument.getUri())));
       currentTextReplaceData = null;
     }
     if (hierarchy.getLastTextReplacing() != null) {
@@ -113,8 +121,14 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
 
   private void restartReplace(Token start) {
     if (currentTextReplaceData != null) {
-      currentTextReplaceData.getReplacePatterns().forEach(p ->
-              hierarchy.addTextReplacing(p, extendedDocument.getUri(), currentTextReplaceData.getRange(extendedDocument.getUri())));
+      currentTextReplaceData
+          .getReplacePatterns()
+          .forEach(
+              p ->
+                  hierarchy.addTextReplacing(
+                      p,
+                      extendedDocument.getUri(),
+                      currentTextReplaceData.getRange(extendedDocument.getUri())));
       currentTextReplaceData = null;
     }
     if (hierarchy.getLastTextReplacing() != null) {

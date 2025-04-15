@@ -30,23 +30,38 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests all variations of the DISABLE PROGRAM command found in the link above.
  */
 public class TestCicsDisableProgram {
-  private static final String TEST_DISABLE_PROGRAM_ALL_VALID = "DISABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) EXITALL FORMATEDF PURGEABLE SHUTDOWN SPI STOP TASKSTART";
-  private static final String TEST_DISABLE_PROGRAM_VALID_ONE = "DISABLE SHUTDOWN PROGRAM({$varOne}) PURGEABLE EXITALL";
-  private static final String TEST_DISABLE_PROGRAM_VALID_TWO = "DISABLE ENTRYNAME({$varTwo}) PROGRAM({$varOne}) EXIT({$varTwo})";
-  private static final String TEST_DISABLE_PROGRAM_VALID_THREE = "DISABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) FORMATEDF PURGEABLE TASKSTART";
-  private static final String TEST_DISABLE_PROGRAM_VALID_FOUR = "DISABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) STOP SPI";
-  private static final String TEST_DISABLE_PROGRAM_VALID_FIVE = "DISABLE PROGRAM({$varOne}) TASKSTART SHUTDOWN";
-  private static final String TEST_DISABLE_PROGRAM_VALID_SIX = "DISABLE PROGRAM({$varOne}) EXITALL ";
+  private static final String TEST_DISABLE_PROGRAM_ALL_VALID =
+      "DISABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) EXITALL FORMATEDF PURGEABLE SHUTDOWN SPI"
+          + " STOP TASKSTART";
+  private static final String TEST_DISABLE_PROGRAM_VALID_ONE =
+      "DISABLE SHUTDOWN PROGRAM({$varOne}) PURGEABLE EXITALL";
+  private static final String TEST_DISABLE_PROGRAM_VALID_TWO =
+      "DISABLE ENTRYNAME({$varTwo}) PROGRAM({$varOne}) EXIT({$varTwo})";
+  private static final String TEST_DISABLE_PROGRAM_VALID_THREE =
+      "DISABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) FORMATEDF PURGEABLE TASKSTART";
+  private static final String TEST_DISABLE_PROGRAM_VALID_FOUR =
+      "DISABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) STOP SPI";
+  private static final String TEST_DISABLE_PROGRAM_VALID_FIVE =
+      "DISABLE PROGRAM({$varOne}) TASKSTART SHUTDOWN";
+  private static final String TEST_DISABLE_PROGRAM_VALID_SIX =
+      "DISABLE PROGRAM({$varOne}) EXITALL ";
 
-
-  private static final String TEST_DISABLE_MISSING_PROGRAM = "DISABLE {_ENTRYNAME({$varOne}) EXIT({$varTwo})|error1_}";
-  private static final String TEST_DISABLE_MISSING_EXIT = "DISABLE {_PROGRAM({$varOne}) ENTRYNAME({$varTwo})|error1_}";
-  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_ONE = "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) {EXITALL|error1}";
-  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_TWO = "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) {FORMATEDF|error1}";
-  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_THREE = "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {PURGEABLE|error1}";
-  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_FOUR = "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {SHUTDOWN|error1}";
-  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_FIVE = "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {SPI|error1}";
-  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_SIX = "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {TASKSTART|error1}";
+  private static final String TEST_DISABLE_MISSING_PROGRAM =
+      "DISABLE {_ENTRYNAME({$varOne}) EXIT({$varTwo})|error1_}";
+  private static final String TEST_DISABLE_MISSING_EXIT =
+      "DISABLE {_PROGRAM({$varOne}) ENTRYNAME({$varTwo})|error1_}";
+  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_ONE =
+      "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) {EXITALL|error1}";
+  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_TWO =
+      "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) {FORMATEDF|error1}";
+  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_THREE =
+      "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {PURGEABLE|error1}";
+  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_FOUR =
+      "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {SHUTDOWN|error1}";
+  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_FIVE =
+      "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {SPI|error1}";
+  private static final String TEST_DISABLE_PROGRAM_INVALID_EXIT_SIX =
+      "DISABLE PROGRAM({$varOne}) {EXIT|error1}({$varTwo}) ENTRYNAME({$varTwo}) {TASKSTART|error1}";
 
   @Test
   void testCicsDisableProgramAllValid() {
@@ -85,97 +100,114 @@ public class TestCicsDisableProgram {
 
   @Test
   void testCicsDisableMissingProgram() {
-    CICSTestUtils.errorTest(TEST_DISABLE_MISSING_PROGRAM,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_MISSING_PROGRAM,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Missing required option: PROGRAM",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Missing required option: PROGRAM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableMissingExit() {
-    CICSTestUtils.errorTest(TEST_DISABLE_MISSING_EXIT,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_MISSING_EXIT,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Must include one or more of the following: EXIT or EXITALL or FORMATEDF or PURGEABLE or SHUTDOWN or SPI or STOP or TASKSTART",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Must include one or more of the following: EXIT or EXITALL or FORMATEDF or"
+                    + " PURGEABLE or SHUTDOWN or SPI or STOP or TASKSTART",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableProgramInvalidExitOne() {
-    CICSTestUtils.errorTest(TEST_DISABLE_PROGRAM_INVALID_EXIT_ONE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_PROGRAM_INVALID_EXIT_ONE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: EXIT or EXITALL",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: EXIT or EXITALL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableProgramInvalidExitTwo() {
-    CICSTestUtils.errorTest(TEST_DISABLE_PROGRAM_INVALID_EXIT_TWO,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_PROGRAM_INVALID_EXIT_TWO,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: EXIT or FORMATEDF",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: EXIT or FORMATEDF",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableProgramInvalidExitThree() {
-    CICSTestUtils.errorTest(TEST_DISABLE_PROGRAM_INVALID_EXIT_THREE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_PROGRAM_INVALID_EXIT_THREE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: EXIT or PURGEABLE",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: EXIT or PURGEABLE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableProgramInvalidExitFour() {
-    CICSTestUtils.errorTest(TEST_DISABLE_PROGRAM_INVALID_EXIT_FOUR,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_PROGRAM_INVALID_EXIT_FOUR,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: EXIT or SHUTDOWN",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: EXIT or SHUTDOWN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableProgramInvalidExitFive() {
-    CICSTestUtils.errorTest(TEST_DISABLE_PROGRAM_INVALID_EXIT_FIVE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_PROGRAM_INVALID_EXIT_FIVE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: EXIT or SPI",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: EXIT or SPI",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testCicsDisableProgramInvalidExitSix() {
-    CICSTestUtils.errorTest(TEST_DISABLE_PROGRAM_INVALID_EXIT_SIX,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_DISABLE_PROGRAM_INVALID_EXIT_SIX,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: EXIT or TASKSTART",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: EXIT or TASKSTART",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 }

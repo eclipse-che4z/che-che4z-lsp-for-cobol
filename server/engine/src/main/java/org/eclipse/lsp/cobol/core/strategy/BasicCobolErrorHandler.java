@@ -31,138 +31,137 @@ import org.eclipse.lsp.cobol.core.CobolParser;
 @Slf4j
 // for test
 @NoArgsConstructor
-public class BasicCobolErrorHandler extends DefaultErrorStrategy implements MessageServiceProvider  {
-    private static final String REPORT_NO_VIABLE_ALTERNATIVE =
-            "ErrorStrategy.reportNoViableAlternative";
-    private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
+public class BasicCobolErrorHandler extends DefaultErrorStrategy implements MessageServiceProvider {
+  private static final String REPORT_NO_VIABLE_ALTERNATIVE =
+      "ErrorStrategy.reportNoViableAlternative";
+  private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
 
-    @Getter
-    @Setter
-    private MessageService messageService;
-    @Getter @Setter private ErrorMessageHelper errorMessageHelper;
+  @Getter @Setter private MessageService messageService;
+  @Getter @Setter private ErrorMessageHelper errorMessageHelper;
 
-    public BasicCobolErrorHandler(MessageService messageService) {
-        this.messageService = messageService;
-        this.errorMessageHelper = new ErrorMessageHelper(messageService);
+  public BasicCobolErrorHandler(MessageService messageService) {
+    this.messageService = messageService;
+    this.errorMessageHelper = new ErrorMessageHelper(messageService);
+  }
+
+  @Override
+  public void reportError(Parser recognizer, RecognitionException e) {
+    // if we've already reported an error and have not matched a token
+    // yet successfully, don't report any errors.
+    if (!inErrorRecoveryMode(recognizer)) {
+      beginErrorCondition(recognizer);
+      reportErrorByType(recognizer, e);
     }
+  }
 
-    @Override
-    public void reportError(Parser recognizer, RecognitionException e) {
-        // if we've already reported an error and have not matched a token
-        // yet successfully, don't report any errors.
-        if (!inErrorRecoveryMode(recognizer)) {
-            beginErrorCondition(recognizer);
-            reportErrorByType(recognizer, e);
-        }
+  private void reportErrorByType(Parser recognizer, RecognitionException e) {
+    if (e instanceof InputMismatchException) {
+      reportInputMismatch(recognizer, (InputMismatchException) e);
+      return;
     }
+    if (e instanceof NoViableAltException) {
+      reportNoViableAlternative(recognizer, (NoViableAltException) e);
+      return;
+    }
+    if (e instanceof FailedPredicateException) {
+      reportFailedPredicate(recognizer, (FailedPredicateException) e);
+      return;
+    }
+    reportUnrecognizedException(recognizer, e);
+  }
 
-    private void reportErrorByType(Parser recognizer, RecognitionException e) {
-        if (e instanceof InputMismatchException) {
-            reportInputMismatch(recognizer, (InputMismatchException) e);
-            return;
-        }
-        if (e instanceof NoViableAltException) {
-            reportNoViableAlternative(recognizer, (NoViableAltException) e);
-            return;
-        }
-        if (e instanceof FailedPredicateException) {
-            reportFailedPredicate(recognizer, (FailedPredicateException) e);
-            return;
-        }
-        reportUnrecognizedException(recognizer, e);
-    }
+  private void reportUnrecognizedException(Parser recognizer, RecognitionException e) {
+    LOG.error("unknown recognition error type: " + e.getClass().getName());
+    recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
+  }
 
-    private void reportUnrecognizedException(Parser recognizer, RecognitionException e) {
-        LOG.error("unknown recognition error type: " + e.getClass().getName());
-        recognizer.notifyErrorListeners(e.getOffendingToken(), e.getMessage(), e);
-    }
+  @Override
+  protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
+    Token token = e.getOffendingToken();
+    String msg =
+        errorMessageHelper.getInputMismatchMessage(recognizer, e, token, getOffendingToken(e));
+    recognizer.notifyErrorListeners(token, msg, e);
+  }
 
-    @Override
-    protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
-        Token token = e.getOffendingToken();
-        String msg =
-                errorMessageHelper.getInputMismatchMessage(recognizer, e, token, getOffendingToken(e));
-        recognizer.notifyErrorListeners(token, msg, e);
-    }
+  @Override
+  protected void reportNoViableAlternative(Parser recognizer, NoViableAltException e) {
+    String messageParams = errorMessageHelper.retrieveInputForNoViableException(recognizer, e);
+    String msg = messageService.getMessage(REPORT_NO_VIABLE_ALTERNATIVE, messageParams);
+    recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
+  }
 
-    @Override
-    protected void reportNoViableAlternative(Parser recognizer, NoViableAltException e) {
-        String messageParams = errorMessageHelper.retrieveInputForNoViableException(recognizer, e);
-        String msg = messageService.getMessage(REPORT_NO_VIABLE_ALTERNATIVE, messageParams);
-        recognizer.notifyErrorListeners(e.getOffendingToken(), msg, e);
+  @Override
+  protected void reportUnwantedToken(Parser recognizer) {
+    if (inErrorRecoveryMode(recognizer)) {
+      return;
     }
+    beginErrorCondition(recognizer);
+    Token currentToken = recognizer.getCurrentToken();
+    IntervalSet expectedTokens = recognizer.getExpectedTokens();
+    if (dotIsExpected(expectedTokens)
+        && !dotIsNext(recognizer.getInputStream())
+        && !errorCharIsNext(recognizer.getInputStream())) {
+      ((CobolParser) recognizer).notifyError("missing.period", currentToken.getText());
+    } else {
+      String msg =
+          errorMessageHelper.getUnwantedTokenMessage(
+              recognizer, currentToken, getTokenErrorDisplay(currentToken));
+      recognizer.notifyErrorListeners(currentToken, msg, null);
+    }
+  }
 
-    @Override
-    protected void reportUnwantedToken(Parser recognizer) {
-        if (inErrorRecoveryMode(recognizer)) {
-            return;
-        }
-        beginErrorCondition(recognizer);
-        Token currentToken = recognizer.getCurrentToken();
-        IntervalSet expectedTokens = recognizer.getExpectedTokens();
-        if (dotIsExpected(expectedTokens)
-                && !dotIsNext(recognizer.getInputStream())
-                && !errorCharIsNext(recognizer.getInputStream())) {
-            ((CobolParser) recognizer).notifyError("missing.period", currentToken.getText());
-        } else {
-            String msg =
-                    errorMessageHelper.getUnwantedTokenMessage(
-                            recognizer, currentToken, getTokenErrorDisplay(currentToken));
-            recognizer.notifyErrorListeners(currentToken, msg, null);
-        }
-    }
+  private static boolean dotIsExpected(IntervalSet expectedTokensForRule) {
+    return expectedTokensForRule.contains(CobolParser.DOT_FS)
+        || expectedTokensForRule.contains(CobolParser.DOT_FS2);
+  }
 
-    private static boolean dotIsExpected(IntervalSet expectedTokensForRule) {
-        return expectedTokensForRule.contains(CobolParser.DOT_FS)
-                || expectedTokensForRule.contains(CobolParser.DOT_FS2);
-    }
+  private static boolean dotIsNext(TokenStream inputStream) {
+    return isDot(inputStream.LA(1));
+  }
 
-    private static boolean dotIsNext(TokenStream inputStream) {
-        return isDot(inputStream.LA(1));
-    }
+  private boolean errorCharIsNext(TokenStream inputStream) {
+    return inputStream.LA(1) == CobolParser.ERRORCHAR;
+  }
 
-    private boolean errorCharIsNext(TokenStream inputStream) {
-        return inputStream.LA(1) == CobolParser.ERRORCHAR;
-    }
+  private static boolean isDot(int type) {
+    return type == CobolParser.DOT_FS || type == CobolParser.DOT_FS2;
+  }
 
-    private static boolean isDot(int type) {
-        return type == CobolParser.DOT_FS || type == CobolParser.DOT_FS2;
+  @Override
+  protected void reportMissingToken(Parser recognizer) {
+    if (inErrorRecoveryMode(recognizer)) {
+      return;
     }
+    if (dotIsExpected(recognizer.getExpectedTokens())) {
+      ((CobolParser) recognizer)
+          .notifyError("missing.period", recognizer.getCurrentToken().getText());
+      return;
+    }
+    beginErrorCondition(recognizer);
+    String msg =
+        messageService.getMessage(
+            REPORT_MISSING_TOKEN,
+            errorMessageHelper.getExpectedText(recognizer),
+            ErrorMessageHelper.getRule(recognizer));
+    recognizer.notifyErrorListeners(getPreviousToken(recognizer), msg, null);
+  }
 
-    @Override
-    protected void reportMissingToken(Parser recognizer) {
-        if (inErrorRecoveryMode(recognizer)) {
-            return;
-        }
-        if (dotIsExpected(recognizer.getExpectedTokens())) {
-            ((CobolParser) recognizer).notifyError("missing.period", recognizer.getCurrentToken().getText());
-            return;
-        }
-        beginErrorCondition(recognizer);
-        String msg =
-                messageService.getMessage(
-                        REPORT_MISSING_TOKEN,
-                        errorMessageHelper.getExpectedText(recognizer),
-                        ErrorMessageHelper.getRule(recognizer));
-        recognizer.notifyErrorListeners(getPreviousToken(recognizer), msg, null);
+  private Token getPreviousToken(Parser recognizer) {
+    if (recognizer.getCurrentToken().getText().trim().length() == 1) {
+      return recognizer.getCurrentToken();
     }
+    int index = recognizer.getCurrentToken().getTokenIndex();
+    while (index > 0) {
+      index--;
+      Token token = recognizer.getTokenStream().get(index);
+      if (!token.getText().trim().isEmpty()) {
+        return token;
+      }
+    }
+    return recognizer.getCurrentToken();
+  }
 
-    private Token getPreviousToken(Parser recognizer) {
-        if (recognizer.getCurrentToken().getText().trim().length() == 1) {
-            return recognizer.getCurrentToken();
-        }
-        int index = recognizer.getCurrentToken().getTokenIndex();
-        while (index > 0) {
-            index--;
-            Token token = recognizer.getTokenStream().get(index);
-            if (!token.getText().trim().isEmpty()) {
-                return token;
-            }
-        }
-        return recognizer.getCurrentToken();
-    }
-
-    private String getOffendingToken(InputMismatchException e) {
-        return getTokenErrorDisplay(e.getOffendingToken());
-    }
+  private String getOffendingToken(InputMismatchException e) {
+    return getTokenErrorDisplay(e.getOffendingToken());
+  }
 }

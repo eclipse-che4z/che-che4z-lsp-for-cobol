@@ -17,9 +17,7 @@ package org.eclipse.lsp.cobol.common.pipeline;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
-/**
- * Processing Pipeline Stage Result
- */
+/** Processing Pipeline Stage Result */
 @Value
 @AllArgsConstructor
 public class StageResult<T> {
@@ -30,8 +28,10 @@ public class StageResult<T> {
     this.data = data;
     stopProcessing = false;
   }
+
   /**
    * Creates an empty stage processing result
+   *
    * @return an empty stage processing result
    */
   public static StageResult<?> empty() {
@@ -40,6 +40,7 @@ public class StageResult<T> {
 
   /**
    * Indicates if pipeline needs to be stopped after current processing stage
+   *
    * @return true if processing needs to be stopped and false otherwise
    */
   public boolean stopProcessing() {

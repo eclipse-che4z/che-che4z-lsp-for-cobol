@@ -14,6 +14,13 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE;
+import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NAME;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,15 +36,6 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE;
-import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NAME;
 
 /** The abstract class for all variable definitions. */
 @ToString(callSuper = true)

@@ -18,9 +18,7 @@ import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
-/**
- * Provides replacement functionality
- */
+/** Provides replacement functionality */
 @Value
 public class ReplacementContext {
   Pair<String, String> replacement;

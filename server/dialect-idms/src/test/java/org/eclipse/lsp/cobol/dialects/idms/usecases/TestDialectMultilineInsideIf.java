@@ -40,7 +40,11 @@ class TestDialectMultilineInsideIf {
 
   @Test
   void test() {
-    UseCaseEngine.runTestForDiagnostics(TEXT, ImmutableList.of(Fixtures.subschemaCopy(""), Fixtures.mapsCopy("")), ImmutableMap.of(), ImmutableList.of(),
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT,
+        ImmutableList.of(Fixtures.subschemaCopy(""), Fixtures.mapsCopy("")),
+        ImmutableMap.of(),
+        ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }
 }

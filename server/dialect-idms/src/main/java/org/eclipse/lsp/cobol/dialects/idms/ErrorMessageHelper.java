@@ -15,19 +15,18 @@
 
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.antlr.v4.runtime.Recognizer.EOF;
+
 import com.google.common.collect.ImmutableSet;
+import java.util.*;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-
-import java.util.*;
-
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static org.antlr.v4.runtime.Recognizer.EOF;
 
 /** This is a utility class to fetch error messages encountered while parsing COBOL file. */
 class ErrorMessageHelper {
@@ -112,8 +111,7 @@ class ErrorMessageHelper {
 
   private String getExpectedText(Parser recognizer, IntervalSet interval) {
     final String newMessage =
-        buildErrorMessage(
-            removeIdentifierTokens(collectErrorTokens(recognizer, interval)));
+        buildErrorMessage(removeIdentifierTokens(collectErrorTokens(recognizer, interval)));
     return interval.size() > 1 ? String.format("{%s}", newMessage) : newMessage;
   }
 

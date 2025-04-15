@@ -15,7 +15,11 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.util.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -27,16 +31,12 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingSe
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
 /** This test checks the logic of {@link ReplacingServiceImpl} */
 class ReplacingServiceImplTest {
 
   private final MessageService messageService = mock(MessageService.class);
   private final Locality locality = Locality.builder().build();
+
   /**
    * Test the service applies replacing for the given text by provided patterns. The left value in
    * the pattern pair is a regex for replaceable, and the right one is a replacement text. Here:
@@ -48,14 +48,19 @@ class ReplacingServiceImplTest {
   void testApplyReplacing() {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     ExtendedDocument dm1 = new ExtendedDocument("   01\n.   .CHILD101\n.", "");
-    replacingService.applyReplacing(dm1, new ReplaceData(ImmutableList.of(
-            Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
-            Pair.of("CHILD1", "CHILD2")), "", new Range()));
+    replacingService.applyReplacing(
+        dm1,
+        new ReplaceData(
+            ImmutableList.of(
+                Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"), // .
+                Pair.of("CHILD1", "CHILD2")),
+            "",
+            new Range()));
     assertEquals("   05\n.   .CHILD201\n.", dm1.toString());
 
     ExtendedDocument dm2 = new ExtendedDocument("01 ABC.", "");
-    replacingService.applyReplacing(dm2,
-            new ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
+    replacingService.applyReplacing(
+        dm2, new ReplaceData(ImmutableList.of(Pair.of("", "")), "", new Range()));
     assertEquals("01 ABC.", dm2.toString());
   }
 

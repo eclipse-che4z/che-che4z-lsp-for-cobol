@@ -69,19 +69,26 @@ class WorkspaceServiceTest {
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
 
-    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        new DidChangeConfigurationHandler(
+            stateService,
             null,
             copybookNameService,
             null,
             null,
             null,
             messageService,
-            asyncAnalysisService, getMockLayoutStore(), copybookService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = mock(DidChangeWatchedFilesHandler.class);
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
+    ExecuteCommandHandler executeCommandHandler =
+        new ExecuteCommandHandler(stateService, asyncAnalysisService);
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler =
+        mock(DidChangeWatchedFilesHandler.class);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceService service = new CobolWorkspaceServiceImpl(
+    WorkspaceService service =
+        new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             executeCommandHandler,
             didChangeConfigurationHandler,
@@ -113,19 +120,26 @@ class WorkspaceServiceTest {
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     CopybookService copybookService = mock(CopybookService.class);
 
-    DidChangeConfigurationHandler didChangeConfigurationHandler = new DidChangeConfigurationHandler(stateService,
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        new DidChangeConfigurationHandler(
+            stateService,
             null,
             copybookNameService,
             null,
             null,
             null,
             null,
-            asyncAnalysisService, getMockLayoutStore(), copybookService);
-    ExecuteCommandHandler executeCommandHandler = new ExecuteCommandHandler(stateService, asyncAnalysisService);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = mock(DidChangeWatchedFilesHandler.class);
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
+    ExecuteCommandHandler executeCommandHandler =
+        new ExecuteCommandHandler(stateService, asyncAnalysisService);
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler =
+        mock(DidChangeWatchedFilesHandler.class);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
-    WorkspaceService service = new CobolWorkspaceServiceImpl(
+    WorkspaceService service =
+        new CobolWorkspaceServiceImpl(
             lspMessageBroker,
             executeCommandHandler,
             didChangeConfigurationHandler,
@@ -156,10 +170,14 @@ class WorkspaceServiceTest {
   /** Test configuration change method is delegated to the handler */
   @Test
   void testChangeConfigurationDelegatesRequestToHandler() throws InterruptedException {
-    DidChangeConfigurationHandler didChangeConfigurationHandler = mock(DidChangeConfigurationHandler.class);
+    DidChangeConfigurationHandler didChangeConfigurationHandler =
+        mock(DidChangeConfigurationHandler.class);
     ExecuteCommandHandler executeCommandHandler = mock(ExecuteCommandHandler.class);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = mock(DidChangeWatchedFilesHandler.class);
-    doNothing().when(didChangeConfigurationHandler).didChangeConfiguration(any(DidChangeConfigurationParams.class));
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler =
+        mock(DidChangeWatchedFilesHandler.class);
+    doNothing()
+        .when(didChangeConfigurationHandler)
+        .didChangeConfiguration(any(DidChangeConfigurationParams.class));
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
     WorkspaceService workspaceService =
@@ -169,8 +187,11 @@ class WorkspaceServiceTest {
             didChangeConfigurationHandler,
             didChangeWatchedFilesHandler);
     ((LspEventConsumer) workspaceService).startConsumer();
-    doNothing().when(didChangeConfigurationHandler).didChangeConfiguration(any(DidChangeConfigurationParams.class));
-    DidChangeConfigurationParams didChangeConfigurationParams = new DidChangeConfigurationParams(new Object());
+    doNothing()
+        .when(didChangeConfigurationHandler)
+        .didChangeConfiguration(any(DidChangeConfigurationParams.class));
+    DidChangeConfigurationParams didChangeConfigurationParams =
+        new DidChangeConfigurationParams(new Object());
     workspaceService.didChangeConfiguration(didChangeConfigurationParams);
     waitingQuery(lspMessageBroker).join();
     lspMessageBroker.stop();
@@ -219,11 +240,21 @@ class WorkspaceServiceTest {
 
     DidChangeConfigurationHandler didChangeConfigurationHandler =
         new DidChangeConfigurationHandler(
-            stateService, null, copybookNameService, null, null, null, null, asyncAnalysisService, getMockLayoutStore(), copybookService);
+            stateService,
+            null,
+            copybookNameService,
+            null,
+            null,
+            null,
+            null,
+            asyncAnalysisService,
+            getMockLayoutStore(),
+            copybookService);
 
     ExecuteCommandHandler executeCommandHandler =
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
-    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler = mock(DidChangeWatchedFilesHandler.class);
+    DidChangeWatchedFilesHandler didChangeWatchedFilesHandler =
+        mock(DidChangeWatchedFilesHandler.class);
 
     LspMessageBroker lspMessageBroker = new LspMessageBroker();
     WorkspaceService service =

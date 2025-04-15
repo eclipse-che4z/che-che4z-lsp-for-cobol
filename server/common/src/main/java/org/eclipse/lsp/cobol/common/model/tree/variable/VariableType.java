@@ -18,9 +18,8 @@ import lombok.Getter;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 
 /**
- * Enumeration of variable node types. It describes only types that are related to the
- * level number or special definition clauses. They also contain a message template for
- * localization.
+ * Enumeration of variable node types. It describes only types that are related to the level number
+ * or special definition clauses. They also contain a message template for localization.
  */
 public enum VariableType {
   CONDITION_DATA_NAME("variables.conditionName"),

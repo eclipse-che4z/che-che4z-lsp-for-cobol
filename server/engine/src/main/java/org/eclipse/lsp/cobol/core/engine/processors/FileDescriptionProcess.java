@@ -14,16 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import static org.eclipse.lsp.cobol.common.VariableConstants.FD_WITHOUT_FILE_CONTROL;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
-
-import static org.eclipse.lsp.cobol.common.VariableConstants.FD_WITHOUT_FILE_CONTROL;
 
 /** FileDescriptionNode processor */
 public class FileDescriptionProcess implements Processor<FileDescriptionNode> {

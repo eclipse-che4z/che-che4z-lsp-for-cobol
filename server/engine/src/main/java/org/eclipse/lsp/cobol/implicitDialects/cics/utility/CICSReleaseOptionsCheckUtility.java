@@ -14,6 +14,11 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_release;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -21,24 +26,19 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_release;
-
 /** Checks CICS RELEASE rules for required and invalid options */
 public class CICSReleaseOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_release;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.PROGRAM, ErrorSeverity.ERROR);
+        }
+      };
 
-  public CICSReleaseOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSReleaseOptionsCheckUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 

@@ -18,12 +18,11 @@ package org.eclipse.lsp.cobol.core.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
@@ -32,32 +31,48 @@ import org.junit.jupiter.api.Test;
 
 /** Check if the variable used is part of the defined variables */
 public class VariableUsageUtilsTest {
-    List<VariableNode> datacomNodes = Db2ImplicitVariablesGenerator.generateDatacomNodes();
-    Locality locality = Locality.builder()
-            .uri(ImplicitCodeUtils.createFullUrl("implicit-code-SQLCA_DB2"))
-            .build();
-    @Test
-    void testFindVariablesForUsage() {
-        VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-ERR-MSG", locality);
-        List<VariableUsageNode> usageNodes = Collections.singletonList(usageNode1);
-        VariableNode variableNode1 = new ElementaryItemNode(locality, 10, "SQLCA-ERR-MSG", false, "X(80)",
-                null, UsageFormat.UNDEFINED, false, false, false);
-        Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
-        datacomNodes.forEach(n -> n.getDepthFirstStream().forEach(v -> definedVariables.put(((VariableNode) v).getName(), (VariableNode) v)));
-        List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(definedVariables, usageNodes);
+  List<VariableNode> datacomNodes = Db2ImplicitVariablesGenerator.generateDatacomNodes();
+  Locality locality =
+      Locality.builder().uri(ImplicitCodeUtils.createFullUrl("implicit-code-SQLCA_DB2")).build();
 
-        assertEquals(1, result.size());
-        assertTrue(result.contains(variableNode1));
-    }
+  @Test
+  void testFindVariablesForUsage() {
+    VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-ERR-MSG", locality);
+    List<VariableUsageNode> usageNodes = Collections.singletonList(usageNode1);
+    VariableNode variableNode1 =
+        new ElementaryItemNode(
+            locality,
+            10,
+            "SQLCA-ERR-MSG",
+            false,
+            "X(80)",
+            null,
+            UsageFormat.UNDEFINED,
+            false,
+            false,
+            false);
+    Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
+    datacomNodes.forEach(
+        n ->
+            n.getDepthFirstStream()
+                .forEach(
+                    v -> definedVariables.put(((VariableNode) v).getName(), (VariableNode) v)));
+    List<VariableNode> result =
+        VariableUsageUtils.findVariablesForUsage(definedVariables, usageNodes);
 
-    @Test
-    void testFindVariablesForUsageNoMatch() {
-        VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-NO-MATCH", locality);
-        List<VariableUsageNode> usageNodes = Arrays.asList(usageNode1);
-        Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
-        definedVariables.put("SQLCA", datacomNodes.get(0));
-        List<VariableNode> result = VariableUsageUtils.findVariablesForUsage(definedVariables, usageNodes);
+    assertEquals(1, result.size());
+    assertTrue(result.contains(variableNode1));
+  }
 
-        assertTrue(result.isEmpty());
-    }
+  @Test
+  void testFindVariablesForUsageNoMatch() {
+    VariableUsageNode usageNode1 = new VariableUsageNode("SQLCA-NO-MATCH", locality);
+    List<VariableUsageNode> usageNodes = Arrays.asList(usageNode1);
+    Multimap<String, VariableNode> definedVariables = ArrayListMultimap.create();
+    definedVariables.put("SQLCA", datacomNodes.get(0));
+    List<VariableNode> result =
+        VariableUsageUtils.findVariablesForUsage(definedVariables, usageNodes);
+
+    assertTrue(result.isEmpty());
+  }
 }

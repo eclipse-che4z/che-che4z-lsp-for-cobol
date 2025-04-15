@@ -48,16 +48,18 @@ class FileSystemUtilsTest {
     try (MockedStatic<URLDecoder> urlDecoderMock = mockStatic(URLDecoder.class)) {
       FileSystemService fileSystemService = new WorkspaceFileService();
 
-      urlDecoderMock.when(() -> URLDecoder.decode(eq(decodedURI), anyString()))
+      urlDecoderMock
+          .when(() -> URLDecoder.decode(eq(decodedURI), anyString()))
           .thenThrow(UnsupportedEncodingException.class);
 
-      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-        fileSystemService.decodeURI(decodedURI);
-      });
+      IllegalArgumentException exception =
+          assertThrows(
+              IllegalArgumentException.class,
+              () -> {
+                fileSystemService.decodeURI(decodedURI);
+              });
 
       assertEquals("UTF-8 charset is unsupported", exception.getMessage());
-
     }
-
   }
 }

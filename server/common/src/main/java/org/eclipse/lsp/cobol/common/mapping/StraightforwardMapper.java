@@ -18,9 +18,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Straightforward mapper
- */
+/** Straightforward mapper */
 class StraightforwardMapper implements Mapper {
 
   @Override
@@ -30,8 +28,14 @@ class StraightforwardMapper implements Mapper {
 
   @Override
   public Location apply(MappedCharacter startCharacter, MappedCharacter endCharacter) {
-    Position startPosition = new Position(startCharacter.getOriginalPosition().getLine(), startCharacter.getOriginalPosition().getCharacter());
-    Position endPosition = new Position(endCharacter.getOriginalPosition().getLine(), endCharacter.getOriginalPosition().getCharacter());
+    Position startPosition =
+        new Position(
+            startCharacter.getOriginalPosition().getLine(),
+            startCharacter.getOriginalPosition().getCharacter());
+    Position endPosition =
+        new Position(
+            endCharacter.getOriginalPosition().getLine(),
+            endCharacter.getOriginalPosition().getCharacter());
 
     Range originalRange = new Range(startPosition, endPosition);
     return new Location(startCharacter.getUri(), originalRange);

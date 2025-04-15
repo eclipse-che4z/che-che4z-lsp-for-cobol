@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.lsp4j.Range;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Objects representing a cross-reference in a SYSPRINT file.
@@ -62,7 +62,9 @@ public class SysprintSnap {
     sb.append("\t");
     if (referencesLocation != null) {
       sb.append(
-          referencesLocation.stream().map(this::getFormattedRange).collect(Collectors.joining(",")));
+          referencesLocation.stream()
+              .map(this::getFormattedRange)
+              .collect(Collectors.joining(",")));
     } else {
       sb.append(references.stream().map(Object::toString).collect(Collectors.joining(",")));
     }
@@ -72,6 +74,9 @@ public class SysprintSnap {
   private String getFormattedRange(Range range) {
     return String.format(
         "%d:%d-%d:%d",
-        range.getStart().getLine(), range.getStart().getCharacter(), range.getEnd().getLine(), range.getEnd().getCharacter());
+        range.getStart().getLine(),
+        range.getStart().getCharacter(),
+        range.getEnd().getLine(),
+        range.getEnd().getCharacter());
   }
 }

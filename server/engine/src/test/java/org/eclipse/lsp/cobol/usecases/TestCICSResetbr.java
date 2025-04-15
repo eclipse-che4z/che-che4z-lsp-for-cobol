@@ -29,29 +29,30 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the RESETBR command.
  */
 public class TestCICSResetbr {
-  private static final String RESETBR_VALID_MINIMAL =
-          "RESETBR FILE({$varOne}) RIDFLD({$varTwo})";
+  private static final String RESETBR_VALID_MINIMAL = "RESETBR FILE({$varOne}) RIDFLD({$varTwo})";
 
   private static final String RESETBR_VALID_FULL =
-          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) GTEQ";
+      "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour})"
+          + " SYSID({$varFive}) GTEQ";
 
   private static final String RESETBR_INVALID_FULL =
-          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {KEYLENGTH|errorOne}({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) GTEQ {RBA|errorTwo}";
+      "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {KEYLENGTH|errorOne}({$varThree}) GENERIC"
+          + " REQID({$varFour}) SYSID({$varFive}) GTEQ {RBA|errorTwo}";
 
   private static final String RESETBR_INVALID_NO_FILE =
-          "RESETBR {_RIDFLD({$varOne}) REQID({$varTwo}) EQUAL|errorOne_}";
+      "RESETBR {_RIDFLD({$varOne}) REQID({$varTwo}) EQUAL|errorOne_}";
 
   private static final String RESETBR_INVALID_NO_RIDFLD =
-          "RESETBR {_FILE({$varOne}) KEYLENGTH({$varTwo}) GTEQ|errorOne_}";
+      "RESETBR {_FILE({$varOne}) KEYLENGTH({$varTwo}) GTEQ|errorOne_}";
 
   private static final String RESETBR_INVALID_NO_KEYLENGTH =
-          "RESETBR {_FILE({$varOne}) RIDFLD({$varTwo}) GENERIC GTEQ|errorOne_}";
+      "RESETBR {_FILE({$varOne}) RIDFLD({$varTwo}) GENERIC GTEQ|errorOne_}";
 
   private static final String RESETBR_INVALID_MULTIPLE_RBA_RRN =
-          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {RBA|errorOne} {RRN|errorTwo}";
+      "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {RBA|errorOne} {RRN|errorTwo}";
 
   private static final String RESETBR_INVALID_MULTIPLE_COMPARISON_OPTIONS =
-          "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {EQUAL|errorTwo}";
+      "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {EQUAL|errorTwo}";
 
   @Test
   void testResetbrValidMinimal() {
@@ -66,96 +67,100 @@ public class TestCICSResetbr {
   @Test
   void testResetbrInvalidFull() {
     CICSTestUtils.errorTest(
-            RESETBR_INVALID_FULL,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESETBR_INVALID_FULL,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or"
+                    + " KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or"
+                    + " KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testResetbrInvalidNoFile() {
     CICSTestUtils.errorTest(
-            RESETBR_INVALID_NO_FILE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, none provided: FILE or DATASET",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESETBR_INVALID_NO_FILE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: FILE or DATASET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testResetbrInvalidNoRidfld() {
     CICSTestUtils.errorTest(
-            RESETBR_INVALID_NO_RIDFLD,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: RIDFLD",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESETBR_INVALID_NO_RIDFLD,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: RIDFLD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testResetbrInvalidNoKeyLength() {
     CICSTestUtils.errorTest(
-            RESETBR_INVALID_NO_KEYLENGTH,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option for: GENERIC",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESETBR_INVALID_NO_KEYLENGTH,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option for: GENERIC",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testResetbrInvalidMultipleRbaRrn() {
     CICSTestUtils.errorTest(
-            RESETBR_INVALID_MULTIPLE_RBA_RRN,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or KEYLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESETBR_INVALID_MULTIPLE_RBA_RRN,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or"
+                    + " KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: RBA, RRN, XRBA or"
+                    + " KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testResetbrInvalidMultipleComparisonOptions() {
     CICSTestUtils.errorTest(
-            RESETBR_INVALID_MULTIPLE_COMPARISON_OPTIONS,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RESETBR_INVALID_MULTIPLE_COMPARISON_OPTIONS,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

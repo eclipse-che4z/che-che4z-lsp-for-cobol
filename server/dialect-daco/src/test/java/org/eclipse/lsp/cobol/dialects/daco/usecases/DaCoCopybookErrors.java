@@ -26,27 +26,27 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Check for the error on the copybook statement if copybook contains errors
- */
+/** Check for the error on the copybook statement if copybook contains errors */
 class DaCoCopybookErrors {
-  private static final String TEXT = "000020 IDENTIFICATION DIVISION.\n"
-      + "000030 PROGRAM-ID.    BSPMOE1M.                                           D-----\n"
-      + "000110 ENVIRONMENT  DIVISION.\n"
-      + "000120 IDMS-CONTROL SECTION.\n"
-      + "000130 PROTOCOL. MODE BATCH DEBUG\n"
-      + "000140              IDMS-RECORDS MANUAL.\n"
-      + "000170 DATA   DIVISION.\n"
-      + "000180*----------------------------------------------------------------*\n"
-      + "000190 WORKING-STORAGE SECTION.\n"
-      + "011480 LINKAGE SECTION.                                                   D00050\n"
-      + "011550 {_01  COPY MAID {~LDQLAB1M!DaCo}|1_}.\n"
-      + "011590 PROCEDURE DIVISION. \n"
-      + "       {#*PARA1}.";
+  private static final String TEXT =
+      "000020 IDENTIFICATION DIVISION.\n"
+          + "000030 PROGRAM-ID.    BSPMOE1M.                                           D-----\n"
+          + "000110 ENVIRONMENT  DIVISION.\n"
+          + "000120 IDMS-CONTROL SECTION.\n"
+          + "000130 PROTOCOL. MODE BATCH DEBUG\n"
+          + "000140              IDMS-RECORDS MANUAL.\n"
+          + "000170 DATA   DIVISION.\n"
+          + "000180*----------------------------------------------------------------*\n"
+          + "000190 WORKING-STORAGE SECTION.\n"
+          + "011480 LINKAGE SECTION.                                                   D00050\n"
+          + "011550 {_01  COPY MAID {~LDQLAB1M!DaCo}|1_}.\n"
+          + "011590 PROCEDURE DIVISION. \n"
+          + "       {#*PARA1}.";
 
-  private static final String COPYBOOK = "     1 01  {$*LDQLAB1M-XQL|2}.  ERROR.\n"
-      + "     2     03 OPD-XQL                  PIC X(3)    VALUE SPACE.\n"
-      + "     3     03 RTT-XQL                  PIC X(4)    VALUE ZERO.\n";
+  private static final String COPYBOOK =
+      "     1 01  {$*LDQLAB1M-XQL|2}.  ERROR.\n"
+          + "     2     03 OPD-XQL                  PIC X(3)    VALUE SPACE.\n"
+          + "     3     03 RTT-XQL                  PIC X(4)    VALUE ZERO.\n";
 
   @Test
   void test() {
@@ -63,11 +63,11 @@ class DaCoCopybookErrors {
             "2",
             new Diagnostic(
                 new Range(),
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item LDQLAB1M-XQL",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item"
+                    + " LDQLAB1M-XQL",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }
-
 }

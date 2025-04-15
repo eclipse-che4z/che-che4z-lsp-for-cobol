@@ -16,6 +16,9 @@ package org.eclipse.lsp.cobol.dialects.daco;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -39,10 +42,6 @@ import org.eclipse.lsp.cobol.dialects.daco.processors.implicit.DaCoImplicitCodeP
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /** Process the text according to the DaCo rules */
 public final class DaCoDialect implements CobolDialect {
   public static final String NAME = "DaCo";
@@ -57,8 +56,8 @@ public final class DaCoDialect implements CobolDialect {
 
   public DaCoDialect(CopybookService copybookService, MessageService messageService) {
     this.messageService = messageService;
-    this.maidProcessor = new DaCoMaidProcessor(copybookService,
-        new InterruptingTreeListener(), messageService);
+    this.maidProcessor =
+        new DaCoMaidProcessor(copybookService, new InterruptingTreeListener(), messageService);
   }
 
   /**
@@ -83,7 +82,8 @@ public final class DaCoDialect implements CobolDialect {
     removeDcDb(context.getExtendedDocument());
     DialectOutcome maidOutcome = maidProcessor.process(context, errors);
     context.getExtendedDocument().commitTransformations();
-    DaCoLexer lexer = new DaCoLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
+    DaCoLexer lexer =
+        new DaCoLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DaCoParser parser = new DaCoParser(tokens);
     DialectParserListener listener =
@@ -101,8 +101,16 @@ public final class DaCoDialect implements CobolDialect {
     parserErrors.addAll(listener.getErrors());
     parserErrors.addAll(visitor.getErrors());
 
-    parserErrors.forEach(error -> error.getLocation().getLocation().setRange(
-            context.getExtendedDocument().mapLocation(error.getLocation().getLocation().getRange()).getRange()));
+    parserErrors.forEach(
+        error ->
+            error
+                .getLocation()
+                .getLocation()
+                .setRange(
+                    context
+                        .getExtendedDocument()
+                        .mapLocation(error.getLocation().getLocation().getRange())
+                        .getRange()));
 
     errors.addAll(parserErrors);
 
@@ -139,10 +147,12 @@ public final class DaCoDialect implements CobolDialect {
   @Override
   public List<ProcessorDescription> getProcessors() {
     return ImmutableList.of(
-        new ProcessorDescription(DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION, new DaCoCopyFromProcessor()),
-        new ProcessorDescription(ProgramNode.class, ProcessingPhase.POST_DEFINITION, new DaCoImplicitCodeProcessor()),
-        new ProcessorDescription(SortTableNode.class, ProcessingPhase.VALIDATION, new DaCoObsoleteNodeCheck())
-    );
+        new ProcessorDescription(
+            DaCoCopyFromNode.class, ProcessingPhase.POST_DEFINITION, new DaCoCopyFromProcessor()),
+        new ProcessorDescription(
+            ProgramNode.class, ProcessingPhase.POST_DEFINITION, new DaCoImplicitCodeProcessor()),
+        new ProcessorDescription(
+            SortTableNode.class, ProcessingPhase.VALIDATION, new DaCoObsoleteNodeCheck()));
   }
 
   @Override

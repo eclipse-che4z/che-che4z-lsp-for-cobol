@@ -32,9 +32,7 @@ import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
 import org.eclipse.lsp4j.FoldingRange;
 import org.eclipse.lsp4j.FoldingRangeRequestParams;
 
-/**
- * LSP FoldingRange Handler
- */
+/** LSP FoldingRange Handler */
 @Slf4j
 public class FoldingRangeHandler {
 
@@ -43,7 +41,10 @@ public class FoldingRangeHandler {
   private final AnalysisService analysisService;
 
   @Inject
-  public FoldingRangeHandler(DocumentModelService documentService, AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService) {
+  public FoldingRangeHandler(
+      DocumentModelService documentService,
+      AsyncAnalysisService asyncAnalysisService,
+      AnalysisService analysisService) {
     this.documentService = documentService;
     this.asyncAnalysisService = asyncAnalysisService;
     this.analysisService = analysisService;
@@ -58,11 +59,12 @@ public class FoldingRangeHandler {
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
     String uri = params.getTextDocument().getUri();
     Node rootNode =
-            documentService.isDocumentSynced(uri)
-                    ? documentService.get(uri).getAnalysisResult().getRootNode()
-                    : null;
-    return rootNode == null ? Collections.emptyList()
-            : new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
+        documentService.isDocumentSynced(uri)
+            ? documentService.get(uri).getAnalysisResult().getRootNode()
+            : null;
+    return rootNode == null
+        ? Collections.emptyList()
+        : new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
   }
 
   /**
@@ -82,18 +84,18 @@ public class FoldingRangeHandler {
    */
   public List<LspEventDependency> getDependencies(String uri) {
     return ImmutableList.of(
-        asyncAnalysisService.createDependencyOn(uri),
-        () -> documentService.isDocumentSynced(uri));
+        asyncAnalysisService.createDependencyOn(uri), () -> documentService.isDocumentSynced(uri));
   }
 
   /**
    * Gives cancel condition
+   *
    * @param uri
    * @return list of {@link LspEventCancelCondition}
    */
   public List<LspEventCancelCondition> getCancelConditions(String uri) {
-   return ImmutableList.of(
-            asyncAnalysisService.createCancelConditionOnClose(uri),
-           () -> analysisService.isCopybook(uri, documentService.get(uri).getText()));
+    return ImmutableList.of(
+        asyncAnalysisService.createCancelConditionOnClose(uri),
+        () -> analysisService.isCopybook(uri, documentService.get(uri).getText()));
   }
 }

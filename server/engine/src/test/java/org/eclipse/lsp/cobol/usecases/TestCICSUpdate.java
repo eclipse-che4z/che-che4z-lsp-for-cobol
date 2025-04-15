@@ -24,22 +24,26 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS UPDATE COUNTER and UPDATE DCOUNTER commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-update-counter-update-dcounter">UPDATE COUNTER DCOUNTER Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-update-counter-update-dcounter">UPDATE
+ * COUNTER DCOUNTER Command</a>
  *
  * <p>This class tests all variations of the UPDATE command: COUNTER and DCOUNTER.
  */
 public class TestCICSUpdate {
   private static final String UPDATE_COUNTER_VALID =
-          "UPDATE COUNTER({$varOne}) POOL({$varTwo}) VALUE({$varThree}) COMPAREMIN({$varFour}) COMPAREMAX({$varFive})";
+      "UPDATE COUNTER({$varOne}) POOL({$varTwo}) VALUE({$varThree}) COMPAREMIN({$varFour})"
+          + " COMPAREMAX({$varFive})";
 
   private static final String UPDATE_COUNTER_INVALID =
-          "UPDATE {_POOL({$varTwo})|errorOne|errorTwo_}";
+      "UPDATE {_POOL({$varTwo})|errorOne|errorTwo_}";
 
   private static final String UPDATE_DCOUNTER_VALID =
-          "UPDATE DCOUNTER({$varOne}) POOL({$varTwo}) VALUE({$varThree}) COMPAREMIN({$varFour}) COMPAREMAX({$varFive})";
+      "UPDATE DCOUNTER({$varOne}) POOL({$varTwo}) VALUE({$varThree}) COMPAREMIN({$varFour})"
+          + " COMPAREMAX({$varFive})";
 
   private static final String UPDATE_DCOUNTER_INVALID =
-          "UPDATE DCOUNTER({$varOne}) {DCOUNTER|errorOne}({$varOne}) POOL({$varTwo}) VALUE({$varThree})";
+      "UPDATE DCOUNTER({$varOne}) {DCOUNTER|errorOne}({$varOne}) POOL({$varTwo})"
+          + " VALUE({$varThree})";
 
   @Test
   void testUpdateCounterValid() {
@@ -49,20 +53,20 @@ public class TestCICSUpdate {
   @Test
   void testUpdateCounterInvalid() {
     CICSTestUtils.errorTest(
-            UPDATE_COUNTER_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, none provided: COUNTER or DCOUNTER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: VALUE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        UPDATE_COUNTER_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: COUNTER or DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: VALUE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -73,13 +77,13 @@ public class TestCICSUpdate {
   @Test
   void testUpdateDcounterInvalid() {
     CICSTestUtils.errorTest(
-            UPDATE_DCOUNTER_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: DCOUNTER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        UPDATE_DCOUNTER_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: DCOUNTER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

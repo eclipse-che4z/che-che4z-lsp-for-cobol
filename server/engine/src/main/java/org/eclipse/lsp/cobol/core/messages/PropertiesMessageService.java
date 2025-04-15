@@ -14,10 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECT_REGISTRY;
+
 import com.google.gson.JsonArray;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
@@ -27,23 +40,9 @@ import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.eclipse.lsp.cobol.service.settings.ConfigHelper;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.stream.Stream;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECT_REGISTRY;
-
 /**
- * This class is a properties file implementation of {@link MessageService} . It loads messages
- * from a properties file into memory to be used latter on for logging or messaging.
+ * This class is a properties file implementation of {@link MessageService} . It loads messages from
+ * a properties file into memory to be used latter on for logging or messaging.
  */
 @Singleton
 @Slf4j
@@ -124,15 +123,15 @@ public class PropertiesMessageService implements MessageService {
                         }));
   }
 
-  private void handleRegisteredDialects(List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
+  private void handleRegisteredDialects(
+      List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
     dialectRegistryItems.stream()
-        .filter(
-            registeredDialects ->
-                dialects.contains(registeredDialects.getName()))
+        .filter(registeredDialects -> dialects.contains(registeredDialects.getName()))
         .forEach(this::updateResourceBundle);
   }
 
-  private void handleImplicitDialects(List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
+  private void handleImplicitDialects(
+      List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
     if (dialectRegistryItems.isEmpty()) {
       dialects.forEach(this::updateResourceBundle);
     }

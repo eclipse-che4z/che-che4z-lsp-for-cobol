@@ -32,9 +32,7 @@ import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test if we can actually stop the consumer.
- */
+/** Test if we can actually stop the consumer. */
 class ConsumerLoopStopTest {
   @Test
   void testStop() throws InterruptedException, ExecutionException {
@@ -50,7 +48,8 @@ class ConsumerLoopStopTest {
     }
   }
 
-  private static CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery(LspMessageBroker lspMessageBroker) {
+  private static CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery(
+      LspMessageBroker lspMessageBroker) {
     CodeActionParams params = mock(CodeActionParams.class);
     CodeActionHandler codeActionHandler = mock(CodeActionHandler.class);
     when(codeActionHandler.codeAction(params)).thenReturn(emptyList());

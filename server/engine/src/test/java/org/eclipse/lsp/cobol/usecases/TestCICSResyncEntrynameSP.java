@@ -14,44 +14,45 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-        import com.google.common.collect.ImmutableMap;
-        import org.eclipse.lsp.cobol.common.error.ErrorSource;
-        import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
-        import org.eclipse.lsp4j.Diagnostic;
-        import org.eclipse.lsp4j.DiagnosticSeverity;
-        import org.eclipse.lsp4j.Range;
-        import org.junit.jupiter.api.Test;
-
-        import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS RESYNC ENTRYNAME command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=commands-resync-entryname">RESYNC ENTRYNAME SP Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=commands-resync-entryname">RESYNC ENTRYNAME
+ * SP Command</a>
  *
  * <p>This class tests all variations of the RESYNC ENTRYNAME command found in the link above.
  */
 public class TestCICSResyncEntrynameSP {
-    private static final String RESYNC_VALID =
-            "RESYNC ENTRYNAME({$varFour}) QUALIFIER({$varFour}) IDLIST({$varFour}) PARTIAL IDLISTLENGTH({$varFour})";
+  private static final String RESYNC_VALID =
+      "RESYNC ENTRYNAME({$varFour}) QUALIFIER({$varFour}) IDLIST({$varFour}) PARTIAL"
+          + " IDLISTLENGTH({$varFour})";
 
-    private static final String RESYNC_INVALID =
-            "RESYNC {_ENTRYNAME({$varFour}) QUALIFIER({$varFour}) IDLISTLENGTH({$varFour})|error_}";
+  private static final String RESYNC_INVALID =
+      "RESYNC {_ENTRYNAME({$varFour}) QUALIFIER({$varFour}) IDLISTLENGTH({$varFour})|error_}";
 
-    @Test
-    void testResyncValid() {
-        CICSTestUtils.noErrorTest(RESYNC_VALID, "SP");
-    }
+  @Test
+  void testResyncValid() {
+    CICSTestUtils.noErrorTest(RESYNC_VALID, "SP");
+  }
 
-    @Test
-    void testResyncInvalidAbcode() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "error",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option for: IDLISTLENGTH without IDLIST",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(RESYNC_INVALID, expectedDiagnostic, "SP");
-    }
+  @Test
+  void testResyncInvalidAbcode() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option for: IDLISTLENGTH without IDLIST",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RESYNC_INVALID, expectedDiagnostic, "SP");
+  }
 }

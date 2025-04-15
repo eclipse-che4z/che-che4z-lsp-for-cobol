@@ -14,8 +14,11 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -23,10 +26,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** These test for variations other idms SECTION definitions */
 class TestIdmsSections {

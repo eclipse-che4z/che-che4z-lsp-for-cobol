@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * Data transport object of CF AST. CFASTNode is root of CF ASF node hierarchy. It contains list of

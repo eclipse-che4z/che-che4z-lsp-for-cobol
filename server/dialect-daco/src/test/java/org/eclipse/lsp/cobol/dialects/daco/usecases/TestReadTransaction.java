@@ -32,6 +32,11 @@ class TestReadTransaction {
 
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

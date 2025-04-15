@@ -19,9 +19,7 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 
-/**
- * Mock Text Processor class
- */
+/** Mock Text Processor class */
 public class MockTextPreprocessor implements CleanerPreprocessor {
   @Override
   public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {

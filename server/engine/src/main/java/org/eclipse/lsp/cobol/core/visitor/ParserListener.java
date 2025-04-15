@@ -29,8 +29,8 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -53,9 +53,10 @@ public class ParserListener extends BaseErrorListener {
       String msg,
       RecognitionException e) {
 
-    Range range = new Range(
-        new Position(line - 1, charPositionInLine), new Position(line - 1,
-        charPositionInLine + getOffendingSymbolSize(offendingSymbol)));
+    Range range =
+        new Range(
+            new Position(line - 1, charPositionInLine),
+            new Position(line - 1, charPositionInLine + getOffendingSymbolSize(offendingSymbol)));
 
     if ("token recognition error at: '\\n'".equals(msg)) {
       return;
@@ -70,7 +71,8 @@ public class ParserListener extends BaseErrorListener {
                     .uri(location.getUri())
                     .range(location.getRange())
                     .copybookId(copybooksRepository.getCopybookIdByUri(location.getUri()))
-                    .build().toOriginalLocation())
+                    .build()
+                    .toOriginalLocation())
             .suggestion(msg)
             .severity(getErrorSeverity(e))
             .build();

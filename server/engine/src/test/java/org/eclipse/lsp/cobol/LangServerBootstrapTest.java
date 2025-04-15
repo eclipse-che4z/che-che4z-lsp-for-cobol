@@ -15,19 +15,19 @@
 
 package org.eclipse.lsp.cobol;
 
+import static com.google.inject.Key.get;
+import static com.google.inject.name.Names.named;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.inject.Injector;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.lsp.CobolLanguageServer;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageServer;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static com.google.inject.Key.get;
-import static com.google.inject.name.Names.named;
-import static org.junit.jupiter.api.Assertions.*;
 
 /** This test check the logic of the application bootstrap */
 class LangServerBootstrapTest {

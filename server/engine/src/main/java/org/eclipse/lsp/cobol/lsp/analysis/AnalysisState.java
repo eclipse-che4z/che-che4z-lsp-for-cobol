@@ -14,9 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.analysis;
 
-/**
- * Represent different stages of a document being analysed
- */
+/** Represent different stages of a document being analysed */
 public enum AnalysisState {
-    SCHEDULED, STARTED, SKIPPED, ANALYSING, COMPLETED, EXCEPTIONALLY_FINISHED;
+  SCHEDULED,
+  STARTED,
+  SKIPPED,
+  ANALYSING,
+  COMPLETED,
+  EXCEPTIONALLY_FINISHED;
 }

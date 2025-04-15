@@ -22,27 +22,25 @@ import org.junit.jupiter.api.Test;
 /** A test case for COPY FROM statement with line concatenation */
 public class TestDaCoCopyFrom4 {
   private static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. PROGNAME.\n"
-                  + "       ENVIRONMENT  DIVISION.\n"
-                  + "       IDMS-CONTROL SECTION.\n"
-                  + "       PROTOCOL. MODE BATCH DEBUG IDMS-RECORDS MANUAL.\n"
-                  + "       DATA   DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01  {$*A-SYY}.\n"
-                  + "           03 {$*AA-SYY`&AA-SXX} PIC X(4).\n"
-                  + "       01  {$*B} PIC X(72)   VALUE                  \n"
-                  + "           '-\n"
-                  + "      -    '-'.\n"
-                  + "       01  {$*A-SXX} COPY-FROM YY.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           DISPLAY {$A-SXX}.\n";
-
-
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. PROGNAME.\n"
+          + "       ENVIRONMENT  DIVISION.\n"
+          + "       IDMS-CONTROL SECTION.\n"
+          + "       PROTOCOL. MODE BATCH DEBUG IDMS-RECORDS MANUAL.\n"
+          + "       DATA   DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*A-SYY}.\n"
+          + "           03 {$*AA-SYY`&AA-SXX} PIC X(4).\n"
+          + "       01  {$*B} PIC X(72)   VALUE                  \n"
+          + "           '-\n"
+          + "      -    '-'.\n"
+          + "       01  {$*A-SXX} COPY-FROM YY.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$A-SXX}.\n";
 
   @Test
   void test() {
-     UseCaseEngine.runTest(
+    UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(),
         ImmutableMap.of(),

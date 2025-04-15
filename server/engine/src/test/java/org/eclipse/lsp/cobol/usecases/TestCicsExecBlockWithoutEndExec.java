@@ -53,7 +53,6 @@ public class TestCicsExecBlockWithoutEndExec {
                 new Range(),
                 "Extraneous input .",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())
-            ));
+                ErrorSource.PARSING.getText())));
   }
 }

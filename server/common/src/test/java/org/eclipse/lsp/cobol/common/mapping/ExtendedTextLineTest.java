@@ -14,15 +14,13 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.eclipse.lsp4j.Position;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for ExtendedTextLine
- */
+/** Test for ExtendedTextLine */
 class ExtendedTextLineTest {
   @Test
   void testToString() {
@@ -81,9 +79,12 @@ class ExtendedTextLineTest {
 
   @Test
   void testNewLineCharacter() {
-    RuntimeException thrown = Assertions.assertThrows(RuntimeException.class, () -> {
-      new ExtendedTextLine("text \r\n end", 6, "uri");
-    });
+    RuntimeException thrown =
+        Assertions.assertThrows(
+            RuntimeException.class,
+            () -> {
+              new ExtendedTextLine("text \r\n end", 6, "uri");
+            });
     Assertions.assertEquals("Text line contains a new line characters", thrown.getMessage());
   }
 

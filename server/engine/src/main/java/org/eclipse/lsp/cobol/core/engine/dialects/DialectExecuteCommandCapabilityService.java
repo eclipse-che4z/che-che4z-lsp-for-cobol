@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
-import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
-
 import java.util.List;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 
 /** Interface to register dialect specific server side execute command capabilities. */
 public interface DialectExecuteCommandCapabilityService {
@@ -38,6 +37,7 @@ public interface DialectExecuteCommandCapabilityService {
 
   /**
    * Registers custom code action providers from dialects
+   *
    * @param providers list of {@link CodeActionProvider}
    */
   void registerDialectCodeActionProviders(List<CodeActionProvider> providers);

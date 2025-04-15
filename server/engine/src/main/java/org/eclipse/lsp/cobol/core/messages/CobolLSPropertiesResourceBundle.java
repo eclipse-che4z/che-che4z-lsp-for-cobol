@@ -15,11 +15,6 @@
 package org.eclipse.lsp.cobol.core.messages;
 
 import com.google.common.annotations.VisibleForTesting;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.eclipse.lsp.cobol.common.DialectRegistryItem;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -27,6 +22,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
 /**
  * This is a multiple properties resource bundle. Resource bundles contain locale-specific objects.
@@ -40,8 +39,7 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   private final Properties properties;
   private final Locale locale;
 
-  public CobolLSPropertiesResourceBundle(
-          String basename, Locale locale) {
+  public CobolLSPropertiesResourceBundle(String basename, Locale locale) {
     this.baseName = basename;
     this.properties = new Properties();
     this.locale = locale;
@@ -54,18 +52,19 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
    * @param dialectRegistryItem dialect registry for which resource needs to be updated
    * @throws IOException when resources for a dialect is not found
    */
-  public void updateMessageResourceBundle(DialectRegistryItem dialectRegistryItem) throws IOException {
+  public void updateMessageResourceBundle(DialectRegistryItem dialectRegistryItem)
+      throws IOException {
     properties.putAll(load(dialectRegistryItem, locale));
   }
 
-  private Properties load(DialectRegistryItem dialectRegistryItem, Locale locale) throws IOException {
+  private Properties load(DialectRegistryItem dialectRegistryItem, Locale locale)
+      throws IOException {
     Properties properties = new Properties();
     try {
       List<String> resourceName = toSuspectedBundleNames(locale);
       Collections.reverse(resourceName);
       LOG.debug("URI for dialect jar:" + dialectRegistryItem.getUri());
-      InputStream validResources =
-              getDialectResources(resourceName, dialectRegistryItem.getUri());
+      InputStream validResources = getDialectResources(resourceName, dialectRegistryItem.getUri());
       properties.load(validResources);
     } catch (Exception e) {
 
@@ -83,8 +82,7 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
    * @throws IOException when no resource is found or jar not found
    */
   @VisibleForTesting
-  public InputStream getDialectResources(
-      List<String> resourceName, URI jarUri) throws IOException {
+  public InputStream getDialectResources(List<String> resourceName, URI jarUri) throws IOException {
     JarFile jar = new JarFile(jarUri.toURL().getFile());
     for (String s : resourceName) {
       if (Objects.nonNull(jar.getJarEntry(s))) {

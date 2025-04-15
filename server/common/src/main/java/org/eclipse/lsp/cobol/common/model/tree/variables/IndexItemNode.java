@@ -15,13 +15,12 @@
 package org.eclipse.lsp.cobol.common.model.tree.variables;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.Getter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp4j.Location;
-
-import java.util.List;
 
 /**
  * This value class represents an Index item. It is defined using INDEXED BY statement in a {@link

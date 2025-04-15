@@ -14,7 +14,5 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
-/**
- * A marker interface for all Language server events
- */
+/** A marker interface for all Language server events */
 public interface LspEvent {}

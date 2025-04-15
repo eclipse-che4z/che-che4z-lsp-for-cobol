@@ -47,11 +47,11 @@ public interface ConfigurationService {
   List<String> getSubroutineDirectories();
 
   /**
-   * Get a list configuration for a document.
-   * For example. "configuration-example" : ["setting1","setting2"]
+   * Get a list configuration for a document. For example. "configuration-example" :
+   * ["setting1","setting2"]
    *
-   * <p>NOTE: This method won't work for a single element setting like
-   * "configuration-example" : "setting1"
+   * <p>NOTE: This method won't work for a single element setting like "configuration-example" :
+   * "setting1"
    *
    * @param documentUri document URI for which configuration needs to be fetched.
    * @param section the required section in the client configuration.
@@ -78,7 +78,7 @@ public interface ConfigurationService {
     boolean cicsTranslatorEnabled;
     List<DialectRegistryItem> dialectRegistry;
     List<String> compilerOptions;
-//    CobolProgramLayout layout;
+    //    CobolProgramLayout layout;
     Map<String, JsonElement> dialectsSettings;
 
     public ConfigurationEntity() {
@@ -88,7 +88,7 @@ public interface ConfigurationService {
       dialectRegistry = ImmutableList.of();
       compilerOptions = ImmutableList.of();
       dialectsSettings = ImmutableMap.of();
-//      layout = new CobolProgramLayout();
+      //      layout = new CobolProgramLayout();
     }
   }
 }

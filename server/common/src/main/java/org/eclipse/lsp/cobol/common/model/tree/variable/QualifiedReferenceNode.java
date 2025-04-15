@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-
-import java.util.Optional;
 
 /**
  * The class represents usage of qualified variable in COBOL. Under this node will be one or more

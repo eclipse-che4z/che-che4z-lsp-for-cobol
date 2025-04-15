@@ -44,14 +44,17 @@ public class Keywords extends CompletionStorage<String> {
       return result;
     }
     dialectService
-            .getImplicitCobolDialects().forEach(dialect -> result.putAll(dialect.getKeywords()));
+        .getImplicitCobolDialects()
+        .forEach(dialect -> result.putAll(dialect.getKeywords()));
 
-    dialectTypes
-            .forEach(dialectType -> result.putAll(dialectService.getDialectByName(dialectType)
-            .map(CobolDialect::getKeywords).orElse(Collections.emptyMap()))
-    );
+    dialectTypes.forEach(
+        dialectType ->
+            result.putAll(
+                dialectService
+                    .getDialectByName(dialectType)
+                    .map(CobolDialect::getKeywords)
+                    .orElse(Collections.emptyMap())));
 
     return result;
   }
-
 }

@@ -55,24 +55,25 @@ class TestRenamesWithNonExistingName {
                 new Range(),
                 "The data entry with the name NOT-EXISTS1 not found",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VARNAME4",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item"
+                    + " VARNAME4",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
                 "The data entry with the name NOT-EXISTS2 not found",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "4",
             new Diagnostic(
                 new Range(),
                 "Variable VARNAME5 is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
 import java.util.List;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -42,38 +41,47 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Test for {@link IdmsCopybookVisitor}
- */
+/** Test for {@link IdmsCopybookVisitor} */
 @ExtendWith(MockitoExtension.class)
 class IdmsCopybookVisitorTest {
 
   private static final String PROGRAM_DOCUMENT_URI = "programDocumentUri";
-  @Mock
-  private CopybookService copybookService;
-  @Mock
-  private IdmsCopybookService idmsCopybookService;
-  @Mock
-  private CleanerPreprocessor preprocessor;
+  @Mock private CopybookService copybookService;
+  @Mock private IdmsCopybookService idmsCopybookService;
+  @Mock private CleanerPreprocessor preprocessor;
   private IdmsCopybookVisitor visitor;
 
   @BeforeEach
   void init() {
-      visitor = new IdmsCopybookVisitor(copybookService, preprocessor, idmsCopybookService, PROGRAM_DOCUMENT_URI, "documentUri", 1);
+    visitor =
+        new IdmsCopybookVisitor(
+            copybookService,
+            preprocessor,
+            idmsCopybookService,
+            PROGRAM_DOCUMENT_URI,
+            "documentUri",
+            1);
   }
 
   @Test
   void testVisitCopyIdmsStatement() {
-    IdmsCopyParser.CopyIdmsStatementContext ctx = mock(IdmsCopyParser.CopyIdmsStatementContext.class);
-    IdmsCopyParser.CopyIdmsOptionsContext copyContext = mock(IdmsCopyParser.CopyIdmsOptionsContext.class);
-    IdmsCopyParser.CopyIdmsSourceContext sourceContext = mock(IdmsCopyParser.CopyIdmsSourceContext.class);
+    IdmsCopyParser.CopyIdmsStatementContext ctx =
+        mock(IdmsCopyParser.CopyIdmsStatementContext.class);
+    IdmsCopyParser.CopyIdmsOptionsContext copyContext =
+        mock(IdmsCopyParser.CopyIdmsOptionsContext.class);
+    IdmsCopyParser.CopyIdmsSourceContext sourceContext =
+        mock(IdmsCopyParser.CopyIdmsSourceContext.class);
     CopybookName expectedCopybookName = new CopybookName("copybook", "IDMS");
-    when(copybookService.resolve(any(CopybookId.class), any(CopybookName.class), anyString(), anyString(),
-            any()))
-            .thenReturn(
-                    new ResultWithErrors<>(
-                            new CopybookModel(expectedCopybookName.toCopybookId(PROGRAM_DOCUMENT_URI), expectedCopybookName, null, null),
-                            Collections.emptyList()));
+    when(copybookService.resolve(
+            any(CopybookId.class), any(CopybookName.class), anyString(), anyString(), any()))
+        .thenReturn(
+            new ResultWithErrors<>(
+                new CopybookModel(
+                    expectedCopybookName.toCopybookId(PROGRAM_DOCUMENT_URI),
+                    expectedCopybookName,
+                    null,
+                    null),
+                Collections.emptyList()));
 
     when(ctx.copyIdmsOptions()).thenReturn(copyContext);
     when(copyContext.copyIdmsSource()).thenReturn(sourceContext);
@@ -125,7 +133,8 @@ class IdmsCopybookVisitorTest {
 
   @Test
   void testVisitDataDescriptionEntryFormatLevel77() {
-    DataDescriptionEntryFormat1Level77Context ctx = mock(DataDescriptionEntryFormat1Level77Context.class);
+    DataDescriptionEntryFormat1Level77Context ctx =
+        mock(DataDescriptionEntryFormat1Level77Context.class);
     TerminalNode terminalNode = mock(TerminalNode.class);
     when(ctx.LEVEL_NUMBER_77()).thenReturn(terminalNode);
     when(terminalNode.getSymbol()).thenReturn(mock((Token.class)));
@@ -158,8 +167,9 @@ class IdmsCopybookVisitorTest {
   @Test
   void testvisitFileDescriptionEntry() {
     FileDescriptionEntryContext ctx = mock(FileDescriptionEntryContext.class);
-    CobolWordContext cobolWordContext =  mock(CobolWordContext.class);
-    FileDescriptionEntryClausesContext entryClausesContext = mock(FileDescriptionEntryClausesContext.class);
+    CobolWordContext cobolWordContext = mock(CobolWordContext.class);
+    FileDescriptionEntryClausesContext entryClausesContext =
+        mock(FileDescriptionEntryClausesContext.class);
     when((ctx.fileDescriptionEntryClauses())).thenReturn(entryClausesContext);
     when(ctx.fileDescriptionEntryClauses().cobolWord()).thenReturn(cobolWordContext);
     when(cobolWordContext.getStart()).thenReturn(mock(Token.class));
@@ -168,7 +178,8 @@ class IdmsCopybookVisitorTest {
     cobolWordContext.stop = mock(Token.class);
     when(ctx.fileDescriptionEntryClauses().getStart()).thenReturn(mock(Token.class));
     when(ctx.fileDescriptionEntryClauses().getStop()).thenReturn(mock(Token.class));
-    when(ctx.fileDescriptionEntryClauses().getStart().getInputStream()).thenReturn(mock(CharStream.class));
+    when(ctx.fileDescriptionEntryClauses().getStart().getInputStream())
+        .thenReturn(mock(CharStream.class));
     List<Node> result = visitor.visitFileDescriptionEntry(ctx);
 
     assertEquals(result.get(0).getLocality().getRange().getStart(), new Position(-1, 0));

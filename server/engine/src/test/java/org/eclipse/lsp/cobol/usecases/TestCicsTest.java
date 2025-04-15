@@ -24,8 +24,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS TEST EVENT command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-test-event">TEST EVENT
- * Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-test-event">TEST EVENT Command</a>
  *
  * <p>This class tests all variations of the TEST EVENT command found in the link above.
  */
@@ -35,7 +34,6 @@ public class TestCicsTest {
 
   private static final String TEST_EVENT_INVALID_ONE = "TEST {_EVENT({$varOne})|error1_}";
   private static final String TEST_EVENT_INVALID_TWO = "TEST {_FIRESTATUS({$varTwo})|error1_}";
-
 
   @Test
   void testCicsTestValidOne() {
@@ -49,25 +47,27 @@ public class TestCicsTest {
 
   @Test
   void testCicsTestInvalidOne() {
-    CICSTestUtils.errorTest(TEST_EVENT_INVALID_ONE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_EVENT_INVALID_ONE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Missing required option: FIRESTATUS",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "Missing required option: FIRESTATUS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testCicsTestInvalidTwo() {
-    CICSTestUtils.errorTest(TEST_EVENT_INVALID_TWO,
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: EVENT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+    CICSTestUtils.errorTest(
+        TEST_EVENT_INVALID_TWO,
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: EVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

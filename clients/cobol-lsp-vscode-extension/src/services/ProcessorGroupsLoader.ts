@@ -71,7 +71,14 @@ const PreprocessorModel = t.union([
   t.intersection([
     t.type({ name: t.string }),
     t.partial({
-      libs: t.array(t.string),
+      libs: t.array(
+        t.union([
+          t.string,
+          EndevorConfigModel,
+          ZoweDatasetConfigModel,
+          ZoweUssConfigModel,
+        ]),
+      ),
       "copybook-extensions": t.array(t.string),
       "compiler-options": t.array(t.string),
       "copybook-file-encoding": t.string,

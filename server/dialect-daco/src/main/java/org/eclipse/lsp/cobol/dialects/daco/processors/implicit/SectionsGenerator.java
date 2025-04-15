@@ -14,32 +14,30 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureSectionNode;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-/**
- * Generates predefined section content provider that generates content for a copybook
- */
+/** Generates predefined section content provider that generates content for a copybook */
 @UtilityClass
 class SectionsGenerator {
 
   /**
    * Read injected code content
+   *
    * @param predefinedSection set of DaCo predefined sessions in a program
    * @param existingSessions set of existing sessions in a program
    * @return a list of generated section name nodes
    */
-  public List<CodeBlockDefinitionNode> generate(List<String> predefinedSection, Set<String> existingSessions) {
-    Locality locality = Locality.builder()
-        .uri(ImplicitCodeUtils.createFullUrl("daco-generated-sections"))
-        .build();
+  public List<CodeBlockDefinitionNode> generate(
+      List<String> predefinedSection, Set<String> existingSessions) {
+    Locality locality =
+        Locality.builder().uri(ImplicitCodeUtils.createFullUrl("daco-generated-sections")).build();
 
     return predefinedSection.stream()
         .filter(s -> !existingSessions.contains(s))

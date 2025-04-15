@@ -23,17 +23,16 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for variable picture clause
- */
+/** Tests for variable picture clause */
 class TestVariablePicClause {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID. GRP1.\n"
-      + "       DATA DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       01 {$*ROOT}.\n"
-      + "           02 {$*VARNAME|1} PIC X(3).\n"
-      + "             03 {$*CHILD} PIC X(2).\n";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. GRP1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*ROOT}.\n"
+          + "           02 {$*VARNAME|1} PIC X(3).\n"
+          + "             03 {$*CHILD} PIC X(2).\n";
 
   @Test
   void test() {
@@ -42,6 +41,10 @@ class TestVariablePicClause {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "Group variable VARNAME cannot have PICTURE clause", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+            new Diagnostic(
+                new Range(),
+                "Group variable VARNAME cannot have PICTURE clause",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

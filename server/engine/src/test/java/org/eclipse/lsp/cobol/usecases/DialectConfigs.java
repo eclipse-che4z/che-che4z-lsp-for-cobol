@@ -28,24 +28,32 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 public class DialectConfigs {
   public AnalysisConfig getIDMSAnalysisConfig() {
     return new AnalysisConfig(
-            CopybookProcessingMode.DISABLED,
-        ImmutableList.of("IDMS"), true, false,
+        CopybookProcessingMode.DISABLED,
+        ImmutableList.of("IDMS"),
+        true,
+        false,
         ImmutableList.of(),
         ImmutableMap.of());
   }
 
   /**
    * Provides DaCo dialect configuration
+   *
    * @return DaCo dialect configuration
    */
   public AnalysisConfig getDaCoAnalysisConfig() {
     List<String> list = ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999");
 
     return new AnalysisConfig(
-            CopybookProcessingMode.DISABLED,
-            ImmutableList.of("DaCo", "IDMS"), true, false,
-            ImmutableList.of(),
-            ImmutableMap.of("daco.predefined-sections", new Gson().toJsonTree(list),
-                    "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        CopybookProcessingMode.DISABLED,
+        ImmutableList.of("DaCo", "IDMS"),
+        true,
+        false,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "daco.predefined-sections",
+            new Gson().toJsonTree(list),
+            "target-sql-backend",
+            new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

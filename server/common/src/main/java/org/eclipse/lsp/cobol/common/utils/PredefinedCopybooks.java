@@ -15,14 +15,13 @@
 
 package org.eclipse.lsp.cobol.common.utils;
 
-import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import static org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks.Copybook.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks.Copybook.*;
+import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
 /** This util class encapsulates the logic of resolving the predefined variable names. */
 @UtilityClass
@@ -35,8 +34,7 @@ public class PredefinedCopybooks {
    * @return Copybook for this name or null
    */
   public Copybook forName(String name) {
-    return Arrays.stream(values()).filter(c ->  c.name().equals(name))
-        .findFirst().orElse(null);
+    return Arrays.stream(values()).filter(c -> c.name().equals(name)).findFirst().orElse(null);
   }
 
   /**
@@ -53,9 +51,7 @@ public class PredefinedCopybooks {
     SQLCA {
       @Override
       public String nameForBackend(SQLBackend backend) {
-        return backend == SQLBackend.DATACOM_SERVER
-            ? "SQLCA_DATACOM"
-            : "SQLCA_DB2";
+        return backend == SQLBackend.DATACOM_SERVER ? "SQLCA_DATACOM" : "SQLCA_DB2";
       }
     },
     SQLDA {

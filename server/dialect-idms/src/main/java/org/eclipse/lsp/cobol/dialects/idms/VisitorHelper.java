@@ -14,15 +14,15 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
+
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsCopyParser.*;
-
-import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 
 /** Utility class for visitor and delegates classes with useful methods */
 @Slf4j

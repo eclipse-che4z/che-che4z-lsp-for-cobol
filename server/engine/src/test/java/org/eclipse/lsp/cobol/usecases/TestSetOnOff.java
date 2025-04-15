@@ -57,9 +57,12 @@ class TestSetOnOff {
                 new Range(),
                 "Invalid receiving field type. Expected: Mnemonic name",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
-                new Range(), "Variable ABCDE is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+                new Range(),
+                "Variable ABCDE is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

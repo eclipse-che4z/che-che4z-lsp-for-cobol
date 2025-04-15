@@ -14,11 +14,10 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
-import lombok.Getter;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.Getter;
 
 /** Compiler directive context */
 public class CompilerDirectiveContext {
@@ -44,9 +43,10 @@ public class CompilerDirectiveContext {
    * @param compilerDirectiveOption {@link CompilerDirectiveOption}
    */
   public void updateDirectiveOptions(CompilerDirectiveOption compilerDirectiveOption) {
-    compilerDirectiveMap.merge(compilerDirectiveOption.getCompilerDirectiveName(),
-            compilerDirectiveOption.getValue(),
-            (n1, n2) -> Stream.concat(n1.stream(), n2.stream()).collect(Collectors.toList()));
+    compilerDirectiveMap.merge(
+        compilerDirectiveOption.getCompilerDirectiveName(),
+        compilerDirectiveOption.getValue(),
+        (n1, n2) -> Stream.concat(n1.stream(), n2.stream()).collect(Collectors.toList()));
   }
 
   /**
@@ -66,10 +66,12 @@ public class CompilerDirectiveContext {
    */
   public Optional<CompilerDirectiveOption> filterDirectiveList(List<CompilerDirectiveName> names) {
     CompilerDirectiveOption defaultValue = names.get(0).defaultValue();
-    return Optional.ofNullable(compilerDirectiveMap.entrySet().stream()
+    return Optional.ofNullable(
+        compilerDirectiveMap.entrySet().stream()
             .filter(entry -> Objects.nonNull(entry.getKey()))
             .filter(entry -> names.contains(entry.getKey()))
             .map(entry -> new CompilerDirectiveOption(entry.getKey(), entry.getValue()))
-            .findFirst().orElse(defaultValue));
+            .findFirst()
+            .orElse(defaultValue));
   }
 }

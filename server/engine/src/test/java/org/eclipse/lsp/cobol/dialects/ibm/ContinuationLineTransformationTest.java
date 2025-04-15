@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -93,7 +92,7 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
     lines.add("000500    01 WS-CONST-CREATE PIC X(134) VALUE 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
     lines.add("000251     'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'.");
 
-      List<SyntaxError> errors = runTransformation(reduceLines(lines));
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
 
     assertEquals(1, errors.size());
   }
@@ -113,17 +112,21 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
   }
 
   private List<SyntaxError> runTransformation(String text) {
-      List<CobolLine> lines = convertToCobolLines(text);
+    List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     IbmCobolLineWriter ibmCobolLineWriter = new IbmCobolLineWriter(new CodeLayoutStore());
     when(store.getCodeLayout()).thenReturn(Optional.empty());
-    ContinuationLineTransformation transformation = new IbmCobolContinuationLineTransformation(mockMessageService, store);
-    StringClosedCorrectlyValidator stringClosedCorrectlyValidator = new StringClosedCorrectlyValidator(mockMessageService);
+    ContinuationLineTransformation transformation =
+        new IbmCobolContinuationLineTransformation(mockMessageService, store);
+    StringClosedCorrectlyValidator stringClosedCorrectlyValidator =
+        new StringClosedCorrectlyValidator(mockMessageService);
 
-    ResultWithErrors<List<CobolLine>> listResultWithErrors = transformation.transformLines("", lines);
+    ResultWithErrors<List<CobolLine>> listResultWithErrors =
+        transformation.transformLines("", lines);
     List<SyntaxError> result = new ArrayList<>(listResultWithErrors.getErrors());
-    ExtendedDocument extendedDocument = ibmCobolLineWriter.serialize(listResultWithErrors.getResult(), "DOC_URI");
+    ExtendedDocument extendedDocument =
+        ibmCobolLineWriter.serialize(listResultWithErrors.getResult(), "DOC_URI");
     result.addAll(stringClosedCorrectlyValidator.validateLines(extendedDocument));
     return result;
   }

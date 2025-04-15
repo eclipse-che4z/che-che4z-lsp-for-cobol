@@ -35,18 +35,18 @@ class TestSqlExecuteImmediateStatement {
           + "           END-EXEC.\n";
 
   /*
-  COMPILATION FAILS
-  -----------------------
-     000035                     EXEC SQL
+   COMPILATION FAILS
+   -----------------------
+      000035                     EXEC SQL
 
- ==000035==> IGYPS0226-E DSNH104I DSNHSMS1 LINE 35 COL 75  ILLEGAL SYMBOL "'DELETE FROM
-                         DSN8C10.DEPT WHERE ABC = 1'". SOME SYMBOLS THAT MIGHT BE LEGAL ARE: :
+  ==000035==> IGYPS0226-E DSNH104I DSNHSMS1 LINE 35 COL 75  ILLEGAL SYMBOL "'DELETE FROM
+                          DSN8C10.DEPT WHERE ABC = 1'". SOME SYMBOLS THAT MIGHT BE LEGAL ARE: :
 
-   000036                         EXECUTE IMMEDIATE
-   000037                         'DELETE FROM DSN8C10.DEPT WHERE ABC = 1'
-   000038                     END-EXEC.
-   000039
-   */
+    000036                         EXECUTE IMMEDIATE
+    000037                         'DELETE FROM DSN8C10.DEPT WHERE ABC = 1'
+    000038                     END-EXEC.
+    000039
+    */
   @Disabled("Compilation Fails")
   @Test
   void test() {

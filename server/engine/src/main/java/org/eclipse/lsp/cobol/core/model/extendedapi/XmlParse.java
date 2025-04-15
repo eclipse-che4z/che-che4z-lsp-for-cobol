@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
-
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.ProcedureName;

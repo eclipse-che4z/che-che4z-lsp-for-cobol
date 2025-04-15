@@ -22,13 +22,14 @@ import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.toURI;
 
 import com.google.common.collect.ImmutableList;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp4j.Diagnostic;
@@ -61,6 +62,7 @@ public class AnnotatedDocumentCleaning {
       Map<String, Diagnostic> expectedDiagnostics,
       SQLBackend sqlBackend,
       List<String> compilerOptions) {
+    final List<ImmutablePair<ProcedureId, Location>> pendingParagraphUsages = new ArrayList<>();
     TestData testData =
         processDocument(
             text,
@@ -68,18 +70,69 @@ public class AnnotatedDocumentCleaning {
             DOCUMENT_URI,
             subroutineNames,
             expectedDiagnostics,
-            explicitCopybooks.stream()
-                .findFirst()
-                .map(CobolText::getDialectType)
-                .orElse(null));
+            explicitCopybooks.stream().findFirst().map(CobolText::getDialectType).orElse(null),
+            null,
+            pendingParagraphUsages);
 
-    return new PreprocessedDocument(
-        testData.getText(),
-        processCopybooks(
-            collectCopybooks(explicitCopybooks, testData.getCopybookUsages(), sqlBackend, compilerOptions),
-            expectedDiagnostics,
-            testData),
-        testData);
+    List<CobolText> copybooks =
+        collectCopybooks(
+                explicitCopybooks, testData.getCopybookUsages(), sqlBackend, compilerOptions)
+            .map(
+                c -> {
+                  TestData test =
+                      processDocument(
+                          c.getFullText(),
+                          c.getFileName(),
+                          toURI(c.getFileName(), c.getDialectType()),
+                          ImmutableList.of(),
+                          expectedDiagnostics,
+                          c.getDialectType(),
+                          testData.getCopybookEnterSectionNames().get(c.getFileName()),
+                          pendingParagraphUsages);
+                  mergeTestData(testData, test);
+                  return new CobolText(
+                      test.getCopybookName(),
+                      test.getDialectType(),
+                      test.getText(),
+                      c.getUrl(),
+                      c.isPreprocess());
+                })
+            .collect(toList());
+    pendingParagraphUsages.forEach(
+        p -> {
+          if (testData.getProcedureDefinitions().containsKey(p.getKey())) {
+            testData
+                .getProcedureUsages()
+                .computeIfAbsent(p.getKey(), it -> new ArrayList<>())
+                .add(p.getValue());
+          } else {
+            testData.getProcedureDefinitions().keySet().stream()
+                .filter(
+                    locations ->
+                        locations.isParagraph()
+                            && locations.getParagraphName().equals(p.getKey().getParagraphName()))
+                .forEach(
+                    k ->
+                        testData
+                            .getProcedureUsages()
+                            .computeIfAbsent(k, it -> new ArrayList<>())
+                            .add(p.getValue()));
+          }
+        });
+    pendingParagraphUsages.clear();
+    return new PreprocessedDocument(testData.getText(), copybooks, testData);
+  }
+
+  private static void mergeTestData(TestData testData, TestData test) {
+    mergeMaps(testData.getCopybookDefinitions(), test.getCopybookDefinitions());
+    mergeMaps(testData.getCopybookUsages(), test.getCopybookUsages());
+    mergeMaps(testData.getProcedureDefinitions(), test.getProcedureDefinitions());
+    mergeMaps(testData.getProcedureUsages(), test.getProcedureUsages());
+    mergeMaps(testData.getSubroutineDefinitions(), test.getSubroutineDefinitions());
+    mergeMaps(testData.getSubroutineUsages(), test.getSubroutineUsages());
+    mergeMaps(testData.getVariableDefinitions(), test.getVariableDefinitions());
+    mergeMaps(testData.getVariableUsages(), test.getVariableUsages());
+    mergeMaps(testData.getDiagnostics(), test.getDiagnostics());
   }
 
   private Stream<CobolText> collectCopybooks(
@@ -92,37 +145,19 @@ public class AnnotatedDocumentCleaning {
         collectUsedPredefinedCopybooks(
             usedCopybooks.keySet(),
             explicitCopybooks.stream().map(CobolText::getFileName).collect(Collectors.toList()),
-            sqlBackend, compilerOptions));
+            sqlBackend,
+            compilerOptions));
   }
 
   private Stream<CobolText> collectUsedPredefinedCopybooks(
-      Set<String> copybookUsages, List<String> explicitCopybooks, SQLBackend sqlBackend, List<String> compilerOptions) {
+      Set<String> copybookUsages,
+      List<String> explicitCopybooks,
+      SQLBackend sqlBackend,
+      List<String> compilerOptions) {
     return PredefinedCopybooks.getNames().stream()
         .filter(copybookUsages::contains)
         .filter(it -> !explicitCopybooks.contains(it))
         .map(PredefinedCopybookUtils.toCobolText(sqlBackend, compilerOptions));
-  }
-
-  private List<CobolText> processCopybooks(
-      Stream<CobolText> copybooks,
-      Map<String, Diagnostic> expectedDiagnostics,
-      TestData testData) {
-    return copybooks
-        .map(c -> {
-          TestData test = processCopybook(expectedDiagnostics).apply(c);
-          test = collectDataFromCopybooks(testData).apply(test);
-          return new CobolText(test.getCopybookName(), test.getDialectType(), test.getText(), c.getUrl(), c.isPreprocess());
-        }).collect(toList());
-  }
-
-  private Function<CobolText, TestData> processCopybook(Map<String, Diagnostic> expectedDiagnostics) {
-    return it -> processDocument(
-        it.getFullText(),
-        it.getFileName(),
-        toURI(it.getFileName(), it.getDialectType()),
-        ImmutableList.of(),
-        expectedDiagnostics,
-        it.getDialectType());
   }
 
   private TestData processDocument(
@@ -131,7 +166,9 @@ public class AnnotatedDocumentCleaning {
       String uri,
       List<String> subroutineNames,
       Map<String, Diagnostic> expectedDiagnostics,
-      String dialectType) {
+      String dialectType,
+      String sectionName,
+      List<ImmutablePair<ProcedureId, Location>> pendingParagraphUsages) {
     int numberOfLines = text.split("\\R").length;
 
     UseCasePreprocessorLexer lexer = new UseCasePreprocessorLexer(fromString(text));
@@ -151,24 +188,12 @@ public class AnnotatedDocumentCleaning {
             numberOfLines,
             subroutineNames,
             expectedDiagnostics,
-            dialectType);
+            dialectType,
+            sectionName,
+            pendingParagraphUsages);
+
     new ParseTreeWalker().walk(listener, startRule);
     return listener.getProcessingResult();
-  }
-
-  private Function<TestData, TestData> collectDataFromCopybooks(TestData accumulator) {
-    return copybookTestData -> {
-      mergeMaps(accumulator.getCopybookDefinitions(), copybookTestData.getCopybookDefinitions());
-      mergeMaps(accumulator.getCopybookUsages(), copybookTestData.getCopybookUsages());
-      mergeMaps(accumulator.getProcedureDefinitions(), copybookTestData.getProcedureDefinitions());
-      mergeMaps(accumulator.getProcedureUsages(), copybookTestData.getProcedureUsages());
-      mergeMaps(accumulator.getSubroutineDefinitions(), copybookTestData.getSubroutineDefinitions());
-      mergeMaps(accumulator.getSubroutineUsages(), copybookTestData.getSubroutineUsages());
-      mergeMaps(accumulator.getVariableDefinitions(), copybookTestData.getVariableDefinitions());
-      mergeMaps(accumulator.getVariableUsages(), copybookTestData.getVariableUsages());
-      mergeMaps(accumulator.getDiagnostics(), copybookTestData.getDiagnostics());
-      return copybookTestData;
-    };
   }
 
   private <K, V> void mergeMaps(Map<K, List<V>> to, Map<K, List<V>> from) {

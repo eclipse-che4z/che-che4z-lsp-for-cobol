@@ -65,14 +65,14 @@ class CobolLineReaderImplTest extends AbstractCobolLinePreprocessorTest {
 
     assertThat(processed.getResult(), hasSize(lines.size()));
     range(0, lines.size())
-            .forEach(i -> assertThat(processed.getResult().get(i), hasToString(lines.get(i))));
+        .forEach(i -> assertThat(processed.getResult().get(i), hasToString(lines.get(i))));
 
     assertThat(processed.getErrors(), hasSize(1));
 
     SyntaxError error = processed.getErrors().get(0);
     assertThat(
-            error.getLocation().getLocation().getRange(),
-            is(new Range(new Position(10, 0), new Position(10, 1))));
+        error.getLocation().getLocation().getRange(),
+        is(new Range(new Position(10, 0), new Position(10, 1))));
   }
 
   /** Empty string should not be processed. */

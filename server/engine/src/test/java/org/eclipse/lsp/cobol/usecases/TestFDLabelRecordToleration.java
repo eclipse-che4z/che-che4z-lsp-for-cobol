@@ -37,7 +37,8 @@ public class TestFDLabelRecordToleration {
           + "001500            ORGANIZATION IS INDEXED. \n"
           + "002300 DATA DIVISION.                                                   00002300\n"
           + "002400 FILE SECTION.                                                    00002400\n"
-          + "002500 FD  {$*ABCD}                                                         00002500\n";
+          + "002500 FD  {$*ABCD}                                                        "
+          + " 00002500\n";
   private static final String SUFFIX =
       "002800     DATA RECORD IS {$AAAAAAAAAA}.                                   00002800\n"
           + "       01 {$*AAAAAAAAAA} PIC 9(2).\n";

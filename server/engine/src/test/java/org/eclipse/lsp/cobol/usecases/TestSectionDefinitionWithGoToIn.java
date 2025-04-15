@@ -21,10 +21,11 @@ import org.junit.jupiter.api.Test;
 
 /** Test for a bug related to "GO TO P IN S." statement. It seems that IN S defines section */
 public class TestSectionDefinitionWithGoToIn {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. PROG.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           GO TO {#P} IN SECT1.\n"
+          + "           GO TO {#P} IN {@SECT1}.\n"
           + "       {@*SECT1} SECTION.\n"
           + "       {#*P}.\n"
           + "           EXIT.";

@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.sql;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -27,12 +29,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Error Listener
- */
+/** Error Listener */
 @Slf4j
 public class Db2ErrorListener extends BaseErrorListener {
   private final String uri;
@@ -85,13 +82,11 @@ public class Db2ErrorListener extends BaseErrorListener {
   }
 
   private int getOffendingSymbolSize(Object offendingSymbol) {
-      if (offendingSymbol instanceof CommonToken) {
-          CommonToken token = (CommonToken) offendingSymbol;
-          return  token.getStartIndex() != -1
-                  ? token.getStopIndex() - token.getStartIndex() + 1
-                  : 0;
-      }
-      return 0;
+    if (offendingSymbol instanceof CommonToken) {
+      CommonToken token = (CommonToken) offendingSymbol;
+      return token.getStartIndex() != -1 ? token.getStopIndex() - token.getStartIndex() + 1 : 0;
+    }
+    return 0;
   }
 
   private int getOffendingSymbolSize(String offendingSymbol) {

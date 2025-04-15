@@ -77,50 +77,78 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public List<Node> visitUnSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.UnSupportedDeprecatedCompilerDirectivesContext ctx) {
-    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
-      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
-      analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .errorCode(() -> "IGYOS4003-E")
-              .location(new OriginalLocation(location, null))
-              .suggestion(messageService.getMessage("compilerDirective.deprecatedDirectiveUse", ctx.getText()))
-              .severity(ErrorSeverity.ERROR)
-              .build());
-    });
+  public List<Node> visitUnSupportedDeprecatedCompilerDirectives(
+      CompilerDirectivesParser.UnSupportedDeprecatedCompilerDirectivesContext ctx) {
+    VisitorHelper.retrieveRangeLocality(ctx)
+        .ifPresent(
+            r -> {
+              Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+              Location location =
+                  new Location(analysisContext.getExtendedDocument().getUri(), range);
+              analysisContext
+                  .getAccumulatedErrors()
+                  .add(
+                      SyntaxError.syntaxError()
+                          .errorSource(ErrorSource.PARSING)
+                          .errorCode(() -> "IGYOS4003-E")
+                          .location(new OriginalLocation(location, null))
+                          .suggestion(
+                              messageService.getMessage(
+                                  "compilerDirective.deprecatedDirectiveUse", ctx.getText()))
+                          .severity(ErrorSeverity.ERROR)
+                          .build());
+            });
     return super.visitUnSupportedDeprecatedCompilerDirectives(ctx);
   }
 
   @Override
-  public List<Node> visitOptionalDeprecatedCompilerDirectives(CompilerDirectivesParser.OptionalDeprecatedCompilerDirectivesContext ctx) {
-    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
-      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
-      analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .errorCode(() -> "IGYOS4013-I")
-              .location(new OriginalLocation(location, null))
-              .suggestion(messageService.getMessage("compilerDirective.info.deprecatedDirectiveUse", ctx.getText()))
-              .severity(ErrorSeverity.INFO)
-              .build());
-    });
+  public List<Node> visitOptionalDeprecatedCompilerDirectives(
+      CompilerDirectivesParser.OptionalDeprecatedCompilerDirectivesContext ctx) {
+    VisitorHelper.retrieveRangeLocality(ctx)
+        .ifPresent(
+            r -> {
+              Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+              Location location =
+                  new Location(analysisContext.getExtendedDocument().getUri(), range);
+              analysisContext
+                  .getAccumulatedErrors()
+                  .add(
+                      SyntaxError.syntaxError()
+                          .errorSource(ErrorSource.PARSING)
+                          .errorCode(() -> "IGYOS4013-I")
+                          .location(new OriginalLocation(location, null))
+                          .suggestion(
+                              messageService.getMessage(
+                                  "compilerDirective.info.deprecatedDirectiveUse", ctx.getText()))
+                          .severity(ErrorSeverity.INFO)
+                          .build());
+            });
     return super.visitOptionalDeprecatedCompilerDirectives(ctx);
   }
 
   @Override
-  public List<Node> visitCompilableSupportedDeprecatedCompilerDirectives(CompilerDirectivesParser.CompilableSupportedDeprecatedCompilerDirectivesContext ctx) {
-    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
-      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
-      analysisContext.getAccumulatedErrors().add(SyntaxError.syntaxError()
-              .errorSource(ErrorSource.PARSING)
-              .errorCode(() -> "IGYOS4008-W")
-              .location(new OriginalLocation(location, null))
-              .suggestion(messageService.getMessage("compilerDirective.warning.deprecatedDirectiveUse", ctx.getText()))
-              .severity(ErrorSeverity.WARNING)
-              .build());
-    });
+  public List<Node> visitCompilableSupportedDeprecatedCompilerDirectives(
+      CompilerDirectivesParser.CompilableSupportedDeprecatedCompilerDirectivesContext ctx) {
+    VisitorHelper.retrieveRangeLocality(ctx)
+        .ifPresent(
+            r -> {
+              Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+              Location location =
+                  new Location(analysisContext.getExtendedDocument().getUri(), range);
+              analysisContext
+                  .getAccumulatedErrors()
+                  .add(
+                      SyntaxError.syntaxError()
+                          .errorSource(ErrorSource.PARSING)
+                          .errorCode(() -> "IGYOS4008-W")
+                          .location(new OriginalLocation(location, null))
+                          .suggestion(
+                              messageService.getMessage(
+                                  "compilerDirective.warning.deprecatedDirectiveUse",
+                                  ctx.getText()))
+                          .severity(ErrorSeverity.WARNING)
+                          .build());
+            });
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
   }
 

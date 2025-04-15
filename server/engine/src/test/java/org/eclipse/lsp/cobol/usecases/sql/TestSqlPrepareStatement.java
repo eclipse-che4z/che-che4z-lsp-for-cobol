@@ -25,18 +25,13 @@ import org.junit.jupiter.api.Test;
 class TestSqlPrepareStatement {
 
   /**
-   * -----------------
-   * COMPILE OUTPUT
-   * ------------------
-   *    000035                     EXEC SQL
+   * ----------------- COMPILE OUTPUT ------------------ 000035 EXEC SQL
    *
-   *  ==000035==> IGYPS0226-E DSNH104I DSNHSMS1 LINE 35 COL 72  ILLEGAL SYMBOL "'INSERT INTO
-   *                          DSN8C10.DEPT VALUES(?,?,?,?,?)'". SOME SYMBOLS THAT MIGHT BE LEGAL ARE: :
+   * <p>==000035==> IGYPS0226-E DSNH104I DSNHSMS1 LINE 35 COL 72 ILLEGAL SYMBOL "'INSERT INTO
+   * DSN8C10.DEPT VALUES(?,?,?,?,?)'". SOME SYMBOLS THAT MIGHT BE LEGAL ARE: :
    *
-   *    000036                     PREPARE DEPT_INSERT FROM
-   *    000037                      'INSERT INTO DSN8C10.DEPT VALUES(?,?,?,?,?)'
-   *    000038                     END-EXEC.
-   *    000039
+   * <p>000036 PREPARE DEPT_INSERT FROM 000037 'INSERT INTO DSN8C10.DEPT VALUES(?,?,?,?,?)' 000038
+   * END-EXEC. 000039
    */
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

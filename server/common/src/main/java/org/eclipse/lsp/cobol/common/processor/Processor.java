@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-
 import java.util.function.BiConsumer;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /**
  * AST Processor marker

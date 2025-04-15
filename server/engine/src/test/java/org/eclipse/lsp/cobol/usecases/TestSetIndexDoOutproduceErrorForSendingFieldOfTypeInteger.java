@@ -42,8 +42,10 @@ public class TestSetIndexDoOutproduceErrorForSendingFieldOfTypeInteger {
           + "005000 01  {$*INDEX-ID}                    PIC 999         VALUE ZERO.      NC1414.2\n"
           + "021200 PROCEDURE DIVISION.                                              NC1404.2\n"
           + "048400 {#*SET-TEST-003-01}.                                                 NC1404.2\n"
-          + "048700     SET {$INDEX1} UP BY {$CS-3}.                                       NC1404.2\n"
-          + "043200     SET {$INDEX1} DOWN BY {$TABLE2-REC} ({$INDEX2} + 4).                  NC1414.2\n"
+          + "048700     SET {$INDEX1} UP BY {$CS-3}.                                      "
+          + " NC1404.2\n"
+          + "043200     SET {$INDEX1} DOWN BY {$TABLE2-REC} ({$INDEX2} + 4).                 "
+          + " NC1414.2\n"
           + "043200     SET {$INDEX1} DOWN BY {$TABLE2-REC} (2).                         \n"
           + "043200     SET {$INDEX1} DOWN BY {$TABLE2-REC|1}.                  \n";
 
@@ -56,7 +58,8 @@ public class TestSetIndexDoOutproduceErrorForSendingFieldOfTypeInteger {
             "1",
             new Diagnostic(
                 new Range(),
-                "Invalid sending field type. Expected: Elementary integer data item, Non-zero integer",
+                "Invalid sending field type. Expected: Elementary integer data item, Non-zero"
+                    + " integer",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

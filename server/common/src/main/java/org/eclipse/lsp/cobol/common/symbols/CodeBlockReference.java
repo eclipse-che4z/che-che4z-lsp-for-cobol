@@ -14,11 +14,10 @@
  */
 package org.eclipse.lsp.cobol.common.symbols;
 
-import lombok.Getter;
-import org.eclipse.lsp4j.Location;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import org.eclipse.lsp4j.Location;
 
 /**
  * The class represents definitions and references for Section and Paragraphs name node in COBOL

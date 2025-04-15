@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.DocumentHighlightHandler;
 import org.eclipse.lsp4j.DocumentHighlight;
 import org.eclipse.lsp4j.DocumentHighlightParams;
 
-/**
- * `textDocument/documentHighlight` Language server event
- */
+/** `textDocument/documentHighlight` Language server event */
 public class DocumentHighlightQuery implements LspQuery<List<? extends DocumentHighlight>> {
   final CompletableFuture<List<? extends DocumentHighlight>> result;
   private final DocumentHighlightParams params;

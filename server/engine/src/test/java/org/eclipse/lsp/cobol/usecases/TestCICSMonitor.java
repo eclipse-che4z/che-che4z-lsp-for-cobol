@@ -29,17 +29,15 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the MONITOR command.
  */
 public class TestCICSMonitor {
-  private static final String MONITOR_VALID_MINIMAL =
-          "MONITOR POINT({$varOne})";
+  private static final String MONITOR_VALID_MINIMAL = "MONITOR POINT({$varOne})";
 
   private static final String MONITOR_VALID_FULL =
-          "MONITOR POINT({$varOne}) DATA1({$varTwo}) DATA2({$varThree}) ENTRYNAME({$varFour})";
+      "MONITOR POINT({$varOne}) DATA1({$varTwo}) DATA2({$varThree}) ENTRYNAME({$varFour})";
 
-  private static final String MONITOR_INVALID_NO_POINT =
-          "MONITOR {_DATA1({$varTwo})|errorOne_} ";
+  private static final String MONITOR_INVALID_NO_POINT = "MONITOR {_DATA1({$varTwo})|errorOne_} ";
 
   private static final String MONITOR_INVALID_DUPLICATE_DATA1 =
-          "MONITOR POINT({$varOne}) DATA1({$varTwo}) {DATA1|errorOne}({$varThree})";
+      "MONITOR POINT({$varOne}) DATA1({$varTwo}) {DATA1|errorOne}({$varThree})";
 
   @Test
   void testMonitorValidMinimal() {
@@ -54,26 +52,26 @@ public class TestCICSMonitor {
   @Test
   void testMonitorInvalidNoPoint() {
     CICSTestUtils.errorTest(
-            MONITOR_INVALID_NO_POINT,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: POINT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        MONITOR_INVALID_NO_POINT,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: POINT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testMonitorInvalidDuplicateData1() {
     CICSTestUtils.errorTest(
-            MONITOR_INVALID_DUPLICATE_DATA1,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: DATA1",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        MONITOR_INVALID_DUPLICATE_DATA1,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: DATA1",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

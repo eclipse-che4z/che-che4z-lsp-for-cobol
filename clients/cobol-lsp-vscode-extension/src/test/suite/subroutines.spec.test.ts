@@ -23,6 +23,8 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     await helper.activate();
   });
 
+  suiteTeardown(async () => await helper.closeAllEditors());
+
   test("Diagnostics report missing subroutine", async function () {
     this.timeout(helper.TEST_TIMEOUT);
     await helper.showDocument("CALL.cbl");
@@ -39,21 +41,29 @@ suite("Integration Test Suite: Subroutines resolving", () => {
 
   test("Subroutines auto completions are provided", async function () {
     this.timeout(helper.TEST_TIMEOUT);
-    const editor = await helper.showDocument("CALL.cbl");
-    await helper.insertString(
-      editor,
-      helper.pos(23, 0),
-      "           CALL ''.\n",
-    );
-    helper.moveCursor(editor, helper.pos(23, 17));
+    const editor = await helper.openUntitledDocument();
+
+    await helper.insertString(editor, helper.pos(0, 0), "           CALL ''.");
+    await helper.sleep(1000);
+
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
+
+    helper.moveCursor(editor, helper.pos(0, 17));
     const completions = await helper.triggerCompletionsAndWaitForResults();
+    await helper.sleep(1000);
     const position = completions.items.findIndex((ci) => ci.label === "SUB1");
+    assert.notEqual(
+      position,
+      -1,
+      `SUB1 completion not found, ${JSON.stringify(completions.items.slice(0, 10))}`,
+    );
     await helper.executeCommandMultipleTimes("selectNextSuggestion", position);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     await helper.waitFor(() => {
-      return editor.document.lineAt(23).text.trim() === "CALL 'SUB1'.";
+      return editor.document.lineAt(0).text.trim() === "CALL 'SUB1'.";
     });
-    const line = editor.document.lineAt(23).text.trim();
+    const line = editor.document.lineAt(0).text.trim();
     assert.strictEqual(line, "CALL 'SUB1'.");
   });
 });

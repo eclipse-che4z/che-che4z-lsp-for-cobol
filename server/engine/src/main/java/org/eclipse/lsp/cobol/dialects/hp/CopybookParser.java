@@ -14,16 +14,13 @@
  */
 package org.eclipse.lsp.cobol.dialects.hp;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.LinkedList;
-import java.util.List;
-
-/**
- * HP Copybook parser
- */
+/** HP Copybook parser */
 class CopybookParser {
 
   public static List<CopybookDescriptor> parseAndCleanup(ExtendedDocument extendedDocument) {
@@ -35,7 +32,8 @@ class CopybookParser {
       String content = lines[line].toUpperCase();
       int index = content.indexOf("COPY");
       if (index > 0) {
-        Range statementRange = new Range(new Position(line, index), new Position(line, content.length()));
+        Range statementRange =
+            new Range(new Position(line, index), new Position(line, content.length()));
         Range nameRange = findNameRange(content, line, index + "COPY".length());
         String name = "acopylib";
         String variable = "var";
@@ -44,10 +42,10 @@ class CopybookParser {
 
       for (int i = 0; i < content.length(); i++) {
         if (content.charAt(i) == '$') {
-            extendedDocument.replace(new Range(new Position(line, i), new Position(line, i + 1)), " ");
+          extendedDocument.replace(
+              new Range(new Position(line, i), new Position(line, i + 1)), " ");
         }
       }
-
     }
     return result;
   }

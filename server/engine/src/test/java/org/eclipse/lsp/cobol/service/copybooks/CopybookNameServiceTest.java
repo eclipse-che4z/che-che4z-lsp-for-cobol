@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.inject.Provider;
-
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -35,13 +34,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-
 import org.apache.commons.io.FileSystem;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,10 +66,8 @@ class CopybookNameServiceTest {
   private final FileSystemService files = mock(WorkspaceFileService.class);
   private final Path cpyPath = mock(Path.class);
   private final Path wrkPath = mock(Path.class);
-  @Mock
-  private Provider<CobolLanguageClient> provider;
-  @Mock
-  private CobolLanguageClient client;
+  @Mock private Provider<CobolLanguageClient> provider;
+  @Mock private CobolLanguageClient client;
 
   @BeforeEach
   void setupMocks() {
@@ -81,13 +77,14 @@ class CopybookNameServiceTest {
     String relativeValidCpyPath = "copybooks";
     workspaceProgramUri = "file:///" + workspaceProgramUri;
     workspace.add(new WorkspaceFolder(workspaceProgramUri));
-    copyNames.addAll(ImmutableList.of(absoluteValidCpyPath, relativeValidCpyPath, workspaceProgramPath));
+    copyNames.addAll(
+        ImmutableList.of(absoluteValidCpyPath, relativeValidCpyPath, workspaceProgramPath));
     when(provider.get()).thenReturn(client);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(workspace));
     when(settingsService.fetchTextConfigurationWithScope(any(), eq(CPY_LOCAL_PATHS.label)))
-            .thenReturn(CompletableFuture.completedFuture(copyNames));
+        .thenReturn(CompletableFuture.completedFuture(copyNames));
     when(settingsService.fetchTextConfigurationWithScope(any(), eq(DIALECTS.label)))
-            .thenReturn(CompletableFuture.completedFuture(Collections.emptyList()));
+        .thenReturn(CompletableFuture.completedFuture(Collections.emptyList()));
   }
 
   private JsonArray toJsonArray(List<String> copyNames) {
@@ -98,101 +95,76 @@ class CopybookNameServiceTest {
 
   static Stream<Arguments> collectCopybookNamesData() {
     return Stream.of(
-            Arguments.of(
-                    Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
-                    Arrays.asList(".cpy", ".CPY"),
-                    2),
-            Arguments.of(
-                    Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
-                    Collections.singletonList(".cpy"),
-                    0), // lowercase extension, copybooks not found
-            Arguments.of(
-                    Collections.emptyList(),
-                    Arrays.asList(".cpy", ".CPY"),
-                    0), // no folders with copybooks, nothing found
-            Arguments.of(
-                    Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
-                    Arrays.asList(".abc", ".cde"),
-                    0), // copybooks with extensions from config wasn't found.
-            Arguments.of(
-                    Arrays.asList("VALIDNAME2.abc", "VALIDNAME.cde"),
-                    Arrays.asList(".abc", ".cde"),
-                    2),
-            Arguments.of(
-                    Arrays.asList("VALIDNAME2", "VALIDNAME"),
-                    Collections.singletonList(""),
-                    2)
-    );
+        Arguments.of(
+            Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"), Arrays.asList(".cpy", ".CPY"), 2),
+        Arguments.of(
+            Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
+            Collections.singletonList(".cpy"),
+            0), // lowercase extension, copybooks not found
+        Arguments.of(
+            Collections.emptyList(),
+            Arrays.asList(".cpy", ".CPY"),
+            0), // no folders with copybooks, nothing found
+        Arguments.of(
+            Arrays.asList("VALIDNAME2.CPY", "VALIDNAME.CPY"),
+            Arrays.asList(".abc", ".cde"),
+            0), // copybooks with extensions from config wasn't found.
+        Arguments.of(
+            Arrays.asList("VALIDNAME2.abc", "VALIDNAME.cde"), Arrays.asList(".abc", ".cde"), 2),
+        Arguments.of(Arrays.asList("VALIDNAME2", "VALIDNAME"), Collections.singletonList(""), 2));
   }
 
   static Stream<Arguments> copybooksWithExtensionsOrderData() {
     return Stream.of(
-            Arguments.of(
-                    Arrays.asList(".xyz", ".copy", ".COPY", ".cpy", ".CPY"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("copy").build())
-            ),
-            Arguments.of(
-                    Arrays.asList(".xyz", ".CPY", ".cpy", ".COPY", ".copy"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("CPY").build())
-            ),
-            Arguments.of(
-                    Arrays.asList(".xyz", ".acd"),
-                    Optional.empty()
-            ),
-            Arguments.of(
-                    Arrays.asList("", ".copy"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("").build())
-            ),
-            Arguments.of(
-                    Collections.emptyList(),
-                    Optional.empty()
-            ),
-            Arguments.of(
-                    Arrays.asList(".COPY", ".copy"),
-                    Optional.of(CopybookName.builder().displayName("A").extension("COPY").build())
-            )
-    );
+        Arguments.of(
+            Arrays.asList(".xyz", ".copy", ".COPY", ".cpy", ".CPY"),
+            Optional.of(CopybookName.builder().displayName("A").extension("copy").build())),
+        Arguments.of(
+            Arrays.asList(".xyz", ".CPY", ".cpy", ".COPY", ".copy"),
+            Optional.of(CopybookName.builder().displayName("A").extension("CPY").build())),
+        Arguments.of(Arrays.asList(".xyz", ".acd"), Optional.empty()),
+        Arguments.of(
+            Arrays.asList("", ".copy"),
+            Optional.of(CopybookName.builder().displayName("A").extension("").build())),
+        Arguments.of(Collections.emptyList(), Optional.empty()),
+        Arguments.of(
+            Arrays.asList(".COPY", ".copy"),
+            Optional.of(CopybookName.builder().displayName("A").extension("COPY").build())));
   }
 
   @ParameterizedTest
   @MethodSource("copybooksWithExtensionsOrderData")
   void testCopybooksWithExtensionsOrder(
-          List<String> extensionsInConfig,
-          Optional<CopybookName> copybookFound
-  ) {
+      List<String> extensionsInConfig, Optional<CopybookName> copybookFound) {
 
     validFoldersMock();
-    when(settingsService.fetchTextConfigurationWithScope(anyString(),
-            eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
+    when(settingsService.fetchTextConfigurationWithScope(anyString(), eq(CPY_EXTENSIONS.label)))
+        .thenReturn(CompletableFuture.completedFuture(extensionsInConfig));
     when(files.listFilesInDirectory(anyString())).thenReturn(Collections.emptyList());
-    when(files.listFilesInDirectory(anyString())).thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy", "A"));
+    when(files.listFilesInDirectory(anyString()))
+        .thenReturn(Arrays.asList("A.CPY", "A.COPY", "A.cpy", "A.copy", "A"));
 
     CopybookNameService copybookNameService =
-            new CopybookNameServiceImpl(settingsService, files, provider);
+        new CopybookNameServiceImpl(settingsService, files, provider);
     copybookNameService.collectLocalCopybookNames();
 
     assertEquals(copybookFound, copybookNameService.findByName("", "A"));
-
   }
 
-  /**
-   * Test scenarios when the copybook local path exists in the settings.
-   */
+  /** Test scenarios when the copybook local path exists in the settings. */
   @ParameterizedTest
   @MethodSource("collectCopybookNamesData")
-  void
-  testValidFoldersWithCopybooks(
-          List<String> filesInCopybookDirectory,
-          List<String> extensionsInCofig,
-          int expectedCopybookFound
-  ) {
+  void testValidFoldersWithCopybooks(
+      List<String> filesInCopybookDirectory,
+      List<String> extensionsInCofig,
+      int expectedCopybookFound) {
     validFoldersMock();
-    when(settingsService.fetchTextConfigurationWithScope(anyString(),
-            eq(CPY_EXTENSIONS.label))).thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
+    when(settingsService.fetchTextConfigurationWithScope(anyString(), eq(CPY_EXTENSIONS.label)))
+        .thenReturn(CompletableFuture.completedFuture(extensionsInCofig));
     when(files.listFilesInDirectory(absoluteValidCpyPath)).thenReturn(filesInCopybookDirectory);
 
     CopybookNameService copybookNameService =
-            new CopybookNameServiceImpl(settingsService, files, provider);
+        new CopybookNameServiceImpl(settingsService, files, provider);
 
     assertEquals(expectedCopybookFound, copybookNameService.getNames("/TEST/MY.CBL").size());
   }
@@ -200,11 +172,12 @@ class CopybookNameServiceTest {
   @Test
   void testNullPaths() {
     CopybookNameService copybookNameService =
-            new CopybookNameServiceImpl(settingsService, files, provider);
+        new CopybookNameServiceImpl(settingsService, files, provider);
     when(client.workspaceFolders()).thenReturn(CompletableFuture.completedFuture(null));
     when(settingsService.fetchTextConfigurationWithScope(anyString(), eq(CPY_EXTENSIONS.label)))
-            .thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
-    when(settingsService.fetchConfigurations(any(), any())).thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
+        .thenReturn(CompletableFuture.completedFuture(Collections.singletonList("cpy")));
+    when(settingsService.fetchConfigurations(any(), any()))
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
     when(files.decodeURI(absoluteValidCpyPath)).thenReturn(null);
     when(files.getPathFromURI(absoluteValidCpyPath)).thenReturn(null);
     when(cpyPath.resolve(absoluteValidCpyPath)).thenReturn(null);

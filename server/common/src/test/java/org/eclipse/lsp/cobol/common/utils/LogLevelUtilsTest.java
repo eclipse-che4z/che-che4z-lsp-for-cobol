@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ch.qos.logback.classic.Level;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
@@ -22,12 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * This test checks the runtime root log level update provided by {@link
- * LogLevelUtils}
- */
+/** This test checks the runtime root log level update provided by {@link LogLevelUtils} */
 class LogLevelUtilsTest {
 
   /** Test the runtime root log level update provided by {@link LogLevelUtils#updateLogLevel()} */

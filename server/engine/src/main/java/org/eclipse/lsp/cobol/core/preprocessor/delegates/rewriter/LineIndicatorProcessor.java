@@ -24,10 +24,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.CobolLineUtils;
-import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
 /**
  * This class processes the indicator area of COBOL lines checking if some operations should be
@@ -39,8 +39,7 @@ public abstract class LineIndicatorProcessor implements CobolLineReWriter {
   private static final String DOUBLE_QUOTE_LITERAL = "\"([^\"]|\"\"|'')*+\"";
   private static final String SINGLE_QUOTE_LITERAL = "'([^']|''|\"\")*+'";
   public static final Pattern FLOATING_COMMENT_LINE =
-      Pattern.compile(
-              "(?<validText>.*?)(?<floatingComment>\\*>.*)?");
+      Pattern.compile("(?<validText>.*?)(?<floatingComment>\\*>.*)?");
 
   protected abstract CobolProgramLayout getLayout();
 
@@ -85,8 +84,7 @@ public abstract class LineIndicatorProcessor implements CobolLineReWriter {
     final String trimmedContentArea = trimLeadingWhitespace(conditionalRightTrimmedContentArea);
     if (StringUtils.isBlank(conditionalRightTrimmedContentArea)) {
       result =
-          CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(
-              WS, EMPTY_STRING, line, layout);
+          CobolLineUtils.copyCobolLineWithIndicatorAndContentArea(WS, EMPTY_STRING, line, layout);
       /*
        If a line, which is continued on the next line, ends in column 72 with a quotation mark as
        the last character ...

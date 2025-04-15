@@ -18,28 +18,26 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 
-/**
- * Utility class for registered server type
- */
+/** Utility class for registered server type */
 @UtilityClass
 public class ServerTypeUtil {
-    /**
-     * Checks if the registered serverType is compatible with the registered dialects.
-     * True, if server type is NATIVE and dialects are registered, false otherwise.
-     *
-     * @param analysisConfig Configuration
-     * @return True, if server type is NATIVE and dialects are registered, false otherwise.
-     */
-    public boolean isInCompatibleServerTypeRegistered(@NonNull AnalysisConfig analysisConfig) {
-        return isNativeServerType() && !analysisConfig.getDialects().isEmpty();
-    }
+  /**
+   * Checks if the registered serverType is compatible with the registered dialects. True, if server
+   * type is NATIVE and dialects are registered, false otherwise.
+   *
+   * @param analysisConfig Configuration
+   * @return True, if server type is NATIVE and dialects are registered, false otherwise.
+   */
+  public boolean isInCompatibleServerTypeRegistered(@NonNull AnalysisConfig analysisConfig) {
+    return isNativeServerType() && !analysisConfig.getDialects().isEmpty();
+  }
 
-    /**
-     * True if server is started as a native server.
-     *
-     * @return True if server is started as a native server
-     */
-    public boolean isNativeServerType() {
-        return System.getProperty("serverType", "JAVA").equalsIgnoreCase("NATIVE");
-    }
+  /**
+   * True if server is started as a native server.
+   *
+   * @return True if server is started as a native server
+   */
+  public boolean isNativeServerType() {
+    return System.getProperty("serverType", "JAVA").equalsIgnoreCase("NATIVE");
+  }
 }

@@ -101,7 +101,8 @@ public class ServiceModule extends AbstractModule {
   }
 
   private void bindHoverActions() {
-    Multibinder<HoverProvider> hoverProviderMultibinder = newSetBinder(binder(), HoverProvider.class);
+    Multibinder<HoverProvider> hoverProviderMultibinder =
+        newSetBinder(binder(), HoverProvider.class);
     hoverProviderMultibinder.addBinding().to(VariableHover.class);
     hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }

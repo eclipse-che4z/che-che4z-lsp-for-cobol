@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.model;
 
 import lombok.Getter;
+
 /** Enum for the different Section types */
 public enum SectionType {
   CONFIGURATION("CONFIGURATION"),

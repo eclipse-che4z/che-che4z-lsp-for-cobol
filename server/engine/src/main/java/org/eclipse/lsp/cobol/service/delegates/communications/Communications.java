@@ -14,11 +14,10 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.communications;
 
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.MessageType;
-
 import java.util.List;
 import java.util.Map;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.MessageType;
 
 public interface Communications {
 

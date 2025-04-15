@@ -29,20 +29,18 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the LOAD command.
  */
 public class TestCICSLoad {
-  private static final String LOAD_VALID_MINIMAL =
-          "LOAD PROGRAM({$varOne})";
+  private static final String LOAD_VALID_MINIMAL = "LOAD PROGRAM({$varOne})";
 
   private static final String LOAD_VALID_FULL =
-          "LOAD PROGRAM({$varOne}) SET({$varTwo}) LENGTH({$varThree}) ENTRY({$varFour}) HOLD";
+      "LOAD PROGRAM({$varOne}) SET({$varTwo}) LENGTH({$varThree}) ENTRY({$varFour}) HOLD";
 
-  private static final String LOAD_INVALID_NO_PROGRAM =
-          "LOAD {_SET({$varTwo}) HOLD|errorOne_} ";
+  private static final String LOAD_INVALID_NO_PROGRAM = "LOAD {_SET({$varTwo}) HOLD|errorOne_} ";
 
   private static final String LOAD_INVALID_DUPLICATE_SET =
-          "LOAD PROGRAM({$varOne}) SET({$varTwo}) {SET|errorOne}({$varTwo}) HOLD";
+      "LOAD PROGRAM({$varOne}) SET({$varTwo}) {SET|errorOne}({$varTwo}) HOLD";
 
   private static final String LOAD_INVALID_DUPLICATE_LENGTH =
-          "LOAD PROGRAM({$varOne}) {LENGTH|errorOne} ({$varTwo}){FLENGTH|errorTwo}({$varThree})";
+      "LOAD PROGRAM({$varOne}) {LENGTH|errorOne} ({$varTwo}){FLENGTH|errorTwo}({$varThree})";
 
   @Test
   void testLoadValidMinimal() {
@@ -57,45 +55,45 @@ public class TestCICSLoad {
   @Test
   void testLoadInvalidNoProgram() {
     CICSTestUtils.errorTest(
-            LOAD_INVALID_NO_PROGRAM,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: PROGRAM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LOAD_INVALID_NO_PROGRAM,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PROGRAM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testLoadInvalidDuplicateSet() {
     CICSTestUtils.errorTest(
-            LOAD_INVALID_DUPLICATE_SET,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: SET",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LOAD_INVALID_DUPLICATE_SET,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testLoadInvalidDuplicateLength() {
     CICSTestUtils.errorTest(
-            LOAD_INVALID_DUPLICATE_LENGTH,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: LENGTH or FLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: LENGTH or FLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LOAD_INVALID_DUPLICATE_LENGTH,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: LENGTH or FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: LENGTH or FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

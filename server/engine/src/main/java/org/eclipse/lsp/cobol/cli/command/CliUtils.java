@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.Injector;
+import java.util.Optional;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.SubroutineService;
@@ -39,26 +40,22 @@ import org.eclipse.lsp.cobol.dialects.ibm.*;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 
-import java.util.Optional;
-
-/**
- * CLI related utils
- */
+/** CLI related utils */
 public class CliUtils {
 
-  public static final Gson GSON = new GsonBuilder()
-          .disableHtmlEscaping()
-          .setPrettyPrinting().create();
+  public static final Gson GSON =
+      new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
   /**
    * Init CLI pipeline
    *
-   * @param diCtx              DI context
+   * @param diCtx DI context
    * @param isAnalysisRequired do we need analysis in the pipeline
-   * @param dialect            cobol dialect
+   * @param dialect cobol dialect
    * @return new pipeline
    */
-  public static Pipeline<AnalysisContext> setupPipeline(Injector diCtx, boolean isAnalysisRequired, CobolLanguageId dialect) {
+  public static Pipeline<AnalysisContext> setupPipeline(
+      Injector diCtx, boolean isAnalysisRequired, CobolLanguageId dialect) {
     switch (dialect) {
       case COBOL:
         return getPipelineForCobolDialect(diCtx, isAnalysisRequired);
@@ -77,40 +74,58 @@ public class CliUtils {
    */
   public static JsonObject diagnosticToJson(SyntaxError syntaxError) {
     JsonObject diagnostic = new JsonObject();
-    Optional.ofNullable(syntaxError.getErrorCode()).ifPresent(code -> diagnostic.add("code", new JsonPrimitive(code.getLabel())));
-    Optional.ofNullable(syntaxError.getErrorSource()).ifPresent(es -> diagnostic.add("source", new JsonPrimitive(es.getText())));
-    Optional.ofNullable(syntaxError.getLocation()).ifPresent(l -> diagnostic.add("location", GSON.toJsonTree(l)));
-    Optional.ofNullable(syntaxError.getSeverity()).ifPresent(s -> diagnostic.add("severity", new JsonPrimitive(s.name())));
-    Optional.ofNullable(syntaxError.getSuggestion()).ifPresent(s -> diagnostic.add("suggestion", new JsonPrimitive(s)));
-    Optional.ofNullable(syntaxError.getRelatedInformation()).ifPresent(ri -> diagnostic.add("related", GSON.toJsonTree(ri)));
+    Optional.ofNullable(syntaxError.getErrorCode())
+        .ifPresent(code -> diagnostic.add("code", new JsonPrimitive(code.getLabel())));
+    Optional.ofNullable(syntaxError.getErrorSource())
+        .ifPresent(es -> diagnostic.add("source", new JsonPrimitive(es.getText())));
+    Optional.ofNullable(syntaxError.getLocation())
+        .ifPresent(l -> diagnostic.add("location", GSON.toJsonTree(l)));
+    Optional.ofNullable(syntaxError.getSeverity())
+        .ifPresent(s -> diagnostic.add("severity", new JsonPrimitive(s.name())));
+    Optional.ofNullable(syntaxError.getSuggestion())
+        .ifPresent(s -> diagnostic.add("suggestion", new JsonPrimitive(s)));
+    Optional.ofNullable(syntaxError.getRelatedInformation())
+        .ifPresent(ri -> diagnostic.add("related", GSON.toJsonTree(ri)));
     return diagnostic;
   }
 
-
-  private static Pipeline<AnalysisContext> getPipelineForHpCobol(Injector diCtx, boolean isAnalysisRequired) {
+  private static Pipeline<AnalysisContext> getPipelineForHpCobol(
+      Injector diCtx, boolean isAnalysisRequired) {
     Pipeline<AnalysisContext> pipeline = new Pipeline<>();
     DialectService dialectService = diCtx.getInstance(DialectService.class);
     MessageService messageService = diCtx.getInstance(MessageService.class);
-    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(CobolLanguageId.HP_COBOL);
+    CleanerPreprocessor preprocessor =
+        diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(CobolLanguageId.HP_COBOL);
 
     pipeline.add(new HpCleanupStage(preprocessor));
     pipeline.add(new CompilerDirectivesStage(messageService));
-    pipeline.add(new HpCopybookProcessingStage(messageService, diCtx.getInstance(CopybookService.class)));
+    pipeline.add(
+        new HpCopybookProcessingStage(messageService, diCtx.getInstance(CopybookService.class)));
     pipeline.add(new PreprocessorStage(diCtx.getInstance(GrammarPreprocessor.class), preprocessor));
     if (isAnalysisRequired) {
       pipeline.add(new ImplicitDialectProcessingStage(dialectService));
       pipeline.add(new ParserStage(messageService, diCtx.getInstance(ParseTreeListener.class)));
-      pipeline.add(new TransformTreeStage(diCtx.getInstance(SymbolsRepository.class), messageService, diCtx.getInstance(SubroutineService.class), diCtx.getInstance(CachingConfigurationService.class), dialectService, diCtx.getInstance(AstProcessor.class), diCtx.getInstance(CodeLayoutStore.class)));
+      pipeline.add(
+          new TransformTreeStage(
+              diCtx.getInstance(SymbolsRepository.class),
+              messageService,
+              diCtx.getInstance(SubroutineService.class),
+              diCtx.getInstance(CachingConfigurationService.class),
+              dialectService,
+              diCtx.getInstance(AstProcessor.class),
+              diCtx.getInstance(CodeLayoutStore.class)));
     }
     return pipeline;
   }
 
-  private static Pipeline<AnalysisContext> getPipelineForCobolDialect(Injector diCtx, boolean isAnalysisRequired) {
+  private static Pipeline<AnalysisContext> getPipelineForCobolDialect(
+      Injector diCtx, boolean isAnalysisRequired) {
     Pipeline<AnalysisContext> pipeline = new Pipeline<>();
     DialectService dialectService = diCtx.getInstance(DialectService.class);
     MessageService messageService = diCtx.getInstance(MessageService.class);
     GrammarPreprocessor grammarPreprocessor = diCtx.getInstance(GrammarPreprocessor.class);
-    CleanerPreprocessor preprocessor = diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(CobolLanguageId.COBOL);
+    CleanerPreprocessor preprocessor =
+        diCtx.getInstance(TrueDialectServiceImpl.class).getPreprocessor(CobolLanguageId.COBOL);
 
     pipeline.add(new IbmCleanupStage(preprocessor));
     pipeline.add(new CompilerDirectivesStage(messageService));
@@ -119,7 +134,15 @@ public class CliUtils {
     if (isAnalysisRequired) {
       pipeline.add(new ImplicitDialectProcessingStage(dialectService));
       pipeline.add(new ParserStage(messageService, diCtx.getInstance(ParseTreeListener.class)));
-      pipeline.add(new TransformTreeStage(diCtx.getInstance(SymbolsRepository.class), messageService, diCtx.getInstance(SubroutineService.class), diCtx.getInstance(CachingConfigurationService.class), dialectService, diCtx.getInstance(AstProcessor.class), diCtx.getInstance(CodeLayoutStore.class)));
+      pipeline.add(
+          new TransformTreeStage(
+              diCtx.getInstance(SymbolsRepository.class),
+              messageService,
+              diCtx.getInstance(SubroutineService.class),
+              diCtx.getInstance(CachingConfigurationService.class),
+              dialectService,
+              diCtx.getInstance(AstProcessor.class),
+              diCtx.getInstance(CodeLayoutStore.class)));
     }
     return pipeline;
   }

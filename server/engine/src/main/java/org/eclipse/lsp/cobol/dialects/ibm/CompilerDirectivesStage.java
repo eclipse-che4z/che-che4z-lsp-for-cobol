@@ -25,6 +25,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
+import org.eclipse.lsp.cobol.common.pipeline.Stage;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
@@ -32,19 +34,18 @@ import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorListener;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorStrategy;
 import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesVisitor;
-import org.eclipse.lsp.cobol.common.pipeline.Stage;
-import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Process compiler options statements in the source file and substitute them with empty lines.
- */
-public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node>, List<CompilerDirectiveNode>> {
+/** Process compiler options statements in the source file and substitute them with empty lines. */
+public class CompilerDirectivesStage
+    implements Stage<AnalysisContext, List<Node>, List<CompilerDirectiveNode>> {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
           Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)(?:\\*?(CBL|PROCESS)\\s+(?<compilerOptions>.+)|>>\\s*(?<compilerDirectives>.+))");
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
-  private static final Pattern DIALECT_FILLER_PATTERN = Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
+  private static final Pattern DIALECT_FILLER_PATTERN =
+      Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
   private static final Pattern SECTION_PATTERN =
           Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
   private static final Pattern JAVA_SHAREABLE_ON_PATTERN = Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
@@ -87,9 +88,7 @@ public class CompilerDirectivesStage implements Stage<AnalysisContext, List<Node
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
-      Range range = new Range(
-              new Position(i, 0),
-              new Position(i, lines[i].length()));
+      Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
       ctx.getExtendedDocument().replace(range, newText);
     }
 

@@ -17,15 +17,13 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
+import org.eclipse.lsp.cobol.test.CobolText;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for DaCo implicit code injection
- */
+/** Test for DaCo implicit code injection */
 class TestDaCoImplicitCode {
 
   private static final String TEXT_WS =
@@ -55,10 +53,11 @@ class TestDaCoImplicitCode {
           + "               MOVE 6 to {$OPDATOINI-XII}.\r\n"
           + "               MOVE 6 to {$RMXKNM-BIA}.\r\n";
 
-  private static final String COPY = "       01  {$*ITEAVL-XIA}.\n"
-      + "           03 {$*TBLKNM-XIA}.\n"
-      + "             05 {$*ROWKNM-XIA}                         OCCURS 15.\n"
-      + "               07 {$*SPETPS-XIA}           PIC X.\n";
+  private static final String COPY =
+      "       01  {$*ITEAVL-XIA}.\n"
+          + "           03 {$*TBLKNM-XIA}.\n"
+          + "             05 {$*ROWKNM-XIA}                         OCCURS 15.\n"
+          + "               07 {$*SPETPS-XIA}           PIC X.\n";
 
   private static final String TEXT_DYN =
       "        IDENTIFICATION DIVISION. \n"
@@ -94,7 +93,9 @@ class TestDaCoImplicitCode {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_WS,
         ImmutableList.of(Fixtures.subschemaCopy("")),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 
   @Test
@@ -102,15 +103,20 @@ class TestDaCoImplicitCode {
     UseCaseEngine.runTest(
         TEXT_LS,
         ImmutableList.of(),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 
   @Test
   void testImplicitWorkingSectionDynamicCode() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT,
-        ImmutableList.of(new CobolText("PMOREC", DaCoDialect.NAME, COPY), Fixtures.subschemaCopy("")),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(
+            new CobolText("PMOREC", DaCoDialect.NAME, COPY), Fixtures.subschemaCopy("")),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 
   @Test
@@ -118,7 +124,9 @@ class TestDaCoImplicitCode {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_DYN,
         ImmutableList.of(Fixtures.subschemaCopy("")),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 
   @Test
@@ -126,7 +134,9 @@ class TestDaCoImplicitCode {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_DYN_DUPLICATE,
         ImmutableList.of(Fixtures.subschemaCopy("")),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 
   @Test
@@ -134,7 +144,8 @@ class TestDaCoImplicitCode {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_SML,
         ImmutableList.of(Fixtures.subschemaCopy("")),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
-
 }

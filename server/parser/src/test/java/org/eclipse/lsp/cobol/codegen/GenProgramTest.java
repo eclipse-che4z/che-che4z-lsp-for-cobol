@@ -16,14 +16,12 @@
  */
 package org.eclipse.lsp.cobol.codegen;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Code generator tests.
- */
+import org.junit.jupiter.api.Test;
+
+/** Code generator tests. */
 class GenProgramTest {
   @Test
   void test() {

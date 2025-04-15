@@ -20,14 +20,15 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
 /**
- * The class represents SORT statement in COBOL.
- * <a href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
+ * The class represents SORT statement in COBOL. <a
+ * href="https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-sort-statement">...</a>
  */
 @Getter
 @ToString(callSuper = true)
 public class SortNode extends Node {
   boolean ascending;
   String key;
+
   public SortNode(Locality location, boolean ascending, String key) {
     super(location, NodeType.SORT);
     this.ascending = ascending;

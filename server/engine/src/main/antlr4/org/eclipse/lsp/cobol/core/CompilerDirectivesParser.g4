@@ -35,7 +35,9 @@ compilerXOptsOption
        : APOST
        | CBLCARD
        | CICS
+       | CO2
        | COBOL2
+       | CO3
        | COBOL3
        | CPSM
        | DBCS
@@ -47,6 +49,7 @@ compilerXOptsOption
        | ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR)
        | LENGTH
        | ((LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR)
+       | LIN
        | LINKAGE
        | NATLANG
        | NOCBLCARD
@@ -62,7 +65,9 @@ compilerXOptsOption
        | NOSPIE
        | NOVBREF
        | NUM
+       | OP
        | OPTIONS
+       | Q_CHAR
        | QUOTE
        | SEQ
        | SP
@@ -73,8 +78,8 @@ compilerXOptsOption
        ;
 
 cicsTranslatorCompileDirectivedKeywords
-       : CBLCARD | COBOL2 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
-       | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OPTIONS | SP | SPIE | SYSEIB
+       : CBLCARD | CO2 | COBOL2 | CO3 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | LIN | LINKAGE | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
+       | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OP | OPTIONS | Q_CHAR | QUOTE | SP | SPIE | SYSEIB
        ;
 
 deprecatedCompilerOptions:

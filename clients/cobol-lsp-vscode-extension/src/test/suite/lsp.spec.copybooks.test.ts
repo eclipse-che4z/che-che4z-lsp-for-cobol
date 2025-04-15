@@ -236,12 +236,26 @@ suite("Integration Test Suite: Copybooks", function () {
     });
 
     test("Copybooks auto completions are provided", async function () {
-      const editor = await helper.showDocument("USERC1N1.cbl");
-      await helper.insertString(editor, helper.pos(19, 0), "       COPY PAY\n");
-      helper.moveCursor(editor, helper.pos(19, 18));
+      const editor = await helper.openUntitledDocument();
+      await helper.insertString(editor, pos(0, 0), "      COPY PAY.");
+
+      await helper.sleep(1000);
+
+      const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      assert.strictEqual(diagnostics.length, 0);
+
+      helper.moveCursor(editor, helper.pos(0, 14));
+
       const completions = await helper.triggerCompletionsAndWaitForResults();
+      await helper.sleep(1000);
+
       const position = completions.items.findIndex(
         (ci) => ci.label === "PAYLIB",
+      );
+      assert.notEqual(
+        position,
+        -1,
+        `PAYLIB completion not found, ${JSON.stringify(completions.items.slice(0, 10))}`,
       );
 
       await helper.executeCommandMultipleTimes(
@@ -251,9 +265,10 @@ suite("Integration Test Suite: Copybooks", function () {
 
       await vscode.commands.executeCommand("acceptSelectedSuggestion");
       await helper.waitFor(() => {
-        return editor.document.lineAt(19).text.trim() === "COPY PAYLIB";
+        return editor.document.lineAt(0).text.trim() === "COPY PAYLIB.";
       });
-      assert.strictEqual(editor.document.lineAt(19).text.trim(), "COPY PAYLIB");
+
+      assert.strictEqual(editor.document.lineAt(0).text.trim(), "COPY PAYLIB.");
     });
   });
 });

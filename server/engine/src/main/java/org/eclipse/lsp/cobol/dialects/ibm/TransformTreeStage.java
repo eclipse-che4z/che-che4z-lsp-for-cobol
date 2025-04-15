@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.*;
-
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -61,11 +60,10 @@ import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Transform Tree Stage
- */
+/** Transform Tree Stage */
 @RequiredArgsConstructor
-public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResult, ParserStageResult> {
+public class TransformTreeStage
+    implements Stage<AnalysisContext, ProcessingResult, ParserStageResult> {
 
   protected final SymbolsRepository symbolsRepository;
   protected final MessageService messageService;
@@ -76,14 +74,18 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   protected final CodeLayoutStore layoutStore;
 
   @Override
-  public StageResult<ProcessingResult> run(AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
+  public StageResult<ProcessingResult> run(
+      AnalysisContext context, StageResult<ParserStageResult> prevStageResult) {
     // Transform parsed tree to AST
     // We expect only the root node here
-    RootNode rootNode = (RootNode) transformAST(
-            context,
-            context.getCopybooksRepository(),
-            prevStageResult.getData().getTokens(),
-            prevStageResult.getData().getTree()).get(0);
+    RootNode rootNode =
+        (RootNode)
+            transformAST(
+                    context,
+                    context.getCopybooksRepository(),
+                    prevStageResult.getData().getTokens(),
+                    prevStageResult.getData().getTree())
+                .get(0);
 
     SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
     processSyntaxTree(context.getConfig(), symbolAccumulator, context, rootNode);
@@ -114,7 +116,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     int index = 0;
     for (Node child : node.getChildren()) {
       if (child.getLocality().getUri().equals(dialectNode.getLocality().getUri())
-          && (child.getLocality().getRange().getStart().getLine() >= dialectNode.getLocality().getRange().getStart().getLine())) {
+          && (child.getLocality().getRange().getStart().getLine()
+              >= dialectNode.getLocality().getRange().getStart().getLine())) {
         break;
       }
       index++;
@@ -124,25 +127,39 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   }
 
   private void addCopyNodes(AnalysisContext context, Node rootNode) {
-    for (Map.Entry<String, Location> copybook : context.getCopybooksRepository().getUsages().entries()) {
+    for (Map.Entry<String, Location> copybook :
+        context.getCopybooksRepository().getUsages().entries()) {
       String name = copybook.getKey();
       Range range = copybook.getValue().getRange();
-      Locality statementLocality = Locality.builder().range(range).uri(copybook.getValue().getUri()).build();
-      String copybookUri = context.getCopybooksRepository().getDefinitions().get(name).stream().findFirst().orElse(null);
-      rootNode.addChild(
-          new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
+      Locality statementLocality =
+          Locality.builder().range(range).uri(copybook.getValue().getUri()).build();
+      String copybookUri =
+          context.getCopybooksRepository().getDefinitions().get(name).stream()
+              .findFirst()
+              .orElse(null);
+      rootNode.addChild(new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
     }
   }
 
-  protected List<Node> transformAST(AnalysisContext ctx,
-                                  CopybooksRepository copybooksRepository, CommonTokenStream tokens,
-                                  CobolParser.StartRuleContext tree) {
-    CobolProgramLayout cobolProgramLayout = layoutStore.getCodeLayout()
+  protected List<Node> transformAST(
+      AnalysisContext ctx,
+      CopybooksRepository copybooksRepository,
+      CommonTokenStream tokens,
+      CobolParser.StartRuleContext tree) {
+    CobolProgramLayout cobolProgramLayout =
+        layoutStore
+            .getCodeLayout()
             .map(lay -> CodeLayoutUtil.mergeLayout(ctx.getLanguageId().getLayout(), lay))
             .orElse(ctx.getLanguageId().getLayout());
     CobolVisitor visitor =
-        new CobolVisitor(copybooksRepository, tokens, ctx.getExtendedDocument(),
-            messageService, subroutineService, cachingConfigurationService, cobolProgramLayout);
+        new CobolVisitor(
+            copybooksRepository,
+            tokens,
+            ctx.getExtendedDocument(),
+            messageService,
+            subroutineService,
+            cachingConfigurationService,
+            cobolProgramLayout);
     List<Node> syntaxTree = visitor.visit(tree);
     shapeSectionsAndParagraphs(syntaxTree.get(0));
     ctx.getAccumulatedErrors().addAll(visitor.getErrors());
@@ -154,16 +171,17 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     List<Node> children = new ArrayList<>();
     for (Node node : parent.getChildren()) {
       if (!node.getChildren().isEmpty()) {
-          shapeSectionsAndParagraphs(node);
+        shapeSectionsAndParagraphs(node);
       }
-      if (node.getNodeType() == NodeType.PROCEDURE_SECTION && !(node instanceof DeclarativeProcedureSectionNode)) {
-          handleSection(stack, node);
-          children.add(node);
-          continue;
+      if (node.getNodeType() == NodeType.PROCEDURE_SECTION
+          && !(node instanceof DeclarativeProcedureSectionNode)) {
+        handleSection(stack, node);
+        children.add(node);
+        continue;
       }
       if (node.getNodeType() == NodeType.PARAGRAPH) {
-          handleParagraph(children, stack, node);
-          continue;
+        handleParagraph(children, stack, node);
+        continue;
       }
 
       if (!stack.isEmpty()) {
@@ -179,20 +197,20 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
   }
 
   private void handleSection(LinkedList<Node> stack, Node node) {
-      if (stack.isEmpty()) {
-          stack.push(node);
-          return;
-      }
-      if (stack.peek().getNodeType() == NodeType.PROCEDURE_SECTION) {
-          stack.pop();
-          stack.push(node);
-          return;
-      }
-      if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
-          stack.pop();
-          stack.pop();
-          stack.push(node);
-      }
+    if (stack.isEmpty()) {
+      stack.push(node);
+      return;
+    }
+    if (stack.peek().getNodeType() == NodeType.PROCEDURE_SECTION) {
+      stack.pop();
+      stack.push(node);
+      return;
+    }
+    if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
+      stack.pop();
+      stack.pop();
+      stack.push(node);
+    }
   }
 
   private static void handleParagraph(List<Node> siblings, LinkedList<Node> stack, Node node) {
@@ -214,68 +232,88 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
       return;
     }
     if (stack.peek().getNodeType() == NodeType.PARAGRAPH) {
-        stack.pop();
-        stack.peek().addChild(node);
-        stack.push(node);
+      stack.pop();
+      stack.peek().addChild(node);
+      stack.push(node);
     }
   }
 
-  private void processSyntaxTree(AnalysisConfig analysisConfig, SymbolAccumulator symbolAccumulator, AnalysisContext ctx, Node rootNode) {
+  private void processSyntaxTree(
+      AnalysisConfig analysisConfig,
+      SymbolAccumulator symbolAccumulator,
+      AnalysisContext ctx,
+      Node rootNode) {
     addCopyNodes(ctx, rootNode);
     addDialectsNode(ctx, rootNode);
 
     ProcessingContext processingContext =
-            new ProcessingContext(new ArrayList<>(), symbolAccumulator, getCompilerDirectiveContext(analysisConfig), ctx.getConfig().getDialectsSettings());
+        new ProcessingContext(
+            new ArrayList<>(),
+            symbolAccumulator,
+            getCompilerDirectiveContext(analysisConfig),
+            ctx.getConfig().getDialectsSettings());
     registerProcessors(analysisConfig, processingContext, symbolAccumulator, ctx.getLanguageId());
-    ctx.getAccumulatedErrors().addAll(astProcessor.processSyntaxTree(analysisConfig, processingContext, ctx, rootNode));
+    ctx.getAccumulatedErrors()
+        .addAll(astProcessor.processSyntaxTree(analysisConfig, processingContext, ctx, rootNode));
   }
 
   private CompilerDirectiveContext getCompilerDirectiveContext(AnalysisConfig analysisConfig) {
     CompilerDirectiveContext compilerDirectiveContext = new CompilerDirectiveContext();
     analysisConfig.getCompilerOptions().stream()
-            .map(this::getCompilerDirective)
-            .forEach(opts -> opts.ifPresent(compilerDirectiveContext::updateDirectiveOptions));
+        .map(this::getCompilerDirective)
+        .forEach(opts -> opts.ifPresent(compilerDirectiveContext::updateDirectiveOptions));
     return compilerDirectiveContext;
   }
 
   private Optional<CompilerDirectiveOption> getCompilerDirective(String compilerOptions) {
     return Arrays.stream(CompilerDirectiveName.values())
-            .map(val -> val.getDirectiveOption(compilerOptions))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
+        .map(val -> val.getDirectiveOption(compilerOptions))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
   }
 
-  private void registerProcessors(AnalysisConfig analysisConfig, ProcessingContext ctx, SymbolAccumulator symbolAccumulator, CobolLanguageId languageId) {
+  private void registerProcessors(
+      AnalysisConfig analysisConfig,
+      ProcessingContext ctx,
+      SymbolAccumulator symbolAccumulator,
+      CobolLanguageId languageId) {
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
     ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulator));
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
     ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulator));
-    ctx.register(t, DeclarativeProcedureSectionNode.class, new DeclarativeProcedureSectionRegister(symbolAccumulator));
     ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
     ctx.register(t, ProcedureDivisionReturningNode.class, new ProcedureDivisionReturningProcess());
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;
     ctx.register(d, ProgramNode.class, new FunctionNodeProcess(symbolAccumulator));
-    ctx.register(d, ParagraphsNode.class, new DefineCodeBlock(symbolAccumulator));
     ctx.register(d, SectionNameNode.class, new SectionNameRegister(symbolAccumulator));
     ctx.register(d, ParagraphNameNode.class, new ParagraphNameRegister(symbolAccumulator));
-    ctx.register(d, ProcedureDivisionBodyNode.class, new DefineCodeBlock(symbolAccumulator));
 
     // Phase POST DEFINITION
-    ctx.register(ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
-    ctx.register(ProcessingPhase.POST_DEFINITION, FunctionDeclaration.class, new ProgramRepositoryEnricher(symbolAccumulator));
+    ctx.register(
+        ProcessingPhase.POST_DEFINITION, SectionNode.class, new ImplicitVariablesProcessor());
+    ctx.register(
+        ProcessingPhase.POST_DEFINITION,
+        FunctionDeclaration.class,
+        new ProgramRepositoryEnricher(symbolAccumulator));
 
     // Phase PRE USAGE
-    ctx.register(ProcessingPhase.PRE_USAGE, QualifiedReferenceNode.class, new FunctionUsageReferenceEnricher(symbolAccumulator));
+    ctx.register(
+        ProcessingPhase.PRE_USAGE,
+        QualifiedReferenceNode.class,
+        new FunctionUsageReferenceEnricher(symbolAccumulator));
 
     // Phase USAGE
     ProcessingPhase u = ProcessingPhase.USAGE;
     ctx.register(u, CodeBlockUsageNode.class, new CodeBlockUsage(symbolAccumulator));
-    ctx.register(u, QualifiedReferenceNode.class, new QualifiedReferenceUpdateVariableUsage(symbolAccumulator));
+    ctx.register(
+        u,
+        QualifiedReferenceNode.class,
+        new QualifiedReferenceUpdateVariableUsage(symbolAccumulator));
     ctx.register(u, FunctionReference.class, new FunctionReferenceProcessor(symbolAccumulator));
 
     // ENRICHMENT
@@ -289,7 +327,8 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
 
     // Phase VALIDATION
     ProcessingPhase v = ProcessingPhase.VALIDATION;
-    VariableWithLevelCheck variableWithLevelCheck = new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore));
+    VariableWithLevelCheck variableWithLevelCheck =
+        new VariableWithLevelCheck(CodeLayoutUtil.getProgramLayout(languageId, layoutStore));
     ctx.register(v, ConditionDataNameNode.class, variableWithLevelCheck);
     ctx.register(v, ElementaryItemNode.class, variableWithLevelCheck);
     ctx.register(v, GroupItemNode.class, variableWithLevelCheck);
@@ -332,10 +371,10 @@ public class TransformTreeStage implements Stage<AnalysisContext, ProcessingResu
     ctx.register(v, JavaCallableDataWorkingSectionNode.class, new JavaCallableDataWorkingSectionProcessor());
     ctx.register(v, JavaShareableOffWithoutOnNode.class, new JavaShareableOffWithoutOnProcessor());
     // Implicit Dialects
-    dialectService.getActiveImplicitDialects(analysisConfig)
-            .stream().map(CobolDialect::getProcessors)
-            .flatMap(List::stream)
-            .forEach(ctx::register);
+    dialectService.getActiveImplicitDialects(analysisConfig).stream()
+        .map(CobolDialect::getProcessors)
+        .flatMap(List::stream)
+        .forEach(ctx::register);
 
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());

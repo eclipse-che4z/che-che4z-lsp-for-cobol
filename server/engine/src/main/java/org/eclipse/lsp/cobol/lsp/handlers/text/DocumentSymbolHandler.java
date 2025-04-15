@@ -30,9 +30,7 @@ import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.SymbolInformation;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * LSP DocumentSymbol Handler
- */
+/** LSP DocumentSymbol Handler */
 @Slf4j
 public class DocumentSymbolHandler {
   private final AsyncAnalysisService asyncAnalysisService;
@@ -40,7 +38,10 @@ public class DocumentSymbolHandler {
   private final DocumentModelService documentModelService;
 
   @Inject
-  public DocumentSymbolHandler(AsyncAnalysisService asyncAnalysisService, AnalysisService analysisService, DocumentModelService documentModelService) {
+  public DocumentSymbolHandler(
+      AsyncAnalysisService asyncAnalysisService,
+      AnalysisService analysisService,
+      DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.analysisService = analysisService;
     this.documentModelService = documentModelService;
@@ -52,15 +53,19 @@ public class DocumentSymbolHandler {
    * @param params DocumentSymbolParams.
    * @return The list of either SymbolInformation or DocumentSymbols.
    */
-  public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(DocumentSymbolParams params) {
+  public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(
+      DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
     return createDocumentSymbols(documentModelService.get(uri).getOutlineResult());
   }
 
-  private List<Either<SymbolInformation, DocumentSymbol>> createDocumentSymbols(List<DocumentSymbol> documentSymbols) {
+  private List<Either<SymbolInformation, DocumentSymbol>> createDocumentSymbols(
+      List<DocumentSymbol> documentSymbols) {
     return documentSymbols == null
-            ? ImmutableList.of()
-            : documentSymbols.stream().map(Either::<SymbolInformation, DocumentSymbol>forRight).collect(toList());
+        ? ImmutableList.of()
+        : documentSymbols.stream()
+            .map(Either::<SymbolInformation, DocumentSymbol>forRight)
+            .collect(toList());
   }
 
   /**
@@ -69,21 +74,25 @@ public class DocumentSymbolHandler {
    * @param params DocumentSymbolParams.
    * @return LspNotification.
    */
-  public LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(DocumentSymbolParams params) {
+  public LspQuery<List<Either<SymbolInformation, DocumentSymbol>>> createEvent(
+      DocumentSymbolParams params) {
     return new DocumentSymbolQuery(params, this);
   }
 
   /**
    * Get dependency for this handler
+   *
    * @param params
    * @return list of {@link LspEventDependency}
    */
   public List<LspEventDependency> getDependencies(DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(uri),
-            () -> documentModelService.get(uri) != null && ((documentModelService.get(uri).getOutlineResult() != null
-                    && !documentModelService.get(uri).getOutlineResult().isEmpty())
+        asyncAnalysisService.createDependencyOn(uri),
+        () ->
+            documentModelService.get(uri) != null
+                && ((documentModelService.get(uri).getOutlineResult() != null
+                        && !documentModelService.get(uri).getOutlineResult().isEmpty())
                     || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
   }
 
@@ -94,7 +103,6 @@ public class DocumentSymbolHandler {
    */
   public List<LspEventCancelCondition> getCancelDependencies(DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
-    return ImmutableList.of(
-            asyncAnalysisService.createCancelConditionOnClose(uri));
+    return ImmutableList.of(asyncAnalysisService.createCancelConditionOnClose(uri));
   }
 }

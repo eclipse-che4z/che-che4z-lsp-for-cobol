@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests the usage of special registers implicitly introduced by CICS translator. Check {@link
- * org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSSRImplicitVariablesGenerator} for complete
- * list of implicit registers.
+ * org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSSRImplicitVariablesGenerator} for
+ * complete list of implicit registers.
  */
 public class TestCICSGeneratedRegisters {
   public static final String TEXT =
@@ -70,9 +70,10 @@ public class TestCICSGeneratedRegisters {
   void testWhenCicsTranslateIsDiabled() {
     AnalysisConfig analysisConfig =
         new AnalysisConfig(
-                CopybookProcessingMode.ENABLED,
+            CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            false, false,
+            false,
+            false,
             ImmutableList.of(),
             ImmutableMap.of());
 

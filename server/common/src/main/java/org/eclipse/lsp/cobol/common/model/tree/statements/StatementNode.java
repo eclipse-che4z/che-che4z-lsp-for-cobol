@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.common.model.tree.statements;
 
+import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
+
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-
-import static org.eclipse.lsp.cobol.common.model.NodeType.STATEMENT;
 
 /**
  * This class represents a special node for statements that may apply statement-specific validation.

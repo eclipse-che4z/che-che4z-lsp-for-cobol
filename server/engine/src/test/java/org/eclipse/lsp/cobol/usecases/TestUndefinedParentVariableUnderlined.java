@@ -15,6 +15,9 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.DISABLED;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -26,9 +29,6 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.DISABLED;
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * This test checks that the undefined parent variable underlined while variable call hierarchy
@@ -52,7 +52,8 @@ class TestUndefinedParentVariableUnderlined {
   void assertCopybookProcessingModeNotChangesLogic() {
     Assertions.assertEquals(
         UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(ENABLED).build()),
-        UseCaseUtils.analyze(UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
+        UseCaseUtils.analyze(
+            UseCase.builder().text(TEXT).copybookProcessingMode(DISABLED).build()));
   }
 
   @Test
@@ -62,6 +63,10 @@ class TestUndefinedParentVariableUnderlined {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), "Variable MAMA is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+            new Diagnostic(
+                new Range(),
+                "Variable MAMA is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

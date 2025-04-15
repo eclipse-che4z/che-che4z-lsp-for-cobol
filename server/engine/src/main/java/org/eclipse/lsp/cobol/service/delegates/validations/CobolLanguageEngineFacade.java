@@ -19,14 +19,14 @@ import com.google.inject.Singleton;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.core.engine.CobolLanguageEngine;
 import org.eclipse.lsp4j.Diagnostic;
 
 /**
  * This class is a facade that maps the result of the syntax and semantic analysis to a model
- * consumed by the LSP, i.e. convert {@link org.eclipse.lsp.cobol.common.error.SyntaxError} to {@link Diagnostic} and adjust semantic
- * context.
+ * consumed by the LSP, i.e. convert {@link org.eclipse.lsp.cobol.common.error.SyntaxError} to
+ * {@link Diagnostic} and adjust semantic context.
  */
 @Singleton
 public class CobolLanguageEngineFacade implements LanguageEngineFacade {
@@ -66,7 +66,8 @@ public class CobolLanguageEngineFacade implements LanguageEngineFacade {
    * @return a model containing full analysis result, e.g. errors and semantic elements
    */
   @Override
-  public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig, String languageId) {
+  public AnalysisResult analyze(
+      String uri, String text, AnalysisConfig analysisConfig, String languageId) {
     return engine.run(uri, text, analysisConfig, CobolLanguageId.MAPPER.get(languageId));
   }
 }

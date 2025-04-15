@@ -39,8 +39,8 @@ public class TestCicsExciEndBrowseStatement {
           + "               RETCODE({$CHECK})\n"
           + "           END-EXEC.";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }

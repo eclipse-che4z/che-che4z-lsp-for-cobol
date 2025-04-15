@@ -14,40 +14,42 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
+import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Singleton;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.Synchronized;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
-
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
 
 /** This class is a repository for symbols */
 @Singleton
 @Slf4j
 public class SymbolsRepository {
-  private static final SymbolTable EMPTY_SYM_TABLE = new SymbolTable(null) {
-    @Override
-    public void register(VariableNode node) {
-      throw new IllegalStateException("Cannot register symbols in temporary symbol table");
-    }
-  };
+  private static final SymbolTable EMPTY_SYM_TABLE =
+      new SymbolTable(null) {
+        @Override
+        public void register(VariableNode node) {
+          throw new IllegalStateException("Cannot register symbols in temporary symbol table");
+        }
+      };
   private final Map<String, SymbolTable> programSymbols;
 
   public SymbolsRepository() {
@@ -84,22 +86,13 @@ public class SymbolsRepository {
   }
 
   /**
-   * Get paragraphs data
+   * Get procedures data
    *
    * @param program the program node
-   * @return map of paragraphs
+   * @return map of procedures
    */
-  public Map<String, CodeBlockReference> getParagraphMap(ProgramNode program) {
-    return getSymbolTable(program).getParagraphMap();
-  }
-  /**
-   * Get section data
-   *
-   * @param program the program node
-   * @return map of sections
-   */
-  public Map<String, CodeBlockReference> getSectionMap(ProgramNode program) {
-    return getSymbolTable(program).getSectionMap();
+  public Map<ProcedureId, CodeBlockReference> getProceduresMap(ProgramNode program) {
+    return getSymbolTable(program).getProcedures();
   }
 
   /**
@@ -110,7 +103,8 @@ public class SymbolsRepository {
    * @param position the position to check
    * @return element at specified position
    */
-  public static Optional<DefinedAndUsedStructure> findElementByPosition(String uri, AnalysisResult result, Position position) {
+  public static Optional<DefinedAndUsedStructure> findElementByPosition(
+      String uri, AnalysisResult result, Position position) {
     if (result == null || result.getRootNode() == null) {
       return Optional.empty();
     }
@@ -121,12 +115,20 @@ public class SymbolsRepository {
         .map(SymbolsRepository::constructElementsExcludingImplicits);
   }
 
-  private static DefinedAndUsedStructure constructElementsExcludingImplicits(DefinedAndUsedStructure ctx) {
+  private static DefinedAndUsedStructure constructElementsExcludingImplicits(
+      DefinedAndUsedStructure ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
     List<Location> usages =
         ctx.getUsages().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    return new SymbolsRepository.Element("", definitions, usages);
+
+    String name = ctx.getName();
+    if (ctx instanceof CodeBlockUsageNode) {
+      final CodeBlockUsageNode node = (CodeBlockUsageNode) ctx;
+      final String section = node.getOfSection();
+      if (section != null) name += " OF " + section;
+    }
+    return new SymbolsRepository.Element(name, definitions, usages);
   }
 
   private static Predicate<Location> uriNotImplicit() {

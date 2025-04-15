@@ -17,12 +17,11 @@ package org.eclipse.lsp.cobol.core.semantics;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.util.HashMap;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.copybook.CopybookId;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
-
-import java.util.HashMap;
 
 /**
  * This class represents a semantic sub-context for specific types of elements that have names and
@@ -38,8 +37,8 @@ public class CopybooksRepository {
   /**
    * Add defined language element to the context
    *
-   * @param name     name of the element
-   * @param dialect  the copybook dialect
+   * @param name name of the element
+   * @param dialect the copybook dialect
    * @param documentUri uri of the document that contains a coopybook definition
    * @param copybookUri - the uri of a copybook
    */
@@ -52,8 +51,8 @@ public class CopybooksRepository {
   /**
    * Add the position of a language element usage
    *
-   * @param name     name of the element
-   * @param dialect  the copybook dialect
+   * @param name name of the element
+   * @param dialect the copybook dialect
    * @param location location of the used element
    */
   public void addUsage(String name, String dialect, Location location) {
@@ -63,8 +62,8 @@ public class CopybooksRepository {
   /**
    * Add the definition statement of an element
    *
-   * @param name     the of copybook
-   * @param dialect  the copybook dialect
+   * @param name the of copybook
+   * @param dialect the copybook dialect
    * @param location the location of the definition statements
    */
   public void addStatement(String name, String dialect, Locality location) {
@@ -74,7 +73,7 @@ public class CopybooksRepository {
   /**
    * Check if the context contains a language element with the provided name already defined
    *
-   * @param name    a language element name to check
+   * @param name a language element name to check
    * @param dialect the copybook dialectÒ
    * @param uri - the uri of a copybook
    * @return true if the element already defined
@@ -85,6 +84,7 @@ public class CopybooksRepository {
 
   /**
    * Creates copybook id
+   *
    * @param name - name of the copybook
    * @param dialect - copybook dialect
    * @param uri - the uri of a copybook
@@ -96,6 +96,7 @@ public class CopybooksRepository {
 
   /**
    * Returns copybook id (if exists) by copybook uri
+   *
    * @param uri - the uri of a copybook
    * @return a copybook id
    */

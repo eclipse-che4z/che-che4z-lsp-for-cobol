@@ -32,6 +32,7 @@ public class CopybookName {
   String displayName;
   String dialectType;
   String extension;
+
   public String getQualifiedName() {
     return displayName;
   }
@@ -50,6 +51,7 @@ public class CopybookName {
 
   /**
    * Create an id from CopybookName object
+   *
    * @param programUri a program URI
    * @return an instance of copybook id
    */

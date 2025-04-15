@@ -15,7 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.strategy;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.antlr.v4.runtime.Recognizer.EOF;
+
 import com.google.common.collect.ImmutableSet;
+import java.util.*;
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
@@ -23,12 +28,6 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.CobolParser;
-
-import java.util.*;
-
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static org.antlr.v4.runtime.Recognizer.EOF;
 
 /** This is a utility class to fetch error messages encountered while parsing COBOL file. */
 public class ErrorMessageHelper {
@@ -63,8 +62,7 @@ public class ErrorMessageHelper {
       Parser recognizer, InputMismatchException e, Token token, String offendingTokens) {
     return token.getType() == EOF
         ? messageService.getMessage(END_OF_FILE_MESSAGE)
-        : messageService.getMessage(
-            REPORT_INPUT_MISMATCH, offendingTokens);
+        : messageService.getMessage(REPORT_INPUT_MISMATCH, offendingTokens);
   }
 
   /**

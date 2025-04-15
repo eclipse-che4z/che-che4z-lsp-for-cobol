@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.common.utils;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /** This test checks {@link StringUtils} utility functions. */
 class StringUtilsTest {

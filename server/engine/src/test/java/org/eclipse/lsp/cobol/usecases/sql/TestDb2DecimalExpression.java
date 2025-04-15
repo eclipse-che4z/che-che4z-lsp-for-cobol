@@ -19,24 +19,22 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Check for 1. decimal case
- */
+/** Check for 1. decimal case */
 class TestDb2DecimalExpression {
-    public static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "           EXEC SQL\n"
-                    + "           UPDATE DSN8C10.EMP\n"
-                    + "               SET SALARY = SALARY + 100.\n"
-                    + "               WHERE WORKDEPT = 'D11'\n"
-                    + "           END-EXEC.\n";
+  public static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "           UPDATE DSN8C10.EMP\n"
+          + "               SET SALARY = SALARY + 100.\n"
+          + "               WHERE WORKDEPT = 'D11'\n"
+          + "           END-EXEC.\n";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }

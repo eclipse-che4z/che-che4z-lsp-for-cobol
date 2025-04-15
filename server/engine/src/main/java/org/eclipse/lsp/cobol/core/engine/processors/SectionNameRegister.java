@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import static org.eclipse.lsp.cobol.common.model.NodeType.PROCEDURE_SECTION;
+
+import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
-
-import static org.eclipse.lsp.cobol.common.model.NodeType.PROCEDURE_SECTION;
 
 /** SectionNameNode processor */
 public class SectionNameRegister implements Processor<SectionNameNode> {
@@ -31,11 +31,13 @@ public class SectionNameRegister implements Processor<SectionNameNode> {
 
   @Override
   public void accept(SectionNameNode node, ProcessingContext ctx) {
-    if (node.getParent().getNodeType() != PROCEDURE_SECTION || ctx.getCurrentProgramNode() == null) {
+    if (node.getParent().getNodeType() != PROCEDURE_SECTION
+        || ctx.getCurrentProgramNode() == null) {
       // TODO: register usage
       return;
     }
-    symbolAccumulator.registerSectionNameNode(ctx.getCurrentProgramNode(), node)
-            .ifPresent(ctx.getErrors()::add);
+    symbolAccumulator
+        .registerSectionNameNode(ctx.getCurrentProgramNode(), node)
+        .ifPresent(ctx.getErrors()::add);
   }
 }

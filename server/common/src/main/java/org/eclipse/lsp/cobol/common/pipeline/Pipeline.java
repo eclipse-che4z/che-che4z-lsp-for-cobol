@@ -14,23 +14,21 @@
  */
 package org.eclipse.lsp.cobol.common.pipeline;
 
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSessionProvider;
 
-import java.util.*;
-
-/**
- * Processing pipeline functionality
- */
+/** Processing pipeline functionality */
 @Slf4j
 public class Pipeline<C extends BenchmarkSessionProvider> {
   private final List<Stage<C, ?, ?>> stages = new LinkedList<>();
-    /**
+
+  /**
    * Adds a new stage to the pipeline
    *
    * @param stage - pipeline processing stage
    */
-  public void add(Stage<C , ?, ?> stage) {
+  public void add(Stage<C, ?, ?> stage) {
     stages.add(stage);
   }
 
@@ -45,7 +43,10 @@ public class Pipeline<C extends BenchmarkSessionProvider> {
 
     for (Stage stage : stages) {
       StageResult<?> prevResult = result;
-      result = context.getBenchmarkSession().measure(stage.getName(), () -> stage.run(context, prevResult));
+      result =
+          context
+              .getBenchmarkSession()
+              .measure(stage.getName(), () -> stage.run(context, prevResult));
       if (result.stopProcessing()) {
         return new PipelineResult(result);
       }

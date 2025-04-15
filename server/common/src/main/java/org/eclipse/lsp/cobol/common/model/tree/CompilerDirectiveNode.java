@@ -35,6 +35,6 @@ public class CompilerDirectiveNode extends Node {
   public CompilerDirectiveNode(Locality location, String directiveText, String dialect) {
     super(location, NodeType.COMPILER_DIRECTIVE);
     this.directiveText = directiveText;
-    this.dialect =  dialect;
+    this.dialect = dialect;
   }
 }

@@ -14,16 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import com.google.common.collect.ImmutableList;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
 
 /**
  * This class represents a storage for static completion content, e.g. keywords. It provides

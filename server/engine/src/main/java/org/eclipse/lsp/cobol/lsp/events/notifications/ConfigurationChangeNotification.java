@@ -18,7 +18,7 @@ import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeConfigurationHandler;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 
-/** `workspace/didChangeConfiguration` language server event*/
+/** `workspace/didChangeConfiguration` language server event */
 public class ConfigurationChangeNotification implements LspNotification {
   private final DidChangeConfigurationParams params;
   private final DidChangeConfigurationHandler didChangeConfigurationHandler;

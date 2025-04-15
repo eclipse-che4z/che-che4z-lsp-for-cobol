@@ -29,20 +29,17 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the POINT command.
  */
 public class TestCICSPoint {
-  private static final String POINT_VALID =
-          "POINT";
+  private static final String POINT_VALID = "POINT";
 
-  private static final String POINT_VALID_CONVID =
-          "POINT CONVID({$varOne})";
+  private static final String POINT_VALID_CONVID = "POINT CONVID({$varOne})";
 
-  private static final String POINT_VALID_SESSION =
-          "POINT SESSION({$varOne})";
+  private static final String POINT_VALID_SESSION = "POINT SESSION({$varOne})";
 
   private static final String POINT_INVALID_DUPLICATE_SESSION =
-          "POINT  SESSION({$varOne}) {SESSION|errorOne}({$varTwo})";
+      "POINT  SESSION({$varOne}) {SESSION|errorOne}({$varTwo})";
 
   private static final String POINT_INVALID_BOTH_OPTIONS =
-          "POINT {CONVID|errorOne}({$varOne}) {SESSION|errorTwo}({$varTwo})";
+      "POINT {CONVID|errorOne}({$varOne}) {SESSION|errorTwo}({$varTwo})";
 
   @Test
   void testPointValid() {
@@ -62,32 +59,32 @@ public class TestCICSPoint {
   @Test
   void testPointInvalidDuplicateSession() {
     CICSTestUtils.errorTest(
-            POINT_INVALID_DUPLICATE_SESSION,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: SESSION",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        POINT_INVALID_DUPLICATE_SESSION,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: SESSION",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testPointInvalidBothOptions() {
     CICSTestUtils.errorTest(
-            POINT_INVALID_BOTH_OPTIONS,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: CONVID or SESSION",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: CONVID or SESSION",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        POINT_INVALID_BOTH_OPTIONS,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: CONVID or SESSION",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: CONVID or SESSION",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

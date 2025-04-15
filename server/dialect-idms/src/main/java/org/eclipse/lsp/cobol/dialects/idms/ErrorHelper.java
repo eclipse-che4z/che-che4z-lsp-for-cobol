@@ -15,31 +15,29 @@
 
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-
-/**
- * Helper class for syntax errors creation
- */
+/** Helper class for syntax errors creation */
 @Slf4j
 @UtilityClass
 class ErrorHelper {
-  public SyntaxError missingCopybooks(MessageService messageService, Locality locality, String copybookName) {
+  public SyntaxError missingCopybooks(
+      MessageService messageService, Locality locality, String copybookName) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
             .location(locality.toOriginalLocation())
             .suggestion(
                 messageService.getMessage(
-                    "GrammarPreprocessorListener.errorSuggestion",
-                    copybookName))
+                    "GrammarPreprocessorListener.errorSuggestion", copybookName))
             .severity(ERROR)
             .errorCode(ErrorCodes.MISSING_COPYBOOK)
             .build();
@@ -47,15 +45,15 @@ class ErrorHelper {
     return error;
   }
 
-  public SyntaxError circularDependency(MessageService messageService, Locality locality, String copybookName) {
+  public SyntaxError circularDependency(
+      MessageService messageService, Locality locality, String copybookName) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.DIALECT)
             .location(locality.toOriginalLocation())
             .suggestion(
                 messageService.getMessage(
-                    "IdmsCopybookVisitor.errorCircularDependency",
-                    copybookName))
+                    "IdmsCopybookVisitor.errorCircularDependency", copybookName))
             .severity(ERROR)
             .errorCode(ErrorCodes.MISSING_COPYBOOK)
             .build();

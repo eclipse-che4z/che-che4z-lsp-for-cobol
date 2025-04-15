@@ -44,7 +44,8 @@ public class FindCopybookCommand implements CodeActionProvider {
       @NonNull CodeActionParams params) {
     return params.getContext().getDiagnostics().stream()
         .filter(it -> it.getCode() != null)
-        .filter(it -> ErrorCodes.MISSING_COPYBOOK.getLabel().equalsIgnoreCase(it.getCode().getLeft()))
+        .filter(
+            it -> ErrorCodes.MISSING_COPYBOOK.getLabel().equalsIgnoreCase(it.getCode().getLeft()))
         .map(toCodeAction(params))
         .map(Either::<Command, CodeAction>forRight)
         .collect(toList());
@@ -65,7 +66,7 @@ public class FindCopybookCommand implements CodeActionProvider {
   private Command createCommand(@NonNull CodeActionParams params, @NonNull Diagnostic it) {
     return new Command(
         TITLE,
-            ErrorCodes.MISSING_COPYBOOK.getLabel(),
+        ErrorCodes.MISSING_COPYBOOK.getLabel(),
         asList(retrieveCopybookName(it), params.getTextDocument().getUri()));
   }
 

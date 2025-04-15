@@ -66,8 +66,7 @@ class TestIdmsControlSectionAll {
           + "            IDMS-RECORDS WITHIN WORKING-STORAGE LEVELS INCREMENTED 18";
 
   private static final String IDMSCS_MANUAL =
-      "            PROTOCOL. MODE ABC.\n"
-          + "            IDMS-RECORDS MANUAL\n";
+      "            PROTOCOL. MODE ABC.\n" + "            IDMS-RECORDS MANUAL\n";
 
   private static final String IDMSCS_LINKAGE_SECTION =
       "            PROTOCOL. MODE ABC.\n"
@@ -86,8 +85,7 @@ class TestIdmsControlSectionAll {
         BOILERPLATE + IDMSCS_WITH_SSN_IDMSREC,
         BOILERPLATE + IDMSCS_WITH_ONLY_PROTOCOL,
         BOILERPLATE + IDMSCS_WITH_SSN_LEN_ERROR,
-        BOILERPLATE + IDMSCS_MANUAL
-        );
+        BOILERPLATE + IDMSCS_MANUAL);
   }
 
   @ParameterizedTest
@@ -99,7 +97,8 @@ class TestIdmsControlSectionAll {
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
-            new Diagnostic(new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.DIALECT.getText())),
+            new Diagnostic(
+                new Range(), MESSAGE_1, DiagnosticSeverity.Error, ErrorSource.DIALECT.getText())),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
   }
@@ -112,10 +111,11 @@ class TestIdmsControlSectionAll {
         ImmutableMap.of(),
         ImmutableList.of(),
         new AnalysisConfig(
-                CopybookProcessingMode.ENABLED,
-            ImmutableList.of(IdmsDialect.NAME), true, false,
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(IdmsDialect.NAME),
+            true,
+            false,
             ImmutableList.of(),
             ImmutableMap.of()));
   }
-
 }

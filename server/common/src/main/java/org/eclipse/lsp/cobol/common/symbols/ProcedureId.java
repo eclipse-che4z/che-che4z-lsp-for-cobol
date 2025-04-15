@@ -17,25 +17,33 @@ package org.eclipse.lsp.cobol.common.symbols;
 import lombok.ToString;
 import lombok.Value;
 
-/**
- * The class represents procedure identification in COBOL program.
- */
+/** The class represents procedure identification in COBOL program. */
 @Value
 @ToString
 public class ProcedureId {
-    String sectionName;
-    String paragraphName;
+  String sectionName;
+  String paragraphName;
 
-    public ProcedureId(String sectionName, String paragraphName) {
-        this.sectionName = sectionName !=null ? sectionName.toUpperCase() : null;
-        this.paragraphName = paragraphName !=null ? paragraphName.toUpperCase() : null;
-    }
-    /**
-     * Check if the code block is a procedure section.
-     *
-     * @return true the code block is a procedure section
-     */
-    public boolean isSection() {
-        return sectionName != null && paragraphName == null;
-    }
+  public ProcedureId(String sectionName, String paragraphName) {
+    this.sectionName = sectionName != null ? sectionName.toUpperCase() : null;
+    this.paragraphName = paragraphName != null ? paragraphName.toUpperCase() : null;
+  }
+
+  /**
+   * Check if the code block is a procedure section.
+   *
+   * @return true the code block is a procedure section
+   */
+  public boolean isSection() {
+    return sectionName != null && paragraphName == null;
+  }
+
+  /**
+   * Check if the code block is a procedure paragraph.
+   *
+   * @return true the code block is a procedure paragraph
+   */
+  public boolean isParagraph() {
+    return paragraphName != null;
+  }
 }

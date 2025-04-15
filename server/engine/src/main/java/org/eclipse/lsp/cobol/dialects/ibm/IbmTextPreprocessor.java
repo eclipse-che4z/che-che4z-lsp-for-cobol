@@ -57,7 +57,8 @@ public class IbmTextPreprocessor implements CleanerPreprocessor {
   public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = reader.processLines(documentUri, cobolCode).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformation.transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> transformedLines =
+        transformation.transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = indicatorProcessor.processLines(transformedLines);
 
     ExtendedDocument code = writer.serialize(rewrittenLines, documentUri);

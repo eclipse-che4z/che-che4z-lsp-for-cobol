@@ -17,9 +17,7 @@ package org.eclipse.lsp.cobol.common.error;
 
 import lombok.AllArgsConstructor;
 
-/**
- * This enum represents the source where error is generated during parsing and analysis.
- */
+/** This enum represents the source where error is generated during parsing and analysis. */
 @AllArgsConstructor
 public enum ErrorSource {
   PARSING("(parsing)"),

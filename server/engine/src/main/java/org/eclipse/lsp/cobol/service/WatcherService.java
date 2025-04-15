@@ -15,10 +15,9 @@
 
 package org.eclipse.lsp.cobol.service;
 
+import java.util.List;
 import lombok.NonNull;
 import org.eclipse.lsp4j.WorkspaceFolder;
-
-import java.util.List;
 
 /**
  * This service applies all the operations regarding watching the file system, including settings.
@@ -67,7 +66,6 @@ public interface WatcherService {
    */
   @NonNull
   List<String> getWatchingFolders();
-
 
   /**
    * Get a list of all workspace associated with this watcher

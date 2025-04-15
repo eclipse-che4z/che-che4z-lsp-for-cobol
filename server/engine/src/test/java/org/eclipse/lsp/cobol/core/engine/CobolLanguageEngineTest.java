@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
@@ -48,7 +49,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.dialects.TrueDialectServiceImpl;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
@@ -60,11 +60,13 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This test checks the logic of {@link CobolLanguageEngine}. It should first run {@link
- * CleanerPreprocessor} to clean up the given COBOL text, then apply syntax and semantic analysis. If
- * the text doesn't have any semantic elements, it should return an empty {@link Node}
+ * CleanerPreprocessor} to clean up the given COBOL text, then apply syntax and semantic analysis.
+ * If the text doesn't have any semantic elements, it should return an empty {@link Node}
  */
 class CobolLanguageEngineTest {
-  private static final String ERROR_MSG = "Ensure that you have Java installed and that your serverRuntime is set to JAVA for dialect support.";
+  private static final String ERROR_MSG =
+      "Ensure that you have Java installed and that your serverRuntime is set to JAVA for dialect"
+          + " support.";
 
   private static final String TEXT = "       IDENTIFICATION DIVISION.";
   private static final String URI = "document.cbl";
@@ -90,56 +92,67 @@ class CobolLanguageEngineTest {
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(new BenchmarkSession());
 
-    TrueDialectService<AnalysisContext> trueDialectService = new TrueDialectServiceImpl(grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
-        null,
-        dialectService, astProcessor, symbolsRepository, store, copybookService);
+    TrueDialectService<AnalysisContext> trueDialectService =
+        new TrueDialectServiceImpl(
+            grammarPreprocessor,
+            mockMessageService,
+            treeListener,
+            mock(SubroutineService.class),
+            null,
+            dialectService,
+            astProcessor,
+            symbolsRepository,
+            store,
+            copybookService);
     CobolLanguageEngine engine =
-            new CobolLanguageEngine(trueDialectService,
-                mockMessageService,
-                mock(ErrorFinalizerService.class),
-                benchmarkService);
+        new CobolLanguageEngine(
+            trueDialectService,
+            mockMessageService,
+            mock(ErrorFinalizerService.class),
+            benchmarkService);
     when(mockMessageService.getMessage(anyString(), anyString(), anyString())).thenReturn("");
     Locality locality =
-            Locality.builder()
-                    .uri(URI)
-                    .range(new Range(new Position(), new Position()))
-                    .build();
+        Locality.builder().uri(URI).range(new Range(new Position(), new Position())).build();
     SyntaxError error =
-            SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.PARSING)
-                    .location(locality.toOriginalLocation())
-                    .suggestion("suggestion")
-                    .severity(ERROR)
-                    .build();
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .location(locality.toOriginalLocation())
+            .suggestion("suggestion")
+            .severity(ERROR)
+            .build();
     SyntaxError eofError =
-            SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.PARSING)
-                    .location(
-                            Locality.builder()
-                                    .uri(URI)
-                                    .range(new Range(new Position(0, 31), new Position(0, 31)))
-                                    .token("<EOF>")
-                                    .build().toOriginalLocation())
-                    .severity(ERROR)
-                    .build();
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .location(
+                Locality.builder()
+                    .uri(URI)
+                    .range(new Range(new Position(0, 31), new Position(0, 31)))
+                    .token("<EOF>")
+                    .build()
+                    .toOriginalLocation())
+            .severity(ERROR)
+            .build();
 
-    DialectProcessingContext context = DialectProcessingContext.builder()
+    DialectProcessingContext context =
+        DialectProcessingContext.builder()
             .extendedDocument(new ExtendedDocument(TEXT, URI))
             .build();
     context.getExtendedDocument().commitTransformations();
     when(dialectService.process(anyList(), any()))
-            .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(dialectService.processImplicitDialects(any(), anyList(), any()))
-            .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(new DialectOutcome(context), ImmutableList.of()));
     when(preprocessor.cleanUpCode(URI, TEXT))
-            .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
+        .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
-    when(grammarPreprocessor.preprocess(any(), any())).thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
+    when(grammarPreprocessor.preprocess(any(), any()))
+        .thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
     Range sourceRange = new Range(new Position(0, 7), new Position(0, 31));
     Range programRange = new Range(new Position(0, 7), new Position(0, 31));
     Range divisionRange = new Range(new Position(0, 7), new Position(0, 31));
-    AnalysisResult actual = engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED), CobolLanguageId.COBOL);
+    AnalysisResult actual =
+        engine.run(URI, TEXT, AnalysisConfig.defaultConfig(ENABLED), CobolLanguageId.COBOL);
     Node root = actual.getRootNode();
     Node program = root.getChildren().get(0);
     Node division = program.getChildren().get(0);
@@ -162,16 +175,27 @@ class CobolLanguageEngineTest {
     BenchmarkService benchmarkService = mock(BenchmarkService.class);
     when(benchmarkService.startSession()).thenReturn(mock(BenchmarkSession.class));
 
-    TrueDialectService<AnalysisContext> trueDialectService = new TrueDialectServiceImpl(grammarPreprocessor, mockMessageService, treeListener, mock(SubroutineService.class),
-        null,
-        dialectService, astProcessor, symbolsRepository, store, copybookService);
+    TrueDialectService<AnalysisContext> trueDialectService =
+        new TrueDialectServiceImpl(
+            grammarPreprocessor,
+            mockMessageService,
+            treeListener,
+            mock(SubroutineService.class),
+            null,
+            dialectService,
+            astProcessor,
+            symbolsRepository,
+            store,
+            copybookService);
     CobolLanguageEngine engine =
-        new CobolLanguageEngine(trueDialectService,
+        new CobolLanguageEngine(
+            trueDialectService,
             mockMessageService,
             mock(ErrorFinalizerService.class),
             benchmarkService);
 
-    AnalysisResult actual = engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig(), CobolLanguageId.COBOL);
+    AnalysisResult actual =
+        engine.run(URI, TEXT, DialectConfigs.getDaCoAnalysisConfig(), CobolLanguageId.COBOL);
     Assertions.assertEquals(1, actual.getDiagnostics().size());
     Assertions.assertEquals(ERROR_MSG, actual.getDiagnostics().get(URI).get(0).getMessage());
   }

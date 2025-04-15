@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
+import static org.eclipse.lsp.cobol.positive.SysprintSnapProcessService.getPatternForCuttingReport;
+
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.eclipse.lsp.cobol.positive.SysprintSnapProcessService.getPatternForCuttingReport;
 
 /** Enum representing different sections in a SYSPRINT file. */
 public enum ReportSection {

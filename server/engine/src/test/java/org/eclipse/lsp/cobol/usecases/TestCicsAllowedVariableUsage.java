@@ -16,15 +16,15 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.Stream;
-
 /** Test the allowed variable usage */
 public class TestCicsAllowedVariableUsage {
-  public static final String TEXT = ""
+  public static final String TEXT =
+      ""
           + "       Identification Division.\n"
           + "       Program-id. HELLOT.\n"
           + "\n"

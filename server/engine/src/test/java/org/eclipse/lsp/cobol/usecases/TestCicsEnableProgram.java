@@ -31,25 +31,43 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCicsEnableProgram {
   private static final String TEST_ENABLE_PROGRAM_BARE = "ENABLE PROGRAM({$varOne})";
-  private static final String TEST_ENABLE_PROGRAM_SOME_ONE = "ENABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) EXIT({$varThree}) FORMATEDF PURGEABLE SHUTDOWN SPI START TASKSTART";
-  private static final String TEST_ENABLE_PROGRAM_SOME_TWO = "ENABLE PROGRAM({$varOne}) ENTRY({$varTwo}) EXIT({$varFour}) REQUIRED GAENTRYNAME({$varTwo})";
-  private static final String TEST_ENABLE_PROGRAM_SOME_THREE = "ENABLE PROGRAM({$varOne}) THREADSAFE PURGEABLE GALENGTH({$varTwo})";
-  private static final String TEST_ENABLE_PROGRAM_SOME_FOUR = "ENABLE PROGRAM({$varOne}) QUASIRENT LINKEDITMODE SHUTDOWN TALENGTH({$varThree})";
-  private static final String TEST_ENABLE_PROGRAM_SOME_FIVE = "ENABLE PROGRAM({$varOne}) OPENAPI TALENGTH({$varThree}) GALENGTH({$varFour})";
-  private static final String TEST_ENABLE_PROGRAM_ALL_VALID_ONE = "ENABLE PROGRAM({$varOne}) ENTRY({$varTwo}) ENTRYNAME({$varTwo}) EXIT({$varThree}) FORMATEDF "
-          + "GALENGTH({$varFour}) GALOCATION({$varFive}) GAEXECUTABLE INDOUBTWAIT LINKEDITMODE THREADSAFE OPENAPI PURGEABLE SHUTDOWN SPI START "
-          + "TALENGTH({$varSix}) TAEXECUTABLE TASKSTART";
-  private static final String TEST_ENABLE_PROGRAM_ALL_VALID_TWO = "ENABLE PROGRAM({$varOne}) ENTRY({$varTwo}) ENTRYNAME({$varTwo}) EXIT({$varThree}) FORMATEDF "
-          + "GAENTRYNAME({$varFour}) INDOUBTWAIT LINKEDITMODE REQUIRED OPENAPI PURGEABLE SHUTDOWN SPI START TALENGTH({$varSix}) TAEXECUTABLE TASKSTART";
+  private static final String TEST_ENABLE_PROGRAM_SOME_ONE =
+      "ENABLE PROGRAM({$varOne}) ENTRYNAME({$varTwo}) EXIT({$varThree}) FORMATEDF PURGEABLE"
+          + " SHUTDOWN SPI START TASKSTART";
+  private static final String TEST_ENABLE_PROGRAM_SOME_TWO =
+      "ENABLE PROGRAM({$varOne}) ENTRY({$varTwo}) EXIT({$varFour}) REQUIRED GAENTRYNAME({$varTwo})";
+  private static final String TEST_ENABLE_PROGRAM_SOME_THREE =
+      "ENABLE PROGRAM({$varOne}) THREADSAFE PURGEABLE GALENGTH({$varTwo})";
+  private static final String TEST_ENABLE_PROGRAM_SOME_FOUR =
+      "ENABLE PROGRAM({$varOne}) QUASIRENT LINKEDITMODE SHUTDOWN TALENGTH({$varThree})";
+  private static final String TEST_ENABLE_PROGRAM_SOME_FIVE =
+      "ENABLE PROGRAM({$varOne}) OPENAPI TALENGTH({$varThree}) GALENGTH({$varFour})";
+  private static final String TEST_ENABLE_PROGRAM_ALL_VALID_ONE =
+      "ENABLE PROGRAM({$varOne}) ENTRY({$varTwo}) ENTRYNAME({$varTwo}) EXIT({$varThree}) FORMATEDF"
+          + " GALENGTH({$varFour}) GALOCATION({$varFive}) GAEXECUTABLE INDOUBTWAIT LINKEDITMODE"
+          + " THREADSAFE OPENAPI PURGEABLE SHUTDOWN SPI START TALENGTH({$varSix}) TAEXECUTABLE"
+          + " TASKSTART";
+  private static final String TEST_ENABLE_PROGRAM_ALL_VALID_TWO =
+      "ENABLE PROGRAM({$varOne}) ENTRY({$varTwo}) ENTRYNAME({$varTwo}) EXIT({$varThree}) FORMATEDF"
+          + " GAENTRYNAME({$varFour}) INDOUBTWAIT LINKEDITMODE REQUIRED OPENAPI PURGEABLE SHUTDOWN"
+          + " SPI START TALENGTH({$varSix}) TAEXECUTABLE TASKSTART";
 
-  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_PROGRAM = "ENABLE {_ENTRYNAME({$varOne}) EXIT({$varTwo})|error1_}";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_ONE = "ENABLE PROGRAM({$varOne}) {_GALOCATION|error1_}({$varTwo})";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_TWO = "ENABLE PROGRAM({$varOne}) {GAEXECUTABLE|error1}";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_GALENGTH_GAENTRYNAME = "ENABLE PROGRAM({$varOne}) {_GALENGTH|error1_}({$varTwo}) {_GAENTRYNAME|error1_}({$varTwo})";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_ONE = "ENABLE PROGRAM({$varOne}) {QUASIRENT|error1} {OPENAPI|error1}";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_TWO = "ENABLE PROGRAM({$varOne}) {QUASIRENT|error1} {THREADSAFE|error1}";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_THREE = "ENABLE PROGRAM({$varOne}) {QUASIRENT|error1} {REQUIRED|error1}";
-  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_TALENGTH = "ENABLE PROGRAM({$varOne}) {TAEXECUTABLE|error1}";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_PROGRAM =
+      "ENABLE {_ENTRYNAME({$varOne}) EXIT({$varTwo})|error1_}";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_ONE =
+      "ENABLE PROGRAM({$varOne}) {_GALOCATION|error1_}({$varTwo})";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_TWO =
+      "ENABLE PROGRAM({$varOne}) {GAEXECUTABLE|error1}";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_GALENGTH_GAENTRYNAME =
+      "ENABLE PROGRAM({$varOne}) {_GALENGTH|error1_}({$varTwo}) {_GAENTRYNAME|error1_}({$varTwo})";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_ONE =
+      "ENABLE PROGRAM({$varOne}) {QUASIRENT|error1} {OPENAPI|error1}";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_TWO =
+      "ENABLE PROGRAM({$varOne}) {QUASIRENT|error1} {THREADSAFE|error1}";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_THREE =
+      "ENABLE PROGRAM({$varOne}) {QUASIRENT|error1} {REQUIRED|error1}";
+  private static final String TEST_ENABLE_PROGRAM_INVALID_MISSING_TALENGTH =
+      "ENABLE PROGRAM({$varOne}) {TAEXECUTABLE|error1}";
 
   @Test
   void testEnableProgramBare() {
@@ -93,98 +111,116 @@ public class TestCicsEnableProgram {
 
   @Test
   void testEnableProgramInvalidMissingProgram() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_MISSING_PROGRAM,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_MISSING_PROGRAM,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Missing required option: PROGRAM",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Missing required option: PROGRAM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidMissingGALengthOne() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_ONE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_ONE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: GALOCATION without GALENGTH",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Invalid option provided: GALOCATION without GALENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidMissingGALengthTwo() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_TWO,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_MISSING_GALENGTH_TWO,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: GAEXECUTABLE without GALENGTH",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Invalid option provided: GAEXECUTABLE without GALENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidGALengthGAEntryName() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_GALENGTH_GAENTRYNAME,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_GALENGTH_GAENTRYNAME,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: GALENGTH or GAENTRYNAME",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GALENGTH or"
+                    + " GAENTRYNAME",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidQuasirentOne() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_ONE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_ONE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: QUASIRENT or OPENAPI",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: QUASIRENT or OPENAPI",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidQuasirentTwo() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_TWO,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_TWO,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: QUASIRENT or THREADSAFE or REQUIRED",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: QUASIRENT or"
+                    + " THREADSAFE or REQUIRED",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidQuasirentThree() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_THREE,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_QUASIRENT_THREE,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: QUASIRENT or THREADSAFE or REQUIRED",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: QUASIRENT or"
+                    + " THREADSAFE or REQUIRED",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
 
   @Test
   void testEnableProgramInvalidMissingTALength() {
-    CICSTestUtils.errorTest(TEST_ENABLE_PROGRAM_INVALID_MISSING_TALENGTH,
-            ImmutableMap.of(
+    CICSTestUtils.errorTest(
+        TEST_ENABLE_PROGRAM_INVALID_MISSING_TALENGTH,
+        ImmutableMap.of(
             "error1",
             new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: TAEXECUTABLE without TALENGTH",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())), "SP");
+                new Range(),
+                "Invalid option provided: TAEXECUTABLE without TALENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP");
   }
-
 }

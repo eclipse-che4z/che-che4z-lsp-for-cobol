@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -24,8 +25,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Location;
-
-import java.util.List;
 
 /**
  * The class represents the name of variable definition.
@@ -51,7 +50,8 @@ import java.util.List;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class VariableDefinitionNameNode extends Node implements DefinedAndUsedStructure, Describable {
+public class VariableDefinitionNameNode extends Node
+    implements DefinedAndUsedStructure, Describable {
   private final String name;
 
   public VariableDefinitionNameNode(Locality locality, String name) {

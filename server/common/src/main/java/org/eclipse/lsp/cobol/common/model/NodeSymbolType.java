@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.common.model;
 
-import lombok.AllArgsConstructor;
-import org.eclipse.lsp4j.SymbolKind;
-
+import static org.eclipse.lsp4j.SymbolKind.*;
 import static org.eclipse.lsp4j.SymbolKind.Class;
 import static org.eclipse.lsp4j.SymbolKind.Object;
-import static org.eclipse.lsp4j.SymbolKind.*;
+
+import lombok.AllArgsConstructor;
+import org.eclipse.lsp4j.SymbolKind;
 
 /**
  * The Node Type represents different kinds of COBOL source structure. Has the same meaning as

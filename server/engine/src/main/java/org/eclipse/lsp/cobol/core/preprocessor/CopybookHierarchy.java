@@ -15,6 +15,11 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,12 +30,6 @@ import org.eclipse.lsp.cobol.core.model.CopyStatementModifier;
 import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
 import org.eclipse.lsp4j.Range;
-
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * This value class tracks moving in copybook hierarchy and replacing while preprocessor analysis.
@@ -91,7 +90,7 @@ public class CopybookHierarchy {
    *
    * @param pattern a pattern to be applied to the document content
    * @param uri The url of original document
-   * @param range   a range to replace text in
+   * @param range a range to replace text in
    */
   public void addTextReplacing(Pair<String, String> pattern, String uri, Range range) {
     ReplaceData data = textReplacing.peek();
@@ -126,12 +125,15 @@ public class CopybookHierarchy {
     return copybookStack.stream().map(function).collect(toList());
   }
 
-  /** Move all the copy replacing clauses to the recursive replacement stack
+  /**
+   * Move all the copy replacing clauses to the recursive replacement stack
+   *
    * @param uri document uri
    */
   public void prepareCopybookReplacement(String uri) {
     if (!copyReplacingClauses.isEmpty()) {
-      recursiveReplaceStmtStack.add(new ReplaceData(new ArrayList<>(copyReplacingClauses), uri, new Range()));
+      recursiveReplaceStmtStack.add(
+          new ReplaceData(new ArrayList<>(copyReplacingClauses), uri, new Range()));
       copyReplacingClauses.clear();
     }
   }
@@ -153,7 +155,8 @@ public class CopybookHierarchy {
    * @param errors errors collection
    */
   public void replaceCopybook(
-      ExtendedDocument copybook, BiConsumer<ExtendedDocument, ReplaceData> accumulator,
+      ExtendedDocument copybook,
+      BiConsumer<ExtendedDocument, ReplaceData> accumulator,
       List<SyntaxError> errors) {
     for (ReplaceData replaceData : recursiveReplaceStmtStack) {
       accumulator.accept(copybook, replaceData);
@@ -166,7 +169,8 @@ public class CopybookHierarchy {
    * @param extendedDocument an extended document to replace
    * @param accumulator a consumer for applying the replacing
    */
-  public void replaceText(ExtendedDocument extendedDocument, BiConsumer<ExtendedDocument, ReplaceData> accumulator) {
+  public void replaceText(
+      ExtendedDocument extendedDocument, BiConsumer<ExtendedDocument, ReplaceData> accumulator) {
     textReplacing.forEach(tr -> accumulator.accept(extendedDocument, tr));
     textReplacing.clear();
   }

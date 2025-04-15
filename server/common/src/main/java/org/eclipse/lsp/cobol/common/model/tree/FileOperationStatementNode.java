@@ -27,7 +27,8 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 public class FileOperationStatementNode extends StatementNode {
   @Getter private final VariableNameAndLocality filename;
 
-  public FileOperationStatementNode(Locality locality, VariableNameAndLocality filename, NodeType nodeType) {
+  public FileOperationStatementNode(
+      Locality locality, VariableNameAndLocality filename, NodeType nodeType) {
     super(locality, nodeType);
     this.filename = filename;
   }

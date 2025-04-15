@@ -14,29 +14,28 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
-import com.google.common.collect.Multimap;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import lombok.NonNull;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp4j.CompletionItem;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.function.Predicate;
-
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.CONSTANTS;
 import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.VARIABLES;
 import static org.eclipse.lsp4j.CompletionItemKind.Constant;
 import static org.eclipse.lsp4j.CompletionItemKind.Variable;
+
+import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import java.util.Collection;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
+import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp4j.CompletionItem;
 
 /**
  * This completion provider returns all the defined variables as completion suggestions and their

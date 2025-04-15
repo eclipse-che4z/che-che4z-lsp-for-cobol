@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service.copybooks;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import java.util.LinkedList;
 import java.util.List;
 

@@ -14,6 +14,12 @@
  */
 package org.eclipse.lsp.cobol.usecases.suite;
 
+import static org.eclipse.lsp.cobol.usecases.suite.TestWatcherHelper.ROOT_DIRECTORY_PROPERTY;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -22,13 +28,6 @@ import org.eclipse.lsp.cobol.test.engine.TestData;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestWatcher;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-
-import static org.eclipse.lsp.cobol.usecases.suite.TestWatcherHelper.ROOT_DIRECTORY_PROPERTY;
 
 /**
  * This is unit test watcher class and is responsible to write test data if "usecase.test.repo.dir"

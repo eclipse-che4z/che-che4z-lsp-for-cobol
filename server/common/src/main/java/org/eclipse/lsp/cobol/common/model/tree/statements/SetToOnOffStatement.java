@@ -15,12 +15,11 @@
 
 package org.eclipse.lsp.cobol.common.model.tree.statements;
 
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-
-import java.util.List;
 
 /** This class implements the logic for SET TO ON/OFF statement. */
 @EqualsAndHashCode(callSuper = true)

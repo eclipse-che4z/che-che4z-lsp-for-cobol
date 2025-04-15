@@ -15,12 +15,12 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp.cobol.core.CobolParser.EntryNameContext;
+
 import org.antlr.v4.runtime.RuleContext;
 import org.eclipse.lsp.cobol.core.CobolParser.DataDescriptionEntryFormat1Context;
 import org.eclipse.lsp.cobol.core.CobolParserBaseListener;
-
-import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.core.CobolParser.EntryNameContext;
 
 /** This listener retrieves the name of the latest variable in the text */
 public class LastVariableNameListener extends CobolParserBaseListener {

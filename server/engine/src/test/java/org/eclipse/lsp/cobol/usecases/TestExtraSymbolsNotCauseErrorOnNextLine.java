@@ -27,8 +27,15 @@ import org.junit.jupiter.api.Test;
 class TestExtraSymbolsNotCauseErrorOnNextLine {
 
   private static final String TEXT =
-      "000000 Identification DIVISION.                                         23323232{extra|1}\r\n" // Extra symbols at the end of this line
-          + "002800 Program-ID.                                                      23323232\r\n" // Should not show an error on this line
+      "000000 Identification DIVISION.                                        "
+          + " 23323232{extra|1}\r\n" // Extra symbols at the end of this line
+          + "002800 Program-ID.                           "
+          + "     "
+          + "     "
+          + "     "
+          + "     "
+          + "     "
+          + "  23323232\r\n" // Should not show an error on this line
           + "002800  HELLOWORLD.                                                     23323232\r\n"
           + "024200 PROCEDURE DIVISION .                                             CM1014.2";
 
@@ -42,6 +49,9 @@ class TestExtraSymbolsNotCauseErrorOnNextLine {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PREPROCESSING.getText())));
+                new Range(),
+                MESSAGE,
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

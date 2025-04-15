@@ -34,6 +34,7 @@ public class NodeUtils {
 
   /**
    * Checks if the passed node is a Alphanumeric variable node
+   *
    * @param node Node to check
    * @return True if node is an alphanumeric variable, false otherwise
    */
@@ -49,6 +50,7 @@ public class NodeUtils {
 
   /**
    * checks is the passed node is a dynamic group item variable
+   *
    * @param node Node to check
    * @return True if node is an dynamic group variable, false otherwise
    */
@@ -61,6 +63,7 @@ public class NodeUtils {
 
   /**
    * checks if the passed node is a justified group item
+   *
    * @param node to check
    * @return True if node is an justified group variable, false otherwise
    */

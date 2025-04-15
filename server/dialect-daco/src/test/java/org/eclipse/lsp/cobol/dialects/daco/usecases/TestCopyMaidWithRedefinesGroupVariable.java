@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 class TestCopyMaidWithRedefinesGroupVariable {
   private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
@@ -41,16 +41,17 @@ class TestCopyMaidWithRedefinesGroupVariable {
           + "           04 {$*D} REDEFINES {$B-SSS}.\n";
 
   private static final String COPYBOOK_CONTENT =
-                "       01  {$*A-S`A-SSS}.\n"
-              + "           03 {$*B-S`B-SSS}.\n"
-              + "             05 {$*C-S`C-SSS} PIC X.\n";
+      "       01  {$*A-S`A-SSS}.\n"
+          + "           03 {$*B-S`B-SSS}.\n"
+          + "             05 {$*C-S`C-SSS} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("CB", DaCoDialect.NAME, COPYBOOK_CONTENT)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(new CobolText("CB", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

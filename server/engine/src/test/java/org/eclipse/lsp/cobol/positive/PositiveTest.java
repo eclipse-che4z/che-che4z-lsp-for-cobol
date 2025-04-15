@@ -24,6 +24,9 @@ import static org.eclipse.lsp.cobol.positive.CobolTextRegistry.PATH_TO_LISTING_S
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,10 +34,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -72,20 +71,21 @@ class PositiveTest extends ConfigurableTest {
     this.cobolTextRegistry = cobolTextRegistry;
     String fileName = text.getFileName();
     Map<ReportSection, List<SysprintSnap>> dataNameRefs =
-            getDataNameRefs(fileName, cobolTextRegistry);
+        getDataNameRefs(fileName, cobolTextRegistry);
     LOG.debug("Processing: " + fileName);
     AnalysisConfig analysisConfig = getAnalysisConfiguration(cobolTextRegistry.getDialect());
     UseCase useCase =
-            UseCase.builder()
-                    .documentUri(fileName)
-                    .text(text.getFullText())
-                    .copybooks(getTestFileSpecificCopybooks(cobolTextRegistry, fileName))
-                    .copybookProcessingMode(ENABLED)
-                    .dialects(analysisConfig.getDialects())
-                    .dialectsSettings(analysisConfig.getDialectsSettings())
-                    .build();
+        UseCase.builder()
+            .documentUri(fileName)
+            .text(text.getFullText())
+            .copybooks(getTestFileSpecificCopybooks(cobolTextRegistry, fileName))
+            .copybookProcessingMode(ENABLED)
+            .dialects(analysisConfig.getDialects())
+            .dialectsSettings(analysisConfig.getDialectsSettings())
+            .build();
     AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-    PositiveTestUtility.assetDefinitionsNReferencesFromSnap(analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
+    PositiveTestUtility.assetDefinitionsNReferencesFromSnap(
+        analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
     assertNoError(fileName, analyze);
   }
 
@@ -96,11 +96,14 @@ class PositiveTest extends ConfigurableTest {
 
   static Stream<Arguments> getTestFiles() {
     String path = ofNullable(getProperty(PATH_TO_TEST_RESOURCES)).orElse("../../tests/test_files");
-    return searchFolderToTest(ImmutableList.of(Paths.get(path).toFile())).stream().map(p -> p.toAbsolutePath().toString())
-            .flatMap(folder -> {
+    return searchFolderToTest(ImmutableList.of(Paths.get(path).toFile())).stream()
+        .map(p -> p.toAbsolutePath().toString())
+        .flatMap(
+            folder -> {
               CobolTextRegistry cobolTextRegistry = retrieveTextsRegistry(folder);
               List<CobolText> textsToTest = getTextsToTest(cobolTextRegistry);
-              return textsToTest.stream().map(file -> Arguments.of(cobolTextRegistry, file, new File(folder).getName()));
+              return textsToTest.stream()
+                  .map(file -> Arguments.of(cobolTextRegistry, file, new File(folder).getName()));
             });
   }
 
@@ -120,18 +123,17 @@ class PositiveTest extends ConfigurableTest {
 
   private static List<File> listFiles(File file) {
     return Optional.ofNullable(file.listFiles())
-            .map(Arrays::stream)
-            .orElse(Stream.empty())
-            .collect(Collectors.toList());
+        .map(Arrays::stream)
+        .orElse(Stream.empty())
+        .collect(Collectors.toList());
   }
 
   private static boolean isValidTestFolder(File file) {
     return Optional.ofNullable(file.listFiles())
-            .map(Arrays::stream)
-            .orElse(Stream.empty())
-            .anyMatch(f -> f.getName().equals("positive"));
+        .map(Arrays::stream)
+        .orElse(Stream.empty())
+        .anyMatch(f -> f.getName().equals("positive"));
   }
-
 
   /**
    * Get the files to be analyzed by Language Server from {@link CobolTextRegistry} using file-based
@@ -164,7 +166,7 @@ class PositiveTest extends ConfigurableTest {
   }
 
   protected static Map<ReportSection, List<SysprintSnap>> getDataNameRefs(
-          String filename, CobolTextRegistry textRegistry) {
+      String filename, CobolTextRegistry textRegistry) {
     return textRegistry.getSnapForFile(filename);
   }
 
@@ -172,7 +174,7 @@ class PositiveTest extends ConfigurableTest {
    * Check that there were no errors found.
    *
    * @param diagnostics list of diagnostic from the analysis result
-   * @param fileName    name of the file that has been tested
+   * @param fileName name of the file that has been tested
    */
   protected void assertNoSyntaxErrorsFound(List<Diagnostic> diagnostics, String fileName) {
     assertEquals(0, diagnostics.size(), createErrorMessage(diagnostics, fileName));
@@ -182,18 +184,18 @@ class PositiveTest extends ConfigurableTest {
     StringBuilder result = new StringBuilder(fileName);
     result.append(" contains syntax errors:\r\n");
     diagnostics.forEach(
-            it -> {
-              result.append(it.getRange().getStart().getLine() + 1);
-              result.append(":");
-              result.append(it.getRange().getStart().getCharacter());
-              result.append(" - ");
-              result.append(it.getRange().getEnd().getLine() + 1);
-              result.append(":");
-              result.append(it.getRange().getEnd().getCharacter());
-              result.append(" : ");
-              result.append(it.getMessage());
-              result.append("\r\n");
-            });
+        it -> {
+          result.append(it.getRange().getStart().getLine() + 1);
+          result.append(":");
+          result.append(it.getRange().getStart().getCharacter());
+          result.append(" - ");
+          result.append(it.getRange().getEnd().getLine() + 1);
+          result.append(":");
+          result.append(it.getRange().getEnd().getCharacter());
+          result.append(" : ");
+          result.append(it.getMessage());
+          result.append("\r\n");
+        });
     return result.toString();
   }
 
@@ -208,13 +210,13 @@ class PositiveTest extends ConfigurableTest {
 
   void assertNoError(String fileName, AnalysisResult analyze) {
     List<Diagnostic> diagnostic =
-            ofNullable(analyze.getDiagnostics().get(fileName))
-                    .map(
-                            diagnostics ->
-                                    diagnostics.stream()
-                                            .filter(it -> it.getSeverity() == DiagnosticSeverity.Error)
-                                            .collect(toList()))
-                    .orElse(emptyList());
+        ofNullable(analyze.getDiagnostics().get(fileName))
+            .map(
+                diagnostics ->
+                    diagnostics.stream()
+                        .filter(it -> it.getSeverity() == DiagnosticSeverity.Error)
+                        .collect(toList()))
+            .orElse(emptyList());
     assertNoSyntaxErrorsFound(diagnostic, fileName);
   }
 
@@ -223,20 +225,20 @@ class PositiveTest extends ConfigurableTest {
    * from {@link CobolTextRegistry} using file-based implementation.
    *
    * @param cobolTextRegistry {@link CobolTextRegistry}
-   * @param fileName          file to be analysed
+   * @param fileName file to be analysed
    * @return List of copybooks
    */
   protected List<CobolText> getTestFileSpecificCopybooks(
-          CobolTextRegistry cobolTextRegistry, String fileName) {
+      CobolTextRegistry cobolTextRegistry, String fileName) {
     Stream<CobolText> cobolTextStream =
-            getCopybooks(cobolTextRegistry).stream()
-                    .filter(
-                            book ->
-                                    getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream()
-                                            .noneMatch(b1 -> b1.getFileName().equals(book.getFileName())));
+        getCopybooks(cobolTextRegistry).stream()
+            .filter(
+                book ->
+                    getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream()
+                        .noneMatch(b1 -> b1.getFileName().equals(book.getFileName())));
     return Stream.concat(
-                    cobolTextStream, getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream())
-            .collect(toList());
+            cobolTextStream, getCopybooks(cobolTextRegistry, fileName.split("\\.")[0]).stream())
+        .collect(toList());
   }
 
   /**
@@ -251,11 +253,12 @@ class PositiveTest extends ConfigurableTest {
 
     if (testDialectsLists.contains("IDMS")) {
       return new AnalysisConfig(
-              ENABLED,
-              ImmutableList.of("IDMS"),
-              true, false,
-              ImmutableList.of(),
-              ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+          ENABLED,
+          ImmutableList.of("IDMS"),
+          true,
+          false,
+          ImmutableList.of(),
+          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

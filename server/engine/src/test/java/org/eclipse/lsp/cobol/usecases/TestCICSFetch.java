@@ -31,35 +31,36 @@ import org.junit.jupiter.api.Test;
 public class TestCICSFetch {
   // FETCH ANY tests
   private static final String FETCH_ANY_VALID_ONE =
-          "FETCH ANY({$varOne}) CHANNEL({$varTwo}) COMPSTATUS({$varThree}) ABCODE({$varFour})";
+      "FETCH ANY({$varOne}) CHANNEL({$varTwo}) COMPSTATUS({$varThree}) ABCODE({$varFour})";
 
   private static final String FETCH_ANY_VALID_TWO =
-          "FETCH ANY({$varOne}) COMPSTATUS({$varThree}) TIMEOUT({$varTwo})";
+      "FETCH ANY({$varOne}) COMPSTATUS({$varThree}) TIMEOUT({$varTwo})";
 
   private static final String FETCH_ANY_INVALID_ONE =
-          "FETCH ANY({$varOne}) COMPSTATUS({$varThree}) {NOSUSPEND|errorOne} {TIMEOUT|errorTwo}({$varTwo})";
+      "FETCH ANY({$varOne}) COMPSTATUS({$varThree}) {NOSUSPEND|errorOne}"
+          + " {TIMEOUT|errorTwo}({$varTwo})";
 
-  private static final String FETCH_ANY_INVALID_TWO =
-          "FETCH {_ANY({$varOne})|errorOne_}";
+  private static final String FETCH_ANY_INVALID_TWO = "FETCH {_ANY({$varOne})|errorOne_}";
 
   // FETCH CHILD tests
   private static final String FETCH_CHILD_VALID_ONE =
-          "FETCH CHILD({$varOne}) CHANNEL({$varTwo}) COMPSTATUS({$varThree}) ABCODE({$varFour})";
+      "FETCH CHILD({$varOne}) CHANNEL({$varTwo}) COMPSTATUS({$varThree}) ABCODE({$varFour})";
 
   private static final String FETCH_CHILD_VALID_TWO =
-          "FETCH CHILD({$varOne}) COMPSTATUS({$varThree}) NOSUSPEND";
+      "FETCH CHILD({$varOne}) COMPSTATUS({$varThree}) NOSUSPEND";
 
   private static final String FETCH_CHILD_INVALID_ONE =
-          "FETCH CHILD({$varOne}) COMPSTATUS({$varThree}) {NOSUSPEND|errorOne} {TIMEOUT|errorTwo}({$varTwo})";
+      "FETCH CHILD({$varOne}) COMPSTATUS({$varThree}) {NOSUSPEND|errorOne}"
+          + " {TIMEOUT|errorTwo}({$varTwo})";
 
-  private static final String FETCH_CHILD_INVALID_TWO =
-          "FETCH {_CHILD({$varOne})|errorOne_}";
+  private static final String FETCH_CHILD_INVALID_TWO = "FETCH {_CHILD({$varOne})|errorOne_}";
 
   private static final String FETCH_CHILD_INVALID_THREE =
-          "FETCH ANY({$varOne}) COMPSTATUS({$varThree}) {ANY|errorOne}({$varTwo}) CHANNEL({$varThree})";
+      "FETCH ANY({$varOne}) COMPSTATUS({$varThree}) {ANY|errorOne}({$varTwo}) CHANNEL({$varThree})";
 
   private static final String FETCH_CHILD_INVALID_FOUR =
-          "FETCH CHILD({$varOne}) CHANNEL({$varTwo}) {CHANNEL|errorOne}({$varThree}) COMPSTATUS({$varThree})";
+      "FETCH CHILD({$varOne}) CHANNEL({$varTwo}) {CHANNEL|errorOne}({$varThree})"
+          + " COMPSTATUS({$varThree})";
 
   @Test
   void testFetchAnyValidOne() {
@@ -74,33 +75,33 @@ public class TestCICSFetch {
   @Test
   void testFetchAnyInvalidOne() {
     CICSTestUtils.errorTest(
-            FETCH_ANY_INVALID_ONE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        FETCH_ANY_INVALID_ONE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testFetchAnyInvalidTwo() {
     CICSTestUtils.errorTest(
-            FETCH_ANY_INVALID_TWO,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: COMPSTATUS",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        FETCH_ANY_INVALID_TWO,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: COMPSTATUS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -116,59 +117,58 @@ public class TestCICSFetch {
   @Test
   void testFetchChildInvalidOne() {
     CICSTestUtils.errorTest(
-            FETCH_CHILD_INVALID_ONE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        FETCH_CHILD_INVALID_ONE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: NOSUSPEND or TIMEOUT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testFetchChildInvalidTwo() {
     CICSTestUtils.errorTest(
-            FETCH_CHILD_INVALID_TWO,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: COMPSTATUS",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        FETCH_CHILD_INVALID_TWO,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: COMPSTATUS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testFetchAnyDuplicateOptions() {
     CICSTestUtils.errorTest(
-            FETCH_CHILD_INVALID_THREE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: ANY",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        FETCH_CHILD_INVALID_THREE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: ANY",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testFetchChildDuplicateOptions() {
     CICSTestUtils.errorTest(
-            FETCH_CHILD_INVALID_FOUR,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: CHANNEL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        FETCH_CHILD_INVALID_FOUR,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: CHANNEL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }
-

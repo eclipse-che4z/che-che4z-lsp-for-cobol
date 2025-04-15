@@ -14,10 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.model;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 /** This data class represents a COBOL variable, that may contain a structure. */
 @Data

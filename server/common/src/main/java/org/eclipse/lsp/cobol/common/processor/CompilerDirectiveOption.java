@@ -15,9 +15,8 @@
 
 package org.eclipse.lsp.cobol.common.processor;
 
-import lombok.Value;
-
 import java.util.List;
+import lombok.Value;
 
 /** Compiler directive Options */
 @Value

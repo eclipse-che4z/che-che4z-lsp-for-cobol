@@ -114,8 +114,11 @@ class TestCopybookReplacePatterns {
 
   private static final String REPL5 =
       "      ***************************************************************** 09700000\r\n"
-          + "         02  {$*LOGHDR}.                                                    18000000\r\n"
-          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000|1}           PIC S9(7) COMP-3.                         24000000";
+          + "         02  {$*LOGHDR}.                                                   "
+          + " 18000000\r\n"
+          + "           03 "
+          + " {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000|1}"
+          + "           PIC S9(7) COMP-3.                         24000000";
   private static final String REPL5_NAME = "REPL5";
 
   private static final String REPL6 =
@@ -124,8 +127,11 @@ class TestCopybookReplacePatterns {
 
   private static final String REPL7 =
       "      ***************************************************************** 09700000\r\n"
-          + "         02  {$*LOGHDR}.                                                    18000000\r\n"
-          + "           03  {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000|1}           PIC S9(7) COMP-3.";
+          + "         02  {$*LOGHDR}.                                                   "
+          + " 18000000\r\n"
+          + "           03 "
+          + " {$*LDAY^DMAN1230000000000000000000000000000000000000000000001111111111111111111111111111111111111111111100000000000000000000000|1}"
+          + "           PIC S9(7) COMP-3.";
   private static final String REPL7_NAME = "REPL7";
 
   private static final String REPL8 = "0      01 {$*'XXX_ID$'^ACC_ID}    PIC 9.\n";
@@ -178,12 +184,12 @@ class TestCopybookReplacePatterns {
                 "Variable name cannot exceed 30 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-                "2",
-                new Diagnostic(
-                        new Range(),
-                        "Errors inside the copybook",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.COPYBOOK.getText())));
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText())));
   }
 
   @Test
@@ -204,12 +210,12 @@ class TestCopybookReplacePatterns {
                 "Variable name cannot exceed 30 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
-                "2",
-                new Diagnostic(
-                        new Range(),
-                        "Errors inside the copybook",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.COPYBOOK.getText())));
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Errors inside the copybook",
+                DiagnosticSeverity.Error,
+                ErrorSource.COPYBOOK.getText())));
   }
 
   @Test

@@ -18,8 +18,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -57,8 +57,9 @@ class TestCopyMaidAllowsOnlyValidLevelNumbers {
             "2",
             new Diagnostic(
                 null,
-                "Syntax error on '50' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE, "
-                    + "LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, '01-49', '66', '77', '88'}",
+                "Syntax error on '50' expected {CBL, END, EXEC, FILE, ID, IDENTIFICATION, LINKAGE,"
+                    + " LOCAL-STORAGE, PROCEDURE, PROCESS, WORKING-STORAGE, '01-49', '66', '77',"
+                    + " '88'}",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),

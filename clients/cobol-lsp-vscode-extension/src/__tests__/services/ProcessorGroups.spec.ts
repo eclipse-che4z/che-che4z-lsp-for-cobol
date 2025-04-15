@@ -58,7 +58,16 @@ jest.mock("vscode", () => {
                                   "IDMS",
                                   {
                                       "name": "DaCo",
-                                      "libs": ["/daco"]
+                                      "libs": ["/daco",
+                                      {
+                                  "environment": "ENV",
+                                  "stage": "1",
+                                  "system": "SYSTEM",
+                                  "subsystem": "SUBSYTEM",
+                                  "type": "COPY",
+                                  "profile": "instance.internal.connection"
+                                }
+                                  ]
                                   },
                                   {
                                       "name": "SQL",
@@ -238,6 +247,45 @@ it("Processor groups configuration matches program relative to workspace", async
   };
   const result = await loadProcessorGroupDialectConfig(item, []);
   expect(result).toStrictEqual(["IDMS"]);
+});
+it("Checks library configurations in preprocessor definitions overrides processor group libraries", async () => {
+  jest
+    .spyOn(glob, "globSync")
+    .mockImplementation(
+      (config: string | string[], _options: glob.GlobOptions) => {
+        if (config[0] === "/copy") {
+          return ["copy-resolved-from-glob"];
+        }
+        if (config[0] === "/daco") {
+          return ["daco-resolved-from-glob"];
+        } else {
+          console.trace(config);
+          throw Error("some issue with input param");
+        }
+      },
+    );
+  const scope = {
+    scopeUri: WORKSPACE_URI + "/progDaF.cob",
+  };
+  const resultCobol = await loadProcessorGroupCopybookPathsConfig(scope, []);
+  const resultDaco = await loadProcessorGroupCopybookPathsConfig(
+    scope,
+    [],
+    "DaCo",
+  );
+
+  expect(resultCobol).toStrictEqual(["copy-resolved-from-glob"]);
+  expect(resultDaco).toStrictEqual([
+    "daco-resolved-from-glob",
+    {
+      environment: "ENV",
+      profile: "instance.internal.connection",
+      stage: "1",
+      subsystem: "SUBSYTEM",
+      system: "SYSTEM",
+      type: "COPY",
+    },
+  ]);
 });
 
 it("Processor groups configuration matches program with *", async () => {

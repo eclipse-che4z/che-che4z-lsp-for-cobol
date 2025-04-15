@@ -20,9 +20,7 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
-/**
- * The class represents a literal in COBOL.
- */
+/** The class represents a literal in COBOL. */
 @ToString(callSuper = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)

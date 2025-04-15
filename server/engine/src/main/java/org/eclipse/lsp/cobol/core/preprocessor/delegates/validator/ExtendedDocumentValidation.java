@@ -14,15 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.validator;
 
+import java.util.List;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 
-import java.util.List;
-
-/**
- * Performs validation on the transformed cobol lines
- */
+/** Performs validation on the transformed cobol lines */
 public interface ExtendedDocumentValidation {
   /**
    * Perform validation on {@link CobolLine}.

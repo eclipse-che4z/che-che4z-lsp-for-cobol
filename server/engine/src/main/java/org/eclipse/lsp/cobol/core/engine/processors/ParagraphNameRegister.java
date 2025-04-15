@@ -15,12 +15,11 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Optional;
+import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.ParagraphNameNode;
-
-import java.util.Optional;
 
 /** ParagraphNameNode processor */
 public class ParagraphNameRegister implements Processor<ParagraphNameNode> {

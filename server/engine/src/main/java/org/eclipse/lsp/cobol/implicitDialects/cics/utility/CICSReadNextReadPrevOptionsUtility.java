@@ -15,6 +15,10 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_readnext_readprev;
+
+import java.util.*;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -22,11 +26,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_readnext_readprev;
 
 /** Checks CICS ReadNext ReadPrev rules for required and invalid options */
 public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtility {
@@ -58,7 +57,8 @@ public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtil
         }
       };
 
-  public CICSReadNextReadPrevOptionsUtility(DialectProcessingContext context, List<SyntaxError> errors) {
+  public CICSReadNextReadPrevOptionsUtility(
+      DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
   }
 
@@ -78,14 +78,24 @@ public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtil
   @SuppressWarnings("unchecked")
   private void checkReadNextReadPrevBody(CICSParser.Cics_readnext_readprev_bodyContext ctx) {
     checkHasMandatoryOptions(ctx.cics_file_name(), ctx, "FILE");
-    List<TerminalNode> file = ctx.cics_file_name().stream().map(CICSParser.Cics_file_nameContext::FILE).collect(Collectors.toList());
-    List<TerminalNode> dataset = ctx.cics_file_name().stream().map(CICSParser.Cics_file_nameContext::DATASET).collect(Collectors.toList());
+    List<TerminalNode> file =
+        ctx.cics_file_name().stream()
+            .map(CICSParser.Cics_file_nameContext::FILE)
+            .collect(Collectors.toList());
+    List<TerminalNode> dataset =
+        ctx.cics_file_name().stream()
+            .map(CICSParser.Cics_file_nameContext::DATASET)
+            .collect(Collectors.toList());
     checkHasMutuallyExclusiveOptions("FILE or DATASET", file, dataset);
 
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
     checkHasMutuallyExclusiveOptions(
-            "UNCOMMITTED or CONSISTENT or REPEATABLE or UPDATE", ctx.UNCOMMITTED(), ctx.CONSISTENT(), ctx.REPEATABLE(), ctx.UPDATE());
+        "UNCOMMITTED or CONSISTENT or REPEATABLE or UPDATE",
+        ctx.UNCOMMITTED(),
+        ctx.CONSISTENT(),
+        ctx.REPEATABLE(),
+        ctx.UPDATE());
 
     if (!ctx.UPDATE().isEmpty() && ctx.TOKEN().isEmpty()) {
       checkHasIllegalOptions(ctx.UPDATE(), "UPDATE without TOKEN");

@@ -63,8 +63,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
 
   @Inject
   public SourceUnitGraph(
-      WorkspaceFileService fileService,
-      AsyncAnalysisService asyncAnalysisService) {
+      WorkspaceFileService fileService, AsyncAnalysisService asyncAnalysisService) {
     this.fileService = fileService;
     asyncAnalysisService.register(ImmutableList.of(this));
   }

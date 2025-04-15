@@ -30,25 +30,22 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCICSPost {
   private static final String POST_VALID_INTERVAL =
-          "POST INTERVAL(0) SET({$varOne}) REQID({$varTwo})";
+      "POST INTERVAL(0) SET({$varOne}) REQID({$varTwo})";
 
-  private static final String POST_VALID_TIME =
-          "POST TIME(120000) SET({$varOne})";
+  private static final String POST_VALID_TIME = "POST TIME(120000) SET({$varOne})";
 
   private static final String POST_VALID_AFTER =
-          "POST AFTER HOURS({$varOne}) MINUTES({$varTwo}) SECONDS({$varThree}) SET({$varOne})";
+      "POST AFTER HOURS({$varOne}) MINUTES({$varTwo}) SECONDS({$varThree}) SET({$varOne})";
 
   private static final String POST_VALID_AT =
-          "POST AT HOURS({$varOne}) MINUTES({$varTwo}) SECONDS({$varThree}) SET({$varOne})";
+      "POST AT HOURS({$varOne}) MINUTES({$varTwo}) SECONDS({$varThree}) SET({$varOne})";
 
-  private static final String POST_INVALID_NO_OPTION =
-          "POST {_AT SET(123)|errorOne_}";
+  private static final String POST_INVALID_NO_OPTION = "POST {_AT SET(123)|errorOne_}";
 
   private static final String POST_INVALID_MULTIPLE_OPTIONS =
-          "POST {INTERVAL|errorOne}(0) {TIME|errorTwo}(120000) SET({$varOne})";
+      "POST {INTERVAL|errorOne}(0) {TIME|errorTwo}(120000) SET({$varOne})";
 
-  private static final String POST_INVALID_AFTER_NO_TIME =
-          "POST {_AFTER SET(123)|errorOne_}";
+  private static final String POST_INVALID_AFTER_NO_TIME = "POST {_AFTER SET(123)|errorOne_}";
 
   @Test
   void testPostValidInterval() {
@@ -73,45 +70,47 @@ public class TestCICSPost {
   @Test
   void testPostInvalidNoOption() {
     CICSTestUtils.errorTest(
-            POST_INVALID_NO_OPTION,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: HOURS or MINUTES or SECONDS",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        POST_INVALID_NO_OPTION,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: HOURS or MINUTES or SECONDS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testPostInvalidMultipleOptions() {
     CICSTestUtils.errorTest(
-            POST_INVALID_MULTIPLE_OPTIONS,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: INTERVAL or TIME or AFTER or AT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: INTERVAL or TIME or AFTER or AT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        POST_INVALID_MULTIPLE_OPTIONS,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INTERVAL or TIME or"
+                    + " AFTER or AT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INTERVAL or TIME or"
+                    + " AFTER or AT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testPostInvalidAfterNoTime() {
     CICSTestUtils.errorTest(
-            POST_INVALID_AFTER_NO_TIME,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: HOURS or MINUTES or SECONDS",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        POST_INVALID_AFTER_NO_TIME,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: HOURS or MINUTES or SECONDS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

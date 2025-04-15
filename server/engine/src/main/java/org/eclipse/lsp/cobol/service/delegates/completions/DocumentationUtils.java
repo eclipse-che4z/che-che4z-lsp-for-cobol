@@ -15,12 +15,11 @@
 
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp4j.MarkupContent;
-
-import javax.annotation.Nullable;
-import java.util.function.Predicate;
 
 /** This utility class contains methods specific for preparing completion suggestion */
 @UtilityClass

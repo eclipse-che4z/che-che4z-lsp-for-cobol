@@ -14,28 +14,27 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.statements;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.ObsoleteNode;
+import org.eclipse.lsp.cobol.common.model.tree.RemarksNode;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.RemarksNode;
-import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.core.engine.processors.ObsoleteNodeCheck;
+import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Test {@link ObsoleteNode} */
 class ObsoleteNodeTest {
@@ -46,10 +45,11 @@ class ObsoleteNodeTest {
     RemarksNode remarksNode = new RemarksNode(locality);
     AstProcessor astProcessor = new AstProcessor();
     List<SyntaxError> errors = new ArrayList<>();
-    ProcessingContext ctx = new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
+    ProcessingContext ctx =
+        new ProcessingContext(errors, new SymbolAccumulator(), ImmutableMap.of());
     ctx.register(
         new ProcessorDescription(
-                RemarksNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
+            RemarksNode.class, ProcessingPhase.TRANSFORMATION, new ObsoleteNodeCheck()));
     rootNode.addChild(remarksNode);
     astProcessor.process(ProcessingPhase.TRANSFORMATION, rootNode, ctx);
 

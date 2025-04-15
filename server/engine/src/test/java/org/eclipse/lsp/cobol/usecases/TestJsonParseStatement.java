@@ -50,7 +50,8 @@ public class TestJsonParseStatement {
           + "           end-json.\n"
           + "       End program jp_ex.";
 
-  public static final String TEXT_IDENTIFIER1_VALIDATION_1 = "       Identification division.\n"
+  public static final String TEXT_IDENTIFIER1_VALIDATION_1 =
+      "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
           + "       Data division.\n"
           + "       Working-storage section.\n"
@@ -74,7 +75,8 @@ public class TestJsonParseStatement {
           + "           end-json.\n"
           + "       End program jp_ex.";
 
-  public static final String TEXT_IDENTIFIER1_VALIDATION_2 = "       Identification division.\n"
+  public static final String TEXT_IDENTIFIER1_VALIDATION_2 =
+      "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
           + "       Data division.\n"
           + "       Working-storage section.\n"
@@ -98,7 +100,8 @@ public class TestJsonParseStatement {
           + "           end-json.\n"
           + "       End program jp_ex.";
 
-  public static final String TEXT_IDENTIFIER1_VALIDATION_3 = "       Identification division.\n"
+  public static final String TEXT_IDENTIFIER1_VALIDATION_3 =
+      "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
           + "       Data division.\n"
           + "       Working-storage section.\n"
@@ -122,7 +125,8 @@ public class TestJsonParseStatement {
           + "           end-json.\n"
           + "       End program jp_ex.";
 
-  public static final String TEXT_IDENTIFIER1_IDENTIFIER2_OVERLAP = "       Identification division.\n"
+  public static final String TEXT_IDENTIFIER1_IDENTIFIER2_OVERLAP =
+      "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
           + "       Data division.\n"
           + "       Working-storage section.\n"
@@ -146,7 +150,8 @@ public class TestJsonParseStatement {
           + "           end-json.\n"
           + "       End program jp_ex.";
 
-  public static final String TEXT_IDENTIFIER2_UNBOUNDED = "       Identification division.\n"
+  public static final String TEXT_IDENTIFIER2_UNBOUNDED =
+      "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
           + "       Data division.\n"
           + "       Working-storage section.\n"
@@ -170,7 +175,8 @@ public class TestJsonParseStatement {
           + "           end-json.\n"
           + "       End program jp_ex.";
 
-  public static final String TEXT_IDENTIFIER2_UNBOUNDED_2 = "       Identification division.\n"
+  public static final String TEXT_IDENTIFIER2_UNBOUNDED_2 =
+      "       Identification division.\n"
           + "       Program-id. jp_ex.\n"
           + "       Data division.\n"
           + "       Working-storage section.\n"
@@ -192,29 +198,29 @@ public class TestJsonParseStatement {
           + "       End program jp_ex.";
 
   public static final String TEXT_IDENTIFIER3 =
-          "       Identification division.\n"
-                  + "       Program-id. jp_ex.\n"
-                  + "       Data division.\n"
-                  + "       Working-storage section.\n"
-                  + "       01 {$*docx} pic x(1000).\n"
-                  + "       01 {$*myrecord}.\n"
-                  + "           02 {$*data-a} pic x.\n"
-                  + "             88 {$*data-a-flag} value 'T' false 'F'.\n"
-                  + "           02 {$*data-b} pic x.\n"
-                  + "             88 {$*data-b-true} value '1'.\n"
-                  + "             88 {$*data-b-false} value '0'.\n"
-                  + "           02 {$*data-c} pic x.\n"
-                  + "       Procedure division.\n"
-                  + "           Json parse {$docx}  into {$myrecord}\n"
-                  + "             with detail\n"
-                  + "             suppress {$docx|1}\n"
-                  + "             CONVERTING {$data-a} FROM BOOLEAN USING {$data-a-flag}\n"
-                  + "             ALSO {$data-b} FROM BOOLEAN USING {$data-b-true} AND {$data-b-false}\n"
-                  + "             ALSO {$data-c} FROM BOOLEAN USING 'a' AND 'z'\n"
-                  + "             not on exception\n"
-                  + "               display \"Successful JSON Parse\"\n"
-                  + "           end-json.\n"
-                  + "       End program jp_ex.";
+      "       Identification division.\n"
+          + "       Program-id. jp_ex.\n"
+          + "       Data division.\n"
+          + "       Working-storage section.\n"
+          + "       01 {$*docx} pic x(1000).\n"
+          + "       01 {$*myrecord}.\n"
+          + "           02 {$*data-a} pic x.\n"
+          + "             88 {$*data-a-flag} value 'T' false 'F'.\n"
+          + "           02 {$*data-b} pic x.\n"
+          + "             88 {$*data-b-true} value '1'.\n"
+          + "             88 {$*data-b-false} value '0'.\n"
+          + "           02 {$*data-c} pic x.\n"
+          + "       Procedure division.\n"
+          + "           Json parse {$docx}  into {$myrecord}\n"
+          + "             with detail\n"
+          + "             suppress {$docx|1}\n"
+          + "             CONVERTING {$data-a} FROM BOOLEAN USING {$data-a-flag}\n"
+          + "             ALSO {$data-b} FROM BOOLEAN USING {$data-b-true} AND {$data-b-false}\n"
+          + "             ALSO {$data-c} FROM BOOLEAN USING 'a' AND 'z'\n"
+          + "             not on exception\n"
+          + "               display \"Successful JSON Parse\"\n"
+          + "           end-json.\n"
+          + "       End program jp_ex.";
 
   public static final String TEXT_IDENTIFIER3_OMITTED =
       "       Identification division.\n"
@@ -269,30 +275,30 @@ public class TestJsonParseStatement {
           + "       End program jp_ex.";
 
   public static final String TEXT_CONDITION =
-          "       Identification division.\n"
-                  + "       Program-id. jp_ex.\n"
-                  + "       Data division.\n"
-                  + "       Working-storage section.\n"
-                  + "       01 {$*docx} pic x(1000).\n"
-                  + "       01 {$*myrecord}.\n"
-                  + "           02 {$*data-a} pic x.\n"
-                  + "             88 {$*data-a-flag} value 'T' false 'F'.\n"
-                  + "           02 {$*data-b} pic x.\n"
-                  + "             88 {$*data-b-true} value '1'.\n"
-                  + "             88 {$*data-b-false} value '0'.\n"
-                  + "           02 {$*data-c} pic x.\n"
-                  + "       Procedure division.\n"
-                  + "           Json parse {$docx}  into {$myrecord}\n"
-                  + "             with detail\n"
-                  + "             name of {$DATA-A} 'a'\n"
-                  + "             suppress {$data-a}\n"
-                  + "             CONVERTING {$data-a} FROM BOOLEAN USING {$data-c|1}\n"
-                  + "             ALSO {$data-b} FROM BOOLEAN USING {$data-b-true} AND {$data-b-false}\n"
-                  + "             ALSO {$data-c} FROM BOOLEAN USING 'a' AND 'z'\n"
-                  + "             not on exception\n"
-                  + "               display \"Successful JSON Parse\"\n"
-                  + "           end-json.\n"
-                  + "       End program jp_ex.";
+      "       Identification division.\n"
+          + "       Program-id. jp_ex.\n"
+          + "       Data division.\n"
+          + "       Working-storage section.\n"
+          + "       01 {$*docx} pic x(1000).\n"
+          + "       01 {$*myrecord}.\n"
+          + "           02 {$*data-a} pic x.\n"
+          + "             88 {$*data-a-flag} value 'T' false 'F'.\n"
+          + "           02 {$*data-b} pic x.\n"
+          + "             88 {$*data-b-true} value '1'.\n"
+          + "             88 {$*data-b-false} value '0'.\n"
+          + "           02 {$*data-c} pic x.\n"
+          + "       Procedure division.\n"
+          + "           Json parse {$docx}  into {$myrecord}\n"
+          + "             with detail\n"
+          + "             name of {$DATA-A} 'a'\n"
+          + "             suppress {$data-a}\n"
+          + "             CONVERTING {$data-a} FROM BOOLEAN USING {$data-c|1}\n"
+          + "             ALSO {$data-b} FROM BOOLEAN USING {$data-b-true} AND {$data-b-false}\n"
+          + "             ALSO {$data-c} FROM BOOLEAN USING 'a' AND 'z'\n"
+          + "             not on exception\n"
+          + "               display \"Successful JSON Parse\"\n"
+          + "           end-json.\n"
+          + "       End program jp_ex.";
 
   public static final String TEXT_IDENTIFIER5 =
       "       Identification division.\n"
@@ -327,90 +333,119 @@ public class TestJsonParseStatement {
 
   @Test
   void test_identifier1_for_alphanumeric() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER1_VALIDATION_1, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER1_VALIDATION_1,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DOCX elementary item must be alphanumeric and not be defined with JUSTIFIED or dynamic-length.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DOCX elementary item must be alphanumeric and not be defined with JUSTIFIED or"
+                    + " dynamic-length.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier1_for_dynamic() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER1_VALIDATION_2, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER1_VALIDATION_2,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DOCX elementary item must be alphanumeric and not be defined with JUSTIFIED or dynamic-length.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DOCX elementary item must be alphanumeric and not be defined with JUSTIFIED or"
+                    + " dynamic-length.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier1_for_justified() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER1_VALIDATION_3, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER1_VALIDATION_3,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DOCX elementary item must be alphanumeric and not be defined with JUSTIFIED or dynamic-length.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DOCX elementary item must be alphanumeric and not be defined with JUSTIFIED or"
+                    + " dynamic-length.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier1_identifier2_overlap() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER1_IDENTIFIER2_OVERLAP, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER1_IDENTIFIER2_OVERLAP,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "JSON parse DATA-A must not overlap MYRECORD",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "JSON parse DATA-A must not overlap MYRECORD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier1_identifier2_unbounded() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER2_UNBOUNDED, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER2_UNBOUNDED,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "MYRECORD group item must be alphanumeric and not be UNBOUNDED or contain a RENAMES clause.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "MYRECORD group item must be alphanumeric and not be UNBOUNDED or contain a RENAMES"
+                    + " clause.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier1_identifier2_unbounded_groupItem() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER2_UNBOUNDED_2, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER2_UNBOUNDED_2,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "MYRECORD group item must be alphanumeric and not be UNBOUNDED or contain a RENAMES clause.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "MYRECORD group item must be alphanumeric and not be UNBOUNDED or contain a RENAMES"
+                    + " clause.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier3_should_be_subordinateTo_identifier2() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER3, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER3,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DOCX must reference a data item that is subordinate to MYRECORD",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DOCX must reference a data item that is subordinate to MYRECORD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_identifier3_with_omitted_should_be_identifier2() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER3_OMITTED, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER3_OMITTED,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DATA-A must reference MYRECORD.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DATA-A must reference MYRECORD.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -420,24 +455,30 @@ public class TestJsonParseStatement {
 
   @Test
   void test_identifier5_must_be_single_byte_alphanumeric_elementary_node() {
-    UseCaseEngine.runTest(TEXT_IDENTIFIER5, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_IDENTIFIER5,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DATA-C must be a single-byte alphanumeric elementary data item whose data definition entry contains PICTURE X.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DATA-C must be a single-byte alphanumeric elementary data item whose data"
+                    + " definition entry contains PICTURE X.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void test_condition_must_be_level88() {
-    UseCaseEngine.runTest(TEXT_CONDITION, ImmutableList.of(), ImmutableMap.of(
+    UseCaseEngine.runTest(
+        TEXT_CONDITION,
+        ImmutableList.of(),
+        ImmutableMap.of(
             "1",
             new Diagnostic(
-                    new Range(),
-                    "DATA-C must be a level-88.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText())));
+                new Range(),
+                "DATA-C must be a level-88.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
-
 }

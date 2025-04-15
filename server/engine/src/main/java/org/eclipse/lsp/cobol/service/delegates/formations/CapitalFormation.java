@@ -15,16 +15,15 @@
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
 import com.google.common.collect.ImmutableList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
 
 public class CapitalFormation implements Formation {
   static final String UPPERCASE = "\"Uppercase\"";
@@ -80,7 +79,8 @@ public class CapitalFormation implements Formation {
   }
 
   @Override
-  public List<TextEdit> format(@NonNull List<CobolDocumentModel.Line> lines, @NonNull List<String> settings) {
+  public List<TextEdit> format(
+      @NonNull List<CobolDocumentModel.Line> lines, @NonNull List<String> settings) {
     Function<Character, Character> modifier = getModifier(settings);
     if (modifier == null) {
       return ImmutableList.of();
@@ -129,7 +129,9 @@ public class CapitalFormation implements Formation {
       context.checkLiteralValue(ch);
 
       if (!literal && context.insideLiteralValue() && builder.length() > 0) {
-        context.getResult().add(constructEdit(line.getNumber(), builder, context.getCurrentPos(), i));
+        context
+            .getResult()
+            .add(constructEdit(line.getNumber(), builder, context.getCurrentPos(), i));
       }
       if (context.insideLiteralValue()) {
         continue;
@@ -151,7 +153,9 @@ public class CapitalFormation implements Formation {
       Character newCh = context.getModifier().apply(ch);
       if (newCh == ch) {
         if (builder.length() > 0) {
-          context.getResult().add(constructEdit(line.getNumber(), builder, context.getCurrentPos(), i));
+          context
+              .getResult()
+              .add(constructEdit(line.getNumber(), builder, context.getCurrentPos(), i));
         }
       } else {
         if (builder.length() == 0) {
@@ -162,14 +166,18 @@ public class CapitalFormation implements Formation {
     }
     // Check after loop if we have not committed edit structure
     if (builder.length() > 0) {
-      context.getResult().add(constructEdit(line.getNumber(), builder, context.getCurrentPos(), maxLen));
+      context
+          .getResult()
+          .add(constructEdit(line.getNumber(), builder, context.getCurrentPos(), maxLen));
     }
   }
 
-  private TextEdit constructEdit(int lineNumber, StringBuilder builder, int startPos, int endPosExcluded) {
+  private TextEdit constructEdit(
+      int lineNumber, StringBuilder builder, int startPos, int endPosExcluded) {
     String text = builder.toString();
     builder.setLength(0);
-    Range range = new Range(new Position(lineNumber, startPos), new Position(lineNumber, endPosExcluded));
+    Range range =
+        new Range(new Position(lineNumber, startPos), new Position(lineNumber, endPosExcluded));
 
     return new TextEdit(range, text);
   }

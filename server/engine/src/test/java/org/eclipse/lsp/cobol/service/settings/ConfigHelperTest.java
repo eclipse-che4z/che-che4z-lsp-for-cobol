@@ -14,17 +14,14 @@
  */
 package org.eclipse.lsp.cobol.service.settings;
 
-import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonPrimitive;
-import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test for ConfigHelper
- */
+import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonPrimitive;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+
+/** Test for ConfigHelper */
 class ConfigHelperTest {
 
   @Test
@@ -47,9 +44,9 @@ class ConfigHelperTest {
 
   @Test
   void test_json() {
-    Optional<String> result = ConfigHelper.getValueAsString(ImmutableList.of(new JsonPrimitive("test")));
+    Optional<String> result =
+        ConfigHelper.getValueAsString(ImmutableList.of(new JsonPrimitive("test")));
     assertTrue(result.isPresent());
     assertEquals("test", result.get());
   }
-
 }

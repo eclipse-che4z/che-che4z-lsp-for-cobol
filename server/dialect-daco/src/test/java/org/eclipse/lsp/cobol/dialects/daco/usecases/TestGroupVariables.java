@@ -20,27 +20,32 @@ import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** Test for group variables **/
+/** Test for group variables * */
 class TestGroupVariables {
-  private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
-      + "       PROGRAM-ID.    BADPA61M.\n"
-      + "       ENVIRONMENT  DIVISION.\n"
-      + "       IDMS-CONTROL SECTION.\n"
-      + "       PROTOCOL.    MODE IS BATCH           DEBUG\n"
-      + "              IDMS-RECORDS            MANUAL.\n"
-      + "       DATA   DIVISION.\n"
-      + "       WORKING-STORAGE SECTION.\n"
-      + "       01 {$*AREA-XW4}.\n"
-      + "           03 {$*TBLOPT-XW4}.\n"
-      + "               07 {$*TBLCRI-XW4}.\n"
-      + "                 09 {$*RUSCRI-BW4}       PIC S9(2)   VALUE ZERO  COMP.\n"
-      + "                 09 {$*ROWCRI-XW4}                   OCCURS 40.\n"
-      + "       01 {$*AREA-XW5}.\n"
-      + "           05 {$*TBLCRI-XW6}  COPY-FROM W4.";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    BADPA61M.\n"
+          + "       ENVIRONMENT  DIVISION.\n"
+          + "       IDMS-CONTROL SECTION.\n"
+          + "       PROTOCOL.    MODE IS BATCH           DEBUG\n"
+          + "              IDMS-RECORDS            MANUAL.\n"
+          + "       DATA   DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*AREA-XW4}.\n"
+          + "           03 {$*TBLOPT-XW4}.\n"
+          + "               07 {$*TBLCRI-XW4}.\n"
+          + "                 09 {$*RUSCRI-BW4}       PIC S9(2)   VALUE ZERO  COMP.\n"
+          + "                 09 {$*ROWCRI-XW4}                   OCCURS 40.\n"
+          + "       01 {$*AREA-XW5}.\n"
+          + "           05 {$*TBLCRI-XW6}  COPY-FROM W4.";
 
   @Test
   void test() {
-    UseCaseEngine.runTestForDiagnostics(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(),
+    UseCaseEngine.runTestForDiagnostics(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
   }
 }

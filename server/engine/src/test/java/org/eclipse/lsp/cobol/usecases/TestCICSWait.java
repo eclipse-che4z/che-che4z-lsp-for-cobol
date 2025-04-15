@@ -45,7 +45,8 @@ public class TestCICSWait {
       "WAIT EVENT ECADDR(100) {ECADDR|errorOne}(100) NAME(100) RESP(100)";
 
   private static final String EXTERNAL_VALID_ONE =
-      "WAIT EXTERNAL ECBLIST({$varOne}) NUMEVENTS({$varTwo}) PURGEABILITY({$varOne}) NAME({$varOne}) NOHANDLE";
+      "WAIT EXTERNAL ECBLIST({$varOne}) NUMEVENTS({$varTwo}) PURGEABILITY({$varOne})"
+          + " NAME({$varOne}) NOHANDLE";
 
   private static final String EXTERNAL_VALID_TWO =
       "WAIT EXTERNAL ECBLIST({$varOne}) NUMEVENTS({$varTwo})";
@@ -140,13 +141,15 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: PURGEABLE or PURGEABILITY or NOTPURGEABLE",
+                "Exactly one option required, options are mutually exclusive: PURGEABLE or"
+                    + " PURGEABILITY or NOTPURGEABLE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: PURGEABLE or PURGEABILITY or NOTPURGEABLE",
+                "Exactly one option required, options are mutually exclusive: PURGEABLE or"
+                    + " PURGEABILITY or NOTPURGEABLE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -174,13 +177,15 @@ public class TestCICSWait {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: JOURNALNAME or JORUNALNUM",
+                "Exactly one option required, options are mutually exclusive: JOURNALNAME or"
+                    + " JORUNALNUM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: JOURNALNAME or JORUNALNUM",
+                "Exactly one option required, options are mutually exclusive: JOURNALNAME or"
+                    + " JORUNALNUM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

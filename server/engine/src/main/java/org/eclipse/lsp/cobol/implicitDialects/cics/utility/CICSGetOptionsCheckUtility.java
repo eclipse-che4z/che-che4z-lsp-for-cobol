@@ -14,19 +14,17 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_get;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_get;
 
 /** Checks CICS Get rules for required and invalid options */
 public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -93,8 +91,12 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   @SuppressWarnings("unchecked")
   private void checkContainerBTS(CICSParser.Cics_get_container_btsContext ctx) {
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
-    checkHasMutuallyExclusiveOptions("ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS", ctx.ACTIVITY(),
-            ctx.ACQACTIVITY(), ctx.PROCESS(), ctx.ACQPROCESS());
+    checkHasMutuallyExclusiveOptions(
+        "ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS",
+        ctx.ACTIVITY(),
+        ctx.ACQACTIVITY(),
+        ctx.PROCESS(),
+        ctx.ACQPROCESS());
     checkHasExactlyOneOption("INTO or SET or NODATA", ctx, ctx.INTO(), ctx.SET(), ctx.NODATA());
     if (!ctx.SET().isEmpty() || !ctx.NODATA().isEmpty()) {
       checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
@@ -112,8 +114,11 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
     }
     checkHasMutuallyExclusiveOptions("NODATA or BYTEOFFSET", ctx.NODATA(), ctx.BYTEOFFSET());
-    checkHasMutuallyExclusiveOptions("INTOCCSID or INTOCODEPAGE or CONVERTST",
-            ctx.INTOCCSID(), ctx.INTOCODEPAGE(), ctx.CONVERTST());
+    checkHasMutuallyExclusiveOptions(
+        "INTOCCSID or INTOCODEPAGE or CONVERTST",
+        ctx.INTOCCSID(),
+        ctx.INTOCODEPAGE(),
+        ctx.CONVERTST());
     if (!ctx.CCSID().isEmpty()) {
       checkHasMandatoryOptions(ctx.CONVERTST(), ctx, "CONVERTST");
     }

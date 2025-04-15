@@ -14,6 +14,10 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -23,14 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
-/**
- * Test for {@link DialectParserListener}
- */
+/** Test for {@link DialectParserListener} */
 @ExtendWith(MockitoExtension.class)
 class DialectParserListenerTest {
 
@@ -51,5 +48,4 @@ class DialectParserListenerTest {
     List<SyntaxError> result = service.getErrors();
     assertEquals(1, result.size());
   }
-
 }

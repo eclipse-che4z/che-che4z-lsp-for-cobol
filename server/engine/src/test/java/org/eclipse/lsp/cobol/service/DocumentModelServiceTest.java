@@ -27,9 +27,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for DocumentModelService
- */
+/** Test for DocumentModelService */
 class DocumentModelServiceTest {
   private DocumentModelService service;
   private String languageId = "cobol";
@@ -138,5 +136,4 @@ class DocumentModelServiceTest {
     assertEquals(0, diagnostics.get(uri).size());
     assertNotNull(service.get(uri));
   }
-
 }

@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -60,10 +59,12 @@ class TestCommentLines {
     CodeLayoutStore store = mock(CodeLayoutStore.class);
     when(store.getCodeLayout()).thenReturn(Optional.empty());
 
-    CleanerPreprocessor textPreprocessor =
-        new IbmTextPreprocessor(messageService, store);
+    CleanerPreprocessor textPreprocessor = new IbmTextPreprocessor(messageService, store);
     String actual =
-        textPreprocessor.cleanUpCode(DOCUMENT_URI, TEXT).unwrap(accumulatedErrors::addAll).toString();
+        textPreprocessor
+            .cleanUpCode(DOCUMENT_URI, TEXT)
+            .unwrap(accumulatedErrors::addAll)
+            .toString();
     assertEquals(EXPECTED, actual);
     assertTrue(accumulatedErrors.isEmpty());
   }

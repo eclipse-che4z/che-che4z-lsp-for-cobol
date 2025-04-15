@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.processor;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -26,8 +27,6 @@ import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
-
-import java.util.Optional;
 
 /** Semantics check for the EXEC CICS block location */
 @AllArgsConstructor
@@ -49,13 +48,13 @@ public class CICSExecBlockProcessor implements Processor<ExecCicsNode> {
 
   private void throwError(ExecCicsNode execCicsNode, ProcessingContext processingContext) {
     processingContext
-            .getErrors()
-            .add(
-                    SyntaxError.syntaxError()
-                            .location(execCicsNode.getLocality().toOriginalLocation())
-                            .severity(ErrorSeverity.ERROR)
-                            .errorSource(ErrorSource.PARSING)
-                            .suggestion(messageService.getMessage("cics.invalidExecBlock"))
-                            .build());
+        .getErrors()
+        .add(
+            SyntaxError.syntaxError()
+                .location(execCicsNode.getLocality().toOriginalLocation())
+                .severity(ErrorSeverity.ERROR)
+                .errorSource(ErrorSource.PARSING)
+                .suggestion(messageService.getMessage("cics.invalidExecBlock"))
+                .build());
   }
 }

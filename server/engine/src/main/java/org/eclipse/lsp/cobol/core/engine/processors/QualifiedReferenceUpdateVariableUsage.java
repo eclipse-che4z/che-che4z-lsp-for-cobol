@@ -15,12 +15,16 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
@@ -30,11 +34,6 @@ import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.FigurativeConstants;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /** QualifiedReferenceNode processor */
 @Slf4j
@@ -62,9 +61,11 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
       return;
     }
 
-    List<VariableNode> foundDefinitions = ctx.getCurrentProgramNode() != null
-        ? symbolAccumulator.getVariableDefinition(ctx.getCurrentProgramNode(), variableUsageChain)
-        : ImmutableList.of();
+    List<VariableNode> foundDefinitions =
+        ctx.getCurrentProgramNode() != null
+            ? symbolAccumulator.getVariableDefinition(
+                ctx.getCurrentProgramNode(), variableUsageChain)
+            : ImmutableList.of();
 
     if (isQualifyExtendedDirectiveEnabled(ctx) && foundDefinitions.size() > 1) {
       foundDefinitions = updateDefinitionForQualifyExtended(node, foundDefinitions);
@@ -73,12 +74,12 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
       node.setVariableDefinitionNode(definitionNode);
       for (VariableUsageNode usageNode : variableUsageChain) {
         while (definitionNode != null
-                && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
+            && !usageNode.getName().equalsIgnoreCase(definitionNode.getName())) {
           definitionNode =
-                  definitionNode
-                          .getNearestParentByType(NodeType.VARIABLE)
-                          .map(VariableNode.class::cast)
-                          .orElse(null);
+              definitionNode
+                  .getNearestParentByType(NodeType.VARIABLE)
+                  .map(VariableNode.class::cast)
+                  .orElse(null);
         }
         if (definitionNode == null) {
           // this is not valid case: if we found definition with all qualifiers we must find
@@ -91,16 +92,16 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     }
     if (foundDefinitions.size() > 1) {
       foundDefinitions =
-              foundDefinitions.stream()
-                      .filter(d -> !d.getLocality().getUri().startsWith("implicit:"))
-                      .collect(Collectors.toList());
+          foundDefinitions.stream()
+              .filter(d -> !d.getLocality().getUri().startsWith("implicit:"))
+              .collect(Collectors.toList());
     }
     if (foundDefinitions.size() == 1) {
       return;
     }
     String dataName = variableUsageChain.get(0).getName();
     if (FigurativeConstants.FIGURATIVE_CONSTANTS.stream()
-            .anyMatch(e -> dataName.toUpperCase().equals(e))) {
+        .anyMatch(e -> dataName.toUpperCase().equals(e))) {
       return;
     }
 
@@ -109,34 +110,35 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     }
 
     SyntaxError error =
-            SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.PARSING)
-                    .severity(ErrorSeverity.ERROR)
-                    .location(node.getLocality().toOriginalLocation())
-                    .messageTemplate(
-                            MessageTemplate.of(
-                                    foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,
-                                    dataName))
-                    .build();
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .severity(ErrorSeverity.ERROR)
+            .location(node.getLocality().toOriginalLocation())
+            .messageTemplate(
+                MessageTemplate.of(
+                    foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,
+                    dataName))
+            .build();
     ctx.getErrors().add(error);
     LOG.debug("Syntax error by QualifiedReferenceNode " + error.toString());
   }
 
   private static boolean isQualifyExtendedDirectiveEnabled(ProcessingContext ctx) {
     return ctx.getCompilerDirectiveContext()
-            .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
-            .filter(t -> !t.getValue().isEmpty())
-            .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
-            .orElse(false);
+        .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.QUALIFY))
+        .filter(t -> !t.getValue().isEmpty())
+        .map(t -> t.getValue().get(t.getValue().size() - 1).equals("EXTEND"))
+        .orElse(false);
   }
 
-  private List<VariableNode> updateDefinitionForQualifyExtended(QualifiedReferenceNode node, List<VariableNode> foundDefinitions) {
+  private List<VariableNode> updateDefinitionForQualifyExtended(
+      QualifiedReferenceNode node, List<VariableNode> foundDefinitions) {
     List<VariableNode> definitionWithLevel01 =
-            foundDefinitions.stream()
-                    .filter(VariableWithLevelNode.class::isInstance)
-                    .map(VariableWithLevelNode.class::cast)
-                    .filter(n -> n.getLevel() == 1)
-                    .collect(Collectors.toList());
+        foundDefinitions.stream()
+            .filter(VariableWithLevelNode.class::isInstance)
+            .map(VariableWithLevelNode.class::cast)
+            .filter(n -> n.getLevel() == 1)
+            .collect(Collectors.toList());
     if (definitionWithLevel01.size() == 1) {
       foundDefinitions = definitionWithLevel01;
       node.setVariableDefinitionNode(definitionWithLevel01.get(0));

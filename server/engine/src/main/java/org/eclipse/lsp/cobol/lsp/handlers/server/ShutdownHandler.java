@@ -20,22 +20,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.LspMessageBroker;
 
-/**
- * LSP Shutdown Handler
- */
+/** LSP Shutdown Handler */
 @Slf4j
 public class ShutdownHandler {
   private final DisposableLSPStateService disposableLSPStateService;
   private final LspMessageBroker lspMessageBroker;
 
   @Inject
-  public ShutdownHandler(DisposableLSPStateService disposableLSPStateService, LspMessageBroker lspMessageBroker) {
+  public ShutdownHandler(
+      DisposableLSPStateService disposableLSPStateService, LspMessageBroker lspMessageBroker) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.lspMessageBroker = lspMessageBroker;
   }
 
   /**
    * Handle shutdown request.
+   *
    * @return ShutdownResponse.
    */
   public ShutdownResponse shutdown() {
@@ -50,9 +50,7 @@ public class ShutdownHandler {
     return new ShutdownResponse(null, String.valueOf(exitCode));
   }
 
-  /**
-   * Represents the JSON RPC response structure for shutdown command as per LSP specification
-   */
+  /** Represents the JSON RPC response structure for shutdown command as per LSP specification */
   @AllArgsConstructor
   public static class ShutdownResponse {
     private final String result;

@@ -21,9 +21,7 @@ import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * This test checks for the copybook multiline statement
- */
+/** This test checks for the copybook multiline statement */
 class TestCopybookMultilineMapping {
 
   private static final String TEXT =

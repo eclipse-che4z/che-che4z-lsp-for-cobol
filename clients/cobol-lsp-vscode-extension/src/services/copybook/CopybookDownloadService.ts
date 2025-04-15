@@ -78,7 +78,11 @@ export class CopybookDownloadService {
     }
 
     const pgConfigs = (
-      await loadProcessorGroupCopybookPathsConfig({ scopeUri: documentUri }, [])
+      await loadProcessorGroupCopybookPathsConfig(
+        { scopeUri: documentUri },
+        [],
+        copybookName.dialect,
+      )
     ).filter((config) => typeof config != "string");
 
     if (pgConfigs.length > 0) {
@@ -198,6 +202,7 @@ export class CopybookDownloadService {
     const pgConfigs = await loadProcessorGroupCopybookPathsConfig(
       { scopeUri: documentUri },
       [],
+      dialectType,
     );
     if (pgConfigs.length > 0) {
       return (
@@ -413,10 +418,23 @@ export class CopybookDownloadService {
       documentUri,
       this.explorerApi,
     );
-    const configs = await loadProcessorGroupCopybookPathsConfig(
-      { scopeUri: documentUri },
-      [],
-    );
+    const configs: (
+      | string
+      | ZoweDatasetConfigModel
+      | ZoweUssConfigModel
+      | EndevorConfigModel
+    )[] = [];
+    const uniqueDialects = [...new Set(dialects)];
+    for (const dialect of uniqueDialects) {
+      configs.push(
+        ...(await loadProcessorGroupCopybookPathsConfig(
+          { scopeUri: documentUri },
+          [],
+          dialect,
+        )),
+      );
+    }
+
     if (
       await this.isProcessorGroupConfigsSatisfiesDownload(
         documentUri,

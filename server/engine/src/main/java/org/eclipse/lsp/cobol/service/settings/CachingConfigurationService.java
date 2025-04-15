@@ -40,39 +40,47 @@ public class CachingConfigurationService implements ConfigurationService {
   private final DialectService dialectService;
 
   @Inject
-  public CachingConfigurationService(SettingsService settingsService, DialectService dialectService) {
+  public CachingConfigurationService(
+      SettingsService settingsService, DialectService dialectService) {
     this.settingsService = settingsService;
     this.dialectService = dialectService;
   }
 
   private CompletableFuture<ConfigurationEntity> createConfigFuture(String documentURI) {
-    List<String> settingsList = new LinkedList<>(Arrays.asList(
-        DIALECTS.label,
-        SUBROUTINE_LOCAL_PATHS.label,
-        CICS_TRANSLATOR_ENABLED.label,
-        DIALECT_REGISTRY.label,
-        COMPILER_OPTIONS.label));
+    List<String> settingsList =
+        new LinkedList<>(
+            Arrays.asList(
+                DIALECTS.label,
+                SUBROUTINE_LOCAL_PATHS.label,
+                CICS_TRANSLATOR_ENABLED.label,
+                DIALECT_REGISTRY.label,
+                COMPILER_OPTIONS.label));
 
-    List<String> dialectsSections = Stream.concat(
-            dialectService.getSettingsSections().stream(),
-            dialectService.getImplicitDialectSettingsSections().stream())
+    List<String> dialectsSections =
+        Stream.concat(
+                dialectService.getSettingsSections().stream(),
+                dialectService.getImplicitDialectSettingsSections().stream())
             .collect(Collectors.toList());
 
     settingsList.addAll(dialectsSections);
 
     return Optional.ofNullable(settingsService.fetchConfigurations(documentURI, settingsList))
-        .map(c -> c.thenApply(future ->
-            Optional.ofNullable(future)
-                .map(list -> parseConfig(list, dialectsSections))
-                .orElse(new ConfigurationEntity()))
-        ).orElse(CompletableFuture.completedFuture(new ConfigurationEntity()));
+        .map(
+            c ->
+                c.thenApply(
+                    future ->
+                        Optional.ofNullable(future)
+                            .map(list -> parseConfig(list, dialectsSections))
+                            .orElse(new ConfigurationEntity())))
+        .orElse(CompletableFuture.completedFuture(new ConfigurationEntity()));
   }
 
   @Override
   @SuppressWarnings("java:S2142")
   public AnalysisConfig getConfig(String scopeURI, CopybookProcessingMode mode) {
     try {
-      AnalysisConfig config = AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture(scopeURI).get());
+      AnalysisConfig config =
+          AnalysisConfigHelper.fromConfigEntity(mode, createConfigFuture(scopeURI).get());
       if (ServerTypeUtil.isNativeServerType()) {
         return config;
       }
@@ -113,22 +121,25 @@ public class CachingConfigurationService implements ConfigurationService {
     return dialectService.getWatchingFolderSettings();
   }
 
-  private ConfigurationEntity parseConfig(List<Object> clientConfig, List<String> dialectsSections) {
+  private ConfigurationEntity parseConfig(
+      List<Object> clientConfig, List<String> dialectsSections) {
     return Optional.ofNullable(clientConfig)
         .map(cc -> this.parseSettings(cc, dialectsSections))
         .orElseGet(ConfigurationEntity::new);
   }
 
-  private ConfigurationEntity parseSettings(List<Object> clientConfig, List<String> dialectsSections) {
+  private ConfigurationEntity parseSettings(
+      List<Object> clientConfig, List<String> dialectsSections) {
 
     return new ConfigurationEntity(
-            ConfigHelper.parseDialects((JsonArray) clientConfig.get(0)),
-            ConfigHelper.parseSubroutineFolder((JsonElement) clientConfig.get(1)),
-            ConfigHelper.parseCicsTranslatorOption((JsonElement) clientConfig.get(2)),
-            ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(3)),
-            ConfigHelper.parseCompilerOptions(clientConfig.get(4)),
-        getDialectsSettings(clientConfig.subList(5, 5 + dialectsSections.size()).toArray(), dialectsSections.toArray())
-        );
+        ConfigHelper.parseDialects((JsonArray) clientConfig.get(0)),
+        ConfigHelper.parseSubroutineFolder((JsonElement) clientConfig.get(1)),
+        ConfigHelper.parseCicsTranslatorOption((JsonElement) clientConfig.get(2)),
+        ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(3)),
+        ConfigHelper.parseCompilerOptions(clientConfig.get(4)),
+        getDialectsSettings(
+            clientConfig.subList(5, 5 + dialectsSections.size()).toArray(),
+            dialectsSections.toArray()));
   }
 
   private Map<String, JsonElement> getDialectsSettings(Object[] config, Object[] dialectsSections) {

@@ -25,10 +25,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import java.util.Optional;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
@@ -58,7 +58,8 @@ class InitializedHandlerTest {
     prepareSettingsService(settingsService, localeStore);
 
     CodeLayoutStore codeLayoutStore = mock(CodeLayoutStore.class);
-    when(codeLayoutStore.getCodeLayout()).thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
+    when(codeLayoutStore.getCodeLayout())
+        .thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
     when(codeLayoutStore.updateCodeLayout()).thenReturn(mock -> {});
 
     InitializedHandler initializedHandler =
@@ -69,7 +70,8 @@ class InitializedHandlerTest {
             settingsService,
             localeStore,
             mock(AnalysisService.class),
-            messageService, codeLayoutStore);
+            messageService,
+            codeLayoutStore);
     initializedHandler.initialized(new InitializedParams());
     verify(watchingService).watchConfigurationChange();
     verify(settingsService).fetchConfiguration(LOCALE.label);
@@ -97,6 +99,7 @@ class InitializedHandlerTest {
     when(settingsService.fetchConfiguration("dialect"))
         .thenReturn(completedFuture(singletonList(arr)));
     when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
-        .thenReturn(completedFuture(ImmutableList.of(Optional.of(CobolLanguageId.COBOL.getLayout()))));
+        .thenReturn(
+            completedFuture(ImmutableList.of(Optional.of(CobolLanguageId.COBOL.getLayout()))));
   }
 }

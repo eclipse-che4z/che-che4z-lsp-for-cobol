@@ -14,6 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
@@ -23,47 +28,39 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-/**
- *  Test {@link CopybookHoverProvider}
- */
+/** Test {@link CopybookHoverProvider} */
 @ExtendWith(MockitoExtension.class)
 class CopybookHoverProviderTest {
-    private CopybookHoverProvider copybookHoverProvider;
+  private CopybookHoverProvider copybookHoverProvider;
 
-    @BeforeEach
-    void setUp() {
-        copybookHoverProvider = new CopybookHoverProvider();
-    }
+  @BeforeEach
+  void setUp() {
+    copybookHoverProvider = new CopybookHoverProvider();
+  }
 
-    @Test
-    void testGetHover() {
-        TextDocumentPositionParams position = mock(TextDocumentPositionParams.class);
-        when(position.getTextDocument()).thenReturn(mock(TextDocumentIdentifier.class));
-        SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
-        copybookHoverProvider.getHover(mock(CobolDocumentModel.class), position, sourceUnitGraph);
+  @Test
+  void testGetHover() {
+    TextDocumentPositionParams position = mock(TextDocumentPositionParams.class);
+    when(position.getTextDocument()).thenReturn(mock(TextDocumentIdentifier.class));
+    SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
+    copybookHoverProvider.getHover(mock(CobolDocumentModel.class), position, sourceUnitGraph);
 
-        verify(sourceUnitGraph, times(1)).isUserSuppliedCopybook(any());
-    }
+    verify(sourceUnitGraph, times(1)).isUserSuppliedCopybook(any());
+  }
 
-    @Test
-    void testGetHover_graphIsCopybook() {
-        TextDocumentPositionParams position = mock(TextDocumentPositionParams.class);
-        when(position.getTextDocument()).thenReturn(mock(TextDocumentIdentifier.class));
-        SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
-        when(sourceUnitGraph.isUserSuppliedCopybook(any())).thenReturn(true);
-        SourceUnitGraph.NodeV nodeV = mock(SourceUnitGraph.NodeV.class);
-        List<SourceUnitGraph.NodeV> containedCopybookNode =  new ArrayList<>();
-        containedCopybookNode.add(nodeV);
-        when(sourceUnitGraph.getInjectedCopybookNode(any(), any())).thenReturn(containedCopybookNode);
-        when(containedCopybookNode.get(0).getContent()).thenReturn("Content");
-        copybookHoverProvider.getHover(mock(CobolDocumentModel.class), position, sourceUnitGraph);
+  @Test
+  void testGetHover_graphIsCopybook() {
+    TextDocumentPositionParams position = mock(TextDocumentPositionParams.class);
+    when(position.getTextDocument()).thenReturn(mock(TextDocumentIdentifier.class));
+    SourceUnitGraph sourceUnitGraph = mock(SourceUnitGraph.class);
+    when(sourceUnitGraph.isUserSuppliedCopybook(any())).thenReturn(true);
+    SourceUnitGraph.NodeV nodeV = mock(SourceUnitGraph.NodeV.class);
+    List<SourceUnitGraph.NodeV> containedCopybookNode = new ArrayList<>();
+    containedCopybookNode.add(nodeV);
+    when(sourceUnitGraph.getInjectedCopybookNode(any(), any())).thenReturn(containedCopybookNode);
+    when(containedCopybookNode.get(0).getContent()).thenReturn("Content");
+    copybookHoverProvider.getHover(mock(CobolDocumentModel.class), position, sourceUnitGraph);
 
-        verify(nodeV, times(1)).getContent();
-    }
+    verify(nodeV, times(1)).getContent();
+  }
 }

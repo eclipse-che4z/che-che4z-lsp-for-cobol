@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -26,10 +29,6 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /** This error listener registers syntax errors found by dialect parser. */
 @Slf4j
@@ -64,7 +63,8 @@ class DialectParserListener extends BaseErrorListener {
                             new Position(
                                 errorLine,
                                 charPositionInLine + getOffendingSymbolSize(offendingSymbol))))
-                    .build().toOriginalLocation())
+                    .build()
+                    .toOriginalLocation())
             .severity(getSeverity(msg))
             .build();
     LOG.debug("Syntax error by DialectParserListener " + error.toString());

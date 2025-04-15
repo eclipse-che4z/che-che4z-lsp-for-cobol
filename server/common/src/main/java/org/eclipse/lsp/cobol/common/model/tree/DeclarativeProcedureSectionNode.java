@@ -24,7 +24,8 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class DeclarativeProcedureSectionNode extends ProcedureSectionNode {
-  public DeclarativeProcedureSectionNode(Locality location, String name, String text, Locality definition) {
+  public DeclarativeProcedureSectionNode(
+      Locality location, String name, String text, Locality definition) {
     super(location, name, text, definition);
   }
 }

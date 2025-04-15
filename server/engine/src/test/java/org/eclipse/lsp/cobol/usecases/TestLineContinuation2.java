@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -21,8 +23,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Test if variable usage position tracked correctly with line concatenation. */
 class TestLineContinuation2 {
@@ -53,10 +53,10 @@ class TestLineContinuation2 {
                 null),
             "CBB",
             new Diagnostic(
-                    new Range(),
-                    "The following paragraph is not defined: MISSING-PAR",
-                    Error,
-                    "COBOL Language Support (parsing)",
-                    null)));
+                new Range(),
+                "The following paragraph is not defined: MISSING-PAR",
+                Error,
+                "COBOL Language Support (parsing)",
+                null)));
   }
 }

@@ -14,25 +14,18 @@
  */
 package org.eclipse.lsp.cobol.common.benchmark;
 
+import java.util.*;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.stream.Collectors;
-
-/**
- * Utility class for performance related logic.
- */
+/** Utility class for performance related logic. */
 @UtilityClass
 @Slf4j
 public class PerformanceMeasurementUtils {
 
   /**
    * Log timing into CSV file
+   *
    * @param benchmarkSession timing data
    */
 }

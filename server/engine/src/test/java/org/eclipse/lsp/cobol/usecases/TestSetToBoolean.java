@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static com.google.common.collect.ImmutableMap.of;
+
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -22,8 +24,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static com.google.common.collect.ImmutableMap.of;
 
 /** This test checks that only mnemonic ames expected in the SET ON/OFF statement */
 class TestSetToBoolean {
@@ -54,6 +54,6 @@ class TestSetToBoolean {
                 new Range(),
                 "Invalid receiving field type. Expected: Condition name",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -14,7 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.pipeline.stages;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -24,18 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-/**
- * Test CompilerDirectivesStage
- */
+/** Test CompilerDirectivesStage */
 class CompilerDirectivesStageTest {
   @ParameterizedTest(name = "{index}: {0} ''{1}''")
   @MethodSource("positiveCases")
@@ -74,26 +71,64 @@ class CompilerDirectivesStageTest {
 
   static Stream<Arguments> positiveCases() {
     return Stream.of(
-            Arguments.of("Compiler Directive at the beginnig of a line", "CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directives at the beginnig of a line", "CBL NOCICS\nCBL CICS", ImmutableList.of("NOCICS", "CICS")),
-            Arguments.of("Compiler Directive after 3 spaces", "   CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive after 6 spaces", "      CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive after 7 spaces", "       CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive after spaces 8 spaces", "        CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive after more spaces", "           CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive after 'sequence number'", "0abcdePROCESS NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive in column 8 - SEQ", "000010 PROCESS NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Compiler Directive after column 8 - SEQ", "000010     CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Listing control in column 8 - SEQ", "000010 *PROCESS NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Listing control in column 8 - NOSEQ", "       *CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Listing control after column 8 - SEQ ", "000010    *CBL NOCICS", ImmutableList.of("NOCICS")),
-            Arguments.of("Listing control after column 8 - NOSEQ ", "          *PROCESS NOCICS", ImmutableList.of("NOCICS"))
-    );
+        Arguments.of(
+            "Compiler Directive at the beginnig of a line",
+            "CBL NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directives at the beginnig of a line",
+            "CBL NOCICS\nCBL CICS",
+            ImmutableList.of("NOCICS", "CICS")),
+        Arguments.of(
+            "Compiler Directive after 3 spaces", "   CBL NOCICS", ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive after 6 spaces", "      CBL NOCICS", ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive after 7 spaces", "       CBL NOCICS", ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive after spaces 8 spaces",
+            "        CBL NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive after more spaces",
+            "           CBL NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive after 'sequence number'",
+            "0abcdePROCESS NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive in column 8 - SEQ",
+            "000010 PROCESS NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Compiler Directive after column 8 - SEQ",
+            "000010     CBL NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Listing control in column 8 - SEQ",
+            "000010 *PROCESS NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Listing control in column 8 - NOSEQ",
+            "       *CBL NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Listing control after column 8 - SEQ ",
+            "000010    *CBL NOCICS",
+            ImmutableList.of("NOCICS")),
+        Arguments.of(
+            "Listing control after column 8 - NOSEQ ",
+            "          *PROCESS NOCICS",
+            ImmutableList.of("NOCICS")));
   }
+
   static Stream<Arguments> negativeCases() {
     return Stream.of(
-            Arguments.of("Incorrect compiler directive", "a    CBL NOCICS", ImmutableList.of()),
-            Arguments.of("Incorrect compiler directive", "           PROCESSING PROCEDURE XML-HANDLER", ImmutableList.of())
-    );
+        Arguments.of("Incorrect compiler directive", "a    CBL NOCICS", ImmutableList.of()),
+        Arguments.of(
+            "Incorrect compiler directive",
+            "           PROCESSING PROCEDURE XML-HANDLER",
+            ImmutableList.of()));
   }
 }

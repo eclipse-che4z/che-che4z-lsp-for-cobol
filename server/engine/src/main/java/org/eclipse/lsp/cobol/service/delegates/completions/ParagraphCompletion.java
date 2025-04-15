@@ -14,24 +14,24 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
+import static org.eclipse.lsp4j.CompletionItemKind.Method;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collection;
+import java.util.Map;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Map;
-
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
-import static org.eclipse.lsp.cobol.common.model.NodeType.PROGRAM;
-import static org.eclipse.lsp.cobol.service.delegates.completions.CompletionOrder.PARAGRAPHS;
-import static org.eclipse.lsp4j.CompletionItemKind.Method;
 
 /** This completion provider returns paragraphs from this document as completion suggestions */
 @Singleton
@@ -54,9 +54,11 @@ public class ParagraphCompletion implements Completion {
         .getDepthFirstStream()
         .filter(hasType(PROGRAM))
         .map(ProgramNode.class::cast)
-        .map(symbolsRepository::getParagraphMap)
+        .map(symbolsRepository::getProceduresMap)
         .map(Map::keySet)
         .flatMap(Collection::stream)
+        .filter(ProcedureId::isParagraph)
+        .map(ProcedureId::getParagraphName)
         .filter(DocumentationUtils.startsWithIgnoreCase(token))
         .map(this::toParagraphCompletion)
         .collect(toList());

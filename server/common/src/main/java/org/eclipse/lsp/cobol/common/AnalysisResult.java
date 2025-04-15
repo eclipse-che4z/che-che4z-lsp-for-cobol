@@ -14,16 +14,15 @@
  */
 package org.eclipse.lsp.cobol.common;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
-import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
-import org.eclipse.lsp.cobol.common.model.tree.RootNode;
-import org.eclipse.lsp4j.Diagnostic;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
+import org.eclipse.lsp4j.Diagnostic;
 
 /**
  * This class represents a semantic context of the analysed document. It contains a map of {@link
@@ -35,5 +34,7 @@ public class AnalysisResult {
   public static final AnalysisResult EMPTY = AnalysisResult.builder().build();
   @Builder.Default Map<String, List<Diagnostic>> diagnostics = new HashMap<>();
   @Builder.Default RootNode rootNode = new RootNode();
-  @EqualsAndHashCode.Exclude @Builder.Default Map<String, SymbolTable> symbolTableMap = new HashMap<>();
+
+  @EqualsAndHashCode.Exclude @Builder.Default
+  Map<String, SymbolTable> symbolTableMap = new HashMap<>();
 }

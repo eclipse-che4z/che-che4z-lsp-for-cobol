@@ -14,19 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Replacement data storage
- */
+/** Replacement data storage */
 @Value
 @RequiredArgsConstructor
 public class ReplaceData {

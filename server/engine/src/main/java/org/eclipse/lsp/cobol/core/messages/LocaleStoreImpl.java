@@ -14,16 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
-import org.eclipse.lsp.cobol.common.message.LocaleEnum;
-import org.eclipse.lsp.cobol.common.message.LocaleStore;
-import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import com.google.common.collect.Iterables;
 import com.google.gson.JsonPrimitive;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp4j.MessageType;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +24,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.message.LocaleEnum;
+import org.eclipse.lsp.cobol.common.message.LocaleStore;
+import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
+import org.eclipse.lsp4j.MessageType;
 
 /**
  * Concrete implementation for {@link LocaleStore}

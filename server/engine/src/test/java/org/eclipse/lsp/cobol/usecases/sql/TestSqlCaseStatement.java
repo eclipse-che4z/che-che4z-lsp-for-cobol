@@ -21,8 +21,8 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests the DB2 SQL CASE statement.
- * Ref - https://www.ibm.com/docs/en/db2/11.5?topic=expressions-case-expression#sdx-synid_search-condition
+ * Tests the DB2 SQL CASE statement. Ref -
+ * https://www.ibm.com/docs/en/db2/11.5?topic=expressions-case-expression#sdx-synid_search-condition
  */
 public class TestSqlCaseStatement {
   public static final String TEXT =

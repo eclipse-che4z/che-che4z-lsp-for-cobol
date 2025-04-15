@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -22,8 +24,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Warning;
 
 /** Tests inline comment with just the comment tag doesn't throw error. */
 public class TestInlineComments {
@@ -83,10 +83,15 @@ public class TestInlineComments {
 
   @Test
   void testFloatingCommentFlagsErrorWhenCommentIsNotPrecededBySpace() {
-    UseCaseEngine.runTest(TEXT4, ImmutableList.of(), ImmutableMap.of("1", new Diagnostic(
-            new Range(),
-            "Missing blank before inline comment",
-            Warning,
-            ErrorSource.PREPROCESSING.getText())));
+    UseCaseEngine.runTest(
+        TEXT4,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Missing blank before inline comment",
+                Warning,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

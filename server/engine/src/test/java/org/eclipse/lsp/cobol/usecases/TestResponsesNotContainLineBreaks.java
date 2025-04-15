@@ -54,7 +54,7 @@ class TestResponsesNotContainLineBreaks {
             "1",
             new Diagnostic(
                 new Range(),
-                    "Extraneous input '>'",
+                "Extraneous input '>'",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

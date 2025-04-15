@@ -15,11 +15,11 @@
 
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * This enum class represents all the supported usage formats. UNDEFINED means that the usage format

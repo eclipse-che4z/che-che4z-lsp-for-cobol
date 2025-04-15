@@ -14,8 +14,13 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
@@ -27,12 +32,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * Tests CICS translator options. Refer <a
@@ -133,7 +132,6 @@ public class TestCICSTranslatorOptions {
     Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
     Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
     Assertions.assertEquals(
-        "Syntax error on 'XOPTS'",
-        diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
+        "Syntax error on 'XOPTS'", diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
   }
 }

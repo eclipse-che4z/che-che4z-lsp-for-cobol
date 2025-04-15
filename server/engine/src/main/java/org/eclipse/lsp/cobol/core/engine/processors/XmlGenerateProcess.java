@@ -14,7 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import static java.util.stream.Collectors.groupingBy;
+import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -26,16 +35,6 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.model.NodeUtils;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
-import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 
 /** Apply all validation of XML Generate Statement. */
 public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
@@ -54,8 +53,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier1());
     if (identifier1Nodes.isEmpty()) return;
     List<VariableNode> identifier1FoundDefinitions =
-        VariableUsageUtils.getDefinitionNode(
-                symbolAccumulator, xmlGenerateNode, identifier1Nodes);
+        VariableUsageUtils.getDefinitionNode(symbolAccumulator, xmlGenerateNode, identifier1Nodes);
 
     semanticAnalysisForIdentifier1(
         processingContext, identifier1Nodes, identifier1FoundDefinitions);
@@ -63,8 +61,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         VariableUsageUtils.getVariableUsageNode(xmlGenerateNode, xmlGenerateNode.getIdentifier2());
     if (identifier2Nodes.isEmpty()) return;
     List<VariableNode> identifier2FoundDefinitions =
-        VariableUsageUtils.getDefinitionNode(
-                symbolAccumulator, xmlGenerateNode, identifier2Nodes);
+        VariableUsageUtils.getDefinitionNode(symbolAccumulator, xmlGenerateNode, identifier2Nodes);
     if (identifier2FoundDefinitions.isEmpty()) return;
     semanticAnalysisForIdentifier2(
         processingContext,
@@ -79,7 +76,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       if (identifier3Nodes.isEmpty()) return;
       List<VariableNode> identifier3FoundDefinitions =
           VariableUsageUtils.getDefinitionNode(
-                  symbolAccumulator, xmlGenerateNode, identifier3Nodes);
+              symbolAccumulator, xmlGenerateNode, identifier3Nodes);
       semanticAnalysisForIdentifier3(
           processingContext,
           identifier3Nodes,
@@ -95,7 +92,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         if (identifier4Nodes.isEmpty()) return;
         List<VariableNode> identifier4FoundDefinitions =
             VariableUsageUtils.getDefinitionNode(
-                    symbolAccumulator, xmlGenerateNode, identifier4Nodes);
+                symbolAccumulator, xmlGenerateNode, identifier4Nodes);
         semanticAnalysisForIdentifier4(
             processingContext,
             identifier4Nodes,
@@ -111,7 +108,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         if (identifier5Nodes.isEmpty()) return;
         List<VariableNode> identifier5FoundDefinitions =
             VariableUsageUtils.getDefinitionNode(
-                    symbolAccumulator, xmlGenerateNode, identifier5Nodes);
+                symbolAccumulator, xmlGenerateNode, identifier5Nodes);
         semanticAnalysisForIdentifier5(
             processingContext,
             identifier5Nodes,
@@ -150,9 +147,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier8 -> {
           List<VariableNode> foundDefinitionsForIdentifier8 =
               VariableUsageUtils.getDefinitionNode(
-                      symbolAccumulator,
-                  xmlGenerateNode,
-                  Collections.singletonList(identifier8));
+                  symbolAccumulator, xmlGenerateNode, Collections.singletonList(identifier8));
           if (foundDefinitionsForIdentifier8.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
             return;
           }
@@ -190,9 +185,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier7 -> {
           List<VariableNode> foundDefinitionsForIdentifier7 =
               VariableUsageUtils.getDefinitionNode(
-                      symbolAccumulator,
-                  xmlGenerateNode,
-                  Collections.singletonList(identifier7));
+                  symbolAccumulator, xmlGenerateNode, Collections.singletonList(identifier7));
           if (foundDefinitionsForIdentifier7.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
             return;
           }
@@ -229,9 +222,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
         identifier6 -> {
           List<VariableNode> foundDefinitionsForIdentifier6 =
               VariableUsageUtils.getDefinitionNode(
-                      symbolAccumulator,
-                  xmlGenerateNode,
-                  Collections.singletonList(identifier6));
+                  symbolAccumulator, xmlGenerateNode, Collections.singletonList(identifier6));
           if (foundDefinitionsForIdentifier6.isEmpty() || identifier2FoundDefinitions.isEmpty()) {
             return;
           }
@@ -266,8 +257,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       List<VariableNode> identifier3FoundDefinitions) {
     if (identifier5FoundDefinitions.isEmpty()) return;
     if (identifier5FoundDefinitions.get(0) instanceof ElementaryNode) {
-      ElementaryNode foundDefinitionNode =
-          (ElementaryNode) identifier5FoundDefinitions.get(0);
+      ElementaryNode foundDefinitionNode = (ElementaryNode) identifier5FoundDefinitions.get(0);
       boolean isNational = foundDefinitionNode.getUsageFormat() == UsageFormat.NATIONAL;
       if (!(NodeUtils.ALPHANUMERIC_DATA_TYPES.contains(foundDefinitionNode.getEffectiveDataType())
               || isNational)
@@ -330,8 +320,7 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
       List<VariableNode> identifier4FoundDefinitions) {
     if (identifier4FoundDefinitions.isEmpty()) return;
     if (identifier4FoundDefinitions.get(0) instanceof ElementaryNode) {
-      ElementaryNode foundDefinitionNode =
-          (ElementaryNode) identifier4FoundDefinitions.get(0);
+      ElementaryNode foundDefinitionNode = (ElementaryNode) identifier4FoundDefinitions.get(0);
       boolean isNational = foundDefinitionNode.getUsageFormat() == UsageFormat.NATIONAL;
       if (!(NodeUtils.ALPHANUMERIC_DATA_TYPES.contains(foundDefinitionNode.getEffectiveDataType())
               || isNational)
@@ -488,16 +477,14 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
                   .messageTemplate(
                       MessageTemplate.of(
                           "xmlGenProcess.identifier2.overlap",
-                              identifier2Nodes.get(0).getName(),
-                              identifier1FoundDefinitions.get(0).getName()
-                          ))
+                          identifier2Nodes.get(0).getName(),
+                          identifier1FoundDefinitions.get(0).getName()))
                   .build());
     }
 
     // validation of elementary items
     if (identifier2FoundDefnitions.get(0) instanceof ElementaryNode) {
-      ElementaryNode foundDefinitionNode =
-          (ElementaryNode) identifier2FoundDefnitions.get(0);
+      ElementaryNode foundDefinitionNode = (ElementaryNode) identifier2FoundDefnitions.get(0);
       if (foundDefinitionNode.getName().equals(FILLER_NAME)
           || foundDefinitionNode.getName().trim().isEmpty()
           || isRenameClause(foundDefinitionNode)
@@ -634,7 +621,9 @@ public class XmlGenerateProcess implements Processor<XmlGenerateNode> {
                   .severity(ErrorSeverity.ERROR)
                   .location(identifier1.get(0).getLocality().toOriginalLocation())
                   .messageTemplate(
-                      MessageTemplate.of("jsonParseProcess.identifier1.groupItemError", identifier1.get(0).getName()))
+                      MessageTemplate.of(
+                          "jsonParseProcess.identifier1.groupItemError",
+                          identifier1.get(0).getName()))
                   .build());
     }
   }

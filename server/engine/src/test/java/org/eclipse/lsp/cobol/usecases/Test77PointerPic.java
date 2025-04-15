@@ -19,9 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Level 77 should be handled as the root level.
- */
+/** Level 77 should be handled as the root level. */
 public class Test77PointerPic {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

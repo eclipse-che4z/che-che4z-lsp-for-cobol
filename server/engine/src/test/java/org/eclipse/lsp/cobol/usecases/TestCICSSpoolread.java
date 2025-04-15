@@ -30,16 +30,17 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCICSSpoolread {
   private static final String SPOOLREAD_VALID_MINIMAL =
-          "SPOOLREAD TOKEN({$varOne}) INTO({$varTwo})";
+      "SPOOLREAD TOKEN({$varOne}) INTO({$varTwo})";
 
   private static final String SPOOLREAD_VALID_FULL =
-          "SPOOLREAD TOKEN({$varOne}) INTO({$varTwo}) MAXFLENGTH({$varThree}) TOFLENGTH({$varFour}) NOHANDLE";
+      "SPOOLREAD TOKEN({$varOne}) INTO({$varTwo}) MAXFLENGTH({$varThree}) TOFLENGTH({$varFour})"
+          + " NOHANDLE";
 
   private static final String SPOOLREAD_INVALID_NO_TOKEN =
-          "SPOOLREAD {_INTO({$varTwo}) TOFLENGTH({$varOne}) NOHANDLE|errorOne_}";
+      "SPOOLREAD {_INTO({$varTwo}) TOFLENGTH({$varOne}) NOHANDLE|errorOne_}";
 
   private static final String SPOOLREAD_INVALID_NO_INTO =
-          "SPOOLREAD {_TOKEN({$varOne}) MAXFLENGTH({$varTwo}) NOHANDLE|errorOne_}";
+      "SPOOLREAD {_TOKEN({$varOne}) MAXFLENGTH({$varTwo}) NOHANDLE|errorOne_}";
 
   @Test
   void testSpoolreadValidMinimal() {
@@ -54,26 +55,26 @@ public class TestCICSSpoolread {
   @Test
   void testSpoolreadInvalidNoToken() {
     CICSTestUtils.errorTest(
-            SPOOLREAD_INVALID_NO_TOKEN,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: TOKEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLREAD_INVALID_NO_TOKEN,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TOKEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testSpoolreadInvalidNoInto() {
     CICSTestUtils.errorTest(
-            SPOOLREAD_INVALID_NO_INTO,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: INTO",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLREAD_INVALID_NO_INTO,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INTO",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

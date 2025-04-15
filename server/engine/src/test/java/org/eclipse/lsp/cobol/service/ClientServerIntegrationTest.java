@@ -87,17 +87,16 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
           + "       {_COPY {~CPYBK1|1}.|3_}\n"
           + "       End program ProgramId.";
   @Inject TextDocumentService service;
-  @Inject
-  LspMessageBroker lspMessageBroker;
+  @Inject LspMessageBroker lspMessageBroker;
   @Inject MockLanguageClient client;
   @Inject LspEventConsumer lspEventConsumer;
-  @Inject
-  DisposableLSPStateService stateService;
+  @Inject DisposableLSPStateService stateService;
 
   @BeforeAll
   void setup() {
     lspEventConsumer.startConsumer();
   }
+
   @AfterAll
   void tearDown() throws InterruptedException {
     lspMessageBroker.stop();
@@ -119,14 +118,15 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     assertEquals(0, stateService.getExitCode());
 
     CodeActionParams params =
-        new CodeActionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Range(), new CodeActionContext());
+        new CodeActionParams(
+            new TextDocumentIdentifier(DOCUMENT_URI), new Range(), new CodeActionContext());
     CompletionParams completionParams =
         new CompletionParams(new TextDocumentIdentifier(DOCUMENT_URI), new Position(0, 8));
 
     Position position = new Position(0, 2);
     TextDocumentIdentifier testTextDocumentIdentifier = new TextDocumentIdentifier(DOCUMENT_URI);
     DocumentHighlightParams documentHighlightParams =
-            new DocumentHighlightParams(testTextDocumentIdentifier, position);
+        new DocumentHighlightParams(testTextDocumentIdentifier, position);
     DefinitionParams definitionParams = new DefinitionParams(testTextDocumentIdentifier, position);
     ReferenceParams referenceParams = mock(ReferenceParams.class);
     // params.getTextDocument().getUri()
@@ -141,7 +141,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     assertEquals(SHUTDOWN_RESPONSE, service.definition(definitionParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.completion(completionParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.references(referenceParams).get()); // NOSONAR
-    assertEquals(SHUTDOWN_RESPONSE, service.documentHighlight(documentHighlightParams).get()); // NOSONAR
+    assertEquals(
+        SHUTDOWN_RESPONSE, service.documentHighlight(documentHighlightParams).get()); // NOSONAR
     assertEquals(SHUTDOWN_RESPONSE, service.formatting(mockFormattingParam).get()); // NOSONAR
 
     List<TextDocumentContentChangeEvent> textEdits = new ArrayList<>();
@@ -173,7 +174,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK1, true, textService);
-    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery = waitingQuery(lspMessageBroker);
+    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery =
+        waitingQuery(lspMessageBroker);
     waitingQuery.join();
     lspMessageBroker.stop();
     assertEquals(4, locations.size());
@@ -193,7 +195,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     LspEventConsumer lspEventConsumer = injector.getInstance(LspEventConsumer.class);
     lspEventConsumer.startConsumer();
     analysisService.setExtensionConfig(ImmutableList.of());
-    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery = waitingQuery(lspMessageBroker);
+    CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery =
+        waitingQuery(lspMessageBroker);
     textService.didOpen(
         new DidOpenTextDocumentParams(new TextDocumentItem(DOCUMENT_URI, LANGUAGE, 1, TEXT)));
     List<? extends Location> locations = invokeReferencesRequest(TEST_COPYBOOK2, true, textService);
@@ -236,7 +239,8 @@ public class ClientServerIntegrationTest extends ConfigurableTest {
     return textService.references(referenceParams).get();
   }
 
-  private static CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery(LspMessageBroker lspMessageBroker) {
+  private static CompletableFuture<List<Either<Command, CodeAction>>> waitingQuery(
+      LspMessageBroker lspMessageBroker) {
     CodeActionParams params = mock(CodeActionParams.class);
     CodeActionHandler codeActionHandler = mock(CodeActionHandler.class);
     when(codeActionHandler.codeAction(params)).thenReturn(emptyList());

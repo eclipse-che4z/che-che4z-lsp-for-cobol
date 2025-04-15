@@ -14,6 +14,8 @@
 package org.eclipse.lsp.cobol.dialects.daco.usecases;
 
 import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -22,60 +24,59 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Tests the DaCo END WRITE REPORT statement
- */
+/** Tests the DaCo END WRITE REPORT statement */
 class TestDaCoEndWriteReport {
 
-    private static final String TEXT =
-            "        IDENTIFICATION DIVISION. \r\n"
-                    + "        PROGRAM-ID. test1. \r\n"
-                    + "        ENVIRONMENT DIVISION.\n"
-                    + "        IDMS-CONTROL SECTION.\n"
-                    + "            PROTOCOL. MODE ABC.\n"
-                    + "            IDMS-RECORDS MANUAL\n"
-                    + "        DATA DIVISION. \r\n"
-                    + "        WORKING-STORAGE SECTION. \r\n"
-                    + "        PROCEDURE DIVISION. \r\n"
-                    + "            WRITE REPORT ENDRPT. \r\n"
-                    + "            WRITE REPORT TGD11 ENDRPT. \r\n"
-                    + "            WRITE REPORT RGD11 ENDRPT. \r\n"
-                    // Negative tests
-                    + "            WRITE REPORT {R-CA|1|2} ENDRPT. \r\n"
-                    + "            WRITE REPORT {R-CAS|1} ENDRPT. \r\n"
-                    + "            WRITE REPORT {RFDRGR|2} ENDRPT. \r\n"
-                    + "            WRITE REPORT {STDFE|3} ENDRPT. \r\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "        DATA DIVISION. \r\n"
+          + "        WORKING-STORAGE SECTION. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "            WRITE REPORT ENDRPT. \r\n"
+          + "            WRITE REPORT TGD11 ENDRPT. \r\n"
+          + "            WRITE REPORT RGD11 ENDRPT. \r\n"
+          // Negative tests
+          + "            WRITE REPORT {R-CA|1|2} ENDRPT. \r\n"
+          + "            WRITE REPORT {R-CAS|1} ENDRPT. \r\n"
+          + "            WRITE REPORT {RFDRGR|2} ENDRPT. \r\n"
+          + "            WRITE REPORT {STDFE|3} ENDRPT. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
-        Map<String, Diagnostic> diagnosticMap = new HashMap<>();
-        diagnosticMap.put(
-                "1",
-                new Diagnostic(
-                        new Range(),
-                        "Only alphanumerics are allowed for report name",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.DIALECT.getText()));
-        diagnosticMap.put(
-                "2",
-                new Diagnostic(
-                        new Range(),
-                        "Exact length of report name must be 5 bytes",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.DIALECT.getText()));
-        diagnosticMap.put(
-                "3",
-                new Diagnostic(
-                        new Range(),
-                        "String must starts with R or T values",
-                        DiagnosticSeverity.Error,
-                        ErrorSource.DIALECT.getText()));
+    Map<String, Diagnostic> diagnosticMap = new HashMap<>();
+    diagnosticMap.put(
+        "1",
+        new Diagnostic(
+            new Range(),
+            "Only alphanumerics are allowed for report name",
+            DiagnosticSeverity.Error,
+            ErrorSource.DIALECT.getText()));
+    diagnosticMap.put(
+        "2",
+        new Diagnostic(
+            new Range(),
+            "Exact length of report name must be 5 bytes",
+            DiagnosticSeverity.Error,
+            ErrorSource.DIALECT.getText()));
+    diagnosticMap.put(
+        "3",
+        new Diagnostic(
+            new Range(),
+            "String must starts with R or T values",
+            DiagnosticSeverity.Error,
+            ErrorSource.DIALECT.getText()));
 
-        UseCaseEngine.runTest(
-                TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
-    }
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        diagnosticMap,
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

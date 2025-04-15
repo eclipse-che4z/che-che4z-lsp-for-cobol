@@ -14,16 +14,16 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * Service class exposing functions related to extracting the @{@link SysprintSnap} from a SYSPRINT files.
+ * Service class exposing functions related to extracting the @{@link SysprintSnap} from a SYSPRINT
+ * files.
  */
 @Getter
 public class SysprintSnapProcessService {
@@ -31,7 +31,8 @@ public class SysprintSnapProcessService {
   private final Map<String, String> renamedReferences;
   private static final String CROSS_REFERENCE_REPORT_START =
       "Defined   Cross-reference of data names   References";
-  private static final String CROSS_REFERENCE_REPORT_END = "LineID  Message code  Message text|End of compilation";
+  private static final String CROSS_REFERENCE_REPORT_END =
+      "LineID  Message code  Message text|End of compilation";
 
   static Pattern getPatternForCuttingReport(String start, String end) {
     return Pattern.compile(String.format("(%s).*?(%s)", start, end), Pattern.DOTALL);
@@ -42,7 +43,9 @@ public class SysprintSnapProcessService {
 
   public static final Pattern VARIABLES_REFERENCES_PATTERN =
       Pattern.compile(
-          "\\s+(\\d+|EXTERNAL)(\\s+\\S+)(\\s?(\\.\\s)+( [A-Z]?\\d+)+(\\r?\\n\\s{43}( [A-Z]?\\d+)+)*|$)",
+          "\\s+(\\d+|EXTERNAL)(\\s+\\S+)(\\s?(\\.\\s)+( [A-Z]?\\d+)+(\\r"
+              + "?\\n"
+              + "\\s{43}( [A-Z]?\\d+)+)*|$)",
           Pattern.MULTILINE);
 
   public SysprintSnapProcessService(String sysprint) {
@@ -60,11 +63,18 @@ public class SysprintSnapProcessService {
   }
 
   private String getMemoryReferencesReport() {
-    Pattern crossReferenceReportPattern = getPatternForCuttingReport(CROSS_REFERENCE_REPORT_START, CROSS_REFERENCE_REPORT_END);
+    Pattern crossReferenceReportPattern =
+        getPatternForCuttingReport(CROSS_REFERENCE_REPORT_START, CROSS_REFERENCE_REPORT_END);
     String result = extractReportBasedOnCuttingPattern(crossReferenceReportPattern);
     result =
         Pattern.compile(
-                "^(.*?)IBM Enterprise COBOL for z\\SOS\\s+(.*?)Page\\s+\\d+\\r?\\n\\d Defined\\s+Cross-reference of(.*?)References\\r?\\n\\r?\\n\\d",
+                "^(.*?)IBM Enterprise COBOL for z\\SOS\\s+(.*?)Page\\s+\\d+\\r"
+                    + "?\\n"
+                    + "\\d Defined\\s+Cross-reference of(.*?)References\\r"
+                    + "?\\n"
+                    + "\\r"
+                    + "?\\n"
+                    + "\\d",
                 Pattern.MULTILINE)
             .matcher(result)
             .replaceAll(" ");
@@ -85,7 +95,8 @@ public class SysprintSnapProcessService {
   }
 
   /**
-   * @return a mapping between report section and List of @{@link SysprintSnap} parsed from a SYSPRINT file.
+   * @return a mapping between report section and List of @{@link SysprintSnap} parsed from a
+   *     SYSPRINT file.
    */
   public Map<ReportSection, List<SysprintSnap>> getVariableReferenceReport() {
     String memoryReferencesReport = getMemoryReferencesReport();

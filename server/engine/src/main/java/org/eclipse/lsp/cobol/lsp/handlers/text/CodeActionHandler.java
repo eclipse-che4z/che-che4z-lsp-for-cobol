@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.inject.Inject;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp4j.CodeAction;
@@ -22,11 +23,7 @@ import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import java.util.List;
-
-/**
- * LSP CodeAction Handler
- */
+/** LSP CodeAction Handler */
 @Slf4j
 public class CodeActionHandler {
   private final CodeActions actions;
@@ -38,6 +35,7 @@ public class CodeActionHandler {
 
   /**
    * Handle codeAction request.
+   *
    * @param params CodeActionParams.
    * @return List of either commands or code actions.
    */

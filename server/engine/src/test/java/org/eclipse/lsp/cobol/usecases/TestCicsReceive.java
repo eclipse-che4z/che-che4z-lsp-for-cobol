@@ -16,16 +16,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Test CICS RECEIVE command. Documentation link: <a
@@ -645,13 +645,15 @@ public class TestCicsReceive {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
+                "Exactly one option required, options are mutually exclusive: MAXLENGTH or"
+                    + " MAXFLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Exactly one option required, options are mutually exclusive: MAXLENGTH or MAXFLENGTH",
+                "Exactly one option required, options are mutually exclusive: MAXLENGTH or"
+                    + " MAXFLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

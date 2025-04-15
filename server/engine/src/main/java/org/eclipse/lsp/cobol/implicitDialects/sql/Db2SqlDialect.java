@@ -65,7 +65,8 @@ public class Db2SqlDialect implements CobolDialect {
 
   @Override
   public Map<String, String> getKeywords() {
-    return KeywordsUtils.getKeywords(Db2SqlDialect.class.getClassLoader(), "LanguageKeywords_sql.txt");
+    return KeywordsUtils.getKeywords(
+        Db2SqlDialect.class.getClassLoader(), "LanguageKeywords_sql.txt");
   }
 
   @Override

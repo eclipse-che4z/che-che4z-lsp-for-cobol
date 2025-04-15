@@ -16,13 +16,12 @@ package org.eclipse.lsp.cobol.service.mocks;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-
-import java.util.concurrent.CompletableFuture;
 
 /** Mock implementation of language server. Only for testing purposes. */
 @Singleton
@@ -55,5 +54,4 @@ public class MockLanguageServer implements LanguageServer {
   public WorkspaceService getWorkspaceService() {
     return null;
   }
-
 }

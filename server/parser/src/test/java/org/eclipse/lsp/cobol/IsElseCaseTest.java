@@ -14,39 +14,40 @@
  */
 package org.eclipse.lsp.cobol;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /** Test complex IF condition parsing */
 public class IsElseCaseTest {
-    private static final String TEXT = "       IDENTIFICATION DIVISION.\n"
-            + "       PROGRAM-ID. IFELSE.\n"
-            + "       DATA DIVISION. \n"
-            + "       WORKING-STORAGE SECTION.\n"
-            + "       77  C1  PIC 9 VALUE 0.\n"
-            + "       77  C2  PIC 9 VALUE 0.\n"
-            + "       77  C3  PIC 9 VALUE 0.\n"
-            + "       PROCEDURE DIVISION.\n"
-            + "           IF C1 EQUAL \"1\"\n"
-            + "               IF C2 EQUAL \"2\"\n"
-            + "                   IF C3 EQUAL \"3\"\n"
-            + "                       DISPLAY \"C3 TRUE\"\n"
-            + "                   ELSE\n"
-            + "                       DISPLAY \"C3 FALSE\"\n"
-            + "               ELSE\n"
-            + "                   DISPLAY \"DOT\".";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. IFELSE.\n"
+          + "       DATA DIVISION. \n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       77  C1  PIC 9 VALUE 0.\n"
+          + "       77  C2  PIC 9 VALUE 0.\n"
+          + "       77  C3  PIC 9 VALUE 0.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           IF C1 EQUAL \"1\"\n"
+          + "               IF C2 EQUAL \"2\"\n"
+          + "                   IF C3 EQUAL \"3\"\n"
+          + "                       DISPLAY \"C3 TRUE\"\n"
+          + "                   ELSE\n"
+          + "                       DISPLAY \"C3 FALSE\"\n"
+          + "               ELSE\n"
+          + "                   DISPLAY \"DOT\".";
 
-    @Test
-    void test() {
-        CobolLexer antlrLexer = new CobolLexer(CharStreams.fromString(TEXT));
-        CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
-        CobolParser antlrParser = new CobolParser(tokens);
-        antlrParser.startRule();
-        assertEquals(0, antlrParser.getNumberOfSyntaxErrors());
-    }
+  @Test
+  void test() {
+    CobolLexer antlrLexer = new CobolLexer(CharStreams.fromString(TEXT));
+    CommonTokenStream tokens = new CommonTokenStream(antlrLexer);
+    CobolParser antlrParser = new CobolParser(tokens);
+    antlrParser.startRule();
+    assertEquals(0, antlrParser.getNumberOfSyntaxErrors());
+  }
 }

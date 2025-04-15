@@ -16,17 +16,14 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
-import lombok.SneakyThrows;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import lombok.SneakyThrows;
 
-/**
- * Provides files in the working folder
- */
+/** Provides files in the working folder */
 @Singleton
 public class WorkingFolderService {
 
@@ -34,6 +31,7 @@ public class WorkingFolderService {
 
   /**
    * Returns a list of filenames in the working folder
+   *
    * @param workdir is a working folder URI
    * @return a list of filenames in the working folder
    */
@@ -48,6 +46,7 @@ public class WorkingFolderService {
 
   /**
    * Returns a working folder uri
+   *
    * @return a working folder path
    */
   @SneakyThrows
@@ -65,6 +64,7 @@ public class WorkingFolderService {
 
   /**
    * Returns a working folder uri
+   *
    * @param path path string
    * @return a working folder uri
    */
@@ -74,8 +74,6 @@ public class WorkingFolderService {
   }
 
   private URI getDefaultDir() throws URISyntaxException {
-    return WorkingFolderService.class.getProtectionDomain().getCodeSource().getLocation()
-        .toURI();
+    return WorkingFolderService.class.getProtectionDomain().getCodeSource().getLocation().toURI();
   }
-
 }

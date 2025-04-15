@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Test for DaCoPreprocessor
- */
+import org.junit.jupiter.api.Test;
+
+/** Test for DaCoPreprocessor */
 class DaCoPreprocessorTest {
   @Test
   void testRange() {
@@ -45,5 +43,4 @@ class DaCoPreprocessorTest {
     String result = DaCoPreprocessor.run("123456");
     assertEquals("      ", result);
   }
-
 }

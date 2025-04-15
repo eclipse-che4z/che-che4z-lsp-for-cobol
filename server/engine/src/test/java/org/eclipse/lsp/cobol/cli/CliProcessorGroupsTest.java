@@ -14,21 +14,19 @@
  */
 package org.eclipse.lsp.cobol.cli;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
+import java.nio.file.Paths;
 import org.eclipse.lsp.cobol.cli.processorgroups.ProcessorGroupsResolver;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test processor groups support.
- */
+/** Test processor groups support. */
 class CliProcessorGroupsTest {
   @Test
   void test() {
-    String groupsString = "{\n"
+    String groupsString =
+        "{\n"
             + "    \"pgroups\": [\n"
             + "        {\n"
             + "            \"name\": \"SLICK\",\n"
@@ -40,14 +38,19 @@ class CliProcessorGroupsTest {
             + "        }\n"
             + "    ]   \n"
             + "}";
-    String programsString = "{\n"
+    String programsString =
+        "{\n"
             + "    \"pgms\": [        \n"
             + "        {\"program\": \"COBPGM/*\", \"pgroup\": \"SLICK\"}\n"
             + "    ]\n"
             + "}";
 
     ProcessorGroupsResolver pg = new ProcessorGroupsResolver(programsString, groupsString);
-    assertEquals(Paths.get("/root/COBCOPY/IBM"), pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")).get(0));
-    assertEquals(ImmutableList.of("", ".CPY"), pg.resolveCopybooksExtensions(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")));
+    assertEquals(
+        Paths.get("/root/COBCOPY/IBM"),
+        pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")).get(0));
+    assertEquals(
+        ImmutableList.of("", ".CPY"),
+        pg.resolveCopybooksExtensions(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")));
   }
 }

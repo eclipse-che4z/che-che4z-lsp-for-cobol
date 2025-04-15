@@ -31,7 +31,8 @@ public class TestVariableUsageForFigurativeConstants {
           + "       01  {$*PASS-COUNTER}                  PIC 999      VALUE ZERO.\n"
           + "       01  {$*P-OR-F}                  PIC 999      VALUE ZERO.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       {#*PASS}.  MOVE \"PASS \" TO {$P-OR-F}.  ADD 1 TO {$PASS-COUNTER}.            \n"
+          + "       {#*PASS}.  MOVE \"PASS \" TO {$P-OR-F}.  ADD 1 TO {$PASS-COUNTER}.           "
+          + " \n"
           + "       {#*SEQ-TEST-GF-7}.                                                    \n"
           + "           IF \"\" < QUOTE PERFORM {#PASS} .                        ";
 

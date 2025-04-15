@@ -52,6 +52,6 @@ class TestRenamesThruNotExists {
                 new Range(),
                 "The data entry with the name NOT-EXISTS not found",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

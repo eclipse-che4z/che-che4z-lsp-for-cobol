@@ -14,12 +14,6 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,30 +22,37 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
-/**
- * Utility class for reading listing snapshot.
- */
+/** Utility class for reading listing snapshot. */
 @UtilityClass
 @Slf4j
 public class SnapshotReader {
+  public static final String POSITION_SPLITTER = ":";
   private static final Pattern EXTRACT_DIFF_SECTION_OF_A_SNAPSHOT =
       Pattern.compile("DATA_NAMES((?s:.*?))PROCEDURES((?s:.*?))PROGRAMS((?s:.*))");
+
   private static final Pattern STRING_TO_SYSPRINTSNAP =
       Pattern.compile(
-          "(\\d+(:\\d+-\\d+:\\d+)?)\\t(.*?)\\t((\\d+(:\\d+-\\d+:\\d+)?)(,\\d+(:\\d+-\\d+:\\d+)?)*)?");
+          "(\\d+(:\\d+-\\d+:\\d+)?)\\t(.*?)\\t"
+              + "((\\d+(:\\d+-\\d+:\\d+)?)(,\\d+(:\\d+-\\d+:\\d+)?)*)?");
+
   private static final Pattern PARSE_RANGE =
       Pattern.compile("(\\d+(:\\d+)?)(-(\\d+(:\\d+)?))?", Pattern.MULTILINE);
-  public static final String POSITION_SPLITTER = ":";
 
   /**
    * Read all the listing snapshot present in a folder location.
+   *
    * @param snapShotLocation folder location of compiler listing snapshots
    * @return filename mapped to {@link SysprintSnap} object segregated by {@link ReportSection}
    * @throws IOException
    */
-  public static Map<String, TreeMap<ReportSection, List<SysprintSnap>>> read(String snapShotLocation)
-      throws IOException {
+  public static Map<String, TreeMap<ReportSection, List<SysprintSnap>>> read(
+      String snapShotLocation) throws IOException {
     Map<String, TreeMap<ReportSection, List<SysprintSnap>>> result = new HashMap<>();
     Files.walk(Paths.get(snapShotLocation))
         .filter(Files::isRegularFile)
@@ -63,7 +64,7 @@ public class SnapshotReader {
                     path.getFileName().toString(),
                     parseRecord(FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8)));
               } catch (IOException e) {
-               LOG.error("Error while reading snapshots");
+                LOG.error("Error while reading snapshots");
               }
             });
     return result;

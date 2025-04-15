@@ -15,18 +15,17 @@
 
 package org.eclipse.lsp.cobol.service.mocks;
 
-import org.eclipse.lsp.cobol.test.CobolText;
-
 import java.util.List;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 public interface CopybooksMock {
 
-  /** @return all the Cobol files for copybooks */
+  /**
+   * @return all the Cobol files for copybooks
+   */
   List<CobolText> getCopybooks();
 
-
   /**
-   *
    * @param filename
    * @return all the Cobol files for copybooks associated with a file
    */

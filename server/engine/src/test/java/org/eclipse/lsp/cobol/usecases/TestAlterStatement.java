@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -22,11 +24,7 @@ import org.eclipse.lsp.cobol.common.model.tree.AlterNode;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-/**
- * Test for ALTER statement
- */
+/** Test for ALTER statement */
 class TestAlterStatement {
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\r\n"
@@ -34,20 +32,24 @@ class TestAlterStatement {
           + "       PROCEDURE DIVISION.\r\n";
 
   private static final String ALTER_FROM =
-            "           ALTER {#PAR1} OF SEC1 TO PROCEED TO {#PAR2} OF SEC1.\r\n"
+      "           ALTER {#PAR1} OF {@SEC1} TO PROCEED TO {#PAR2} OF {@SEC1}.\r\n"
           + "       {@*SEC1} SECTION.\r\n"
           + "       {#*PAR1}.\r\n"
           + "       {#*PAR2}.\r\n";
 
   @Test
   void testAlterFrom() {
-    AnalysisResult result = UseCaseEngine.runTest(TEXT + ALTER_FROM, ImmutableList.of(), ImmutableMap.of());
+    AnalysisResult result =
+        UseCaseEngine.runTest(TEXT + ALTER_FROM, ImmutableList.of(), ImmutableMap.of());
 
-    AlterNode alterNode = result.getRootNode().getDepthFirstStream()
-        .filter(n -> n.getNodeType() == NodeType.ALTER)
-        .map(AlterNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    AlterNode alterNode =
+        result
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n.getNodeType() == NodeType.ALTER)
+            .map(AlterNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(alterNode);
     assertEquals("PAR1", alterNode.getFrom().getName());

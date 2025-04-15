@@ -16,12 +16,10 @@
  */
 package org.eclipse.lsp.cobol.codegen.snippets;
 
-import org.eclipse.lsp.cobol.codegen.GeneratorContext;
 import org.eclipse.lsp.cobol.codegen.CobolCodeGenerator;
+import org.eclipse.lsp.cobol.codegen.GeneratorContext;
 
-/**
- * Open statement generator.
- */
+/** Open statement generator. */
 public class OpenStatementGenerator implements SnippetGenerator {
   @Override
   public String generate(GeneratorContext ctx) {

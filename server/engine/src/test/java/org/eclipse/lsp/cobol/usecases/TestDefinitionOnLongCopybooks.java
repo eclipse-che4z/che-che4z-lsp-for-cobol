@@ -66,9 +66,11 @@ class TestDefinitionOnLongCopybooks {
             TEXT, ImmutableList.of(new CobolText("ABCD", COPYBOOK_CONTENT)), ImmutableMap.of());
     SymbolsRepository symbolsRepository = mock(SymbolsRepository.class);
     CobolDocumentModel document = new CobolDocumentModel(DOCUMENT_URI, TEXT, result);
-    TextDocumentPositionParams position = new TextDocumentPositionParams(
+    TextDocumentPositionParams position =
+        new TextDocumentPositionParams(
             new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15));
-    Location expectedDef = new Location(
+    Location expectedDef =
+        new Location(
             "file:///c:/workspace/.c4z/.copybooks/ABCD.cpy",
             new Range(new Position(), new Position()));
     DefinedAndUsedStructure ctx = mock(DefinedAndUsedStructure.class);
@@ -77,9 +79,16 @@ class TestDefinitionOnLongCopybooks {
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
 
     try (MockedStatic mocked = mockStatic(SymbolsRepository.class)) {
-      mocked.when(() -> SymbolsRepository.findElementByPosition(eq(DOCUMENT_URI), eq(document.getAnalysisResult()),
-          eq(position.getPosition()))).thenReturn(Optional.of(ctx));
-      List<Location> definitions = new ElementOccurrences(documentGraph).findDefinitions(document, position);
+      mocked
+          .when(
+              () ->
+                  SymbolsRepository.findElementByPosition(
+                      eq(DOCUMENT_URI),
+                      eq(document.getAnalysisResult()),
+                      eq(position.getPosition())))
+          .thenReturn(Optional.of(ctx));
+      List<Location> definitions =
+          new ElementOccurrences(documentGraph).findDefinitions(document, position);
 
       assertEquals(1, definitions.size());
       assertEquals(expectedDef, definitions.get(0));

@@ -14,8 +14,16 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
+import static java.lang.System.getProperty;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -24,21 +32,13 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
+import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.lang.System.getProperty;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 /** Utility class for Positive Tests. */
 @UtilityClass
@@ -91,22 +91,24 @@ public class PositiveTestUtility {
       String fileName) {
     if (blacklistedTestFiles.contains(fileName)) return;
     Multimap<String, Node> variableDefinitionFromLSPEngine = ArrayListMultimap.create();
-    Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine = ArrayListMultimap.create();
+    Multimap<ProcedureId, CodeBlockReference> procedureDefinitionsFromLSPEngine =
+        ArrayListMultimap.create();
     Multimap<String, Node> programDefinitionFromLSPEngine = ArrayListMultimap.create();
 
     fetchReferencesFromLSPEngine(
         rootNode,
         symbolTableMap,
         variableDefinitionFromLSPEngine,
-        paragraphDefFromLSPEngine,
+        procedureDefinitionsFromLSPEngine,
         programDefinitionFromLSPEngine);
+
     assertDataName(
         dataNameRefs.getOrDefault(ReportSection.DATA_NAMES, Collections.emptyList()),
         variableDefinitionFromLSPEngine,
         fileName);
     assertProcedures(
         dataNameRefs.getOrDefault(ReportSection.PROCEDURES, Collections.emptyList()),
-        paragraphDefFromLSPEngine,
+        procedureDefinitionsFromLSPEngine,
         fileName);
     assertPrograms(
         dataNameRefs.getOrDefault(ReportSection.PROGRAMS, emptyList()),
@@ -134,43 +136,36 @@ public class PositiveTestUtility {
 
   private void assertProcedures(
       List<SysprintSnap> sysprintSnaps,
-      Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
+      Multimap<ProcedureId, CodeBlockReference> paragraphDefFromLSPEngine,
       String fileName) {
     sysprintSnaps.forEach(
         snap -> {
           String dataName = snap.getDataName();
-          Optional<Map.Entry<List<Location>, List<Location>>> foundElementFromLSPEngine =
-              paragraphDefFromLSPEngine.get(dataName).stream()
-                  .map(node -> Collections.singletonMap(node.getDefinitions(), node.getUsage()))
-                  .map(Map::entrySet)
-                  .flatMap(Collection::stream)
-                  .filter(ref -> matchParagraphDefinition(snap, ref))
-                  .findFirst();
-          Assertions.assertTrue(
-              foundElementFromLSPEngine.isPresent(),
+          // TODO: SysprintSnap is to be updated to ProcedureIds
+          ProcedureId pId = new ProcedureId(null, dataName);
+          Collection<CodeBlockReference> codeBlockReferences = paragraphDefFromLSPEngine.get(pId);
+          List<Location> defs = new ArrayList<>();
+          List<Location> usages = new ArrayList<>();
+          codeBlockReferences.forEach(
+              ref -> {
+                defs.addAll(ref.getDefinitions());
+                usages.addAll(ref.getUsage());
+              });
+
+          Assertions.assertFalse(
+              defs.isEmpty(),
               "["
                   + fileName
                   + "]:"
                   + "Procedure definition for "
                   + dataName
                   + " not found in LSP engine");
-          List<Location> nodes = foundElementFromLSPEngine.get().getValue();
-          assertReferencesByProcedures(snap, nodes, fileName);
+          assertReferencesByProcedures(snap, usages, fileName);
 
           // TODO : Update snap object when flag provided
-          snap.setDefinitionLocation(foundElementFromLSPEngine.get().getKey().get(0).getRange());
-          snap.setReferencesLocation(nodes.stream().map(Location::getRange).collect(toList()));
+          snap.setDefinitionLocation(defs.get(0).getRange());
+          snap.setReferencesLocation(usages.stream().map(Location::getRange).collect(toList()));
         });
-  }
-
-  private boolean matchParagraphDefinition(
-      SysprintSnap snap, Map.Entry<List<Location>, List<Location>> ref) {
-    if (snap.getDefinitionLocation() != null) {
-      return ref.getKey().stream()
-          .anyMatch(node -> snap.getDefinitionLocation().equals(node.getRange()));
-    }
-    return ref.getKey().stream()
-        .anyMatch(node -> node.getRange().getStart().getLine() + 1 == snap.getDefinedLineNo());
   }
 
   private void assertReferencesByProcedures(
@@ -191,6 +186,8 @@ public class PositiveTestUtility {
                         + "]:"
                         + "Procedure snapReferences for "
                         + snap.getDataName()
+                        + " at "
+                        + snap.getDefinedLineNo()
                         + " not found at line no: "
                         + snapRef);
               });
@@ -372,7 +369,7 @@ public class PositiveTestUtility {
       Node rootNode,
       Map<String, SymbolTable> symbolTableMap,
       Multimap<String, Node> variableDefinitionFromLSPEngine,
-      Multimap<String, CodeBlockReference> paragraphDefFromLSPEngine,
+      Multimap<ProcedureId, CodeBlockReference> procedureDefFromLSPEngine,
       Multimap<String, Node> programDefinitionFromLSPEngine) {
     SymbolsRepository repo = new SymbolsRepository();
     repo.updateSymbols(symbolTableMap);
@@ -382,11 +379,13 @@ public class PositiveTestUtility {
         .map(ProgramNode.class::cast)
         .forEach(
             programNode -> {
-              Stream.of(repo.getParagraphMap(programNode), repo.getSectionMap(programNode))
-                  .flatMap(entry -> entry.entrySet().stream())
+              repo.getProceduresMap(programNode)
                   .forEach(
-                      entry -> paragraphDefFromLSPEngine.put(entry.getKey(), entry.getValue()));
-
+                      (key, value) -> {
+                        String name =
+                            key.isParagraph() ? key.getParagraphName() : key.getSectionName();
+                        procedureDefFromLSPEngine.put(new ProcedureId(null, name), value);
+                      });
               repo.getVariables(programNode).values().stream()
                   .flatMap(Node::getDepthFirstStream)
                   .filter(VariableNode.class::isInstance)

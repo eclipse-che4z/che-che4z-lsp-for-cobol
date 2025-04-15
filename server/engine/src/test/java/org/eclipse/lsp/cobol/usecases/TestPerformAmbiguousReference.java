@@ -24,28 +24,29 @@ import org.junit.jupiter.api.Test;
 /** Test for ambiguous paragraph perform call */
 public class TestPerformAmbiguousReference {
   private static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. TEST1.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "       {@*SEC1} SECTION.\n"
-                  + "           PERFORM {_PAR|1_}.\n"
-                  + "       {@*SEC2} SECTION.\n"
-                  + "       {#*PAR}.\n"
-                  + "       {@*SEC3} SECTION.\n"
-                  + "       {#*PAR}.\n";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {@*SEC1} SECTION.\n"
+          + "           PERFORM {#PAR|1}.\n"
+          + "       {@*SEC2} SECTION.\n"
+          + "       {#*PAR}.\n"
+          + "       {@*SEC3} SECTION.\n"
+          + "       {#*PAR}.\n";
 
   @Test
   void test() {
     AnalysisResult analysisResult =
-            UseCaseEngine.runTest(
-                    TEXT,
-                    ImmutableList.of(),
-                    ImmutableMap.of("1",
-                            new Diagnostic(new Range(),
-                                    "Ambiguous reference for PAR",
-                                    DiagnosticSeverity.Error,
-                                    "COBOL Language Support (parsing)"
-                            )),
-                    ImmutableList.of());
+        UseCaseEngine.runTest(
+            TEXT,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                "1",
+                new Diagnostic(
+                    new Range(),
+                    "Ambiguous reference for PAR",
+                    DiagnosticSeverity.Error,
+                    "COBOL Language Support (parsing)")),
+            ImmutableList.of());
   }
 }

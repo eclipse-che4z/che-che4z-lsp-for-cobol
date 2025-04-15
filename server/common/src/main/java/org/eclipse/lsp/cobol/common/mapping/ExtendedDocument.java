@@ -14,27 +14,20 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
-import lombok.Getter;
-
 import java.util.List;
 import java.util.Objects;
-
+import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Extended document class
- */
+/** Extended document class */
 public class ExtendedDocument {
-  @Getter
-  private final String originalText;
+  @Getter private final String originalText;
   private final ExtendedText baseText;
-  @Getter
-  private final ExtendedText currentText;
-  @Getter
-  private boolean dirty;
+  @Getter private final ExtendedText currentText;
+  @Getter private boolean dirty;
 
   public ExtendedDocument(String text, String uri) {
     originalText = text;
@@ -58,15 +51,16 @@ public class ExtendedDocument {
 
   /**
    * Returns original text, situated between the start and the end lines from the locality range
+   *
    * @param locality - the text locality
    * @return string value that represents a text from the original document
    */
   public String getBaseText(Locality locality) {
     int startLine = locality.getRange().getStart().getLine();
-    int endLine = locality.getRange().getEnd().getLine();;
+    int endLine = locality.getRange().getEnd().getLine();
+    ;
 
-    if (!baseText.getUri().equals(locality.getUri())
-        || baseText.getLines().size() <= endLine) {
+    if (!baseText.getUri().equals(locality.getUri()) || baseText.getLines().size() <= endLine) {
       return "";
     }
     StringBuilder sb = new StringBuilder();
@@ -79,9 +73,7 @@ public class ExtendedDocument {
     return sb.toString();
   }
 
-  /**
-   * Commit changes
-   */
+  /** Commit changes */
   public void commitTransformations() {
     if (isDirty()) {
       baseText.clear();
@@ -104,6 +96,7 @@ public class ExtendedDocument {
 
   /**
    * Substitutes copybook statement range with a copybook extended text
+   *
    * @param copyStatementRange - a copybook statement range
    * @param copybook - a copybook extended text
    */
@@ -115,6 +108,7 @@ public class ExtendedDocument {
 
   /**
    * Substitutes copybook statement range with a copybook extended text with respect to spaces
+   *
    * @param copyStatementRange - a copybook statement range
    * @param copybook - a copybook extended text
    */
@@ -126,17 +120,23 @@ public class ExtendedDocument {
 
   /**
    * Inserts a copybook extended text to the given line number
+   *
    * @param line - a line number
    * @param copybook - a copybook extended text
    */
   public void insertCopybook(int line, ExtendedText copybook) {
     int updatedLine = updateLineDueToChanges(line);
-    currentText.insert(updatedLine, copybook, new Location(currentText.getUri(), new Range(new Position(line, 0), new Position(line, 0))));
+    currentText.insert(
+        updatedLine,
+        copybook,
+        new Location(
+            currentText.getUri(), new Range(new Position(line, 0), new Position(line, 0))));
     dirty = true;
   }
 
   /**
    * Replaces given range of text with a new text
+   *
    * @param range - range of text to replace
    * @param newText - a new text
    */
@@ -148,6 +148,7 @@ public class ExtendedDocument {
 
   /**
    * Replaces given range of text with a new text
+   *
    * @param range - range of text to replace
    * @param textLine - a new Extended text
    */
@@ -160,6 +161,7 @@ public class ExtendedDocument {
 
   /**
    * Cleares a range of text
+   *
    * @param range - a range of text
    */
   public void clear(Range range) {
@@ -170,6 +172,7 @@ public class ExtendedDocument {
 
   /**
    * Fill the range with the given character
+   *
    * @param range - a range of text
    * @param c - the character
    */
@@ -185,6 +188,7 @@ public class ExtendedDocument {
 
   /**
    * Checks if a line segment can be trimmed to empty string
+   *
    * @param lineno line number to investigate
    * @param start start column
    * @param end end column (exclusive)
@@ -195,23 +199,27 @@ public class ExtendedDocument {
     assert 0 <= start;
     assert start <= end;
     List<ExtendedTextLine> lines = baseText.getLines();
-    if (lineno >= lines.size())
-      return true;
+    if (lineno >= lines.size()) return true;
     List<MappedCharacter> chars = lines.get(lineno).getCharacters();
     for (int i = start; i < chars.size() && i < end; ++i) {
       // emulates behavior of trim function
-      if (chars.get(i).getCharacter() > ' ')
-        return false;
+      if (chars.get(i).getCharacter() > ' ') return false;
     }
     return true;
   }
 
   private Range updateRangeDueToChanges(Range range) {
     if (isDirty()) {
-      if(Objects.equals(range.getStart(), range.getEnd())) {
-        range = new Range(updatePositionDueToChanges(range.getStart()), updatePositionDueToChanges(range.getEnd()));
+      if (Objects.equals(range.getStart(), range.getEnd())) {
+        range =
+            new Range(
+                updatePositionDueToChanges(range.getStart()),
+                updatePositionDueToChanges(range.getEnd()));
       } else {
-        range = new Range(updatePositionDueToChanges(range.getStart()), updateEndPositionDueToChanges(range.getEnd()));
+        range =
+            new Range(
+                updatePositionDueToChanges(range.getStart()),
+                updateEndPositionDueToChanges(range.getEnd()));
       }
     }
     return range;
@@ -247,7 +255,8 @@ public class ExtendedDocument {
   private Position updateEndPositionDueToChanges(Position position) {
     // Shift position to left to make range end inclusive.
     int linePos = position.getCharacter() == 0 ? position.getLine() - 1 : position.getLine();
-    int charPos = position.getCharacter() == 0
+    int charPos =
+        position.getCharacter() == 0
             ? baseText.getLines().get(position.getLine() - 1).size() - 1
             : position.getCharacter() - 1;
 

@@ -16,13 +16,11 @@
  */
 package org.eclipse.lsp.cobol.codegen.snippets;
 
+import org.eclipse.lsp.cobol.codegen.CobolCodeGenerator;
 import org.eclipse.lsp.cobol.codegen.GeneratorContext;
 import org.eclipse.lsp.cobol.codegen.IdentifierType;
-import org.eclipse.lsp.cobol.codegen.CobolCodeGenerator;
 
-/**
- * Generates a SECTION
- */
+/** Generates a SECTION */
 public class SectionGenerator implements SnippetGenerator {
   @Override
   public String generate(GeneratorContext ctx) {

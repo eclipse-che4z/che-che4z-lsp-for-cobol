@@ -80,7 +80,8 @@ class Test88ThruHover {
         provider.getHover(
             new CobolDocumentModel("", "", result),
             new TextDocumentPositionParams(
-                new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15)), documentGraph);
+                new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15)),
+            documentGraph);
 
     Hover expected = new Hover(ImmutableList.of(Either.forRight(new MarkedString("cobol", HOVER))));
     assertEquals(expected, actual);

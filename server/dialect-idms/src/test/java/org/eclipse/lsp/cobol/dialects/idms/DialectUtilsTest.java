@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.dialects.idms.utils.TestUtils;
 import org.eclipse.lsp4j.Range;
@@ -21,12 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
-/**
- * Test for {@link DialectUtils}
- */
+/** Test for {@link DialectUtils} */
 @ExtendWith(MockitoExtension.class)
 class DialectUtilsTest {
 
@@ -42,5 +40,4 @@ class DialectUtilsTest {
     assertEquals(4, range.getEnd().getLine());
     assertEquals(6, range.getEnd().getCharacter());
   }
-
 }

@@ -14,13 +14,13 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
+import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_77;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
-
-import static org.eclipse.lsp.cobol.common.VariableConstants.LEVEL_77;
 
 /**
  * This value class represents an independent element item COBOL variable, that has a level number

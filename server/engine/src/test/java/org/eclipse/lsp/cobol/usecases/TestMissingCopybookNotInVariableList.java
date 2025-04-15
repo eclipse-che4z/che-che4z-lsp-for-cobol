@@ -15,16 +15,16 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /**
  * This test covers case when copybook that was not found appears as a variable. Assert that there
@@ -52,7 +52,7 @@ class TestMissingCopybookNotInVariableList {
                 "CPYNAME: Copybook not found",
                 Error,
                 ErrorSource.COPYBOOK.getText(),
-                    ErrorCodes.MISSING_COPYBOOK.getLabel()),
+                ErrorCodes.MISSING_COPYBOOK.getLabel()),
             "nopic",
             new Diagnostic(
                 new Range(),

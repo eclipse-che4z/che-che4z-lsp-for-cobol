@@ -14,20 +14,20 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
-import lombok.NonNull;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Error listener for Compiler Directives parser
- */
+/** Error listener for Compiler Directives parser */
 public class CompilerDirectivesErrorListener extends BaseErrorListener {
   private final AnalysisContext analysisContext;
   private final Position startPosition;
@@ -38,32 +38,24 @@ public class CompilerDirectivesErrorListener extends BaseErrorListener {
   }
 
   @Override
-  public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+  public void syntaxError(
+      Recognizer<?, ?> recognizer,
+      Object offendingSymbol,
+      int line,
+      int charPositionInLine,
+      String msg,
+      RecognitionException e) {
     Position start = new Position(line - 1, charPositionInLine);
     Position end = new Position(line - 1, ((CommonToken) offendingSymbol).getStopIndex() + 1);
     Range range = CompilerDirectivesUtils.shiftRange(new Range(start, end), startPosition);
     Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
-    throwException(locationToLocality(location), msg);
-  }
-
-  private void throwException(@NonNull Locality locality, String message) {
     SyntaxError error =
-            SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.PARSING)
-                    .location(locality.toOriginalLocation())
-                    .suggestion(message)
-                    .severity(ErrorSeverity.ERROR)
-                    .build();
-
-    if (!analysisContext.getAccumulatedErrors().contains(error)) {
-      analysisContext.getAccumulatedErrors().add(error);
-    }
-  }
-
-  private Locality locationToLocality(Location location) {
-    return Locality.builder()
-            .range(location.getRange())
-            .uri(location.getUri())
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .suggestion(msg)
+            .location(new OriginalLocation(location, null))
+            .severity(ErrorSeverity.ERROR)
             .build();
+    analysisContext.getAccumulatedErrors().add(error);
   }
 }

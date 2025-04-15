@@ -29,11 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.dialects.ibm.IbmTextPreprocessor;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
@@ -82,10 +82,7 @@ class TypingTest extends FileBasedTest {
 
     MessageService messageService = mock(MessageService.class);
 
-    CleanerPreprocessor preprocessor =
-        new IbmTextPreprocessor(
-            messageService,
-            layoutStore);
+    CleanerPreprocessor preprocessor = new IbmTextPreprocessor(messageService, layoutStore);
     ResultWithErrors<ExtendedText> cleanTextResult =
         preprocessor.cleanUpCode(cobolText.getFileName(), cobolText.getFullText());
     for (SyntaxError error : cleanTextResult.getErrors()) LOG.error(error.toString());

@@ -15,15 +15,13 @@
 
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An abstract class for code blocks, e.g. paragraphs or section in procedure division, defined in

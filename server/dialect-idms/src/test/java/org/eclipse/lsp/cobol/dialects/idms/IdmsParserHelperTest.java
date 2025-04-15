@@ -14,7 +14,14 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.Optional;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -24,17 +31,7 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-/**
- * Test for IdmsParserHelper
- */
+/** Test for IdmsParserHelper */
 class IdmsParserHelperTest {
 
   @Test
@@ -42,7 +39,8 @@ class IdmsParserHelperTest {
     Token startToken = mock(Token.class);
     when(startToken.getText()).thenReturn("start");
 
-    IdmsCopyParser.DataPictureClauseContext clause = mock(IdmsCopyParser.DataPictureClauseContext.class);
+    IdmsCopyParser.DataPictureClauseContext clause =
+        mock(IdmsCopyParser.DataPictureClauseContext.class);
     when(clause.getStart()).thenReturn(startToken);
     when(clause.getText()).thenReturn("start text");
 
@@ -54,9 +52,12 @@ class IdmsParserHelperTest {
 
   @Test
   void testRetrieveValueIntervals() {
-    IdmsCopyParser.DataValueIntervalContext context = mock(IdmsCopyParser.DataValueIntervalContext.class);
-    IdmsCopyParser.DataValueIntervalFromContext from = mock(IdmsCopyParser.DataValueIntervalFromContext.class);
-    IdmsCopyParser.DataValueIntervalToContext to = mock(IdmsCopyParser.DataValueIntervalToContext.class);
+    IdmsCopyParser.DataValueIntervalContext context =
+        mock(IdmsCopyParser.DataValueIntervalContext.class);
+    IdmsCopyParser.DataValueIntervalFromContext from =
+        mock(IdmsCopyParser.DataValueIntervalFromContext.class);
+    IdmsCopyParser.DataValueIntervalToContext to =
+        mock(IdmsCopyParser.DataValueIntervalToContext.class);
     IdmsCopyParser.ThruTokenContext thru = mock(IdmsCopyParser.ThruTokenContext.class);
     IdmsCopyParser.LiteralContext literal = mock(IdmsCopyParser.LiteralContext.class);
 
@@ -78,15 +79,19 @@ class IdmsParserHelperTest {
 
   @Test
   void testRetrieveUsageFormat() {
-    IdmsCopyParser.DataUsageClauseContext clause = mock(IdmsCopyParser.DataUsageClauseContext.class);
-    IdmsCopyParser.UsageFormatContext usageFormatContext = mock(IdmsCopyParser.UsageFormatContext.class);
+    IdmsCopyParser.DataUsageClauseContext clause =
+        mock(IdmsCopyParser.DataUsageClauseContext.class);
+    IdmsCopyParser.UsageFormatContext usageFormatContext =
+        mock(IdmsCopyParser.UsageFormatContext.class);
     Token startToken = mock(Token.class);
 
     when(startToken.getText()).thenReturn(UsageFormat.COMPUTATIONAL_5.toDisplayString());
     when(clause.usageFormat()).thenReturn(usageFormatContext);
     when(usageFormatContext.getStart()).thenReturn(startToken);
 
-    List<UsageFormat> result = IdmsParserHelper.retrieveUsageFormat(ImmutableList.of(clause, mock(IdmsCopyParser.DataUsageClauseContext.class)));
+    List<UsageFormat> result =
+        IdmsParserHelper.retrieveUsageFormat(
+            ImmutableList.of(clause, mock(IdmsCopyParser.DataUsageClauseContext.class)));
 
     assertEquals(1, result.size());
     assertEquals(UsageFormat.COMPUTATIONAL_5, result.get(0));
@@ -108,7 +113,9 @@ class IdmsParserHelperTest {
     Locality locality = IdmsParserHelper.buildNameRangeLocality(ctx, name, "uri");
 
     assertEquals(start, locality.getRange().getStart());
-    assertEquals(new Position(start.getLine(), start.getCharacter() + name.length()), locality.getRange().getEnd());
+    assertEquals(
+        new Position(start.getLine(), start.getCharacter() + name.length()),
+        locality.getRange().getEnd());
     assertEquals("uri", locality.getUri());
   }
 
@@ -130,7 +137,8 @@ class IdmsParserHelperTest {
   @Test
   void testRetrieveOccursToValue() {
     IdmsCopyParser.DataOccursClauseContext ctx = mock(IdmsCopyParser.DataOccursClauseContext.class);
-    IdmsCopyParser.DataOccursToContext dataOccursTo = mock(IdmsCopyParser.DataOccursToContext.class);
+    IdmsCopyParser.DataOccursToContext dataOccursTo =
+        mock(IdmsCopyParser.DataOccursToContext.class);
     IdmsCopyParser.IntegerLiteralContext literal = mock(IdmsCopyParser.IntegerLiteralContext.class);
 
     when(literal.getText()).thenReturn("23");
@@ -150,7 +158,6 @@ class IdmsParserHelperTest {
     assertEquals(23, IdmsParserHelper.getInteger(literal));
   }
 
-
   @Test
   void testExtractLevelRange() {
     String text = "token text";
@@ -164,5 +171,4 @@ class IdmsParserHelperTest {
     Range expectedRange = new Range(new Position(9, 33), new Position(9, 33 + text.length() - 1));
     assertEquals(expectedRange, range);
   }
-
 }

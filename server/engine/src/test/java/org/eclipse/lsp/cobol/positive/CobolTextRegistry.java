@@ -14,19 +14,23 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
-import org.eclipse.lsp.cobol.service.mocks.CopybooksMock;
-import org.eclipse.lsp.cobol.test.CobolText;
-
 import java.util.List;
 import java.util.Map;
+import org.eclipse.lsp.cobol.service.mocks.CopybooksMock;
+import org.eclipse.lsp.cobol.test.CobolText;
 
 public interface CobolTextRegistry extends CopybooksMock {
   String PATH_TO_LISTING_SNAP = "listingSnap";
   String DEFAULT_LISTING_PATH = "../../Cobol85PositiveTestsSuite/compileListing/snapshot";
-  /** @return all the Cobol files for positive tests */
+
+  /**
+   * @return all the Cobol files for positive tests
+   */
   List<CobolText> getPositives();
 
-  /** @return all the Cobol files for negative tests */
+  /**
+   * @return all the Cobol files for negative tests
+   */
   List<CobolText> getNegatives();
 
   /**
@@ -39,6 +43,7 @@ public interface CobolTextRegistry extends CopybooksMock {
 
   /**
    * Gives the dialect.
+   *
    * @return Dialect string name
    */
   String getDialect();

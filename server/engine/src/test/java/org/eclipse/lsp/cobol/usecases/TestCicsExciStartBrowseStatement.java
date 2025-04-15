@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -23,9 +25,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Tests CICS STARTBROWSE CONTAINER (EXCI) statement. Ref:
@@ -35,7 +34,7 @@ public class TestCicsExciStartBrowseStatement {
 
   // Test Strings
   private static final String EXCI_TEXT =
-          "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. EXCISTMTTEST.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
@@ -52,18 +51,31 @@ public class TestCicsExciStartBrowseStatement {
           + "           RETCODE({$RETURN-CODE})\n"
           + "           END-EXEC.";
 
-  private static final String STARTBROWSE_ACTIVITY_VALID = "STARTBROWSE ACTIVITY ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_CONTAINER_VALID = "STARTBROWSE CONTAINER PROCESS({$varOne}) PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_EVENT_VALID = "STARTBROWSE EVENT ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_PROCESS_VALID = "STARTBROWSE PROCESS PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_ACTIVITY_VALID =
+      "STARTBROWSE ACTIVITY ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_CONTAINER_VALID =
+      "STARTBROWSE CONTAINER PROCESS({$varOne}) PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_EVENT_VALID =
+      "STARTBROWSE EVENT ACTIVITYID({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_PROCESS_VALID =
+      "STARTBROWSE PROCESS PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
   private static final String STARTBROWSE_TIMER_VALID = "STARTBROWSE TIMER BROWSETOKEN({$varOne})";
 
-  private static final String STARTBROWSE_INVALID_CONTAINER = "STARTBROWSE CONTAINER PROCESS({$varOne}) {PROCESSTYPE|errorOne}({$varOne}) {CHANNEL|errorTwo}({$varOne}) BROWSETOKEN({$varOne})";
-  private static final String STARTBROWSE_INVALID_CONTAINER_2 = "STARTBROWSE {_{_CONTAINER|errorTwo_} {_PROCESS|errorOne|errorTwo_} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})|errorThree_}";
-  private static final String STARTBROWSE_INVALID_ACTIVITY = "STARTBROWSE {_ACTIVITY ACTIVITYID({$varOne} )|errorOne_}";
-  private static final String STARTBROWSE_INVALID_EVENT = "STARTBROWSE {_EVENT ACTIVITYID({$varOne} )|errorOne_}";
-  private static final String STARTBROWSE_INVALID_PROCESS = "STARTBROWSE {_PROCESS BROWSETOKEN({$varOne} )|errorOne_}";
-  private static final String STARTBROWSE_INVALID_PROCESS_2 = "STARTBROWSE PROCESS {_PROCESS({$varOne})|errorOne_} PROCESSTYPE({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_INVALID_CONTAINER =
+      "STARTBROWSE CONTAINER PROCESS({$varOne}) {PROCESSTYPE|errorOne}({$varOne})"
+          + " {CHANNEL|errorTwo}({$varOne}) BROWSETOKEN({$varOne})";
+  private static final String STARTBROWSE_INVALID_CONTAINER_2 =
+      "STARTBROWSE {_{_CONTAINER|errorTwo_} {_PROCESS|errorOne|errorTwo_} PROCESSTYPE({$varOne})"
+          + " BROWSETOKEN({$varOne})|errorThree_}";
+  private static final String STARTBROWSE_INVALID_ACTIVITY =
+      "STARTBROWSE {_ACTIVITY ACTIVITYID({$varOne} )|errorOne_}";
+  private static final String STARTBROWSE_INVALID_EVENT =
+      "STARTBROWSE {_EVENT ACTIVITYID({$varOne} )|errorOne_}";
+  private static final String STARTBROWSE_INVALID_PROCESS =
+      "STARTBROWSE {_PROCESS BROWSETOKEN({$varOne} )|errorOne_}";
+  private static final String STARTBROWSE_INVALID_PROCESS_2 =
+      "STARTBROWSE PROCESS {_PROCESS({$varOne})|errorOne_} PROCESSTYPE({$varOne})"
+          + " BROWSETOKEN({$varOne})";
 
   // Test Functions
   @Test
@@ -100,18 +112,20 @@ public class TestCicsExciStartBrowseStatement {
   @Test
   void testStartBrowseContainerInvalid() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
-    tempDiagnostic.put("errorOne",
-            new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: PROCESSTYPE",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
-    tempDiagnostic.put("errorTwo",
-            new Diagnostic(
-                    new Range(),
-                    "Options \"ACTIVITYID, PROCESS or CHANNEL\" are mutually exclusive.",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Invalid option provided: PROCESSTYPE",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorTwo",
+        new Diagnostic(
+            new Range(),
+            "Options \"ACTIVITYID, PROCESS or CHANNEL\" are mutually exclusive.",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_CONTAINER, tempDiagnostic);
   }
@@ -119,24 +133,28 @@ public class TestCicsExciStartBrowseStatement {
   @Test
   void testStartBrowseContainerInvalid_2() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
-    tempDiagnostic.put("errorOne",
-            new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: PROCESS, in this context, requires a value",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
-    tempDiagnostic.put("errorTwo",
-            new Diagnostic(
-                    new Range(),
-                    "Exactly one option required, options are mutually exclusive: ACTIVITY, CONTAINER, PROCESS, EVENT or TIMER",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
-    tempDiagnostic.put("errorThree",
-            new Diagnostic(
-                    new Range(),
-                    "If one option is specified, all options must be present: PROCESS and PROCESSTYPE",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Invalid option provided: PROCESS, in this context, requires a value",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorTwo",
+        new Diagnostic(
+            new Range(),
+            "Exactly one option required, options are mutually exclusive: ACTIVITY, CONTAINER,"
+                + " PROCESS, EVENT or TIMER",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorThree",
+        new Diagnostic(
+            new Range(),
+            "If one option is specified, all options must be present: PROCESS and PROCESSTYPE",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_CONTAINER_2, tempDiagnostic);
   }
@@ -144,48 +162,52 @@ public class TestCicsExciStartBrowseStatement {
   @Test
   void testStartBrowseActivityInvalid() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
-    tempDiagnostic.put("errorOne",
-            new Diagnostic(
-                    new Range(),
-                    "Missing required option: BROWSETOKEN",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: BROWSETOKEN",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_ACTIVITY, tempDiagnostic);
   }
 
   @Test
   void testStartBrowseEventInvalid() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
-    tempDiagnostic.put("errorOne",
-            new Diagnostic(
-                    new Range(),
-                    "Missing required option: BROWSETOKEN",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: BROWSETOKEN",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_EVENT, tempDiagnostic);
   }
 
   @Test
   void testStartBrowseProcessInvalid() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
-    tempDiagnostic.put("errorOne",
-            new Diagnostic(
-                    new Range(),
-                    "Missing required option: PROCESSTYPE",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: PROCESSTYPE",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS, tempDiagnostic);
   }
 
   @Test
   void testStartBrowseProcessInvalid_2() {
     Map<String, Diagnostic> tempDiagnostic = new HashMap<>();
-    tempDiagnostic.put("errorOne",
-            new Diagnostic(
-                    new Range(),
-                    "Invalid option provided: PROCESS, in this context, cannot have a value",
-                    DiagnosticSeverity.Error,
-                    ErrorSource.PARSING.getText()));
+    tempDiagnostic.put(
+        "errorOne",
+        new Diagnostic(
+            new Range(),
+            "Invalid option provided: PROCESS, in this context, cannot have a value",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(STARTBROWSE_INVALID_PROCESS_2, tempDiagnostic);
   }
 }

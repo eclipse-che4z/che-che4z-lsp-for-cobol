@@ -16,15 +16,14 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /** Test CopyNode position in AST when it contains CICS or SQL statements */
 public class TestCopynodeInsertionAtCorrectPlaceInAST {

@@ -15,22 +15,22 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import lombok.AllArgsConstructor;
+import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-import org.eclipse.lsp.cobol.common.model.tree.SectionNameNode;
 
-/**
- * Enrich section name node with necessary data
- */
+/** Enrich section name node with necessary data */
 @AllArgsConstructor
 public class SectionNameNodeEnricher implements Processor<SectionNameNode> {
   private final SymbolAccumulator symbolAccumulator;
 
   @Override
   public void accept(SectionNameNode sectionNameNode, ProcessingContext processingContext) {
-    sectionNameNode.setDefinitions(symbolAccumulator.getSectionLocations(sectionNameNode, CodeBlockReference::getDefinitions));
-    sectionNameNode.setUsages(symbolAccumulator.getSectionLocations(sectionNameNode, CodeBlockReference::getUsage));
+    sectionNameNode.setDefinitions(
+        symbolAccumulator.getSectionLocations(sectionNameNode, CodeBlockReference::getDefinitions));
+    sectionNameNode.setUsages(
+        symbolAccumulator.getSectionLocations(sectionNameNode, CodeBlockReference::getUsage));
   }
 }

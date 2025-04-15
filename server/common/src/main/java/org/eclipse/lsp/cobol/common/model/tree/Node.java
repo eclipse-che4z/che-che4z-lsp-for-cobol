@@ -14,16 +14,15 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
-
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /** The class represents a Node in source structure tree. */
 @ToString
@@ -68,7 +67,6 @@ public abstract class Node {
     node.setParent(this);
     children.add(node);
   }
-
 
   /**
    * Add a child node to this node and updates the child parent link.
@@ -154,6 +152,7 @@ public abstract class Node {
     }
     return Optional.ofNullable(result);
   }
+
   /**
    * Get nearest parent using predicate.
    *
@@ -162,7 +161,7 @@ public abstract class Node {
    */
   public Optional<Node> getNearestParent(Predicate<Node> predicate) {
     return Optional.ofNullable(parent)
-            .flatMap(it -> predicate.test(it) ? Optional.of(it) : it.getNearestParent(predicate));
+        .flatMap(it -> predicate.test(it) ? Optional.of(it) : it.getNearestParent(predicate));
   }
 
   /**
@@ -180,7 +179,10 @@ public abstract class Node {
     if (o == null || getClass() != o.getClass()) return false;
 
     Node node = (Node) o;
-    return Objects.equals(locality, node.locality) && Objects.equals(text, node.text) && nodeType == node.nodeType && Objects.equals(dialect, node.dialect);
+    return Objects.equals(locality, node.locality)
+        && Objects.equals(text, node.text)
+        && nodeType == node.nodeType
+        && Objects.equals(dialect, node.dialect);
   }
 
   @Override

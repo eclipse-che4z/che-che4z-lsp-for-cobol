@@ -14,18 +14,15 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-
-/**
- * Test for DaCoDialect
- */
+/** Test for DaCoDialect */
 class DaCoDialectTest {
   @Test
   void testKeywords() {

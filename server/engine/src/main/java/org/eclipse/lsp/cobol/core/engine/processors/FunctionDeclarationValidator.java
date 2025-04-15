@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -22,9 +24,6 @@ import org.eclipse.lsp.cobol.common.model.tree.FunctionDeclaration;
 import org.eclipse.lsp.cobol.common.model.tree.FunctionReference;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /** Processor for FUnctionDeclaration */
 public class FunctionDeclarationValidator implements Processor<FunctionDeclaration> {
@@ -57,7 +56,8 @@ public class FunctionDeclarationValidator implements Processor<FunctionDeclarati
                 addError(
                     processingContext,
                     funcReference,
-                    "The \"FUNCTION\" phrase of the \"REPOSITORY\" paragraph contained more than one user-defined function definition"));
+                    "The \"FUNCTION\" phrase of the \"REPOSITORY\" paragraph contained more than"
+                        + " one user-defined function definition"));
   }
 
   private void checkSemanticsForAllImplicitFunctionDeclaration(
@@ -82,7 +82,8 @@ public class FunctionDeclarationValidator implements Processor<FunctionDeclarati
                 addError(
                     processingContext,
                     funcReference,
-                    "WHEN-COMPILED can not be specified in the FUNCTION clause of the REPOSITORY paragraph"));
+                    "WHEN-COMPILED can not be specified in the FUNCTION clause of the REPOSITORY"
+                        + " paragraph"));
   }
 
   private List<FunctionReference> getFunctionReferences(FunctionDeclaration functionDeclaration) {

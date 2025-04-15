@@ -15,17 +15,16 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_gds;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_gds;
 
 /** Checks CICS GDS rules for required and invalid options */
 public class CICSGdsOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
@@ -33,7 +32,7 @@ public class CICSGdsOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_gds;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-      new HashMap<Integer, ErrorSeverity>() { };
+      new HashMap<Integer, ErrorSeverity>() {};
 
   public CICSGdsOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);

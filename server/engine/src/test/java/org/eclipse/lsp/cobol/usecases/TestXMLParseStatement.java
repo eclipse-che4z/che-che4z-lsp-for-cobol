@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -25,9 +28,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /** Tests XML parse statement. */
 public class TestXMLParseStatement {
@@ -94,11 +94,11 @@ public class TestXMLParseStatement {
           + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
 
   private static final String XMP_PARSE_STATEMENT_XMLSS =
-          "           XML PARSE {$XML-DOC} \n"
-                  + "           WITH ENCODING 1200\n"
-                  + "           RETURNING NATIONAL\n"
-                  + "           VALIDATING WITH {$QUESTION}\n"
-                  + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
+      "           XML PARSE {$XML-DOC} \n"
+          + "           WITH ENCODING 1200\n"
+          + "           RETURNING NATIONAL\n"
+          + "           VALIDATING WITH {$QUESTION}\n"
+          + "           PROCESSING PROCEDURE {#XML-HANDLER}\n";
 
   public static final String TEXT =
       XML_PARSE_STATEMENT_PRECESSED + XMP_PARSE_STATEMENT + XML_PARSE_SUCCESSOR;
@@ -207,14 +207,18 @@ public class TestXMLParseStatement {
 
   @Test
   void xmlParsePositiveTest() {
-    AnalysisResult analysisResult = UseCaseEngine.runTest(
-        COMPILE_OPTION_XMLPARSE_XMLSS + TEXT, ImmutableList.of(), ImmutableMap.of());
+    AnalysisResult analysisResult =
+        UseCaseEngine.runTest(
+            COMPILE_OPTION_XMLPARSE_XMLSS + TEXT, ImmutableList.of(), ImmutableMap.of());
 
-    XMLParseNode node = analysisResult.getRootNode().getDepthFirstStream()
-        .filter(n -> n.getNodeType() == NodeType.XML_PARSE)
-         .map(XMLParseNode.class::cast)
-        .findFirst()
-        .orElse(null);
+    XMLParseNode node =
+        analysisResult
+            .getRootNode()
+            .getDepthFirstStream()
+            .filter(n -> n.getNodeType() == NodeType.XML_PARSE)
+            .map(XMLParseNode.class::cast)
+            .findFirst()
+            .orElse(null);
 
     assertNotNull(node);
     assertEquals("XML-HANDLER", node.getProcessingProcedureName().getName());
@@ -232,19 +236,22 @@ public class TestXMLParseStatement {
             "1",
             new Diagnostic(
                 new Range(),
-                "The ENCODING phrase can be specified only when the XMLPARSE(XMLSS) compiler option is in effect",
+                "The ENCODING phrase can be specified only when the XMLPARSE(XMLSS) compiler option"
+                    + " is in effect",
                 DiagnosticSeverity.Hint,
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "RETURNING NATIONAL phrase can be specified only when the XMLPARSE(XMLSS) compiler option is in effect",
+                "RETURNING NATIONAL phrase can be specified only when the XMLPARSE(XMLSS) compiler"
+                    + " option is in effect",
                 DiagnosticSeverity.Hint,
                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-                "Validating phrase can be specified only when XMLPARSE(XMLSS) compiler option is in effect",
+                "Validating phrase can be specified only when XMLPARSE(XMLSS) compiler option is in"
+                    + " effect",
                 DiagnosticSeverity.Hint,
                 ErrorSource.PARSING.getText())));
   }
@@ -315,9 +322,6 @@ public class TestXMLParseStatement {
 
   @Test
   void test_whenIdentifier1HasMoreThanOneDefinitions_thenProcess() {
-    UseCaseEngine.runTest(
-            XML_PARSE_SUBSTRING_IDENTIFIER,
-            ImmutableList.of(),
-            ImmutableMap.of());
+    UseCaseEngine.runTest(XML_PARSE_SUBSTRING_IDENTIFIER, ImmutableList.of(), ImmutableMap.of());
   }
 }

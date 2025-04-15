@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import java.util.Collection;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Completion provider that allows to resolve autocomplete requests with specific items based on
@@ -46,7 +44,7 @@ public interface Completion {
    * @param document in current context
    * @return True if document is ready, false otherwise.
    */
-  default boolean isDocumentReadyForSemanticCollection(CobolDocumentModel document) {
-    return !(Objects.isNull(document) || Objects.isNull(document.getLastAnalysisResult()));
+  default boolean isDocumentReadyForSemanticCollection(@Nullable CobolDocumentModel document) {
+    return document != null && document.getLastAnalysisResult() != null;
   }
 }

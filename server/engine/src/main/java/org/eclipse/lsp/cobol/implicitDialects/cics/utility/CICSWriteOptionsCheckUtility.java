@@ -15,6 +15,11 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_write;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -22,55 +27,49 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_write;
-
 /** Checks CICS Write rules for required and invalid options */
 public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   public static final int RULE_INDEX = RULE_cics_write;
 
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
-          new HashMap<Integer, ErrorSeverity>() {
-            {
-              put(CICSLexer.WRITE, ErrorSeverity.ERROR);
-              put(CICSLexer.FILE, ErrorSeverity.ERROR);
-              put(CICSLexer.DATASET, ErrorSeverity.ERROR);
-              put(CICSLexer.MASSINSERT, ErrorSeverity.WARNING);
-              put(CICSLexer.FROM, ErrorSeverity.ERROR);
-              put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
-              put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.SYSID, ErrorSeverity.ERROR);
-              put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.RBA, ErrorSeverity.WARNING);
-              put(CICSLexer.RRN, ErrorSeverity.WARNING);
-              put(CICSLexer.XRBA, ErrorSeverity.WARNING);
-              put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
-              put(CICSLexer.JOURNALNAME, ErrorSeverity.ERROR);
-              put(CICSLexer.JTYPEID, ErrorSeverity.ERROR);
-              put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.REQID, ErrorSeverity.ERROR);
-              put(CICSLexer.PREFIX, ErrorSeverity.ERROR);
-              put(CICSLexer.PFXLENG, ErrorSeverity.ERROR);
-              put(CICSLexer.WAIT, ErrorSeverity.WARNING);
-              put(CICSLexer.OPERATOR, ErrorSeverity.ERROR);
-              put(CICSLexer.TEXT, ErrorSeverity.ERROR);
-              put(CICSLexer.TEXTLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.ROUTECODES, ErrorSeverity.ERROR);
-              put(CICSLexer.NUMROUTES, ErrorSeverity.ERROR);
-              put(CICSLexer.CONSNAME, ErrorSeverity.ERROR);
-              put(CICSLexer.EVENTUAL, ErrorSeverity.WARNING);
-              put(CICSLexer.ACTION, ErrorSeverity.ERROR);
-              put(CICSLexer.CRITICAL, ErrorSeverity.WARNING);
-              put(CICSLexer.IMMEDIATE, ErrorSeverity.WARNING);
-              put(CICSLexer.REPLY, ErrorSeverity.ERROR);
-              put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.REPLYLENGTH, ErrorSeverity.ERROR);
-              put(CICSLexer.TIMEOUT, ErrorSeverity.ERROR);
-            }
-          };
+      new HashMap<Integer, ErrorSeverity>() {
+        {
+          put(CICSLexer.WRITE, ErrorSeverity.ERROR);
+          put(CICSLexer.FILE, ErrorSeverity.ERROR);
+          put(CICSLexer.DATASET, ErrorSeverity.ERROR);
+          put(CICSLexer.MASSINSERT, ErrorSeverity.WARNING);
+          put(CICSLexer.FROM, ErrorSeverity.ERROR);
+          put(CICSLexer.RIDFLD, ErrorSeverity.ERROR);
+          put(CICSLexer.KEYLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.LENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.RBA, ErrorSeverity.WARNING);
+          put(CICSLexer.RRN, ErrorSeverity.WARNING);
+          put(CICSLexer.XRBA, ErrorSeverity.WARNING);
+          put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+          put(CICSLexer.JOURNALNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.JTYPEID, ErrorSeverity.ERROR);
+          put(CICSLexer.FLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.REQID, ErrorSeverity.ERROR);
+          put(CICSLexer.PREFIX, ErrorSeverity.ERROR);
+          put(CICSLexer.PFXLENG, ErrorSeverity.ERROR);
+          put(CICSLexer.WAIT, ErrorSeverity.WARNING);
+          put(CICSLexer.OPERATOR, ErrorSeverity.ERROR);
+          put(CICSLexer.TEXT, ErrorSeverity.ERROR);
+          put(CICSLexer.TEXTLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.ROUTECODES, ErrorSeverity.ERROR);
+          put(CICSLexer.NUMROUTES, ErrorSeverity.ERROR);
+          put(CICSLexer.CONSNAME, ErrorSeverity.ERROR);
+          put(CICSLexer.EVENTUAL, ErrorSeverity.WARNING);
+          put(CICSLexer.ACTION, ErrorSeverity.ERROR);
+          put(CICSLexer.CRITICAL, ErrorSeverity.WARNING);
+          put(CICSLexer.IMMEDIATE, ErrorSeverity.WARNING);
+          put(CICSLexer.REPLY, ErrorSeverity.ERROR);
+          put(CICSLexer.MAXLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.REPLYLENGTH, ErrorSeverity.ERROR);
+          put(CICSLexer.TIMEOUT, ErrorSeverity.ERROR);
+        }
+      };
 
   public CICSWriteOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     super(context, errors, DUPLICATE_CHECK_OPTIONS);
@@ -132,8 +131,13 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("NUMROUTES or CONSNAME", ctx.NUMROUTES(), ctx.CONSNAME());
     checkHasMutuallyExclusiveOptions("ROUTECODES or CONSNAME", ctx.ROUTECODES(), ctx.CONSNAME());
 
-    checkHasMutuallyExclusiveOptions("EVENTUAL or ACTION or CRITICAL or IMMEDIATE or REPLY",
-            ctx.EVENTUAL(), ctx.ACTION(), ctx.CRITICAL(), ctx.IMMEDIATE(), ctx.REPLY());
+    checkHasMutuallyExclusiveOptions(
+        "EVENTUAL or ACTION or CRITICAL or IMMEDIATE or REPLY",
+        ctx.EVENTUAL(),
+        ctx.ACTION(),
+        ctx.CRITICAL(),
+        ctx.IMMEDIATE(),
+        ctx.REPLY());
     if (!ctx.TIMEOUT().isEmpty() || !ctx.REPLYLENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.REPLY(), ctx, "REPLY");
     }

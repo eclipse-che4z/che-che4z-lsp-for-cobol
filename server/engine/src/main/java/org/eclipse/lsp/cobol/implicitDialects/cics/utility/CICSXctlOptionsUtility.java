@@ -15,18 +15,17 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_xctl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_xctl;
 
 /** Checks CICS XCTL rules for required and invalid options */
 public class CICSXctlOptionsUtility extends CICSOptionsCheckBaseUtility {
@@ -68,6 +67,7 @@ public class CICSXctlOptionsUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
 
     if (ctx.COMMAREA().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without COMMAREA");
-    if (ctx.INPUTMSG().isEmpty()) checkHasIllegalOptions(ctx.INPUTMSGLEN(), "INPUTMSGLEN without INPUTMSG");
+    if (ctx.INPUTMSG().isEmpty())
+      checkHasIllegalOptions(ctx.INPUTMSGLEN(), "INPUTMSGLEN without INPUTMSG");
   }
 }

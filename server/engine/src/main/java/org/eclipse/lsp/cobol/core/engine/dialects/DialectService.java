@@ -365,10 +365,11 @@ public class DialectService {
   /**
    * Add pre-defined copybooks from dialects to the copybook repository.
    *
-   * @param config     {@link AnalysisConfig}
+   * @param config {@link AnalysisConfig}
    * @param preprocessor - dialect specific preprocessor
    */
-  public void addDialectPredefinedCopybooks(AnalysisConfig config, CleanerPreprocessor preprocessor) {
+  public void addDialectPredefinedCopybooks(
+      AnalysisConfig config, CleanerPreprocessor preprocessor) {
     List<CobolDialect> dialects = new ArrayList<>();
     config.getDialects().forEach(dialect -> getDialectByName(dialect).ifPresent(dialects::add));
     dialects.addAll(getActiveImplicitDialects(config));

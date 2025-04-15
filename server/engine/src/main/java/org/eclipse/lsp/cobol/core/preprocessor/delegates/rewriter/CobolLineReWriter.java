@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter;
 
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-
 import java.util.List;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 
 /**
  * The implementations of this interface should receive a list of lines and apply some changes on
@@ -33,7 +32,8 @@ public interface CobolLineReWriter {
   List<CobolLine> processLines(List<CobolLine> lines);
 
   /**
-   *  Checks if a string ends with Quote marks
+   * Checks if a string ends with Quote marks
+   *
    * @param stringToCheck {@link String} parameter for test
    * @return True is string ends with quotes and false otherwise
    */
@@ -43,6 +43,7 @@ public interface CobolLineReWriter {
 
   /**
    * Checks if a string starts with Quote marks
+   *
    * @param stringToCheck {@link String} parameter for test
    * @return True is string starts with quotes and false otherwise
    */

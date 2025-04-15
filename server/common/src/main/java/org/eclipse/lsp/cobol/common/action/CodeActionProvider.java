@@ -15,13 +15,12 @@
 
 package org.eclipse.lsp.cobol.common.action;
 
+import java.util.List;
 import lombok.NonNull;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-
-import java.util.List;
 
 /**
  * Code action provider that may resolve the actions request and return a list of commands or code

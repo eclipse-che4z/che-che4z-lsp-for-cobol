@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -21,8 +22,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
-
-import java.util.List;
 
 /** JsonParse node */
 @ToString(callSuper = true)

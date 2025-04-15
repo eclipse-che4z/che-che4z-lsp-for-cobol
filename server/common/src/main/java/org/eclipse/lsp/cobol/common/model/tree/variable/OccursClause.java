@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
-import lombok.Value;
-
 import java.util.List;
+import lombok.Value;
 
 /** The class represents occurs clause in COBOL. */
 @Value

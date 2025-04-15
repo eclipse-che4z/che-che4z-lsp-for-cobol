@@ -28,6 +28,7 @@ public class CancelProgressHandler {
 
   /**
    * Cancel analysis for the passed uri
+   *
    * @param uri
    * @throws InterruptedException
    */

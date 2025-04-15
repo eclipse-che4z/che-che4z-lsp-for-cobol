@@ -21,9 +21,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests @{@link ServerTypeUtil}
- */
+/** Tests @{@link ServerTypeUtil} */
 class ServerTypeUtilTest {
 
   @Test
@@ -40,8 +38,7 @@ class ServerTypeUtilTest {
     System.setProperty("serverType", "NATIVE");
     AnalysisConfig dialectAnalysisConfig = DialectConfigs.getDaCoAnalysisConfig();
     boolean inCompatibleServerTypeRegistered =
-            ServerTypeUtil.isInCompatibleServerTypeRegistered(
-                    dialectAnalysisConfig);
+        ServerTypeUtil.isInCompatibleServerTypeRegistered(dialectAnalysisConfig);
     Assertions.assertTrue(inCompatibleServerTypeRegistered);
   }
 

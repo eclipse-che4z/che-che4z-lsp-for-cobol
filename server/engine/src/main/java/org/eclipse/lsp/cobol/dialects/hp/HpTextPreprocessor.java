@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.dialects.hp;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -27,9 +29,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.rewriter.CobolLineReWri
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.CobolLinesTransformation;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class re-writes the content of the analyzing file to simplify the processing by the grammar,
@@ -54,7 +53,8 @@ class HpTextPreprocessor implements CleanerPreprocessor {
   public ResultWithErrors<ExtendedText> cleanUpCode(String documentUri, String cobolCode) {
     List<SyntaxError> errors = new ArrayList<>();
     List<CobolLine> lines = reader.processLines(documentUri, cobolCode).unwrap(errors::addAll);
-    List<CobolLine> transformedLines = transformation.transformLines(documentUri, lines).unwrap(errors::addAll);
+    List<CobolLine> transformedLines =
+        transformation.transformLines(documentUri, lines).unwrap(errors::addAll);
     List<CobolLine> rewrittenLines = indicatorProcessor.processLines(transformedLines);
 
     ExtendedDocument code = writer.serialize(rewrittenLines, documentUri);

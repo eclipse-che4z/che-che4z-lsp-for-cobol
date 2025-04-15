@@ -55,6 +55,8 @@ class TestCopyMaidDoesNotShowMissingCopybookOnStatementWithoutNumber {
                 "PMOREC: Copybook not found",
                 DiagnosticSeverity.Error,
                 ErrorSource.DIALECT.getText(),
-                ErrorCodes.MISSING_COPYBOOK.getLabel())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+                ErrorCodes.MISSING_COPYBOOK.getLabel())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

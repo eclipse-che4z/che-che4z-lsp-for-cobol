@@ -29,9 +29,7 @@ import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp4j.InitializedParams;
 
-/**
- * LSP Initialized Handler
- */
+/** LSP Initialized Handler */
 public class InitializedHandler {
   private final WatcherService watchingService;
   private final CopybookNameService copybookNameService;
@@ -43,14 +41,15 @@ public class InitializedHandler {
   private final MessageService messageService;
 
   @Inject
-  public InitializedHandler(WatcherService watchingService,
-                            CopybookNameService copybookNameService,
-                            Keywords keywords,
-                            SettingsService settingsService,
-                            LocaleStore localeStore,
-                            AnalysisService analysisService,
-                            MessageService messageService,
-                            CodeLayoutStore codeLayoutStore) {
+  public InitializedHandler(
+      WatcherService watchingService,
+      CopybookNameService copybookNameService,
+      Keywords keywords,
+      SettingsService settingsService,
+      LocaleStore localeStore,
+      AnalysisService analysisService,
+      MessageService messageService,
+      CodeLayoutStore codeLayoutStore) {
     this.watchingService = watchingService;
     this.copybookNameService = copybookNameService;
     this.keywords = keywords;
@@ -63,6 +62,7 @@ public class InitializedHandler {
 
   /**
    * Handle LSP initialized request.
+   *
    * @param params InitializedParams.
    */
   public void initialized(@Nullable InitializedParams params) {
@@ -77,7 +77,9 @@ public class InitializedHandler {
   }
 
   private void getCobolProgramLayout() {
-    settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label).thenAccept(codeLayoutStore.updateCodeLayout());
+    settingsService
+        .fetchConfiguration(COBOL_PROGRAM_LAYOUT.label)
+        .thenAccept(codeLayoutStore.updateCodeLayout());
   }
 
   private void getLocaleFromClient() {
@@ -86,13 +88,13 @@ public class InitializedHandler {
 
   private void notifyConfiguredCopybookExtensions() {
     settingsService
-            .fetchTextConfiguration(CPY_EXTENSIONS.label)
-            .thenAccept(analysisService::setExtensionConfig);
+        .fetchTextConfiguration(CPY_EXTENSIONS.label)
+        .thenAccept(analysisService::setExtensionConfig);
   }
 
   private void getLogLevelFromClient() {
     settingsService
-            .fetchConfiguration(LOGGING_LEVEL.label)
-            .thenAccept(LogLevelUtils.updateLogLevel());
+        .fetchConfiguration(LOGGING_LEVEL.label)
+        .thenAccept(LogLevelUtils.updateLogLevel());
   }
 }

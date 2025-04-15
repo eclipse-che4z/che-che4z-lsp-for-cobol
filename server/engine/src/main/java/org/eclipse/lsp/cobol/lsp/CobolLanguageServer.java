@@ -55,15 +55,15 @@ public class CobolLanguageServer implements LanguageServer {
   @Inject
   @SuppressWarnings("squid:S107")
   public CobolLanguageServer(
-          LspMessageBroker lspMessageBroker,
-          TextDocumentService textService,
-          WorkspaceService workspaceService,
-          ExitHandler exitHandler,
-          ShutdownHandler shutdownHandler,
-          InitializeHandler initializeHandler,
-          InitializedHandler initializedHandler,
-          LspEventConsumer lspEventConsumer,
-          CancelProgressHandler cancelProgressHandler) {
+      LspMessageBroker lspMessageBroker,
+      TextDocumentService textService,
+      WorkspaceService workspaceService,
+      ExitHandler exitHandler,
+      ShutdownHandler shutdownHandler,
+      InitializeHandler initializeHandler,
+      InitializedHandler initializedHandler,
+      LspEventConsumer lspEventConsumer,
+      CancelProgressHandler cancelProgressHandler) {
     this.lspMessageBroker = lspMessageBroker;
     this.textService = textService;
     this.workspaceService = workspaceService;
@@ -121,6 +121,7 @@ public class CobolLanguageServer implements LanguageServer {
 
   @Override
   public void cancelProgress(WorkDoneProgressCancelParams params) {
-    lspMessageBroker.notify(new CancelProgressNotification(params.getToken().getLeft(), cancelProgressHandler));
+    lspMessageBroker.notify(
+        new CancelProgressNotification(params.getToken().getLeft(), cancelProgressHandler));
   }
 }

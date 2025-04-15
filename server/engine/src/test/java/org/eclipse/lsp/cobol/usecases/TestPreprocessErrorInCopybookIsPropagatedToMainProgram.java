@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -23,8 +25,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** Tests that the pre-process error from a copybook is propagated to the source cobol prohram. */
 public class TestPreprocessErrorInCopybookIsPropagatedToMainProgram {
@@ -36,7 +36,8 @@ public class TestPreprocessErrorInCopybookIsPropagatedToMainProgram {
           + "       PROCEDURE DIVISION.\n"
           + "        {_copy {~test9}.|error1_}";
   public static final String COPYBOOK_CONTENT =
-      "                                                                                {extra|error2}";
+      "                                                                               "
+          + " {extra|error2}";
   private static final String COPYBOOK_ID = "TEST9";
 
   @Test

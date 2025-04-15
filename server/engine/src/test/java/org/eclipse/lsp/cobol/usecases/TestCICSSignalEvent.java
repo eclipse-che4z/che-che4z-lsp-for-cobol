@@ -24,28 +24,27 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS SIGNAL EVENT command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-signal-event">SIGNAL EVENT Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-signal-event">SIGNAL EVENT
+ * Command</a>
  *
  * <p>This class tests the SIGNAL EVENT command.
  */
 public class TestCICSSignalEvent {
-  private static final String SIGNAL_EVENT_VALID_MINIMAL =
-          "SIGNAL EVENT({$varOne})";
+  private static final String SIGNAL_EVENT_VALID_MINIMAL = "SIGNAL EVENT({$varOne})";
 
-  private static final String SIGNAL_FROM_INVALID =
-          "SIGNAL {FROM(123)|errorOne}";
+  private static final String SIGNAL_FROM_INVALID = "SIGNAL {FROM(123)|errorOne}";
 
   private static final String SIGNAL_EVENT_VALID_FROMCHANNEL =
-          "SIGNAL EVENT({$varOne}) FROMCHANNEL({$varTwo})";
+      "SIGNAL EVENT({$varOne}) FROMCHANNEL({$varTwo})";
 
   private static final String SIGNAL_EVENT_VALID_FROM =
-          "SIGNAL EVENT({$varOne}) FROM({$varTwo}) FROMLENGTH({$varThree})";
+      "SIGNAL EVENT({$varOne}) FROM({$varTwo}) FROMLENGTH({$varThree})";
 
   private static final String SIGNAL_EVENT_INVALID_BOTH_FROM =
-          "SIGNAL EVENT({$varOne}) {FROMCHANNEL|errorOne}({$varTwo}) {FROM|errorTwo}({$varThree})";
+      "SIGNAL EVENT({$varOne}) {FROMCHANNEL|errorOne}({$varTwo}) {FROM|errorTwo}({$varThree})";
 
   private static final String SIGNAL_EVENT_INVALID_FROMLENGTH_WITHOUT_FROM =
-          "SIGNAL {_EVENT({$varOne}) FROMLENGTH(123)|errorOne_}";
+      "SIGNAL {_EVENT({$varOne}) FROMLENGTH(123)|errorOne_}";
 
   @Test
   void testSignalEventValidMinimal() {
@@ -55,14 +54,14 @@ public class TestCICSSignalEvent {
   @Test
   void testSignalFromInvalid() {
     CICSTestUtils.errorTest(
-            SIGNAL_FROM_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: EVENT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SIGNAL_FROM_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: EVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -78,32 +77,32 @@ public class TestCICSSignalEvent {
   @Test
   void testSignalEventInvalidBothFrom() {
     CICSTestUtils.errorTest(
-            SIGNAL_EVENT_INVALID_BOTH_FROM,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: FROMCHANNEL or FROM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: FROMCHANNEL or FROM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SIGNAL_EVENT_INVALID_BOTH_FROM,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: FROMCHANNEL or FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: FROMCHANNEL or FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testSignalEventInvalidFromlengthWithoutFrom() {
     CICSTestUtils.errorTest(
-            SIGNAL_EVENT_INVALID_FROMLENGTH_WITHOUT_FROM,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FROM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SIGNAL_EVENT_INVALID_FROMLENGTH_WITHOUT_FROM,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

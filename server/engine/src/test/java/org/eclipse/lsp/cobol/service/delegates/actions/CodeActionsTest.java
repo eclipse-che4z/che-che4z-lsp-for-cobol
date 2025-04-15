@@ -15,19 +15,18 @@
 
 package org.eclipse.lsp.cobol.service.delegates.actions;
 
-import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
-import org.eclipse.lsp4j.CodeAction;
-import org.eclipse.lsp4j.CodeActionParams;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import static java.util.Collections.singletonList;
 import static org.eclipse.lsp4j.jsonrpc.messages.Either.forRight;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.HashSet;
+import java.util.Set;
+import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
+import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionParams;
+import org.junit.jupiter.api.Test;
 
 /**
  * This test checks the logic of {@link CodeActions} delegate. It should collect the list of either

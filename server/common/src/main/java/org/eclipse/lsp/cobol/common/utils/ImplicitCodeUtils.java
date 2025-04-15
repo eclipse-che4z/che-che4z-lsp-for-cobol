@@ -17,16 +17,16 @@ package org.eclipse.lsp.cobol.common.utils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Utility class for implicit code injection
- */
+/** Utility class for implicit code injection */
 @Slf4j
 @UtilityClass
 public class ImplicitCodeUtils {
   /** Prefix for uri of the predefined copybooks */
   private static final String PREF_IMPLICIT = "implicit://";
+
   @SuppressWarnings("java:S1075")
   private static final String IMPLICIT_PATH = "/implicitCopybooks/";
+
   /** ** Prefix for defining undefined subroutines */
   private static final String IMPLICIT_SUBROUTINE_PATH = "/implicitSubroutine/";
 
@@ -42,6 +42,7 @@ public class ImplicitCodeUtils {
 
   /**
    * Creates a url for implicit code
+   *
    * @return implicit code location
    */
   public String createLocation() {
@@ -50,6 +51,7 @@ public class ImplicitCodeUtils {
 
   /**
    * Creates a url for implicit code
+   *
    * @return implicit code location
    */
   public String createSubroutineLocation() {
@@ -58,6 +60,7 @@ public class ImplicitCodeUtils {
 
   /**
    * Creates the path to implicit code
+   *
    * @param name is a name of the implicit code
    * @return the path
    */
@@ -67,6 +70,7 @@ public class ImplicitCodeUtils {
 
   /**
    * Creates full url for implicit code
+   *
    * @param name is a name of the implicit code
    * @return the full url
    */

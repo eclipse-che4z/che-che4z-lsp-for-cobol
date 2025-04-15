@@ -15,6 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.strategy;
 
+import static org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper.*;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
@@ -22,9 +25,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp.cobol.core.strategy.ErrorMessageHelper.*;
-import static org.mockito.Mockito.*;
 
 /** Tests {@link ErrorMessageHelper} class. */
 class ErrorMessageHelperTest {

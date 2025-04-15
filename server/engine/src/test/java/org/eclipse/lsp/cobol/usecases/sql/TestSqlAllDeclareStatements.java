@@ -127,7 +127,8 @@ class TestSqlAllDeclareStatements {
           + "             END-EXEC.\n"
           + "       PROCEDURE DIVISION.";
 
-  private static final String DECLARE_TABLE_WITH_COMPLEX_TIMESTAMP = ""
+  private static final String DECLARE_TABLE_WITH_COMPLEX_TIMESTAMP =
+      ""
           + "       IDENTIFICATION DIVISION.                                 \n"
           + "       PROGRAM-ID. HELLO-SQL.                                   \n"
           + "       DATA DIVISION.                                           \n"

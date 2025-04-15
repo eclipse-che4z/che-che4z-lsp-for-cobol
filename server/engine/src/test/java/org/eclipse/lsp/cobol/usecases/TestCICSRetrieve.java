@@ -26,32 +26,32 @@ import org.junit.jupiter.api.Test;
  * Test CICS RETRIEVE commands. Documentation link: <a
  * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-retrieve">RETRIEVE Command</a>
  *
- * <p>This class tests all variations of the RETRIEVE command: standard, REATTACH EVENT, and SUBEVENT.
+ * <p>This class tests all variations of the RETRIEVE command: standard, REATTACH EVENT, and
+ * SUBEVENT.
  */
 public class TestCICSRetrieve {
   // RETRIEVE standard tests
   private static final String RETRIEVE_STANDARD_VALID_ONE =
-          "RETRIEVE INTO({$varOne}) LENGTH({$varTwo}) RTRANSID({$varThree})";
+      "RETRIEVE INTO({$varOne}) LENGTH({$varTwo}) RTRANSID({$varThree})";
 
   private static final String RETRIEVE_STANDARD_VALID_TWO =
-          "RETRIEVE SET({$varOne}) QUEUE({$varTwo}) WAIT";
+      "RETRIEVE SET({$varOne}) QUEUE({$varTwo}) WAIT";
 
   private static final String RETRIEVE_STANDARD_INVALID =
-          "RETRIEVE {INTO|errorOne}({$varOne}) {SET|errorTwo}({$varTwo})";
+      "RETRIEVE {INTO|errorOne}({$varOne}) {SET|errorTwo}({$varTwo})";
 
   // RETRIEVE REATTACH EVENT tests
   private static final String RETRIEVE_REATTACH_VALID =
-          "RETRIEVE REATTACH EVENT({$varOne}) EVENTTYPE({$varTwo})";
+      "RETRIEVE REATTACH EVENT({$varOne}) EVENTTYPE({$varTwo})";
 
-  private static final String RETRIEVE_REATTACH_INVALID =
-          "RETRIEVE {EVENT(123)|errorOne}";
+  private static final String RETRIEVE_REATTACH_INVALID = "RETRIEVE {EVENT(123)|errorOne}";
 
   // RETRIEVE SUBEVENT tests
   private static final String RETRIEVE_SUBEVENT_VALID =
-          "RETRIEVE SUBEVENT({$varOne}) EVENT({$varTwo}) EVENTTYPE({$varThree})";
+      "RETRIEVE SUBEVENT({$varOne}) EVENT({$varTwo}) EVENTTYPE({$varThree})";
 
   private static final String RETRIEVE_SUBEVENT_INVALID =
-          "RETRIEVE {_SUBEVENT({$varOne}) EVENTTYPE(123)|errorOne_}";
+      "RETRIEVE {_SUBEVENT({$varOne}) EVENTTYPE(123)|errorOne_}";
 
   @Test
   void testRetrieveStandardValidOne() {
@@ -66,20 +66,20 @@ public class TestCICSRetrieve {
   @Test
   void testRetrieveStandardInvalid() {
     CICSTestUtils.errorTest(
-            RETRIEVE_STANDARD_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: INTO or SET",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: INTO or SET",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RETRIEVE_STANDARD_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INTO or SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INTO or SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -90,14 +90,14 @@ public class TestCICSRetrieve {
   @Test
   void testRetrieveReattachInvalid() {
     CICSTestUtils.errorTest(
-            RETRIEVE_REATTACH_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: REATTACH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RETRIEVE_REATTACH_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: REATTACH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -108,13 +108,13 @@ public class TestCICSRetrieve {
   @Test
   void testRetrieveSubeventInvalid() {
     CICSTestUtils.errorTest(
-            RETRIEVE_SUBEVENT_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: EVENT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        RETRIEVE_SUBEVENT_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: EVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

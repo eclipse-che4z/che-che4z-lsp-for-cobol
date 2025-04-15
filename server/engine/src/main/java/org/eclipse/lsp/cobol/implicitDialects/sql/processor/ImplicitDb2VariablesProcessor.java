@@ -14,10 +14,11 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.sql.processor;
 
-import java.util.List;
-import java.util.Objects;
+import static org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect.SQL_BACKEND_SETTING;
 
 import com.google.gson.JsonElement;
+import java.util.List;
+import java.util.Objects;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -29,25 +30,28 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.implicitDialects.sql.generator.Db2ImplicitVariablesGenerator;
 
-import static org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect.SQL_BACKEND_SETTING;
-
 /** Enrich symbolic table with DB2 predefined variables based on the configured SQL backend */
 public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
 
   @Override
   public void accept(SectionNode sectionNode, ProcessingContext ctx) {
     if (ctx.getCurrentProgramNode() == null) {
-      throw new RuntimeException("Program for section " + sectionNode.getSectionType() + " not found");
+      throw new RuntimeException(
+          "Program for section " + sectionNode.getSectionType() + " not found");
     }
     if (sectionNode.getSectionType() == SectionType.WORKING_STORAGE) {
       VariableAccumulator variableAccumulator = ctx.getVariableAccumulator();
       ProgramNode programNode = ctx.getCurrentProgramNode();
-      if (getSqlBackendConfig(ctx).equalsIgnoreCase(SQLBackend.DB2_SERVER.toString()) && !hasSqlCa(programNode)) {
+      if (getSqlBackendConfig(ctx).equalsIgnoreCase(SQLBackend.DB2_SERVER.toString())
+          && !hasSqlCa(programNode)) {
         registerVariables(
-            variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generateDb2Nodes(
-                        ctx.getCompilerDirectiveContext().getCompilerDirectiveMap()));
+            variableAccumulator,
+            programNode,
+            Db2ImplicitVariablesGenerator.generateDb2Nodes(
+                ctx.getCompilerDirectiveContext().getCompilerDirectiveMap()));
       }
-      if (getSqlBackendConfig(ctx).equalsIgnoreCase(SQLBackend.DATACOM_SERVER.toString()) && !hasSqlCa(programNode)) {
+      if (getSqlBackendConfig(ctx).equalsIgnoreCase(SQLBackend.DATACOM_SERVER.toString())
+          && !hasSqlCa(programNode)) {
         registerVariables(
             variableAccumulator, programNode, Db2ImplicitVariablesGenerator.generateDatacomNodes());
       }
@@ -61,16 +65,18 @@ public class ImplicitDb2VariablesProcessor implements Processor<SectionNode> {
   }
 
   private static boolean hasSqlCa(ProgramNode programNode) {
-    return null != programNode.findFirstNodeInSubtree(node -> {
-      if (!(node instanceof VariableWithLevelNode)) {
-        return false;
-      }
-      VariableWithLevelNode vwl = (VariableWithLevelNode) node;
-      if (vwl.getLevel() != 1) {
-        return false;
-      }
-      return vwl.getName().equalsIgnoreCase("SQLCA");
-    });
+    return null
+        != programNode.findFirstNodeInSubtree(
+            node -> {
+              if (!(node instanceof VariableWithLevelNode)) {
+                return false;
+              }
+              VariableWithLevelNode vwl = (VariableWithLevelNode) node;
+              if (vwl.getLevel() != 1) {
+                return false;
+              }
+              return vwl.getName().equalsIgnoreCase("SQLCA");
+            });
   }
 
   private void registerVariables(

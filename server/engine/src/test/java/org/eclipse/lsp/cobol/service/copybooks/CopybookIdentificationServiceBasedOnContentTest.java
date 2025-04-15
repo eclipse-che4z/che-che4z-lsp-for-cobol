@@ -133,5 +133,4 @@ class CopybookIdentificationServiceBasedOnContentTest {
     doc.setText(content);
     Assertions.assertFalse(service.isCopybook(doc.getUri(), doc.getText(), ImmutableList.of()));
   }
-
 }

@@ -14,9 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.model;
 
-/**
- * The interface represents structure that can show formatted line to the user.
- */
+/** The interface represents structure that can show formatted line to the user. */
 public interface Describable {
   /**
    * Get user friendly node description.

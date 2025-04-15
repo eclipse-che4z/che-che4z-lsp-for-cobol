@@ -14,15 +14,14 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import lombok.NonNull;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
-
-import lombok.NonNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class TrimFormation implements Formation {
 
@@ -33,7 +32,8 @@ public class TrimFormation implements Formation {
   }
 
   @Override
-  public List<TextEdit> format(@NonNull List<CobolDocumentModel.Line> lines, List<String> settings) {
+  public List<TextEdit> format(
+      @NonNull List<CobolDocumentModel.Line> lines, List<String> settings) {
     List<TextEdit> formattedText = new ArrayList<>();
     for (CobolDocumentModel.Line line : lines) {
       String newText = rtrim(line.getText());

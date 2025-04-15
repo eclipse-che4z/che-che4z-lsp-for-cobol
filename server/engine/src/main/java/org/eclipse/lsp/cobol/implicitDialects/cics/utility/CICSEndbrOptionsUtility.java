@@ -15,19 +15,18 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr_opts;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbr_opts;
 
 /** Checks CICS Extract rules for required and invalid options */
 public class CICSEndbrOptionsUtility extends CICSOptionsCheckBaseUtility {
@@ -55,9 +54,9 @@ public class CICSEndbrOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-      if (ctx.getRuleIndex() == RULE_cics_endbr_opts) {
-          checkEndbr((CICSParser.Cics_endbr_optsContext) ctx);
-      }
+    if (ctx.getRuleIndex() == RULE_cics_endbr_opts) {
+      checkEndbr((CICSParser.Cics_endbr_optsContext) ctx);
+    }
     checkDuplicates(ctx);
   }
 

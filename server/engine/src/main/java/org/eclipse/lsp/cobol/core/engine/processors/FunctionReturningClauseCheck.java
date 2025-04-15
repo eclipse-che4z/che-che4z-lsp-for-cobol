@@ -14,14 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
-import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.ProcedureDivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
+import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
+import org.eclipse.lsp.cobol.common.processor.Processor;
 
 /** Check presence of a returning clause of a function */
 public class FunctionReturningClauseCheck implements Processor<ProcedureDivisionNode> {
@@ -30,7 +30,8 @@ public class FunctionReturningClauseCheck implements Processor<ProcedureDivision
     if (ctx.getCurrentProgramNode() == null) {
       throw new RuntimeException();
     }
-    if (ctx.getCurrentProgramNode().getSubtype() != ProgramSubtype.Function || proc.hasReturningClause) {
+    if (ctx.getCurrentProgramNode().getSubtype() != ProgramSubtype.Function
+        || proc.hasReturningClause) {
       return;
     }
     ctx.getErrors()

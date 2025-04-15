@@ -19,7 +19,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -30,9 +29,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookId;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 
-/**
- * Implements copybook cache functionality
- */
+/** Implements copybook cache functionality */
 @Singleton
 public class CopybookCache {
 
@@ -50,9 +47,7 @@ public class CopybookCache {
             .build();
   }
 
-  /**
-   * Invalidates copybook cache
-   */
+  /** Invalidates copybook cache */
   public void invalidateAll() {
     cache.invalidateAll();
   }
@@ -74,17 +69,20 @@ public class CopybookCache {
 
   /**
    * Gets copybook model from cache
+   *
    * @param copybookId copybook name
    * @param callable function to call if copybook does not exist
    * @return a copybook model
    * @throws ExecutionException with error message
    */
-  public CopybookModel get(CopybookId copybookId, Callable<CopybookModel> callable) throws ExecutionException {
+  public CopybookModel get(CopybookId copybookId, Callable<CopybookModel> callable)
+      throws ExecutionException {
     return cache.get(copybookId, callable);
   }
 
   /**
    * Store copybook model to cache
+   *
    * @param copybookModel to store
    */
   public void store(CopybookModel copybookModel) {
@@ -93,6 +91,7 @@ public class CopybookCache {
 
   /**
    * Invalidate cache for the passed key
+   *
    * @param copybookId
    */
   public void invalidate(CopybookId copybookId) {

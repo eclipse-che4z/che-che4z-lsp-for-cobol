@@ -17,9 +17,7 @@ package org.eclipse.lsp.cobol.common.model.tree;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
-/**
- * The class represents procedureDivisionBody rule in COBOL grammar.
- */
+/** The class represents procedureDivisionBody rule in COBOL grammar. */
 public class ProcedureDivisionBodyNode extends Node {
   public ProcedureDivisionBodyNode(Locality location) {
     super(location, NodeType.CODE_BLOCK_PARENT);

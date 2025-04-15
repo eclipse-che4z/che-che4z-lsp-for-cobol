@@ -14,6 +14,11 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -21,21 +26,13 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-
-/**
- * Test for ParserListener
- */
+/** Test for ParserListener */
 class ParserListenerTest {
   @Test
   void test() {
     ParserListener parserListener = new ParserListener();
-    parserListener.syntaxError(mock(Recognizer.class), new Object(), 5, 10, "message",
-        mock(RecognitionException.class));
+    parserListener.syntaxError(
+        mock(Recognizer.class), new Object(), 5, 10, "message", mock(RecognitionException.class));
     List<SyntaxError> errors = parserListener.getErrors();
 
     assertEquals(1, errors.size());

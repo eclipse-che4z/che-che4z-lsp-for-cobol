@@ -15,7 +15,8 @@
 package org.eclipse.lsp.cobol.common.copybook;
 
 /**
- * This enum class defines two options which can be used to choose target backend sql server (DB2 or DATACOM)
+ * This enum class defines two options which can be used to choose target backend sql server (DB2 or
+ * DATACOM)
  */
 public enum SQLBackend {
   DB2_SERVER,

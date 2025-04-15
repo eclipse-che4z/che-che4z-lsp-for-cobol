@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -22,71 +23,75 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 /**
  * Test CICS Check commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-check-acqprocess">CHECK ACQPROCESS Command</a>
- * <a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-check-activity">CHECK ACTIVITY Command</a>
- * <a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-check-timer">CHECK TIMER Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-check-acqprocess">CHECK ACQPROCESS
+ * Command</a> <a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-check-activity">CHECK
+ * ACTIVITY Command</a> <a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-check-timer">CHECK
+ * TIMER Command</a>
+ *
  * <p>This class tests all variations of the CHECK command found in the link above.
  */
 public class TestCICSCheck {
 
-    private static final String CHECK_ACQPROCESS_VALID =
-            "CHECK ACQPROCESS COMPSTATUS({$varOne}) ABCODE({$varFour}) ABPROGRAM({$varFour})"
-                    + "MODE({$varOne}) SUSPSTATUS({$varOne})";
-    private static final String CHECK_ACTIVITY_VALID =
-            "CHECK ACTIVITY ({$varOne}) COMPSTATUS({$varOne}) ABCODE({$varFour}) ABPROGRAM({$varFour})"
-                    + "MODE({$varOne}) SUSPSTATUS({$varOne})";
-    private static final String CHECK_TIMER_VALID =
-            "CHECK TIMER({$varFour}) STATUS({$varOne}) ";
-    private static final String CHECK_ACTIVITY_ACQPROCESS_INVALID =
-            "CHECK COMPSTATUS({$varOne}) {ACTIVITY|errorAcqprocess}(100) {ACQPROCESS|errorAcqprocess2} ";
-    private static final String CHECK_ACTIVITY_INVALID_COMPSTATUS =
-            "CHECK {_ACTIVITY ({$varOne}) SUSPSTATUS(100)|errorMissingCompstatus_}";
-    @Test
-    void testCheckAcqprocessValid() {
-        CICSTestUtils.noErrorTest(CHECK_ACQPROCESS_VALID);
-    }
-    @Test
-    void testCheckActivityValid() {
-        CICSTestUtils.noErrorTest(CHECK_ACTIVITY_VALID);
-    }
-    @Test
-    void testCheckTimerValid() {
-        CICSTestUtils.noErrorTest(CHECK_TIMER_VALID);
-    }
+  private static final String CHECK_ACQPROCESS_VALID =
+      "CHECK ACQPROCESS COMPSTATUS({$varOne}) ABCODE({$varFour}) ABPROGRAM({$varFour})"
+          + "MODE({$varOne}) SUSPSTATUS({$varOne})";
+  private static final String CHECK_ACTIVITY_VALID =
+      "CHECK ACTIVITY ({$varOne}) COMPSTATUS({$varOne}) ABCODE({$varFour}) ABPROGRAM({$varFour})"
+          + "MODE({$varOne}) SUSPSTATUS({$varOne})";
+  private static final String CHECK_TIMER_VALID = "CHECK TIMER({$varFour}) STATUS({$varOne}) ";
+  private static final String CHECK_ACTIVITY_ACQPROCESS_INVALID =
+      "CHECK COMPSTATUS({$varOne}) {ACTIVITY|errorAcqprocess}(100) {ACQPROCESS|errorAcqprocess2} ";
+  private static final String CHECK_ACTIVITY_INVALID_COMPSTATUS =
+      "CHECK {_ACTIVITY ({$varOne}) SUSPSTATUS(100)|errorMissingCompstatus_}";
 
-    @Test
-    void testCheckActivityInvalid() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "errorAcqprocess",
-                        new Diagnostic(
-                                new Range(),
-                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()),
-                        "errorAcqprocess2",
-                        new Diagnostic(
-                                new Range(),
-                                "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY or ACQPROCESS",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(CHECK_ACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);
-    }
+  @Test
+  void testCheckAcqprocessValid() {
+    CICSTestUtils.noErrorTest(CHECK_ACQPROCESS_VALID);
+  }
 
-    @Test
-    void testCancelTransidInvalid() {
-        Map<String, Diagnostic> expectedDiagnostics =
-                ImmutableMap.of(
-                        "errorMissingCompstatus",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option: COMPSTATUS",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(CHECK_ACTIVITY_INVALID_COMPSTATUS, expectedDiagnostics);
-    }
+  @Test
+  void testCheckActivityValid() {
+    CICSTestUtils.noErrorTest(CHECK_ACTIVITY_VALID);
+  }
+
+  @Test
+  void testCheckTimerValid() {
+    CICSTestUtils.noErrorTest(CHECK_TIMER_VALID);
+  }
+
+  @Test
+  void testCheckActivityInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorAcqprocess",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or"
+                    + " ACQACTIVITY or ACQPROCESS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorAcqprocess2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or"
+                    + " ACQACTIVITY or ACQPROCESS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(CHECK_ACTIVITY_ACQPROCESS_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testCancelTransidInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorMissingCompstatus",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: COMPSTATUS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(CHECK_ACTIVITY_INVALID_COMPSTATUS, expectedDiagnostics);
+  }
 }

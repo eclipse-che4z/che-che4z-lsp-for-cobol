@@ -16,8 +16,8 @@ package org.eclipse.lsp.cobol.dialects.daco.nodes;
 
 import lombok.Getter;
 import lombok.ToString;
-import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp4j.Location;
 
@@ -30,7 +30,14 @@ public class DaCoCopyNode extends CopyNode {
 
   int startingLevel;
 
-  public DaCoCopyNode(Locality statementLocality, Location nameLocation, String layoutId, String layoutUsage, int startingLevel, String suffix, String uri) {
+  public DaCoCopyNode(
+      Locality statementLocality,
+      Location nameLocation,
+      String layoutId,
+      String layoutUsage,
+      int startingLevel,
+      String suffix,
+      String uri) {
     super(statementLocality, nameLocation, layoutId, DaCoDialect.NAME, uri);
     this.layoutUsage = layoutUsage;
     this.suffix = suffix;

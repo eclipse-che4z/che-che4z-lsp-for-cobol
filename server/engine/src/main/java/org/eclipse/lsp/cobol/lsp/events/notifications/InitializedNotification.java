@@ -18,9 +18,7 @@ import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.server.InitializedHandler;
 import org.eclipse.lsp4j.InitializedParams;
 
-/**
- * initialized language server notification
- */
+/** initialized language server notification */
 public class InitializedNotification implements LspNotification {
   private final InitializedParams params;
   private final InitializedHandler initializedHandler;

@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
@@ -21,18 +23,12 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-
 /** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
 public class ParagraphNameNode extends Node implements DefinedAndUsedStructure {
   private final String name;
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  @Setter private List<Location> definitions = ImmutableList.of();
+  @Setter private List<Location> usages = ImmutableList.of();
 
   public ParagraphNameNode(Locality location, String paragraphName) {
     super(location, NodeType.PARAGRAPH_NAME_NODE);

@@ -14,9 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramIdNode;
 
 /** ProgramIdNode processor */
 public class ProgramIdProcess implements Processor<ProgramIdNode> {

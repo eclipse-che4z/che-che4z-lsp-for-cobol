@@ -30,34 +30,30 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCICSLink {
   private static final String LINK_PROGRAM_VALID_ONE =
-          "LINK PROGRAM({$varOne}) COMMAREA({$varTwo}) LENGTH({$varThree})";
+      "LINK PROGRAM({$varOne}) COMMAREA({$varTwo}) LENGTH({$varThree})";
 
   private static final String LINK_PROGRAM_VALID_TWO =
-          "LINK PROGRAM({$varOne}) CHANNEL({$varTwo}) INPUTMSG({$varThree}) INPUTMSGLEN({$varFour})";
+      "LINK PROGRAM({$varOne}) CHANNEL({$varTwo}) INPUTMSG({$varThree}) INPUTMSGLEN({$varFour})";
 
-  private static final String LINK_PROGRAM_INVALID_ONE =
-          "LINK {COMMAREA(123)|errorOne}";
+  private static final String LINK_PROGRAM_INVALID_ONE = "LINK {COMMAREA(123)|errorOne}";
 
   private static final String LINK_PROGRAM_INVALID_TWO =
-          "LINK PROGRAM({$varOne}) {COMMAREA|errorOne}({$varTwo}) {CHANNEL|errorTwo}({$varThree})";
+      "LINK PROGRAM({$varOne}) {COMMAREA|errorOne}({$varTwo}) {CHANNEL|errorTwo}({$varThree})";
 
   private static final String LINK_PROGRAM_INVALID_THREE =
-          "LINK PROGRAM({$varOne}) {INPUTMSG|errorOne}({$varTwo}) {SYSID|errorTwo}({$varThree})";
+      "LINK PROGRAM({$varOne}) {INPUTMSG|errorOne}({$varTwo}) {SYSID|errorTwo}({$varThree})";
 
-  private static final String LINK_ACQPROCESS_VALID =
-          "LINK ACQPROCESS INPUTEVENT({$varOne})";
+  private static final String LINK_ACQPROCESS_VALID = "LINK ACQPROCESS INPUTEVENT({$varOne})";
 
-  private static final String LINK_ACQPROCESS_INVALID =
-          "LINK {INPUTEVENT(123)|errorOne}";
+  private static final String LINK_ACQPROCESS_INVALID = "LINK {INPUTEVENT(123)|errorOne}";
 
   private static final String LINK_ACTIVITY_VALID_ONE =
-          "LINK ACTIVITY({$varOne}) INPUTEVENT({$varTwo})";
+      "LINK ACTIVITY({$varOne}) INPUTEVENT({$varTwo})";
 
-  private static final String LINK_ACTIVITY_VALID_TWO =
-          "LINK ACQACTIVITY INPUTEVENT({$varTwo})";
+  private static final String LINK_ACTIVITY_VALID_TWO = "LINK ACQACTIVITY INPUTEVENT({$varTwo})";
 
   private static final String LINK_ACTIVITY_INVALID =
-          "LINK {ACTIVITY|errorOne}({$varOne}) {ACQACTIVITY|errorTwo}";
+      "LINK {ACTIVITY|errorOne}({$varOne}) {ACQACTIVITY|errorTwo}";
 
   @Test
   void testLinkProgramValidOne() {
@@ -72,52 +68,52 @@ public class TestCICSLink {
   @Test
   void testLinkProgramInvalidOne() {
     CICSTestUtils.errorTest(
-            LINK_PROGRAM_INVALID_ONE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: PROGRAM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LINK_PROGRAM_INVALID_ONE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PROGRAM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testLinkProgramInvalidTwo() {
     CICSTestUtils.errorTest(
-            LINK_PROGRAM_INVALID_TWO,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: COMMAREA or CHANNEL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: COMMAREA or CHANNEL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LINK_PROGRAM_INVALID_TWO,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: COMMAREA or CHANNEL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: COMMAREA or CHANNEL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testLinkProgramInvalidThree() {
     CICSTestUtils.errorTest(
-            LINK_PROGRAM_INVALID_THREE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: INPUTMSG or SYSID",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: INPUTMSG or SYSID",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LINK_PROGRAM_INVALID_THREE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INPUTMSG or SYSID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: INPUTMSG or SYSID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -128,14 +124,14 @@ public class TestCICSLink {
   @Test
   void testLinkAcqprocessInvalid() {
     CICSTestUtils.errorTest(
-            LINK_ACQPROCESS_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: ACQPROCESS",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LINK_ACQPROCESS_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ACQPROCESS",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -151,19 +147,21 @@ public class TestCICSLink {
   @Test
   void testLinkActivityInvalid() {
     CICSTestUtils.errorTest(
-            LINK_ACTIVITY_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or ACQACTIVITY",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        LINK_ACTIVITY_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or"
+                    + " ACQACTIVITY",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or"
+                    + " ACQACTIVITY",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

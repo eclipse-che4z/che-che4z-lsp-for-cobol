@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -22,25 +23,29 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 /**
- * Test CICS  ENDBROWSE  commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-endbrowse-activity">ENDBROWSE Command</a>
+ * Test CICS ENDBROWSE commands. Documentation link: <a
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-endbrowse-activity">ENDBROWSE
+ * Command</a>
  *
  * <p>This class tests all variations of the ENDBROWSE command found in the link above.
  */
 public class TestCICSEndBrowse {
-  private static final String ENDBROWSE_ACTIVITY_VALID = "ENDBROWSE ACTIVITY BROWSETOKEN({$varOne})";
-  private static final String ENDBROWSE_ACTIVITY_INVALID = "ENDBROWSE ACTIVITY {ACTIVITY|error1} BROWSETOKEN({$varOne})";
-  private static final String ENDBROWSE_ACTIVITY_CONTAINER_INVALID = "ENDBROWSE {ACTIVITY|error1} {CONTAINER|error2} BROWSETOKEN({$varOne}) RETCODE({$varOne})";
-  private static final String ENDBROWSE_CONTAINER_VALID = "ENDBROWSE CONTAINER BROWSETOKEN({$varOne}) RETCODE({$varOne})";
+  private static final String ENDBROWSE_ACTIVITY_VALID =
+      "ENDBROWSE ACTIVITY BROWSETOKEN({$varOne})";
+  private static final String ENDBROWSE_ACTIVITY_INVALID =
+      "ENDBROWSE ACTIVITY {ACTIVITY|error1} BROWSETOKEN({$varOne})";
+  private static final String ENDBROWSE_ACTIVITY_CONTAINER_INVALID =
+      "ENDBROWSE {ACTIVITY|error1} {CONTAINER|error2} BROWSETOKEN({$varOne}) RETCODE({$varOne})";
+  private static final String ENDBROWSE_CONTAINER_VALID =
+      "ENDBROWSE CONTAINER BROWSETOKEN({$varOne}) RETCODE({$varOne})";
   private static final String ENDBROWSE_EVENT_VALID = "ENDBROWSE EVENT BROWSETOKEN({$varOne})";
-  private static final String ENDBROWSE_EVENT_TIMER_INVALID = "ENDBROWSE {EVENT|error1} {TIMER|error2} BROWSETOKEN({$varOne})";
+  private static final String ENDBROWSE_EVENT_TIMER_INVALID =
+      "ENDBROWSE {EVENT|error1} {TIMER|error2} BROWSETOKEN({$varOne})";
   private static final String ENDBROWSE_TIMER_VALID = "ENDBROWSE TIMER BROWSETOKEN({$varOne})";
   private static final String ENDBROWSE_PROCESS_VALID = "ENDBROWSE PROCESS BROWSETOKEN({$varOne})";
 
-    @Test
+  @Test
   void testEndbrowseActivityValid() {
     CICSTestUtils.noErrorTest(ENDBROWSE_ACTIVITY_VALID);
   }
@@ -48,32 +53,34 @@ public class TestCICSEndBrowse {
   @Test
   void testEndbrowseActivityInvalid() {
     Map<String, Diagnostic> expectedDiagnostics =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: ACTIVITY",
-                            DiagnosticSeverity.Warning,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: ACTIVITY",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ENDBROWSE_ACTIVITY_INVALID, expectedDiagnostics);
   }
 
   @Test
   void testEndbrowseActivityContainerInvalid() {
     Map<String, Diagnostic> expectedDiagnostics =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER"
+                    + " or EVENT or PROCESS or TIMER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER"
+                    + " or EVENT or PROCESS or TIMER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ENDBROWSE_ACTIVITY_CONTAINER_INVALID, expectedDiagnostics);
   }
 
@@ -90,19 +97,21 @@ public class TestCICSEndBrowse {
   @Test
   void testEndbrowseEventTimerInvalid() {
     Map<String, Diagnostic> expectedDiagnostics =
-            ImmutableMap.of(
-                    "error1",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER"
+                    + " or EVENT or PROCESS or TIMER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: ACTIVITY or CONTAINER"
+                    + " or EVENT or PROCESS or TIMER",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ENDBROWSE_EVENT_TIMER_INVALID, expectedDiagnostics);
   }
 

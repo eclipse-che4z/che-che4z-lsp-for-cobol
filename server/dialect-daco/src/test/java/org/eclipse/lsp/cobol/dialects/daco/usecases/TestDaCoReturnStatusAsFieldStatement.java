@@ -23,34 +23,32 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the DaCo Return Status as Field statement
- */
+/** Tests the DaCo Return Status as Field statement */
 class TestDaCoReturnStatusAsFieldStatement {
 
-    private static final String TEXT =
-            "        IDENTIFICATION DIVISION. \r\n"
-                    + "        PROGRAM-ID. test1. \r\n"
-                    + "        DATA DIVISION. \r\n"
-                    + "        PROCEDURE DIVISION. \r\n"
-                    + "            RETURN FIELD DISACTMDU. \r\n"
-                    // Negative tests
-                    + "            RETURN FIELD {SDEREEWREWAAD|1}. \r\n";
+  private static final String TEXT =
+      "        IDENTIFICATION DIVISION. \r\n"
+          + "        PROGRAM-ID. test1. \r\n"
+          + "        DATA DIVISION. \r\n"
+          + "        PROCEDURE DIVISION. \r\n"
+          + "            RETURN FIELD DISACTMDU. \r\n"
+          // Negative tests
+          + "            RETURN FIELD {SDEREEWREWAAD|1}. \r\n";
 
-    @Test
-    void test() {
+  @Test
+  void test() {
 
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(),
-                ImmutableMap.of(
-                        "1",
-                        new Diagnostic(
-                                new Range(),
-                                "Max length limit of 12 bytes allowed for field name.",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.DIALECT.getText())),
-                ImmutableList.of(),
-                DialectConfigs.getDaCoAnalysisConfig());
-    }
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Max length limit of 12 bytes allowed for field name.",
+                DiagnosticSeverity.Error,
+                ErrorSource.DIALECT.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

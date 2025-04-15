@@ -84,18 +84,18 @@ public abstract class FileBasedTest extends ConfigurableTest {
         .map(Arrays::stream)
         .orElse(Stream.empty())
         .anyMatch(f -> f.getName().equals("positive"));
-    }
+  }
 
-
-    /**
-     * Get the files to be analyzed by Language Server from {@link CobolTextRegistry} using file-based
-     * implementation.
-     *
-     * @return the list of objects that would be passed to the constructor one by one
-     */
+  /**
+   * Get the files to be analyzed by Language Server from {@link CobolTextRegistry} using file-based
+   * implementation.
+   *
+   * @return the list of objects that would be passed to the constructor one by one
+   */
   protected static List<CobolText> getTextsToTest(CobolTextRegistry textRegistry) {
     return textRegistry.getPositives();
   }
+
   /**
    * Get the copybooks to be passed to the Language Server while analyzing from {@link
    * CobolTextRegistry} using file-based implementation.
@@ -204,7 +204,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
 
     if (testDialectsLists.contains("IDMS")) {
       return new AnalysisConfig(
-              ENABLED,
+          ENABLED,
           ImmutableList.of("IDMS"),
           true,
           false,

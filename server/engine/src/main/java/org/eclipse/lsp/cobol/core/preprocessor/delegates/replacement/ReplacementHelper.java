@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -23,18 +26,13 @@ import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
 import org.eclipse.lsp4j.Range;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-
-/**
- * Helper for replacement functionality
- */
+/** Helper for replacement functionality */
 @UtilityClass
 public class ReplacementHelper {
 
   /**
    * Creates a string for replacement parsing from a given clause
+   *
    * @param ctx - clause
    * @return a string
    */
@@ -55,6 +53,7 @@ public class ReplacementHelper {
 
   /**
    * Creates a string for replacement parsing from a given list of clauses
+   *
    * @param children - list of clauses
    * @return a string
    */
@@ -64,13 +63,14 @@ public class ReplacementHelper {
       if (parseTree instanceof CobolPreprocessor.ReplacingPhraseContext) {
         for (ParseTree clause : ((CobolPreprocessor.ReplacingPhraseContext) parseTree).children) {
           if (clause instanceof CobolPreprocessor.ReplaceClauseContext) {
-            CobolPreprocessor.ReplacePseudoTextContext pseudoTextContext = ((CobolPreprocessor.ReplaceClauseContext) clause).replacePseudoText();
-            CobolPreprocessor.ReplaceLiteralContext literalContext = ((CobolPreprocessor.ReplaceClauseContext) clause).replaceLiteral();
-            ParserRuleContext context = Optional.ofNullable((ParserRuleContext) pseudoTextContext).orElse(literalContext);
+            CobolPreprocessor.ReplacePseudoTextContext pseudoTextContext =
+                ((CobolPreprocessor.ReplaceClauseContext) clause).replacePseudoText();
+            CobolPreprocessor.ReplaceLiteralContext literalContext =
+                ((CobolPreprocessor.ReplaceClauseContext) clause).replaceLiteral();
+            ParserRuleContext context =
+                Optional.ofNullable((ParserRuleContext) pseudoTextContext).orElse(literalContext);
 
-            String clauseString = createClause(context)
-                .replace(" : ", ":")
-                .replace(" .", ".");
+            String clauseString = createClause(context).replace(" : ", ":").replace(" .", ".");
             clauses.add(ImmutablePair.of(clauseString, AntlrRangeUtils.constructRange(context)));
           }
         }

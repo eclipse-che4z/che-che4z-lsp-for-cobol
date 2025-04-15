@@ -14,15 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic.implicit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.generator.CICSBulkImplicitVariablesGenerator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for BlkImplicitVariablesGenerator
- */
+/** Test for BlkImplicitVariablesGenerator */
 class BlkImplicitVariablesGeneratorTest {
   @Test
   void test() {

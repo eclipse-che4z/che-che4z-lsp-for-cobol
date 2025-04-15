@@ -27,9 +27,7 @@ import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp4j.DocumentFormattingParams;
 import org.eclipse.lsp4j.TextEdit;
 
-/**
- * LSP Formatting Handler
- */
+/** LSP Formatting Handler */
 @Slf4j
 public class FormattingHandler {
   private final DocumentModelService documentService;
@@ -37,7 +35,10 @@ public class FormattingHandler {
   private final AsyncAnalysisService asyncAnalysisService;
 
   @Inject
-  public FormattingHandler(DocumentModelService documentService, Formations formations, AsyncAnalysisService asyncAnalysisService) {
+  public FormattingHandler(
+      DocumentModelService documentService,
+      Formations formations,
+      AsyncAnalysisService asyncAnalysisService) {
     this.documentService = documentService;
     this.formations = formations;
     this.asyncAnalysisService = asyncAnalysisService;
@@ -71,6 +72,6 @@ public class FormattingHandler {
    */
   public List<LspEventDependency> getDependencies(DocumentFormattingParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+        asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

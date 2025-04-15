@@ -16,16 +16,13 @@
  */
 package org.eclipse.lsp.cobol.codegen;
 
-import org.eclipse.lsp.cobol.codegen.snippets.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.lsp.cobol.codegen.snippets.*;
 
-/**
- * COBOL code generator settings.
- */
+/** COBOL code generator settings. */
 public class GeneratorSettings {
   static List<SnippetGenerator> statements = new ArrayList<>();
   static Map<SnippetGenerator, Double> statementsProbability = new HashMap<>();
@@ -51,9 +48,10 @@ public class GeneratorSettings {
     int undefined = statements.size() - statementsProbability.size();
     double pK = statementsProbability.values().stream().mapToDouble(v -> v).sum();
     double pU = (1.0 - pK) / (undefined);
-    statements.forEach(s -> {
-      statementsProbability.computeIfAbsent(s, k -> pU);
-    });
+    statements.forEach(
+        s -> {
+          statementsProbability.computeIfAbsent(s, k -> pU);
+        });
   }
 
   boolean enableRandom = true;

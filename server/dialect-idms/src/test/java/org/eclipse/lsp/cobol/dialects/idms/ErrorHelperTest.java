@@ -14,9 +14,13 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -24,13 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-/**
- * Test for {@link ErrorHelper}
- */
+/** Test for {@link ErrorHelper} */
 @ExtendWith(MockitoExtension.class)
 class ErrorHelperTest {
   @Test
@@ -63,5 +61,4 @@ class ErrorHelperTest {
     assertEquals(ErrorCodes.MISSING_COPYBOOK.getLabel(), result.getErrorCode().getLabel());
     assertEquals(message, result.getSuggestion());
   }
-
 }

@@ -17,6 +17,9 @@ package org.eclipse.lsp.cobol.test.engine;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
@@ -27,16 +30,13 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.PredefinedCopybooks;
 import org.eclipse.lsp.cobol.test.CobolText;
 
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 /** This util class allows retrieving and processing the predefined copybooks for syntax analysis */
 @Slf4j
 @UtilityClass
 class PredefinedCopybookUtils {
 
   private final WorkspaceFileService files = new WorkspaceFileService();
+
   /**
    * Retrieve the predefined copybook content using the given name and the sqlBackend and convert it
    * to the CobolText
@@ -48,7 +48,8 @@ class PredefinedCopybookUtils {
     return name ->
         new CobolText(
             name,
-            convertToStdSql(files.readImplicitCode(retrieveRealName(name, sqlBackend)), compilerOptions));
+            convertToStdSql(
+                files.readImplicitCode(retrieveRealName(name, sqlBackend)), compilerOptions));
   }
 
   /**
@@ -58,9 +59,19 @@ class PredefinedCopybookUtils {
    * @param programUri uri of the program
    * @return list of models for predefined copybooks
    */
-  List<CopybookModel> loadPredefinedCopybooks(SQLBackend sqlBackend, List<CobolText> copybooks, String programUri, List<String> compilerOptions) {
+  List<CopybookModel> loadPredefinedCopybooks(
+      SQLBackend sqlBackend,
+      List<CobolText> copybooks,
+      String programUri,
+      List<String> compilerOptions) {
     return PredefinedCopybooks.getNames().stream()
-        .map(name -> retrieveModel(new CopybookName(name, findDialect(name, copybooks)), programUri, sqlBackend, compilerOptions))
+        .map(
+            name ->
+                retrieveModel(
+                    new CopybookName(name, findDialect(name, copybooks)),
+                    programUri,
+                    sqlBackend,
+                    compilerOptions))
         .collect(Collectors.toList());
   }
 
@@ -72,7 +83,11 @@ class PredefinedCopybookUtils {
         .orElse(null);
   }
 
-  private CopybookModel retrieveModel(CopybookName copybookName, String programUri, SQLBackend sqlBackend, List<String> compilerOptions) {
+  private CopybookModel retrieveModel(
+      CopybookName copybookName,
+      String programUri,
+      SQLBackend sqlBackend,
+      List<String> compilerOptions) {
     final String name = retrieveRealName(copybookName.getDisplayName(), sqlBackend);
 
     String content = files.readImplicitCode(name);
@@ -86,7 +101,8 @@ class PredefinedCopybookUtils {
             sqlBackend,
             compilerOptions);
     String fullUrl = ImplicitCodeUtils.createFullUrl(name);
-    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, fullUrl, cleanCopybook.getText());
+    return new CopybookModel(
+        copybookName.toCopybookId(programUri), copybookName, fullUrl, cleanCopybook.getText());
   }
 
   private String retrieveRealName(String name, SQLBackend sqlBackend) {
@@ -95,8 +111,7 @@ class PredefinedCopybookUtils {
 
   private String convertToStdSql(String content, List<String> compilerOptions) {
     if (!compilerOptions.isEmpty() && compilerOptions.get(0).equalsIgnoreCase("STDSQL(YES)")) {
-      return content.replace("SQLCODE", "SQLCADE")
-              .replace("SQLSTATE", "SQLSTAT");
+      return content.replace("SQLCODE", "SQLCADE").replace("SQLSTATE", "SQLSTAT");
     }
     return content;
   }

@@ -24,19 +24,17 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS SYNCPOINT commands. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-syncpoint-rollback">SYNCPOINT Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-syncpoint-rollback">SYNCPOINT
+ * Command</a>
  *
  * <p>This class tests all variations of the SYNCPOINT command: standard and ROLLBACK.
  */
 public class TestCICSSyncPoint {
-  private static final String SYNCPOINT_STANDARD_VALID =
-          "SYNCPOINT";
+  private static final String SYNCPOINT_STANDARD_VALID = "SYNCPOINT";
 
-  private static final String SYNCPOINT_ROLLBACK_VALID =
-          "SYNCPOINT ROLLBACK";
+  private static final String SYNCPOINT_ROLLBACK_VALID = "SYNCPOINT ROLLBACK";
 
-  private static final String SYNCPOINT_ROLLBACK_INVALID =
-          "SYNCPOINT ROLLBACK {ROLLBACK|errorOne}";
+  private static final String SYNCPOINT_ROLLBACK_INVALID = "SYNCPOINT ROLLBACK {ROLLBACK|errorOne}";
 
   @Test
   void testSyncpointStandardValid() {
@@ -51,13 +49,13 @@ public class TestCICSSyncPoint {
   @Test
   void testSyncpointRollbackInvalid() {
     CICSTestUtils.errorTest(
-            SYNCPOINT_ROLLBACK_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: ROLLBACK",
-                            DiagnosticSeverity.Warning,
-                            ErrorSource.PARSING.getText())));
+        SYNCPOINT_ROLLBACK_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: ROLLBACK",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
   }
 }

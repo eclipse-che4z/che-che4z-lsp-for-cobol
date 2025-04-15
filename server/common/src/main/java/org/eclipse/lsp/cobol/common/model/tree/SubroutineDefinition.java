@@ -15,21 +15,22 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /** The class represents the Subroutine definition. */
 @Getter
 public class SubroutineDefinition {
   private final String subroutineName;
   private final Location location;
-  @EqualsAndHashCode.Exclude private final transient List<SubroutineNameNode> usages = new ArrayList<>();
+
+  @EqualsAndHashCode.Exclude
+  private final transient List<SubroutineNameNode> usages = new ArrayList<>();
 
   public SubroutineDefinition(Location locality, String subroutineName) {
     this.location = locality;

@@ -14,7 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -23,17 +30,7 @@ import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunications;
 import org.junit.jupiter.api.Test;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-/**
- * Test for DialectDiscoveryFolderService
- */
+/** Test for DialectDiscoveryFolderService */
 class DialectDiscoveryFolderServiceTest {
   @Test
   void testLoadDialects() {
@@ -42,8 +39,10 @@ class DialectDiscoveryFolderServiceTest {
     CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    List<CobolDialect> dialectList =
+        service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
 
@@ -54,8 +53,10 @@ class DialectDiscoveryFolderServiceTest {
     CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getWorkingFolder()).thenThrow(new RuntimeException());
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    List<CobolDialect> dialectList =
+        service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
 
@@ -66,8 +67,10 @@ class DialectDiscoveryFolderServiceTest {
     CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getFilenames(any())).thenThrow(new RuntimeException());
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList = service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    List<CobolDialect> dialectList =
+        service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
 
@@ -78,8 +81,11 @@ class DialectDiscoveryFolderServiceTest {
     CodeActions actions = mock(CodeActions.class);
     when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList = service.loadDialects(URI.create(""), mock(CopybookService.class), mock(MessageService.class));
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    List<CobolDialect> dialectList =
+        service.loadDialects(
+            URI.create(""), mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
   }
 
@@ -88,7 +94,8 @@ class DialectDiscoveryFolderServiceTest {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     service.registerExecuteCommandCapabilities(Collections.emptyList(), "test");
     verify(communications).registerExecuteCommandCapability(Collections.emptyList(), "test");
   }
@@ -98,7 +105,8 @@ class DialectDiscoveryFolderServiceTest {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     service.unregisterExecuteCommandCapabilities("test");
     verify(communications).unregisterExecuteCommandCapability("test");
   }
@@ -108,7 +116,8 @@ class DialectDiscoveryFolderServiceTest {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
-    DialectDiscoveryFolderService service = new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
     service.registerDialectCodeActionProviders(Collections.emptyList());
     verify(actions).registerNewProviders(Collections.emptyList());
   }

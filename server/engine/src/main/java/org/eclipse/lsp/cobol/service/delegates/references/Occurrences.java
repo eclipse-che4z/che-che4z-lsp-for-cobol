@@ -71,5 +71,5 @@ public interface Occurrences {
    */
   @NonNull
   List<DocumentHighlight> findHighlights(
-          AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position);
+      AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position);
 }

@@ -45,7 +45,8 @@ class TestReplacingForSeveralTokensInOneLine {
           + "           GOBACK.";
 
   private static final String REPL =
-      "              MOVE 10 TO {_{:TAG:-CHILD^ABCDE-CHILD} OF {:TAG:-PARENT^ABCDE-PARENT}|invalidS_}";
+      "              MOVE 10 TO {_{:TAG:-CHILD^ABCDE-CHILD} OF"
+          + " {:TAG:-PARENT^ABCDE-PARENT}|invalidS_}";
 
   private static final String REPL_NAME = "REPL";
   private static final String MESSAGE = "Variable ABCDE-CHILD is not defined";
@@ -56,8 +57,17 @@ class TestReplacingForSeveralTokensInOneLine {
         DOCUMENT,
         ImmutableList.of(new CobolText(REPL_NAME, REPL)),
         ImmutableMap.of(
-            "invalid", new Diagnostic(new Range(), "Errors inside the copybook", DiagnosticSeverity.Error,  ErrorSource.COPYBOOK.getText()),
-            "invalidS", new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())
-                ));
+            "invalid",
+                new Diagnostic(
+                    new Range(),
+                    "Errors inside the copybook",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.COPYBOOK.getText()),
+            "invalidS",
+                new Diagnostic(
+                    new Range(),
+                    MESSAGE,
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText())));
   }
 }

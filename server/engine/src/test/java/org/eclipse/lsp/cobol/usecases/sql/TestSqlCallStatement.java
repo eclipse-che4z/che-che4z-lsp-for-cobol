@@ -34,14 +34,12 @@ class TestSqlCallStatement {
           + "           END-EXEC.";
 
   /**
-   * compile output
-   *    000035                     EXEC SQL
+   * compile output 000035 EXEC SQL
    *
-   *  ==000035==> IGYPS0226-E DSNH104I DSNHSM2V LINE 35 COL 38  ILLEGAL SYMBOL "SQLD". SOME SYMBOLS
-   *                          THAT MIGHT BE LEGAL ARE: :
+   * <p>==000035==> IGYPS0226-E DSNH104I DSNHSM2V LINE 35 COL 38 ILLEGAL SYMBOL "SQLD". SOME SYMBOLS
+   * THAT MIGHT BE LEGAL ARE: :
    *
-   *    000036                        CALL myProc USING DESCRIPTOR SQLD
-   *    000037                     END-EXEC.
+   * <p>000036 CALL myProc USING DESCRIPTOR SQLD 000037 END-EXEC.
    */
   @Disabled("Compilation error")
   @Test

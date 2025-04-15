@@ -30,19 +30,19 @@ import org.junit.jupiter.api.Test;
  */
 public class TestCICSSpoolWrite {
   private static final String SPOOLWRITE_VALID_MINIMAL =
-          "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo})";
+      "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo})";
 
   private static final String SPOOLWRITE_VALID_FULL =
-          "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo}) FLENGTH({$varThree}) LINE NOHANDLE";
+      "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo}) FLENGTH({$varThree}) LINE NOHANDLE";
 
   private static final String SPOOLWRITE_INVALID_NO_TOKEN =
-          "SPOOLWRITE {_FROM({$varTwo}) FLENGTH({$varOne}) LINE|errorOne_}";
+      "SPOOLWRITE {_FROM({$varTwo}) FLENGTH({$varOne}) LINE|errorOne_}";
 
   private static final String SPOOLWRITE_INVALID_NO_FROM =
-          "SPOOLWRITE {_TOKEN({$varOne}) FLENGTH(123)|errorOne_}";
+      "SPOOLWRITE {_TOKEN({$varOne}) FLENGTH(123)|errorOne_}";
 
   private static final String SPOOLWRITE_INVALID_BOTH_LINE_PAGE =
-          "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo}) {LINE|errorOne} {PAGE|errorTwo}";
+      "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo}) {LINE|errorOne} {PAGE|errorTwo}";
 
   @Test
   void testSpoolwriteValidMinimal() {
@@ -57,45 +57,45 @@ public class TestCICSSpoolWrite {
   @Test
   void testSpoolwriteInvalidNoToken() {
     CICSTestUtils.errorTest(
-            SPOOLWRITE_INVALID_NO_TOKEN,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: TOKEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLWRITE_INVALID_NO_TOKEN,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TOKEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testSpoolwriteInvalidNoFrom() {
     CICSTestUtils.errorTest(
-            SPOOLWRITE_INVALID_NO_FROM,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FROM",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLWRITE_INVALID_NO_FROM,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testSpoolwriteInvalidBothLinePage() {
     CICSTestUtils.errorTest(
-            SPOOLWRITE_INVALID_BOTH_LINE_PAGE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: LINE or PAGE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: LINE or PAGE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLWRITE_INVALID_BOTH_LINE_PAGE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: LINE or PAGE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: LINE or PAGE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

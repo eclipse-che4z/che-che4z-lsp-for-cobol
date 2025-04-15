@@ -16,41 +16,38 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test COPY MAID with variable definition on the same level
- */
+/** Test COPY MAID with variable definition on the same level */
 public class TestDaCoNotFirstMaidStatement {
-    private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID.    CPYFROM.\n"
-                    + "        ENVIRONMENT DIVISION.\n"
-                    + "        IDMS-CONTROL SECTION.\n"
-                    + "            PROTOCOL. MODE ABC.\n"
-                    + "            IDMS-RECORDS MANUAL\n"
-                    + "       DATA   DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       01  {$*ROOT-XXX}.\n"
-                    + "         03  {$*PR1} PIC 9(9).\n"
-                    + "         03  COPY MAID {~CB!DACO}.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "           DISPLAY {$PR1-XXX}.\n";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    CPYFROM.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "       DATA   DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01  {$*ROOT-XXX}.\n"
+          + "         03  {$*PR1} PIC 9(9).\n"
+          + "         03  COPY MAID {~CB!DACO}.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$PR1-XXX}.\n";
 
-    private static final String CB =
-            "       01  {$*ROOT}.\n"
-          + "         03 {$*PR1-XDY`PR1-XXX} PIC 9(9).\n";
+  private static final String CB =
+      "       01  {$*ROOT}.\n" + "         03 {$*PR1-XDY`PR1-XXX} PIC 9(9).\n";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(new CobolText("CB", DaCoDialect.NAME, CB)),
-                ImmutableMap.of(),
-                ImmutableList.of(),
-                DialectConfigs.getDaCoAnalysisConfig());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(new CobolText("CB", DaCoDialect.NAME, CB)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

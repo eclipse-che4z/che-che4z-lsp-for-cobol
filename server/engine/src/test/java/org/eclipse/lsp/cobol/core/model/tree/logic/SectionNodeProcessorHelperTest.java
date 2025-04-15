@@ -14,7 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree.logic;
 
+import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -27,19 +33,10 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.eclipse.lsp.cobol.common.model.tree.Node.hasType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /** Test {@link SectionNodeProcessorHelper} */
 class SectionNodeProcessorHelperTest {
-  private static final Locality LOCALITY = Locality.builder()
-      .uri("")
-      .range(new Range(new Position(1, 1), new Position(2, 2)))
-      .build();
+  private static final Locality LOCALITY =
+      Locality.builder().uri("").range(new Range(new Position(1, 1), new Position(2, 2))).build();
 
   @Test
   void simpleStructureTest() {

@@ -15,6 +15,13 @@
 
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -24,14 +31,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ValueInterval;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 /** Utility class for visitor and delegates classes with useful methods */
 @UtilityClass
@@ -55,7 +54,8 @@ class IdmsParserHelper {
    * @param contexts a list of ANTLR value intervals
    * @return the list of value intervals
    */
-  public List<ValueInterval> retrieveValueIntervals(List<IdmsCopyParser.DataValueIntervalContext> contexts) {
+  public List<ValueInterval> retrieveValueIntervals(
+      List<IdmsCopyParser.DataValueIntervalContext> contexts) {
     return contexts.stream()
         .map(
             context ->
@@ -82,7 +82,8 @@ class IdmsParserHelper {
    * @param contexts a list of ANTLR usage clauses
    * @return the list of usage formats
    */
-  public List<UsageFormat> retrieveUsageFormat(List<IdmsCopyParser.DataUsageClauseContext> contexts) {
+  public List<UsageFormat> retrieveUsageFormat(
+      List<IdmsCopyParser.DataUsageClauseContext> contexts) {
     return contexts.stream()
         .map(IdmsCopyParser.DataUsageClauseContext::usageFormat)
         .filter(Objects::nonNull)
@@ -94,34 +95,36 @@ class IdmsParserHelper {
 
   /**
    * Builds context name locality based on the name and uri of the document
+   *
    * @param ctx is a parse rule context
    * @param name is a name of the entity
    * @param uri is an uri of the document
    * @return locality object
    */
   public Locality buildNameRangeLocality(ParserRuleContext ctx, String name, String uri) {
-    Range range = new Range(
-        new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
-        new Position(ctx.getStop().getLine() - 1, ctx.getStart().getCharPositionInLine() + name.length()));
+    Range range =
+        new Range(
+            new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
+            new Position(
+                ctx.getStop().getLine() - 1,
+                ctx.getStart().getCharPositionInLine() + name.length()));
 
-    return Locality.builder()
-        .uri(uri)
-        .range(range)
-        .build();
+    return Locality.builder().uri(uri).range(range).build();
   }
 
   /**
    * Gets value from ValueIsTokenContext context
+   *
    * @param ctx a context object
    * @return extracted value
    */
   public String retrieveValueToken(IdmsCopyParser.ValueIsTokenContext ctx) {
     return ctx.valueToken().getText().toUpperCase()
         + Optional.ofNullable(ctx.isAreToken())
-        .map(ParserRuleContext::getText)
-        .map(String::toUpperCase)
-        .map(" "::concat)
-        .orElse("");
+            .map(ParserRuleContext::getText)
+            .map(String::toUpperCase)
+            .map(" "::concat)
+            .orElse("");
   }
 
   /**
@@ -137,6 +140,7 @@ class IdmsParserHelper {
 
   /**
    * Gets a value from DataOccursClauseContext context
+   *
    * @param ctx a context object
    * @return extracted value
    */
@@ -168,14 +172,16 @@ class IdmsParserHelper {
 
   /**
    * Extracts a level range
+   *
    * @param token a token with a defined level
    * @return a range of a level statement
    */
   public Range extractLevelRange(Token token) {
     Range range = new Range();
     range.setStart(new Position(token.getLine() - 1, token.getCharPositionInLine()));
-    range.setEnd(new Position(token.getLine() - 1, token.getCharPositionInLine() + token.getText().length() - 1));
+    range.setEnd(
+        new Position(
+            token.getLine() - 1, token.getCharPositionInLine() + token.getText().length() - 1));
     return range;
   }
-
 }

@@ -16,14 +16,13 @@ package org.eclipse.lsp.cobol.dialects.idms.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
+import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 /** Test IDMS MAP IN statements */
 class TestIdmsMapInStatement {
@@ -53,7 +52,8 @@ class TestIdmsMapInStatement {
 
   private static final String TST3 =
       DEFS
-          + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} \n           LENGTH {$MFLD-LEN}.\n";
+          + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} \n"
+          + "           LENGTH {$MFLD-LEN}.\n";
 
   private static final String TST4 =
       DEFS + "           MAP IN USING {$EMPMAP} NOIO DATASTREAM FROM {$MFLD} LENGTH 20.\n";

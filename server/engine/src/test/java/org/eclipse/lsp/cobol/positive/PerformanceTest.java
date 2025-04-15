@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.positive;
 
+import java.util.List;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -23,8 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
-
-import java.util.List;
 
 /**
  * This test collects the time that the Language Engine needs to parse the given text from the
@@ -53,7 +52,11 @@ class PerformanceTest extends FileBasedTest {
       long start = System.currentTimeMillis();
       List<Diagnostic> result =
           UseCaseUtils.analyzeForErrors(
-              UseCase.builder().documentUri(name).text(fullText).copybooks(getCopybooks(cobolTextRegistry)).build());
+              UseCase.builder()
+                  .documentUri(name)
+                  .text(fullText)
+                  .copybooks(getCopybooks(cobolTextRegistry))
+                  .build());
       long stop = System.currentTimeMillis();
 
       assertNoSyntaxErrorsFound(result, name);

@@ -384,7 +384,8 @@ public class TestFunction {
             "1",
             new Diagnostic(
                 new Range(),
-                "WHEN-COMPILED can not be specified in the FUNCTION clause of the REPOSITORY paragraph",
+                "WHEN-COMPILED can not be specified in the FUNCTION clause of the REPOSITORY"
+                    + " paragraph",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -512,13 +513,15 @@ public class TestFunction {
             "1",
             new Diagnostic(
                 new Range(),
-                "The name FUNC1 cannot be used as a data-name because it was already declared as a function",
+                "The name FUNC1 cannot be used as a data-name because it was already declared as a"
+                    + " function",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "The name HEX-OF cannot be used as a data-name because it was already declared as a function",
+                "The name HEX-OF cannot be used as a data-name because it was already declared as a"
+                    + " function",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

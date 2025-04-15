@@ -16,13 +16,12 @@
 package org.eclipse.lsp.cobol.common;
 
 import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
-import lombok.Value;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import lombok.NonNull;
+import lombok.Value;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
 /**
  * This value class represents a processing result of any type that may contain syntax errors.

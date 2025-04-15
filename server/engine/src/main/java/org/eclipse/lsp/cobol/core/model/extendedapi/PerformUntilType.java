@@ -14,9 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
-/**
- * Perform type represents PERFORM UNTIL Clause type
- */
+/** Perform type represents PERFORM UNTIL Clause type */
 public enum PerformUntilType {
   UNTIL_EXIT,
   UNTIL_CONDITION

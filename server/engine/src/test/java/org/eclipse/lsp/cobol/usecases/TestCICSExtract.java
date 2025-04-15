@@ -15,14 +15,13 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 /**
  * Test CICS EXTRACT commands. Documentation link: <a
@@ -33,7 +32,9 @@ import java.util.Map;
 public class TestCICSExtract {
 
   private static final String EXTRACT_ATTACH_ALL_OPTIONS_VALID_ONE =
-      "EXTRACT ATTACH ATTACHID({$varOne}) PROCESS({$varTwo}) RESOURCE({$varThree}) RPROCESS({$varFour}) RRESOURCE({$varFive}) QUEUE({$varSix}) IUTYPE({$varSix}) DATASTR({$varSix}) RECFM({$varSix})";
+      "EXTRACT ATTACH ATTACHID({$varOne}) PROCESS({$varTwo}) RESOURCE({$varThree})"
+          + " RPROCESS({$varFour}) RRESOURCE({$varFive}) QUEUE({$varSix}) IUTYPE({$varSix})"
+          + " DATASTR({$varSix}) RECFM({$varSix})";
 
   private static final String EXTRACT_ATTACH_PARTIAL_VALID_ONE =
       "EXTRACT ATTACH PROCESS({$varOne})";
@@ -48,7 +49,12 @@ public class TestCICSExtract {
       "EXTRACT {_ATTRIBUTES CONVID(100)|errorOne_}";
 
   private static final String EXTRACT_CERTIFICATE_ALL_OPTIONS_VALID_ONE =
-      "EXTRACT CERTIFICATE({$varOne}) LENGTH({$varOne}) SERIALNUM({$varOne}) SERIALNUMLEN({$varOne}) USERID({$varOne}) OWNER COMMONNAME({$varOne}) COMMONNAMLEN({$varOne}) COUNTRY({$varOne}) COUNTRYLEN({$varOne}) STATE({$varOne}) STATELEN({$varOne}) LOCALITY({$varOne}) LOCALITYLEN({$varOne}) ORGANIZATION({$varOne}) ORGANIZATLEN({$varOne}) ORGUNIT({$varOne}) ORGUNITLEN({$varOne})";
+      "EXTRACT CERTIFICATE({$varOne}) LENGTH({$varOne}) SERIALNUM({$varOne})"
+          + " SERIALNUMLEN({$varOne}) USERID({$varOne}) OWNER COMMONNAME({$varOne})"
+          + " COMMONNAMLEN({$varOne}) COUNTRY({$varOne}) COUNTRYLEN({$varOne}) STATE({$varOne})"
+          + " STATELEN({$varOne}) LOCALITY({$varOne}) LOCALITYLEN({$varOne})"
+          + " ORGANIZATION({$varOne}) ORGANIZATLEN({$varOne}) ORGUNIT({$varOne})"
+          + " ORGUNITLEN({$varOne})";
 
   private static final String EXTRACT_CERTIFICATE_PARTIAL_VALID_ONE =
       "EXTRACT CERTIFICATE({$varOne}) COMMONNAME({$varOne}) ORGUNITLEN({$varOne})";
@@ -75,7 +81,8 @@ public class TestCICSExtract {
       "EXTRACT LOGONMSG {INTO|errorOne}(100) RESP(100) RESP2(101) {SET|errorTwo}(100) LENGTH(100)";
 
   private static final String EXTRACT_PROCESS_ALL_OPTIONS_VALID_ONE =
-      "EXTRACT PROCESS PROCNAME({$varOne}) PROCLENGTH({$varOne}) MAXPROCLEN({$varOne}) CONVID({$varOne}) SYNCLEVEL({$varOne}) PIPLIST({$varOne}) PIPLENGTH({$varOne})";
+      "EXTRACT PROCESS PROCNAME({$varOne}) PROCLENGTH({$varOne}) MAXPROCLEN({$varOne})"
+          + " CONVID({$varOne}) SYNCLEVEL({$varOne}) PIPLIST({$varOne}) PIPLENGTH({$varOne})";
 
   private static final String EXTRACT_PROCESS_PARTIAL_VALID_ONE =
       "EXTRACT PROCESS SYNCLEVEL({$varOne})";
@@ -84,7 +91,13 @@ public class TestCICSExtract {
       "EXTRACT PROCESS {MAXPROCLEN|errorOne}(100)";
 
   private static final String EXTRACT_TCPIP_ALL_OPTIONS_VALID_ONE =
-      "EXTRACT TCPIP AUTHENTICATE({$varOne}) CLIENTNAME({$varOne}) CNAMELENGTH({$varOne}) SERVERNAME({$varOne}) SNAMELENGTH({$varOne}) CLIENTADDR({$varOne}) CADDRLENGTH({$varOne}) CLNTIPFAMILY({$varOne}) CLIENTADDRNU({$varOne}) CLNTADDR6NU({$varOne}) SERVERADDR({$varOne}) SADDRLENGTH({$varOne}) SRVRIPFAMILY({$varOne}) SERVERADDRNU({$varOne}) SRVRADDR6NU({$varOne}) SSLTYPE({$varOne}) TCPIPSERVICE({$varOne}) PORTNUMBER({$varOne}) PORTNUMNU({$varOne}) PRIVACY({$varOne}) MAXDATALEN({$varOne})";
+      "EXTRACT TCPIP AUTHENTICATE({$varOne}) CLIENTNAME({$varOne}) CNAMELENGTH({$varOne})"
+          + " SERVERNAME({$varOne}) SNAMELENGTH({$varOne}) CLIENTADDR({$varOne})"
+          + " CADDRLENGTH({$varOne}) CLNTIPFAMILY({$varOne}) CLIENTADDRNU({$varOne})"
+          + " CLNTADDR6NU({$varOne}) SERVERADDR({$varOne}) SADDRLENGTH({$varOne})"
+          + " SRVRIPFAMILY({$varOne}) SERVERADDRNU({$varOne}) SRVRADDR6NU({$varOne})"
+          + " SSLTYPE({$varOne}) TCPIPSERVICE({$varOne}) PORTNUMBER({$varOne}) PORTNUMNU({$varOne})"
+          + " PRIVACY({$varOne}) MAXDATALEN({$varOne})";
 
   private static final String EXTRACT_TCPIP_PARTIAL_VALID_ONE =
       "EXTRACT TCPIP CLIENTADDR({$varOne}) CADDRLENGTH({$varOne}) MAXDATALEN({$varOne})";
@@ -100,7 +113,11 @@ public class TestCICSExtract {
   private static final String EXTRACT_TCT_INVALID_ONE = "EXTRACT {_TCT SYSID(100)|errorOne_}";
 
   private static final String EXTRACT_WEB_SERVER_ALL_OPTIONS_VALID_ONE =
-      "EXTRACT WEB SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne}) HOSTTYPE({$varOne}) HTTPMETHOD({$varOne}) METHODLENGTH({$varOne}) HTTPVERSION({$varOne}) VERSIONLEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) PORTNUMBER({$varOne}) QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) REQUESTTYPE({$varOne}) URIMAP({$varOne})";
+      "EXTRACT WEB SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne}) HOSTTYPE({$varOne})"
+          + " HTTPMETHOD({$varOne}) METHODLENGTH({$varOne}) HTTPVERSION({$varOne})"
+          + " VERSIONLEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) PORTNUMBER({$varOne})"
+          + " QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) REQUESTTYPE({$varOne})"
+          + " URIMAP({$varOne})";
 
   private static final String EXTRACT_WEB_SERVER_PARTIAL_ONE =
       "EXTRACT WEB SCHEME({$varOne}) PORTNUMBER({$varOne})";
@@ -109,7 +126,10 @@ public class TestCICSExtract {
       "EXTRACT WEB {HOSTTYPE|errorOne}(100)";
 
   private static final String EXTRACT_WEB_CLIENT_ALL_OPTIONS_VALID_ONE =
-      "EXTRACT WEB SESSTOKEN({$varOne}) SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne}) HOSTTYPE({$varOne}) HTTPVERSION({$varOne}) VERSIONLEN({$varOne}) PATH({$varOne}) PATHLENGTH({$varOne}) PORTNUMBER({$varOne}) URIMAP({$varOne}) REALM({$varOne}) REALMLEN({$varOne})";
+      "EXTRACT WEB SESSTOKEN({$varOne}) SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne})"
+          + " HOSTTYPE({$varOne}) HTTPVERSION({$varOne}) VERSIONLEN({$varOne}) PATH({$varOne})"
+          + " PATHLENGTH({$varOne}) PORTNUMBER({$varOne}) URIMAP({$varOne}) REALM({$varOne})"
+          + " REALMLEN({$varOne})";
 
   private static final String EXTRACT_WEB_CLIENT_PARTIAL_ONE =
       "EXTRACT WEB SESSTOKEN({$varOne}) SCHEME({$varOne}) PORTNUMBER({$varOne})";

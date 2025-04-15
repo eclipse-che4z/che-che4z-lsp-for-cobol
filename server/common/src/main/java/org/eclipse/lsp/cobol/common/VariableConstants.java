@@ -16,10 +16,7 @@ package org.eclipse.lsp.cobol.common;
 
 import lombok.experimental.UtilityClass;
 
-
-/**
- * Provides constants
- */
+/** Provides constants */
 @UtilityClass
 public class VariableConstants {
   public static final int LEVEL_FD_SD = -2;

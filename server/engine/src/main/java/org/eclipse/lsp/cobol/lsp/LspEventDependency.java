@@ -14,13 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
-/**
- * Contains event handler execution precondition.
- */
+/** Contains event handler execution precondition. */
 @FunctionalInterface
 public interface LspEventDependency {
   /**
    * Chech if it's ok to run event handler.
+   *
    * @return false is execution should be postponed.
    */
   boolean isSatisfied();

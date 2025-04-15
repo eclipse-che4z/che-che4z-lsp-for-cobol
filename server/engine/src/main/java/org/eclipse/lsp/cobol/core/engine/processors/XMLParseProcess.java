@@ -15,22 +15,21 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.tree.XMLParseNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.CompilerDirectiveName;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp.cobol.core.model.VariableUsageUtils;
-import org.eclipse.lsp.cobol.common.model.tree.XMLParseNode;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 /** Apply all the validation for the XML Parse statement and return found errors. */
 public class XMLParseProcess implements Processor<XMLParseNode> {
@@ -41,9 +40,9 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
       ImmutableList.of(
           EffectiveDataType.STRING, EffectiveDataType.INTEGER, EffectiveDataType.UNDETERMINED);
   public static final ImmutableList<String> CODED_CHARSET_FOR_XML_DOC =
-      ImmutableList.of("1200",
-          "1208", "1047", "1140", "37", "1141", "273", "1142", "277", "1143", "278", "1144", "280",
-          "1145", "284", "1146", "285", "1147", "297", "1148", "500", "1149", "871");
+      ImmutableList.of(
+          "1200", "1208", "1047", "1140", "37", "1141", "273", "1142", "277", "1143", "278", "1144",
+          "280", "1145", "284", "1146", "285", "1147", "297", "1148", "500", "1149", "871");
 
   public XMLParseProcess(SymbolAccumulator symbolAccumulator) {
     this.symbolAccumulator = symbolAccumulator;
@@ -51,11 +50,13 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
 
   @Override
   public void accept(XMLParseNode xmlParseNode, ProcessingContext processingContext) {
-    List<String> xmlParseCompilerDirectiveOptions = getXmlParseCompilerDirectiveOptions(processingContext);
+    List<String> xmlParseCompilerDirectiveOptions =
+        getXmlParseCompilerDirectiveOptions(processingContext);
 
     boolean isXmlss = isXmlssCompilerOptionEnabled(xmlParseCompilerDirectiveOptions);
 
-    List<VariableNode> identifier1Definitions = getVariableDefinition(xmlParseNode, xmlParseNode.getIdentifier1());
+    List<VariableNode> identifier1Definitions =
+        getVariableDefinition(xmlParseNode, xmlParseNode.getIdentifier1());
     if (identifier1Definitions.isEmpty()) {
       return;
     }
@@ -113,7 +114,8 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
       if (variableUsageNodeForIdentifier.isEmpty()) {
         return Collections.emptyList();
       }
-      return VariableUsageUtils.getDefinitionNode(symbolAccumulator, xmlParseNode, variableUsageNodeForIdentifier);
+      return VariableUsageUtils.getDefinitionNode(
+          symbolAccumulator, xmlParseNode, variableUsageNodeForIdentifier);
     }
     return Collections.emptyList();
   }
@@ -186,10 +188,9 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
               SyntaxError.syntaxError()
                   .errorSource(ErrorSource.PARSING)
                   .severity(ErrorSeverity.HINT)
-                  .location(xmlParseNode.getXmlValidatingContext().getLocality().toOriginalLocation())
-                  .messageTemplate(
-                      MessageTemplate.of(
-                          "xmlParse.validating.phrase"))
+                  .location(
+                      xmlParseNode.getXmlValidatingContext().getLocality().toOriginalLocation())
+                  .messageTemplate(MessageTemplate.of("xmlParse.validating.phrase"))
                   .build());
     }
   }
@@ -206,26 +207,23 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
                     .severity(ErrorSeverity.HINT)
                     .location(
                         xmlParseNode.getXmlNationalContext().getLocality().toOriginalLocation())
-                    .messageTemplate(
-                        MessageTemplate.of(
-                            "xmlParse.returnNational.phrase"))
+                    .messageTemplate(MessageTemplate.of("xmlParse.returnNational.phrase"))
                     .build());
       }
     }
-      if (Objects.nonNull(xmlParseNode.getEncodingLocality())) {
-        if (!CODED_CHARSET_FOR_XML_DOC.contains(xmlParseNode.getEncodingLocality().getName())) {
-          processingContext
-              .getErrors()
-              .add(
-                  SyntaxError.syntaxError()
-                      .errorSource(ErrorSource.PARSING)
-                      .severity(ErrorSeverity.HINT)
-                      .location(
-                          xmlParseNode.getEncodingLocality().getLocality().toOriginalLocation())
-                      .messageTemplate(MessageTemplate.of("xmlParse.unsupported.ccid"))
-                      .build());
-        }
+    if (Objects.nonNull(xmlParseNode.getEncodingLocality())) {
+      if (!CODED_CHARSET_FOR_XML_DOC.contains(xmlParseNode.getEncodingLocality().getName())) {
+        processingContext
+            .getErrors()
+            .add(
+                SyntaxError.syntaxError()
+                    .errorSource(ErrorSource.PARSING)
+                    .severity(ErrorSeverity.HINT)
+                    .location(xmlParseNode.getEncodingLocality().getLocality().toOriginalLocation())
+                    .messageTemplate(MessageTemplate.of("xmlParse.unsupported.ccid"))
+                    .build());
       }
+    }
   }
 
   private void semanticCheckForEncoding(
@@ -242,9 +240,7 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
                     .errorSource(ErrorSource.PARSING)
                     .severity(ErrorSeverity.HINT)
                     .location(xmlParseNode.getEncodingLocality().getLocality().toOriginalLocation())
-                    .messageTemplate(
-                        MessageTemplate.of(
-                            "xmlParse.encoding.phrase"))
+                    .messageTemplate(MessageTemplate.of("xmlParse.encoding.phrase"))
                     .build());
       }
       if (isNational) {
@@ -261,10 +257,10 @@ public class XMLParseProcess implements Processor<XMLParseNode> {
   }
 
   private List<String> getXmlParseCompilerDirectiveOptions(ProcessingContext processingContext) {
-    return processingContext.getCompilerDirectiveContext()
-            .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.XMLPARSE))
-              .orElse(CompilerDirectiveName.XMLPARSE.defaultValue())
-            .getValue();
-
+    return processingContext
+        .getCompilerDirectiveContext()
+        .filterDirectiveList(ImmutableList.of(CompilerDirectiveName.XMLPARSE))
+        .orElse(CompilerDirectiveName.XMLPARSE.defaultValue())
+        .getValue();
   }
 }

@@ -14,11 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.model.ProcedureName;
-
-import java.util.Optional;
 
 /** Data transport object of CF AST. Perform type represents PERFORM statement. */
 @Value
@@ -30,14 +29,18 @@ public class Perform extends CFASTNode {
   String thruSectionName;
   String performUntilType;
 
-  public Perform(ProcedureName target, ProcedureName thru, Location location, PerformUntilType performUntilType) {
+  public Perform(
+      ProcedureName target,
+      ProcedureName thru,
+      Location location,
+      PerformUntilType performUntilType) {
     super(CFASTNodeType.PERFORM.getValue(), location);
     this.targetName = Optional.ofNullable(target).map(ProcedureName::getName).orElse(null);
-    this.targetSectionName = Optional.ofNullable(target).map(ProcedureName::getInSection).orElse(null);
+    this.targetSectionName =
+        Optional.ofNullable(target).map(ProcedureName::getInSection).orElse(null);
     this.thruName = Optional.ofNullable(thru).map(ProcedureName::getName).orElse(null);
     this.thruSectionName = Optional.ofNullable(thru).map(ProcedureName::getInSection).orElse(null);
-    this.performUntilType = Optional.ofNullable(performUntilType)
-        .map(PerformUntilType::name)
-        .orElse(null);
+    this.performUntilType =
+        Optional.ofNullable(performUntilType).map(PerformUntilType::name).orElse(null);
   }
 }

@@ -24,25 +24,23 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS SPOOLCLOSE TOKEN command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-spoolread">SPOOLCLOSE TOKEN Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-spoolread">SPOOLCLOSE TOKEN
+ * Command</a>
  *
  * <p>This class tests the SPOOLCLOSE TOKEN command.
  */
 public class TestCICSSpoolcloseToken {
-  private static final String SPOOLCLOSE_TOKEN_VALID_MINIMAL =
-          "SPOOLCLOSE TOKEN({$varOne})";
+  private static final String SPOOLCLOSE_TOKEN_VALID_MINIMAL = "SPOOLCLOSE TOKEN({$varOne})";
 
-  private static final String SPOOLCLOSE_TOKEN_VALID_KEEP =
-          "SPOOLCLOSE TOKEN({$varOne}) KEEP";
+  private static final String SPOOLCLOSE_TOKEN_VALID_KEEP = "SPOOLCLOSE TOKEN({$varOne}) KEEP";
 
   private static final String SPOOLCLOSE_TOKEN_VALID_DELETE =
-          "SPOOLCLOSE TOKEN({$varOne}) DELETE NOHANDLE";
+      "SPOOLCLOSE TOKEN({$varOne}) DELETE NOHANDLE";
 
-  private static final String SPOOLCLOSE_TOKEN_INVALID_NO_TOKEN =
-          "SPOOLCLOSE {NOHANDLE|errorOne}";
+  private static final String SPOOLCLOSE_TOKEN_INVALID_NO_TOKEN = "SPOOLCLOSE {NOHANDLE|errorOne}";
 
   private static final String SPOOLCLOSE_TOKEN_INVALID_BOTH_KEEP_DELETE =
-          "SPOOLCLOSE TOKEN({$varOne}) {KEEP|errorOne} {DELETE|errorTwo}";
+      "SPOOLCLOSE TOKEN({$varOne}) {KEEP|errorOne} {DELETE|errorTwo}";
 
   @Test
   void testSpoolcloseTokenValidMinimal() {
@@ -62,32 +60,32 @@ public class TestCICSSpoolcloseToken {
   @Test
   void testSpoolcloseTokenInvalidNoToken() {
     CICSTestUtils.errorTest(
-            SPOOLCLOSE_TOKEN_INVALID_NO_TOKEN,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: TOKEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLCLOSE_TOKEN_INVALID_NO_TOKEN,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TOKEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testSpoolcloseTokenInvalidBothKeepDelete() {
     CICSTestUtils.errorTest(
-            SPOOLCLOSE_TOKEN_INVALID_BOTH_KEEP_DELETE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: KEEP or DELETE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: KEEP or DELETE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        SPOOLCLOSE_TOKEN_INVALID_BOTH_KEEP_DELETE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: KEEP or DELETE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: KEEP or DELETE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

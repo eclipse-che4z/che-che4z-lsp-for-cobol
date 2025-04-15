@@ -26,9 +26,10 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 
-/** The class is to override the actual preprocessor and redirect to usecase engine preprocessor.
+/**
+ * The class is to override the actual preprocessor and redirect to usecase engine preprocessor.
  * TODO: It requires further refactoring as it is for clientServerIntegration test specifically.
- * */
+ */
 public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
   @Override
   public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig) {
@@ -36,7 +37,8 @@ public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
   }
 
   @Override
-  public AnalysisResult analyze(String uri, String text, AnalysisConfig analysisConfig, String languageId) {
+  public AnalysisResult analyze(
+      String uri, String text, AnalysisConfig analysisConfig, String languageId) {
     final String copybook1 = "       {_COPY {~CPYBK1}.|1_}";
     final String copybook2 = "       {_COPY {~CPYBK2}.|2_}";
 
@@ -61,8 +63,6 @@ public class ClientServerIntegrationTestImpl implements LanguageEngineFacade {
                 new Range(),
                 "Errors inside the copybook",
                 DiagnosticSeverity.Error,
-                ErrorSource.COPYBOOK.getText())
-        )
-    );
+                ErrorSource.COPYBOOK.getText())));
   }
 }

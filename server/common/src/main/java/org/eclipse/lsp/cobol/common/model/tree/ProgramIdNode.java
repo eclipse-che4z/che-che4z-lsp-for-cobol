@@ -14,19 +14,16 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
-
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
-
-import com.google.common.collect.ImmutableList;
 
 /** The class represents program ID. */
 @ToString(callSuper = true)
@@ -35,10 +32,8 @@ import com.google.common.collect.ImmutableList;
 public class ProgramIdNode extends Node implements DefinedAndUsedStructure {
   String programId;
   final ProgramSubtype subtype;
-  @Setter
-  private List<Location> definitions = ImmutableList.of();
-  @Setter
-  private List<Location> usages = ImmutableList.of();
+  @Setter private List<Location> definitions = ImmutableList.of();
+  @Setter private List<Location> usages = ImmutableList.of();
 
   public ProgramIdNode(Locality locality, String programId, ProgramSubtype subtype) {
     super(locality, NodeType.PROGRAM_ID);

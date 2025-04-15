@@ -19,20 +19,24 @@ import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 
 /**
- * Contract for the notifier which notifies the document analysis state to all registered {@link AnalysisStateListener}
+ * Contract for the notifier which notifies the document analysis state to all registered {@link
+ * AnalysisStateListener}
  */
 public interface AnalysisStateNotifier {
-    /**
-     * registers the listeners, which are interested in the {@link AnalysisStateListener}
-     * @param analysisStateListeners
-     */
-    void register(List<AnalysisStateListener> analysisStateListeners);
+  /**
+   * registers the listeners, which are interested in the {@link AnalysisStateListener}
+   *
+   * @param analysisStateListeners
+   */
+  void register(List<AnalysisStateListener> analysisStateListeners);
 
-    /**
-     * notify all listeners the analysis state
-     * @param state
-     * @param model
-     * @param eventSource
-     */
-    void notifyAllListeners(AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource);
+  /**
+   * notify all listeners the analysis state
+   *
+   * @param state
+   * @param model
+   * @param eventSource
+   */
+  void notifyAllListeners(
+      AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource);
 }

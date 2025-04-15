@@ -14,6 +14,10 @@
  */
 package org.eclipse.lsp.cobol.positive;
 
+import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
+
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
@@ -26,11 +30,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
 /**
  * This class provides capability to run the server for actual cobol files that are provided using
@@ -70,7 +69,8 @@ class PositiveTestOld extends FileBasedTest {
               .dialectsSettings(analysisConfig.getDialectsSettings())
               .build();
       AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
+      PositiveTestUtility.assetDefinitionsNReferencesFromSnap(
+          analyze.getSymbolTableMap(), dataNameRefs, analyze.getRootNode(), fileName);
       assertNoError(fileName, analyze);
     }
   }

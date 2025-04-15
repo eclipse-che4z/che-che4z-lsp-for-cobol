@@ -16,12 +16,11 @@
 package org.eclipse.lsp.cobol.core.model;
 
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.Value;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-
-import java.util.List;
 
 /**
  * This value class represents an output of embedded code parser. It is used for mapping purposes.

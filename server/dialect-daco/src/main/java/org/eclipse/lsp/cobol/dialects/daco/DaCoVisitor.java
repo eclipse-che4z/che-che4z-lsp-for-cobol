@@ -14,7 +14,12 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
+import static org.eclipse.lsp.cobol.dialects.daco.DaCoParser.DOT_FS;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -24,21 +29,15 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.dialects.daco.nodes.SortTableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.DacoStatementsContext;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.QualifiedDataNameContext;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoParser.VariableUsageNameContext;
-import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.dialects.daco.nodes.SortTableNode;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
-import static org.eclipse.lsp.cobol.dialects.daco.DaCoParser.DOT_FS;
 
 /**
  * This extension of {@link DaCoParserBaseVisitor} applies the semantic analysis based on the
@@ -107,7 +106,10 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
 
   private Locality constructLocality(ParserRuleContext ctx) {
     Location location = context.getExtendedDocument().mapLocation(DialectUtils.constructRange(ctx));
-    return Locality.builder().uri(context.getExtendedDocument().getUri()).range(location.getRange()).build();
+    return Locality.builder()
+        .uri(context.getExtendedDocument().getUri())
+        .range(location.getRange())
+        .build();
   }
 
   public List<SyntaxError> getErrors() {
@@ -115,18 +117,21 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
   }
 
   private void addReplacementContext(TerminalNode token) {
-    String newText = context.getExtendedDocument().toString()
+    String newText =
+        context
+            .getExtendedDocument()
+            .toString()
             .substring(token.getSymbol().getStartIndex(), token.getSymbol().getStopIndex() + 1)
             .replaceAll("[^ \n]", " ");
 
     int line = token.getSymbol().getLine();
     int inLine = token.getSymbol().getCharPositionInLine();
-    Range range = new Range(
+    Range range =
+        new Range(
             new Position(line - 1, inLine),
             new Position(
-                    line - 1,
-                    inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1)
-    );
+                line - 1,
+                inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1));
     // TODO: probably it should be resolved in grammar, but we need to preserve dot
     //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
     if (token.getSymbol().getType() == DOT_FS) {
@@ -134,15 +139,22 @@ public class DaCoVisitor extends DaCoParserBaseVisitor<List<Node>> {
     }
     context.getExtendedDocument().replace(range, newText);
   }
+
   private void addReplacementContext(ParserRuleContext ctx) {
-    String newText = context.getExtendedDocument().toString()
+    String newText =
+        context
+            .getExtendedDocument()
+            .toString()
             .substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1)
             .replaceAll("[^ \n]", CobolDialect.FILLER);
     Token start = ctx.start;
     Token stop = ctx.stop;
-    Range range = new Range(new Position(start.getLine() - 1, start.getCharPositionInLine()),
-            new Position(stop.getLine() - 1,
-                    stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1));
+    Range range =
+        new Range(
+            new Position(start.getLine() - 1, start.getCharPositionInLine()),
+            new Position(
+                stop.getLine() - 1,
+                stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1));
     // TODO: probably it should be resolved in grammar, but we need to preserve dot
     //  cause COBOL parser does not expect dots to be consumed by IDMS preprocessor.
     if (ctx.getStop().getType() == DOT_FS) {

@@ -20,9 +20,7 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.writer.CobolLineWriter;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 
-/**
- * {@link CobolLineWriter} for "hpcobol"
- */
+/** {@link CobolLineWriter} for "hpcobol" */
 class HPCobolLineWriter extends CobolLineWriter {
   private final CodeLayoutStore layoutStore;
 

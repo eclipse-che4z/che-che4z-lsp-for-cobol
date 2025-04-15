@@ -14,17 +14,16 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.processor;
 
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.SectionType;
+import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
+import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
-import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp4j.Range;
-
-import java.util.Optional;
 
 /**
  * Checks for the mandatory Data Division (Working storage Section and Linkage section) in a program
@@ -34,16 +33,18 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
 
   @Override
   public void accept(ProgramNode programNode, ProcessingContext processingContext) {
-      if (isSectionMissing(programNode, SectionType.LINKAGE)) {
-        addSectionNode(
-                getDataDivisionTypeNode(programNode).orElseGet(() -> createVirtualDivisionNode(programNode)),
-                SectionType.LINKAGE);
-      }
-      if (isSectionMissing(programNode, SectionType.WORKING_STORAGE)) {
-        addSectionNode(
-                getDataDivisionTypeNode(programNode).orElseGet(() -> createVirtualDivisionNode(programNode)),
-                SectionType.WORKING_STORAGE);
-      }
+    if (isSectionMissing(programNode, SectionType.LINKAGE)) {
+      addSectionNode(
+          getDataDivisionTypeNode(programNode)
+              .orElseGet(() -> createVirtualDivisionNode(programNode)),
+          SectionType.LINKAGE);
+    }
+    if (isSectionMissing(programNode, SectionType.WORKING_STORAGE)) {
+      addSectionNode(
+          getDataDivisionTypeNode(programNode)
+              .orElseGet(() -> createVirtualDivisionNode(programNode)),
+          SectionType.WORKING_STORAGE);
+    }
   }
 
   private void addSectionNode(DivisionNode divisionNode, SectionType type) {
@@ -52,30 +53,32 @@ public class CICSTranslateMandatorySectionProcess implements Processor<ProgramNo
 
   private Optional<DivisionNode> getDataDivisionTypeNode(ProgramNode programNode) {
     return Optional.ofNullable(
-            programNode.findFirstNodeInSubtree(n -> n instanceof DivisionNode
-                    && ((DivisionNode) n).getDivisionType() == DivisionType.DATA_DIVISION))
-            .map(DivisionNode.class::cast);
+            programNode.findFirstNodeInSubtree(
+                n ->
+                    n instanceof DivisionNode
+                        && ((DivisionNode) n).getDivisionType() == DivisionType.DATA_DIVISION))
+        .map(DivisionNode.class::cast);
   }
 
   private boolean isSectionMissing(ProgramNode programNode, SectionType sectionType) {
-    return null == programNode.findFirstNodeInSubtree(
+    return null
+        == programNode.findFirstNodeInSubtree(
             n -> n instanceof SectionNode && ((SectionNode) n).getSectionType() == sectionType);
   }
 
-
   private static DivisionNode createVirtualDivisionNode(ProgramNode programNode) {
-    Locality locality = Locality.builder()
+    Locality locality =
+        Locality.builder()
             .uri(programNode.getLocality().getUri())
             // Empty range for virtual node
-            .range(new Range(
+            .range(
+                new Range(
                     programNode.getLocality().getRange().getStart(),
-                    programNode.getLocality().getRange().getStart()
-            ))
+                    programNode.getLocality().getRange().getStart()))
             .build();
     DivisionNode divisionNode = new DivisionNode(locality, DivisionType.DATA_DIVISION);
     divisionNode.setParent(programNode);
     programNode.getChildren().add(0, divisionNode);
     return divisionNode;
   }
-
 }

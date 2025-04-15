@@ -14,10 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.model.extendedapi;
 
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-
-import java.util.List;
 
 /** Data transport object of CF AST. GoTo type is GOTO statement node. */
 @Value

@@ -43,16 +43,16 @@ public interface LspQuery<T> extends LspEvent {
     return ImmutableList.of();
   }
 
-    /**
-     * Dependency data for the event. Allow to cancel the execution.
-     * @return list of {@link LspEventCancelCondition}
-     */
+  /**
+   * Dependency data for the event. Allow to cancel the execution.
+   *
+   * @return list of {@link LspEventCancelCondition}
+   */
   default List<LspEventCancelCondition> getCancelConditions() {
     return ImmutableList.of();
   }
 
   /**
-   *
    * @return CompletableFuture for a {@link LspQuery}
    */
   CompletableFuture<T> getResult();

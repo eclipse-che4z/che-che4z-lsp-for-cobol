@@ -14,14 +14,13 @@
  */
 package org.eclipse.lsp.cobol.common.processor;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /** Tests {@link CompilerDirectiveContext} */
 class CompilerDirectiveContextTest {
@@ -63,9 +62,9 @@ class CompilerDirectiveContextTest {
 
     assertEquals(context.getCompilerDirectiveMap().entrySet().size(), 0);
     context.updateDirectiveOptions(
-            new CompilerDirectiveOption(CompilerDirectiveName.STDSQL, ImmutableList.of(YES)));
+        new CompilerDirectiveOption(CompilerDirectiveName.STDSQL, ImmutableList.of(YES)));
     Optional<CompilerDirectiveOption> result =
-            context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.STDSQL));
+        context.filterDirectiveList(ImmutableList.of(CompilerDirectiveName.STDSQL));
     assertTrue(result.isPresent());
     Assertions.assertTrue(result.get().getValue().contains(YES));
   }

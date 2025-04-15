@@ -56,7 +56,8 @@ class TestCOUNTVariableNameAllowed {
 
   @Test
   @Disabled(
-      "Issue https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/646 is not valid. Check sysprint attached along with this class")
+      "Issue https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/646 is not valid."
+          + " Check sysprint attached along with this class")
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
   }

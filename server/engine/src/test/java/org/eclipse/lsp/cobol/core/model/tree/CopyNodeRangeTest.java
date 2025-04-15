@@ -14,19 +14,19 @@
  */
 package org.eclipse.lsp.cobol.core.model.tree;
 
-import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
-import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.common.AnalysisResult;
-import org.eclipse.lsp.cobol.test.engine.UseCase;
-import org.eclipse.lsp4j.Position;
-import org.junit.jupiter.api.Test;
-
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.DOCUMENT_URI;
 import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
+import org.eclipse.lsp.cobol.test.engine.UseCase;
+import org.eclipse.lsp4j.Position;
+import org.junit.jupiter.api.Test;
 
 /** Check that copy statement produce correct ranges */
 class CopyNodeRangeTest {

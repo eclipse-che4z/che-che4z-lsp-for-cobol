@@ -29,35 +29,36 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the STARTBR command.
  */
 public class TestCICSStartbr {
-  private static final String STARTBR_VALID_MINIMAL =
-          "STARTBR FILE({$varOne}) RIDFLD({$varTwo})";
+  private static final String STARTBR_VALID_MINIMAL = "STARTBR FILE({$varOne}) RIDFLD({$varTwo})";
 
   private static final String STARTBR_DATASET_VALID =
-          "STARTBR DATASET({$varOne}) RIDFLD({$varTwo})";
+      "STARTBR DATASET({$varOne}) RIDFLD({$varTwo})";
 
   private static final String STARTBR_INVALID_NO_KEYLENGTH =
-          "STARTBR {_FILE({$varOne}) RIDFLD({$varTwo}) GENERIC|errorOne_}";
+      "STARTBR {_FILE({$varOne}) RIDFLD({$varTwo}) GENERIC|errorOne_}";
 
   private static final String STARTBR_VALID_FULL =
-          "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour}) SYSID({$varFive}) DEBKEY";
+      "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) KEYLENGTH({$varThree}) GENERIC REQID({$varFour})"
+          + " SYSID({$varFive}) DEBKEY";
 
   private static final String STARTBR_SYSID_INVALID =
-          "STARTBR {_FILE({$varOne}) RIDFLD({$varTwo}) SYSID({$varFive}) GTEQ|errorOne_}";
+      "STARTBR {_FILE({$varOne}) RIDFLD({$varTwo}) SYSID({$varFive}) GTEQ|errorOne_}";
 
   private static final String STARTBR_INVALID_NO_FILE =
-          "STARTBR {_RIDFLD({$varTwo}) KEYLENGTH({$varOne}) GENERIC|errorOne_}";
+      "STARTBR {_RIDFLD({$varTwo}) KEYLENGTH({$varOne}) GENERIC|errorOne_}";
 
   private static final String STARTBR_INVALID_NO_RIDFLD =
-          "STARTBR {_FILE({$varOne}) KEYLENGTH({$varTwo}) GENERIC|errorOne_}";
+      "STARTBR {_FILE({$varOne}) KEYLENGTH({$varTwo}) GENERIC|errorOne_}";
 
   private static final String STARTBR_INVALID_MULTIPLE_POSITIONING =
-          "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) {DEBKEY|errorOne|errorThree} {RBA|errorTwo|errorFour}";
+      "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) {DEBKEY|errorOne|errorThree}"
+          + " {RBA|errorTwo|errorFour}";
 
   private static final String STARTBR_INVALID_MULTIPLE_COMPARISON =
-          "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {EQUAL|errorTwo}";
+      "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {EQUAL|errorTwo}";
 
   private static final String STARTBR_INVALID_GTEQ_DEBKEY =
-          "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {DEBKEY|errorTwo}";
+      "STARTBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {DEBKEY|errorTwo}";
 
   @Test
   void testStartbrValidMinimal() {
@@ -72,27 +73,27 @@ public class TestCICSStartbr {
   @Test
   void testStartbrInvalidNoKeylength() {
     CICSTestUtils.errorTest(
-            STARTBR_INVALID_NO_KEYLENGTH,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: KEYLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        STARTBR_INVALID_NO_KEYLENGTH,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testStartbrSysidInvalid() {
     CICSTestUtils.errorTest(
-            STARTBR_SYSID_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, none provided: KEYLENGTH, RBA, RRN, or XRBA",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        STARTBR_SYSID_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: KEYLENGTH, RBA, RRN, or XRBA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -103,96 +104,101 @@ public class TestCICSStartbr {
   @Test
   void testStartbrInvalidNoFile() {
     CICSTestUtils.errorTest(
-            STARTBR_INVALID_NO_FILE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, none provided: FILE or DATASET",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        STARTBR_INVALID_NO_FILE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: FILE or DATASET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testStartbrInvalidNoRidfld() {
     CICSTestUtils.errorTest(
-            STARTBR_INVALID_NO_RIDFLD,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: RIDFLD",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        STARTBR_INVALID_NO_RIDFLD,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: RIDFLD",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testStartbrInvalidMultiplePositioning() {
     CICSTestUtils.errorTest(
-            STARTBR_INVALID_MULTIPLE_POSITIONING,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: DEBKEY, DEBREC, RBA, RRN, or XRBA",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: DEBKEY, DEBREC, RBA, RRN, or XRBA",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorThree",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA or DEBREC",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorFour",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA or DEBREC",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())
-            ));
+        STARTBR_INVALID_MULTIPLE_POSITIONING,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: DEBKEY, DEBREC, RBA,"
+                    + " RRN, or XRBA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: DEBKEY, DEBREC, RBA,"
+                    + " RRN, or XRBA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorThree",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA"
+                    + " or DEBREC",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorFour",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA"
+                    + " or DEBREC",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testStartbrInvalidMultipleComparison() {
     CICSTestUtils.errorTest(
-            STARTBR_INVALID_MULTIPLE_COMPARISON,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        STARTBR_INVALID_MULTIPLE_COMPARISON,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testStartbrInvalidGteqDebkey() {
     CICSTestUtils.errorTest(
-            STARTBR_INVALID_GTEQ_DEBKEY,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA or DEBREC",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "errorTwo",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA or DEBREC",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        STARTBR_INVALID_GTEQ_DEBKEY,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA"
+                    + " or DEBREC",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, options are mutually exclusive: GTEQ or DEBKEY or RBA"
+                    + " or DEBREC",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

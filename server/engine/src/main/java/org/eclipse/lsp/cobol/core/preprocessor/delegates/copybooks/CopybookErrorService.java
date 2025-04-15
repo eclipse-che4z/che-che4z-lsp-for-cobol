@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.INFO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
@@ -24,20 +27,17 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.INFO;
-
-/**
- * Provides creating errors for copybooks
- */
+/** Provides creating errors for copybooks */
 @Slf4j
 @RequiredArgsConstructor
 class CopybookErrorService {
 
-  private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME = "Syntax error by checkCopybookName: {}";
+  private static final String SYNTAX_ERROR_CHECK_COPYBOOK_NAME =
+      "Syntax error by checkCopybookName: {}";
   private final MessageService messageService;
 
-  public SyntaxError addCopybookNameError(CopybookName copybookName, Locality locality, int maxLen) {
+  public SyntaxError addCopybookNameError(
+      CopybookName copybookName, Locality locality, int maxLen) {
     return addCopybookError(
         copybookName.getQualifiedName(),
         maxLen,
@@ -54,7 +54,8 @@ class CopybookErrorService {
       String messageID,
       String logMessage) {
     SyntaxError error =
-        SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, copybookName.getDisplayName()))
             .location(locality.toOriginalLocation())
@@ -69,8 +70,7 @@ class CopybookErrorService {
             .errorSource(ErrorSource.COPYBOOK)
             .severity(ERROR)
             .suggestion(
-                messageService.getMessage(
-                    "GrammarPreprocessorListener.recursionDetected", name))
+                messageService.getMessage("GrammarPreprocessorListener.recursionDetected", name))
             .location(locality.toOriginalLocation())
             .build();
     LOG.debug("Syntax error by CopybookErrorService: {}", error.toString());
@@ -112,7 +112,8 @@ class CopybookErrorService {
       String messageID,
       String logMessage) {
     SyntaxError error =
-        SyntaxError.syntaxError().errorSource(ErrorSource.COPYBOOK)
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.COPYBOOK)
             .severity(info)
             .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
             .location(locality.toOriginalLocation())

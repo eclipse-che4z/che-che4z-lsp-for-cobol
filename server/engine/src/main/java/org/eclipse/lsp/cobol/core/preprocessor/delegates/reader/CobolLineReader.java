@@ -26,13 +26,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
 import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
-import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -56,7 +56,8 @@ public abstract class CobolLineReader {
    * @return List of COBOL lines with a list of errors if found, or an empty list
    */
   @NonNull
-  public ResultWithErrors<List<CobolLine>> processLines(@NonNull String uri, @NonNull String lines) {
+  public ResultWithErrors<List<CobolLine>> processLines(
+      @NonNull String uri, @NonNull String lines) {
     List<SyntaxError> accumulatedErrors = new ArrayList<>();
     List<CobolLine> result = new ArrayList<>();
     try (Scanner scanner = new Scanner(lines)) {
@@ -69,8 +70,9 @@ public abstract class CobolLineReader {
 
       while (scanner.hasNextLine()) {
         currentLine = scanner.nextLine();
-        CobolLine currentCobolLine = parseLine(currentLine, uri, lineNumber, linePattern, directivePattern, layout)
-            .unwrap(accumulatedErrors::addAll);
+        CobolLine currentCobolLine =
+            parseLine(currentLine, uri, lineNumber, linePattern, directivePattern, layout)
+                .unwrap(accumulatedErrors::addAll);
 
         currentCobolLine.setPredecessor(lastCobolLine);
         result.add(currentCobolLine);
@@ -90,7 +92,11 @@ public abstract class CobolLineReader {
 
   @NonNull
   ResultWithErrors<CobolLine> parseLine(
-      @NonNull String line, @NonNull String uri, int lineNumber, Pattern linePattern, Pattern directivePattern,
+      @NonNull String line,
+      @NonNull String uri,
+      int lineNumber,
+      Pattern linePattern,
+      Pattern directivePattern,
       CobolProgramLayout layout) {
     List<SyntaxError> errors = new ArrayList<>();
     CobolLine cobolLine;
@@ -98,9 +104,12 @@ public abstract class CobolLineReader {
     Matcher usualLine = linePattern.matcher(line);
     Matcher directivesLine = directivePattern.matcher(line);
     if (directivesLine.matches()) {
-      cobolLine = processCompilerDirectives(line, uri, lineNumber, directivesLine, layout).unwrap(errors::addAll);
+      cobolLine =
+          processCompilerDirectives(line, uri, lineNumber, directivesLine, layout)
+              .unwrap(errors::addAll);
     } else if (usualLine.matches()) {
-      cobolLine = processNormalLine(line, uri, lineNumber, usualLine, layout).unwrap(errors::addAll);
+      cobolLine =
+          processNormalLine(line, uri, lineNumber, usualLine, layout).unwrap(errors::addAll);
     } else {
       // It is impossible. Pattern must match any line.
       LOG.error("The line '{}' can't be parsed.", line);
@@ -113,7 +122,11 @@ public abstract class CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> processCompilerDirectives(
-      @NonNull String line, @NonNull String uri, int lineNumber, @NonNull Matcher matcher, CobolProgramLayout layout) {
+      @NonNull String line,
+      @NonNull String uri,
+      int lineNumber,
+      @NonNull Matcher matcher,
+      CobolProgramLayout layout) {
     List<SyntaxError> errors = new ArrayList<>();
     int contentStart = matcher.start("directives");
     String directives = matcher.group("directives");
@@ -126,7 +139,11 @@ public abstract class CobolLineReader {
   }
 
   private ResultWithErrors<CobolLine> processNormalLine(
-          @NonNull String line, @NonNull String uri, int lineNumber, Matcher matcher, CobolProgramLayout layout) {
+      @NonNull String line,
+      @NonNull String uri,
+      int lineNumber,
+      Matcher matcher,
+      CobolProgramLayout layout) {
     List<SyntaxError> errors = new ArrayList<>();
     CobolLine cobolLine = new CobolLine();
     cobolLine.setSequenceArea(matcher.group("sequence"));
@@ -144,61 +161,67 @@ public abstract class CobolLineReader {
   private String cleanupString(@NonNull String line, int contentStart, CobolProgramLayout layout) {
     String lineWithoutSequence = StringUtils.repeat(' ', contentStart) + line;
     return lineWithoutSequence.length() > layout.getSourceCodeLength()
-            ? lineWithoutSequence.substring(0, layout.getSourceCodeLength())
-            : lineWithoutSequence;
+        ? lineWithoutSequence.substring(0, layout.getSourceCodeLength())
+        : lineWithoutSequence;
   }
 
   private ResultWithErrors<CobolLineTypeEnum> determineType(
-          String indicatorArea, String uri, int lineNumber, CobolProgramLayout layout) {
+      String indicatorArea, String uri, int lineNumber, CobolProgramLayout layout) {
     return ofNullable(getIndicator().get(indicatorArea))
-            .map(it -> new ResultWithErrors<>(it, Collections.emptyList()))
-            .orElseGet(
-                    () ->
-                            new ResultWithErrors<>(
-                                    NORMAL,
-                                    Collections.singletonList(
-                                            createError(
-                                                    uri,
-                                                    messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
-                                                    lineNumber,
-                                                    layout.getSequenceLength(), layout.getSequenceLength() + 1))));
+        .map(it -> new ResultWithErrors<>(it, Collections.emptyList()))
+        .orElseGet(
+            () ->
+                new ResultWithErrors<>(
+                    NORMAL,
+                    Collections.singletonList(
+                        createError(
+                            uri,
+                            messageService.getMessage("CobolLineReaderImpl.incorrectLineFormat"),
+                            lineNumber,
+                            layout.getSequenceLength(),
+                            layout.getSequenceLength() + 1))));
   }
 
   @NonNull
   private Optional<SyntaxError> checkLineLength(
-          @NonNull String line, @NonNull String uri, int lineNumber, CobolProgramLayout layout) {
+      @NonNull String line, @NonNull String uri, int lineNumber, CobolProgramLayout layout) {
     int maxLineLength = layout.getMaxLineLength();
     if (line.length() <= maxLineLength) {
       return Optional.empty();
     }
     return Optional.of(
-            createError(
-                    uri,
-                    messageService.getMessage("CobolLineReaderImpl.longLineMsg", maxLineLength),
-                    lineNumber,
-                    maxLineLength,
-                    line.length()));
+        createError(
+            uri,
+            messageService.getMessage("CobolLineReaderImpl.longLineMsg", maxLineLength),
+            lineNumber,
+            maxLineLength,
+            line.length()));
   }
 
   private Optional<SyntaxError> checkSequenceArea(
-          @NonNull String line, @NonNull String uri, int lineNumber, int contentStart, CobolProgramLayout layout) {
+      @NonNull String line,
+      @NonNull String uri,
+      int lineNumber,
+      int contentStart,
+      CobolProgramLayout layout) {
     if (isSequenceNumberFormatCorrect(line, contentStart, layout)) {
       return Optional.empty();
     }
     return Optional.of(
-            createError(
-                    uri,
-                    messageService.getMessage("CompilerDirectivesTransformation.sequenceNumber"),
-                    lineNumber,
-                    0,
-                    1));
+        createError(
+            uri,
+            messageService.getMessage("CompilerDirectivesTransformation.sequenceNumber"),
+            lineNumber,
+            0,
+            1));
   }
 
-  private boolean isSequenceNumberFormatCorrect(String line, int contentStart, CobolProgramLayout layout) {
+  private boolean isSequenceNumberFormatCorrect(
+      String line, int contentStart, CobolProgramLayout layout) {
     // issue error the sequence must start with a number.
     return contentStart < (layout.getIndicatorLength() + layout.getSequenceLength())
-            || StringUtils.isBlank(line.substring(0, contentStart))
-            || Character.isDigit(line.charAt(0));
+        || StringUtils.isBlank(line.substring(0, contentStart))
+        || Character.isDigit(line.charAt(0));
   }
 
   /**
@@ -213,20 +236,21 @@ public abstract class CobolLineReader {
    */
   @NonNull
   private SyntaxError createError(
-          @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {
+      @NonNull String uri, @NonNull String message, int lineNumber, int start, int stop) {
     SyntaxError error =
-            SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.PREPROCESSING)
-                    .suggestion(message)
-                    .severity(ERROR)
-                    .location(
-                            Locality.builder()
-                                    .uri(uri)
-                                    .range(
-                                            new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
-                                    .recognizer(getClass())
-                                    .build().toOriginalLocation())
-                    .build();
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PREPROCESSING)
+            .suggestion(message)
+            .severity(ERROR)
+            .location(
+                Locality.builder()
+                    .uri(uri)
+                    .range(
+                        new Range(new Position(lineNumber, start), new Position(lineNumber, stop)))
+                    .recognizer(getClass())
+                    .build()
+                    .toOriginalLocation())
+            .build();
 
     LOG.debug("Syntax error by CobolLineReaderImpl: {}", error.toString());
     return error;

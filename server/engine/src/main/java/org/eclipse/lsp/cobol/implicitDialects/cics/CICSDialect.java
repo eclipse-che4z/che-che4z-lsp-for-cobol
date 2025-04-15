@@ -112,9 +112,13 @@ public class CICSDialect implements CobolDialect {
             parseError);
 
     // Traverse the parse tree to generate dialect specific nodes
-    List<Node> nodes = new ArrayList<>(cicsVisitor.visitCompilerDirective(compilerDirectiveContext));
+    List<Node> nodes =
+        new ArrayList<>(cicsVisitor.visitCompilerDirective(compilerDirectiveContext));
 
-    return nodes.stream().filter(CompilerDirectiveNode.class::isInstance).map(CompilerDirectiveNode.class::cast).collect(Collectors.toList());
+    return nodes.stream()
+        .filter(CompilerDirectiveNode.class::isInstance)
+        .map(CompilerDirectiveNode.class::cast)
+        .collect(Collectors.toList());
   }
 
   private CICSParser.StartRuleContext parseCICS(
@@ -135,7 +139,7 @@ public class CICSDialect implements CobolDialect {
   }
 
   private CICSParser.CompilerDirectiveContext parseCICSDirective(
-          String text, String programDocumentUri, List<SyntaxError> errors) {
+      String text, String programDocumentUri, List<SyntaxError> errors) {
     CICSLexer lexer = new CICSLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     CICSParser parser = new CICSParser(tokens);

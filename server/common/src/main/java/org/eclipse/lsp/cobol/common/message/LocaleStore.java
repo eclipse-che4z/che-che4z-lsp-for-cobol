@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.common.message;
 
 import com.google.gson.JsonPrimitive;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -24,7 +23,6 @@ import java.util.function.Consumer;
  * Stores the locale for entire application and is single point of contact for all locale related
  * issues. This class update application locale, notify subscriber in case of locale update and
  * returns currently set locale.
- *
  */
 public interface LocaleStore {
 
@@ -44,6 +42,7 @@ public interface LocaleStore {
 
   /**
    * Update the locale for an application.
+   *
    * @param locale to be updated.
    */
   void updateLocale(LocaleEnum locale);

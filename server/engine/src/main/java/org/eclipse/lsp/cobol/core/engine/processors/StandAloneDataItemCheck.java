@@ -14,16 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import static org.eclipse.lsp.cobol.common.VariableConstants.EMPTY_STRUCTURE_MSG;
+
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
+import org.eclipse.lsp.cobol.common.model.tree.variable.StandAloneDataItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.model.tree.variable.StandAloneDataItemNode;
-
-import java.util.List;
-
-import static org.eclipse.lsp.cobol.common.VariableConstants.EMPTY_STRUCTURE_MSG;
 
 /** StandAloneDataItemNode processor */
 public class StandAloneDataItemCheck implements Processor<StandAloneDataItemNode> {

@@ -23,9 +23,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.ReferencesHandler;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.ReferenceParams;
 
-/**
- * `textDocument/references` language server event
- */
+/** `textDocument/references` language server event */
 public class ReferenceQuery implements LspQuery<List<? extends Location>> {
 
   final CompletableFuture<List<? extends Location>> result;

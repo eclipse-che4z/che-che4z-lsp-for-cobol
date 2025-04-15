@@ -14,6 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.validator;
 
+import static java.util.Optional.ofNullable;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -26,17 +36,6 @@ import org.eclipse.lsp.cobol.core.preprocessor.delegates.transformer.Continuatio
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.util.Optional.ofNullable;
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
-
 /** Validates a transformed Cobol lines for correctly quoted Strings */
 @Slf4j
 public class StringClosedCorrectlyValidator implements ExtendedDocumentValidation {
@@ -44,10 +43,9 @@ public class StringClosedCorrectlyValidator implements ExtendedDocumentValidatio
   private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("('([^'])*'|\"([^\"])*\")");
   private final MessageService messageService;
 
-    public StringClosedCorrectlyValidator(
-      MessageService messageService) {
+  public StringClosedCorrectlyValidator(MessageService messageService) {
     this.messageService = messageService;
-    }
+  }
 
   @Override
   public List<SyntaxError> validateLines(ExtendedDocument extendedDocument) {

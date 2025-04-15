@@ -14,19 +14,17 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-/**
- * Test for {@link CopybookIdentificationCombinedStrategy}
- */
+import com.google.common.collect.ImmutableList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/** Test for {@link CopybookIdentificationCombinedStrategy} */
 class CopybookIdentificationCombinedStrategyTest {
   private CopybookIdentificationService suffixStrategy;
   private CopybookIdentificationService contentStrategy;
@@ -59,5 +57,4 @@ class CopybookIdentificationCombinedStrategyTest {
     verify(contentStrategy, times(0)).isCopybook(anyString(), any(), any());
     verify(suffixStrategy, times(1)).isCopybook(anyString(), any(), any());
   }
-
 }

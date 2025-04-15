@@ -15,18 +15,6 @@
 
 package org.eclipse.lsp.cobol.service;
 
-import com.google.common.collect.ImmutableList;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
-import org.eclipse.lsp.cobol.service.providers.ClientProvider;
-import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
-import org.eclipse.lsp4j.*;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.internal.verification.Times;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import static java.util.Collections.singletonList;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.CPY_LOCAL_PATHS;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.SUBROUTINE_LOCAL_PATHS;
@@ -35,6 +23,17 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.service.providers.ClientProvider;
+import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
+import org.eclipse.lsp4j.*;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.internal.verification.Times;
 
 /**
  * This class is a unit test for the {@link WatcherServiceImpl} and asserts that it creates correct
@@ -199,19 +198,13 @@ class WatcherServiceImplTest {
     assertEquals(2, watchers.size());
     FileSystemWatcher fileWatcher = watchers.get(0);
     assertEquals("**/*", fileWatcher.getGlobPattern().getRight().getPattern());
-    assertEquals(WORKSPACE_URI, fileWatcher
-            .getGlobPattern()
-            .getRight()
-            .getBaseUri()
-            .getLeft().getUri());
+    assertEquals(
+        WORKSPACE_URI, fileWatcher.getGlobPattern().getRight().getBaseUri().getLeft().getUri());
     assertEquals(7, fileWatcher.getKind().intValue());
 
     FileSystemWatcher folderWatcher = watchers.get(1);
-    assertEquals(WORKSPACE_URI, folderWatcher
-            .getGlobPattern()
-            .getRight()
-            .getBaseUri()
-            .getLeft().getUri());
+    assertEquals(
+        WORKSPACE_URI, folderWatcher.getGlobPattern().getRight().getBaseUri().getLeft().getUri());
     assertNull(folderWatcher.getGlobPattern().getRight().getPattern());
     assertEquals(7, folderWatcher.getKind().intValue());
   }

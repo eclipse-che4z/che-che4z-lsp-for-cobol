@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -73,6 +73,8 @@ class TestCopyMaidWithQualifierMissingCopybook {
                 new Range(),
                 "Variable VAR1 is not defined",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

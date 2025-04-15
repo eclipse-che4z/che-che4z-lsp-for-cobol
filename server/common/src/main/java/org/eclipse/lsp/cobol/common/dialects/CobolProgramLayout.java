@@ -53,9 +53,10 @@ public class CobolProgramLayout {
     this.areaALength = areaALength;
     this.areaBLength = areaBLength;
     this.commentAreaLength = commentAreaLength;
-    this.cobolLinePattern = Pattern.compile(
-        String.format(
-            "^(?<sequence>.{0,%s})(?<indicator>.{0,%s})(?<contentA>.{0,%s})(?<contentB>.{0,%s})(?<comment>.{0,%s})(?<extra>.*)$",
-            sequenceLength, indicatorLength, areaALength, areaBLength, commentAreaLength));
+    this.cobolLinePattern =
+        Pattern.compile(
+            String.format(
+                "^(?<sequence>.{0,%s})(?<indicator>.{0,%s})(?<contentA>.{0,%s})(?<contentB>.{0,%s})(?<comment>.{0,%s})(?<extra>.*)$",
+                sequenceLength, indicatorLength, areaALength, areaBLength, commentAreaLength));
   }
 }

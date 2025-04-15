@@ -14,6 +14,8 @@
 package org.eclipse.lsp.cobol.dialects.daco.usecases;
 
 import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -21,9 +23,6 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /** Tests the DaCo AUTO WRITE REPORT statement */
 class TestDaCoAutoWriteReport {
@@ -62,6 +61,10 @@ class TestDaCoAutoWriteReport {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     UseCaseEngine.runTest(
-        TEXT, ImmutableList.of(), diagnosticMap, ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        TEXT,
+        ImmutableList.of(),
+        diagnosticMap,
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

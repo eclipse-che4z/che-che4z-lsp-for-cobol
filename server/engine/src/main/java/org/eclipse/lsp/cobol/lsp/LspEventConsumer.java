@@ -29,9 +29,9 @@ public class LspEventConsumer {
   private final ExecutorService singleThreadExecutor =
       Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Event Consumer"));
   private final ExecutorService notificationThreadExecutor =
-          Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Notification Consumer"));
+      Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Notification Consumer"));
   private final ExecutorService queryThreadExecutor =
-          Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Query Consumer"));
+      Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Query Consumer"));
 
   protected LspEventConsumer(LspMessageBroker lspMessageBroker) {
     this.lspMessageBroker = lspMessageBroker;
@@ -84,9 +84,7 @@ public class LspEventConsumer {
     }
   }
 
-  /**
-   * Start the {@link LspEvent} consumer
-   */
+  /** Start the {@link LspEvent} consumer */
   public void startConsumer() {
     CompletableFuture.supplyAsync(
         () -> {

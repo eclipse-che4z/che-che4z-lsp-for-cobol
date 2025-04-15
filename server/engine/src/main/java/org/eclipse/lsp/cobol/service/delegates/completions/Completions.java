@@ -14,8 +14,15 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.completions;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
@@ -23,14 +30,6 @@ import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * This class is used as a delegate for code completion operations. It requires type-specific
@@ -60,35 +59,34 @@ public class Completions {
    * on the server yet.
    *
    * @param document - document model that should be used to retrieve the required token. May be
-   *                 null.
-   * @param params   - request parameters that contain the position of the required token in the
-   *                 document
+   *     null.
+   * @param params - request parameters that contain the position of the required token in the
+   *     document
    * @return a CompletionList with completion suggestions that do not contain documentation
    */
   @NonNull
   public CompletionList collectFor(
-          @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     List<CompletionItem> items = collectCompletions(document, params);
     return new CompletionList(false, items);
   }
 
   @NonNull
   private List<CompletionItem> collectCompletions(
-          @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     String token = retrieveToken(document, params);
-    return providers
-            .stream()
-            .map(it -> it.getCompletionItems(token, document))
-            .flatMap(Collection::stream)
-            .distinct()
-            .collect(toList());
+    return providers.stream()
+        .map(it -> it.getCompletionItems(token, document))
+        .flatMap(Collection::stream)
+        .distinct()
+        .collect(toList());
   }
 
   @NonNull
   private static String retrieveToken(
-          @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
+      @Nullable CobolDocumentModel document, @NonNull CompletionParams params) {
     return Optional.ofNullable(document)
-            .map(it -> it.getTokenBeforePosition(params.getPosition()))
-            .orElse("");
+        .map(it -> it.getTokenBeforePosition(params.getPosition()))
+        .orElse("");
   }
 }

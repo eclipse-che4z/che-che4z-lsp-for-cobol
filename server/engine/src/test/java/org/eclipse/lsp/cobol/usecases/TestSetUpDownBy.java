@@ -83,14 +83,15 @@ class TestSetUpDownBy {
             "2",
             new Diagnostic(
                 new Range(),
-                "Invalid sending field type. Expected: Elementary integer data item, Non-zero integer",
+                "Invalid sending field type. Expected: Elementary integer data item, Non-zero"
+                    + " integer",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-                    "A period was assumed before \"IND3\".",
-                    DiagnosticSeverity.Error,
+                "A period was assumed before \"IND3\".",
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",
             new Diagnostic(
@@ -103,8 +104,7 @@ class TestSetUpDownBy {
                 new Range(),
                 "The following token must start in Area A: IND3",
                 DiagnosticSeverity.Warning,
-                ErrorSource.PARSING.getText())
-        ),
+                ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

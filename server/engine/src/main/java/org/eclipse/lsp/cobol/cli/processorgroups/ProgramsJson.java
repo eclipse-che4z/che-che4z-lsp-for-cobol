@@ -14,9 +14,8 @@
  */
 package org.eclipse.lsp.cobol.cli.processorgroups;
 
-import lombok.Getter;
-
 import java.util.List;
+import lombok.Getter;
 
 /** Program JSON description */
 @Getter

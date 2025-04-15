@@ -15,14 +15,14 @@
 
 package org.eclipse.lsp.cobol.common.utils;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /** Test to check RangeUtils */
 class RangeUtilsTest {
@@ -62,6 +62,7 @@ class RangeUtilsTest {
   void isInsideNegative() {
     assertFalse(RangeUtils.isInside(firstRange, secondRange));
   }
+
   @Test
   void isPositionsAreEquals() {
     assertFalse(RangeUtils.isAfter(firstLine, firstLine));

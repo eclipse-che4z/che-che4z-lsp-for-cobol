@@ -17,14 +17,15 @@ import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test CICS ASSIGN command. Documentation link: <a
- * <a https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-assign Command</a>
+ * Test CICS ASSIGN command. Documentation link: <a <a
+ * https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-assign Command</a>
+ *
  * <p>This class tests all variations of the CICS ASSIGN command found in the link above.
  */
 public class TestCicsAssignStatement {
 
   private static final String ASSIGN_VALID_ALL =
-          "ASSIGN ABCODE('name')\n"
+      "ASSIGN ABCODE('name')\n"
           + "ABDUMP('name')\n"
           + "ABOFFSET('name')\n"
           + "ABPROGRAM('name')\n"

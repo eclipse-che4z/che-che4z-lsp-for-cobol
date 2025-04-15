@@ -14,18 +14,17 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
-import org.eclipse.lsp4j.TextEdit;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp4j.TextEdit;
 
 @Singleton
 public class Formations {
@@ -43,16 +42,17 @@ public class Formations {
   public List<TextEdit> format(CobolDocumentModel model) {
     List<String> settings;
     try {
-      settings = settingsService.fetchConfiguration(FORMATTING)
-          .get()
-          .stream()
-          .map(Object::toString)
-          .collect(Collectors.toList());
+      settings =
+          settingsService.fetchConfiguration(FORMATTING).get().stream()
+              .map(Object::toString)
+              .collect(Collectors.toList());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
-    return Optional.ofNullable(model).map(applyFormatting(settings)).orElse(Collections.emptyList());
+    return Optional.ofNullable(model)
+        .map(applyFormatting(settings))
+        .orElse(Collections.emptyList());
   }
 
   private Function<CobolDocumentModel, List<TextEdit>> applyFormatting(List<String> settings) {

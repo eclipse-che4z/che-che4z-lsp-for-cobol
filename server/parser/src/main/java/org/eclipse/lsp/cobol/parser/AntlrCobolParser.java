@@ -24,14 +24,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 
-/**
- * ANTLR Parser Wrapper
- */
+/** ANTLR Parser Wrapper */
 public class AntlrCobolParser implements AstBuilder {
   private final CommonTokenStream tokens;
   private final CobolParser antlrParser;
 
-  public AntlrCobolParser(CharStream input, BaseErrorListener listener, DefaultErrorStrategy errorStrategy, ParseTreeListener treeListener) {
+  public AntlrCobolParser(
+      CharStream input,
+      BaseErrorListener listener,
+      DefaultErrorStrategy errorStrategy,
+      ParseTreeListener treeListener) {
     CobolLexer antlrLexer = new CobolLexer(input);
     antlrLexer.removeErrorListeners();
     tokens = new CommonTokenStream(antlrLexer);
@@ -42,6 +44,7 @@ public class AntlrCobolParser implements AstBuilder {
     antlrParser.setErrorHandler(errorStrategy);
     antlrParser.addParseListener(treeListener);
   }
+
   @Override
   public CobolParser.StartRuleContext runParser() {
     return antlrParser.startRule();

@@ -45,5 +45,4 @@ public enum CopybookProcessingMode {
       String uri, CopybookProcessingMode copybookProcessingMode) {
     return FileUtils.isFileUnderExtendedSourceFolder(uri) ? DISABLED : copybookProcessingMode;
   }
-
 }

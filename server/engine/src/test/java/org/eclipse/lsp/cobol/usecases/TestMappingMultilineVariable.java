@@ -40,7 +40,8 @@ class TestMappingMultilineVariable {
           + "006600                                                                  NC2054.2\n"
           + "006700     X(10)                                                   VALUENC2054.2\n"
           + "006900     \"ABCDE12345\".                                                NC2054.2\n"
-          + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}                                  NC2054.2\n";
+          + "007100 77  {$*SPACING-RECEIVE|1}    {PICTUREQ|2}                                 "
+          + " NC2054.2\n";
 
   @Test
   void test() {
@@ -51,16 +52,13 @@ class TestMappingMultilineVariable {
             "1",
             new Diagnostic(
                 new Range(),
-                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item SPACING-RECEIVE",
+                "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item"
+                    + " SPACING-RECEIVE",
                 Error,
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
-              new Range(),
-              "Syntax error on 'PICTUREQ'",
-              Error,
-              ErrorSource.PARSING.getText())
-            ),
+                new Range(), "Syntax error on 'PICTUREQ'", Error, ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

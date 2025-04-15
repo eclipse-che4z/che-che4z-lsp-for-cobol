@@ -14,17 +14,15 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.junit.jupiter.api.Test;
-
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Test for VisitorHelper
- */
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.junit.jupiter.api.Test;
+
+/** Test for VisitorHelper */
 class VisitorHelperTest {
 
   @Test
@@ -49,5 +47,4 @@ class VisitorHelperTest {
 
     assertEquals("UPPERCASE_NAME", VisitorHelper.getName(node));
   }
-
 }

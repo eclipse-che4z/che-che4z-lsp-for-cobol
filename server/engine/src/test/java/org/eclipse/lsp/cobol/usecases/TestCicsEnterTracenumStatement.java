@@ -14,50 +14,50 @@
  */
 package org.eclipse.lsp.cobol.usecases;
 
-        import com.google.common.collect.ImmutableMap;
-        import org.eclipse.lsp.cobol.common.error.ErrorSource;
-        import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
-        import org.eclipse.lsp4j.Diagnostic;
-        import org.eclipse.lsp4j.DiagnosticSeverity;
-        import org.eclipse.lsp4j.Range;
-        import org.junit.jupiter.api.Test;
-
-        import java.util.Map;
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS Enter Tracenum command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-enter-tracenum">Enter Tracenum Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-enter-tracenum">Enter Tracenum
+ * Command</a>
  *
  * <p>This class tests all variations of the Enter Tracenum command found in the link above.
  */
 public class TestCicsEnterTracenumStatement {
-    private static final String ENTER_TRACENUM_VALID =
-            "ENTER TRACENUM({$varFour})";
-    private static final String ENTER_TRACENUM_ALL_VALID =
-            "ENTER TRACENUM({$varFour}) FROM({$varFour}) \n"
-                   + "FROMLENGTH({$varFour}) RESOURCE({$varFour}) EXCEPTION";
-    private static final String ENTER_TRACENUM_FROMLENGTH_INVALID =
-            "ENTER  {_TRACENUM({$varOne})FROMLENGTH({$varTwo})|errorMissingFrom_}";
+  private static final String ENTER_TRACENUM_VALID = "ENTER TRACENUM({$varFour})";
+  private static final String ENTER_TRACENUM_ALL_VALID =
+      "ENTER TRACENUM({$varFour}) FROM({$varFour}) \n"
+          + "FROMLENGTH({$varFour}) RESOURCE({$varFour}) EXCEPTION";
+  private static final String ENTER_TRACENUM_FROMLENGTH_INVALID =
+      "ENTER  {_TRACENUM({$varOne})FROMLENGTH({$varTwo})|errorMissingFrom_}";
 
-    @Test
-    void testEnterTracenumValid() {
-        CICSTestUtils.noErrorTest(ENTER_TRACENUM_VALID);
-    }
-    @Test
-    void testEnterTracenumAllValid() {
-        CICSTestUtils.noErrorTest(ENTER_TRACENUM_ALL_VALID);
-    }
-    @Test
-    void testEnterTracenumFromLengthInvalid() {
-        Map<String, Diagnostic> expectedDiagnostic =
-                ImmutableMap.of(
-                        "errorMissingFrom",
-                        new Diagnostic(
-                                new Range(),
-                                "Missing required option: FROM",
-                                DiagnosticSeverity.Error,
-                                ErrorSource.PARSING.getText()));
-        CICSTestUtils.errorTest(ENTER_TRACENUM_FROMLENGTH_INVALID, expectedDiagnostic);
-    }
+  @Test
+  void testEnterTracenumValid() {
+    CICSTestUtils.noErrorTest(ENTER_TRACENUM_VALID);
+  }
+
+  @Test
+  void testEnterTracenumAllValid() {
+    CICSTestUtils.noErrorTest(ENTER_TRACENUM_ALL_VALID);
+  }
+
+  @Test
+  void testEnterTracenumFromLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "errorMissingFrom",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ENTER_TRACENUM_FROMLENGTH_INVALID, expectedDiagnostic);
+  }
 }
-

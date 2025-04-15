@@ -13,18 +13,17 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco.usecases;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 /** This test checks that COPY MAID statement is parsed correctly with a floating comment */
 public class TestCopyMaidWithFloatingComment {
-    private static final String TEXT =
+  private static final String TEXT =
       "        IDENTIFICATION DIVISION.\n"
           + "          PROGRAM-ID. PARTEST.\n"
           + "        ENVIRONMENT DIVISION.\n"
@@ -44,6 +43,8 @@ public class TestCopyMaidWithFloatingComment {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText("NAME", DaCoDialect.NAME, COPYBOOK)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

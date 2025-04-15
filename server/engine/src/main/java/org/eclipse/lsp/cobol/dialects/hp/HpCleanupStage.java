@@ -22,9 +22,7 @@ import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 
-/**
- * Cleanup preprocessor pipeline stage
- */
+/** Cleanup preprocessor pipeline stage */
 public class HpCleanupStage implements Stage<AnalysisContext, Void, Void> {
 
   private final CleanerPreprocessor preprocessor;
@@ -35,12 +33,12 @@ public class HpCleanupStage implements Stage<AnalysisContext, Void, Void> {
 
   @Override
   public StageResult<Void> run(AnalysisContext context, StageResult<Void> prevStageResult) {
-    ResultWithErrors<ExtendedText> resultWithErrors = preprocessor.cleanUpCode(
-        context.getDocumentUri(),
-        context.getText());
+    ResultWithErrors<ExtendedText> resultWithErrors =
+        preprocessor.cleanUpCode(context.getDocumentUri(), context.getText());
 
     context.getAccumulatedErrors().addAll(resultWithErrors.getErrors());
-    context.setExtendedDocument(new ExtendedDocument(resultWithErrors.getResult(), context.getText()));
+    context.setExtendedDocument(
+        new ExtendedDocument(resultWithErrors.getResult(), context.getText()));
 
     return new StageResult<>(null);
   }
@@ -49,5 +47,4 @@ public class HpCleanupStage implements Stage<AnalysisContext, Void, Void> {
   public String getName() {
     return "Cleanup document processing";
   }
-
 }

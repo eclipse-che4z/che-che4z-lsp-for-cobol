@@ -24,21 +24,26 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-/**
- * Check EXEC CICS not in Procedure Division error message
- */
+/** Check EXEC CICS not in Procedure Division error message */
 class TestExecCicsInProcedureDivision {
 
-    private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. CICSERR.\n"
-                    + "       DATA DIVISION.\n"
-                    + "           {_EXEC CICS END-EXEC|1_}.\n";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. CICSERR.\n"
+          + "       DATA DIVISION.\n"
+          + "           {_EXEC CICS END-EXEC|1_}.\n";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(
-                "1", new Diagnostic(new Range(), "Invalid CICS EXEC block", DiagnosticSeverity.Error, ErrorSource.PARSING.getText())
-        ));
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Invalid CICS EXEC block",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
 }

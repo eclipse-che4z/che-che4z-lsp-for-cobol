@@ -14,19 +14,16 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramSubtype;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for {@link TreeScanner}
- */
+/** Test for {@link TreeScanner} */
 public class TreeScannerTest {
   @Test
   void testScan() {

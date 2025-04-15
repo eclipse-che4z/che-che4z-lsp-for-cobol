@@ -16,11 +16,11 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 
 import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
 /** VariableWithLevelNode processor */
 public class VariableWithLevelCheck implements Processor<VariableWithLevelNode> {
@@ -32,7 +32,11 @@ public class VariableWithLevelCheck implements Processor<VariableWithLevelNode> 
 
   @Override
   public void accept(VariableWithLevelNode node, ProcessingContext ctx) {
-    int areaAFinish = programLayout.getSequenceLength() + programLayout.getIndicatorLength() + programLayout.getAreaALength() - 1;
+    int areaAFinish =
+        programLayout.getSequenceLength()
+            + programLayout.getIndicatorLength()
+            + programLayout.getAreaALength()
+            - 1;
     if ((node.getLevel() == LEVEL_01 || node.getLevel() == LEVEL_77)
         && node.getLocality().getRange().getStart().getCharacter() > areaAFinish) {
       ctx.getErrors().add(node.getError(MessageTemplate.of(AREA_A_WARNING, node.getName())));

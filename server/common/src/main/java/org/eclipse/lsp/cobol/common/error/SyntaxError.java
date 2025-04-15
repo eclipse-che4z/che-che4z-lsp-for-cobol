@@ -24,8 +24,7 @@ import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 /**
  * This value class represents a syntax or semantic error found during the analysis. The finalized
  * version should always contain a non-null {@link Locality}. If it has only the offended token
- * after the CobolLanguageEngine finishes analysis, then
- * this error is invalid.
+ * after the CobolLanguageEngine finishes analysis, then this error is invalid.
  */
 // Please, don't use static imports for this method:
 // https://github.com/rzwitserloot/lombok/issues/2044

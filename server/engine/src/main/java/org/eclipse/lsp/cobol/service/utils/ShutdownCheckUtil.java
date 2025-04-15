@@ -15,13 +15,12 @@
 
 package org.eclipse.lsp.cobol.service.utils;
 
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 
 /**
  * Check for the server state and return response accordingly. <br>
@@ -33,6 +32,7 @@ import java.util.function.Supplier;
 @UtilityClass
 public class ShutdownCheckUtil {
   private final String shutdownResponse = "InvalidRequest";
+
   /**
    * Check server state and returns a completable Future based on the server state. If a server
    * receives requests after a shutdown request those requests should error with InvalidRequest
@@ -43,8 +43,10 @@ public class ShutdownCheckUtil {
    * @param <U>
    * @return CompletableFuture
    */
-  public <U> CompletableFuture<U> supplyAsyncAndCheckShutdown(DisposableLSPStateService disposableLSPStateService,
-      Supplier<U> supplier, Executor executor) {
+  public <U> CompletableFuture<U> supplyAsyncAndCheckShutdown(
+      DisposableLSPStateService disposableLSPStateService,
+      Supplier<U> supplier,
+      Executor executor) {
     if (disposableLSPStateService.isServerShutdown())
       return (CompletableFuture<U>) CompletableFuture.completedFuture(shutdownResponse);
     return CompletableFuture.<U>supplyAsync(supplier, executor);
@@ -57,7 +59,8 @@ public class ShutdownCheckUtil {
    * @param disposableLSPStateService
    * @return CompletableFuture
    */
-  public static CompletableFuture<Object> checkServerState(DisposableLSPStateService disposableLSPStateService) {
+  public static CompletableFuture<Object> checkServerState(
+      DisposableLSPStateService disposableLSPStateService) {
     if (disposableLSPStateService.isServerShutdown())
       return CompletableFuture.completedFuture(shutdownResponse);
     return CompletableFuture.completedFuture(null);

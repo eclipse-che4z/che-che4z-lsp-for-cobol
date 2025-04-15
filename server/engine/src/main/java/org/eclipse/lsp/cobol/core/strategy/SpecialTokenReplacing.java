@@ -15,10 +15,6 @@
 
 package org.eclipse.lsp.cobol.core.strategy;
 
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.utils.ResourceUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.utils.ResourceUtils;
 
 /**
  * This class encapsulates the logic of retrieving the special tokens from the

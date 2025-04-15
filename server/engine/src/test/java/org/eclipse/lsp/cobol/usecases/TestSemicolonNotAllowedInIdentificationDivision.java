@@ -39,15 +39,15 @@ class TestSemicolonNotAllowedInIdentificationDivision {
   @Test
   void test() {
     UseCaseEngine.runTest(
-      TEXT,
-      ImmutableList.of(),
-      ImmutableMap.of(
-        "1",
-        new Diagnostic(
-          new Range(),
-         "A period was assumed before \"PROGRAM-ID\".",
-          DiagnosticSeverity.Error,
-          ErrorSource.PARSING.getText())),
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "A period was assumed before \"PROGRAM-ID\".",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
 }

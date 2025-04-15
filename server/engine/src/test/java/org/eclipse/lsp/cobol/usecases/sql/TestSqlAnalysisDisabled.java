@@ -68,17 +68,19 @@ class TestSqlAnalysisDisabled {
 
   @Test
   void testDisabled() {
-    AnalysisResult analyze = analyze(
+    AnalysisResult analyze =
+        analyze(
             UseCase.builder()
-                    .documentUri(DOCUMENT_URI)
-                    .text(UPDATE_SQL_DISABLED)
-                    .cicsTranslator(true)
-                    .copybookProcessingMode(CopybookProcessingMode.ENABLED)
-                    .sqlBackend(SQLBackend.NONE)
-                    .dialects(ImmutableList.of())
-                    .dialectsSettings(ImmutableMap.of(SQL_BACKEND_SETTING, new Gson().toJsonTree(SQLBackend.NONE)))
-                    .compilerOptions(ImmutableList.of())
-                    .build());
+                .documentUri(DOCUMENT_URI)
+                .text(UPDATE_SQL_DISABLED)
+                .cicsTranslator(true)
+                .copybookProcessingMode(CopybookProcessingMode.ENABLED)
+                .sqlBackend(SQLBackend.NONE)
+                .dialects(ImmutableList.of())
+                .dialectsSettings(
+                    ImmutableMap.of(SQL_BACKEND_SETTING, new Gson().toJsonTree(SQLBackend.NONE)))
+                .compilerOptions(ImmutableList.of())
+                .build());
     Assertions.assertFalse(analyze.getDiagnostics().isEmpty());
   }
 }

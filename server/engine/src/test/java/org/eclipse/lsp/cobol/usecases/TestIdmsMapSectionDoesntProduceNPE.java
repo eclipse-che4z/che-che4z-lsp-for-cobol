@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -24,8 +26,6 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
 
 /** This test checks that there are no NPE thrown while typing in MAP SECTION. */
 class TestIdmsMapSectionDoesntProduceNPE {
@@ -46,10 +46,7 @@ class TestIdmsMapSectionDoesntProduceNPE {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                "Syntax error on 'MAP'",
-                Error,
-                ErrorSource.PARSING.getText())),
+                new Range(), "Syntax error on 'MAP'", Error, ErrorSource.PARSING.getText())),
         ImmutableList.of(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.DISABLED));
   }

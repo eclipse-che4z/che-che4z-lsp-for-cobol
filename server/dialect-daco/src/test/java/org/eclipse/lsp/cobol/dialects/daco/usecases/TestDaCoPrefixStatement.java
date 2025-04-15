@@ -63,6 +63,6 @@ class TestDaCoPrefixStatement {
                 DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),
-            DialectConfigs.getDaCoAnalysisConfig());
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

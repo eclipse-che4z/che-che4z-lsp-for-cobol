@@ -14,6 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Locale;
+import java.util.MissingResourceException;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
@@ -22,13 +28,6 @@ import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Locale;
-import java.util.MissingResourceException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /** Test to check PropertiesMessageService */
 class PropertiesMessageServiceTest {
@@ -73,7 +72,9 @@ class PropertiesMessageServiceTest {
   void whenInValidMessageTemplatePathProvide_getException() {
     Assertions.assertThrows(
         MissingResourceException.class,
-        () -> new PropertiesMessageService("dummy", localeMock, settingsService, workingFolderService));
+        () ->
+            new PropertiesMessageService(
+                "dummy", localeMock, settingsService, workingFolderService));
   }
 
   @Test
@@ -82,9 +83,8 @@ class PropertiesMessageServiceTest {
         new PropertiesMessageService(
             "resourceBundles/Test_messageServiceEmptyFile",
             localeMock,
-                settingsService,
-                workingFolderService
-        );
+            settingsService,
+            workingFolderService);
     assertEquals("1", messageServiceLocal.getMessage("1"));
   }
 
@@ -120,7 +120,8 @@ class PropertiesMessageServiceTest {
   @Test
   void testLocalizeWithRecursiveArgs() {
     assertEquals(
-        "Arg1: Arg1: nest1, arg2: nested arg: nest2, arg2: nested arg: nested arg: nested arg: very nested",
+        "Arg1: Arg1: nest1, arg2: nested arg: nest2, arg2: nested arg: nested arg: nested arg: very"
+            + " nested",
         messageService.localizeTemplate(
             MessageTemplate.of(
                 "3",

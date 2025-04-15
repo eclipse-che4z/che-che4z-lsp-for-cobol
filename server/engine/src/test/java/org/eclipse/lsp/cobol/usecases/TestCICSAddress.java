@@ -29,26 +29,21 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests all variations of the ADDRESS command: standard and SET.
  */
 public class TestCICSAddress {
-  private static final String ADDRESS_STANDARD_VALID_ONE =
-          "ADDRESS ACEE({$varOne})";
+  private static final String ADDRESS_STANDARD_VALID_ONE = "ADDRESS ACEE({$varOne})";
 
   private static final String ADDRESS_STANDARD_VALID_TWO =
-          "ADDRESS COMMAREA({$varOne}) CWA({$varTwo}) EIB({$varThree})";
+      "ADDRESS COMMAREA({$varOne}) CWA({$varTwo}) EIB({$varThree})";
 
-  private static final String ADDRESS_STANDARD_VALID =
-          "ADDRESS";
+  private static final String ADDRESS_STANDARD_VALID = "ADDRESS";
 
   private static final String ADDRESS_STANDARD_INVALID_ONE =
-          "ADDRESS COMMAREA({$varOne}) {COMMAREA|errorOne}({$varOne}) CWA({$varTwo}) EIB({$varThree})";
+      "ADDRESS COMMAREA({$varOne}) {COMMAREA|errorOne}({$varOne}) CWA({$varTwo}) EIB({$varThree})";
 
-  private static final String ADDRESS_SET_VALID =
-          "ADDRESS SET({$varOne}) USING({$varTwo})";
+  private static final String ADDRESS_SET_VALID = "ADDRESS SET({$varOne}) USING({$varTwo})";
 
-  private static final String ADDRESS_SET_INVALID_ONE =
-          "ADDRESS {_SET({$varOne})|errorOne_}";
+  private static final String ADDRESS_SET_INVALID_ONE = "ADDRESS {_SET({$varOne})|errorOne_}";
 
-  private static final String ADDRESS_SET_INVALID_TWO =
-          "ADDRESS {_USING({$varOne})|errorOne_}";
+  private static final String ADDRESS_SET_INVALID_TWO = "ADDRESS {_USING({$varOne})|errorOne_}";
 
   @Test
   void testAddressStandardValidOne() {
@@ -67,15 +62,15 @@ public class TestCICSAddress {
 
   @Test
   void testAddressStandardInvalid() {
-    CICSTestUtils.errorTest(ADDRESS_STANDARD_INVALID_ONE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: COMMAREA",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
-
+    CICSTestUtils.errorTest(
+        ADDRESS_STANDARD_INVALID_ONE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: COMMAREA",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
@@ -86,26 +81,26 @@ public class TestCICSAddress {
   @Test
   void testAddressSetInvalidOne() {
     CICSTestUtils.errorTest(
-            ADDRESS_SET_INVALID_ONE,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: USING",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        ADDRESS_SET_INVALID_ONE,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: USING",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testAddressSetInvalidTwo() {
     CICSTestUtils.errorTest(
-            ADDRESS_SET_INVALID_TWO,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: SET",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        ADDRESS_SET_INVALID_TWO,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

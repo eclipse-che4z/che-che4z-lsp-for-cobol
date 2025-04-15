@@ -14,10 +14,9 @@
  */
 package org.eclipse.lsp.cobol.common.utils;
 
+import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-
-import java.util.regex.Pattern;
 
 /** This utility class provides functions that are useful for pre-processing a COBOL document */
 @UtilityClass

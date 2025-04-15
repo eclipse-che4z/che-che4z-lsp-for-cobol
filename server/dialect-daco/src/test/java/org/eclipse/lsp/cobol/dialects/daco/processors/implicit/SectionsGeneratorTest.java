@@ -16,24 +16,23 @@ package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockDefinitionNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-/**
- * This unit tests check the {@link SectionsGenerator} class functionality
- */
+/** This unit tests check the {@link SectionsGenerator} class functionality */
 class SectionsGeneratorTest {
   @Test
   void testCreatesSectionsFromProvidedNames() {
-    List<String> generated = SectionsGenerator.generate(ImmutableList.of("LABEL1", "LABEL2", "LABEL_EX"), ImmutableSet.of("LABEL_EX"))
-        .stream().map(CodeBlockDefinitionNode::getName)
-        .collect(Collectors.toList());
+    List<String> generated =
+        SectionsGenerator.generate(
+                ImmutableList.of("LABEL1", "LABEL2", "LABEL_EX"), ImmutableSet.of("LABEL_EX"))
+            .stream()
+            .map(CodeBlockDefinitionNode::getName)
+            .collect(Collectors.toList());
 
     Assertions.assertIterableEquals(generated, ImmutableList.of("LABEL1", "LABEL2"));
   }
-
 }

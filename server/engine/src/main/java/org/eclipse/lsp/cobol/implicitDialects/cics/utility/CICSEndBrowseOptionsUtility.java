@@ -15,19 +15,18 @@
 
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse_opts;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_endbrowse_opts;
 
 /** Checks CICS Extract rules for required and invalid options */
 public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
@@ -58,21 +57,28 @@ public class CICSEndBrowseOptionsUtility extends CICSOptionsCheckBaseUtility {
    * @param <E> A subclass of ParserRuleContext
    */
   public <E extends ParserRuleContext> void checkOptions(E ctx) {
-      if (ctx.getRuleIndex() == RULE_cics_endbrowse_opts) {
-          checkEndBrowse((CICSParser.Cics_endbrowse_optsContext) ctx);
-      }
+    if (ctx.getRuleIndex() == RULE_cics_endbrowse_opts) {
+      checkEndBrowse((CICSParser.Cics_endbrowse_optsContext) ctx);
+    }
     checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
   private void checkEndBrowse(CICSParser.Cics_endbrowse_optsContext ctx) {
-    checkHasExactlyOneOption("ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER", ctx,
-            ctx.ACTIVITY(), ctx.CONTAINER(), ctx.EVENT(), ctx.PROCESS(), ctx.TIMER());
+    checkHasExactlyOneOption(
+        "ACTIVITY or CONTAINER or EVENT or PROCESS or TIMER",
+        ctx,
+        ctx.ACTIVITY(),
+        ctx.CONTAINER(),
+        ctx.EVENT(),
+        ctx.PROCESS(),
+        ctx.TIMER());
 
     checkHasMandatoryOptions(ctx.BROWSETOKEN(), ctx, "BROWSETOKEN");
-//    TODO: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2596 (RETCODE is only mandatory in the EXCI mode.)
-//    if (!ctx.CONTAINER().isEmpty()) {
-//      checkHasMandatoryOptions(ctx.RETCODE(), ctx, "RETCODE");
-//    }
+    //    TODO: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2596 (RETCODE is only
+    // mandatory in the EXCI mode.)
+    //    if (!ctx.CONTAINER().isEmpty()) {
+    //      checkHasMandatoryOptions(ctx.RETCODE(), ctx, "RETCODE");
+    //    }
   }
 }

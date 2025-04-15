@@ -19,24 +19,22 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test class for verifying the declaration of a DB2 variable in COBOL code.
- */
+/** Test class for verifying the declaration of a DB2 variable in COBOL code. */
 class TestDb2DeclareVariable {
-    public static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. TEST1.\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       01 {$*A} PIC X."
-                    + "       EXEC SQL\n"
-                    + "           DECLARE :{$A} VARIABLE FOR BIT DATA\n"
-                    + "       END-EXEC.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "           DISPLAY 'HELLO'.\n";
+  public static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*A} PIC X."
+          + "       EXEC SQL\n"
+          + "           DECLARE :{$A} VARIABLE FOR BIT DATA\n"
+          + "       END-EXEC.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY 'HELLO'.\n";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
 }

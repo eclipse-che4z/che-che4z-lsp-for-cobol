@@ -15,22 +15,21 @@
 
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import org.eclipse.lsp.cobol.service.CobolDocumentModel;
-import org.eclipse.lsp.cobol.service.settings.SettingsService;
-import org.eclipse.lsp4j.TextEdit;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.settings.SettingsService;
+import org.eclipse.lsp4j.TextEdit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /** Test {@link Formations} class */
 class FormationsTest {
@@ -38,7 +37,8 @@ class FormationsTest {
   private static final Formation FORMATION_1 = mock(Formation.class);
   private static final Formation FORMATION_2 = mock(Formation.class);
   private static final SettingsService SETTINGS_SERVICE = mock(SettingsService.class);
-  private static final Formations FORMATIONS = new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2), SETTINGS_SERVICE);
+  private static final Formations FORMATIONS =
+      new Formations(ImmutableSet.of(FORMATION_1, FORMATION_2), SETTINGS_SERVICE);
 
   @BeforeEach
   void init() {

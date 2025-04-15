@@ -16,17 +16,16 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.Stream;
-
 /**
  * Test the usage of intrinsic COBOL function calls.
  *
- * Note: This test just checks the allowed
- * function names and is not intended for actual argument check.
+ * <p>Note: This test just checks the allowed function names and is not intended for actual argument
+ * check.
  */
 public class TestIntrinsicFunctionCall {
   private static final String PREFIX =
@@ -40,6 +39,7 @@ public class TestIntrinsicFunctionCall {
           + "       {#*F-MAX-TEST-01}.                                                   \n"
           + "           COMPUTE {$WS-NUM} = FUNCTION {$$";
   private static final String SUFFIX = "}(5).";
+
   // Ref - https://www.ibm.com/docs/en/cobol-zos/6.3?topic=cobol-intrinsic-functions-national-data
   private static Stream<String> getFunctionName() {
     return Stream.of(

@@ -48,6 +48,7 @@ class TestMessageIfVariableNotDefined {
         ImmutableList.of(),
         ImmutableMap.of(
             "notDefined",
-            new Diagnostic(new Range(), MESSAGE, DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+            new Diagnostic(
+                new Range(), MESSAGE, DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
   }
 }

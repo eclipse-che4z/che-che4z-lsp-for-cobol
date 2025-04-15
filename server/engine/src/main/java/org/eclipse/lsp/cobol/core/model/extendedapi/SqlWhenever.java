@@ -27,7 +27,8 @@ public class SqlWhenever extends CFASTNode {
   private final String wheneverType;
   private final String value;
 
-  public SqlWhenever(Location location, String wheneverCondition, String wheneverType, String value) {
+  public SqlWhenever(
+      Location location, String wheneverCondition, String wheneverType, String value) {
     super(CFASTNodeType.EXEC_SQL_WHENEVER.getValue(), location);
     this.wheneverCondition = wheneverCondition;
     this.wheneverType = wheneverType;

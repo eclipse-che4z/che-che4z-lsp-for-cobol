@@ -18,7 +18,6 @@
 package org.eclipse.lsp.cobol.core;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.Parser;
@@ -35,7 +34,9 @@ public abstract class MessageServiceParser extends Parser {
 
   private static final Pattern ALPHANUMERIC = Pattern.compile("[a-zA-Z0-9]+");
 
-  /** @param input {@link TokenStream} */
+  /**
+   * @param input {@link TokenStream}
+   */
   MessageServiceParser(TokenStream input) {
     super(input);
   }
@@ -60,8 +61,8 @@ public abstract class MessageServiceParser extends Parser {
    * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
    * {@link CobolParser}
    *
-   * <p>Example: notifyWarning("db2SqlParser.validValueMsg", input, value); would notify errorListener
-   * with the externalized messages.
+   * <p>Example: notifyWarning("db2SqlParser.validValueMsg", input, value); would notify
+   * errorListener with the externalized messages.
    *
    * @param messageId Unique ID for each message in externalized message file.
    * @param parameters Arguments referenced by the format specifiers in the format string in
@@ -154,6 +155,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.exactLength", objectType, validLength.toString());
     }
   }
+
   /**
    * Validate a string length without first and the last symbol and throw an error if it is
    * incorrect
@@ -193,6 +195,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
     }
   }
+
   /**
    * Validate a string value if it is an integer between 0 and 32767 and throw an error if it is
    * incorrect
@@ -218,6 +221,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.startsWith", String.join(" or ", startsWith));
     }
   }
+
   /**
    * Validate a string value if it is an integer between -2 and 99 and throw an error if it is
    * incorrect
@@ -229,7 +233,7 @@ public abstract class MessageServiceParser extends Parser {
     int value = Integer.parseInt(input);
     if (!(value > min && value < max)) {
       notifyError(
-              "parsers.validValueMsg", input, String.format("in range %d to %d", min + 1, max - 1));
+          "parsers.validValueMsg", input, String.format("in range %d to %d", min + 1, max - 1));
     }
   }
 
@@ -245,6 +249,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.stringLengthRange", minLength.toString(), maxLength.toString());
     }
   }
+
   /**
    * Validate a string value if it is an integer 34 or 16 and throw an error if it is incorrect
    *
@@ -300,8 +305,8 @@ public abstract class MessageServiceParser extends Parser {
 
   private String getMessageForParser(String messageKey, String... parameters) {
     return ((MessageServiceProvider) this.getErrorHandler())
-            .getMessageService()
-            .getMessage(messageKey, (Object[]) parameters);
+        .getMessageService()
+        .getMessage(messageKey, (Object[]) parameters);
   }
 
   private Integer tryParseInt(String input) {

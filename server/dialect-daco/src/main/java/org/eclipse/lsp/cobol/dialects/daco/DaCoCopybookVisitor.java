@@ -14,7 +14,15 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.VariableConstants.*;
+import static org.eclipse.lsp.cobol.dialects.daco.VisitorHelper.*;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -27,18 +35,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.common.VariableConstants.*;
-import static org.eclipse.lsp.cobol.dialects.daco.VisitorHelper.*;
-
-/**
- * DaCoCopybookVisitor
- */
+/** DaCoCopybookVisitor */
 @RequiredArgsConstructor
 public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
   private final String uri;
@@ -48,8 +45,10 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
   private final String copybookId;
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat1(VariableParser.DataDescriptionEntryFormat1Context ctx) {
-    VariableDefinitionNode variableDefinitionNode = VariableDefinitionNode.builder()
+  public List<Node> visitDataDescriptionEntryFormat1(
+      VariableParser.DataDescriptionEntryFormat1Context ctx) {
+    VariableDefinitionNode variableDefinitionNode =
+        VariableDefinitionNode.builder()
             .level(calculateLevel(VisitorHelper.getLevel(ctx.levelNumber().LEVEL_NUMBER())))
             .levelLocality(getLevelLocality(ctx.levelNumber().LEVEL_NUMBER()))
             .statementLocality(retrieveRangeLocality(ctx))
@@ -60,10 +59,10 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
             .usageClauses(VisitorHelper.retrieveUsageFormat(ctx.dataUsageClause()))
             .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
             .redefinesClauses(
-                    ctx.dataRedefinesClause().stream()
-                            .map(VariableParser.DataRedefinesClauseContext::dataName)
-                            .map(this::extractNameAndLocality)
-                            .collect(toList()))
+                ctx.dataRedefinesClause().stream()
+                    .map(VariableParser.DataRedefinesClauseContext::dataName)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
             .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
@@ -74,35 +73,40 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat2(VariableParser.DataDescriptionEntryFormat2Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat2(
+      VariableParser.DataDescriptionEntryFormat2Context ctx) {
     VariableDefinitionNode.Builder builder =
-            VariableDefinitionNode.builder()
-                    .level(LEVEL_66)
-                    .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
-                    .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-                    .statementLocality(retrieveRangeLocality(ctx));
+        VariableDefinitionNode.builder()
+            .level(LEVEL_66)
+            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_66()))
+            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
+            .statementLocality(retrieveRangeLocality(ctx));
 
     ofNullable(ctx.dataRenamesClause())
-            .map(dataRenamesClauseContext -> dataRenamesClauseContext.qualifiedVariableDataName()
-                    .dataName()
-                    .stream()
-                    .map(VariableParser.DataNameContext.class::cast)
-                    .map(this::extractNameAndLocality).collect(toList()))
-            .ifPresent(builder::renamesClause);
-
-    ofNullable(ctx.dataRenamesClause())
-            .map(thruDataNameContext -> thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+        .map(
+            dataRenamesClauseContext ->
+                dataRenamesClauseContext.qualifiedVariableDataName().dataName().stream()
                     .map(VariableParser.DataNameContext.class::cast)
                     .map(this::extractNameAndLocality)
                     .collect(toList()))
-            .ifPresent(builder::renamesThruClause);
+        .ifPresent(builder::renamesClause);
+
+    ofNullable(ctx.dataRenamesClause())
+        .map(
+            thruDataNameContext ->
+                thruDataNameContext.qualifiedVariableDataName().dataName().stream()
+                    .map(VariableParser.DataNameContext.class::cast)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
+        .ifPresent(builder::renamesThruClause);
     return addTreeNode(builder.build(), visitChildren(ctx));
   }
 
   @Override
   public List<Node> visitDataDescriptionEntryFormat1Level77(
       VariableParser.DataDescriptionEntryFormat1Level77Context ctx) {
-    VariableDefinitionNode variableDefinitionNode = VariableDefinitionNode.builder()
+    VariableDefinitionNode variableDefinitionNode =
+        VariableDefinitionNode.builder()
             .level(LEVEL_77)
             .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_77()))
             .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
@@ -113,10 +117,10 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
             .usageClauses(VisitorHelper.retrieveUsageFormat(ctx.dataUsageClause()))
             .occursClauses(retrieveOccursValues(ctx.dataOccursClause()))
             .redefinesClauses(
-                    ctx.dataRedefinesClause().stream()
-                            .map(VariableParser.DataRedefinesClauseContext::dataName)
-                            .map(this::extractNameAndLocality)
-                            .collect(toList()))
+                ctx.dataRedefinesClause().stream()
+                    .map(VariableParser.DataRedefinesClauseContext::dataName)
+                    .map(this::extractNameAndLocality)
+                    .collect(toList()))
             .blankWhenZero(!ctx.dataBlankWhenZeroClause().isEmpty())
             .signClause(!ctx.dataSignClause().isEmpty())
             .isDynamicLength(!ctx.dataDynamicLengthClause().isEmpty())
@@ -126,22 +130,23 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitDataDescriptionEntryFormat3(VariableParser.DataDescriptionEntryFormat3Context ctx) {
+  public List<Node> visitDataDescriptionEntryFormat3(
+      VariableParser.DataDescriptionEntryFormat3Context ctx) {
     return ofNullable(ctx.dataValueClause())
-            .map(VariableParser.DataValueClauseContext::valueIsToken)
-            .map(
-                    valueToken ->
-                            addTreeNode(
-                                    VariableDefinitionNode.builder()
-                                            .level(LEVEL_88)
-                                            .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
-                                            .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
-                                            .statementLocality(retrieveRangeLocality(ctx))
-                                            .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
-                                            .valueToken(VisitorHelper.retrieveValueToken(valueToken))
-                                            .build(),
-                                    visitChildren(ctx)))
-            .orElse(ImmutableList.of());
+        .map(VariableParser.DataValueClauseContext::valueIsToken)
+        .map(
+            valueToken ->
+                addTreeNode(
+                    VariableDefinitionNode.builder()
+                        .level(LEVEL_88)
+                        .levelLocality(getLevelLocality(ctx.LEVEL_NUMBER_88()))
+                        .variableNameAndLocality(extractNameAndLocality(ctx.entryName()))
+                        .statementLocality(retrieveRangeLocality(ctx))
+                        .valueClauses(retrieveValues(ImmutableList.of(ctx.dataValueClause())))
+                        .valueToken(VisitorHelper.retrieveValueToken(valueToken))
+                        .build(),
+                    visitChildren(ctx)))
+        .orElse(ImmutableList.of());
   }
 
   @Override
@@ -178,24 +183,26 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
   }
 
   private Locality retrieveRangeLocality(ParserRuleContext ctx) {
-    Range range = new Range(
+    Range range =
+        new Range(
             new Position(ctx.start.getLine() - 1, ctx.start.getCharPositionInLine()),
             new Position(ctx.stop.getLine() - 1, ctx.stop.getCharPositionInLine()));
 
-    return Locality.builder()
-            .uri(uri)
-            .range(range)
-            .copybookId(copybookId)
-            .build();
+    return Locality.builder().uri(uri).range(range).copybookId(copybookId).build();
   }
 
   private Locality getLevelLocality(TerminalNode terminalNode) {
     return Locality.builder()
-            .range(new Range(
-                    new Position(terminalNode.getSymbol().getLine(), terminalNode.getSymbol().getCharPositionInLine()),
-                    new Position(terminalNode.getSymbol().getLine(), terminalNode.getSymbol().getCharPositionInLine())))
-            .copybookId(copybookId)
-            .build();
+        .range(
+            new Range(
+                new Position(
+                    terminalNode.getSymbol().getLine(),
+                    terminalNode.getSymbol().getCharPositionInLine()),
+                new Position(
+                    terminalNode.getSymbol().getLine(),
+                    terminalNode.getSymbol().getCharPositionInLine())))
+        .copybookId(copybookId)
+        .build();
   }
 
   private VariableNameAndLocality extractNameAndLocality(VariableParser.EntryNameContext context) {
@@ -221,7 +228,7 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
         generatedName = name.substring(0, name.length() - 2) + suffix;
       }
     }
-    Locality locality =  VisitorHelper.buildNameRangeLocality(context, name, uri);
+    Locality locality = VisitorHelper.buildNameRangeLocality(context, name, uri);
     locality.setCopybookId(copybookId);
     return new VariableNameAndLocality(generatedName, locality);
   }
@@ -232,30 +239,36 @@ public class DaCoCopybookVisitor extends VariableParserBaseVisitor<List<Node>> {
 
   private ValueClause retrieveValue(VariableParser.DataValueClauseContext context) {
     return new ValueClause(
-            VisitorHelper.retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()), retrieveRangeLocality(context));
+        VisitorHelper.retrieveValueIntervals(context.dataValueClauseLiteral().dataValueInterval()),
+        retrieveRangeLocality(context));
   }
 
-  private List<OccursClause> retrieveOccursValues(List<VariableParser.DataOccursClauseContext> contexts) {
+  private List<OccursClause> retrieveOccursValues(
+      List<VariableParser.DataOccursClauseContext> contexts) {
     // TODO: Process OCCURS DEPENDING ON
     return contexts.stream()
-            .map(this::toOccursClause)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(toList());
+        .map(this::toOccursClause)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
   }
 
   private Optional<OccursClause> toOccursClause(VariableParser.DataOccursClauseContext ctx) {
     return ofNullable(VisitorHelper.getInteger(ctx.integerLiteral()))
-            .map(
-                    intLit ->
-                            new OccursClause(intLit, VisitorHelper.retrieveOccursToValue(ctx).orElse(null), false,
-                                    retrieveIndexNames(ctx)));
+        .map(
+            intLit ->
+                new OccursClause(
+                    intLit,
+                    VisitorHelper.retrieveOccursToValue(ctx).orElse(null),
+                    false,
+                    retrieveIndexNames(ctx)));
   }
 
-  private List<VariableNameAndLocality> retrieveIndexNames(VariableParser.DataOccursClauseContext ctx) {
+  private List<VariableNameAndLocality> retrieveIndexNames(
+      VariableParser.DataOccursClauseContext ctx) {
     return ofNullable(ctx.indexName()).orElseGet(ImmutableList::of).stream()
-            .map(VariableParser.IndexNameContext::cobolWord)
-            .map(this::extractNameAndLocality)
-            .collect(toList());
+        .map(VariableParser.IndexNameContext::cobolWord)
+        .map(this::extractNameAndLocality)
+        .collect(toList());
   }
 }

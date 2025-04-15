@@ -14,7 +14,16 @@
  */
 package org.eclipse.lsp.cobol.service.settings;
 
+import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.COBOL_PROGRAM_LAYOUT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.google.inject.Provider;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,66 +31,61 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.COBOL_PROGRAM_LAYOUT;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-/**
- * Test for {@link SettingsServiceImpl}
- */
+/** Test for {@link SettingsServiceImpl} */
 @ExtendWith(MockitoExtension.class)
 class SettingsServiceImplTest {
-    @Mock
-    private Provider<CobolLanguageClient> clientProvider;
-    private SettingsServiceImpl settingsService;
+  @Mock private Provider<CobolLanguageClient> clientProvider;
+  private SettingsServiceImpl settingsService;
 
-    @BeforeEach
-    void setUp() {
-        settingsService = new SettingsServiceImpl(clientProvider);
-    }
-    @Test
-    void testFetchConfiguration() {
-        when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
-        when(clientProvider.get().configuration(any())).thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
-        CompletableFuture<List<Object>> future = settingsService.fetchConfiguration("param1", "param2");
-        List<Object> result = future.join();
-        assertNotNull(result);
-        assertEquals(2, result.size());
-    }
+  @BeforeEach
+  void setUp() {
+    settingsService = new SettingsServiceImpl(clientProvider);
+  }
 
-    @Test
-    void testFetchTextConfiguration() {
-        when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
-        when(clientProvider.get().configuration(any())).thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
-        CompletableFuture<List<String>> future = settingsService.fetchTextConfiguration(COBOL_PROGRAM_LAYOUT.label);
-        List<String> result = future.join();
-        assertNotNull(result);
-        verify(clientProvider.get(), times(1)).configuration(any());
-    }
+  @Test
+  void testFetchConfiguration() {
+    when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
+    when(clientProvider.get().configuration(any()))
+        .thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
+    CompletableFuture<List<Object>> future = settingsService.fetchConfiguration("param1", "param2");
+    List<Object> result = future.join();
+    assertNotNull(result);
+    assertEquals(2, result.size());
+  }
 
-    @Test
-    void testFetchTextConfigurationWithScope() {
-        when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
-        when(clientProvider.get().configuration(any())).thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
-        CompletableFuture<List<String>> future = settingsService.fetchTextConfigurationWithScope("scopeUri", "section");
-        List<String> result = future.join();
-        assertNotNull(result);
-        verify(clientProvider.get(), times(1)).configuration(any());
-    }
+  @Test
+  void testFetchTextConfiguration() {
+    when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
+    when(clientProvider.get().configuration(any()))
+        .thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
+    CompletableFuture<List<String>> future =
+        settingsService.fetchTextConfiguration(COBOL_PROGRAM_LAYOUT.label);
+    List<String> result = future.join();
+    assertNotNull(result);
+    verify(clientProvider.get(), times(1)).configuration(any());
+  }
 
-    @Test
-    void testFetchTextConfigurationWithScope_dialect() {
-        when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
-        when(clientProvider.get().configuration(any())).thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
-        CompletableFuture<List<String>> future = settingsService.fetchTextConfigurationWithScope("scopeUri", "section", "dialect");
-        List<String> result = future.join();
-        assertNotNull(result);
-        verify(clientProvider.get(), times(1)).configuration(any());
-    }
+  @Test
+  void testFetchTextConfigurationWithScope() {
+    when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
+    when(clientProvider.get().configuration(any()))
+        .thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
+    CompletableFuture<List<String>> future =
+        settingsService.fetchTextConfigurationWithScope("scopeUri", "section");
+    List<String> result = future.join();
+    assertNotNull(result);
+    verify(clientProvider.get(), times(1)).configuration(any());
+  }
+
+  @Test
+  void testFetchTextConfigurationWithScope_dialect() {
+    when(clientProvider.get()).thenReturn(mock(CobolLanguageClient.class));
+    when(clientProvider.get().configuration(any()))
+        .thenReturn(CompletableFuture.completedFuture(Arrays.asList(Object.class, Object.class)));
+    CompletableFuture<List<String>> future =
+        settingsService.fetchTextConfigurationWithScope("scopeUri", "section", "dialect");
+    List<String> result = future.join();
+    assertNotNull(result);
+    verify(clientProvider.get(), times(1)).configuration(any());
+  }
 }

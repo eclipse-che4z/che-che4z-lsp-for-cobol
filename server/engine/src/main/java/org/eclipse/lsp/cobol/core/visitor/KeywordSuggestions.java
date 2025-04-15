@@ -15,14 +15,13 @@
 
 package org.eclipse.lsp.cobol.core.visitor;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /** This class provides keywords that are used for suggestions during the syntax check. */
 @Slf4j
@@ -33,10 +32,10 @@ public class KeywordSuggestions {
   KeywordSuggestions() {
     Properties props = new Properties();
     try (InputStream keywords =
-        KeywordSuggestions.class.getResourceAsStream(
-            "/LanguageKeywords.txt")) {
+        KeywordSuggestions.class.getResourceAsStream("/LanguageKeywords.txt")) {
       props.load(keywords);
-      suggestions = props.stringPropertyNames().stream().map(String::toUpperCase).collect(Collectors.toSet());
+      suggestions =
+          props.stringPropertyNames().stream().map(String::toUpperCase).collect(Collectors.toSet());
     } catch (IOException e) {
       LOG.error("Cannot load list of the suggested keywords", e);
     }

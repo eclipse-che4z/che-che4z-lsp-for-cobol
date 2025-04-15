@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -23,11 +25,7 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.lsp4j.DiagnosticSeverity.Error;
-
-/**
- * Test if variable usage position tracked correctly with line concatenation.
- */
+/** Test if variable usage position tracked correctly with line concatenation. */
 class TestLineContinuation {
   private static final String TEXT =
       "000100 IDENTIFICATION DIVISION.                                         NC2054.2\n"
@@ -51,14 +49,14 @@ class TestLineContinuation {
 
   private static final String TEXT_WITH_COPY =
       "       IDENTIFICATION DIVISION.                                         \n"
-      + "       PROGRAM-ID. MIN.\n"
-      + "       DATA DIVISION.                                                   \n"
-      + "       WORKING-STORAGE SECTION.                                         \n"
-      + "       01 FILLER  PIC IS X(99)    VALUE IS \" FEATURE                  PA\n"
-      + "      -    \"REMARKS\".                                                   \n"
-      + "       PROCEDURE DIVISION.                                              \n"
-      + "           COPY                                                    {~KP001|missing}\n"
-      + "           .\n";
+          + "       PROGRAM-ID. MIN.\n"
+          + "       DATA DIVISION.                                                   \n"
+          + "       WORKING-STORAGE SECTION.                                         \n"
+          + "       01 FILLER  PIC IS X(99)    VALUE IS \" FEATURE                  PA\n"
+          + "      -    \"REMARKS\".                                                   \n"
+          + "       PROCEDURE DIVISION.                                              \n"
+          + "           COPY                                                    {~KP001|missing}\n"
+          + "           .\n";
 
   @Test
   @Disabled("Fix line concatenation algorithm")
@@ -81,5 +79,4 @@ class TestLineContinuation {
                 "COBOL Language Support (copybook)",
                 "missing copybook")));
   }
-
 }

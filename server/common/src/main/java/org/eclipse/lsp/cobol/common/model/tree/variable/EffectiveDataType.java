@@ -15,11 +15,10 @@
 
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.common.utils.UsageFormatUtils;
-
 import java.util.Objects;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.utils.UsageFormatUtils;
 
 /**
  * This enum class represents all effective data type for {@link ElementaryNode}. The order of this

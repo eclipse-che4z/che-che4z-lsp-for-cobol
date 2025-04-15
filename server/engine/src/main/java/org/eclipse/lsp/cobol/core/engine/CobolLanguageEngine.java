@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkSession;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -37,14 +38,13 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
+import org.eclipse.lsp.cobol.common.pipeline.PipelineResult;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
-import org.eclipse.lsp.cobol.common.pipeline.Pipeline;
-import org.eclipse.lsp.cobol.common.pipeline.PipelineResult;
-import org.eclipse.lsp.cobol.common.pipeline.StageResult;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.dialects.ibm.ProcessingResult;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
 import org.eclipse.lsp.cobol.service.utils.ServerTypeUtil;
@@ -126,18 +126,21 @@ public class CobolLanguageEngine {
   /**
    * Perform syntax and semantic analysis for the given text document
    *
-   * @param documentUri    unique resource identifier of the processed document
-   * @param text           the content of the document that should be processed
+   * @param documentUri unique resource identifier of the processed document
+   * @param text the content of the document that should be processed
    * @param analysisConfig contains analysis processing features info and copybook config with
-   *                       following information: target backend sql server, copybook processing mode which reflect
-   *                       the sync status of the document (DID_OPEN|DID_CHANGE)
-   * @param languageId     language identifier
+   *     following information: target backend sql server, copybook processing mode which reflect
+   *     the sync status of the document (DID_OPEN|DID_CHANGE)
+   * @param languageId language identifier
    * @return Semantic information wrapper object and list of syntax error that might send back to
-   * the client
+   *     the client
    */
   @NonNull
   public AnalysisResult run(
-          @NonNull String documentUri, @NonNull String text, @NonNull AnalysisConfig analysisConfig, CobolLanguageId languageId) {
+      @NonNull String documentUri,
+      @NonNull String text,
+      @NonNull AnalysisConfig analysisConfig,
+      CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     if (shouldNotAnalyse(text, languageId)) {
       return AnalysisResult.builder().build();
@@ -149,7 +152,8 @@ public class CobolLanguageEngine {
     }
 
     BenchmarkSession session = benchmarkService.startSession();
-    AnalysisContext ctx = new AnalysisContext(analysisConfig, session, documentUri, text, languageId);
+    AnalysisContext ctx =
+        new AnalysisContext(analysisConfig, session, documentUri, text, languageId);
 
     Pipeline pipeline = trueDialectService.getPipeline(languageId);
 

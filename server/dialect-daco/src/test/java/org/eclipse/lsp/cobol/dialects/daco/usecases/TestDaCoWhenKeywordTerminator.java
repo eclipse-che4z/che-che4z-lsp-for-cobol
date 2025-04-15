@@ -20,31 +20,33 @@ import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for recognition of "WHEN" COBOL keyword by DaCo.
- */
+/** Test for recognition of "WHEN" COBOL keyword by DaCo. */
 public class TestDaCoWhenKeywordTerminator {
   private static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID. TEST1.\n"
-                  + "        ENVIRONMENT DIVISION.\n"
-                  + "        IDMS-CONTROL SECTION.\n"
-                  + "            PROTOCOL. MODE ABC.\n"
-                  + "            IDMS-RECORDS MANUAL\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01 {$*A} PIC X.\n"
-                  + "       PROCEDURE DIVISION.\n"
-                  + "           EVALUATE TRUE\n"
-                  + "           WHEN {$A} NOT = TRUE\n"
-                  + "              RETURN WARNING 004\n"
-                  + "           WHEN {$A} NOT NUMERIC\n"
-                  + "              RETURN WARNING 002\n"
-                  + "           END-EVALUATE.";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE ABC.\n"
+          + "            IDMS-RECORDS MANUAL\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*A} PIC X.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EVALUATE TRUE\n"
+          + "           WHEN {$A} NOT = TRUE\n"
+          + "              RETURN WARNING 004\n"
+          + "           WHEN {$A} NOT NUMERIC\n"
+          + "              RETURN WARNING 002\n"
+          + "           END-EVALUATE.";
+
   @Test
   void test() {
-    UseCaseEngine.runTest(TEXT, ImmutableList.of(),
-            ImmutableMap.of(), ImmutableList.of(),
-            DialectConfigs.getDaCoAnalysisConfig());
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

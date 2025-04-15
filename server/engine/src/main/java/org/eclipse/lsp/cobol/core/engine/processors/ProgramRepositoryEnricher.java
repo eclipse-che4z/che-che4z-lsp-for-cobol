@@ -14,6 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -25,12 +30,6 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /** Adds repository information to the program nodes */
 @AllArgsConstructor
@@ -44,28 +43,30 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
 
   private void addFunctionDeclarationsToProgramRepository(
       FunctionDeclaration functionDeclaration, ProcessingContext ctx) {
-      Optional.ofNullable(ctx.getCurrentProgramNode()).map(ProgramNode::getRepository)
+    Optional.ofNullable(ctx.getCurrentProgramNode())
+        .map(ProgramNode::getRepository)
         .ifPresent(
-                repository  -> {
-                //  function-name collision with the implicitly available function names is possible.
-                //  Normally this would lead to error,but NOT when `function all intrinsic` clause is used as the
-                //  last declaration in the chain of declarations.
-                //  For example below is a valid syntax:
-                //        `               function hex-of
-                //                        function all intrinsic.`
-                //  In this case we simply replace any collision (hex-of in above example) as an intrinsic references.
+            repository -> {
+              //  function-name collision with the implicitly available function names is possible.
+              //  Normally this would lead to error,but NOT when `function all intrinsic` clause is
+              // used as the
+              //  last declaration in the chain of declarations.
+              //  For example below is a valid syntax:
+              //        `               function hex-of
+              //                        function all intrinsic.`
+              //  In this case we simply replace any collision (hex-of in above example) as an
+              // intrinsic references.
               if (functionDeclaration.isDeclareAllIntrinsicFunctions()) {
                 symbolAccumulator
                     .getAllImplicitFunctionNames()
                     .forEach(name -> repository.put(name, true));
               } else {
-                  functionDeclaration.getChildren().stream()
-                          .filter(FunctionReference.class::isInstance)
-                          .map(FunctionReference.class::cast)
-                          .forEach(
-                                  reference ->
-                                          addOrValidateFunction(
-                                                  repository, reference, functionDeclaration, ctx));
+                functionDeclaration.getChildren().stream()
+                    .filter(FunctionReference.class::isInstance)
+                    .map(FunctionReference.class::cast)
+                    .forEach(
+                        reference ->
+                            addOrValidateFunction(repository, reference, functionDeclaration, ctx));
               }
             });
   }
@@ -83,7 +84,8 @@ public class ProgramRepositoryEnricher implements Processor<FunctionDeclaration>
             addError(
                 processingContext,
                 reference,
-                "Name '%s' was previously defined in the REPOSITORY paragraph.", reference.getName());
+                "Name '%s' was previously defined in the REPOSITORY paragraph.",
+                reference.getName());
           }
           return existingValue != null ? existingValue : isIntrinsic;
         });

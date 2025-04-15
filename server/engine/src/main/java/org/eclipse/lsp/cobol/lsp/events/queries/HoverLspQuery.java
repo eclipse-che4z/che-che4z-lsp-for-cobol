@@ -23,9 +23,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.text.HoverHandler;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
 
-/**
- * `textDocument/hover` language server event
- */
+/** `textDocument/hover` language server event */
 public class HoverLspQuery implements LspQuery<Hover> {
   final CompletableFuture<Hover> result;
   private final HoverParams params;

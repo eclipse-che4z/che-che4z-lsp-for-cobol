@@ -50,14 +50,13 @@ import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFa
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 
-/**
- * Initializer for use case engine
- */
+/** Initializer for use case engine */
 @AutoService(UseCaseInitializer.class)
 public class UseCaseInitializerService implements UseCaseInitializer {
 
   /**
    * Creates injector for testing purposes
+   *
    * @return injector object
    */
   @Override
@@ -67,38 +66,37 @@ public class UseCaseInitializerService implements UseCaseInitializer {
     when(mockSettingsService.fetchConfiguration(any()))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
 
-    return
-        Guice.createInjector(
-            new EngineModule(),
-            new DatabusModule(),
-            new AbstractModule() {
-              @Override
-              protected void configure() {
-                bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
+    return Guice.createInjector(
+        new EngineModule(),
+        new DatabusModule(),
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(TrueDialectService.class).to(TrueDialectServiceImpl.class);
 
-                bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
-                bind(CopybookService.class).to(CopybookServiceImpl.class);
-                bind(SettingsService.class).toInstance(mockSettingsService);
-                bind(FileSystemService.class).toInstance(new WorkspaceFileService());
-                bind(CobolLanguageClient.class).toInstance(languageClient);
-                bind(SubroutineService.class).to(SubroutineServiceImpl.class);
+            bind(LanguageEngineFacade.class).to(CobolLanguageEngineFacade.class);
+            bind(CopybookService.class).to(CopybookServiceImpl.class);
+            bind(SettingsService.class).toInstance(mockSettingsService);
+            bind(FileSystemService.class).toInstance(new WorkspaceFileService());
+            bind(CobolLanguageClient.class).toInstance(languageClient);
+            bind(SubroutineService.class).to(SubroutineServiceImpl.class);
 
-                bind(WatcherService.class).to(WatcherServiceImpl.class);
-                bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
-                bind(CopybookIdentificationService.class)
-                        .annotatedWith(Names.named("contentStrategy"))
-                        .to(CopybookIdentificationServiceBasedOnContent.class);
-                bind(CopybookIdentificationService.class)
-                        .annotatedWith(Names.named("suffixStrategy"))
-                        .to(CopybookIdentificationBasedOnExtension.class);
-                bind(CopybookIdentificationService.class)
-                        .annotatedWith(Names.named("combinedStrategy"))
-                        .to(CopybookIdentificationCombinedStrategy.class);
-                Multibinder<CodeActionProvider> codeActionBinding =
-                        newSetBinder(binder(), CodeActionProvider.class);
-                codeActionBinding.addBinding().to(FindCopybookCommand.class);
-                bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
-              }
-            });
+            bind(WatcherService.class).to(WatcherServiceImpl.class);
+            bind(DialectDiscoveryService.class).to(ExplicitDialectDiscoveryService.class);
+            bind(CopybookIdentificationService.class)
+                .annotatedWith(Names.named("contentStrategy"))
+                .to(CopybookIdentificationServiceBasedOnContent.class);
+            bind(CopybookIdentificationService.class)
+                .annotatedWith(Names.named("suffixStrategy"))
+                .to(CopybookIdentificationBasedOnExtension.class);
+            bind(CopybookIdentificationService.class)
+                .annotatedWith(Names.named("combinedStrategy"))
+                .to(CopybookIdentificationCombinedStrategy.class);
+            Multibinder<CodeActionProvider> codeActionBinding =
+                newSetBinder(binder(), CodeActionProvider.class);
+            codeActionBinding.addBinding().to(FindCopybookCommand.class);
+            bind(DisposableLSPStateService.class).to(CobolLSPServerStateService.class);
+          }
+        });
   }
 }

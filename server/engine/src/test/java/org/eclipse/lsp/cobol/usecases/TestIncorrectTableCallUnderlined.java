@@ -48,9 +48,12 @@ class TestIncorrectTableCallUnderlined {
                 new Range(),
                 "Variable OL-ACCT-NO is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
-                new Range(), "Variable SUB1 is not defined", DiagnosticSeverity.Error,  ErrorSource.PARSING.getText())));
+                new Range(),
+                "Variable SUB1 is not defined",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

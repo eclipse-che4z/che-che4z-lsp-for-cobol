@@ -18,9 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.server.ShutdownHandler;
 
-/**
- * ‘shutdown’ language server event
- */
+/** ‘shutdown’ language server event */
 public class ShutdownQuery implements LspQuery<Object> {
   private final CompletableFuture<Object> result = new CompletableFuture<>();
   private final ShutdownHandler shutdownHandler;

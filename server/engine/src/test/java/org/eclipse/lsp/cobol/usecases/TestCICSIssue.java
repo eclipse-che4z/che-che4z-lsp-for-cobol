@@ -15,13 +15,13 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-import java.util.Map;
 
 /**
  * Test CICS ISSUE commands. Documentation link: <a
@@ -44,7 +44,9 @@ public class TestCICSIssue {
   private static final String ISSUE_ABORT_INVALID_ONE = "ISSUE ABORT {PRINT|errorOne}";
 
   private static final String ISSUE_ADD_ALL_OPTIONS_VALID_ONE =
-      "ISSUE ADD DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne}) FROM({$varFour}) LENGTH({$varOne}) NUMREC({$varOne}) DEFRESP NOWAIT RIDFLD({$varFour}) RRN";
+      "ISSUE ADD DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne})"
+          + " FROM({$varFour}) LENGTH({$varOne}) NUMREC({$varOne}) DEFRESP NOWAIT"
+          + " RIDFLD({$varFour}) RRN";
 
   private static final String ISSUE_ADD_PARTIAL_VALID_ONE =
       "ISSUE ADD DESTID({$varOne}) VOLUME({$varOne}) FROM({$varFour})";
@@ -81,10 +83,13 @@ public class TestCICSIssue {
   private static final String ISSUE_EODS = "ISSUE EODS";
 
   private static final String ISSUE_ERASE_FULL =
-      "ISSUE ERASE DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne}) RIDFLD({$varFour}) KEYLENGTH({$varOne}) KEYNUMBER({$varTwo}) NUMREC({$varOne}) DEFRESP NOWAIT";
+      "ISSUE ERASE DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne})"
+          + " RIDFLD({$varFour}) KEYLENGTH({$varOne}) KEYNUMBER({$varTwo}) NUMREC({$varOne})"
+          + " DEFRESP NOWAIT";
 
   private static final String ISSUE_ERASE_PARTIAL =
-      "ISSUE ERASE DESTID({$varOne}) VOLUME({$varOne}) RIDFLD({$varFour}) KEYLENGTH({$varOne}) DEFRESP";
+      "ISSUE ERASE DESTID({$varOne}) VOLUME({$varOne}) RIDFLD({$varFour}) KEYLENGTH({$varOne})"
+          + " DEFRESP";
 
   private static final String ISSUE_ERASE_INVALID =
       "ISSUE {_ERASE DESTID(100) VOLUME(100) NOWAIT|errorTwo|errorOne_}";
@@ -102,7 +107,8 @@ public class TestCICSIssue {
   private static final String ISSUE_LOAD_PARTIAL = "ISSUE LOAD PROGRAM({$varFour})";
 
   private static final String ISSUE_NOTE_FULL =
-      "ISSUE NOTE DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne}) RIDFLD({$varFour}) RRN";
+      "ISSUE NOTE DESTID({$varOne}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne})"
+          + " RIDFLD({$varFour}) RRN";
 
   private static final String ISSUE_NOTE_INVALID =
       "ISSUE NOTE DESTID(100) DESTIDLENG(111) {VOLUMELENG|errorOne}(100) RIDFLD(111) RRN";
@@ -124,7 +130,8 @@ public class TestCICSIssue {
   private static final String ISSUE_PRINT_FULL = "ISSUE PRINT";
 
   private static final String ISSUE_QUERY_FULL =
-      "ISSUE QUERY DESTID({$varOne}) DESTIDLENG({$varTwo}) VOLUME({$varFour}) VOLUMELENG({$varFive})";
+      "ISSUE QUERY DESTID({$varOne}) DESTIDLENG({$varTwo}) VOLUME({$varFour})"
+          + " VOLUMELENG({$varFive})";
 
   private static final String ISSUE_QUERY_PARTIAL = "ISSUE QUERY DESTID({$varOne})";
 
@@ -137,16 +144,21 @@ public class TestCICSIssue {
   private static final String ISSUE_RECEIVE_PARTIAL = "ISSUE RECEIVE SET({$varFour})";
 
   private static final String ISSUE_REPLACE_FULL =
-      "ISSUE REPLACE DESTID({$varFour}) DESTIDLENG({$varOne}) VOLUME({$varOne}) VOLUMELENG({$varOne}) FROM({$varFour}) LENGTH({$varone}) NUMREC({$varOne}) RIDFLD({$varFour}) KEYLENGTH({$varOne}) KEYNUMBER({$varOne}) DEFRESP NOWAIT";
+      "ISSUE REPLACE DESTID({$varFour}) DESTIDLENG({$varOne}) VOLUME({$varOne})"
+          + " VOLUMELENG({$varOne}) FROM({$varFour}) LENGTH({$varone}) NUMREC({$varOne})"
+          + " RIDFLD({$varFour}) KEYLENGTH({$varOne}) KEYNUMBER({$varOne}) DEFRESP NOWAIT";
 
   private static final String ISSUE_REPLACE_PARTIAL =
-      "ISSUE REPLACE DESTID({$varFour}) FROM({$varFour}) LENGTH({$varOne}) RIDFLD({$varFour}) RRN NOWAIT";
+      "ISSUE REPLACE DESTID({$varFour}) FROM({$varFour}) LENGTH({$varOne}) RIDFLD({$varFour}) RRN"
+          + " NOWAIT";
 
   private static final String ISSUE_REPLACE_INVALID =
-      "ISSUE {_REPLACE DESTID(100) {VOLUMELENG|errorTwo}(100) FROM(101) LENGTH(100) RIDFLD(101) NOWAIT|errorOne_}";
+      "ISSUE {_REPLACE DESTID(100) {VOLUMELENG|errorTwo}(100) FROM(101) LENGTH(100) RIDFLD(101)"
+          + " NOWAIT|errorOne_}";
 
   private static final String ISSUE_SEND_FULL =
-      "ISSUE SEND SUBADDR({$varOne}) CARD VOLUME({$varTwo}) VOLUMELENG({$varThree}) FROM({$varOne}) LENGTH({$varOne}) NOWAIT DEFRESP";
+      "ISSUE SEND SUBADDR({$varOne}) CARD VOLUME({$varTwo}) VOLUMELENG({$varThree}) FROM({$varOne})"
+          + " LENGTH({$varOne}) NOWAIT DEFRESP";
 
   private static final String ISSUE_SEND_PARTIAL = "ISSUE SEND SUBADDR({$varOne}) FROM({$varOne})";
 
@@ -166,7 +178,8 @@ public class TestCICSIssue {
   private static final String ISSUE_WAIT_INVALID = "ISSUE WAIT {CONSOLE|errorOne}";
 
   private static final String ISSUE_WAIT_DUPLICATE_COMMON_INVALID =
-      "ISSUE WAIT {SUBADDR|errorOne}(100) {CONSOLE|errorTwo} VOLUME(100) RESP(100) NOHANDLE {SUBADDR|errorThree|errorFour}(200) {DESTID|errorFive}(10) DESTIDLENG(100)";
+      "ISSUE WAIT {SUBADDR|errorOne}(100) {CONSOLE|errorTwo} VOLUME(100) RESP(100) NOHANDLE"
+          + " {SUBADDR|errorThree|errorFour}(200) {DESTID|errorFive}(10) DESTIDLENG(100)";
 
   @Test
   void testIssueAbendAllOptionsValidOne() {

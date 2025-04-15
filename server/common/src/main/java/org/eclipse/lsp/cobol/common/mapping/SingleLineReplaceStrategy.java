@@ -18,13 +18,12 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Replacement text strategy for single line case
- */
+/** Replacement text strategy for single line case */
 class SingleLineReplaceStrategy implements ReplaceStrategy {
 
   @Override
-  public boolean execute(ExtendedText extendedText, Range range, String newText, Location originalLocation) {
+  public boolean execute(
+      ExtendedText extendedText, Range range, String newText, Location originalLocation) {
     if (range.getEnd().getLine() == range.getStart().getLine()) {
       String[] newLines = MappingHelper.split(newText);
       extendedText.delete(range);
@@ -34,18 +33,25 @@ class SingleLineReplaceStrategy implements ReplaceStrategy {
     return false;
   }
 
-  private void addLines(ExtendedText extendedText, Position position, String[] newLines, Location instantLocation) {
+  private void addLines(
+      ExtendedText extendedText, Position position, String[] newLines, Location instantLocation) {
     if (newLines.length == 1) {
-      extendedText.insert(position, new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
+      extendedText.insert(
+          position, new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
     } else if (newLines.length > 1) {
       extendedText.addLineBreak(position);
-      extendedText.append(position.getLine(), new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
-      extendedText.insert(new Position(position.getLine() + 1, 0), new ExtendedTextLine(newLines[newLines.length - 1],
-          instantLocation, extendedText.getUri()));
+      extendedText.append(
+          position.getLine(),
+          new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
+      extendedText.insert(
+          new Position(position.getLine() + 1, 0),
+          new ExtendedTextLine(
+              newLines[newLines.length - 1], instantLocation, extendedText.getUri()));
       for (int i = 1; i < newLines.length - 2; i++) {
-        extendedText.insert(position.getLine() + i, new ExtendedTextLine(newLines[i], instantLocation, extendedText.getUri()));
+        extendedText.insert(
+            position.getLine() + i,
+            new ExtendedTextLine(newLines[i], instantLocation, extendedText.getUri()));
       }
     }
   }
-
 }

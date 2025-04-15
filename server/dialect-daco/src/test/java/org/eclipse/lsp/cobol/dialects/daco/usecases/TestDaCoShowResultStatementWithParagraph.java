@@ -19,32 +19,30 @@ import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the DAF Show Result statement with paragraph
- */
+/** Tests the DAF Show Result statement with paragraph */
 class TestDaCoShowResultStatementWithParagraph {
 
-    private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
-                    + "       PROGRAM-ID. test1.\n"
-                    + "       ENVIRONMENT DIVISION.\n"
-                    + "       IDMS-CONTROL SECTION.\n"
-                    + "           PROTOCOL. MODE ABC.\n"
-                    + "           IDMS-RECORDS MANUAL\n"
-                    + "       DATA DIVISION.\n"
-                    + "       WORKING-STORAGE SECTION.\n"
-                    + "       PROCEDURE DIVISION.\n"
-                    + "           IF TRUE \n"
-                    + "               SHOW RESULT QMES.\n"
-                    + "       {#*S157-999}.";
+  private static final String TEXT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. test1.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       IDMS-CONTROL SECTION.\n"
+          + "           PROTOCOL. MODE ABC.\n"
+          + "           IDMS-RECORDS MANUAL\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           IF TRUE \n"
+          + "               SHOW RESULT QMES.\n"
+          + "       {#*S157-999}.";
 
-    @Test
-    void test() {
-        UseCaseEngine.runTest(
-                TEXT,
-                ImmutableList.of(),
-                ImmutableMap.of(),
-                ImmutableList.of(),
-                DialectConfigs.getDaCoAnalysisConfig());
-    }
+  @Test
+  void test() {
+    UseCaseEngine.runTest(
+        TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
+  }
 }

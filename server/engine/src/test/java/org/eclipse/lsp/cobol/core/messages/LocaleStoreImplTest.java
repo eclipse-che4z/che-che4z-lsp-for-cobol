@@ -14,23 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.messages;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
 import org.eclipse.lsp.cobol.common.message.LocaleEnum;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Consumer;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 /** Test to check LocaleStoreImpl */
 class LocaleStoreImplTest {

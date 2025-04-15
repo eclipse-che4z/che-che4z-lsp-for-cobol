@@ -29,14 +29,11 @@ import org.junit.jupiter.api.Test;
  * <p>This class tests the POP HANDLE command.
  */
 public class TestCICSPopHandle {
-  private static final String POP_VALID =
-          "POP";
+  private static final String POP_VALID = "POP";
 
-  private static final String POP_HANDLE_VALID =
-          "POP HANDLE";
+  private static final String POP_HANDLE_VALID = "POP HANDLE";
 
-  private static final String POP_HANDLE_INVALID =
-          "POP HANDLE {HANDLE|errorOne}";
+  private static final String POP_HANDLE_INVALID = "POP HANDLE {HANDLE|errorOne}";
 
   @Test
   void testPopValid() {
@@ -51,13 +48,13 @@ public class TestCICSPopHandle {
   @Test
   void testPopHandleInvalid() {
     CICSTestUtils.errorTest(
-            POP_HANDLE_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: HANDLE",
-                            DiagnosticSeverity.Warning,
-                            ErrorSource.PARSING.getText())));
+        POP_HANDLE_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: HANDLE",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
   }
 }

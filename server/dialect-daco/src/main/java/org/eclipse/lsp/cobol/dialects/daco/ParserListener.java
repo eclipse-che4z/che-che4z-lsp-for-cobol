@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -22,9 +24,6 @@ import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** This error listener registers syntax errors found by the COBOL parser. */
 @Slf4j

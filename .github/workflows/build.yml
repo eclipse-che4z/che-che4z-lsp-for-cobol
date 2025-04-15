@@ -58,6 +58,17 @@ jobs:
       - name: Check code quality for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm run lint-quality
+  checks-server:
+    name: Checks server
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v4
+      - uses: axel-op/googlejavaformat-action@v4
+        with:
+          args: "-i"
+          skip-commit: true
+      - name: Print diffs
+        run: git --no-pager diff --exit-code       
   zipSources:
     runs-on: ubuntu-latest
     steps:

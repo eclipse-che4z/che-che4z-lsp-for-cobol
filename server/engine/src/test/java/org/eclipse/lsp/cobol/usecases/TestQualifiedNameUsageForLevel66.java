@@ -51,11 +51,13 @@ public class TestQualifiedNameUsageForLevel66 {
           + "           MOVE     \"ssd\"       TO {$TOM}. ";
   private static final String TEXT =
       PREFIX
-          + "009900      66         {$*AL-BOB} RENAMES {$AL} IN {$A-GLOB} THRU {$BOB} OF {$A-GLOB}.  \n"
+          + "009900      66         {$*AL-BOB} RENAMES {$AL} IN {$A-GLOB} THRU {$BOB} OF {$A-GLOB}."
+          + "  \n"
           + SUFFIX;
   private static final String TEXT2 =
       PREFIX
-          + "009900     66 {$*AL-BOB} RENAMES {$D-LEVEL} IN {$B-LEVEL} THRU {$BOB} OF {$BB-LEVEL}.  \n"
+          + "009900     66 {$*AL-BOB} RENAMES {$D-LEVEL} IN {$B-LEVEL} THRU {$BOB} OF {$BB-LEVEL}. "
+          + " \n"
           + SUFFIX;
 
   private static final String TEXT3 =
@@ -74,10 +76,15 @@ public class TestQualifiedNameUsageForLevel66 {
 
   @Test
   void test3() {
-    UseCaseEngine.runTest(TEXT3, ImmutableList.of(), ImmutableMap.of("1",
+    UseCaseEngine.runTest(
+        TEXT3,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
             new Diagnostic(
-                    new Range(), "The data entry with the name TOM not found", DiagnosticSeverity.Error, ErrorSource.PARSING.getText())));
+                new Range(),
+                "The data entry with the name TOM not found",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
-
-
 }

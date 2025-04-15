@@ -16,12 +16,11 @@ package org.eclipse.lsp.cobol.usecases.sql;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.stream.Stream;
 
 /**
  * This PARAMETERIZED test checks if all below sql CREATE statements works correctly.
@@ -115,7 +114,7 @@ class TestSqlAllCreateStatements {
           + "           END-EXEC.";
 
   public static final String CREATE_FUNCTION_EXT_NO_OPTIONS =
-          TEXT
+      TEXT
           + "                 CREATE FUNCTION REVERSE(INSTR VARCHAR(4000))\n"
           + "                 RETURNS VARCHAR(4000)\n"
           + "                 return null \n"
@@ -166,7 +165,10 @@ class TestSqlAllCreateStatements {
           + "           END-EXEC.";
 
   /**
-   * This compiles even though <a href="https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-create-function-external-scalar">doc</a> says it otherwise.
+   * This compiles even though <a
+   * href="https://www.ibm.com/docs/en/db2-for-zos/13?topic=statements-create-function-external-scalar">doc</a>
+   * says it otherwise.
+   *
    * <pre>CARDINALITY is not supported for external scalar functions.</pre>
    */
   public static final String CREATE_FUNCTION_EXT5 =
@@ -177,7 +179,7 @@ class TestSqlAllCreateStatements {
           + "               LANGUAGE C\n"
           + "               PARAMETER STYLE SQL\n"
           + "               WLM ENVIRONMENT (env, *)\n"
-           + "           END-EXEC.";
+          + "           END-EXEC.";
 
   public static final String CREATE_FUNCTION_EXT6 =
       TEXT
@@ -248,7 +250,7 @@ class TestSqlAllCreateStatements {
           + "           SOURCE SMITH.CENTER (INTEGER, FLOAT);\n"
           + "           END-EXEC.";
 
-    // CREATE GLOBAL TEMPORARY TABLE
+  // CREATE GLOBAL TEMPORARY TABLE
   private static final String CREATE_GLOBAL_TMP_TABLE =
       TEXT
           + "           CREATE GLOBAL TEMPORARY TABLE CURRENTMAP\n"
@@ -323,7 +325,7 @@ class TestSqlAllCreateStatements {
           + "           partition by \n"
           + "           (partition 2 ending (MAXVALUE) inclusive dssize 3G)\n"
           + "           not padded\n"
-          + "           END-EXEC.";;
+          + "           END-EXEC.";
 
   public static final String CREATE_INDEX6 =
       TEXT

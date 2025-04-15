@@ -19,9 +19,7 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 
-/**
- * Represents USE statement
- */
+/** Represents USE statement */
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class UseNode extends Node {

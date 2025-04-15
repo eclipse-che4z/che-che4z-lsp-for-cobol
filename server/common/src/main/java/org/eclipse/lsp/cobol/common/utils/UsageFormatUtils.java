@@ -15,8 +15,16 @@
 
 package org.eclipse.lsp.cobol.common.utils;
 
+import static org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType.*;
+import static org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -24,15 +32,6 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
-
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import static org.eclipse.lsp.cobol.common.model.tree.variable.EffectiveDataType.*;
-import static org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat.*;
 
 /** The utility class is for handling usage clause of a data description entry. */
 @UtilityClass
@@ -90,12 +89,13 @@ public class UsageFormatUtils {
         return Collections.emptyList();
       };
 
-  public Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>> picAndUsageClauseValidator =
-      new EnumMap<>(
-          ImmutableMap.of(
-              STRING, checkStringUsage,
-              REAL, checkNumericUsage,
-              INTEGER, checkNumericUsage));
+  public Map<EffectiveDataType, Function<ElementaryNode, List<SyntaxError>>>
+      picAndUsageClauseValidator =
+          new EnumMap<>(
+              ImmutableMap.of(
+                  STRING, checkStringUsage,
+                  REAL, checkNumericUsage,
+                  INTEGER, checkNumericUsage));
 
   private boolean isStringNode(ElementaryNode variableNode) {
     return !stringUsageFormat.contains(variableNode.getUsageFormat())

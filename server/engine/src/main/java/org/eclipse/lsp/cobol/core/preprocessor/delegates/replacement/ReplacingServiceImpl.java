@@ -15,8 +15,19 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
+import static java.lang.String.format;
+import static java.util.regex.Matcher.quoteReplacement;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,18 +44,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.lang.String.format;
-import static java.util.regex.Matcher.quoteReplacement;
 
 /**
  * This service applies replacing for given text by replace clauses and tokens. It may work with
@@ -80,7 +79,8 @@ public class ReplacingServiceImpl implements ReplacingService {
   }
 
   @Override
-  public void applyReplacing(@NonNull ExtendedDocument extendedDocument, @NonNull ReplaceData replaceData) {
+  public void applyReplacing(
+      @NonNull ExtendedDocument extendedDocument, @NonNull ReplaceData replaceData) {
     for (Pair<String, String> replacePattern : replaceData.getReplacePatterns()) {
       replace(extendedDocument, replacePattern, replaceData.getRange(extendedDocument.getUri()));
     }
@@ -121,7 +121,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     return isInvalidLength
         ? Optional.of(
             SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.EXTENDED_DOCUMENT)
+                .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .location(locality.toOriginalLocation())
                 .suggestion(
@@ -136,7 +136,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     return isInvalidWordPresent
         ? Optional.of(
             SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.EXTENDED_DOCUMENT)
+                .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .suggestion(messageService.getMessage("ReplacingServiceImpl.invalidWord"))
                 .location(locality.toOriginalLocation())
@@ -228,7 +228,10 @@ public class ReplacingServiceImpl implements ReplacingService {
     return trim.replace(", ", " ").replace("; ", " ");
   }
 
-  private void replace(@NonNull ExtendedDocument extendedDocument, @NonNull Pair<String, String> pattern, @NonNull Range scope) {
+  private void replace(
+      @NonNull ExtendedDocument extendedDocument,
+      @NonNull Pair<String, String> pattern,
+      @NonNull Range scope) {
     String text = extendedDocument.toString();
     if (StringUtils.isBlank(text)) {
       return;
@@ -236,9 +239,8 @@ public class ReplacingServiceImpl implements ReplacingService {
     try {
       Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
       while (matcher.find()) {
-        Range range = new Range(
-                getPosition(text, matcher.start()),
-                getPosition(text, matcher.end()));
+        Range range =
+            new Range(getPosition(text, matcher.start()), getPosition(text, matcher.end()));
         if (RangeUtils.isInside(range, scope)) {
           extendedDocument.replace(range, pattern.getRight());
         }

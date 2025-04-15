@@ -17,10 +17,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
-import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
+import org.eclipse.lsp.cobol.core.model.CobolLineTypeEnum;
+import org.eclipse.lsp.cobol.core.preprocessor.CobolLine;
 import org.junit.jupiter.api.Test;
 
 /** This class is a unit test for {@link CobolLineUtils} and checks its utility methods. */

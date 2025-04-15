@@ -19,9 +19,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Represents PROCEDURE NAME (i.e. paragraph) cobol statement
- */
+/** Represents PROCEDURE NAME (i.e. paragraph) cobol statement */
 @Data
 @Builder(toBuilder = true)
 @AllArgsConstructor

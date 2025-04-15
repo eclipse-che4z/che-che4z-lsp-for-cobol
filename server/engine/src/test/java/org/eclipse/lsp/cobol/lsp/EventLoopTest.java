@@ -25,9 +25,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test LSP Event processing loop.
- */
+/** Test LSP Event processing loop. */
 class EventLoopTest {
   LspMessageBroker messageBroker;
   LspEventConsumer consumer;
@@ -47,18 +45,21 @@ class EventLoopTest {
   @Test
   void testInitialize() throws ExecutionException, InterruptedException, TimeoutException {
     InitializeResult initResult = new InitializeResult();
-    CompletableFuture<InitializeResult> result = messageBroker.query(new LspQuery<InitializeResult>() {
-      private final CompletableFuture<InitializeResult> result = new CompletableFuture<>();
-      @Override
-      public InitializeResult query() {
-        return initResult;
-      }
+    CompletableFuture<InitializeResult> result =
+        messageBroker.query(
+            new LspQuery<InitializeResult>() {
+              private final CompletableFuture<InitializeResult> result = new CompletableFuture<>();
 
-      @Override
-      public CompletableFuture<InitializeResult> getResult() {
-        return result;
-      }
-    });
+              @Override
+              public InitializeResult query() {
+                return initResult;
+              }
+
+              @Override
+              public CompletableFuture<InitializeResult> getResult() {
+                return result;
+              }
+            });
     assertEquals(initResult, result.get(1, TimeUnit.SECONDS));
   }
 }

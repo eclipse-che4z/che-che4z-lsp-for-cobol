@@ -47,7 +47,8 @@ public class MultiTableDataNameNode extends VariableWithLevelNode implements Usa
   protected String getVariableDisplayString() {
     StringBuilder stringBuilder = new StringBuilder(getFormattedSuffix());
     stringBuilder.append(String.format(" OCCURS %1$d TIMES", occursClause.getFrom()));
-    if (usageFormat != UsageFormat.UNDEFINED) stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
+    if (usageFormat != UsageFormat.UNDEFINED)
+      stringBuilder.append(" USAGE ").append(usageFormat.toDisplayString());
     return stringBuilder.append(".").toString();
   }
 }

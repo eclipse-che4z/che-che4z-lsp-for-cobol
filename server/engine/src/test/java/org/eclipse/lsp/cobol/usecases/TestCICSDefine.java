@@ -15,14 +15,13 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 /**
  * Test CICS DEFINE commands. Documentation link: <a
@@ -33,7 +32,8 @@ import java.util.Map;
 public class TestCICSDefine {
 
   private static final String DEFINE_ACTIVITY_ALL_OPTIONS_VALID_ONE =
-      "DEFINE ACTIVITY({$varOne}) EVENT({$varTwo}) TRANSID({$varThree}) PROGRAM({$varFour}) USERID({$varFive}) ACTIVITYID({$varSix})";
+      "DEFINE ACTIVITY({$varOne}) EVENT({$varTwo}) TRANSID({$varThree}) PROGRAM({$varFour})"
+          + " USERID({$varFive}) ACTIVITYID({$varSix})";
 
   private static final String DEFINE_ACTIVITY_PARTIAL_OPTIONS_VALID_ONE =
       "DEFINE ACTIVITY({$varOne}) TRANSID({$varThree}) PROGRAM({$varFour}) ACTIVITYID({$varSix})";
@@ -51,7 +51,8 @@ public class TestCICSDefine {
       "DEFINE {_COMPOSITE EVENT('ERROR') SUBEVENT1(100) SUBEVENT2(200)|errorOne_}";
 
   private static final String DEFINE_COUNTER_ALL_OPTIONS_VALID_ONE =
-      "DEFINE COUNTER({$varFive}) POOL({$varFour}) VALUE({$varOne}) MINIMUM({$varTwo}) MAXIMUM({$varThree}) NOSUSPEND";
+      "DEFINE COUNTER({$varFive}) POOL({$varFour}) VALUE({$varOne}) MINIMUM({$varTwo})"
+          + " MAXIMUM({$varThree}) NOSUSPEND";
 
   private static final String DEFINE_DCOUNTER_PARTIAL_OPTIONS_VALID_ONE =
       "DEFINE DCOUNTER({$varOne}) POOL({$varTwo}) NOSUSPEND";
@@ -65,7 +66,8 @@ public class TestCICSDefine {
   private static final String DEFINE_INPUT_EVENT_INVALID_ONE = "DEFINE {INPUT|errorOne} ";
 
   private static final String DEFINE_PROCESS_ALL_OPTIONS_VALID_ONE =
-      "DEFINE PROCESS({$varOne}) PROCESSTYPE({$varTwo}) TRANSID({$varThree}) PROGRAM({$varFour}) USERID({$varFive}) NOCHECK";
+      "DEFINE PROCESS({$varOne}) PROCESSTYPE({$varTwo}) TRANSID({$varThree}) PROGRAM({$varFour})"
+          + " USERID({$varFive}) NOCHECK";
 
   private static final String DEFINE_PROCESS_PARTIAL_OPTIONS_VALID_ONE =
       "DEFINE PROCESS({$varOne}) PROCESSTYPE({$varTwo}) TRANSID({$varThree})";
@@ -74,7 +76,8 @@ public class TestCICSDefine {
       "DEFINE {PROCESS(10) PROCESSTYPE(100) USERID(1000)|errorOne}";
 
   private static final String DEFINE_PROCESS_TIMER_ALL_OPTIONS_VALID_ONE =
-      "DEFINE TIMER({$varOne}) EVENT({$varTwo}) AT HOURS({$varThree}) MINUTES({$varFour}) ON YEAR({$varfive}) MONTH({$varSix}) DAYOFMONTH({$varSix})";
+      "DEFINE TIMER({$varOne}) EVENT({$varTwo}) AT HOURS({$varThree}) MINUTES({$varFour}) ON"
+          + " YEAR({$varfive}) MONTH({$varSix}) DAYOFMONTH({$varSix})";
 
   private static final String DEFINE_PROCESS_TIMER_PARTIAL_OPTIONS_VALID_ONE =
       "DEFINE TIMER({$varOne}) AFTER DAYS({$varTwo})";

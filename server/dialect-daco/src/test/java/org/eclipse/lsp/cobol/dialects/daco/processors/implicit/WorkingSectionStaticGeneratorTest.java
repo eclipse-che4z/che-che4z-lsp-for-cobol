@@ -14,16 +14,13 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco.processors.implicit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for {@link WorkingSectionStaticGenerator}
- */
+/** Test for {@link WorkingSectionStaticGenerator} */
 public class WorkingSectionStaticGeneratorTest {
   @Test
   void testGenerate() {

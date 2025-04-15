@@ -18,12 +18,11 @@
 package org.eclipse.lsp.cobol.dialects.daco;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.regex.Pattern;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStream;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.common.utils.StringUtils;
-
-import java.util.regex.Pattern;
 
 /**
  * Provide the support of message externalization for Parser.
@@ -34,7 +33,9 @@ public abstract class MessageServiceParser extends Parser {
 
   private static final Pattern ALPHANUMERIC = Pattern.compile("[a-zA-Z0-9]+");
 
-  /** @param input {@link TokenStream} */
+  /**
+   * @param input {@link TokenStream}
+   */
   MessageServiceParser(TokenStream input) {
     super(input);
   }
@@ -124,6 +125,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.exactLength", objectType, validLength.toString());
     }
   }
+
   /**
    * Validate a string length without first and the last symbol and throw an error if it is
    * incorrect
@@ -163,6 +165,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
     }
   }
+
   /**
    * Validate a string value if it is an integer between 0 and 32767 and throw an error if it is
    * incorrect
@@ -188,6 +191,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.startsWith", String.join(" or ", startsWith));
     }
   }
+
   /**
    * Validate a string value if it is an integer between -2 and 99 and throw an error if it is
    * incorrect
@@ -215,6 +219,7 @@ public abstract class MessageServiceParser extends Parser {
       notifyError("parsers.stringLengthRange", minLength.toString(), maxLength.toString());
     }
   }
+
   /**
    * Validate a string value if it is an integer 34 or 16 and throw an error if it is incorrect
    *

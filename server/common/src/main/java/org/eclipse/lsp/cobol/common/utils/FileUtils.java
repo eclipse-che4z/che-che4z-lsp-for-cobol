@@ -14,13 +14,10 @@
  */
 package org.eclipse.lsp.cobol.common.utils;
 
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 
-import java.util.regex.Pattern;
-
-/**
- * File utils
- */
+/** File utils */
 @UtilityClass
 public class FileUtils {
   /**

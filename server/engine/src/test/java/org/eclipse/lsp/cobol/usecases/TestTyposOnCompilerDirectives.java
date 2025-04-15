@@ -44,8 +44,7 @@ class TestTyposOnCompilerDirectives {
           + "002800  HELLOWORLD.                                                     23323232\r\n"
           + "024200 PROCEDURE DIVISION .                                             CM1014.2\r\n";
 
-  private static final String DATA_ERROR_MESSAGE =
-      "Syntax error on 'DDATA'";
+  private static final String DATA_ERROR_MESSAGE = "Syntax error on 'DDATA'";
 
   @Test
   void testProcessWithoutNumbersWithTypo() {

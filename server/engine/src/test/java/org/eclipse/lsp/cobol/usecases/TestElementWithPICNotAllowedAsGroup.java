@@ -48,12 +48,12 @@ class TestElementWithPICNotAllowedAsGroup {
                 new Range(),
                 "CHILD1: Only 01, 66 and 77 level numbers are allowed at the highest level",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText()),
+                ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
                 "Variable CHILD1 is not defined",
                 DiagnosticSeverity.Error,
-                 ErrorSource.PARSING.getText())));
+                ErrorSource.PARSING.getText())));
   }
 }

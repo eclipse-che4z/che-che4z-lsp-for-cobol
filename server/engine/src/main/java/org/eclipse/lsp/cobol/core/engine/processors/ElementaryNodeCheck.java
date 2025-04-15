@@ -15,6 +15,9 @@
 package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -23,10 +26,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.utils.UsageFormatUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 /** Validate proper use of PIC and USAGE clause for elementary nodes */
 public class ElementaryNodeCheck implements Processor<ElementaryNode> {

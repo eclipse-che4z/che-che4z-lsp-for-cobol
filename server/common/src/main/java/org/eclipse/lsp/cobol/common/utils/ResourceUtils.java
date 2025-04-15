@@ -14,18 +14,16 @@
  */
 package org.eclipse.lsp.cobol.common.utils;
 
-import lombok.experimental.UtilityClass;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import lombok.experimental.UtilityClass;
 
-/**
- * Resource utils
- */
+/** Resource utils */
 @UtilityClass
 public class ResourceUtils {
   /**
    * Get input stream of resource file
+   *
    * @param filename is a name if a file
    * @return input stream
    * @throws FileNotFoundException otherwise

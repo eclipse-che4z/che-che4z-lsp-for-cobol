@@ -38,15 +38,15 @@ class TestCopyMaidWithWrkDifferentCase {
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$BHTRGL-XNT}.";
 
-  private static final String COPYBOOK_CONTENT =
-      "1           09 {$*BHTRGL-X`BHTRGL-XNT} PIC X.\n";
+  private static final String COPYBOOK_CONTENT = "1           09 {$*BHTRGL-X`BHTRGL-XNT} PIC X.\n";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
-        ImmutableList.of(
-            new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, COPYBOOK_CONTENT)),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

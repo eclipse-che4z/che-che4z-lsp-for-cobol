@@ -15,10 +15,8 @@
 package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.Optional;
-
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -34,9 +32,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Helper class for Db2SqlVisitor
- */
+/** Helper class for Db2SqlVisitor */
 @UtilityClass
 class Db2SqlVisitorHelper {
 
@@ -87,22 +83,21 @@ class Db2SqlVisitorHelper {
 
   /**
    * Adjust node location as per the starting rule context location
+   *
    * @param ctx
    * @param context
    * @param nodes
    */
-  public void adjustNodeLocations(ParserRuleContext ctx, DialectProcessingContext context, List<? extends Node> nodes) {
+  public void adjustNodeLocations(
+      ParserRuleContext ctx, DialectProcessingContext context, List<? extends Node> nodes) {
     for (Node node : nodes) {
-      OriginalLocation originalLocation = Db2SqlVisitorHelper.adjustLocation(
-              node.getLocality().toOriginalLocation(), ctx, context);
+      OriginalLocation originalLocation =
+          Db2SqlVisitorHelper.adjustLocation(node.getLocality().toOriginalLocation(), ctx, context);
       Locality updatedLocality =
-              node.getLocality().toBuilder()
-                      .range(
-                              originalLocation
-                                      .getLocation()
-                                      .getRange())
-                      .uri(originalLocation.getLocation().getUri())
-                      .build();
+          node.getLocality().toBuilder()
+              .range(originalLocation.getLocation().getRange())
+              .uri(originalLocation.getLocation().getUri())
+              .build();
       node.setLocality(updatedLocality);
       if (node.getChildren().isEmpty()) continue;
       adjustNodeLocations(ctx, context, node.getChildren());
@@ -110,61 +105,56 @@ class Db2SqlVisitorHelper {
   }
 
   public OriginalLocation adjustLocation(
-          OriginalLocation originalLocation,
-          ParserRuleContext sqlCodeContext) {
+      OriginalLocation originalLocation, ParserRuleContext sqlCodeContext) {
     Location location = originalLocation.getLocation();
     Range updatedRange =
-            new Range(
-                    getAdjustedStartPosition(sqlCodeContext, location.getRange().getStart()),
-                    getAdjustedEndPosition(sqlCodeContext, location.getRange().getEnd()));
+        new Range(
+            getAdjustedStartPosition(sqlCodeContext, location.getRange().getStart()),
+            getAdjustedEndPosition(sqlCodeContext, location.getRange().getEnd()));
     location.setRange(updatedRange);
     return new OriginalLocation(location, originalLocation.getCopybookId());
   }
 
   public static Position getAdjustedStartPosition(
-          ParserRuleContext sqlCodeContext, Position position) {
+      ParserRuleContext sqlCodeContext, Position position) {
     Position start;
     if (position.getLine() == 0) {
       start =
-              new Position(
-                      position.getLine() + sqlCodeContext.start.getLine() - 1,
-                      position.getCharacter()
-                              + sqlCodeContext.start.getCharPositionInLine());
+          new Position(
+              position.getLine() + sqlCodeContext.start.getLine() - 1,
+              position.getCharacter() + sqlCodeContext.start.getCharPositionInLine());
     } else {
       start =
-              new Position(
-                      position.getLine() + sqlCodeContext.start.getLine() - 1,
-                      position.getCharacter());
+          new Position(
+              position.getLine() + sqlCodeContext.start.getLine() - 1, position.getCharacter());
     }
     return start;
   }
 
   public static Position getAdjustedEndPosition(
-          ParserRuleContext sqlCodeContext, Position position) {
-      int character = position.getCharacter() + (
-            position.getLine() == 0
-                    ? sqlCodeContext.start.getCharPositionInLine()
-                    : 0);
+      ParserRuleContext sqlCodeContext, Position position) {
+    int character =
+        position.getCharacter()
+            + (position.getLine() == 0 ? sqlCodeContext.start.getCharPositionInLine() : 0);
     return new Position(position.getLine() + sqlCodeContext.start.getLine() - 1, character);
   }
 
-  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(Db2SqlExecParser.Dbs_wheneverContext ctx) {
-    if (ctx.SQLERROR() != null)
-      return ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
-    else if (ctx.SQLWARNING() != null)
-      return ExecSqlWheneverNode.WheneverConditionType.SQLWARNING;
-    else
-      return ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
+  public static ExecSqlWheneverNode.WheneverConditionType getConditionType(
+      Db2SqlExecParser.Dbs_wheneverContext ctx) {
+    if (ctx.SQLERROR() != null) return ExecSqlWheneverNode.WheneverConditionType.SQLERROR;
+    else if (ctx.SQLWARNING() != null) return ExecSqlWheneverNode.WheneverConditionType.SQLWARNING;
+    else return ExecSqlWheneverNode.WheneverConditionType.NOT_FOUND;
   }
 
-  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(Db2SqlExecParser.Dbs_wheneverContext ctx) {
+  public static Pair<ExecSqlWheneverNode.WheneverType, String> getWheneverType(
+      Db2SqlExecParser.Dbs_wheneverContext ctx) {
     if (ctx.CONTINUE() != null) {
       return Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null);
     }
     return Optional.ofNullable(ctx.dbs_host_label())
         .map(Db2SqlExecParser.Dbs_host_labelContext::dbs_sql_identifier)
         .filter(hn -> !hn.isEmpty())
-//        .map(c -> c.get(0))
+        //        .map(c -> c.get(0))
         .map(ParseTree::getText)
         .map(t -> Pair.of(ExecSqlWheneverNode.WheneverType.GOTO, t))
         .orElse(Pair.of(ExecSqlWheneverNode.WheneverType.CONTINUE, null));

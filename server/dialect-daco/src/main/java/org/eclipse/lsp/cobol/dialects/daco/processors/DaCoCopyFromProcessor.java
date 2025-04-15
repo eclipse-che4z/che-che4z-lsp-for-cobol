@@ -14,32 +14,33 @@
  */
 package org.eclipse.lsp.cobol.dialects.daco.processors;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.common.symbols.VariableAccumulator;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 /** Handle Copy From node */
 public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
 
   @Override
   public void accept(DaCoCopyFromNode copyFromNode, ProcessingContext processingContext) {
-    astPostprocessing(processingContext.getVariableAccumulator(), copyFromNode, processingContext.getErrors());
+    astPostprocessing(
+        processingContext.getVariableAccumulator(), copyFromNode, processingContext.getErrors());
   }
 
-  private void astPostprocessing(VariableAccumulator variableAccumulator, DaCoCopyFromNode node, List<SyntaxError> errors) {
+  private void astPostprocessing(
+      VariableAccumulator variableAccumulator, DaCoCopyFromNode node, List<SyntaxError> errors) {
 
     List<GroupItemNode> protoCandidates =
         node.getNearestParentByType(NodeType.PROGRAM)

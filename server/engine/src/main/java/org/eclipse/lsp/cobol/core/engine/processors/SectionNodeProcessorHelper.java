@@ -183,41 +183,44 @@ public class SectionNodeProcessorHelper {
     return areNodesAdjusted;
   }
 
-  private static void adjustVariableNodeInsideCopyNode(CopyNode copyNode, List<Node> variables, int i, Node variable) {
-      if (variable instanceof VariableDefinitionNode) {
-          int insertIndex;
-          for (insertIndex = 0; insertIndex < copyNode.getChildren().size(); insertIndex++) {
-              Node node = copyNode.getChildren().get(insertIndex);
-              if (node instanceof CopyNode) {
-                  adjustCopyNodeChild((CopyNode) node, variables, i);
-              }
-              Locality copybNodeChildLocality = node.getLocality();
-              Locality variableLocality = variable.getLocality();
-              if (RangeUtils.isBefore(variableLocality.getRange().getStart(), copybNodeChildLocality.getRange().getStart())) {
-                  break;
-              }
-          }
-          if (!isVariableNodeAlreadyPresentIn(copyNode, (VariableDefinitionNode) variable)) {
-              copyNode.addChildAt(insertIndex, variable);
-              variables.remove(variable);
-          }
-      }
-  }
-
-    private static boolean isVariableNodeAlreadyPresentIn(CopyNode copyNode, VariableDefinitionNode variable) {
-      for (Node node : copyNode.getChildren()) {
-        if (node instanceof VariableDefinitionNode) {
-          VariableDefinitionNode varNode = (VariableDefinitionNode) node;
-          if (varNode.getLocality().equals(variable.getLocality())
-                  && varNode.getVariableName().equals(variable.getVariableName())) {
-            return true;
-          }
+  private static void adjustVariableNodeInsideCopyNode(
+      CopyNode copyNode, List<Node> variables, int i, Node variable) {
+    if (variable instanceof VariableDefinitionNode) {
+      int insertIndex;
+      for (insertIndex = 0; insertIndex < copyNode.getChildren().size(); insertIndex++) {
+        Node node = copyNode.getChildren().get(insertIndex);
+        if (node instanceof CopyNode) {
+          adjustCopyNodeChild((CopyNode) node, variables, i);
+        }
+        Locality copybNodeChildLocality = node.getLocality();
+        Locality variableLocality = variable.getLocality();
+        if (RangeUtils.isBefore(
+            variableLocality.getRange().getStart(), copybNodeChildLocality.getRange().getStart())) {
+          break;
         }
       }
-      return false;
+      if (!isVariableNodeAlreadyPresentIn(copyNode, (VariableDefinitionNode) variable)) {
+        copyNode.addChildAt(insertIndex, variable);
+        variables.remove(variable);
+      }
     }
+  }
 
-    private static boolean canInsertCopyNodeAtIndex(
+  private static boolean isVariableNodeAlreadyPresentIn(
+      CopyNode copyNode, VariableDefinitionNode variable) {
+    for (Node node : copyNode.getChildren()) {
+      if (node instanceof VariableDefinitionNode) {
+        VariableDefinitionNode varNode = (VariableDefinitionNode) node;
+        if (varNode.getLocality().equals(variable.getLocality())
+            && varNode.getVariableName().equals(variable.getVariableName())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private static boolean canInsertCopyNodeAtIndex(
       CopyNode copyNode, int index, List<Node> variables) {
     String copybookLocalityUri = copyNode.getLocality().getUri();
     Range copybookLocalityRange = copyNode.getLocality().getRange();
@@ -317,7 +320,9 @@ public class SectionNodeProcessorHelper {
       return lastVariableOnTheLevel;
     }
     if (isRootLevel(definitionNode.getLevel())) {
-      return definitionNode.getNearestParent(n -> !n.getNodeType().equals(NodeType.VARIABLE_DEFINITION)).get();
+      return definitionNode
+          .getNearestParent(n -> !n.getNodeType().equals(NodeType.VARIABLE_DEFINITION))
+          .get();
     }
     if (lastVariableOnTheLevel.getVariableType() == VariableType.GROUP_ITEM) {
       return lastVariableOnTheLevel;
@@ -329,15 +334,17 @@ public class SectionNodeProcessorHelper {
   }
 
   private Optional<ResultWithErrors<VariableNode>> convert(VariableDefinitionNode definitionNode) {
-      for (Function<VariableDefinitionNode, ResultWithErrors<VariableNode>> matcher : matchers) {
-          ResultWithErrors<VariableNode> result = matcher.apply(definitionNode);
-          if (result != null) {
-              ResultWithErrors<VariableNode> variableNodeResultWithErrors = handleGeneralErrors(result, definitionNode);
-              ResultWithErrors<VariableNode> nodeResultWithErrors = handleRedefines(variableNodeResultWithErrors, definitionNode);
-              return Optional.of(nodeResultWithErrors);
-          }
+    for (Function<VariableDefinitionNode, ResultWithErrors<VariableNode>> matcher : matchers) {
+      ResultWithErrors<VariableNode> result = matcher.apply(definitionNode);
+      if (result != null) {
+        ResultWithErrors<VariableNode> variableNodeResultWithErrors =
+            handleGeneralErrors(result, definitionNode);
+        ResultWithErrors<VariableNode> nodeResultWithErrors =
+            handleRedefines(variableNodeResultWithErrors, definitionNode);
+        return Optional.of(nodeResultWithErrors);
       }
-      return Optional.empty();
+    }
+    return Optional.empty();
   }
 
   private ResultWithErrors<VariableNode> handleGeneralErrors(

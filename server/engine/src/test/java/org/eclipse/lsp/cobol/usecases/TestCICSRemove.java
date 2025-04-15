@@ -24,22 +24,22 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test CICS REMOVE SUBEVENT command. Documentation link: <a
- * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-remove-subevent">REMOVE SUBEVENT Command</a>
+ * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-remove-subevent">REMOVE SUBEVENT
+ * Command</a>
  *
  * <p>This class tests the REMOVE SUBEVENT command.
  */
 public class TestCICSRemove {
-  private static final String REMOVE_SUBEVENT_VALID =
-          "REMOVE SUBEVENT({$varOne}) EVENT({$varTwo})";
+  private static final String REMOVE_SUBEVENT_VALID = "REMOVE SUBEVENT({$varOne}) EVENT({$varTwo})";
 
   private static final String REMOVE_SUBEVENT_INVALID_NO_SUBEVENT =
-          "REMOVE {_EVENT({$varOne})|errorOne_}";
+      "REMOVE {_EVENT({$varOne})|errorOne_}";
 
   private static final String REMOVE_SUBEVENT_INVALID_NO_EVENT =
-          "REMOVE {_SUBEVENT({$varOne})|errorOne_}";
+      "REMOVE {_SUBEVENT({$varOne})|errorOne_}";
 
   private static final String REMOVE_SUBEVENT_INVALID_DUPLICATE_EVENT =
-          "REMOVE SUBEVENT({$varOne}) EVENT({$varTwo}) {EVENT|errorOne}({$varTwo})";
+      "REMOVE SUBEVENT({$varOne}) EVENT({$varTwo}) {EVENT|errorOne}({$varTwo})";
 
   @Test
   void testRemoveSubeventValid() {
@@ -49,39 +49,39 @@ public class TestCICSRemove {
   @Test
   void testRemoveSubeventInvalidNoSubevent() {
     CICSTestUtils.errorTest(
-            REMOVE_SUBEVENT_INVALID_NO_SUBEVENT,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: SUBEVENT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        REMOVE_SUBEVENT_INVALID_NO_SUBEVENT,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SUBEVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testRemoveSubeventInvalidNoEvent() {
     CICSTestUtils.errorTest(
-            REMOVE_SUBEVENT_INVALID_NO_EVENT,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: EVENT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        REMOVE_SUBEVENT_INVALID_NO_EVENT,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: EVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
   void testRemoveSubeventInvalidExtraOption() {
     CICSTestUtils.errorTest(
-            REMOVE_SUBEVENT_INVALID_DUPLICATE_EVENT,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Excessive options provided for: EVENT",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        REMOVE_SUBEVENT_INVALID_DUPLICATE_EVENT,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Excessive options provided for: EVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

@@ -21,9 +21,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Dialect utils class
- */
+/** Dialect utils class */
 @UtilityClass
 public class DialectUtils {
   /**
@@ -36,13 +34,10 @@ public class DialectUtils {
     Token start = ctx.start;
     Token stop = ctx.stop;
     return new Range(
-            new Position(
-                    start.getLine() - 1,
-                    start.getCharPositionInLine()),
-            new Position(
-                    stop.getLine() - 1,
-                    stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1)
-    );
+        new Position(start.getLine() - 1, start.getCharPositionInLine()),
+        new Position(
+            stop.getLine() - 1,
+            stop.getCharPositionInLine() + stop.getStopIndex() - stop.getStartIndex() + 1));
   }
 
   /**
@@ -55,15 +50,15 @@ public class DialectUtils {
     int line = token.getSymbol().getLine();
     int inLine = token.getSymbol().getCharPositionInLine();
     return new Range(
-            new Position(line - 1, inLine),
-            new Position(
-                    line - 1,
-                    inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1)
-    );
+        new Position(line - 1, inLine),
+        new Position(
+            line - 1,
+            inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1));
   }
 
   /**
    * Find line column position by string index
+   *
    * @param text input string
    * @param pos position in text
    * @return position

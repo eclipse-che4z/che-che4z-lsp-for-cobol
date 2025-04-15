@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 
 import com.google.inject.Inject;
-
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.UserInterruptException;
@@ -75,7 +73,10 @@ public class DidChangeWatchedFilesHandler {
               }
               String uriString = path.toUri().toString();
               if (sourceUnitGraph.isFileOpened(uriString)) {
-                LOG.debug("[File change event]  ignoring event for uri : {} as its already opened in editor", uri);
+                LOG.debug(
+                    "[File change event]  ignoring event for uri : {} as its already opened in"
+                        + " editor",
+                    uri);
                 // opened files are taken care by textChange events
                 return;
               }
@@ -131,7 +132,9 @@ public class DidChangeWatchedFilesHandler {
     affectedPrograms.forEach(this::triggerAnalysisForChangedFile);
 
     if (affectedPrograms.isEmpty()) {
-      LOG.debug("[File change event]  trigger analysis for all opened document due to event for path: {}", path);
+      LOG.debug(
+          "[File change event]  trigger analysis for all opened document due to event for path: {}",
+          path);
       analyseAllOpenedDocument();
     }
   }

@@ -12,16 +12,18 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
- package org.eclipse.lsp.cobol.dialects.daco;
+package org.eclipse.lsp.cobol.dialects.daco;
 
 import java.util.Optional;
 
 /** DaCo related utilites */
 public class DaCoHelper {
 
-  /** extract suffix (two characters after -\w substring) of
-   *  @param name of variable
-   *  @return suffix or null if not found
+  /**
+   * extract suffix (two characters after -\w substring) of
+   *
+   * @param name of variable
+   * @return suffix or null if not found
    */
   public static Optional<String> extractSuffix(String name) {
     if (name.length() < 3) {

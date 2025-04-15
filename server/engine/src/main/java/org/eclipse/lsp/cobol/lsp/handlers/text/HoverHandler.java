@@ -29,9 +29,7 @@ import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.HoverParams;
 
-/**
- * LSP Hover Handler
- */
+/** LSP Hover Handler */
 @Slf4j
 public class HoverHandler {
   private final AsyncAnalysisService asyncAnalysisService;
@@ -40,7 +38,11 @@ public class HoverHandler {
   private final SourceUnitGraph documentGraph;
 
   @Inject
-  public HoverHandler(AsyncAnalysisService asyncAnalysisService, Set<HoverProvider> hoverProvider, DocumentModelService documentModelService, SourceUnitGraph documentGraph) {
+  public HoverHandler(
+      AsyncAnalysisService asyncAnalysisService,
+      Set<HoverProvider> hoverProvider,
+      DocumentModelService documentModelService,
+      SourceUnitGraph documentGraph) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.hoverProvider = hoverProvider;
     this.documentModelService = documentModelService;
@@ -52,7 +54,7 @@ public class HoverHandler {
    *
    * @param params HoverParams.
    * @return Hover data.
-   * @throws ExecutionException   forward exception.
+   * @throws ExecutionException forward exception.
    * @throws InterruptedException forward exception.
    */
   public Hover hover(HoverParams params) throws ExecutionException, InterruptedException {
@@ -83,6 +85,6 @@ public class HoverHandler {
    */
   public ImmutableList<LspEventDependency> getDependencies(HoverParams params) {
     return ImmutableList.of(
-            asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+        asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
   }
 }

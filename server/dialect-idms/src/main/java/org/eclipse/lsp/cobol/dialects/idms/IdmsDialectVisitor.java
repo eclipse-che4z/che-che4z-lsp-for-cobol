@@ -15,6 +15,11 @@
 package org.eclipse.lsp.cobol.dialects.idms;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -22,24 +27,14 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-/**
- * Visitor to collect all IDMS copybooks
- */
+/** Visitor to collect all IDMS copybooks */
 class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescriptor>> {
 
   private static final String DEFAULT_PLACEMENT = "WORKING-STORAGE";
   private static final String SUBSCHEMA_COPY = "SUBSCHEMA-DESCRIPTION";
   private static final String MAPS_COPY = "MAPS";
 
-  /**
-   * Contains information about records statement defined in the program
-   */
+  /** Contains information about records statement defined in the program */
   @Data
   private static class IdmsRecordsDescriptor {
     private boolean recordsManualExists;
@@ -48,8 +43,7 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
   }
 
   private final DialectProcessingContext context;
-  @Getter
-  private final IdmsRecordsDescriptor recordsDescriptor;
+  @Getter private final IdmsRecordsDescriptor recordsDescriptor;
 
   IdmsDialectVisitor(DialectProcessingContext context) {
     this.context = context;
@@ -58,8 +52,10 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
   }
 
   @Override
-  public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(IdmsParser.CopyIdmsStatementContext ctx) {
-    return ImmutableList.of(IdmsCopybookDescriptor.from(ctx, context.getExtendedDocument().getUri()));
+  public List<IdmsCopybookDescriptor> visitCopyIdmsStatement(
+      IdmsParser.CopyIdmsStatementContext ctx) {
+    return ImmutableList.of(
+        IdmsCopybookDescriptor.from(ctx, context.getExtendedDocument().getUri()));
   }
 
   @Override
@@ -68,9 +64,11 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
   }
 
   @Override
-  public List<IdmsCopybookDescriptor> visitIdmsRecordLocationParagraph(IdmsParser.IdmsRecordLocationParagraphContext ctx) {
+  public List<IdmsCopybookDescriptor> visitIdmsRecordLocationParagraph(
+      IdmsParser.IdmsRecordLocationParagraphContext ctx) {
     if (ctx.withinClause() != null) {
-      if (ctx.withinClause().withinEntry() != null && ctx.withinClause().withinEntry().children.size() > 1) {
+      if (ctx.withinClause().withinEntry() != null
+          && ctx.withinClause().withinEntry().children.size() > 1) {
         String placement = ctx.withinClause().withinEntry().getChild(1).getText().toUpperCase();
         recordsDescriptor.setRecordsWithinPlacement(placement);
       } else if ("MANUAL".equalsIgnoreCase(ctx.withinClause().getText())) {
@@ -88,9 +86,8 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
 
   @Override
   protected List<IdmsCopybookDescriptor> aggregateResult(
-          List<IdmsCopybookDescriptor> aggregate, List<IdmsCopybookDescriptor> nextResult) {
-    List<IdmsCopybookDescriptor> result =
-            new ArrayList<>(aggregate.size() + nextResult.size());
+      List<IdmsCopybookDescriptor> aggregate, List<IdmsCopybookDescriptor> nextResult) {
+    List<IdmsCopybookDescriptor> result = new ArrayList<>(aggregate.size() + nextResult.size());
     result.addAll(aggregate);
     result.addAll(nextResult);
     return result;
@@ -108,7 +105,10 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
       return ImmutableList.of();
     }
     List<IdmsCopybookDescriptor> result = new LinkedList<>();
-    Pattern pattern = Pattern.compile(recordsDescriptor.getRecordsWithinPlacement() + " +SECTION", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    Pattern pattern =
+        Pattern.compile(
+            recordsDescriptor.getRecordsWithinPlacement() + " +SECTION",
+            Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     String[] lines = context.getExtendedDocument().toString().split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {
@@ -127,10 +127,11 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
   private IdmsCopybookDescriptor createDescriptor(int i, String name, int start, int end) {
     IdmsCopybookDescriptor descriptor = new IdmsCopybookDescriptor();
     descriptor.setName(name);
-    Locality locality = Locality.builder()
-        .uri(context.getProgramDocumentUri())
-        .range(new Range(new Position(i, start), new Position(i, end)))
-        .build();
+    Locality locality =
+        Locality.builder()
+            .uri(context.getProgramDocumentUri())
+            .range(new Range(new Position(i, start), new Position(i, end)))
+            .build();
 
     descriptor.setUsage(locality);
     descriptor.setStatement(locality);

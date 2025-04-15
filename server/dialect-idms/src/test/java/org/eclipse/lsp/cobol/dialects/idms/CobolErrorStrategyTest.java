@@ -14,6 +14,10 @@
  */
 package org.eclipse.lsp.cobol.dialects.idms;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.google.common.collect.ImmutableList;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
@@ -25,18 +29,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-/**
- * Test for {@link CobolErrorStrategy}
- */
+/** Test for {@link CobolErrorStrategy} */
 @ExtendWith(MockitoExtension.class)
 class CobolErrorStrategyTest {
 
-  @Mock
-  private MessageService messageService;
+  @Mock private MessageService messageService;
   private CobolErrorStrategy service;
 
   private InputMismatchException prepareInputMismatchException(Parser parser) {
@@ -92,27 +89,28 @@ class CobolErrorStrategyTest {
 
   @Test
   void testReportErrorFailedPredicateException() {
-    Parser parser = new Parser(mock(TokenStream.class)) {
-      @Override
-      public String[] getTokenNames() {
-        return new String[0];
-      }
+    Parser parser =
+        new Parser(mock(TokenStream.class)) {
+          @Override
+          public String[] getTokenNames() {
+            return new String[0];
+          }
 
-      @Override
-      public String[] getRuleNames() {
-        return new String[] {""};
-      }
+          @Override
+          public String[] getRuleNames() {
+            return new String[] {""};
+          }
 
-      @Override
-      public String getGrammarFileName() {
-        return null;
-      }
+          @Override
+          public String getGrammarFileName() {
+            return null;
+          }
 
-      @Override
-      public ATN getATN() {
-        return null;
-      }
-    };
+          @Override
+          public ATN getATN() {
+            return null;
+          }
+        };
     FailedPredicateException exception = mock(FailedPredicateException.class);
     when(exception.getOffendingToken()).thenReturn(mock(Token.class));
 
@@ -153,5 +151,4 @@ class CobolErrorStrategyTest {
 
     verify(messageService, times(1)).getMessage(any(), any(), any());
   }
-
 }

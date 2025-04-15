@@ -16,15 +16,15 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
-import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
-/** A test case for COPY FROM statement with group variables*/
+/** A test case for COPY FROM statement with group variables */
 public class TestDaCoCopyFrom2 {
   private static final String TEXT =
-            "       IDENTIFICATION DIVISION.\n"
+      "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    CPYFROM.\n"
           + "       ENVIRONMENT DIVISION.\n"
           + "       IDMS-CONTROL SECTION.\n"

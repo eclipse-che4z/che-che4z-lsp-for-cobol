@@ -15,9 +15,8 @@
 package org.eclipse.lsp.cobol.cli.processorgroups;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.Getter;
-
 import java.util.List;
+import lombok.Getter;
 
 /** processor group representation */
 @Getter
@@ -27,5 +26,4 @@ class ProcessorGroup {
 
   @SerializedName("copybook-extensions")
   List<String> copybookExtensions;
-
 }

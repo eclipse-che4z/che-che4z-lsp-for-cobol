@@ -157,6 +157,9 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.logChannel?.debug(`Invalidate document: ${documentUri}`);
 
     this.invalidatePromise(documentUri, rejectPromise);
+    if (rejectPromise) {
+      this.diagnosticService.clearDiagnostics(documentUri);
+    }
     await this.removeTask(documentUri);
   }
 
@@ -320,10 +323,14 @@ class DiagnosticService {
     documentUri: string,
     diagnostics: Map<string, vscode.Diagnostic[]>,
   ) {
-    this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
+    this.clearDiagnostics(documentUri);
     diagnostics.forEach((v, k) =>
       this.diagnosticCollection.set(vscode.Uri.parse(k), v),
     );
+  }
+
+  public clearDiagnostics(documentUri: string) {
+    this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
   }
 }
 

@@ -17,17 +17,18 @@ package org.eclipse.lsp.cobol.common.mapping;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Range;
 
-/**
- * Replacement text strategy
- */
+/** Replacement text strategy */
 interface ReplaceStrategy {
   /**
    * Execute replace strategy for extended text
+   *
    * @param extendedText to execute replace
    * @param range - replace range
    * @param newText - new text
-   * @param originalLocation - original location (url + range) before updating range for dirty document
+   * @param originalLocation - original location (url + range) before updating range for dirty
+   *     document
    * @return true if strategy was executed and false otherwise
    */
-  boolean execute(ExtendedText extendedText, Range range, String newText, Location originalLocation);
+  boolean execute(
+      ExtendedText extendedText, Range range, String newText, Location originalLocation);
 }

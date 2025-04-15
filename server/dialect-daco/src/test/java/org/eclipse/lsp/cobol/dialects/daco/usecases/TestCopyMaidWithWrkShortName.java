@@ -39,15 +39,15 @@ class TestCopyMaidWithWrkShortName {
           + "           DISPLAY {$A}.";
 
   private static final String BHTRGL_XBG =
-      "            09 {$*A} PIC X.\n"
-          + "            09 PIC X.\n"
-          + "            09 FILLER PIC x.";
+      "            09 {$*A} PIC X.\n" + "            09 PIC X.\n" + "            09 FILLER PIC x.";
 
   @Test
   void test() {
     UseCaseEngine.runTest(
         TEXT,
         ImmutableList.of(new CobolText("BHTRGL-XBG", DaCoDialect.NAME, BHTRGL_XBG)),
-        ImmutableMap.of(), ImmutableList.of(), DialectConfigs.getDaCoAnalysisConfig());
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getDaCoAnalysisConfig());
   }
 }

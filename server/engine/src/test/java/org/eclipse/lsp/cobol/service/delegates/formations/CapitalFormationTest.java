@@ -14,7 +14,11 @@
  */
 package org.eclipse.lsp.cobol.service.delegates.formations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -22,17 +26,10 @@ import org.eclipse.lsp4j.TextEdit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for CapitalFormation
- */
+/** Test for CapitalFormation */
 class CapitalFormationTest {
   private static final String TEXT =
-            "      *  commented line \n"
+      "      *  commented line \n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.xML5.\n"
           + "       DATA DIVISION.\n"
@@ -55,10 +52,12 @@ class CapitalFormationTest {
           + "           move '<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP-ENV:Envelop\n"
           + "      -          'e.....<SOAP-ENV:Envelope>' to {$XMLFILEINH}\n"
           + "       \n";
+
   @Test
   void WhenFormatIsCalledWithNullParam_thenIllegalArgumentException() {
     CapitalFormation formation = new CapitalFormation();
-    Assertions.assertThrows(IllegalArgumentException.class, () -> formation.format(null, ImmutableList.of()));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> formation.format(null, ImmutableList.of()));
   }
 
   @Test
@@ -81,7 +80,8 @@ class CapitalFormationTest {
   void whenFormatIsCalledWithUppercaseParamsNearLeftBorders_thenGetProperCollection() {
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", " a    aaaAAA AAA  aaa");
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(2, format.size());
 
@@ -95,8 +95,11 @@ class CapitalFormationTest {
   @Test
   void whenFormatIsCalledWithUppercaseParamsNearRightBorders_thenGetProperCollection() {
     CapitalFormation formation = new CapitalFormation();
-    CobolDocumentModel model = new CobolDocumentModel("", "                                                                      aabb");
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    CobolDocumentModel model =
+        new CobolDocumentModel(
+            "", "                                                                      aabb");
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(1, format.size());
 
@@ -108,7 +111,8 @@ class CapitalFormationTest {
   void whenFormatIsCalledWithUppercaseParamsNearLiteralVaruable_thenGetProperCollection() {
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", "          aa'fhjhsdjh'bb");
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(2, format.size());
 
@@ -122,15 +126,16 @@ class CapitalFormationTest {
   @Test
   void whenFormatIsCalledForMultilineProgramId_thenGetProperCollection() {
     String text =
-          "       IDENTIFICATION DIVISION.\n"
-        + "       PROGRAM-id. \n"
-        + "           xml5.\n"
-        + "       data DIVISION.\n";
+        "       IDENTIFICATION DIVISION.\n"
+            + "       PROGRAM-id. \n"
+            + "           xml5.\n"
+            + "       data DIVISION.\n";
 
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", text);
 
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
     assertEquals(2, format.size());
 
     assertEquals("ID", format.get(0).getNewText());
@@ -147,7 +152,8 @@ class CapitalFormationTest {
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", text);
 
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
     assertEquals(1, format.size());
 
     assertEquals("MOVE", format.get(0).getNewText());
@@ -158,7 +164,8 @@ class CapitalFormationTest {
   void whenFormatIsCalledWithUppercaseParams_thenGetProperCollection() {
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", TEXT);
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
     assertEquals(8, format.size());
   }
 
@@ -166,7 +173,8 @@ class CapitalFormationTest {
   void whenFormatIsCalledWithUppercaseParamsForInlineComment_thenGetProperCollection() {
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", "       *>aAA AAA  aaa");
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(0, format.size());
   }
@@ -175,7 +183,8 @@ class CapitalFormationTest {
   void whenFormatIsCalledWithUppercaseParamsForInlineCommentInTheMiddle_thenGetProperCollection() {
     CapitalFormation formation = new CapitalFormation();
     CobolDocumentModel model = new CobolDocumentModel("", "       aa*>aAA AAA  aaa");
-    List<TextEdit> format = formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
+    List<TextEdit> format =
+        formation.format(model.getLines(), ImmutableList.of(CapitalFormation.UPPERCASE));
 
     assertEquals(1, format.size());
 

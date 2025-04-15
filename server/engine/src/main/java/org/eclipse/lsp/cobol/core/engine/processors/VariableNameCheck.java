@@ -14,14 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
+import java.util.Locale;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-
-import java.util.Locale;
 
 /**
  * perform semantics check on the name of a VariableNode. If a function is declared in the

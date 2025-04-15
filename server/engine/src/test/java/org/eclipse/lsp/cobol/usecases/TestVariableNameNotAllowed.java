@@ -29,26 +29,26 @@ import org.junit.jupiter.params.provider.ValueSource;
 /** Tests the allowed name on a variable. */
 public class TestVariableNameNotAllowed {
   public static final String TEXT =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID.    TEST12.\n"
-                  + "       ENVIRONMENT DIVISION.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01 {$*%s|1} PIC 9(9) VALUE 0.\n"
-                  + "       PROCEDURE DIVISION.";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*%s|1} PIC 9(9) VALUE 0.\n"
+          + "       PROCEDURE DIVISION.";
 
   @ParameterizedTest
   @ValueSource(strings = {"INSERT", "COPY"})
   void test(String input) {
     UseCaseEngine.runTest(
-            String.format(TEXT, input),
-            ImmutableList.of(),
-            ImmutableMap.of(
-                    "1",
-                    new Diagnostic(
-                            new Range(),
-                            String.format("Variable name %s is not allowed", input),
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        String.format(TEXT, input),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                String.format("Variable name %s is not allowed", input),
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

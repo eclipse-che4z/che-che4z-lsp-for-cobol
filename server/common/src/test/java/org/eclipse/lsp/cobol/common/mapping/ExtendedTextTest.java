@@ -14,22 +14,18 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-/**
- * Test for ExtendedText class
- */
+/** Test for ExtendedText class */
 class ExtendedTextTest {
 
-  private static final String TEXT = "     0 LINE\n"
-      + "     1 LINE\n"
-      + "     2 LINE\n"
-      + "     3 LINE\n";
+  private static final String TEXT =
+      "     0 LINE\n" + "     1 LINE\n" + "     2 LINE\n" + "     3 LINE\n";
 
   @Test
   void testToString() {
@@ -47,11 +43,15 @@ class ExtendedTextTest {
 
     Range range = new Range(new Position(4, 0), new Position(4, 5));
     Location location = extendedText.mapLocation(range);
-    assertEquals(new Range(new Position(3, 0), new Position(3, 5)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(3, 0), new Position(3, 5)).toString(),
+        location.getRange().toString());
 
     range = new Range(new Position(2, 0), new Position(2, 5));
     location = extendedText.mapLocation(range);
-    assertEquals(new Range(new Position(0, 0), new Position(0, 5)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(0, 0), new Position(0, 5)).toString(),
+        location.getRange().toString());
     assertEquals("copybook", location.getUri());
   }
 
@@ -62,7 +62,9 @@ class ExtendedTextTest {
 
     Range range = new Range(new Position(4, 0), new Position(4, 5));
     Location location = extendedText.mapLocation(range);
-    assertEquals(new Range(new Position(0, 0), new Position(0, 5)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(0, 0), new Position(0, 5)).toString(),
+        location.getRange().toString());
     assertEquals("copybook", location.getUri());
   }
 
@@ -73,19 +75,25 @@ class ExtendedTextTest {
 
     Range range = new Range(new Position(0, 0), new Position(0, 5));
     Location location = extendedText.mapLocation(range);
-    assertEquals(new Range(new Position(0, 0), new Position(0, 5)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(0, 0), new Position(0, 5)).toString(),
+        location.getRange().toString());
     assertEquals("copybook", location.getUri());
 
     range = new Range(new Position(1, 0), new Position(1, 5));
     location = extendedText.mapLocation(range);
-    assertEquals(new Range(new Position(0, 0), new Position(0, 5)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(0, 0), new Position(0, 5)).toString(),
+        location.getRange().toString());
     assertEquals("uri", location.getUri());
   }
 
   @Test
   void insertExtendedText() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
-    extendedText.insert(new Range(new Position(1, 7), new Position(2, 8)), new ExtendedText("COPYBOOK 1 LINE\r\nCOPYBOOK 2 LINE\r\nCOPYBOOK 3 LINE", "copybook"));
+    extendedText.insert(
+        new Range(new Position(1, 7), new Position(2, 8)),
+        new ExtendedText("COPYBOOK 1 LINE\r\nCOPYBOOK 2 LINE\r\nCOPYBOOK 3 LINE", "copybook"));
 
     Range range = new Range(new Position(2, 0), new Position(2, 3));
     Location location = extendedText.mapLocation(range);
@@ -101,13 +109,17 @@ class ExtendedTextTest {
             + "     3 LINE",
         extendedText.toString());
 
-    assertEquals(new Range(new Position(0, 0), new Position(0, 3)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(0, 0), new Position(0, 3)).toString(),
+        location.getRange().toString());
     assertEquals("copybook", location.getUri());
 
     range = new Range(new Position(6, 0), new Position(6, 3));
     location = extendedText.mapLocation(range);
 
-    assertEquals(new Range(new Position(2, 0), new Position(2, 3)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(2, 0), new Position(2, 3)).toString(),
+        location.getRange().toString());
     assertEquals("uri", location.getUri());
   }
 
@@ -124,11 +136,9 @@ class ExtendedTextTest {
   void testAddLineBreak() {
     ExtendedText extendedText = new ExtendedText(TEXT, "uri");
     extendedText.addLineBreak(new Position(1, 6));
-    assertEquals("     0 LINE\n"
-        + "     1\n"
-        + " LINE\n"
-        + "     2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "     1\n" + " LINE\n" + "     2 LINE\n" + "     3 LINE",
+        extendedText.toString());
   }
 
   @Test
@@ -146,10 +156,8 @@ class ExtendedTextTest {
     Range newRange = new Range(new Position(1, 1), new Position(1, 6));
     location = extendedText.mapLocation(newRange);
 
-    assertEquals("     0 LINE\n"
-        + "  1 LINE\n"
-        + "     2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "  1 LINE\n" + "     2 LINE\n" + "     3 LINE", extendedText.toString());
     assertEquals(range.toString(), location.getRange().toString());
     assertEquals("uri", location.getUri());
   }
@@ -164,12 +172,12 @@ class ExtendedTextTest {
     Range newRange = new Range(new Position(2, 1), new Position(2, 6));
     Location location = extendedText.mapLocation(newRange);
 
-    assertEquals("     0 LINE\n"
-        + "     1\n"
-        + " 2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "     1\n" + " 2 LINE\n" + "     3 LINE", extendedText.toString());
 
-    assertEquals(new Range(new Position(2, 5), new Position(2, 10)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(2, 5), new Position(2, 10)).toString(),
+        location.getRange().toString());
   }
 
   @Test
@@ -182,11 +190,11 @@ class ExtendedTextTest {
     Range newRange = new Range(new Position(2, 1), new Position(2, 6));
     Location location = extendedText.mapLocation(newRange);
 
-    assertEquals("     0 LINE\n"
-        + "     1\n"
-        + " 3 LINE", extendedText.toString());
+    assertEquals("     0 LINE\n" + "     1\n" + " 3 LINE", extendedText.toString());
 
-    assertEquals(new Range(new Position(3, 5), new Position(3, 10)).toString(), location.getRange().toString());
+    assertEquals(
+        new Range(new Position(3, 5), new Position(3, 10)).toString(),
+        location.getRange().toString());
   }
 
   @Test
@@ -196,10 +204,9 @@ class ExtendedTextTest {
     Range range = new Range(new Position(0, 8), new Position(0, 10));
     extendedText.clear(range);
 
-    assertEquals("     0 L  E\n"
-        + "     1 LINE\n"
-        + "     2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 L  E\n" + "     1 LINE\n" + "     2 LINE\n" + "     3 LINE",
+        extendedText.toString());
   }
 
   @Test
@@ -209,11 +216,9 @@ class ExtendedTextTest {
     Range range = new Range(new Position(0, 8), new Position(1, 6));
     extendedText.clear(range);
 
-
-    assertEquals("     0 L   \n"
-        + "       LINE\n"
-        + "     2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 L   \n" + "       LINE\n" + "     2 LINE\n" + "     3 LINE",
+        extendedText.toString());
   }
 
   @Test
@@ -223,10 +228,9 @@ class ExtendedTextTest {
     Range range = new Range(new Position(0, 8), new Position(3, 9));
     extendedText.clear(range);
 
-    assertEquals("     0 L   \n"
-        + "           \n"
-        + "           \n"
-        + "         NE", extendedText.toString());
+    assertEquals(
+        "     0 L   \n" + "           \n" + "           \n" + "         NE",
+        extendedText.toString());
   }
 
   @Test
@@ -240,10 +244,9 @@ class ExtendedTextTest {
     // "NEW" world location
     Location result = extendedText.mapLocation(new Range(new Position(1, 9), new Position(1, 11)));
 
-    assertEquals("     0 LINE\n"
-        + "     1 L_NEW_E\n"
-        + "     2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "     1 L_NEW_E\n" + "     2 LINE\n" + "     3 LINE",
+        extendedText.toString());
     assertEquals(instantLocation.toString(), result.toString());
   }
 
@@ -258,10 +261,8 @@ class ExtendedTextTest {
     // "NEW" world location
     Location result = extendedText.mapLocation(new Range(new Position(1, 9), new Position(1, 11)));
 
-    assertEquals("     0 LINE\n"
-        + "     1 L_NEW_\n"
-        + "E\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "     1 L_NEW_\n" + "E\n" + "     3 LINE", extendedText.toString());
     assertEquals(instantLocation.toString(), result.toString());
   }
 
@@ -276,9 +277,7 @@ class ExtendedTextTest {
     // "NEW" world location
     Location result = extendedText.mapLocation(new Range(new Position(1, 9), new Position(1, 11)));
 
-    assertEquals("     0 LINE\n"
-        + "     1 L_NEW_\n"
-        + "E", extendedText.toString());
+    assertEquals("     0 LINE\n" + "     1 L_NEW_\n" + "E", extendedText.toString());
     assertEquals(instantLocation.toString(), result.toString());
   }
 
@@ -293,11 +292,9 @@ class ExtendedTextTest {
     // "NEW2" world location
     Location result = extendedText.mapLocation(new Range(new Position(2, 6), new Position(2, 9)));
 
-    assertEquals("     0 LINE\n"
-        + "     1 L_NEW1_\n"
-        + "     _NEW2_E\n"
-        + "     2 LINE\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "     1 L_NEW1_\n" + "     _NEW2_E\n" + "     2 LINE\n" + "     3 LINE",
+        extendedText.toString());
     assertEquals(instantLocation.toString(), result.toString());
   }
 
@@ -312,10 +309,9 @@ class ExtendedTextTest {
     // "NEW2" world location
     Location result = extendedText.mapLocation(new Range(new Position(2, 6), new Position(2, 9)));
 
-    assertEquals("     0 LINE\n"
-        + "     1 L_NEW1_\n"
-        + "     _NEW2_E\n"
-        + "     3 LINE", extendedText.toString());
+    assertEquals(
+        "     0 LINE\n" + "     1 L_NEW1_\n" + "     _NEW2_E\n" + "     3 LINE",
+        extendedText.toString());
     assertEquals(instantLocation.toString(), result.toString());
   }
 
@@ -330,46 +326,51 @@ class ExtendedTextTest {
     // "NEW2" world location
     Location result = extendedText.mapLocation(new Range(new Position(2, 6), new Position(2, 9)));
 
-    assertEquals("     0 LINE\n"
-        + "     1 L_NEW1_\n"
-        + "     _NEW2_E", extendedText.toString());
+    assertEquals("     0 LINE\n" + "     1 L_NEW1_\n" + "     _NEW2_E", extendedText.toString());
     assertEquals(instantLocation.toString(), result.toString());
   }
 
   @Test
   void testInsertCopybookProperOriginalLocation() {
     ExtendedText document = new ExtendedText(TEXT, "uri");
-    ExtendedText copybook1 = new ExtendedText("COPY1 LINE 0\nCOPY1 LINE 1\nCOPY1 LINE 2", "copybook1");
-    ExtendedText copybook2 = new ExtendedText("COPY2 LINE 0\nCOPY2 LINE 1\nCOPY2 LINE 2", "copybook2");
+    ExtendedText copybook1 =
+        new ExtendedText("COPY1 LINE 0\nCOPY1 LINE 1\nCOPY1 LINE 2", "copybook1");
+    ExtendedText copybook2 =
+        new ExtendedText("COPY2 LINE 0\nCOPY2 LINE 1\nCOPY2 LINE 2", "copybook2");
 
     copybook1.insert(new Range(new Position(2, 0), new Position(2, 11)), copybook2);
-    Location copyLocation = copybook1.mapLocation(new Range(new Position(1, 0), new Position(3, 8)));
+    Location copyLocation =
+        copybook1.mapLocation(new Range(new Position(1, 0), new Position(3, 8)));
     assertEquals("copybook1", copyLocation.getUri());
     assertEquals(new Range(new Position(1, 0), new Position(2, 11)), copyLocation.getRange());
 
     document.insert(new Range(new Position(3, 8), new Position(3, 11)), copybook1);
-    Location documentLocation = document.mapLocation(new Range(new Position(2, 0), new Position(7, 5)));
+    Location documentLocation =
+        document.mapLocation(new Range(new Position(2, 0), new Position(7, 5)));
     assertEquals("uri", documentLocation.getUri());
     assertEquals(new Range(new Position(2, 0), new Position(3, 11)), documentLocation.getRange());
 
     copyLocation = document.mapLocation(new Range(new Position(4, 0), new Position(7, 5)));
     assertEquals("copybook1", copyLocation.getUri());
     assertEquals(new Range(new Position(2, 0), new Position(3, 11)), documentLocation.getRange());
-
   }
 
   @Test
   void testInsertWithPadding() {
     Range range = new Range(new Position(1, 2), new Position(2, 5));
     ExtendedText extendedText = new ExtendedText("example_text\nexample_text", "example_uri");
-    ExtendedText copybook1 = new ExtendedText("COPY1 LINE 0\nCOPY1 LINE 1\nCOPY1 LINE 2", "copybook1");
-    ExtendedText expectedCopybook = new ExtendedText("COPY1 LINE 0\nCOexample_text\n  example_text LINE 2", "copybook1");
+    ExtendedText copybook1 =
+        new ExtendedText("COPY1 LINE 0\nCOPY1 LINE 1\nCOPY1 LINE 2", "copybook1");
+    ExtendedText expectedCopybook =
+        new ExtendedText("COPY1 LINE 0\nCOexample_text\n  example_text LINE 2", "copybook1");
 
     copybook1.insertWithPadding(range, extendedText);
 
-    assertEquals(expectedCopybook.getLines().get(0).toString(), copybook1.getLines().get(0).toString());
-    assertEquals(expectedCopybook.getLines().get(1).toString(), copybook1.getLines().get(1).toString());
-    assertEquals(expectedCopybook.getLines().get(2).toString(), copybook1.getLines().get(2).toString());
+    assertEquals(
+        expectedCopybook.getLines().get(0).toString(), copybook1.getLines().get(0).toString());
+    assertEquals(
+        expectedCopybook.getLines().get(1).toString(), copybook1.getLines().get(1).toString());
+    assertEquals(
+        expectedCopybook.getLines().get(2).toString(), copybook1.getLines().get(2).toString());
   }
-
 }

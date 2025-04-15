@@ -25,17 +25,13 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-/**
- * Completion Language server event
- */
+/** Completion Language server event */
 public class CompletionQuery implements LspQuery<Either<List<CompletionItem>, CompletionList>> {
   final CompletableFuture<Either<List<CompletionItem>, CompletionList>> result;
   private final CompletionParams params;
   private final CompletionHandler completionHandler;
 
-  public CompletionQuery(
-      CompletionParams params,
-      CompletionHandler completionHandler) {
+  public CompletionQuery(CompletionParams params, CompletionHandler completionHandler) {
     this.completionHandler = completionHandler;
     this.params = params;
     result = new CompletableFuture<>();

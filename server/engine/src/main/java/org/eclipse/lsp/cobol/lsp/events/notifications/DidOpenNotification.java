@@ -19,9 +19,7 @@ import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DidOpenHandler;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 
-/**
- * textDocument/didOpen language server event
- */
+/** textDocument/didOpen language server event */
 public class DidOpenNotification implements LspNotification {
   private final DidOpenTextDocumentParams params;
   private final DidOpenHandler didOpenHandler;

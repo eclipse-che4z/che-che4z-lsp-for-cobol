@@ -40,7 +40,8 @@ public class TestFDRecordContainsClause {
           + "001500            ORGANIZATION IS INDEXED. \n"
           + "002300 DATA DIVISION.                                                   00002300\n"
           + "002400 FILE SECTION.                                                    00002400\n"
-          + "002500 FD  {$*ABCD}                                                         00002500\n";
+          + "002500 FD  {$*ABCD}                                                        "
+          + " 00002500\n";
   private static final String TEXT =
       BASE
           + "002700     RECORD IS VARYING IN SIZE TO 4096 CHARACTERS                 00002700\n"
