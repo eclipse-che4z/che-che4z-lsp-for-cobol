@@ -171,7 +171,7 @@ public class CobolDocumentModel {
     int number;
     String text;
 
-    Line(int number, String text) {
+    public Line(int number, String text) {
       this.number = number;
       this.text = text;
     }

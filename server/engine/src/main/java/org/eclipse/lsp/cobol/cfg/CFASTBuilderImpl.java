@@ -291,7 +291,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
   private String cutSnippet(Node node) {
     CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
-    List<?> resultText = new ArrayList<>();
+    List<CobolDocumentModel.Line> resultText = new ArrayList<>();
 
     if (doc == null) {
       String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");
@@ -305,7 +305,11 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       Set<CopybookModel> copybookSet = copybookService.getCopybookUsage(rootURIString);
       for (CopybookModel copybook : copybookSet) {
         if (nodeURIString.equals(copybook.getUri())) {
-          resultText = new ArrayList<>(Arrays.asList(copybook.getContent().split("\\r?\\n", -1)));
+          String[] tempArr = copybook.getContent().split("\\r?\\n", -1);
+          for (int i=0; i<tempArr.length; i++) {
+            resultText.add(new CobolDocumentModel.Line(i, tempArr[i]));
+          }
+          break;
         }
       }
     }
@@ -328,7 +332,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
               if (sb.length() > 0) {
                 sb.append("\r\n");
               }
-              sb.append(line);
+              sb.append(line.getText());
             });
     return sb.toString();
   }
