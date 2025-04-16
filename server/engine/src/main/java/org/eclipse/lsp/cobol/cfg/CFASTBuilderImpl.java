@@ -306,7 +306,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       for (CopybookModel copybook : copybookSet) {
         if (nodeURIString.equals(copybook.getUri())) {
           String[] tempArr = copybook.getContent().split("\\r?\\n", -1);
-          for (int i=0; i<tempArr.length; i++) {
+          for (int i = 0; i < tempArr.length; i++) {
             resultText.add(new CobolDocumentModel.Line(i, tempArr[i]));
           }
           break;
