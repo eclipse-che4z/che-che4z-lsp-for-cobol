@@ -18,9 +18,7 @@ import static org.eclipse.lsp.cobol.common.model.NodeType.*;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.model.tree.*;
@@ -48,7 +46,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
   private final CopybookServiceImpl copybookService;
 
   @Inject
-  public CFASTBuilderImpl(DocumentModelService documentModelService, CopybookServiceImpl copybookService) {
+  public CFASTBuilderImpl(
+      DocumentModelService documentModelService, CopybookServiceImpl copybookService) {
     this.documentModelService = documentModelService;
     this.copybookService = copybookService;
   }
@@ -315,7 +314,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     }
 
     if (resultText.isEmpty() && doc != null) {
-        resultText = doc.getLines();
+      resultText = doc.getLines();
     } else {
       LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
       return "<snippet creation error>";
