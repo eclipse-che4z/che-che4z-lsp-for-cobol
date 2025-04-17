@@ -18,7 +18,7 @@
   "ACCEPT FROM": {
     "prefix": "ACCEPT",
     "body": [
-      "ACCEPT ${1:variable} ${2|FROM DATE,FROM DAY,FROM DAY-OF-WEEK,TIME|}",
+      "ACCEPT ${1:variable} FROM ${2|DATE,DAY,DAY-OF-WEEK,TIME|}",
       "$0"
     ],
     "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting: https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time / https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
@@ -226,7 +226,7 @@
   },
   "CLOSE": {
     "prefix": "CLOSE",
-    "body": ["CLOSE $(1:fileName}"],
+    "body": ["CLOSE ${1:fileName}"],
     "description": "CLOSE filename"
   },
   "CODE SET": {
@@ -330,6 +330,11 @@
     ],
     "description": "The CONTENT-OF intrinsic function produces a temporary copy of the input argument. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=functions-content"
   },
+  "CONTINUE": {
+    "prefix": "CONTINUE",
+    "body": ["IF ${1:condition}", "\t${2:codeHere}", "ELSE", "\tCONTINUE", "END-IF."],
+    "description": "The CONTINUE statement is a no-op. Indicates that no instruction is present and that execution will fall to the next sequential instruction. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-continue-statement"
+  },
   "CONTROL": {
     "prefix": "CONTROL",
     "body": ["*CONTROL ${1|MAP,NOMAP|)"],
@@ -352,7 +357,7 @@
     "description": "COPY is used to insert source code stored in a PDS or SCM into a COBOL program when it is compiled. Note that the JCL or Source Management System (Endevor, etc.) must be available and specified correctly during compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "COPY REPLACING": {
-    "prefix": "COPY",
+    "prefix": "COPY REPLACING",
     "body": [
       "COPY \"${1:SUBPROG.CPY}\" REPLCAING",
       "\t ==${2:()}== BY ==${3:lnk-}==."
@@ -440,7 +445,7 @@
   "DAY": {
     "prefix": "DAY",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a Julian Date receiving field (PiC 9(5) variable - YY NNN) - from z/OS. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable - YY NNN) - from z/OS. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
   },
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
@@ -538,7 +543,7 @@
   "DIVIDE": {
     "prefix": "DIVIDE",
     "body": ["DIVIDE ${1:a} BY ${2:b} GIVING ${3:c} ${4:REMAINDER ${5:d}}"],
-    "description": "DIVIDE a BY b GIVING [REMAINDER}"
+    "description": "DIVIDE a BY b GIVING REMAINDER"
   },
   "DIVIDE BY GIVING": {
     "prefix": "DIVIDE BY GIVING",
@@ -572,12 +577,12 @@
     "body": ["SET ${1:indexName} DOWN BY ${2:numVarLiteral}"],
     "description": "DOWN BY item"
   },
-  "DUPLICATES #1": {
+  "ALTERNATE RECORD with DUPLICATES": {
     "prefix": "DUPLICATES",
     "body": ["ALTERNATE RECORD KEY IS ${1:FLD-1}", "WITH DUPLICATES."],
     "description": "DUPLICATES allows an indexed VSAM file to be defined with duplicate values declared in a defined variable within the record in the FD. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=files-using-alternate-keys"
   },
-  "DUPLICATES #2": {
+  "SORT with DUPLICATES": {
     "prefix": "DUPLICATES",
     "body": [
       "SORT ${1:FILENAME} ON ${2|ASCENDING,DESCENDING|} ${3:KEY-FLD}",
@@ -685,7 +690,7 @@
     ],
     "description": "The EXCEPTION/ERROR declarative specifies procedures for input/output exception or error handling that are to be executed in addition to the standard z/OS procedures. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
-  "EVERY": {
+  "EVERY (XML)": {
     "prefix": "EVERY",
     "body": [
       "XML GENERATE DOC FROM ${3:VAR-1}",
@@ -711,7 +716,7 @@
     "body": [
       "01 ${2:DOCUMENT-VARIABLE} PIC X(500).",
       "\tXML GENERATE ${2:DOCUMENT-VARIABLE} FROM ${3:MSG-VARIABLE}",
-      "\t\tWITH ATTRIBUTES ${4:attribuesHere}",
+      "\t\tWITH ATTRIBUTES ${4:attributesHere}",
       "\t\tON EXCEPTION ${1:impStatement}",
       "\tEND-XML.",
       "$0"
@@ -791,9 +796,9 @@
     "body": [
       "EVALUATE FALSE",
       "\tWHEN ${1:VAR-A} = ${2:VAR-B}",
-      "\t\tMOVE \"${1:VAR-A} - ${2:VAR-B} NOT EQUAL\" TO DISP-OUT.",
+      "\t\t*> MOVE \"${1:VAR-A} - ${2:VAR-B} NOT EQUAL\" TO DISP-OUT",
       "\tWHEN ${3:VAR-C} = ${4:VAR-D}",
-      "\t\tMOVE \"${3:VAR-C} - ${4:VAR-D} NOT EQUAL\" TO DISP-OUT.",
+      "\t\t*> MOVE \"${3:VAR-C} - ${4:VAR-D} NOT EQUAL\" TO DISP-OUT",
       "END-EVALUATE.",
       "$0"
     ],
