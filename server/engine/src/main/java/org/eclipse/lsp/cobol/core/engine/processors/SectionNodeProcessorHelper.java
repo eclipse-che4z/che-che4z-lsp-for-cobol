@@ -105,15 +105,19 @@ public class SectionNodeProcessorHelper {
    */
   private List<VariableDefinitionNode> unwrapVariables(Node node) {
     List<VariableDefinitionNode> collected = new ArrayList<>();
+    unwrapVariables(node, collected);
+    return collected;
+  }
+
+  private void unwrapVariables(Node node, List<VariableDefinitionNode> collected) {
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.VARIABLE_DEFINITION) {
         collected.add((VariableDefinitionNode) child);
       }
       if (child.getNodeType() == NodeType.COPY) {
-        collected.addAll(unwrapVariables(child));
+        unwrapVariables(child, collected);
       }
     }
-    return collected;
   }
 
   /**
