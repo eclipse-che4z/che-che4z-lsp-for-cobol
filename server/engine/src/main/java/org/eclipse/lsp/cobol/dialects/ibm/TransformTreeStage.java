@@ -104,7 +104,7 @@ public class TransformTreeStage
   }
 
   private void addChild(Node node, Node dialectNode) {
-    int targetIndex = -1;
+    int targetIndex = node.getChildren().size();
     for (int i = 0; i < node.getChildren().size(); i++) {
       Node child = node.getChildren().get(i);
       String childUri = child.getLocality().getUri();
@@ -118,7 +118,6 @@ public class TransformTreeStage
         }
       }
     }
-    targetIndex = targetIndex == -1 ? node.getChildren().size() : targetIndex;
     dialectNode.setParent(node);
     node.getChildren().add(targetIndex, dialectNode);
   }
