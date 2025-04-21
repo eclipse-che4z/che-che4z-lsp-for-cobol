@@ -17,10 +17,7 @@
   },
   "ACCEPT FROM": {
     "prefix": "ACCEPT",
-    "body": [
-      "ACCEPT ${1:variable} FROM ${2|DATE,DAY,DAY-OF-WEEK,TIME|}",
-      "$0"
-    ],
+    "body": ["ACCEPT ${1:variable} FROM ${2|DATE,DAY,DAY-OF-WEEK,TIME|}", "$0"],
     "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting: https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time / https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
   },
   "ACCEPT id": {
@@ -332,7 +329,13 @@
   },
   "CONTINUE": {
     "prefix": "CONTINUE",
-    "body": ["IF ${1:condition}", "\t${2:codeHere}", "ELSE", "\tCONTINUE", "END-IF."],
+    "body": [
+      "IF ${1:condition}",
+      "\t${2:codeHere}",
+      "ELSE",
+      "\tCONTINUE",
+      "END-IF."
+    ],
     "description": "The CONTINUE statement is a no-op. Indicates that no instruction is present and that execution will fall to the next sequential instruction. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-continue-statement"
   },
   "CONTROL": {
