@@ -290,9 +290,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
 
   private String cutSnippet(Node node) {
     CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
-    List<CobolDocumentModel.Line> resultText = new ArrayList<>();
-
-    LOG.error(copybookService.toString());
+    List<String> resultText = new ArrayList<>();
 
     if (doc == null) {
       String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");
@@ -308,37 +306,47 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       for (CopybookModel copybook : copybookSet) {
         if (nodeURIString.equals(copybook.getUri())) {
           String[] tempArr = copybook.getContent().split("\\r?\\n", -1);
-          LOG.error(copybook.getContent());
-          for (int i = 0; i < tempArr.length; i++) {
-            resultText.add(new CobolDocumentModel.Line(i, tempArr[i]));
-          }
+          int startLine = node.getLocality().getRange().getStart().getLine();
+          int stopLine =
+              Math.min(
+                  startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
+          resultText.addAll(Arrays.asList(tempArr).subList(startLine, stopLine));
           break;
         }
       }
     }
 
+    StringBuilder sb = new StringBuilder();
     if (resultText.isEmpty()) {
       if (doc != null) {
-        resultText = doc.getLines();
+        int startLine = node.getLocality().getRange().getStart().getLine();
+        int stopLine =
+            Math.min(
+                startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
+
+        doc.getLines()
+            .subList(startLine, stopLine)
+            .forEach(
+                line -> {
+                  if (sb.length() > 0) {
+                    sb.append("\r\n");
+                  }
+                  sb.append(line.getText());
+                });
       } else {
         LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
         return "<snippet creation error>";
       }
+    } else {
+      resultText.forEach(
+          text -> {
+            if (sb.length() > 0) {
+              sb.append("\r\n");
+            }
+            sb.append(text);
+          });
     }
 
-    StringBuilder sb = new StringBuilder();
-    int startLine = node.getLocality().getRange().getStart().getLine();
-    int stopLine =
-        Math.min(startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
-    resultText
-        .subList(startLine, stopLine)
-        .forEach(
-            line -> {
-              if (sb.length() > 0) {
-                sb.append("\r\n");
-              }
-              sb.append(line.getText());
-            });
     return sb.toString();
   }
 
