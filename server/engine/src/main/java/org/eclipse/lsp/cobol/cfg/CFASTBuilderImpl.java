@@ -299,7 +299,8 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       String nodeURIString = node.getLocality().getUri();
 
       if (rootURIString.isEmpty()) {
-        LOG.error("cutSnippet failed: " + node.getLocality().getUri() + "'s root node is not found'.");
+        LOG.error(
+            "cutSnippet failed: " + node.getLocality().getUri() + "'s root node is not found'.");
         return "<snippet creation error>";
       }
 
