@@ -227,7 +227,8 @@ export async function pickSnippet() {
     // Create the snippets list using settings for dialect
     snippets.forEach((snippet, key) => {
       // Also store the key as we are aligning the view with VSCode snippet
-      prefixToKeyMap.set(snippet.prefix, key);
+      const tempKey = snippet.prefix + (snippet.description ?? key);
+      prefixToKeyMap.set(tempKey, key);
       snippetList.push({
         detail: snippet.description ?? key,
         label: snippet.prefix,
@@ -236,7 +237,7 @@ export async function pickSnippet() {
     });
     input.onDidChangeSelection((items) => {
       const item = items[0];
-      const snippetKey = prefixToKeyMap.get(item.label);
+      const snippetKey = prefixToKeyMap.get(item.label + item.detail);
       if (snippetKey) {
         const snippet = snippets.get(snippetKey);
         if (snippet) {
