@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
+import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
@@ -34,7 +35,6 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.ExecSqlWheneverNode;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -43,11 +43,11 @@ import org.eclipse.lsp4j.Range;
 public class CFASTBuilderImpl implements CFASTBuilder {
   private static final int SNIPPET_LENGTH = 10;
   private final DocumentModelService documentModelService;
-  private final CopybookServiceImpl copybookService;
+  private final CopybookService copybookService;
 
   @Inject
   public CFASTBuilderImpl(
-      DocumentModelService documentModelService, CopybookServiceImpl copybookService) {
+      DocumentModelService documentModelService, CopybookService copybookService) {
     this.documentModelService = documentModelService;
     this.copybookService = copybookService;
   }
@@ -292,12 +292,14 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
     List<CobolDocumentModel.Line> resultText = new ArrayList<>();
 
+    LOG.error(copybookService.toString());
+
     if (doc == null) {
       String rootURIString = node.getNearestParentByType(ROOT).map(this::getRootNodeURI).orElse("");
       String nodeURIString = node.getLocality().getUri();
 
       if (rootURIString.isEmpty()) {
-        LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
+        LOG.error("cutSnippet failed: " + node.getLocality().getUri() + "'s root node is not found'.");
         return "<snippet creation error>";
       }
 
@@ -305,6 +307,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       for (CopybookModel copybook : copybookSet) {
         if (nodeURIString.equals(copybook.getUri())) {
           String[] tempArr = copybook.getContent().split("\\r?\\n", -1);
+          LOG.error(copybook.getContent());
           for (int i = 0; i < tempArr.length; i++) {
             resultText.add(new CobolDocumentModel.Line(i, tempArr[i]));
           }
@@ -313,11 +316,13 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       }
     }
 
-    if (resultText.isEmpty() && doc != null) {
-      resultText = doc.getLines();
-    } else {
-      LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
-      return "<snippet creation error>";
+    if (resultText.isEmpty()) {
+      if (doc != null) {
+        resultText = doc.getLines();
+      } else {
+        LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
+        return "<snippet creation error>";
+      }
     }
 
     StringBuilder sb = new StringBuilder();
