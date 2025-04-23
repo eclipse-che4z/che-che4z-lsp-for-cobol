@@ -79,7 +79,8 @@ class IdmsCopybookServiceTest {
   void testCircularDependency() {
     CopybookName copybookName = new CopybookName("copybook");
     CopybookModel copybookModel =
-        new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content", "content");
+        new CopybookModel(
+            copybookName.toCopybookId(""), copybookName, "copybookUri", "content", "content");
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
@@ -94,7 +95,8 @@ class IdmsCopybookServiceTest {
   void testCreateNode() {
     CopybookName copybookName = new CopybookName("copybook");
     CopybookModel copybookModel =
-        new CopybookModel(copybookName.toCopybookId(""), copybookName, "copybookUri", "content", "content");
+        new CopybookModel(
+            copybookName.toCopybookId(""), copybookName, "copybookUri", "content", "content");
     Locality locality = Locality.builder().build();
     List<SyntaxError> errors = new LinkedList<>();
 
