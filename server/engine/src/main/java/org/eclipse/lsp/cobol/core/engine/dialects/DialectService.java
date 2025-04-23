@@ -277,7 +277,7 @@ public class DialectService {
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
     DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
-    nodes.addAll(result.getDialectNodes());
+    nodes.addAll(0, result.getDialectNodes());
     return new ResultWithErrors<>(new DialectOutcome(nodes, context), errors);
   }
 
