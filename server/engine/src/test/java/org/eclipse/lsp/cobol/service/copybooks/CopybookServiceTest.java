@@ -113,7 +113,7 @@ class CopybookServiceTest {
 
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT, CONTENT),
         copybookModel);
     verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
     verify(files).getPathFromURI(VALID_CPY_URI);
@@ -140,7 +140,7 @@ class CopybookServiceTest {
             .getResult();
 
     assertEquals(
-        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null),
+        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null, null),
         copybookModel);
     verify(files, times(3)).getNameFromURI(DOCUMENT_URI);
     verify(files).getPathFromURI(VALID_CPY_URI);
@@ -165,7 +165,7 @@ class CopybookServiceTest {
             .getResult();
 
     assertEquals(
-        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null),
+        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null, null),
         copybookModel);
     verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
   }
@@ -203,11 +203,11 @@ class CopybookServiceTest {
 
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT, CONTENT),
         copybookModelEnabled);
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT, CONTENT),
         copybookModelSkipped);
   }
 
@@ -231,7 +231,7 @@ class CopybookServiceTest {
             .getResult();
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT, CONTENT),
         copybookModel);
 
     copybookService.invalidateCache(false);
@@ -247,7 +247,7 @@ class CopybookServiceTest {
             .getResult();
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, CONTENT, CONTENT),
         copybookModel);
 
     verify(files, times(2)).getContentByPath(cpyPath);
@@ -271,7 +271,7 @@ class CopybookServiceTest {
             .getResult();
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_3_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_3_URI, CONTENT, CONTENT),
         copybookModel);
 
     copybookService.invalidateCache(true);
@@ -287,7 +287,7 @@ class CopybookServiceTest {
             .getResult();
     assertEquals(
         new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_3_URI, CONTENT),
+            copybookName.toCopybookId(DOCUMENT_URI), copybookName, DOCUMENT_3_URI, CONTENT, CONTENT),
         copybookModel);
 
     verify(files, times(1)).getContentByPath(cpyPath);
@@ -315,7 +315,7 @@ class CopybookServiceTest {
             .getResult();
 
     assertEquals(
-        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null),
+        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null, null),
         copybookModel);
     verify(files, times(2)).getNameFromURI(DOCUMENT_URI);
   }
@@ -370,14 +370,14 @@ class CopybookServiceTest {
     // Check that all copybook models are correct
     assertEquals(
         new CopybookModel(
-            copybookValid.toCopybookId(DOCUMENT_URI), copybookValid, VALID_CPY_URI, CONTENT),
+            copybookValid.toCopybookId(DOCUMENT_URI), copybookValid, VALID_CPY_URI, CONTENT, CONTENT),
         validCpy);
     assertEquals(
-        new CopybookModel(copybookInvalid.toCopybookId(DOCUMENT_URI), copybookInvalid, null, null),
+        new CopybookModel(copybookInvalid.toCopybookId(DOCUMENT_URI), copybookInvalid, null, null, null),
         invalidCpy);
     assertEquals(
         new CopybookModel(
-            copybookInvalid2.toCopybookId(DOCUMENT_2_URI), copybookInvalid2, null, null),
+            copybookInvalid2.toCopybookId(DOCUMENT_2_URI), copybookInvalid2, null, null, null),
         invalidCpy2);
     CopyBookDTO invalidCopybook = new CopyBookDTO(copybookInvalid);
     // First document parsing done
@@ -473,17 +473,18 @@ class CopybookServiceTest {
 
     // Check that all copybook models are correct
     assertEquals(
-        new CopybookModel(copybookInvalid.toCopybookId(DOCUMENT_URI), copybookInvalid, null, null),
+        new CopybookModel(copybookInvalid.toCopybookId(DOCUMENT_URI), copybookInvalid, null, null, null),
         invalidCpy);
     assertEquals(
         new CopybookModel(
             copybookParent.toCopybookId(DOCUMENT_URI),
             copybookParent,
             PARENT_CPY_URI,
+            PARENT_CONTENT,
             PARENT_CONTENT),
         parentCpy);
     assertEquals(
-        new CopybookModel(copybookNested.toCopybookId(DOCUMENT_URI), copybookNested, null, null),
+        new CopybookModel(copybookNested.toCopybookId(DOCUMENT_URI), copybookNested, null, null, null),
         nestedCpy);
 
     // Notify that analysis finished sending the document URI and copybook names that have nested

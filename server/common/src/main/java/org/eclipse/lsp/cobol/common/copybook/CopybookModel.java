@@ -29,4 +29,5 @@ public class CopybookModel {
   CopybookName copybookName;
   String uri;
   String content;
+  String originalContent;
 }

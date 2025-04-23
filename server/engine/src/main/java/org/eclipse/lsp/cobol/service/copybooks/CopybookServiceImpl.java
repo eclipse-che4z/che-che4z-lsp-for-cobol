@@ -135,7 +135,7 @@ public class CopybookServiceImpl implements CopybookService {
     } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new ResultWithErrors<>(
-          new CopybookModel(copybookId, copybookName, null, null), Collections.emptyList());
+          new CopybookModel(copybookId, copybookName, null, null, null), Collections.emptyList());
     }
   }
 
@@ -203,7 +203,8 @@ public class CopybookServiceImpl implements CopybookService {
     try {
       CopybookModel copybookModel =
           copybookCache.get(
-              copybookId, () -> new CopybookModel(copybookId, predefineCopybookName, null, null));
+              copybookId,
+              () -> new CopybookModel(copybookId, predefineCopybookName, null, null, null));
       if (copybookModel.getContent() == null || copybookModel.getUri() == null)
         return Optional.empty();
       return Optional.of(copybookModel);
@@ -224,7 +225,8 @@ public class CopybookServiceImpl implements CopybookService {
             dirtyCopybook.getCopybookId(),
             dirtyCopybook.getCopybookName(),
             dirtyCopybook.getUri(),
-            cleanText);
+            cleanText,
+            dirtyCopybook.getContent());
     return new ResultWithErrors<>(
         copybookModel,
         adjustErrorLocation(dirtyCopybook, textTransformationsResultWithErrors.getErrors()));
@@ -296,7 +298,7 @@ public class CopybookServiceImpl implements CopybookService {
             name ->
                 copybooksForDownloading.computeIfAbsent(name, s -> ConcurrentHashMap.newKeySet()))
         .ifPresent(it -> it.add(copybookName));
-    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, null, null);
+    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, null, null, null);
   }
 
   private CopybookModel loadCopybook(String uri, CopybookName copybookName, String programUri) {
@@ -307,13 +309,16 @@ public class CopybookServiceImpl implements CopybookService {
         uri,
         files.getNameFromURI(programUri),
         file);
-    return files.fileExists(file)
-        ? new CopybookModel(
-            copybookName.toCopybookId(programUri),
-            copybookName,
-            uri,
-            files.getContentByPath(Objects.requireNonNull(file)))
-        : registerForDownloading(copybookName, programUri);
+    if (files.fileExists(file)) {
+      String contentFromFile = files.getContentByPath(Objects.requireNonNull(file));
+      return new CopybookModel(
+          copybookName.toCopybookId(programUri),
+          copybookName,
+          uri,
+          contentFromFile,
+          contentFromFile);
+    }
+    return registerForDownloading(copybookName, programUri);
   }
 
   @Override

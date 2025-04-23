@@ -176,8 +176,9 @@ public class UseCaseUtils {
     String uri = toURI(cobolText.getFileName(), cobolText.getDialectType());
     CopybookName copybookName =
         new CopybookName(cobolText.getFileName(), cobolText.getDialectType());
+    String fullText = cobolText.getFullText();
     return new CopybookModel(
-        copybookName.toCopybookId(programUri), copybookName, uri, cobolText.getFullText());
+        copybookName.toCopybookId(programUri), copybookName, uri, fullText, fullText);
   }
 
   /**

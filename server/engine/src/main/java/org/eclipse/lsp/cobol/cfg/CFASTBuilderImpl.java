@@ -305,7 +305,7 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       Set<CopybookModel> copybookSet = copybookService.getCopybookUsage(rootURIString);
       for (CopybookModel copybook : copybookSet) {
         if (nodeURIString.equals(copybook.getUri())) {
-          String[] tempArr = copybook.getContent().split("\\r?\\n", -1);
+          String[] tempArr = copybook.getOriginalContent().split("\\r?\\n", -1);
           int startLine = node.getLocality().getRange().getStart().getLine();
           int stopLine =
               Math.min(
