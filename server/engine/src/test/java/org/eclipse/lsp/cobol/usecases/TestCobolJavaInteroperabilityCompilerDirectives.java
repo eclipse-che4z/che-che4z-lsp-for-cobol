@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -228,6 +229,53 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                   + "       PROCEDURE DIVISION.\n"
                   + "           GOBACK.\n";
 
+  private static final String TEXT_WITH_COPYBOOK =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. ABCDEF.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       copy {~abc}.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.";
+
+  private static final String COPYBOOK_TEXT =
+          "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+                  + "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+                  + "       >>JAVA-SHAREABLE ON\n"
+                  + "       01 {$*varTwo}   PIC S9 VALUE +100.\n"
+                  + "       01 {$*varThree} PIC S9 VALUE +1000.\n"
+                  + "       >>JAVA-SHAREABLE OFF\n"
+                  + "       01 {$*varFour}  PIC X VALUE 'NAME_ONE'.\n"
+                  + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
+                  + "       >>JAVA-CALLABLE\n"
+                  + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.";
+
+  private static final String TEXT_SETTING_IN_COPYBOOK =
+          "       {_COPY {~abc}.|error1_}\n"
+                  + "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. ABCDEF.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.";
+
+  private static final String COPYBOOK_WITH_SETTING =
+          "       {CBL|error2} JAVAIOP(JAVA64)\n";
+
+  private static final String TEXT_WITH_COPYBOOK_ERROR =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. ABCDEF.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       {_copy {~abc}.|error1_}\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           GOBACK.";
+
+  private static final String COPYBOOK_TEXT_WITH_ERROR =
+          "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+                  + "       01 {$*varOne}   PIC S9 VALUE +10.\n"
+                  + "       >>JAVA-SHAREABLE ON {fdgfd|error2}\n"
+                  + "       01 {$*varTwo}   PIC S9 VALUE +100.";
   @Test
   void testValid1() {
     UseCaseEngine.runTest(TEXT_VALID1, ImmutableList.of(), ImmutableMap.of());
@@ -275,19 +323,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                     "error1",
                     new Diagnostic(
                             new Range(),
-                            "An invalid directive was found: aaa bbb",
+                            "An invalid option was found: aaabbb",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "error2",
                     new Diagnostic(
                             new Range(),
-                            "An invalid directive was found: ccc ddd ff",
+                            "An invalid option was found: cccdddff",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText()),
                     "error3",
                     new Diagnostic(
                             new Range(),
-                            "An invalid directive was found: gg hh i",
+                            "An invalid option was found: gghhi",
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())),
             ImmutableList.of());
@@ -439,5 +487,52 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                             DiagnosticSeverity.Error,
                             ErrorSource.PARSING.getText())),
             ImmutableList.of());
+  }
+
+  @Test
+  void testWithCopybook() {
+    UseCaseEngine.runTest(
+            TEXT_WITH_COPYBOOK,
+            ImmutableList.of(new CobolText("ABC", COPYBOOK_TEXT)),
+            ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingInCopybook() {
+    UseCaseEngine.runTest(
+            TEXT_SETTING_IN_COPYBOOK,
+            ImmutableList.of(new CobolText("ABC", COPYBOOK_WITH_SETTING)),
+            ImmutableMap.of("error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Errors inside the copybook",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.COPYBOOK.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "Syntax error on 'CBL'",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
+
+  }
+
+  @Test
+  void testWithCopybookError() {
+    UseCaseEngine.runTest(
+            TEXT_WITH_COPYBOOK_ERROR,
+            ImmutableList.of(new CobolText("ABC", COPYBOOK_TEXT_WITH_ERROR)),
+            ImmutableMap.of("error1",
+                    new Diagnostic(
+                            new Range(),
+                            "Errors inside the copybook",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.COPYBOOK.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "An invalid option was found: fdgfd",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 }

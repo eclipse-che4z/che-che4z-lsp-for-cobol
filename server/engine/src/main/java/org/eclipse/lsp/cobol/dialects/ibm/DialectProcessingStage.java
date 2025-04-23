@@ -15,14 +15,12 @@
 package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -30,15 +28,15 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 
 /** Dialect Processing Stage */
 @RequiredArgsConstructor
-public class DialectProcessingStage implements Stage<AnalysisContext, DialectOutcome, List<Node>> {
+public class DialectProcessingStage implements Stage<AnalysisContext, DialectOutcome, Void> {
 
   private final DialectService dialectService;
   private final CleanerPreprocessor preprocessor;
 
   @Override
-  public StageResult<DialectOutcome> run(AnalysisContext context, StageResult<List<Node>> prevStageResult) {
+  public StageResult<DialectOutcome> run(
+      AnalysisContext context, StageResult<Void> prevStageResult) {
     // Dialect processing
-    context.getDialectNodes().addAll(prevStageResult.getData());
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
     DialectOutcome dialectOutcome = processDialects(context);
     return new StageResult<>(dialectOutcome, dialectOutcome.isDialectMissed());
@@ -67,7 +65,6 @@ public class DialectProcessingStage implements Stage<AnalysisContext, DialectOut
     Set<SyntaxError> errors = new HashSet<>(ctx.getAccumulatedErrors());
     ctx.getAccumulatedErrors().clear();
     ctx.getAccumulatedErrors().addAll(errors);
-    dialectOutcome.getDialectNodes().addAll(ctx.getDialectNodes());
     return dialectOutcome;
   }
 }

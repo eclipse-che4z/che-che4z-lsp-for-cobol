@@ -16,20 +16,35 @@ package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
+import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
+import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorListener;
+import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesErrorStrategy;
+import org.eclipse.lsp.cobol.core.engine.directives.CompilerDirectivesVisitor;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** Preprocessor stage */
 @RequiredArgsConstructor
@@ -37,6 +52,7 @@ public class PreprocessorStage
     implements Stage<AnalysisContext, CopybooksRepository, DialectOutcome> {
   private final GrammarPreprocessor grammarPreprocessor;
   private final CleanerPreprocessor preprocessor;
+  private final MessageService messageService;
 
   @Override
   public StageResult<CopybooksRepository> run(
@@ -48,6 +64,9 @@ public class PreprocessorStage
 
     context.setDialectNodes(prevStageResult.getData().getDialectNodes());
     context.setCopybooksRepository(copybooksRepository);
+
+    processCobolJavaInteroperabilityDirectives(context);
+
     return new StageResult<>(copybooksRepository);
   }
 
@@ -87,5 +106,61 @@ public class PreprocessorStage
 
     ctx.getAccumulatedErrors().addAll(preprocessorErrors);
     return copybooks;
+  }
+
+  private void processCobolJavaInteroperabilityDirectives(AnalysisContext ctx) {
+    String text = ctx.getExtendedDocument().getCurrentText().toString();
+    Pattern compilerDirectiveLine = Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)>>\\s*(?<compilerDirectives>.+)");
+    Pattern newLinePattern = Pattern.compile("\n\r?");
+    Pattern sectionPattern = Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
+    Pattern javaShareableonPattern = Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
+
+    String[] lines = newLinePattern.split(text);
+    String section = "";
+    boolean isJavaShareableOn = false;
+    for (int i = 0; i < lines.length; i++) {
+      Matcher directivesLine = compilerDirectiveLine.matcher(lines[i]);
+      Matcher sectionLine = sectionPattern.matcher(lines[i]);
+      if (!isJavaShareableOn && javaShareableonPattern.matcher(lines[i]).matches()) {
+        isJavaShareableOn = true;
+      }
+      if (sectionLine.matches()) {
+        section = sectionLine.group().trim();
+      }
+      if (!directivesLine.matches()) {
+        continue;
+      }
+
+      String compilerDirectives = directivesLine.group("compilerDirectives");
+      if (compilerDirectives != null) {
+        ctx.getDialectNodes().addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")),
+                section, directivesLine.group(), isJavaShareableOn));
+      }
+
+      String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
+      Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
+      ctx.getExtendedDocument().replace(range, newText);
+    }
+  }
+
+  private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String section,
+                             String directiveLineText, boolean isJavaShareableOn) {
+    Pattern dialectFillerPattern =
+            Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
+    if (!dialectFillerPattern.matcher(directiveText).matches()) {
+      CompilerDirectivesLexer lexer = new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
+      lexer.removeErrorListeners();
+
+      CompilerDirectivesParser parser = new CompilerDirectivesParser(new CommonTokenStream(lexer));
+      parser.removeErrorListeners();
+      parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
+      parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
+
+      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section,
+              directiveLineText, isJavaShareableOn);
+
+      return visitor.visitCompilerDirectives(parser.compilerDirectives());
+    }
+    return ImmutableList.of();
   }
 }

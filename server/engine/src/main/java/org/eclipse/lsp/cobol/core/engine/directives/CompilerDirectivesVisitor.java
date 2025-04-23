@@ -70,6 +70,11 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     this.isJavaShareableOn = isJavaShareableOn;
   }
 
+  public CompilerDirectivesVisitor(
+          AnalysisContext ctx, MessageService messageService, Position startPosition) {
+    this(ctx, messageService, startPosition, "", "", false);
+  }
+
   @Override
   public List<Node> visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
     analysisContext.getConfig().getCompilerOptions().add(ctx.getText().trim());
@@ -161,7 +166,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   public List<Node> visitExtraneousInput(CompilerDirectivesParser.ExtraneousInputContext ctx) {
     VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
       Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      Location location = analysisContext.getExtendedDocument().mapLocation(range);
       throwException(
               ctx.getText(),
               locationToLocality(location),
@@ -223,24 +228,14 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     if (!directiveLine.matches()) {
       VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
         Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-        Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+        Location location = analysisContext.getExtendedDocument().mapLocation(range);
         throwException(ctx.getText(), locationToLocality(location),
                 messageService.getMessage("compilerDirective.invalid"));
       });
       return false;
     }
 
-    if (directiveLine.matches() && isTextAfterDirective(directiveLine)) {
-      Position start = new Position(startPosition.getLine(), directiveLine.start("extraText"));
-      Position end = new Position(startPosition.getLine(), directiveLine.end("extraText"));
-      Location location = new Location(analysisContext.getExtendedDocument().getUri(), new Range(start, end));
-      throwException(
-              directiveLine.group("extraText").trim(),
-              locationToLocality(location),
-              messageService.getMessage("compilerDirective.invalid"));
-    return false;
-    }
-    return true;
+    return !isTextAfterDirective(directiveLine);
   }
 
   private Locality createStatementLocality(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
@@ -296,9 +291,14 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private Locality locationToLocality(Location location) {
-    return Locality.builder()
+    Locality.LocalityBuilder builder = Locality.builder()
             .range(location.getRange())
-            .uri(location.getUri())
-            .build();
+            .uri(location.getUri());
+
+    if (analysisContext.getCopybooksRepository() != null) {
+      builder.copybookId(analysisContext.getCopybooksRepository().getCopybookIdByUri(location.getUri()));
+    }
+
+    return builder.build();
   }
 }

@@ -232,7 +232,6 @@ cobolJavaInteroperabilityOptions:
                 | (JVMINITOPTIONS | JVMI) LPARENCHAR LITERAL RPARENCHAR
                 | (NOJAVA64 | JAVA64)
             ) RPARENCHAR | (NOJAVAIOP | NOJIOP)) extraneousInput?;
-extraneousInput: .+?;
 
 ssrangeSuboptions
    : NOZLEN
@@ -320,4 +319,5 @@ dataSetName
    ;
 
 compilerDirectives: CALLINTERFACE | DEFINE | cobolJavaInteroperability;
-cobolJavaInteroperability: JAVA_CALLABLE | JAVA_SHAREABLE_ON | JAVA_SHAREABLE_OFF;
+cobolJavaInteroperability: (JAVA_CALLABLE | JAVA_SHAREABLE_ON | JAVA_SHAREABLE_OFF) extraneousInput?;
+extraneousInput: .+?;
