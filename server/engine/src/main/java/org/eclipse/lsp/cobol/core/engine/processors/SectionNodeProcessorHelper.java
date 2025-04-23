@@ -36,9 +36,13 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
+import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variables.*;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** The utility class is for converting VariableDefinitionNode into appropriate VariableNode. */
 @UtilityClass
@@ -104,16 +108,127 @@ public class SectionNodeProcessorHelper {
    * @return a list of unwrapped variables
    */
   private List<VariableDefinitionNode> unwrapVariables(Node node) {
-    List<VariableDefinitionNode> collected = new ArrayList<>();
+    List<Node> variables = new ArrayList<>();
+    List<CopyNode> copybooks = new LinkedList<>();
+
     for (Node child : node.getChildren()) {
       if (child.getNodeType() == NodeType.VARIABLE_DEFINITION) {
-        collected.add((VariableDefinitionNode) child);
+        variables.add(child);
       }
       if (child.getNodeType() == NodeType.COPY) {
-        collected.addAll(unwrapVariables(child));
+        copybooks.add((CopyNode) child);
       }
     }
-    return collected;
+
+    copybooks.sort(Comparator.comparingInt(c -> c.getLocality().getRange().getStart().getLine()));
+
+    int index = 0;
+    for (CopyNode copyNode : copybooks) {
+      index = insertCopybook(variables, index, copyNode);
+    }
+
+    return variables.stream()
+        .flatMap(
+            n -> {
+              if (n.getNodeType() == NodeType.COPY) {
+                return n.getDepthFirstStream();
+              }
+              return ImmutableList.of(n).stream();
+            })
+        .filter(hasType(NodeType.VARIABLE_DEFINITION))
+        .map(VariableDefinitionNode.class::cast)
+        .collect(Collectors.toList());
+  }
+
+  private static int insertCopybook(List<Node> variables, int index, CopyNode copyNode) {
+    if (index > variables.size() - 1) {
+      variables.add(copyNode);
+      return index;
+    }
+    for (int i = index; i < variables.size(); i++) {
+      index++;
+      if (!canInsertCopyNodeAtIndex(copyNode, i, variables)) {
+        index = i;
+        break;
+      }
+    }
+
+    // append at last
+    if (index >= variables.size()) {
+      variables.add(copyNode);
+      return variables.indexOf(copyNode);
+    }
+
+    variables.add(index, copyNode);
+    if (adjustCopyNodeChild(copyNode, variables, index + 1)) {
+      return variables.indexOf(copyNode) + 1;
+    }
+    return index;
+  }
+
+  private static boolean adjustCopyNodeChild(CopyNode copyNode, List<Node> variables, int index) {
+    boolean areNodesAdjusted = false;
+    ArrayList<Node> nodes = new ArrayList<>(variables);
+    for (int i = index; i < nodes.size(); i++) {
+      Node variable = nodes.get(i);
+      String variableNodeUri = variable.getLocality().getUri();
+      String copybookNodeUri = copyNode.getUri();
+      if (Objects.equals(variableNodeUri, copybookNodeUri)) {
+        adjustVariableNodeInsideCopyNode(copyNode, variables, i, variable);
+        areNodesAdjusted = true;
+      } else {
+        break;
+      }
+    }
+    return areNodesAdjusted;
+  }
+
+  private static void adjustVariableNodeInsideCopyNode(
+      CopyNode copyNode, List<Node> variables, int i, Node variable) {
+    if (variable instanceof VariableDefinitionNode) {
+      int insertIndex;
+      for (insertIndex = 0; insertIndex < copyNode.getChildren().size(); insertIndex++) {
+        Node node = copyNode.getChildren().get(insertIndex);
+        if (node instanceof CopyNode) {
+          adjustCopyNodeChild((CopyNode) node, variables, i);
+        }
+        Locality copybNodeChildLocality = node.getLocality();
+        Locality variableLocality = variable.getLocality();
+        if (RangeUtils.isBefore(
+            variableLocality.getRange().getStart(), copybNodeChildLocality.getRange().getStart())) {
+          break;
+        }
+      }
+      if (!isVariableNodeAlreadyPresentIn(copyNode, (VariableDefinitionNode) variable)) {
+        copyNode.addChildAt(insertIndex, variable);
+        variables.remove(variable);
+      }
+    }
+  }
+
+  private static boolean isVariableNodeAlreadyPresentIn(
+      CopyNode copyNode, VariableDefinitionNode variable) {
+    for (Node node : copyNode.getChildren()) {
+      if (node instanceof VariableDefinitionNode) {
+        VariableDefinitionNode varNode = (VariableDefinitionNode) node;
+        if (varNode.getLocality().equals(variable.getLocality())
+            && varNode.getVariableName().equals(variable.getVariableName())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private static boolean canInsertCopyNodeAtIndex(
+      CopyNode copyNode, int index, List<Node> variables) {
+    String copybookLocalityUri = copyNode.getLocality().getUri();
+    Range copybookLocalityRange = copyNode.getLocality().getRange();
+    Node variableDefinitionNode = variables.get(index);
+    String variableUri = variableDefinitionNode.getLocality().getUri();
+    Position variableStartPosition = variableDefinitionNode.getLocality().getRange().getEnd();
+    return variableUri.equals(copybookLocalityUri)
+        && RangeUtils.isBefore(variableStartPosition, copybookLocalityRange.getStart());
   }
 
   /**

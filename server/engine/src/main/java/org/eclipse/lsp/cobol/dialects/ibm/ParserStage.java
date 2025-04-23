@@ -50,8 +50,8 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     // Run parser;
     context.setDialectNodes(
         ImmutableList.<Node>builder()
-            .addAll(prevStageResult.getData().getDialectNodes())
             .addAll(context.getDialectNodes())
+            .addAll(prevStageResult.getData().getDialectNodes())
             .build());
     ParserListener listener =
         new ParserListener(context.getExtendedDocument(), context.getCopybooksRepository());
