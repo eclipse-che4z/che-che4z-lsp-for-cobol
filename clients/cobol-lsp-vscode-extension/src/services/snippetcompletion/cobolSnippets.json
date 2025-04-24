@@ -106,6 +106,13 @@
     "body": ["ALTER ${1:procName-1} TO ${2:procName-2}"],
     "description": "ALTER TO"
   },
+  "IF x AND y AND z": {
+    "prefix": "AND",
+    "body": ["IF ${1:var-1} = ${1:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
+      "\t$0",
+      "END-IF."],
+    "description": "AND is used to connect two or more conditional expressions. When using AND - all expressions connected by AND must test true for the program to take that path. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+  },
   "AREA": {
     "prefix": "AREA",
     "body": ["${1|SAME,SAME SORT,SAME RECORD|} ${2|AREA,AREAS|}"],
@@ -132,6 +139,11 @@
       "$0"
     ],
     "description": "FILE-CONTROL - ASSIGN item"
+  },
+  "BASIS": {
+    "prefix": "BASIS",
+    "body": ["BASIS ${1:sourceName}"],
+    "description": "Similar to COPY, except that BASIS is an extended source program library statement that provides a complete COBOL program as the source for a compilation. https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statements-basis-statement"
   },
   "BEFORE ADVANCING": {
     "prefix": "BEFORE ADVANCING",
