@@ -117,9 +117,11 @@
   },
   "IF x AND y AND z": {
     "prefix": "AND",
-    "body": ["IF ${1:var-1} = ${1:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
+    "body": [
+      "IF ${1:var-1} = ${1:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
       "\t$0",
-      "END-IF."],
+      "END-IF."
+    ],
     "description": "AND is used to connect two or more conditional expressions. When using AND - all expressions connected by AND must test true for the program to take that path. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
   },
   "AREA": {
@@ -208,7 +210,11 @@
   },
   "INDEXED BY": {
     "prefix": "BY",
-    "body": ["01 ${1:TABLE-X}", "\t05 ${2:RECORD-X} OCCURS ${3:100} TIMES INDEXED BY ${5:X-IND}.", "\t\t10 ${6:elementary-items}"],
+    "body": [
+      "01 ${1:TABLE-X}",
+      "\t05 ${2:RECORD-X} OCCURS ${3:100} TIMES INDEXED BY ${5:X-IND}.",
+      "\t\t10 ${6:elementary-items}"
+    ],
     "description": "Defines an internal COBOL index for an internal COBOL table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "SET x UP BY": {
@@ -218,7 +224,11 @@
   },
   "STRING x DELIMITED BY y": {
     "prefix": "BY",
-    "body": ["STRING ${1:VAR-1} DELIMITED BY ${2:VAR-2}", "\tINTO ${3:VAR-3}", "END-STRING."],
+    "body": [
+      "STRING ${1:VAR-1} DELIMITED BY ${2:VAR-2}",
+      "\tINTO ${3:VAR-3}",
+      "END-STRING."
+    ],
     "description": "BY in the STRING (and UNSTRING) statements defines the transfer operation specifics: INTO VAR-3. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "BY UNTIL": {
