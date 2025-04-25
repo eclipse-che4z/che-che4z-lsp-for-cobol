@@ -94,7 +94,16 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "IF variable-1 IS ALPHABETIC"
+    "description": "A COBOL \"class test\" used to determine whether the contents of a variable contains specific upper/lower case values. Used in conjunction with CMPR2/NOCMPR2 as compilation directives. https://www.ibm.com/docs/en/cobol-zos/6.3?topic=expressions-class-condition"
+  },
+  "ALPHANUMERIC": {
+    "prefix": "ALPHANUMERIC",
+    "body": [
+      "IF ${1:variable-1} IS ${2|ALPHANUMERIC,ALPHANUMERIC-EDITED|} THEN",
+      "\t$0",
+      "END-IF."
+    ],
+    "description": "A COBOL \"class test\" which is used to determine whether the contents of a variable contains only letters and numbers (no special character) values. https://www.ibm.com/docs/en/search/alphanumeric?scope=SS6SG3_6.3.0"
   },
   "ALSO": {
     "prefix": "ALSO item",
@@ -157,8 +166,8 @@
   },
   "BINARY": {
     "prefix": "BINARY",
-    "body": ["BINARY ${1:id}"],
-    "description": "BINARY literal"
+    "body": ["${1:numvar} PIC 9(4) BINARY."],
+    "description": "Variables defined with BINARY (and synonyms COMP and COMP-4) are a two's complement data representation in the COBOL language. This example provides two bytes of values in Base 16. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=6-binary-comp-comp-4"
   },
   "BIT TO CHAR": {
     "prefix": "BIT-TO-CHAR",
@@ -196,6 +205,21 @@
     "prefix": "BY",
     "body": ["BY ${1:item}"],
     "description": "BY Item"
+  },
+  "INDEXED BY": {
+    "prefix": "BY",
+    "body": ["01 ${1:TABLE-X}", "\t05 ${2:RECORD-X} OCCURS ${3:100} TIMES INDEXED BY ${5:X-IND}.", "\t\t10 ${6:elementary-items}"],
+    "description": "Defines an internal COBOL index for an internal COBOL table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "SET x UP BY": {
+    "prefix": "BY",
+    "body": ["SET ${1:X-IND} UP BY ${2:1}"],
+    "description": "Adds +1 an internal COBOL table's index - assuming INDEXED BY. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+  },
+  "STRING x DELIMITED BY y": {
+    "prefix": "BY",
+    "body": ["STRING ${1:VAR-1} DELIMITED BY ${2:VAR-2}", "\tINTO ${3:VAR-3}", "END-STRING."],
+    "description": "BY in the STRING (and UNSTRING) statements defines the transfer operation specifics: INTO VAR-3. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "BY UNTIL": {
     "prefix": "BY UNTIL",
