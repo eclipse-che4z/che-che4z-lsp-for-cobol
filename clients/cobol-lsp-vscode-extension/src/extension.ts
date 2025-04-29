@@ -238,34 +238,34 @@ export async function activate(
   // COPY ACCTFILE.    file:/Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/ACCTFILE
   // COPY SLICKCOM. file:/Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKCOM
 
-  languageClientService.addRequestHandler(
-    "copybook/uri",
-    (_a, b: string, _c) => {
-      if (b.toUpperCase() === "SLICKNUM") {
-        return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKNUM";
-      }
-      if (b.toUpperCase() === "ACCTFILE") {
-        return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/ACCTFILE";
-      }
-      if (b.toUpperCase() === "SLICKCOM") {
-        return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKCOM";
-      }
-      if (b.toUpperCase() === "UNKNOWN") {
-        return undefined;
-      }
-      return "zowe-ds:/zosmf/AP891843.PUBLIC.CPY/TEST.cpy";
-    },
-  );
-  languageClientService.addRequestHandler(
-    "file/content",
-    async (uri: string) => {
-      {
-        const vscodeUri = vscode.Uri.parse(uri);
-        const fileData = await vscode.workspace.fs.readFile(vscodeUri);
-        return Buffer.from(fileData).toString("utf8");
-      }
-    },
-  );
+  // languageClientService.addRequestHandler(
+  //   "copybook/uri",
+  //   (_a, b: string, _c) => {
+  //     if (b.toUpperCase() === "SLICKNUM") {
+  //       return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKNUM";
+  //     }
+  //     if (b.toUpperCase() === "ACCTFILE") {
+  //       return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/ACCTFILE";
+  //     }
+  //     if (b.toUpperCase() === "SLICKCOM") {
+  //       return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKCOM";
+  //     }
+  //     if (b.toUpperCase() === "UNKNOWN") {
+  //       return undefined;
+  //     }
+  //     return "zowe-ds:/zosmf/AP891843.PUBLIC.CPY/TEST.cpy";
+  //   },
+  // );
+  // languageClientService.addRequestHandler(
+  //   "file/content",
+  //   async (uri: string) => {
+  //     {
+  //       const vscodeUri = vscode.Uri.parse(uri);
+  //       const fileData = await vscode.workspace.fs.readFile(vscodeUri);
+  //       return Buffer.from(fileData).toString("utf8");
+  //     }
+  //   },
+  // );
 
   await languageClientService.start();
 

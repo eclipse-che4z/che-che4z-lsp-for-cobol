@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
@@ -54,6 +55,7 @@ public class CopybookServiceImpl implements CopybookService {
   private final ResolveFileContent resolveFileContent;
   private final FileDownload fileDownloadService;
   private final PredefinedCopybookStore predefinedCopybookStoreImpl;
+  private final CopybookCache copybookCache;
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -63,11 +65,13 @@ public class CopybookServiceImpl implements CopybookService {
       ResolveCopybookUri resolveCopybookUri,
       ResolveFileContent resolveFileContent,
       FileDownload fileDownloadService,
-      PredefinedCopybookStore predefinedCopybookStoreImpl) {
+      PredefinedCopybookStore predefinedCopybookStoreImpl,
+      CopybookCache copybookCache) {
     this.resolveCopybookUri = resolveCopybookUri;
     this.resolveFileContent = resolveFileContent;
     this.fileDownloadService = fileDownloadService;
     this.predefinedCopybookStoreImpl = predefinedCopybookStoreImpl;
+    this.copybookCache = copybookCache;
   }
 
   @Override
@@ -119,9 +123,28 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
       CleanerPreprocessor preprocessor) {
-    try {
-      ThreadInterruptionUtil.checkThreadInterrupted();
+    ThreadInterruptionUtil.checkThreadInterrupted();
 
+    CopybookModel copybookModel;
+    try {
+      copybookModel =
+          copybookCache.get(
+              copybookId, () -> getCopybook(copybookName, programDocumentUri, preprocessor));
+    } catch (ExecutionException e) {
+      LOG.error("Can't resolve copybook '{}'.", copybookName, e);
+      return new ResultWithErrors<>(
+          new CopybookModel(copybookId, copybookName, null, null), Collections.emptyList());
+    }
+    List<SyntaxError> errors =
+        Optional.ofNullable(copybookModel.getUri())
+            .map(d -> preprocessCopybookErrors.getOrDefault(d, Collections.emptyList()))
+            .orElse(Collections.emptyList());
+    return new ResultWithErrors<>(copybookModel, errors);
+  }
+
+  private CopybookModel getCopybook(
+      CopybookName copybookName, String programDocumentUri, CleanerPreprocessor preprocessor) {
+    try {
       String copybookUri =
           resolveCopybookUri.resolveCopybookUri(
               programDocumentUri,
@@ -131,15 +154,14 @@ public class CopybookServiceImpl implements CopybookService {
         ResultWithErrors<CopybookModel> predefinedCopybook =
             predefinedCopybookStoreImpl.resolve(copybookName, programDocumentUri);
         if (predefinedCopybook.getResult().getContent() == null) {
-          return ResultWithErrors.of(registerForDownloading(copybookName, programDocumentUri));
+          return registerForDownloading(copybookName, programDocumentUri);
         }
-        return ResultWithErrors.of(predefinedCopybook.getResult());
+        return predefinedCopybook.getResult();
       }
       String fileContent = resolveFileContent.getFileContent(copybookUri).join();
 
       if (fileContent == null) {
-        return ResultWithErrors.of(
-            CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri));
+        return CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri);
       }
 
       CopybookModel dirtyCopybook =
@@ -155,12 +177,10 @@ public class CopybookServiceImpl implements CopybookService {
           .add(copybookModelResultWithErrors.getResult());
       preprocessCopybookErrors.put(
           dirtyCopybook.getUri(), copybookModelResultWithErrors.getErrors());
-      return copybookModelResultWithErrors;
+      return copybookModelResultWithErrors.getResult();
     } catch (UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
-      return new ResultWithErrors<>(
-          CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri),
-          Collections.emptyList());
+      return CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri);
     }
   }
 
