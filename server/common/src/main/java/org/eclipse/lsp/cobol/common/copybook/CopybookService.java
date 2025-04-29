@@ -30,7 +30,7 @@ public interface CopybookService {
   /** Remove all the stored copybook. */
   void invalidateCache(boolean onlyNonImplicit);
 
-  void invalidateCache(CopybookModel copybookId);
+  void invalidateCache(CopybookModel copybookModel);
 
   /**
    * Retrieve and return the copybook by its name. Returns a CopybookModel and preprocessed errors
@@ -51,6 +51,21 @@ public interface CopybookService {
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
       CleanerPreprocessor preprocessor);
+
+  /**
+   * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
+   *
+   * @param copybookModel the copybook model
+   */
+  void store(CopybookModel copybookModel);
+
+  /**
+   * Store the copybookModel in cache. Copybook depends on a document from where it is imported.
+   *
+   * @param copybookModel the copybook model
+   * @param preprocessor - Cleanup preprocessor that will be used for new copybooks or null
+   */
+  void store(CopybookModel copybookModel, CleanerPreprocessor preprocessor);
 
   /**
    * Send downloading requests to the Client for copybooks not presented locally, if any.
