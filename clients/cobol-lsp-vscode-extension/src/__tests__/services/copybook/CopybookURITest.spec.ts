@@ -29,19 +29,13 @@ describe("CopybooksPathGenerator tests", () => {
     ];
   });
 
-  it("creates copybook path", () => {
-    expect(
-      CopybookURI.createCopybookPath(
-        [profile],
-        dataset,
-        "copybook",
-        "downloadFolder",
-      ),
-    ).toEqual("downloadFolder/zowe/copybooks/profile/dataset/copybook");
-  });
   it("creates dataset path", () => {
     expect(
       CopybookURI.createDatasetPath([profile], dataset, "downloadFolder"),
-    ).toEqual({ path: "downloadFolder/zowe/copybooks/profile/dataset" });
+    ).toEqual(
+      expect.objectContaining({
+        path: "/downloadFolder/zowe/copybooks/profile/dataset",
+      }),
+    );
   });
 });

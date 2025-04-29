@@ -42,7 +42,6 @@ import {
   loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
-  loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
@@ -66,10 +65,6 @@ interface Item {
 
 const DialectsConfigurationCodec = t.array(t.string);
 export type DialectsConfiguration = t.TypeOf<typeof DialectsConfigurationCodec>;
-const CopybooksLocalPathsConfigurationCodec = t.array(t.string);
-export type CopybooksLocalPathsConfiguration = t.TypeOf<
-  typeof CopybooksLocalPathsConfigurationCodec
->;
 const CopybookExtensionsConfigurationCodec = t.array(t.string);
 const TargetSQLBackendConfigurationCodec = t.string;
 const CopybookEncodingConfigurationCodec = t.string;
@@ -140,28 +135,7 @@ export async function lspConfigHandler(
           );
           break;
         case SETTINGS_CPY_LOCAL_PATH:
-          if (vscode.workspace.getConfiguration().get(item.section)) {
-            await handleProcessorGroupConfigurationRequest(
-              CopybooksLocalPathsConfigurationCodec,
-              loadProcessorGroupCopybookPathsConfig,
-              item,
-              result,
-              outputChannel,
-            );
-          } else {
-            // if no configuration for local or remote copybook paths is provided
-            // use pattern for workspace folder and subfolders as a default value
-            if (
-              !vscode.workspace
-                .getConfiguration(SETTINGS_CPY_SECTION)
-                .get(PATHS_DSN) &&
-              !vscode.workspace
-                .getConfiguration(SETTINGS_CPY_SECTION)
-                .get(PATHS_USS)
-            ) {
-              result.push(["**"]);
-            }
-          }
+          // server should not need to know local paths to copybook folders
           break;
         case SETTINGS_CPY_EXTENSIONS:
           await handleProcessorGroupConfigurationRequest(
@@ -269,10 +243,13 @@ export class SettingsService {
         dialectType,
       ),
     ];
-    const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
 
     if (convertToAbsolutePaths) {
-      return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
+      const uris = SettingsService.prepareLocalSearchUris(
+        paths,
+        vscode.workspace.workspaceFolders ?? [],
+      );
+      return uris.map((u) => u.fsPath);
     }
     return paths;
   }

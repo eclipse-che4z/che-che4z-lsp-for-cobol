@@ -13,58 +13,25 @@
  */
 import { SettingsService } from "../../Settings";
 import { splitFilename } from "../../util/FSUtils";
-import { CopybookName } from "../CopybookDownloadService";
 import { DownloadUtil } from "./DownloadUtil";
-import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
+import {
+  MemberCacheItem,
+  ZoweExplorerDownloader,
+} from "./ZoweExplorerDownloader";
+import * as vscode from "vscode";
 
 /**
  * Copybook downloader from USS using Zowe Explorer
  */
 export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
-  constructor(storagePath: string, explorerAPI: IApiRegisterClient) {
-    super(storagePath, explorerAPI);
-  }
-
-  /**
-   * Downloads a file from USS using Zowe explorer
-   *
-   * @param copybookName Copybook to be downloaded.
-   * @param ussPath ussPath in mainframe.
-   * @param profile zowe profile name
-   */
-  async downloadCopybook(
-    copybookName: CopybookName,
-    ussPath: string,
-    profile: string,
-    extensions: string[],
-  ): Promise<boolean> {
-    const has = await this.hasMember(
-      profile,
-      ussPath,
-      copybookName.name,
-      extensions,
-    );
-    const memberList = await this.getAllMembers(profile, ussPath);
-    const remoteCopybook = DownloadUtil.getRemoteCopybookName(
-      memberList,
-      copybookName.name,
-    );
-    return !!(
-      remoteCopybook &&
-      has &&
-      (await this.downloadCopybookFromMFUsingZowe(
-        ussPath,
-        remoteCopybook,
-        profile,
-      ))
-    );
+  constructor(explorerAPI: IApiRegisterClient) {
+    super(explorerAPI);
   }
 
   public async getAllMembers(
     profileName: string,
     dataset: string,
-    returnExtensions = true,
-  ) {
+  ): Promise<MemberCacheItem[]> {
     const id = this.createId(profileName, dataset);
 
     if (this.memberListCache.has(id)) {
@@ -77,7 +44,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
       await SettingsService.getCopybookExtension();
     const allowedNoExtension = allowedCopybooksExtensions?.includes("");
 
-    const members: string[] = [];
+    const members: MemberCacheItem[] = [];
 
     await this.limitFailedRequests(
       `list USS directory ${profileName}/${dataset}`,
@@ -92,10 +59,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
 
             if (extension) {
               if (allowedCopybooksExtensions?.includes(extension)) {
-                members.push(returnExtensions ? file.name : name);
+                members.push({ name, extension });
               }
             } else if (allowedNoExtension) {
-              members.push(file.name);
+              members.push({ name });
             }
           }
         }
@@ -106,81 +73,31 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     return members;
   }
 
-  /**
-   * Downloads file using Zowe explorer from USS based on passed parameters
-   * @param dataset  dataset name
-   * @param member member name
-   * @param profileName ZE profile name
-   */
-  override async downloadCopybookContent(
-    dataset: string,
-    member: string,
-    profileName: string,
-  ): Promise<boolean> {
-    const loadedProfile = DownloadUtil.loadProfile(
-      profileName,
-      this.explorerAPI,
-    );
-    const downloadOptions = this.getDownloadOptions(
-      profileName,
-      dataset,
-      member,
-      loadedProfile,
-    );
-
-    await this.explorerAPI
-      .getUssApi(loadedProfile)
-      .getContents(`${dataset}/${member}`, downloadOptions.apiOptions);
-
-    if (downloadOptions.decode) {
-      await this.decodeBinaryContent(
-        downloadOptions.fileUri,
-        downloadOptions.decode,
-      );
-    }
-
-    return true;
-  }
-
   public async hasMember(
     profileName: string,
     uss: string,
     copybookName: string,
-    extensions: string[] = [""],
   ): Promise<boolean> {
-    const id = this.createId(profileName, uss);
-    if (this.memberListCache.has(id)) {
-      return this.isCachedMembersHaveCopybook(extensions, id, copybookName);
-    }
-    const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
-    await this.limitFailedRequests(
-      `list USS directory ${profileName}/${uss}`,
-      async () => {
-        const response = await this.explorerAPI
-          .getUssApi(profile)
-          .fileList(uss);
+    const members = await this.getAllMembers(profileName, uss);
 
-        const members = response.apiResponse.items.map((el) => el.name);
-        this.memberListCache.set(id, members);
-      },
-    );
-    if (this.memberListCache.has(id)) {
-      return this.isCachedMembersHaveCopybook(extensions, id, copybookName);
+    if (members.some((member) => member.name === copybookName)) {
+      return true;
     }
     return false;
   }
-  private isCachedMembersHaveCopybook(
-    extensions: string[],
-    id: string,
-    copybook: string,
-  ): boolean {
-    const list = this.memberListCache.get(id);
-    if (!list) return false;
-    for (const extension of extensions) {
-      const copyWithExt = copybook.concat(extension).toUpperCase();
-      if (list.some((member) => member.toUpperCase() === copyWithExt))
-        return true;
+
+  public async resolveCopybookUri(
+    profileName: string,
+    uss: string,
+    copybookName: string,
+  ) {
+    const memberList = await this.getAllMembers(profileName, uss);
+    const member = memberList.find((m) => m.name === copybookName);
+
+    if (member) {
+      return vscode.Uri.parse(
+        `zowe-uss:/${profileName}${uss}/${member.name}${member.extension}`,
+      );
     }
-    return false;
   }
 }

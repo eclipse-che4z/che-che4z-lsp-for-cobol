@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { Uri } from "../../__mocks__/UriMock";
+import { URI as Uri } from "vscode-uri";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookEncodingConfig,
@@ -21,8 +21,8 @@ import {
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "../../services/ProcessorGroups";
-import * as glob from "glob";
 import { SettingsService } from "../../services/Settings";
+import * as vscode from "vscode";
 
 const WORKSPACE_URI = "file:///my/workspace";
 
@@ -34,8 +34,8 @@ jest.mock("fs", () => ({
 jest.mock("vscode", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const vscode = jest.requireActual("../../__mocks__/vscode");
-  const WORKSPACE_URI_OBJ = new Uri("/my/workspace");
-  const WORKSPACE_URI_OBJ_WIN32 = new Uri("/c:/my/workspace");
+  const WORKSPACE_URI_OBJ = Uri.file("/my/workspace");
+  const WORKSPACE_URI_OBJ_WIN32 = Uri.file("/c:/my/workspace");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     ...vscode,
@@ -43,10 +43,7 @@ jest.mock("vscode", () => {
     workspace: {
       fs: {
         readFile: jest.fn().mockImplementation((uri: Uri) => {
-          if (
-            uri.fsPath === "/my/workspace/.cobolplugin/proc_grps.json" ||
-            uri.fsPath === "c:\\my\\workspace\\.cobolplugin\\proc_grps.json"
-          ) {
+          if (uri.toString().includes("proc_grps.json")) {
             return Buffer.from(`{
                       "pgroups": [
                           {
@@ -99,10 +96,7 @@ jest.mock("vscode", () => {
                       ]
                   }`);
           }
-          if (
-            uri.fsPath === "/my/workspace/.cobolplugin/pgm_conf.json" ||
-            uri.fsPath === "c:\\my\\workspace\\.cobolplugin\\pgm_conf.json"
-          ) {
+          if (uri.toString().includes("pgm_conf.json")) {
             return Buffer.from(`{
                       "pgms": [
                           { "program": "c:\\\\my\\\\workspace\\\\TEST.cob", "pgroup": "DAF" },
@@ -115,7 +109,7 @@ jest.mock("vscode", () => {
           }
         }),
       },
-      getWorkspaceFolder: (uri: Uri) =>
+      getWorkspaceFolder: (uri: vscode.Uri) =>
         uri.path.startsWith("/c:")
           ? { uri: WORKSPACE_URI_OBJ_WIN32 }
           : { uri: WORKSPACE_URI_OBJ },
@@ -140,17 +134,6 @@ jest.mock("path", (): unknown => {
 });
 
 describe("Processor groups configuration provides lib path", () => {
-  beforeAll(() => {
-    jest
-      .spyOn(glob, "globSync")
-      .mockImplementation(
-        (config: string | string[], _options: glob.GlobOptions) => {
-          if (config[0] === "/copy") return ["/copy-resolved-from-glob"];
-          else throw Error("some issue with input param");
-        },
-      );
-  });
-
   it("Processor groups configuration provides lib path", async () => {
     const item = {
       scopeUri: WORKSPACE_URI + "/TEST.cob",
@@ -158,22 +141,11 @@ describe("Processor groups configuration provides lib path", () => {
     };
 
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
-    expect(result).toStrictEqual(["/copy-resolved-from-glob"]);
+    expect(result).toEqual([vscode.Uri.file("/copy")]);
   });
 });
 
 describe("Processor groups configuration understand absolute paths", () => {
-  beforeAll(() => {
-    jest
-      .spyOn(glob, "globSync")
-      .mockImplementation(
-        (config: string | string[], _options: glob.GlobOptions) => {
-          if (config[0] === "/abs") return ["/copy-resolved-from-glob"];
-          else throw Error("some issue with input param");
-        },
-      );
-  });
-
   it("Processor groups configuration understand absolute paths", async () => {
     const item = {
       scopeUri: WORKSPACE_URI + "/abs/TEST.cob",
@@ -181,7 +153,7 @@ describe("Processor groups configuration understand absolute paths", () => {
     };
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
     expect(result).toStrictEqual([
-      "/copy-resolved-from-glob",
+      Uri.file("/abs"),
       { dataset: "remote.dataset.location" },
       { uss: "remote.uss.location" },
       {
@@ -249,21 +221,6 @@ it("Processor groups configuration matches program relative to workspace", async
   expect(result).toStrictEqual(["IDMS"]);
 });
 it("Checks library configurations in preprocessor definitions overrides processor group libraries", async () => {
-  jest
-    .spyOn(glob, "globSync")
-    .mockImplementation(
-      (config: string | string[], _options: glob.GlobOptions) => {
-        if (config[0] === "/copy") {
-          return ["copy-resolved-from-glob"];
-        }
-        if (config[0] === "/daco") {
-          return ["daco-resolved-from-glob"];
-        } else {
-          console.trace(config);
-          throw Error("some issue with input param");
-        }
-      },
-    );
   const scope = {
     scopeUri: WORKSPACE_URI + "/progDaF.cob",
   };
@@ -274,9 +231,9 @@ it("Checks library configurations in preprocessor definitions overrides processo
     "DaCo",
   );
 
-  expect(resultCobol).toStrictEqual(["copy-resolved-from-glob"]);
+  expect(resultCobol).toStrictEqual([Uri.file("/copy")]);
   expect(resultDaco).toStrictEqual([
-    "daco-resolved-from-glob",
+    Uri.file("/daco"),
     {
       environment: "ENV",
       profile: "instance.internal.connection",
@@ -316,28 +273,13 @@ it("Processor groups configuration provides compiler-options", async () => {
 });
 
 describe("Processor groups configuration provides lib path in Windows", () => {
-  beforeAll(() => {
-    jest
-      .spyOn(glob, "globSync")
-      .mockImplementation(
-        (config: string | string[], _options: glob.GlobOptions) => {
-          if (config[0] === "/copy") {
-            return ["copy-resolved-from-glob"];
-          } else {
-            console.trace(config);
-            throw Error("some issue with input param");
-          }
-        },
-      );
-  });
-
   it("Processor groups configuration provides lib path in Windows", async () => {
     const item = {
       scopeUri: "file:///c:/my/workspace/TEST.cob",
       section: "cobol-lsp.cpy-manager.paths-local",
     };
     const result = await loadProcessorGroupCopybookPathsConfig(item, []);
-    expect(result).toStrictEqual(["copy-resolved-from-glob"]);
+    expect(result).toStrictEqual([Uri.file("/copy")]);
   });
 });
 describe("Processor groups configurations prepared for download services", () => {
@@ -346,6 +288,6 @@ describe("Processor groups configurations prepared for download services", () =>
       WORKSPACE_URI + "/abs/TEST.cob",
       "COBOL",
     );
-    expect(paths).toStrictEqual(["/abs"]);
+    expect(paths).toStrictEqual([vscode.Uri.file("/abs").fsPath]);
   });
 });

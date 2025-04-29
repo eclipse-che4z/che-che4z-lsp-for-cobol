@@ -77,4 +77,20 @@ export class LocalFilesystemResourceService {
 
     return resources;
   }
+
+  public static async searchDirectory(
+    localPath: vscode.Uri,
+    fileName: string,
+    allowedExtensions: string[],
+  ): Promise<vscode.Uri | undefined> {
+    const fileNamePattern =
+      "{" +
+      allowedExtensions
+        .map((extension) => `${fileName}${extension}`)
+        .join(",") +
+      "}";
+    const searchPattern = createFileSearchPattern(localPath, fileNamePattern);
+    const files = await vscode.workspace.findFiles(searchPattern);
+    return files[0];
+  }
 }

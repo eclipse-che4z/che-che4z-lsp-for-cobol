@@ -21,13 +21,13 @@ import {
 } from "vscode";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
-import { Uri } from "../../../__mocks__/UriMock";
 import {
   DialectInfo,
   DialectRegistry,
 } from "../../../services/DialectRegistry";
 import { DEFAULT_DIALECT } from "../../../constants";
 import * as LocalCopybookService from "../../../services/copybook/LocalCopybooksService";
+import { URI } from "vscode-uri";
 
 describe("CopybooksCompletionProvider", () => {
   let cdsMock: CopybookDownloadService;
@@ -49,7 +49,7 @@ describe("CopybooksCompletionProvider", () => {
       .mockResolvedValue(localCopybooks);
 
     documentMock = {
-      uri: Uri.file("PROGRAM.cbl"),
+      uri: URI.file("/PROGRAM.cbl"),
       lineAt: () => ({ text: lineText }) as unknown as TextLine,
     } as unknown as TextDocument;
     positionMock = {
@@ -238,7 +238,7 @@ describe("CopybooksCompletionProvider", () => {
           );
 
           expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
-            "file://PROGRAM.cbl",
+            "file:///PROGRAM.cbl",
             "DACO",
           );
 
@@ -262,7 +262,7 @@ describe("CopybooksCompletionProvider", () => {
           );
 
           expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
-            "file://PROGRAM.cbl",
+            "file:///PROGRAM.cbl",
             DEFAULT_DIALECT,
           );
 
@@ -288,7 +288,7 @@ describe("CopybooksCompletionProvider", () => {
       );
 
       expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
-        "file://PROGRAM.cbl",
+        "file:///PROGRAM.cbl",
         "COBOL",
       );
     });

@@ -57,3 +57,39 @@ export async function listLocalCopybooks(
 
   return copybooks;
 }
+
+export async function searchLocalCopybooks(
+  documentUri: string,
+  copybookName: string,
+  dialect: string,
+): Promise<vscode.Uri | undefined> {
+  const directoryPaths = await SettingsService.getCopybookLocalPath(
+    documentUri,
+    dialect,
+    false,
+  );
+  const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
+  const searchDirectoryUris = SettingsService.prepareLocalSearchUris(
+    directoryPaths,
+    workspaceFolders,
+  );
+
+  const allowedExtensions =
+    await SettingsService.getCopybookExtension(documentUri);
+
+  const results = await Promise.allSettled(
+    searchDirectoryUris.map(async (directoryUri) =>
+      LocalFilesystemResourceService.searchDirectory(
+        directoryUri,
+        copybookName,
+        allowedExtensions ?? [],
+      ),
+    ),
+  );
+
+  for (const result of results) {
+    if (result.status === "fulfilled" && result.value) {
+      return result.value;
+    }
+  }
+}

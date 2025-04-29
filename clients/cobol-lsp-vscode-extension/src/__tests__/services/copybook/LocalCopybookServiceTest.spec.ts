@@ -50,13 +50,13 @@ describe("LocalCopybookService tests", () => {
             "/test/path/COPYBOOK.CPY",
             "/test/path/subfolder/SUBCOPY.CPY",
           ],
-          "file:///another/path": ["/another/path/COPYBK2"],
+          "file:///workspace/another/path": ["/workspace/another/path/COPYBK2"],
         };
       });
 
       it("return copybooks", async () => {
         const results = await listLocalCopybooks(
-          "PROGRAM.cbl",
+          "file:///PROGRAM.cbl",
           DEFAULT_DIALECT,
         );
 

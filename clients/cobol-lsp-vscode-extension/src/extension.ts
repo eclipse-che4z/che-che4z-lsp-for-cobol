@@ -15,7 +15,6 @@
 import * as vscode from "vscode";
 import { __ExtensionApi } from "@code4z/cobol-dialect-api";
 import { isV1RuntimeDialectDetail } from "./dialect/utils";
-import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
   E4E_INCOMPATIBLE,
@@ -63,6 +62,7 @@ import {
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
 import { DownloadDiagnosticsService } from "./services/DiagnosticsService";
+import { readFileContent } from "./services/copybook/CopybookMessageHandler";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -218,14 +218,6 @@ export async function activate(
     resolveSubroutineURI,
   );
   languageClientService.addRequestHandler(
-    "copybook/resolve",
-    copyBooksDownloader.makeResolveCopybookHandler(),
-  );
-  languageClientService.addRequestHandler(
-    "copybook/download",
-    copyBooksDownloader.makeCopybookDownloadHandler(),
-  );
-  languageClientService.addRequestHandler(
     "workspace/configuration",
     (r: Parameters<typeof lspConfigHandler>[0]) =>
       lspConfigHandler(r, outputChannel),
@@ -234,38 +226,11 @@ export async function activate(
     "cfast/ready",
     analysisService.makeControlFlowAstNotificationHandler(),
   );
-  //   COPY SLICKNUM.    file:/Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKNUM
-  // COPY ACCTFILE.    file:/Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/ACCTFILE
-  // COPY SLICKCOM. file:/Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKCOM
-
   languageClientService.addRequestHandler(
     "copybook/uri",
-    (_a, b: string, _c) => {
-      if (b.toUpperCase() === "SLICKNUM") {
-        return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKNUM";
-      }
-      if (b.toUpperCase() === "ACCTFILE") {
-        return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/ACCTFILE";
-      }
-      if (b.toUpperCase() === "SLICKCOM") {
-        return "file:///Users/amanprashant/IdeaProjects/cobolls-internal-test/SLICK/COBCOPY/SLICKCOM";
-      }
-      if (b.toUpperCase() === "UNKNOWN") {
-        return undefined;
-      }
-      return "zowe-ds:/zosmf/AP891843.PUBLIC.CPY/TEST.cpy";
-    },
+    copyBooksDownloader.makeResolveCopybookUriHandler(),
   );
-  languageClientService.addRequestHandler(
-    "file/content",
-    async (uri: string) => {
-      {
-        const vscodeUri = vscode.Uri.parse(uri);
-        const fileData = await vscode.workspace.fs.readFile(vscodeUri);
-        return Buffer.from(fileData).toString("utf8");
-      }
-    },
-  );
+  languageClientService.addRequestHandler("file/content", readFileContent);
 
   await languageClientService.start();
 
@@ -368,15 +333,6 @@ function registerCommands(
   context: vscode.ExtensionContext,
   copyBooksDownloader: CopybookDownloadService,
 ) {
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "cobol-lsp.cpy-manager.fetch-copybook",
-      async (copybook: string, programName: string) => {
-        await fetchCopybookCommand(copybook, copyBooksDownloader, programName);
-      },
-    ),
-  );
-
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "cobol-lsp.cpy-manager.goto-settings",

@@ -18,7 +18,7 @@ import type {
   Position as PositionType,
   Uri as UriType,
 } from "vscode";
-import { Uri as UriMock } from "./UriMock";
+import { URI, Utils } from "vscode-uri";
 
 import { readFile } from "fs/promises";
 
@@ -26,7 +26,9 @@ import { readFile } from "fs/promises";
 export namespace workspace {
   export const workspaceFolders = [
     {
-      uri: UriMock.parse("/"),
+      name: "workspace",
+      uri: URI.parse("/workspace"),
+      index: 0,
     },
   ];
   export function getConfiguration() {
@@ -59,6 +61,7 @@ export namespace workspace {
     delete: jest.fn().mockReturnValue(true),
     readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
     createDirectory: jest.fn(),
+    stat: jest.fn(),
   };
 
   export const onDidChangeConfiguration = jest
@@ -92,6 +95,7 @@ export namespace window {
     .fn()
     .mockImplementation(() => Promise.resolve());
   export const showInformationMessage = jest.fn().mockReturnValue("Ok");
+  export const showInputBox = jest.fn();
   export const createStatusBarItem = () => {
     return { show: () => {} };
   };
@@ -139,7 +143,8 @@ export enum StatusBarAlignment {
   Right,
 }
 
-export const Uri = UriMock;
+export const Uri = URI;
+Object.assign(Uri, Utils);
 
 export enum ConfigurationTarget {
   Global = 1,
@@ -232,7 +237,7 @@ export const languages = {
   }),
 };
 
-class FileNotFound extends Error {
+export class FileNotFound extends Error {
   code: string;
   constructor() {
     super();
