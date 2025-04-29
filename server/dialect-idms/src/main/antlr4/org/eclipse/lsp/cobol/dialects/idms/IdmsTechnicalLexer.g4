@@ -86,9 +86,6 @@ SQLLINECOMMENT
 	:	SQLLINECOMMENTCHAR ~[\r\n]* NEWLINE -> channel(HIDDEN)
 	;
 
-// treat all the non-processed tokens as errors
-ERRORCHAR : . ;
-
 ZERO_DIGIT: '0';
 
 

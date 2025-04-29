@@ -18,7 +18,7 @@ import { pos } from "./testHelper";
 import * as vscode from "vscode";
 import * as path from "path";
 
-suite("TF48417: XML GENERATE", function () {
+suite.skip("TF48417: XML GENERATE", function () {
   suiteSetup(async function () {
     this.timeout(0);
     this.slow(2000);

@@ -15,7 +15,7 @@ parser grammar CICSParser;
 options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
 startRule: (cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral | ~(EXEC_CICS|DFHRESP|DFHVALUE))* EOF;
-compilerDirective: (.*? compilerOpts)* .*? EOF;
+compilerDirective: (compilerOpts | XOPTS | CICS | ~(XOPTS | CICS))*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |

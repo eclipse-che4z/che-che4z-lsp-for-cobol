@@ -15,15 +15,19 @@
 parser grammar IdmsCopyParser;
 options {tokenVocab = IdmsCopyLexer;  superClass = MessageServiceParser;}
 
-startRule: .*? idmsCopybookRules* EOF;
-idmsCopybookRules: (dataDescriptionEntry | copyIdmsStatement | fileDescriptionEntry) .*?;
+startRule:
+   (
+      (dataDescriptionEntry | copyIdmsStatement | COPY | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88 )
+      | (fileDescriptionEntry | FD | SD)
+      | ~(COPY | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88 | FD | SD)
+   )*
+   EOF;
 
 dataDescriptionEntry
    : dataDescriptionEntryFormat1
    | dataDescriptionEntryFormat2
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
-   | dialectDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
@@ -392,19 +396,10 @@ variableUsageName
    : cobolWord
    ;
 
-dialectDescriptionEntry
-   : dialectNodeFiller
-   ;
-
-dialectNodeFiller
-    : ZERO_WIDTH_SPACE+
-    ;
-
-
 // -- file section ----------------------------------
 
 fileDescriptionEntry
-   : (fileDescriptionEntryClauses dataDescriptionEntry* | dialectNodeFiller)
+   : fileDescriptionEntryClauses dataDescriptionEntry*
    ;
 
 fileDescriptionEntryClauses

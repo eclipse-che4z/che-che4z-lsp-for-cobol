@@ -15,8 +15,19 @@
 parser grammar IdmsParser;
 options {tokenVocab = IdmsLexer;  superClass = MessageServiceParser;}
 
-startRule: .*? idmsRules* EOF;
-idmsRules: (idmsStatements | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
+startRule: (
+     (idmsStatements | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement | ABEND | ACCEPT | ATTACH | BIND
+            | CHANGE | CHECK | COMMIT | CONNECT | COPY | DC | DELETE | DEQUEUE | DISCONNECT | END | ENDPAGE | ENQUEUE
+            | ERASE | FIND | FINISH | FREE | GET | IDMS_CONTROL | IF | INQUIRE | INQUIRE | KEEP | LEVEL_NUMBER | LOAD
+            | MAP | MODIFY | OBTAIN | POST | PUT | READ | READY | RETURN | ROLLBACK | SCHEMA | SEND | SET | SNAP | STARTPAGE
+            | STORE | TRANSFER | WAIT | WRITE
+     )
+     |  ~ (ABEND | ACCEPT | ATTACH | BIND
+         | CHANGE | CHECK | COMMIT | CONNECT | COPY | DC | DELETE | DEQUEUE | DISCONNECT | END | ENDPAGE | ENQUEUE
+         | ERASE | FIND | FINISH | FREE | GET | IDMS_CONTROL | IF | INQUIRE | INQUIRE | KEEP | LEVEL_NUMBER | LOAD
+         | MAP | MODIFY | OBTAIN | POST | PUT | READ | READY | RETURN | ROLLBACK | SCHEMA | SEND | SET | SNAP | STARTPAGE
+         | STORE | TRANSFER | WAIT | WRITE)
+     )* EOF;
 
 idmsSections
    : idmsControlSection | schemaSection | mapSection
