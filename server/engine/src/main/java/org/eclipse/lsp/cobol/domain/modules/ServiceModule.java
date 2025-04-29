@@ -76,8 +76,8 @@ public class ServiceModule extends AbstractModule {
     bind(CopybookService.class).to(CopybookServiceImpl.class);
     bind(PredefinedCopybookStore.class).to(PredefinedCopybookStoreImpl.class);
     // TODO: configure below commented binding based on some flag
-    bind(ResolveCopybookUri.class).to(CacheResolveCopybookUri.class);
-    bind(ResolveFileContent.class).to(DiskBasedFileContent.class);
+    bind(ResolveCopybookUri.class).to(NonCacheResolveCopybookUri.class);
+    bind(ResolveFileContent.class).to(ClientBasedFileContent.class);
     bind(FileDownload.class).to(ClientDownloadFile.class);
     //    bind(ResolveCopybookUri.class).to(NonCacheResolveCopybookUri.class);
     //    bind(ResolveFileContent.class).to(ClientBasedFileContent.class);
