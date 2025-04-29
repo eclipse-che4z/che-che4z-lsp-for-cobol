@@ -46,7 +46,6 @@ import {
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
-import { SettingsUtils } from "./util/SettingsUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
 
