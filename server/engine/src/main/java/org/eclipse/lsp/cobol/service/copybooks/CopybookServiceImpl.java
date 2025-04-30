@@ -214,6 +214,22 @@ public class CopybookServiceImpl implements CopybookService {
     }
   }
 
+  @Override
+  public void store(CopybookModel copybookModel) {
+    copybookCache.store(copybookModel);
+  }
+
+  @Override
+  public void store(CopybookModel copybookModel, CleanerPreprocessor preprocessor) {
+    if (preprocessor != null) {
+      ResultWithErrors<CopybookModel> processedCopybook =
+          CopybookUtility.cleanupCopybook(copybookModel, preprocessor);
+      copybookModel = processedCopybook.getResult();
+      preprocessCopybookErrors.put(copybookModel.getUri(), processedCopybook.getErrors());
+    }
+    store(copybookModel);
+  }
+
   /**
    * Get the list of copybook used by a document
    *
