@@ -35,8 +35,7 @@ public class JavaShareableOffWithoutOnProcessor
     }
   }
 
-  private void throwError(
-          JavaShareableOffWithoutOnNode node, ProcessingContext processingContext) {
+  private void throwError(JavaShareableOffWithoutOnNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(
@@ -44,7 +43,9 @@ public class JavaShareableOffWithoutOnProcessor
                 .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.PARSING)
-                .messageTemplate(MessageTemplate.of("compilerDirective.validation.javaShareableOff", node.getText()))
+                .messageTemplate(
+                    MessageTemplate.of(
+                        "compilerDirective.validation.javaShareableOff", node.getText()))
                 .build());
   }
 }

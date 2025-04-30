@@ -101,7 +101,9 @@ public class CliUtils {
     pipeline.add(new CompilerDirectivesStage(messageService));
     pipeline.add(
         new HpCopybookProcessingStage(messageService, diCtx.getInstance(CopybookService.class)));
-    pipeline.add(new PreprocessorStage(diCtx.getInstance(GrammarPreprocessor.class), preprocessor, messageService));
+    pipeline.add(
+        new PreprocessorStage(
+            diCtx.getInstance(GrammarPreprocessor.class), preprocessor, messageService));
     if (isAnalysisRequired) {
       pipeline.add(new ImplicitDialectProcessingStage(dialectService));
       pipeline.add(new ParserStage(messageService, diCtx.getInstance(ParseTreeListener.class)));

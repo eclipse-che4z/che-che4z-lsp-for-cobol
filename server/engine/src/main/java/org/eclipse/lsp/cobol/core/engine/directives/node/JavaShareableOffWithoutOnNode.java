@@ -21,15 +21,14 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/**
- * Represents a Java-Shareable Off without Java-Shareable On.
- */
+/** Represents a Java-Shareable Off without Java-Shareable On. */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class JavaShareableOffWithoutOnNode extends Node {
   private final boolean isJavaShareableOn;
   private final String text;
+
   public JavaShareableOffWithoutOnNode(Locality location, String text, boolean isJavaShareableOn) {
     super(location, NodeType.CUSTOM);
     this.isJavaShareableOn = isJavaShareableOn;

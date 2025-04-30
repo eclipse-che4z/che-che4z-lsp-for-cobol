@@ -38,7 +38,7 @@ public class JavaShareableOnWorkingSectionProcessor
   }
 
   private void throwError(
-          JavaShareableOnWorkingSectionNode node, ProcessingContext processingContext) {
+      JavaShareableOnWorkingSectionNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(
@@ -46,7 +46,9 @@ public class JavaShareableOnWorkingSectionProcessor
                 .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.PARSING)
-                .messageTemplate(MessageTemplate.of("compilerDirective.validation.workingSection", node.getText()))
+                .messageTemplate(
+                    MessageTemplate.of(
+                        "compilerDirective.validation.workingSection", node.getText()))
                 .build());
   }
 }

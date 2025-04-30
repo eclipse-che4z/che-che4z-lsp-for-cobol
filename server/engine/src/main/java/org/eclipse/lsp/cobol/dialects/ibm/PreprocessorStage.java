@@ -14,12 +14,11 @@
  */
 package org.eclipse.lsp.cobol.dialects.ibm;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -110,9 +109,12 @@ public class PreprocessorStage
 
   private void processCobolJavaInteroperabilityDirectives(AnalysisContext ctx) {
     String text = ctx.getExtendedDocument().getCurrentText().toString();
-    Pattern compilerDirectiveLine = Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)>>\\s*(?<compilerDirectives>.+)");
+    Pattern compilerDirectiveLine =
+        Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)>>\\s*(?<compilerDirectives>.+)");
     Pattern newLinePattern = Pattern.compile("\n\r?");
-    Pattern sectionPattern = Pattern.compile("(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
+    Pattern sectionPattern =
+        Pattern.compile(
+            "(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
     Pattern javaShareableonPattern = Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
 
     String[] lines = newLinePattern.split(text);
@@ -133,8 +135,15 @@ public class PreprocessorStage
 
       String compilerDirectives = directivesLine.group("compilerDirectives");
       if (compilerDirectives != null) {
-        ctx.getDialectNodes().addAll(process(compilerDirectives, ctx, new Position(i, directivesLine.start("compilerDirectives")),
-                section, directivesLine.group(), isJavaShareableOn));
+        ctx.getDialectNodes()
+            .addAll(
+                process(
+                    compilerDirectives,
+                    ctx,
+                    new Position(i, directivesLine.start("compilerDirectives")),
+                    section,
+                    directivesLine.group(),
+                    isJavaShareableOn));
       }
 
       String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
@@ -143,12 +152,18 @@ public class PreprocessorStage
     }
   }
 
-  private List<Node> process(String directiveText, AnalysisContext ctx, Position startPosition, String section,
-                             String directiveLineText, boolean isJavaShareableOn) {
+  private List<Node> process(
+      String directiveText,
+      AnalysisContext ctx,
+      Position startPosition,
+      String section,
+      String directiveLineText,
+      boolean isJavaShareableOn) {
     Pattern dialectFillerPattern =
-            Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
+        Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
     if (!dialectFillerPattern.matcher(directiveText).matches()) {
-      CompilerDirectivesLexer lexer = new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
+      CompilerDirectivesLexer lexer =
+          new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
       lexer.removeErrorListeners();
 
       CompilerDirectivesParser parser = new CompilerDirectivesParser(new CommonTokenStream(lexer));
@@ -156,8 +171,9 @@ public class PreprocessorStage
       parser.setErrorHandler(new CompilerDirectivesErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
 
-      CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, startPosition, section,
-              directiveLineText, isJavaShareableOn);
+      CompilerDirectivesVisitor visitor =
+          new CompilerDirectivesVisitor(
+              ctx, messageService, startPosition, section, directiveLineText, isJavaShareableOn);
 
       return visitor.visitCompilerDirectives(parser.compilerDirectives());
     }

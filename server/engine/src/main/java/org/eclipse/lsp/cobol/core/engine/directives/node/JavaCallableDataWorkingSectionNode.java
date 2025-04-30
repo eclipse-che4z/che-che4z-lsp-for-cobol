@@ -22,18 +22,17 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/**
- * Represents a Java-Callable which are only allowed in the data or working-storage section.
- */
+/** Represents a Java-Callable which are only allowed in the data or working-storage section. */
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class JavaCallableDataWorkingSectionNode extends Node {
-    private final String section;
-    private final String text;
-    public JavaCallableDataWorkingSectionNode(Locality location, String text, String section) {
+  private final String section;
+  private final String text;
+
+  public JavaCallableDataWorkingSectionNode(Locality location, String text, String section) {
     super(location, NodeType.CUSTOM);
-        this.section = section;
-        this.text = text;
-    }
+    this.section = section;
+    this.text = text;
+  }
 }

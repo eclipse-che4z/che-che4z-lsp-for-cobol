@@ -366,9 +366,12 @@ public class TransformTreeStage
     ctx.register(v, ProcedureDivisionUsingNode.class, new LinkageArgumentsOriginCheck());
     ctx.register(v, ProcedureDivisionReturningNode.class, new LinkageArgumentsOriginCheck());
 
-    ctx.register(v, JavaShareableOnWorkingSectionNode.class, new JavaShareableOnWorkingSectionProcessor());
-    ctx.register(v, JavaShareableOffWorkingSectionNode.class, new JavaShareableOffWorkingSectionProcessor());
-    ctx.register(v, JavaCallableDataWorkingSectionNode.class, new JavaCallableDataWorkingSectionProcessor());
+    ctx.register(
+        v, JavaShareableOnWorkingSectionNode.class, new JavaShareableOnWorkingSectionProcessor());
+    ctx.register(
+        v, JavaShareableOffWorkingSectionNode.class, new JavaShareableOffWorkingSectionProcessor());
+    ctx.register(
+        v, JavaCallableDataWorkingSectionNode.class, new JavaCallableDataWorkingSectionProcessor());
     ctx.register(v, JavaShareableOffWithoutOnNode.class, new JavaShareableOffWithoutOnProcessor());
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig).stream()

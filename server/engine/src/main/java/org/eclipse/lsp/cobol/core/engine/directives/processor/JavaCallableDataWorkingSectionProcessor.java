@@ -33,14 +33,14 @@ public class JavaCallableDataWorkingSectionProcessor
   @Override
   public void accept(JavaCallableDataWorkingSectionNode node, ProcessingContext processingContext) {
     if (node.getSection().contains(SectionType.WORKING_STORAGE.getType())
-            || node.getSection().contains(DivisionType.DATA_DIVISION.getDivName())) {
+        || node.getSection().contains(DivisionType.DATA_DIVISION.getDivName())) {
       return;
     }
     throwError(node, processingContext);
   }
 
   private void throwError(
-          JavaCallableDataWorkingSectionNode node, ProcessingContext processingContext) {
+      JavaCallableDataWorkingSectionNode node, ProcessingContext processingContext) {
     processingContext
         .getErrors()
         .add(
@@ -48,7 +48,8 @@ public class JavaCallableDataWorkingSectionProcessor
                 .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.PARSING)
-                .messageTemplate(MessageTemplate.of("compilerDirective.validation.dataSection", node.getText()))
+                .messageTemplate(
+                    MessageTemplate.of("compilerDirective.validation.dataSection", node.getText()))
                 .build());
   }
 }

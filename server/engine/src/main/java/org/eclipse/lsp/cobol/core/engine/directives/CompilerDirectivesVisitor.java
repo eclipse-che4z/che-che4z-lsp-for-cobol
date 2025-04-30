@@ -14,7 +14,16 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -38,20 +47,7 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
-
-
-/**
- * Visitor
- */
+/** Visitor */
 public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisitor<List<Node>> {
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
@@ -60,8 +56,13 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private final String directiveLineText;
   private final boolean isJavaShareableOn;
 
-  public CompilerDirectivesVisitor(AnalysisContext ctx, MessageService messageService, Position startPosition,
-                                   String section, String directiveLineText, boolean isJavaShareableOn) {
+  public CompilerDirectivesVisitor(
+      AnalysisContext ctx,
+      MessageService messageService,
+      Position startPosition,
+      String section,
+      String directiveLineText,
+      boolean isJavaShareableOn) {
     this.analysisContext = ctx;
     this.messageService = messageService;
     this.startPosition = startPosition;
@@ -71,7 +72,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   public CompilerDirectivesVisitor(
-          AnalysisContext ctx, MessageService messageService, Position startPosition) {
+      AnalysisContext ctx, MessageService messageService, Position startPosition) {
     this(ctx, messageService, startPosition, "", "", false);
   }
 
@@ -158,32 +159,36 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public List<Node> visitCobolJavaInteroperabilityOptions(CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
+  public List<Node> visitCobolJavaInteroperabilityOptions(
+      CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
     return super.visitCobolJavaInteroperabilityOptions(ctx);
   }
 
   @Override
   public List<Node> visitExtraneousInput(CompilerDirectivesParser.ExtraneousInputContext ctx) {
-    VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
-      Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-      Location location = analysisContext.getExtendedDocument().mapLocation(range);
-      throwException(
-              ctx.getText(),
-              locationToLocality(location),
-              messageService.getMessage("compilerOption.invalid"));
-    });
+    VisitorHelper.retrieveRangeLocality(ctx)
+        .ifPresent(
+            r -> {
+              Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+              Location location = analysisContext.getExtendedDocument().mapLocation(range);
+              throwException(
+                  ctx.getText(),
+                  locationToLocality(location),
+                  messageService.getMessage("compilerOption.invalid"));
+            });
     return super.visitExtraneousInput(ctx);
   }
 
   @Override
-  public List<Node> visitCompilerDirectives(CompilerDirectivesParser.CompilerDirectivesContext ctx) {
+  public List<Node> visitCompilerDirectives(
+      CompilerDirectivesParser.CompilerDirectivesContext ctx) {
     analysisContext.getConfig().getCompilerOptions().add(ctx.getText().trim());
     return super.visitCompilerDirectives(ctx);
   }
 
   @Override
   public List<Node> visitCobolJavaInteroperability(
-          CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
+      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
 
     int tokenType = ctx.getStart().getType();
 
@@ -199,50 +204,86 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     }
   }
 
-  private List<Node> processJavaCallable(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE\\s*(?<extraText>.*)").matcher(this.directiveLineText);
+  private List<Node> processJavaCallable(
+      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
+    Matcher directiveLine =
+        Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE\\s*(?<extraText>.*)")
+            .matcher(this.directiveLineText);
     validateDirective(ctx, directiveLine);
     Locality statementLocality = createStatementLocality(ctx);
-    return addTreeNode(ctx, (location) -> new JavaCallableDataWorkingSectionNode(statementLocality, ctx.getText(), section));
+    return addTreeNode(
+        ctx,
+        (location) ->
+            new JavaCallableDataWorkingSectionNode(statementLocality, ctx.getText(), section));
   }
 
-  private List<Node> processJavaShareableOn(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON\\s*(?<extraText>.*)").matcher(this.directiveLineText);
+  private List<Node> processJavaShareableOn(
+      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
+    Matcher directiveLine =
+        Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON\\s*(?<extraText>.*)")
+            .matcher(this.directiveLineText);
     validateDirective(ctx, directiveLine);
-    return addTreeNode(ctx, (location) -> new JavaShareableOnWorkingSectionNode(createStatementLocality(ctx), ctx.getText(), section));
+    return addTreeNode(
+        ctx,
+        (location) ->
+            new JavaShareableOnWorkingSectionNode(
+                createStatementLocality(ctx), ctx.getText(), section));
   }
 
-  private List<Node> processJavaShareableOff(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    Matcher directiveLine = Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF\\s*(?<extraText>.*)").matcher(this.directiveLineText);
-    boolean isValid =  validateDirective(ctx, directiveLine);
-    List<Node> nodes = new ArrayList<>(addTreeNode(ctx, (location) ->
-            new JavaShareableOffWorkingSectionNode(createStatementLocality(ctx), ctx.getText(), section)));
+  private List<Node> processJavaShareableOff(
+      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
+    Matcher directiveLine =
+        Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF\\s*(?<extraText>.*)")
+            .matcher(this.directiveLineText);
+    boolean isValid = validateDirective(ctx, directiveLine);
+    List<Node> nodes =
+        new ArrayList<>(
+            addTreeNode(
+                ctx,
+                (location) ->
+                    new JavaShareableOffWorkingSectionNode(
+                        createStatementLocality(ctx), ctx.getText(), section)));
     if (isValid) {
-      nodes.addAll(addTreeNode(ctx, (location) ->
-              new JavaShareableOffWithoutOnNode(createStatementLocality(ctx), ctx.getText(), isJavaShareableOn)));
+      nodes.addAll(
+          addTreeNode(
+              ctx,
+              (location) ->
+                  new JavaShareableOffWithoutOnNode(
+                      createStatementLocality(ctx), ctx.getText(), isJavaShareableOn)));
     }
     return nodes;
   }
 
-  private boolean validateDirective(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx, Matcher directiveLine) {
+  private boolean validateDirective(
+      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx, Matcher directiveLine) {
     if (!directiveLine.matches()) {
-      VisitorHelper.retrieveRangeLocality(ctx).ifPresent(r -> {
-        Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-        Location location = analysisContext.getExtendedDocument().mapLocation(range);
-        throwException(ctx.getText(), locationToLocality(location),
-                messageService.getMessage("compilerDirective.invalid"));
-      });
+      VisitorHelper.retrieveRangeLocality(ctx)
+          .ifPresent(
+              r -> {
+                Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+                Location location = analysisContext.getExtendedDocument().mapLocation(range);
+                throwException(
+                    ctx.getText(),
+                    locationToLocality(location),
+                    messageService.getMessage("compilerDirective.invalid"));
+              });
       return false;
     }
 
     return !isTextAfterDirective(directiveLine);
   }
 
-  private Locality createStatementLocality(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
-    return getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx))).toBuilder()
-            .range(new Range(new Position(startPosition.getLine(), startPosition.getCharacter()),
-                    new Position(startPosition.getLine(), startPosition.getCharacter() + ctx.start.getStopIndex() + 1)))
-            .build();
+  private Locality createStatementLocality(
+      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
+    return getLocality(this.analysisContext.getExtendedDocument().mapLocation(constructRange(ctx)))
+        .toBuilder()
+        .range(
+            new Range(
+                new Position(startPosition.getLine(), startPosition.getCharacter()),
+                new Position(
+                    startPosition.getLine(),
+                    startPosition.getCharacter() + ctx.start.getStopIndex() + 1)))
+        .build();
   }
 
   private static boolean isTextAfterDirective(Matcher directiveLine) {
@@ -272,31 +313,32 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
 
   private Locality getLocality(Location location) {
     Locality.LocalityBuilder builder =
-            Locality.builder().uri(location.getUri()).range(location.getRange());
+        Locality.builder().uri(location.getUri()).range(location.getRange());
     return builder.build();
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
     SyntaxError error =
-            SyntaxError.syntaxError()
-                    .errorSource(ErrorSource.PARSING)
-                    .location(locality.toOriginalLocation())
-                    .suggestion(String.format("%s %s", message, wrongToken))
-                    .severity(ErrorSeverity.ERROR)
-                    .build();
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .location(locality.toOriginalLocation())
+            .suggestion(String.format("%s %s", message, wrongToken))
+            .severity(ErrorSeverity.ERROR)
+            .build();
 
-    if (!analysisContext.getAccumulatedErrors().contains(error) && !wrongToken.contains(CobolDialect.FILLER)) {
+    if (!analysisContext.getAccumulatedErrors().contains(error)
+        && !wrongToken.contains(CobolDialect.FILLER)) {
       analysisContext.getAccumulatedErrors().add(error);
     }
   }
 
   private Locality locationToLocality(Location location) {
-    Locality.LocalityBuilder builder = Locality.builder()
-            .range(location.getRange())
-            .uri(location.getUri());
+    Locality.LocalityBuilder builder =
+        Locality.builder().range(location.getRange()).uri(location.getUri());
 
     if (analysisContext.getCopybooksRepository() != null) {
-      builder.copybookId(analysisContext.getCopybooksRepository().getCopybookIdByUri(location.getUri()));
+      builder.copybookId(
+          analysisContext.getCopybooksRepository().getCopybookIdByUri(location.getUri()));
     }
 
     return builder.build();

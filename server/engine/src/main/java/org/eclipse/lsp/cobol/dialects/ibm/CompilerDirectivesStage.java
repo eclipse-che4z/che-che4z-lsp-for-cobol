@@ -60,9 +60,9 @@ public class CompilerDirectivesStage
       }
       if (directivesLine.matches()) {
         process(
-                directivesLine.group("directives"),
-                ctx,
-                new Position(i, directivesLine.start("directives")));
+            directivesLine.group("directives"),
+            ctx,
+            new Position(i, directivesLine.start("directives")));
         String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
         Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
         ctx.getExtendedDocument().replace(range, newText);

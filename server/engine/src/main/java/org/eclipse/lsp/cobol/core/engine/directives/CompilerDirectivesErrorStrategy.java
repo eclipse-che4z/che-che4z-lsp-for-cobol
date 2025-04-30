@@ -28,8 +28,10 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.ErrorMessageHelper;
 @Getter
 @Slf4j
 @NoArgsConstructor
-public class CompilerDirectivesErrorStrategy extends DefaultErrorStrategy implements MessageServiceProvider {
-  private static final String REPORT_NO_VIABLE_ALTERNATIVE = "ErrorStrategy.reportNoViableAlternative";
+public class CompilerDirectivesErrorStrategy extends DefaultErrorStrategy
+    implements MessageServiceProvider {
+  private static final String REPORT_NO_VIABLE_ALTERNATIVE =
+      "ErrorStrategy.reportNoViableAlternative";
   private static final String REPORT_MISSING_TOKEN = "ErrorStrategy.reportMissingToken";
 
   private MessageService messageService;
@@ -67,7 +69,7 @@ public class CompilerDirectivesErrorStrategy extends DefaultErrorStrategy implem
   protected void reportInputMismatch(Parser recognizer, InputMismatchException e) {
     Token token = e.getOffendingToken();
     String msg =
-            errorMessageHelper.getInputMismatchMessage(recognizer, e, token, getOffendingToken(e));
+        errorMessageHelper.getInputMismatchMessage(recognizer, e, token, getOffendingToken(e));
     recognizer.notifyErrorListeners(token, msg, e);
   }
 
@@ -96,10 +98,10 @@ public class CompilerDirectivesErrorStrategy extends DefaultErrorStrategy implem
     }
     beginErrorCondition(recognizer);
     String msg =
-            messageService.getMessage(
-                    REPORT_MISSING_TOKEN,
-                    errorMessageHelper.getExpectedText(recognizer),
-                    ErrorMessageHelper.getRule(recognizer));
+        messageService.getMessage(
+            REPORT_MISSING_TOKEN,
+            errorMessageHelper.getExpectedText(recognizer),
+            ErrorMessageHelper.getRule(recognizer));
     recognizer.notifyErrorListeners(recognizer.getCurrentToken(), msg, null);
   }
 
