@@ -15,7 +15,7 @@ parser grammar CICSParser;
 options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
 startRule: (cicsExecBlock | cicsDfhRespLiteral | cicsDfhValueLiteral | ~(EXEC_CICS|DFHRESP|DFHVALUE))* EOF;
-compilerDirective: (.*? compilerOpts)* .*? EOF;
+compilerDirective: (.*? cicsTranslatorDirectives)* .*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
@@ -40,57 +40,14 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
 
 allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics | cics_csd;
 
-// compiler options
-compilerOpts
-   : (XOPTS LPARENCHAR compilerXOptsOption (commaClause? compilerXOptsOption)* RPARENCHAR) | cicsOptions;
+cicsTranslatorDirectives:  (CICS | XOPTS) LPARENCHAR cicsTranslatorOptions (COMMACHAR cicsTranslatorOptions)* RPARENCHAR;
 
-cicsOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL)  RPARENCHAR;
-
-compilerXOptsOption
-    : APOST |
-      CBLCARD |
-      CICS |
-      COBOL2 |
-      COBOL3 |
-      CPSM |
-      DBCS |
-      DEBUG |
-      DLI |
-      EDF |
-      EXCI |
-      FEPI |
-      ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (commaClause (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR) |
-      LENGTH |
-      ((LINECOUNT | LC) LPARENCHAR integerLiteral RPARENCHAR) |
-      LINKAGE |
-      NATLANG |
-      NOCBLCARD |
-      NOCPSM |
-      NODEBUG |
-      NOEDF |
-      NOFEPI |
-      NOLENGTH |
-      NOLINKAGE |
-      NONUM |
-      NOOPTIONS |
-      NOSEQ |
-      NOSPIE |
-      NOVBREF |
-      NUM |
-      OPTIONS |
-      QUOTE |
-      SEQ |
-      SP |
-      SPACE LPARENCHAR integerLiteral RPARENCHAR |
-      SPIE |
-      SYSEIB |
-      VBREF
-    ;
-
-cicsTranslatorCompileDirectivedKeywords
-   : CBLCARD | COBOL2 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
-   | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OPTIONS | SP | SPIE | SYSEIB
-   ;
+cicsTranslatorOptions:
+    APOST | CBLCARD | CICS | CO2 | CO3 | COBOL2 | COBOL3 | CPSM | DBCS | DEBUG | DLI | EDF | EXCI | FEPI
+    | ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR)
+    | LENGTH | LIN | LINKAGE | ((LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR) | NATLANG | NOCPSM | NODEBUG
+    | NOEDF | NOOPTIONS | NOFEPI | NOLENGTH | NOLINKAGE | NONUM | NOSEQ | NOSPIE | NUM | OP | OPTIONS | Q_CHAR | QUOTE | SEQ
+    | SP | SYSEIB | SPACE | SPIE | VBREF;
 
 /** RECEIVE: */
 
@@ -1271,7 +1228,7 @@ ABORT
  | YEAR
  | YYYYDDD
  | YYYYMMDD
- | cicsTranslatorCompileDirectivedKeywords;
+ | cicsTranslatorDirectives;
 
 cicsLexerDefinedVariableUsageTokens:
 ABCODE

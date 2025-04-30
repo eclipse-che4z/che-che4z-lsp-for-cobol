@@ -18,69 +18,19 @@ options {tokenVocab = CompilerDirectivesLexer;}
 compilerOptions: compilerOption | (compilerOption COMMACHAR compilerOptions)+;
 compilerOption
     : deprecatedCompilerOptions
-    | compilerXOpts
-    | cicsTranslatorOptions
+    | cicsTranslatorDirectives
     | cobolCompilerOption
     ;
 
 // compiler translator options
-cicsTranslatorOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL)  RPARENCHAR;
+cicsTranslatorDirectives:  (CICS | XOPTS) LPARENCHAR cicsTranslatorOptions (COMMACHAR cicsTranslatorOptions )* RPARENCHAR;
 
-// compiler options
-compilerXOpts
-       : XOPTS LPARENCHAR compilerXOptsOption (COMMACHAR? compilerXOptsOption)* RPARENCHAR
-       ;
-
-compilerXOptsOption
-       : APOST
-       | CBLCARD
-       | CICS
-       | CO2
-       | COBOL2
-       | CO3
-       | COBOL3
-       | CPSM
-       | DBCS
-       | DEBUG
-       | DLI
-       | EDF
-       | EXCI
-       | FEPI
-       | ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR)
-       | LENGTH
-       | ((LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR)
-       | LIN
-       | LINKAGE
-       | NATLANG
-       | NOCBLCARD
-       | NOCPSM
-       | NODEBUG
-       | NOEDF
-       | NOFEPI
-       | NOLENGTH
-       | NOLINKAGE
-       | NONUM
-       | NOOPTIONS
-       | NOSEQ
-       | NOSPIE
-       | NOVBREF
-       | NUM
-       | OP
-       | OPTIONS
-       | Q_CHAR
-       | QUOTE
-       | SEQ
-       | SP
-       | SPACE LPARENCHAR INTEGERLITERAL RPARENCHAR
-       | SPIE
-       | SYSEIB
-       | VBREF
-       ;
-
-cicsTranslatorCompileDirectivedKeywords
-       : CBLCARD | CO2 | COBOL2 | CO3 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | LIN | LINKAGE | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
-       | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OP | OPTIONS | Q_CHAR | QUOTE | SP | SPIE | SYSEIB
-       ;
+cicsTranslatorOptions:
+    APOST | CBLCARD | CICS | CO2 | CO3 | COBOL2 | COBOL3 | CPSM | DBCS | DEBUG | DLI | EDF | EXCI | FEPI
+    | ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR)
+    | LENGTH | LIN | LINKAGE | ((LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR) | NATLANG | NOCPSM | NODEBUG
+    | NOEDF | NOOPTIONS | NOFEPI | NOLENGTH | NOLINKAGE | NONUM | NOSEQ | NOSPIE | NUM | OP | OPTIONS | Q_CHAR | QUOTE | SEQ
+    | SP | SYSEIB | SPACE | SPIE | VBREF;
 
 deprecatedCompilerOptions:
             unSupportedDeprecatedCompilerDirectives

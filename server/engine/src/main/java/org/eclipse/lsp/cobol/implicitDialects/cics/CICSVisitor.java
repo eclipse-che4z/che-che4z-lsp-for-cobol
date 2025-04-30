@@ -162,12 +162,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     cicsOptionsCheckUtility.setExciOptionsEnabled(false);
     cicsOptionsCheckUtility.setSpOptionsEnabled(false);
 
-    for (CICSParser.CompilerOptsContext options : ctx.compilerOpts()) {
-      if (options.cicsOptions() != null) {
-        if (options.cicsOptions().getText().contains("SP"))
-          cicsOptionsCheckUtility.setSpOptionsEnabled(true);
-        if (options.cicsOptions().getText().contains("EXCI"))
-          cicsOptionsCheckUtility.setExciOptionsEnabled(true);
+    for (CICSParser.CicsTranslatorDirectivesContext directives : ctx.cicsTranslatorDirectives()) {
+      if (directives.cicsTranslatorOptions() != null) {
+        for (CICSParser.CicsTranslatorOptionsContext translatorOption :directives.cicsTranslatorOptions()) {
+          if (translatorOption.getText().contains("SP"))
+            cicsOptionsCheckUtility.setSpOptionsEnabled(true);
+          if (translatorOption.getText().contains("EXCI"))
+            cicsOptionsCheckUtility.setExciOptionsEnabled(true);
+        }
       }
     }
 
@@ -196,7 +198,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitCompilerXOptsOption(CICSParser.CompilerXOptsOptionContext ctx) {
+  public List<Node> visitCicsTranslatorOptions(CICSParser.CicsTranslatorOptionsContext ctx) {
     if (Objects.nonNull(ctx.EXCI())) {
       return addTreeNode(
           ctx,
