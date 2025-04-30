@@ -48,7 +48,6 @@ import org.eclipse.lsp.cobol.service.io.impl.NonCacheResolveCopybookUri;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -549,42 +548,43 @@ class CopybookServiceTest {
     return CopybookName.builder().displayName(displayName).build();
   }
 
-  @Disabled("store is only used for predefined copybooks")
   @Test
   void store() {
-    //    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
-    //    CopybookService copybookService = createCopybookService();
-    //    CopybookModel copybookModel =
-    //        copybookService
-    //            .resolve(
-    //                CopybookId.fromString(copybookName.getDisplayName()),
-    //                copybookName,
-    //                DOCUMENT_URI,
-    //                DOCUMENT_URI,
-    //                null)
-    //            .getResult();
-    //    CopybookModel resolve;
-    //    resolve =
-    //        copybookService
-    //            .resolve(
-    //                copybookName.toCopybookId(DOCUMENT_2_URI),
-    //                copybookName,
-    //                DOCUMENT_2_URI,
-    //                DOCUMENT_2_URI,
-    //                null)
-    //            .getResult();
-    //    assertNull(resolve.getContent());
-    //    copybookService.store(copybookModel, null);
-    //    resolve =
-    //        copybookService
-    //            .resolve(
-    //                CopybookId.fromString(copybookName.getDisplayName()),
-    //                copybookName,
-    //                DOCUMENT_URI,
-    //                DOCUMENT_URI,
-    //                null)
-    //            .getResult();
-    //    assertEquals(CONTENT, resolve.getContent());
+    CopybookName copybookName = createCopybook(VALID_CPY_NAME);
+    CopybookService copybookService = createCopybookService();
+    when(client.resolveCopybookUri(DOCUMENT_2_URI, copybookName.getDisplayName(), "COBOL"))
+        .thenReturn(supplyAsync(() -> null));
+    CopybookModel copybookModel =
+        copybookService
+            .resolve(
+                CopybookId.fromString(copybookName.getDisplayName()),
+                copybookName,
+                DOCUMENT_URI,
+                DOCUMENT_URI,
+                null)
+            .getResult();
+    CopybookModel resolve;
+    resolve =
+        copybookService
+            .resolve(
+                copybookName.toCopybookId(DOCUMENT_2_URI),
+                copybookName,
+                DOCUMENT_2_URI,
+                DOCUMENT_2_URI,
+                null)
+            .getResult();
+    assertNull(resolve.getContent());
+    copybookService.store(copybookModel, null);
+    resolve =
+        copybookService
+            .resolve(
+                CopybookId.fromString(copybookName.getDisplayName()),
+                copybookName,
+                DOCUMENT_URI,
+                DOCUMENT_URI,
+                null)
+            .getResult();
+    assertEquals(CONTENT, resolve.getContent());
   }
 
   @Test
