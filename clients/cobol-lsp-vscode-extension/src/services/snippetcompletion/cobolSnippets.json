@@ -151,11 +151,6 @@
     ],
     "description": "FILE-CONTROL - ASSIGN item"
   },
-  "BASIS": {
-    "prefix": "BASIS",
-    "body": ["BASIS ${1:sourceName}"],
-    "description": "Similar to COPY, except that BASIS is an extended source program library statement that provides a complete COBOL program as the source for a compilation. https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statements-basis-statement"
-  },
   "BEFORE ADVANCING": {
     "prefix": "BEFORE ADVANCING",
     "body": [
