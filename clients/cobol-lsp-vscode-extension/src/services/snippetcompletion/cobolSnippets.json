@@ -207,8 +207,8 @@
     "prefix": "BY",
     "body": [
       "01 ${1:TABLE-X}",
-      "\t05 ${2:RECORD-X} OCCURS ${3:100} TIMES INDEXED BY ${5:X-IND}.",
-      "\t\t10 ${6:elementary-items}"
+      "\t05 ${2:RECORD-X} OCCURS ${3:100} TIMES INDEXED BY ${4:X-IND}.",
+      "\t\t10 ${5:elementary-items}"
     ],
     "description": "Defines an internal COBOL index for an internal COBOL table. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
