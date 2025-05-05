@@ -543,11 +543,6 @@
     ],
     "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=procedures-example-use-debugging"
   },
-  "DEFAULT": {
-    "prefix": "DEFAULT",
-    "body": ["QSAMBUFFINITCHAR={1|DEFAULT,SPACE,BINZERO|}"],
-    "description": "A COBOL Runtime directive to initialize the buffers for QSAM (\"flat\" files). Note that your Systems Programmer will most likely utilize this keyword."
-  },
   "DELETE": {
     "prefix": "DELETE fileName",
     "body": ["DELETE ${1:fileName}", "END-DELETE."],
