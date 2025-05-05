@@ -672,13 +672,6 @@
     ],
     "description": "IF ... ELSE codes a choice between two COBOL processing actions. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=actions-coding-choice"
   },
-  "END": {
-    "prefix": "END",
-    "body": [
-      "END-${1|ACCEPT,ADD,CALL,COMPUTE,DELETE,DISPLAY,DIVIDE,EVALUATE,EXEC,IF,INVOKE,JSON,MULTIPLY,OF-PAGE,PERFORM,READ,RECEIVE,RETURN,REWRITE,SEARCH,START,STRING,SUBTRACT,UNSTRING,WRITE,XML|}."
-    ],
-    "description": "Scope terminator - common with many verbs https://www.ibm.com/docs/en/cobol-zos/6.4?topic=appendixes-reserved-words"
-  },
   "ENTRY": {
     "prefix": "ENTRY",
     "body": ["ENTRY ${1:literal}."],
