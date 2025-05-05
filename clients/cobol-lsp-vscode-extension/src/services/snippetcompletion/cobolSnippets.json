@@ -118,7 +118,7 @@
   "IF x AND y AND z": {
     "prefix": "AND",
     "body": [
-      "IF ${1:var-1} = ${1:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
+      "IF ${1:var-1} = ${2:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
       "\t$0",
       "END-IF."
     ],
