@@ -42,7 +42,7 @@
   },
   "ADD CORRESPONDING": {
     "prefix": "ADD CORRESPONDING",
-    "body": ["ADD ${1|CORR,CORRESPONDING|} ${2:id} TO ${3:id}"],
+    "body": ["ADD CORRESPONDING ${1:id} TO ${2:id}"],
     "description": "ADD CORRESPONDING is used to add the corresponding variables or fields in two identical group variables"
   },
   "ADD ON SIZE ERROR": {
