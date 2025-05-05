@@ -115,7 +115,7 @@
     "body": ["ALTER ${1:procName-1} TO ${2:procName-2}"],
     "description": "ALTER TO"
   },
-  "IF x AND y AND z": {
+  "IF x AND y": {
     "prefix": "AND",
     "body": [
       "IF ${1:var-1} = ${2:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
