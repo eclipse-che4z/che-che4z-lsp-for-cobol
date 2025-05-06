@@ -103,11 +103,11 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "A COBOL \"class test\" which is used to determine whether the contents of a variable contains only letters and numbers (no special character) values. https://www.ibm.com/docs/en/search/alphanumeric?scope=SS6SG3_6.3.0"
+    "description": "A COBOL \"class test\" which is used to determine whether the contents of a variable only contain letters and numbers (no special characters). https://www.ibm.com/docs/en/search/alphanumeric?scope=SS6SG3_6.3.0"
   },
   "ALSO": {
     "prefix": "ALSO item",
-    "body": ["ALSO ${1:id|exp|TRUE|FALSE}"],
+    "body": ["ALSO ${1|id,exp,TRUE,FALSE|}"],
     "description": "ALSO id|exp|TRUE|FALSE"
   },
   "ALTER TO": {
@@ -377,7 +377,7 @@
       "\tCONTINUE",
       "END-IF."
     ],
-    "description": "The CONTINUE statement is a no-op. Indicates that no instruction is present and that execution will fall to the next sequential instruction. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-continue-statement"
+    "description": "The CONTINUE statement is a no-op. It indicates that no instruction is present and that execution falls to the next sequential instruction. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-continue-statement"
   },
   "CONTROL": {
     "prefix": "CONTROL",
