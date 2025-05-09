@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.extendedapi;
 
+import static org.mockito.Mockito.mock;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -26,7 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookCache;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler;
@@ -38,6 +45,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 /** Test for @link({@link CFASTBuilderImpl}. */
 @Slf4j
 class CFASTBuilderTest {
+  private final CobolLanguageClient client = mock(CobolLanguageClient.class);
+  private final FileSystemService files = mock(FileSystemService.class);
+
   static Stream<Arguments> casesToTest() throws IOException {
     return Files.list(Paths.get("src", "test", "resources", "cfast"))
         .filter(p -> p.toString().endsWith(".cbl"))
@@ -57,9 +67,10 @@ class CFASTBuilderTest {
     AnalysisResult analysisResult =
         UseCaseUtils.analyze(UseCase.builder().documentUri("fake/path").text(src).build());
     DocumentModelService documentModelService = new DocumentModelService();
+    CopybookServiceImpl copybookService = createCopybookService();
 
     documentModelService.openDocument("fake/path", src, "COBOL");
-    CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
+    CFASTBuilder builder = new CFASTBuilderImpl(documentModelService, copybookService);
     MessageJsonHandler handler = new MessageJsonHandler(ImmutableMap.of());
     Gson gson = handler.getGson();
     gson = gson.newBuilder().setPrettyPrinting().create();
@@ -73,6 +84,12 @@ class CFASTBuilderTest {
                         .build(analysisResult.getRootNode().findFirstProgramNode())
                         .getControlFlowAST()),
                 List.class)));
+  }
+
+  private CopybookServiceImpl createCopybookService() {
+    ClientProvider provider = new ClientProvider();
+    provider.setClient(client);
+    return new CopybookServiceImpl(provider, files, new CopybookCache(3, 3, "HOURS"));
   }
 
   private static Arguments toArguments(Path p) {

@@ -102,7 +102,11 @@ class PredefinedCopybookUtils {
             compilerOptions);
     String fullUrl = ImplicitCodeUtils.createFullUrl(name);
     return new CopybookModel(
-        copybookName.toCopybookId(programUri), copybookName, fullUrl, cleanCopybook.getText());
+        copybookName.toCopybookId(programUri),
+        copybookName,
+        fullUrl,
+        cleanCopybook.getText(),
+        content);
   }
 
   private String retrieveRealName(String name, SQLBackend sqlBackend) {

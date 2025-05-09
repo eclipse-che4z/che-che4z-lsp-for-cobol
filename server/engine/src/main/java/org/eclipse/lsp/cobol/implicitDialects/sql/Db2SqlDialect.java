@@ -181,6 +181,7 @@ public class Db2SqlDialect implements CobolDialect {
                       copybookName.toCopybookId(ImplicitCodeUtils.createFullUrl(c.name())),
                       copybookName,
                       ImplicitCodeUtils.createFullUrl(c.name()),
+                      content,
                       content);
                 });
 

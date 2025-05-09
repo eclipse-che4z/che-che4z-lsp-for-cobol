@@ -15,23 +15,32 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilderImpl;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.InputNode;
 import org.eclipse.lsp.cobol.common.model.tree.OutputNode;
 import org.eclipse.lsp.cobol.common.model.tree.SortNode;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookCache;
+import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
 /** Test for SORT statement */
 class TestSortStatement {
+  private final CobolLanguageClient client = mock(CobolLanguageClient.class);
+  private final FileSystemService files = mock(FileSystemService.class);
+
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\r\n"
           + "       PROGRAM-ID. TEST1.\r\n"
@@ -122,7 +131,8 @@ class TestSortStatement {
     assertNull(outputNode);
 
     DocumentModelService documentModelService = new DocumentModelService();
-    CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
+    CopybookServiceImpl copybookService = createCopybookService();
+    CFASTBuilder builder = new CFASTBuilderImpl(documentModelService, copybookService);
     ExtendedApiResult extendedApiResult =
         builder.build(result.getRootNode().findFirstProgramNode());
 
@@ -170,5 +180,11 @@ class TestSortStatement {
 
     assertEquals("PAR-OUTPUT", outputNode.getThru().getName());
     assertEquals("SORT-SEC", outputNode.getThru().getInSection());
+  }
+
+  private CopybookServiceImpl createCopybookService() {
+    ClientProvider provider = new ClientProvider();
+    provider.setClient(client);
+    return new CopybookServiceImpl(provider, files, new CopybookCache(3, 3, "HOURS"));
   }
 }
