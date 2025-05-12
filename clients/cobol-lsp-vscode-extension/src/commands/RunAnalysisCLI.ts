@@ -154,7 +154,7 @@ export class RunAnalysis {
     const extensionFolder: string | undefined = vscode.Uri.joinPath(
       this.extensionUri,
       "/server/jar/server.jar",
-    ).path;
+    ).fsPath;
 
     if (extensionFolder && currentFileLocation !== "") {
       return (

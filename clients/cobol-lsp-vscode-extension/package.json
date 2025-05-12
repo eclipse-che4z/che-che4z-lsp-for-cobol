@@ -41,11 +41,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "cobol-lsp.cpy-manager.fetch-copybook",
-        "category": "COBOL",
-        "title": "Fetch Copybook"
-      },
-      {
         "command": "cobol-lsp.cpy-manager.goto-settings",
         "category": "COBOL",
         "title": "Open Copybook Location Settings"
