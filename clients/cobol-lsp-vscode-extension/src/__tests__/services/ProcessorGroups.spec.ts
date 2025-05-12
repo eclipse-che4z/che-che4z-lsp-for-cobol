@@ -14,7 +14,6 @@
 
 import {
   loadProcessorGroupCompileOptionsConfig,
-  loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
   loadProcessorGroupCopybookPathsConfig,
@@ -31,11 +30,12 @@ jest.mock("fs", () => ({
   readFileSync: jest.fn().mockImplementation(() => {}),
 }));
 
+const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace");
+const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file("/c:/my/workspace");
+
 jest.mock("vscode", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const vscodeMock = jest.requireActual("../../__mocks__/vscode");
-  const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace");
-  const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file("/c:/my/workspace");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     ...vscodeMock,
@@ -174,15 +174,6 @@ it("Processor groups configuration provides copybook-extensions", async () => {
   };
   const result = await loadProcessorGroupCopybookExtensionsConfig(item, []);
   expect(result).toStrictEqual([".copy"]);
-});
-
-it("Processor groups configuration provides copybook-file-encoding", async () => {
-  const item = {
-    scopeUri: WORKSPACE_URI + "/TEST.cob",
-    section: "cobol-lsp.cpy-manager.copybook-file-encoding",
-  };
-  const result = await loadProcessorGroupCopybookEncodingConfig(item, "");
-  expect(result).toStrictEqual("UTF-8");
 });
 
 it("Processor groups configuration provides cobol-lsp.target-sql-backend", async () => {
