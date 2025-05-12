@@ -934,7 +934,7 @@ describe("Tests copybook download service", () => {
           expect(result).toEqual("file:///workspace/copybooks/COPYBOOK.cpy");
 
           expect(findFilesSpy).toHaveBeenCalledWith({
-            base: Uri.file("/workspace/copybooks"),
+            baseUri: Uri.file("/workspace/copybooks"),
             pattern: "{COPYBOOK.CPY}",
           });
         });
@@ -967,7 +967,7 @@ describe("Tests copybook download service", () => {
 
           expect(findFilesSpy).toHaveBeenCalledTimes(1);
           expect(findFilesSpy).toHaveBeenCalledWith({
-            base: Uri.file("/dialect/copybooks"),
+            baseUri: Uri.file("/dialect/copybooks"),
             pattern: "{COPYBOOK.CPY}",
           });
         });
@@ -1450,7 +1450,7 @@ describe("Tests copybook download service", () => {
           );
 
           expect(findFilesSpy).toHaveBeenCalledWith({
-            base: Uri.file("/workspace/local/pg/copybooks"),
+            baseUri: Uri.file("/workspace/local/pg/copybooks"),
             pattern: "{COPYBOOK.cpy}",
           });
 
@@ -1675,11 +1675,11 @@ describe("Tests copybook download service", () => {
             DEFAULT_DIALECT,
           );
           expect(findFilesSpy).toHaveBeenNthCalledWith(1, {
-            base: vscode.Uri.file("/workspace/local/pg/copybooks"),
+            baseUri: vscode.Uri.file("/workspace/local/pg/copybooks"),
             pattern: "{COPYBOOK.cpy}",
           });
           expect(findFilesSpy).toHaveBeenNthCalledWith(3, {
-            base: vscode.Uri.file("/workspace/copybooks"),
+            baseUri: vscode.Uri.file("/workspace/copybooks"),
             pattern: "{COPYBOOK.cpy}",
           });
         });
@@ -1693,7 +1693,7 @@ describe("Tests copybook download service", () => {
           );
 
           expect(findFilesSpy).toHaveBeenCalledWith({
-            base: expect.objectContaining({
+            baseUri: expect.objectContaining({
               path: "/workspace/copybooks",
               scheme: "file",
             }) as vscode.Uri,
