@@ -52,6 +52,8 @@ public class TestCICSBif {
           + " {BASE64|errorDigestType2}|errorResultMissing_}";
   private static final String BIF_DIGEST_RESULT_MISSING_INVALID =
       "BIF {_DIGEST RECORD(100) RECORDLEN(100)|errorResultMissing_}";
+  private static final String BIF_DEEDIT_TRANS_INVALID = "BIF {_DEEDIT FIELD(100)|error_}";
+
 
   @Test
   void testBifDeeditField() {
@@ -140,5 +142,17 @@ public class TestCICSBif {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(BIF_DIGEST_RESULT_MISSING_INVALID, expectedDiagnostic);
+  }
+  @Test
+  void testBifDeeditLengthTranslatorOpts() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: LENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(BIF_DEEDIT_TRANS_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }
