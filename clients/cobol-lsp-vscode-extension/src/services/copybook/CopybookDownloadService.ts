@@ -354,8 +354,17 @@ export class CopybookDownloadService {
             return e4eResult;
           }
         }
+      } else {
+        if (result.status === "rejected") {
+          this.outputChannel?.appendLine(
+            `Error while resolving copybook ${copybookName} - ${JSON.stringify(result.reason)}`,
+          );
+        }
       }
     }
+    this.outputChannel?.appendLine(
+      `Unable to resolve copybook ${copybookName} using processor groups.`,
+    );
   }
 
   private async isPrerequisiteForDownloadSatisfied(
