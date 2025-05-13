@@ -36,7 +36,6 @@ import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil
 import { E4E } from "../../../type/e4eApi";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { SettingsService } from "../../../services/Settings";
-import { URI as Uri } from "vscode-uri";
 import { FileNotFound } from "../../../__mocks__/vscode";
 import * as ProcessorGroupLoader from "../../../services/ProcessorGroupsLoader";
 import {
@@ -515,7 +514,7 @@ describe("Tests copybook download service", () => {
       );
       DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
       mocked.mockResolvedValue([
-        Uri.file("/libs"),
+        vscode.Uri.file("/libs"),
         { dataset: "dataset", profile: "invalidProfile" },
       ]);
       const downloadService = new CopybookDownloadService(
@@ -621,7 +620,7 @@ describe("Tests copybook download service", () => {
         );
 
         const results = await cds.listRemoteCopybooks(
-          Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl").toString(),
           DEFAULT_DIALECT,
         );
 
@@ -669,7 +668,7 @@ describe("Tests copybook download service", () => {
         );
 
         const results = await cds.listRemoteCopybooks(
-          Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl").toString(),
           DEFAULT_DIALECT,
         );
 
@@ -706,7 +705,7 @@ describe("Tests copybook download service", () => {
           );
 
           const results = await cds.listRemoteCopybooks(
-            Uri.file("/test.cbl").toString(),
+            vscode.Uri.file("/test.cbl").toString(),
             DEFAULT_DIALECT,
           );
 
@@ -730,7 +729,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl").toString(),
               DEFAULT_DIALECT,
             );
             cds.clearCache();
@@ -751,7 +750,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl").toString(),
               DEFAULT_DIALECT,
             );
           }
@@ -779,7 +778,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl").toString(),
               DEFAULT_DIALECT,
             );
           }
@@ -792,7 +791,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl").toString(),
               DEFAULT_DIALECT,
             );
           }
@@ -820,7 +819,7 @@ describe("Tests copybook download service", () => {
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
-          Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl").toString(),
           DEFAULT_DIALECT,
         );
 
@@ -844,7 +843,7 @@ describe("Tests copybook download service", () => {
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
-          Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl").toString(),
           DEFAULT_DIALECT,
         );
 
@@ -874,7 +873,10 @@ describe("Tests copybook download service", () => {
           apiResponse: {
             items:
               uss === "/remote/uss/copybooks"
-                ? [{ name: "COPYBOOK.CPY", mode: "-" }]
+                ? [
+                    { name: "COPYBOOK.CPY", mode: "-" },
+                    { name: "CaSEsEnSiTiVe.CpY", mode: "-" },
+                  ]
                 : [],
           },
         };
@@ -898,7 +900,7 @@ describe("Tests copybook download service", () => {
       jest.spyOn(SettingsService, "getProfileName").mockReturnValue("profile");
       jest.spyOn(vscode.workspace, "getWorkspaceFolder").mockReturnValue({
         index: 0,
-        uri: Uri.file("/workspace"),
+        uri: vscode.Uri.file("/workspace"),
         name: "workspace",
       });
     });
@@ -926,7 +928,7 @@ describe("Tests copybook download service", () => {
             zoweExplorerApiMock,
           );
           const result = await cds.resolveCopybookURI(
-            Uri.file("/test.cbl").toString(),
+            vscode.Uri.file("/test.cbl").toString(),
             "COPYBOOK",
             DEFAULT_DIALECT,
           );
@@ -934,7 +936,7 @@ describe("Tests copybook download service", () => {
           expect(result).toEqual("file:///workspace/copybooks/COPYBOOK.cpy");
 
           expect(findFilesSpy).toHaveBeenCalledWith({
-            baseUri: Uri.file("/workspace/copybooks"),
+            baseUri: vscode.Uri.file("/workspace/copybooks"),
             pattern: "{COPYBOOK.CPY}",
           });
         });
@@ -958,7 +960,7 @@ describe("Tests copybook download service", () => {
         it("uses dialect path configuration, not generic copybooks", async () => {
           const downloader = new CopybookDownloadService("/storagePath");
           const result = await downloader.resolveCopybookURI(
-            Uri.file("/test.cbl").toString(),
+            vscode.Uri.file("/test.cbl").toString(),
             "COPYBOOK",
             "dialect",
           );
@@ -967,7 +969,7 @@ describe("Tests copybook download service", () => {
 
           expect(findFilesSpy).toHaveBeenCalledTimes(1);
           expect(findFilesSpy).toHaveBeenCalledWith({
-            baseUri: Uri.file("/dialect/copybooks"),
+            baseUri: vscode.Uri.file("/dialect/copybooks"),
             pattern: "{COPYBOOK.CPY}",
           });
         });
@@ -989,7 +991,7 @@ describe("Tests copybook download service", () => {
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
-          Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl").toString(),
           "COPYBOOK",
           DEFAULT_DIALECT,
         );
@@ -1017,7 +1019,7 @@ describe("Tests copybook download service", () => {
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
-          Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl").toString(),
           "COPYBOOK",
           DEFAULT_DIALECT,
         );
@@ -1028,6 +1030,22 @@ describe("Tests copybook download service", () => {
 
         expect(fileListMock).toHaveBeenCalledWith("/user/copybooks");
         expect(fileListMock).toHaveBeenCalledWith("/remote/uss/copybooks");
+      });
+
+      it("copybook are case insensitive", async () => {
+        const cds = new CopybookDownloadService(
+          "/globalStorage",
+          zoweExplorerApiMock,
+        );
+        const result = await cds.resolveCopybookURI(
+          vscode.Uri.file("/test.cbl").toString(),
+          "casesensitive",
+          DEFAULT_DIALECT,
+        );
+
+        expect(result).toEqual(
+          "zowe-uss:/profile/remote/uss/copybooks/CaSEsEnSiTiVe.CpY",
+        );
       });
     });
 
@@ -1085,7 +1103,7 @@ describe("Tests copybook download service", () => {
             undefined,
             e4eMock,
           );
-          const documentUri = Uri.file("/test.cbl").toString();
+          const documentUri = vscode.Uri.file("/test.cbl").toString();
           const result = await cds.resolveCopybookURI(
             documentUri,
             "COPYBOOK",
@@ -1113,7 +1131,7 @@ describe("Tests copybook download service", () => {
             undefined,
             e4eMock,
           );
-          const documentUri = Uri.file("/test.cbl").toString();
+          const documentUri = vscode.Uri.file("/test.cbl").toString();
           const resultFirst = await cds.resolveCopybookURI(
             documentUri,
             "COPYBOOK",
@@ -1144,7 +1162,7 @@ describe("Tests copybook download service", () => {
             e4eMock,
           );
 
-          const documentUri = Uri.file("/test.cbl").toString();
+          const documentUri = vscode.Uri.file("/test.cbl").toString();
           const result = await cds.resolveCopybookURI(
             documentUri,
             "NOTEXISTS",
@@ -1214,7 +1232,7 @@ describe("Tests copybook download service", () => {
             undefined,
             e4eMock,
           );
-          const documentUri = Uri.file("/test.cbl").toString();
+          const documentUri = vscode.Uri.file("/test.cbl").toString();
           const result = await cds.resolveCopybookURI(
             documentUri,
             "COPYBOOK",
@@ -1243,7 +1261,7 @@ describe("Tests copybook download service", () => {
             undefined,
             e4eMock,
           );
-          const documentUri = Uri.file("/test.cbl").toString();
+          const documentUri = vscode.Uri.file("/test.cbl").toString();
           const result = await cds.resolveCopybookURI(
             documentUri,
             "COPYBOOK",
@@ -1309,7 +1327,7 @@ describe("Tests copybook download service", () => {
           );
 
           const result = await cds.resolveCopybookURI(
-            Uri.file("/test.cbl").toString(),
+            vscode.Uri.file("/test.cbl").toString(),
             "COPYBOOK",
             DEFAULT_DIALECT,
           );
@@ -1458,7 +1476,7 @@ describe("Tests copybook download service", () => {
           );
 
           expect(findFilesSpy).toHaveBeenCalledWith({
-            baseUri: Uri.file("/workspace/local/pg/copybooks"),
+            baseUri: vscode.Uri.file("/workspace/local/pg/copybooks"),
             pattern: "{COPYBOOK.cpy}",
           });
 
@@ -1624,7 +1642,7 @@ describe("Tests copybook download service", () => {
             e4eMock,
           );
           const result = await cds.resolveCopybookURI(
-            Uri.file("/dataset.cbl").toString(),
+            vscode.Uri.file("/dataset.cbl").toString(),
             "COPYBOOK",
             DEFAULT_DIALECT,
           );
@@ -1641,7 +1659,7 @@ describe("Tests copybook download service", () => {
             e4eMock,
           );
           const result = await cds.resolveCopybookURI(
-            Uri.file("/endevor.cbl").toString(),
+            vscode.Uri.file("/endevor.cbl").toString(),
             "COPYBOOK",
             DEFAULT_DIALECT,
           );
@@ -1668,7 +1686,7 @@ describe("Tests copybook download service", () => {
             e4eMock,
           );
           const result = await cds.resolveCopybookURI(
-            Uri.file("/local.cbl").toString(),
+            vscode.Uri.file("/local.cbl").toString(),
             "COPYBOOK",
             DEFAULT_DIALECT,
           );

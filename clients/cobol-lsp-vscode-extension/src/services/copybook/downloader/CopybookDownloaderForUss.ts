@@ -40,8 +40,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
 
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
 
-    const allowedCopybooksExtensions =
+    let allowedCopybooksExtensions =
       await SettingsService.getCopybookExtension();
+    allowedCopybooksExtensions = allowedCopybooksExtensions?.map((ext) =>
+      ext.toLowerCase(),
+    );
     const allowedNoExtension = allowedCopybooksExtensions?.includes("");
 
     const members: MemberCacheItem[] = [];
@@ -58,7 +61,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
             const [name, extension] = splitFilename(file.name);
 
             if (extension) {
-              if (allowedCopybooksExtensions?.includes(extension)) {
+              if (
+                allowedCopybooksExtensions?.includes(
+                  extension.toLocaleLowerCase(),
+                )
+              ) {
                 members.push({ name, extension });
               }
             } else if (allowedNoExtension) {
