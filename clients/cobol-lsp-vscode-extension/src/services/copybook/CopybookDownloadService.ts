@@ -245,20 +245,12 @@ export class CopybookDownloadService {
       dialectType,
     );
     const results = await Promise.allSettled([
-      ...dsnPaths.map(async (dsn) => {
-        return await this.dsnDownloader?.resolveCopybookUri(
-          profile,
-          dsn,
-          copybookName,
-        );
-      }),
-      ...ussPaths.map(async (uss) => {
-        return await this.ussDownloader?.resolveCopybookUri(
-          profile,
-          uss,
-          copybookName,
-        );
-      }),
+      ...dsnPaths.map((dsn) =>
+        this.dsnDownloader?.resolveCopybookUri(profile, dsn, copybookName),
+      ),
+      ...ussPaths.map((uss) =>
+        this.ussDownloader?.resolveCopybookUri(profile, uss, copybookName),
+      ),
     ]);
 
     for (const result of results) {
@@ -337,13 +329,12 @@ export class CopybookDownloadService {
               copybookName,
             ))
           ) {
-            const e4eResult = await this.e4eDownloader.downloadElementE4E(
-              resolvedProfile,
-              element,
-            );
-            if (e4eResult) {
-              return e4eResult;
-            }
+            return {
+              endevorElement: {
+                resolvedProfile,
+                element,
+              },
+            };
           }
         }
       }
@@ -352,7 +343,17 @@ export class CopybookDownloadService {
     const results = await Promise.allSettled(promises);
     for (const result of results) {
       if (result.status === "fulfilled" && result.value) {
-        return result.value;
+        if (result.value instanceof vscode.Uri) {
+          return result.value;
+        } else {
+          const e4eResult = await this.e4eDownloader?.downloadElementE4E(
+            result.value.endevorElement.resolvedProfile,
+            result.value.endevorElement.element,
+          );
+          if (e4eResult) {
+            return e4eResult;
+          }
+        }
       }
     }
   }

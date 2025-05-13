@@ -1369,6 +1369,14 @@ describe("Tests copybook download service", () => {
                 profile: "instance.internal.connection",
               },
               { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
+              {
+                environment: "ENV",
+                stage: "1",
+                system: "OTHER",
+                subsystem: "SUBSYTEM",
+                type: "COPY",
+                profile: "instance.internal.connection",
+              },
             ],
           },
           {
@@ -1561,6 +1569,9 @@ describe("Tests copybook download service", () => {
             }),
             onDidChangeElement: jest.fn(),
           };
+          jest
+            .spyOn(vscode.workspace.fs, "stat")
+            .mockRejectedValue(new FileNotFound());
         });
 
         it("return local endevor cache copybook uri", async () => {
@@ -1578,6 +1589,9 @@ describe("Tests copybook download service", () => {
           expect(result).toEqual(
             "file:///globalStorage/e4e/copybooks/instance.profile/ENV/1/SYSTEM/SUBSYTEM/COPY/MAP/COPYBOOK",
           );
+
+          // only first matching element from concatenation is downloaded
+          expect(e4eMock.getElement).toHaveBeenCalledTimes(1);
         });
 
         it("doesnt resolve endevor copybook if invalid profile is specified in processor group", async () => {
