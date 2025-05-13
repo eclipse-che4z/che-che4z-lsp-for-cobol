@@ -18,6 +18,7 @@ import {
   Position,
   TextDocument,
   TextLine,
+  Uri,
 } from "vscode";
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
@@ -27,7 +28,6 @@ import {
 } from "../../../services/DialectRegistry";
 import { DEFAULT_DIALECT } from "../../../constants";
 import * as LocalCopybookService from "../../../services/copybook/LocalCopybooksService";
-import { URI } from "vscode-uri";
 
 describe("CopybooksCompletionProvider", () => {
   let cdsMock: CopybookDownloadService;
@@ -49,7 +49,7 @@ describe("CopybooksCompletionProvider", () => {
       .mockResolvedValue(localCopybooks);
 
     documentMock = {
-      uri: URI.file("/PROGRAM.cbl"),
+      uri: Uri.file("/PROGRAM.cbl"),
       lineAt: () => ({ text: lineText }) as unknown as TextLine,
     } as unknown as TextDocument;
     positionMock = {

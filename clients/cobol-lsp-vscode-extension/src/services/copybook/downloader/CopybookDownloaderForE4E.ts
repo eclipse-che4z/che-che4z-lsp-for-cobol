@@ -169,6 +169,7 @@ export class CopybookDownloaderForE4E {
   public async downloadCopybookE4E(
     documentUri: string,
     copybookName: string,
+    _dialectType: string,
   ): Promise<vscode.Uri | undefined> {
     const response = await this.getE4EConfig(documentUri);
     if (!response) return;

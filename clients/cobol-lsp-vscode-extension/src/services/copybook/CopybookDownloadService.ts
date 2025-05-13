@@ -90,6 +90,7 @@ export class CopybookDownloadService {
       const endevorResult = await this.e4eDownloader?.downloadCopybookE4E(
         documentURI,
         copybookName,
+        dialectType,
       );
 
       return endevorResult?.toString();

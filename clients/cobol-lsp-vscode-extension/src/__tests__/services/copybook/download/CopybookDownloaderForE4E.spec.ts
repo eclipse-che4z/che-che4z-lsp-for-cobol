@@ -19,6 +19,7 @@ import {
   e4eResponseEndevorFirst,
 } from "../../../../__mocks__/getE4EMock.utility";
 import * as vscode from "vscode";
+import { DEFAULT_DIALECT } from "../../../../constants";
 
 jest.mock("path", () => ({
   ...jest.requireActual<typeof path>("path"),
@@ -109,7 +110,11 @@ describe("e4e copybook downloader tests", () => {
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
     e4eDownloader.getE4EConfig = async () =>
       Promise.resolve(e4eResponseEndevorFirst);
-    await e4eDownloader.downloadCopybookE4E("uri", "NoCopybook");
+    await e4eDownloader.downloadCopybookE4E(
+      "uri",
+      "NoCopybook",
+      DEFAULT_DIALECT,
+    );
     expect(spyDownloadDataset).not.toHaveBeenCalled();
     expect(spyDownloadElement).not.toHaveBeenCalled();
   });
@@ -119,7 +124,7 @@ describe("e4e copybook downloader tests", () => {
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
     e4eDownloader.getE4EConfig = async () =>
       Promise.resolve(e4eResponseEndevorFirst);
-    await e4eDownloader.downloadCopybookE4E("uri", "copybook");
+    await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
     expect(spyDownloadElement).toHaveBeenCalledWith(
       e4eResponseEndevorFirst.profile,
       {
@@ -141,7 +146,7 @@ describe("e4e copybook downloader tests", () => {
     const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
     e4eDownloader.getE4EConfig = async () =>
       Promise.resolve(e4eResponseEndevorFirst);
-    await e4eDownloader.downloadCopybookE4E("uri", "copybook");
+    await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
     expect(spyDownloadElement).toHaveBeenCalledWith(
       e4eResponseEndevorFirst.profile,
       {
@@ -164,7 +169,7 @@ describe("e4e copybook downloader tests", () => {
     } as unknown as E4E);
     e4eDownloader.getE4EConfig = async () =>
       await Promise.resolve(e4eResponseDatasetFirst);
-    await e4eDownloader.downloadCopybookE4E("uri", "copybook");
+    await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
     expect(getMember).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
   });
@@ -176,7 +181,7 @@ describe("e4e copybook downloader tests", () => {
     } as unknown as E4E);
     e4eDownloader.getE4EConfig = async () =>
       Promise.resolve(e4eResponseEndevorFirst);
-    await e4eDownloader.downloadCopybookE4E("uri", "copybook");
+    await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
     expect(getElement).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
   });
@@ -257,7 +262,11 @@ describe("e4e copybook downloader tests", () => {
       } as unknown as E4E);
       e4eDownloader.getE4EConfig = async () =>
         Promise.resolve(e4eResponseDatasetFirst);
-      await e4eDownloader.downloadCopybookE4E("uri", "copybook");
+      await e4eDownloader.downloadCopybookE4E(
+        "uri",
+        "copybook",
+        DEFAULT_DIALECT,
+      );
       expect(getMember).toHaveBeenCalledWith(
         { instance: "instance", profile: "profile" },
         { dataset: "dataset", member: "copybook" },

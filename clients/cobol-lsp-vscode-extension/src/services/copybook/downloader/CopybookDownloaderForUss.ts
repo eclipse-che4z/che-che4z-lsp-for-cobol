@@ -79,7 +79,8 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: string,
   ): Promise<boolean> {
     const members = await this.getAllMembers(profileName, uss);
-    return members.some((member) => member.name === copybookName);
+    copybookName = copybookName.toUpperCase();
+    return members.some((member) => member.name.toUpperCase() === copybookName);
   }
 
   public async resolveCopybookUri(
@@ -88,7 +89,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: string,
   ) {
     const memberList = await this.getAllMembers(profileName, uss);
-    const member = memberList.find((m) => m.name === copybookName);
+    copybookName = copybookName.toUpperCase();
+    const member = memberList.find(
+      (m) => m.name.toUpperCase() === copybookName,
+    );
 
     if (member) {
       return vscode.Uri.parse(
