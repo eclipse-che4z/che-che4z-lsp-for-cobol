@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import {
   DATASET,
+  DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
@@ -100,15 +101,16 @@ export class CopybookDownloadService {
       dialectType,
     );
 
-    const processorGroupsResult =
-      await this.resolveCopybookUriInProcessorGroups(
-        copybookName,
-        "profile",
-        documentURI,
-        pgConfigs,
-      );
-    if (processorGroupsResult) {
-      return processorGroupsResult.toString();
+    if (pgConfigs.length > 0) {
+      const processorGroupsResult =
+        await this.resolveCopybookUriInProcessorGroups(
+          copybookName,
+          "profile",
+          documentURI,
+          pgConfigs,
+        );
+
+      return processorGroupsResult?.toString();
     }
 
     // search paths-local -> return URI pointing to local file
@@ -288,6 +290,13 @@ export class CopybookDownloadService {
         }
       } else {
         const profile = config.profile ?? defaultProfile;
+        if (
+          !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [
+            DEFAULT_DIALECT,
+          ]))
+        ) {
+          return;
+        }
         if (DATASET in config && this.dsnDownloader) {
           const dsResult = await this.dsnDownloader.resolveCopybookUri(
             profile,

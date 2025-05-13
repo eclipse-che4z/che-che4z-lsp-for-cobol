@@ -1480,6 +1480,7 @@ describe("Tests copybook download service", () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
             zoweExplorerApiMock,
+            e4eMock,
           );
           const result = await cds.resolveCopybookURI(
             "file:///test.cbl",
@@ -1521,6 +1522,7 @@ describe("Tests copybook download service", () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
             zoweExplorerApiMock,
+            e4eMock,
           );
           const result = await cds.resolveCopybookURI(
             "file:///test.cbl",
@@ -1564,11 +1566,11 @@ describe("Tests copybook download service", () => {
         it("return local endevor cache copybook uri", async () => {
           const cds = new CopybookDownloadService(
             "/globalStorage",
-            undefined,
+            zoweExplorerMock,
             e4eMock,
           );
           const result = await cds.resolveCopybookURI(
-            "file:///test.cbl",
+            "file:///endevor.cbl",
             "COPYBOOK",
             DEFAULT_DIALECT,
           );
@@ -1662,23 +1664,23 @@ describe("Tests copybook download service", () => {
         });
       });
 
-      describe("processor group configuration has priority over vscode settings", () => {
+      describe("if processor group configuration is available, vscode settings is not used", () => {
         beforeAll(() => {
           findFilesSpyResult = [];
         });
 
-        it("in processor group - searches the processor group folder first", async () => {
+        it("in processor group - searches the processor group only", async () => {
           const cds = new CopybookDownloadService("storage-path");
           await cds.resolveCopybookURI(
             "file:///test.cbl",
             "COPYBOOK",
             DEFAULT_DIALECT,
           );
-          expect(findFilesSpy).toHaveBeenNthCalledWith(1, {
+          expect(findFilesSpy).toHaveBeenCalledWith({
             baseUri: vscode.Uri.file("/workspace/local/pg/copybooks"),
             pattern: "{COPYBOOK.cpy}",
           });
-          expect(findFilesSpy).toHaveBeenNthCalledWith(3, {
+          expect(findFilesSpy).not.toHaveBeenCalledWith({
             baseUri: vscode.Uri.file("/workspace/copybooks"),
             pattern: "{COPYBOOK.cpy}",
           });
