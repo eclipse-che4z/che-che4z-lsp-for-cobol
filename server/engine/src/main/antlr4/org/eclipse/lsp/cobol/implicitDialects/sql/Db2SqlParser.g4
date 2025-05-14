@@ -66,8 +66,13 @@ result_set_locator: RESULT_SET_LOCATOR VARYING;
 
 tableLocators: TABLE LIKE entry_name AS LOCATOR;
 
-lobWithSize
-    : (BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB | DBCLOB) LPARENCHAR lobSize RPARENCHAR
+lobWithSize : T1=lobWithSize_maxSize_1g { validateLobSize($T1.start, $T1.stop, $T1.text, 1073741823);} |
+                T2=lobWithSize_maxSize_2g { validateLobSize($T2.start, $T2.stop, $T2.text, 2147483647);} ;
+
+lobWithSize_maxSize_1g : DBCLOB LPARENCHAR lobSize RPARENCHAR;
+
+lobWithSize_maxSize_2g
+    : (BINARY LARGE OBJECT | BLOB | CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB) LPARENCHAR lobSize RPARENCHAR
     ;
 
 lobSize: (dbs_integer k_m_g?| T=IDENTIFIER {validateTokenWithRegex($T.text, "\\d+[kKmMgG]", "unexpected token");} );

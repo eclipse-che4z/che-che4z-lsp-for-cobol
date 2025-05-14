@@ -111,8 +111,17 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     if (ctx.xml_lobNO_size() != null) {
       addXmlLobNodes(variableDefinitionNode, generatedVariableLevel);
     } else if (ctx.lobWithSize() != null) {
-      addLobWithSizeNodes(
-          variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize().lobSize()));
+      if (ctx.lobWithSize().lobWithSize_maxSize_1g() != null) {
+        addLobWithSizeNodes(
+            variableDefinitionNode,
+            generatedVariableLevel,
+            lobSize(ctx.lobWithSize().lobWithSize_maxSize_1g().lobSize()));
+      } else {
+        addLobWithSizeNodes(
+            variableDefinitionNode,
+            generatedVariableLevel,
+            lobSize(ctx.lobWithSize().lobWithSize_maxSize_2g().lobSize()));
+      }
     }
 
     return hostVariableDefinitionNode;
@@ -190,10 +199,18 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     List<Node> hostVariableDefinitionNode =
         createHostVariableDefinitionNode(ctx, ctx.dbs_integer(), ctx.entry_name());
     if (ctx.lobWithSize() != null) {
-      generateVarbinVariables(
-          (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-          lobSize(ctx.lobWithSize().lobSize()),
-          ctx);
+      if (ctx.lobWithSize().lobWithSize_maxSize_1g() != null) {
+        generateVarbinVariables(
+            (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+            lobSize(ctx.lobWithSize().lobWithSize_maxSize_1g().lobSize()),
+            ctx);
+
+      } else {
+        generateVarbinVariables(
+            (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+            lobSize(ctx.lobWithSize().lobWithSize_maxSize_2g().lobSize()),
+            ctx);
+      }
     }
     return hostVariableDefinitionNode;
   }
@@ -204,10 +221,17 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     List<Node> hostVariableDefinitionNode =
         createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels_arrays(), ctx.entry_name());
     if (ctx.lobWithSize() != null) {
-      generateVarbinVariables(
-          (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-          lobSize(ctx.lobWithSize().lobSize()),
-          ctx);
+      if (ctx.lobWithSize().lobWithSize_maxSize_1g() != null) {
+        generateVarbinVariables(
+            (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+            lobSize(ctx.lobWithSize().lobWithSize_maxSize_1g().lobSize()),
+            ctx);
+      } else {
+        generateVarbinVariables(
+            (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
+            lobSize(ctx.lobWithSize().lobWithSize_maxSize_2g().lobSize()),
+            ctx);
+      }
     }
     return hostVariableDefinitionNode;
   }
@@ -266,6 +290,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
                             .getExtendedDocument()
                             .mapLocation(constructRange(ctx.entry_name())))))
             .usageClauses(ImmutableList.of(UsageFormat.DISPLAY))
+            .isDb2HostVariable(true)
             .build();
     if (ctx.binary_host_variable_type().VARBINARY() != null) {
       generateVarbinVariables(
@@ -284,8 +309,15 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     String picClause = "X(" + len + ")";
     switch (ctx.getClass().getSimpleName()) {
       case "Lob_host_variablesContext":
-        if (((Db2SqlParser.Lob_host_variablesContext) ctx).lobWithSize().DBCLOB() != null) {
-          picClause = "G(" + len + ")";
+        if ((((Db2SqlParser.Lob_host_variablesContext) ctx).lobWithSize().lobWithSize_maxSize_1g()
+            != null)) {
+          if (((Db2SqlParser.Lob_host_variablesContext) ctx)
+                  .lobWithSize()
+                  .lobWithSize_maxSize_1g()
+                  .DBCLOB()
+              != null) {
+            picClause = "G(" + len + ")";
+          }
         }
       case "Lob_xml_host_variablesContext":
       case "Lob_host_variables_arraysContext":
@@ -299,7 +331,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
       default:
     }
     int generatedVariableLevel = 49;
-    VariableNode variableLenNode =
+    ElementaryItemNode variableLenNode =
         new ElementaryItemNode(
             variableDefinitionNode.getLevelLocality(),
             generatedVariableLevel,
@@ -311,8 +343,9 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             false,
             false,
             false);
+    variableLenNode.setDb2HostVariable(variableDefinitionNode.isDb2HostVariable());
 
-    VariableNode variableTextNode =
+    ElementaryItemNode variableTextNode =
         new ElementaryItemNode(
             variableDefinitionNode.getLevelLocality(),
             generatedVariableLevel,
@@ -324,6 +357,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             false,
             false,
             false);
+    variableTextNode.setDb2HostVariable(variableDefinitionNode.isDb2HostVariable());
 
     variableLenNode
         .getChildren()

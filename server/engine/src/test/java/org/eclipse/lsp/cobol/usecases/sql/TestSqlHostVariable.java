@@ -706,4 +706,73 @@ public class TestSqlHostVariable {
   void testLobXMLVariableArray4() {
     UseCaseEngine.runTest(LOB_XML_ARR_TEXT4, ImmutableList.of(), ImmutableMap.of());
   }
+
+  public static final String CLOB_MAX_SIZE_TEXT =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-CLOB-MAX`->VAR-CLOB-MAX`->VAR-CLOB-MAX-LENGTH`->VAR-CLOB-MAX-DATA} USAGE IS SQL TYPE IS {CLOB (3 G)|1}.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR-CLOB-MAX}.";
+
+  public static final String BLOB_MAX_SIZE_TEXT =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-BLOB-MAX`->VAR-BLOB-MAX`->VAR-BLOB-MAX-LENGTH`->VAR-BLOB-MAX-DATA} USAGE IS SQL TYPE IS {BLOB (3 G)|1}.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR-BLOB-MAX}.";
+
+  public static final String DBCLOB_MAX_SIZE_TEXT =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX-LENGTH`->VAR-DBCLOB-MAX-DATA} USAGE IS SQL TYPE IS {DBCLOB (2 G)|1}.\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR-DBCLOB-MAX}.";
+
+  @Test
+  void testClobMaxSizeError() {
+    UseCaseEngine.runTest(
+        CLOB_MAX_SIZE_TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "'CLOB' type variable exceeds maximum length of 2147483647 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
+  }
+
+  @Test
+  void testBlobMaxSizeError() {
+    UseCaseEngine.runTest(
+        BLOB_MAX_SIZE_TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "'BLOB' type variable exceeds maximum length of 2147483647 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
+  }
+
+  @Test
+  void testDbclobMaxSizeError() {
+    UseCaseEngine.runTest(
+        DBCLOB_MAX_SIZE_TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "'DBCLOB' type variable exceeds maximum length of 1073741823 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
+  }
 }
