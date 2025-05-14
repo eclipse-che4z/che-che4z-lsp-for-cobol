@@ -43,7 +43,7 @@ const defaultConfigs: ExternalConfigurationOptions = {
 
 export class CopybookDownloaderForE4E {
   constructor(
-    private storagePath: string,
+    private storagePath: vscode.Uri,
     private e4e: E4E,
     private outputChannel?: vscode.OutputChannel,
   ) {}
@@ -291,7 +291,7 @@ export class CopybookDownloaderForE4E {
   private static async getCopybookPath(
     instance: string[],
     mapped: string,
-    downloadFolder: string,
+    downloadFolder: vscode.Uri,
     copybook: string,
     outputChannel?: vscode.OutputChannel,
   ): Promise<vscode.Uri> {
@@ -316,7 +316,7 @@ export class CopybookDownloaderForE4E {
       E4E_FOLDER,
       mapped,
     );
-    let finishedPath = vscode.Uri.file(downloadFolder);
+    let finishedPath = downloadFolder;
     for (const subdirectory of subdirectories) {
       finishedPath = vscode.Uri.joinPath(finishedPath, subdirectory);
 

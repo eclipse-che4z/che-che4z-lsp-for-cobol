@@ -77,7 +77,7 @@ describe("Tests copybook download service", () => {
 
   beforeEach(() => {
     downloadService = new CopybookDownloadService(
-      "storage-path",
+      vscode.Uri.file("/storage-path"),
       {} as unknown as IApiRegisterClient,
     );
     downloadService["processDownloadError"] = jest.fn();
@@ -109,7 +109,7 @@ describe("Tests copybook download service", () => {
     describe("ZOWE API is missing", () => {
       it("checks download fails if ZE apis are missing", async () => {
         const resolver = new CopybookDownloadService(
-          "storage-path",
+          vscode.Uri.file("/storage-path"),
           undefined,
           undefined,
         );
@@ -124,7 +124,7 @@ describe("Tests copybook download service", () => {
       it("checks missing explorer api produces diagnostics when processor groups have dsn or uss config", async () => {
         const diagnosticsService = new DownloadDiagnosticsService();
         const service = new CopybookDownloadService(
-          "storage-path",
+          vscode.Uri.file("/storage-path"),
           undefined,
           e4eMock,
           undefined,
@@ -167,7 +167,7 @@ describe("Tests copybook download service", () => {
       it("checks installing e4e or zowe api removes download diagnostics", async () => {
         const diagnosticsService = new DownloadDiagnosticsService();
         const service = new CopybookDownloadService(
-          "storage-path",
+          vscode.Uri.file("/storage-path"),
           undefined,
           undefined,
           undefined,
@@ -222,7 +222,7 @@ describe("Tests copybook download service", () => {
       it("checks missing e4e api produces diagnostics when processor groups have endevor config", async () => {
         const diagnosticsService = new DownloadDiagnosticsService();
         const service = new CopybookDownloadService(
-          "storage-path",
+          vscode.Uri.file("/storage-path"),
           zoweExplorerMock,
           undefined,
           undefined,
@@ -326,7 +326,7 @@ describe("Tests copybook download service", () => {
       describe("invalid credentials", () => {
         beforeEach(() => {
           downloadService = new CopybookDownloadService(
-            "storage-path",
+            vscode.Uri.file("/storage-path"),
             zoweMockUnauthorizedError,
           );
           downloadService["processDownloadError"] = jest.fn();
@@ -387,7 +387,7 @@ describe("Tests copybook download service", () => {
         let prerequisiteCheckSpy: jest.SpyInstance;
         beforeEach(() => {
           downloadService = new CopybookDownloadService(
-            "storage-path",
+            vscode.Uri.file("/storage-path"),
             zoweMockNotFoundError,
           );
           workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
@@ -419,7 +419,7 @@ describe("Tests copybook download service", () => {
         let prerequisiteCheckSpy: jest.SpyInstance;
         beforeEach(() => {
           downloadService = new CopybookDownloadService(
-            "storage-path",
+            vscode.Uri.file("/storage-path"),
             createZoweExplorerMock(permissionsErrorMock),
           );
           workspaceConfigurationMock[PATHS_DSN] = ["TEST.COBOL.COPYBOOK"];
@@ -452,7 +452,7 @@ describe("Tests copybook download service", () => {
     describe("if user is able to list the configured copybook dataset, credentials are considered as valid", () => {
       beforeEach(() => {
         downloadService = new CopybookDownloadService(
-          "storage-path",
+          vscode.Uri.file("/storage-path"),
           zoweExplorerMock,
         );
       });
@@ -472,7 +472,7 @@ describe("Tests copybook download service", () => {
 
     it("no profile checks are done when download configurations are not configured", async () => {
       const downloadService = new CopybookDownloadService(
-        "storage-path",
+        vscode.Uri.file("/storage-path"),
         zoweExplorerMock,
       );
       ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
@@ -493,7 +493,7 @@ describe("Tests copybook download service", () => {
 
     it("checks locked profile do not trigger download", async () => {
       const downloadService = new CopybookDownloadService(
-        "storage-path",
+        vscode.Uri.file("/storage-path"),
         zoweExplorerMock,
       );
       ProfileUtils.getAvailableProfiles = jest.fn().mockReturnValue("profile");
@@ -518,7 +518,7 @@ describe("Tests copybook download service", () => {
         { dataset: "dataset", profile: "invalidProfile" },
       ]);
       const downloadService = new CopybookDownloadService(
-        "storage-path",
+        vscode.Uri.file("/storage-path"),
         zoweExplorerMock,
       );
 
@@ -539,7 +539,7 @@ describe("Tests copybook download service", () => {
   describe("cache clear", () => {
     it("checks clear cache do not throw error when ZE apis are missing", () => {
       const resolver = new CopybookDownloadService(
-        "storage-path",
+        vscode.Uri.file("/storage-path"),
         undefined,
         undefined,
       );
@@ -548,7 +548,7 @@ describe("Tests copybook download service", () => {
 
     it("checks clear cache calls e4e clear config", () => {
       const resolver = new CopybookDownloadService(
-        "storage-path",
+        vscode.Uri.file("/storage-path"),
         undefined,
         {} as unknown as E4E,
       );
@@ -615,7 +615,7 @@ describe("Tests copybook download service", () => {
 
       it("return list of all members of the dataset", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
 
@@ -663,7 +663,7 @@ describe("Tests copybook download service", () => {
 
       it("return list of all members of the dataset", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
 
@@ -698,7 +698,7 @@ describe("Tests copybook download service", () => {
             .mockRejectedValue(new Error(errorMessage));
 
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
             undefined,
             outputChannelMock as unknown as vscode.OutputChannel,
@@ -723,7 +723,7 @@ describe("Tests copybook download service", () => {
       describe("Failed request to list dataset should not be repeated indefinitely", () => {
         it("Successful requests are unlimited", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
           );
 
@@ -744,7 +744,7 @@ describe("Tests copybook download service", () => {
             .mockRejectedValue(new Error(errorMessage));
 
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
           );
 
@@ -772,7 +772,7 @@ describe("Tests copybook download service", () => {
             .mockRejectedValue(new Error(errorMessage));
 
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
           );
 
@@ -815,7 +815,7 @@ describe("Tests copybook download service", () => {
 
       it("no error popup is shown", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
@@ -839,7 +839,7 @@ describe("Tests copybook download service", () => {
 
       it("error popup is shown", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
@@ -924,7 +924,7 @@ describe("Tests copybook download service", () => {
 
         it("local copybook workspace folder is searched", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
           );
           const result = await cds.resolveCopybookURI(
@@ -958,7 +958,9 @@ describe("Tests copybook download service", () => {
             ]);
         });
         it("uses dialect path configuration, not generic copybooks", async () => {
-          const downloader = new CopybookDownloadService("/storagePath");
+          const downloader = new CopybookDownloadService(
+            vscode.Uri.file("/storagePath"),
+          );
           const result = await downloader.resolveCopybookURI(
             vscode.Uri.file("/test.cbl").toString(),
             "COPYBOOK",
@@ -987,7 +989,7 @@ describe("Tests copybook download service", () => {
 
       it("zowe ds uri is constructed", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
@@ -1015,7 +1017,7 @@ describe("Tests copybook download service", () => {
 
       it("zowe ds uri is constructed", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
@@ -1034,7 +1036,7 @@ describe("Tests copybook download service", () => {
 
       it("copybook are case insensitive", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
@@ -1099,7 +1101,7 @@ describe("Tests copybook download service", () => {
 
         it("local cached of copybook uri is returned", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMock,
           );
@@ -1127,7 +1129,7 @@ describe("Tests copybook download service", () => {
 
         it("if copybook is requested multiple times, E4E is called just once", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMock,
           );
@@ -1157,7 +1159,7 @@ describe("Tests copybook download service", () => {
 
         it("doesn't searches other locations if copybook not found in endevor", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMock,
           );
@@ -1228,7 +1230,7 @@ describe("Tests copybook download service", () => {
 
         it("local cached of copybook uri is returned", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMock,
           );
@@ -1257,7 +1259,7 @@ describe("Tests copybook download service", () => {
         it("if cached version is available e4e is not called again", async () => {
           cachedFileExists = true;
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMock,
           );
@@ -1321,7 +1323,7 @@ describe("Tests copybook download service", () => {
 
         it("resolve local copybook instead", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMock,
           );
@@ -1468,7 +1470,9 @@ describe("Tests copybook download service", () => {
           ];
         });
         it("return local copybook uri", async () => {
-          const cds = new CopybookDownloadService("/globalStorage");
+          const cds = new CopybookDownloadService(
+            vscode.Uri.file("/globalStorage"),
+          );
           const result = await cds.resolveCopybookURI(
             "file:///test.cbl",
             "COPYBOOK",
@@ -1504,7 +1508,7 @@ describe("Tests copybook download service", () => {
 
         it("return zowe dsn copybook uri", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
             e4eMock,
           );
@@ -1546,7 +1550,7 @@ describe("Tests copybook download service", () => {
 
         it("return zowe uss copybook uri", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
             e4eMock,
           );
@@ -1594,7 +1598,7 @@ describe("Tests copybook download service", () => {
 
         it("return local endevor cache copybook uri", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerMock,
             e4eMock,
           );
@@ -1614,7 +1618,7 @@ describe("Tests copybook download service", () => {
 
         it("doesnt resolve endevor copybook if invalid profile is specified in processor group", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             undefined,
             e4eMockInvalidProfile,
           );
@@ -1637,7 +1641,7 @@ describe("Tests copybook download service", () => {
 
         it("datasetFirst group -> resolves to dataset uri", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
             e4eMock,
           );
@@ -1654,7 +1658,7 @@ describe("Tests copybook download service", () => {
 
         it("endevorFirst group -> resolves to endevor uri", async () => {
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
             e4eMock,
           );
@@ -1681,7 +1685,7 @@ describe("Tests copybook download service", () => {
             .mockResolvedValue(findFilesSpyResult);
 
           const cds = new CopybookDownloadService(
-            "/globalStorage",
+            vscode.Uri.file("/globalStorage"),
             zoweExplorerApiMock,
             e4eMock,
           );
@@ -1702,7 +1706,9 @@ describe("Tests copybook download service", () => {
         });
 
         it("in processor group - searches the processor group only", async () => {
-          const cds = new CopybookDownloadService("storage-path");
+          const cds = new CopybookDownloadService(
+            vscode.Uri.file("/storage-path"),
+          );
           await cds.resolveCopybookURI(
             "file:///test.cbl",
             "COPYBOOK",
@@ -1719,7 +1725,9 @@ describe("Tests copybook download service", () => {
         });
 
         it("not in pg group -> resolves to copybook just from vscode configuration", async () => {
-          const cds = new CopybookDownloadService("storage-path");
+          const cds = new CopybookDownloadService(
+            vscode.Uri.file("/storage-path"),
+          );
           await cds.resolveCopybookURI(
             "file:///not_processor_group.cbl",
             "COPYBOOK",
@@ -1754,7 +1762,7 @@ describe("Tests copybook download service", () => {
 
       it("return local copybook uri", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
@@ -1780,7 +1788,7 @@ describe("Tests copybook download service", () => {
 
       it("return dsn copybook uri", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
         const result = await cds.resolveCopybookURI(
@@ -1804,7 +1812,7 @@ describe("Tests copybook download service", () => {
       });
       it("checks the order of resolution is same as the one provided in user settings", async () => {
         const cds = new CopybookDownloadService(
-          "/globalStorage",
+          vscode.Uri.file("/globalStorage"),
           zoweExplorerApiMock,
         );
 

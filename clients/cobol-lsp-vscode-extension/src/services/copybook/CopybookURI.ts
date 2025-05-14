@@ -32,11 +32,11 @@ export class CopybookURI {
   public static createDatasetPath(
     profileName: string[],
     dataset: string,
-    downloadFolder: string,
+    downloadFolder: vscode.Uri,
     source: CopybooksSource = ZOWE_FOLDER,
   ) {
     return vscode.Uri.joinPath(
-      vscode.Uri.file(downloadFolder),
+      downloadFolder,
       ...this.createDatasetSubdirectories(profileName, source, dataset),
     );
   }

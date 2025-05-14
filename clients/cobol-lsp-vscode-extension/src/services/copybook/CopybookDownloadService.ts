@@ -135,7 +135,7 @@ export class CopybookDownloadService {
   }
 
   constructor(
-    private storagePath: string,
+    private storagePath: vscode.Uri,
     explorer?: IApiRegisterClient,
     e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
