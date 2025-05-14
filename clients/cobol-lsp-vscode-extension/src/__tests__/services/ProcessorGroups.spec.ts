@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { URI } from "vscode-uri";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,
@@ -30,12 +31,11 @@ jest.mock("fs", () => ({
   readFileSync: jest.fn().mockImplementation(() => {}),
 }));
 
-const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace");
-const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file("/c:/my/workspace");
-
 jest.mock("vscode", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const vscodeMock = jest.requireActual("../../__mocks__/vscode");
+  const WORKSPACE_URI_OBJ = URI.file("/my/workspace");
+  const WORKSPACE_URI_OBJ_WIN32 = URI.file("/c:/my/workspace");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     ...vscodeMock,

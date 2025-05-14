@@ -621,13 +621,13 @@
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
     "@code4z/analysis": "file:../analysis",
     "@vscode/extension-telemetry": "^0.9.8",
-    "glob": "11.0.0",
     "iconv-lite": "^0.6.3",
     "io-ts": "2.2.21",
     "micromatch": "^4.0.8",
     "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
+    "glob": "11.0.0",
     "@eslint/js": "^9.15.0",
     "@types/assert": "^1.5.11",
     "@types/fs-extra": "^11.0.4",

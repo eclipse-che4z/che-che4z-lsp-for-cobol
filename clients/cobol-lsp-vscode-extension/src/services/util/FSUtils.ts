@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { hasMagic } from "glob";
 import * as vscode from "vscode";
 
 export const backwardSlashRegex = new RegExp("\\\\", "g");
@@ -23,6 +22,11 @@ export function cleanWorkspaceFolderName(workspaceFolderPath: string) {
 
 export function normalizePath(folder: string): string {
   return vscode.Uri.file(folder).fsPath;
+}
+
+function hasMagic(input: string) {
+  const pattern = /[*?{}[\]()!]/;
+  return pattern.test(input);
 }
 
 export function createFileSearchPattern(
