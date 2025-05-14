@@ -18,6 +18,9 @@ package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -119,6 +122,55 @@ public abstract class MessageServiceParser extends Parser {
     Integer intInputValue = tryParseInt(input);
     if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
       notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
+    }
+  }
+
+  /**
+   * Validate LOB size and throw an error if it is incorrect
+   *
+   * @param input integer to check
+   * @param maxValue allowed integer value
+   */
+  protected void validateLobSize(Token start, Token stop, String input, Integer maxValue) {
+    if (input != null) {
+      Pattern pattern =
+          Pattern.compile("(?i)(CLOB|DBCLOB|BLOB)\\s*\\(\\s*(\\d+)(?:\\s*([KMG]))?\\s*\\)");
+      Matcher matcher = pattern.matcher(input);
+
+      if (matcher.matches()) {
+        String dataType = matcher.group(1);
+        String numericValue = matcher.group(2);
+        String unit = matcher.group(3);
+
+        long size = Long.parseLong(numericValue);
+        if (unit != null) {
+          switch (unit.toUpperCase()) {
+            case "K":
+              size *= 1024;
+              break;
+            case "M":
+              size *= 1024 * 1024;
+              break;
+            case "G":
+              size *= 1024 * 1024 * 1024;
+              break;
+            default:
+          }
+        }
+
+        ((CommonToken) start).setStopIndex(stop.getStopIndex());
+        if ("CLOB".equalsIgnoreCase(dataType) || "BLOB".equalsIgnoreCase(dataType)) {
+          // Maximum length of CLOB/BLOB: 2147483647 bytes (2 GB - 1 byte)
+          if (size > 2147483647L) {
+            notifyError(start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
+          }
+        } else if ("DBCLOB".equalsIgnoreCase(dataType)) {
+          // Maximum length of DBCLOB: 1073741823 double-byte characters
+          if (size > 1073741823L) {
+            notifyError(start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
+          }
+        }
+      }
     }
   }
 
