@@ -104,7 +104,7 @@ public class TestCICSTranslatorOptions {
   }
 
   public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
-      "       CBL CICS (SP, 'EXCI') \n"
+      "       CBL CICS (SP, {'EXCI'|1}) \n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.  AB01FORE.\n"
           + "       ENVIRONMENT DIVISION.\n"
