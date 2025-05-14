@@ -104,12 +104,12 @@ public class TestCICSTranslatorOptions {
   }
 
   public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
-        "       CBL CICS (SP, 'EXCI') \n"
-                + "       IDENTIFICATION DIVISION.\n"
-                + "       PROGRAM-ID.  AB01FORE.\n"
-                + "       ENVIRONMENT DIVISION.\n"
-                + "       DATA DIVISION.\n"
-                + "       WORKING-STORAGE SECTION.";
+      "       CBL CICS (SP, 'EXCI') \n"
+              + "       IDENTIFICATION DIVISION.\n"
+              + "       PROGRAM-ID.  AB01FORE.\n"
+              + "       ENVIRONMENT DIVISION.\n"
+              + "       DATA DIVISION.\n"
+              + "       WORKING-STORAGE SECTION.";
 
   @ParameterizedTest
   @MethodSource("getOptions")
