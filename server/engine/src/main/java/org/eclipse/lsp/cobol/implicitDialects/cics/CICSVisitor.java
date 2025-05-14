@@ -161,18 +161,15 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCompilerDirective(CICSParser.CompilerDirectiveContext ctx) {
     cicsOptionsCheckUtility.setExciOptionsEnabled(false);
     cicsOptionsCheckUtility.setSpOptionsEnabled(false);
-    cicsOptionsCheckUtility.setNoLengthOptionsEnabled(false);
 
-    for (CICSParser.CicsTranslatorDirectivesContext directives : ctx.cicsTranslatorDirectives()) {
-      if (directives.cicsTranslatorOptions() != null) {
-        for (CICSParser.CicsTranslatorOptionsContext translatorOption :directives.cicsTranslatorOptions()) {
-          if (translatorOption.getText().contains("SP"))
-            cicsOptionsCheckUtility.setSpOptionsEnabled(true);
-          if (translatorOption.getText().contains("EXCI"))
-            cicsOptionsCheckUtility.setExciOptionsEnabled(true);
-          if (translatorOption.getText().contains("NOLENGTH"))
-            cicsOptionsCheckUtility.setNoLengthOptionsEnabled(true);
-        }
+    for (CICSParser.CompilerOptsContext options : ctx.compilerOpts()) {
+      if (options.cicsOptions() != null) {
+        if (options.cicsOptions().getText().contains("SP"))
+          cicsOptionsCheckUtility.setSpOptionsEnabled(true);
+        if (options.cicsOptions().getText().contains("EXCI"))
+          cicsOptionsCheckUtility.setExciOptionsEnabled(true);
+        if (options.cicsOptions().getText().contains("NOLENGTH"))
+          cicsOptionsCheckUtility.setNoLengthOptionsEnabled(true);
       }
     }
 
@@ -201,7 +198,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitCicsTranslatorOptions(CICSParser.CicsTranslatorOptionsContext ctx) {
+  public List<Node> visitCompilerXOptsOption(CICSParser.CompilerXOptsOptionContext ctx) {
     if (Objects.nonNull(ctx.EXCI())) {
       return addTreeNode(
           ctx,
