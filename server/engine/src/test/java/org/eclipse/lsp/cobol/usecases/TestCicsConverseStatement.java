@@ -107,6 +107,8 @@ public class TestCicsConverseStatement {
   private static final String T2660_VALID =
       CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) CTLCHAR(123) LINEADDR(123) LEAVEKB";
 
+  private static final String CONVERSE_TRANS_FROMLENGTH_INVALID = "CONVERSE {NOTRUNCATE|error|error2}";
+
   private Map<String, Diagnostic> getErrorDiagnostic(String errorMessage) {
     return ImmutableMap.of(
         "errorOne",
@@ -211,5 +213,23 @@ public class TestCicsConverseStatement {
   @Test
   void testT2660Valid() {
     CICSTestUtils.noErrorTest(T2660_VALID);
+  }
+  @Test
+  void testConverseTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: FROMLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "error2",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: TOLENGTH OR TOFLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(CONVERSE_TRANS_FROMLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }
