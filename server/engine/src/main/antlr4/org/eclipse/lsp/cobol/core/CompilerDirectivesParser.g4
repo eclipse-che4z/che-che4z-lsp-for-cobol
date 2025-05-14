@@ -23,14 +23,53 @@ compilerOption
     ;
 
 // compiler translator options
-cicsTranslatorDirectives:  (CICS | XOPTS) LPARENCHAR cicsTranslatorOptions (COMMACHAR cicsTranslatorOptions )* RPARENCHAR;
+cicsTranslatorDirectives: (CICS | XOPTS | XOPT) LPARENCHAR (cicsTranslatorOptions | LITERAL ) (COMMACHAR? cicsTranslatorOptions)* RPARENCHAR;
 
-cicsTranslatorOptions:
-    APOST | CBLCARD | CICS | CO2 | CO3 | COBOL2 | COBOL3 | CPSM | DBCS | DEBUG | DLI | EDF | EXCI | FEPI
-    | ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR)
-    | LENGTH | LIN | LINKAGE | ((LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR) | NATLANG | NOCPSM | NODEBUG
-    | NOEDF | NOOPTIONS | NOFEPI | NOLENGTH | NOLINKAGE | NONUM | NOSEQ | NOSPIE | NUM | OP | OPTIONS | Q_CHAR | QUOTE | SEQ
-    | SP | SYSEIB | SPACE | SPIE | VBREF;
+cicsTranslatorOptions
+       : APOST
+       | CBLCARD
+       | CICS
+       | CO2
+       | COBOL2
+       | CO3
+       | COBOL3
+       | CPSM
+       | DBCS
+       | DEBUG
+       | DLI
+       | EDF
+       | EXCI
+       | FEPI
+       | ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (COMMACHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR)
+       | LENGTH
+       | ((LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR)
+       | LIN
+       | LINKAGE
+       | NATLANG
+       | NOCBLCARD
+       | NOCPSM
+       | NODEBUG
+       | NOEDF
+       | NOFEPI
+       | NOLENGTH
+       | NOLINKAGE
+       | NONUM
+       | NOOPTIONS
+       | NOSEQ
+       | NOSPIE
+       | NOVBREF
+       | NUM
+       | OP
+       | OPTIONS
+       | Q_CHAR
+       | QUOTE
+       | SEQ
+       | SP
+       | SPACE LPARENCHAR INTEGERLITERAL RPARENCHAR
+       | SPIE
+       | SYSEIB
+       | VBREF
+       ;
 
 deprecatedCompilerOptions:
             unSupportedDeprecatedCompilerDirectives
