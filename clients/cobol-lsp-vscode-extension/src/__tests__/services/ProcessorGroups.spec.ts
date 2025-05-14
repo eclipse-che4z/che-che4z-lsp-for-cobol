@@ -38,7 +38,7 @@ jest.mock("vscode", () => {
   const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace") as vscode.Uri;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file(
-    "/c:/my/workspace",
+    "c:/my/workspace",
   ) as vscode.Uri;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
