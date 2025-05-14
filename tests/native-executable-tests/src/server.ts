@@ -111,6 +111,21 @@ export class Server {
             return copybooks.find(t => t.includes(copybookName));
         });
 
+        serverConnection.onRequest(
+            "copybook/resolve",
+            (_cobolFilename, copybookName, _dialectType) => {
+              //TODO  Handle dialects
+              return copybooks.find((t) => t.includes(copybookName));
+            }
+          );
+      
+          serverConnection.onRequest(
+            "copybook/uri",
+            (documentURI: string, copybookName: string, dialectType: string) => {
+              return copybooks.find((t) => t.includes(copybookName));
+            }
+          );
+
         serverConnection.onRequest("cobol/resolveSubroutine", _params => {return; });
         serverConnection.onRequest("window/workDoneProgress/create", (_param) => {return;} );
         serverConnection.onNotification("$/progress", (_param) => {} );
