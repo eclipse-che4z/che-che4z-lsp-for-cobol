@@ -86,5 +86,8 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.BINARY(),
         ctx.BASE64(),
         ctx.DIGESTTYPE());
+    if (noLengthOptionsEnabled) {
+      checkHasMandatoryOptions(ctx.RECORDLEN(), ctx, "RECORDLEN");
+    }
   }
 }

@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_connect;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,5 +86,13 @@ public class CICSConnectProcessOptionsCheckUtility extends CICSOptionsCheckBaseU
     }
 
     checkHasMandatoryOptions(ctx.SYNCLEVEL(), ctx, "SYNCLEVEL");
+    if (noLengthOptionsEnabled) {
+      if (!ctx.PROCNAME().isEmpty()) {
+        checkHasMandatoryOptions(ctx.PROCLENGTH(), ctx, "PROCLENGTH");
+      }
+      if (!ctx.PIPLIST().isEmpty()) {
+        checkHasMandatoryOptions(ctx.PIPLENGTH(), ctx, "PIPLENGTH");
+      }
+    }
   }
 }
