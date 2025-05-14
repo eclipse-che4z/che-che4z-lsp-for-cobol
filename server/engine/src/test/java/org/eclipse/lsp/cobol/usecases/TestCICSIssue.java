@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -180,7 +181,26 @@ public class TestCICSIssue {
   private static final String ISSUE_WAIT_DUPLICATE_COMMON_INVALID =
       "ISSUE WAIT {SUBADDR|errorOne}(100) {CONSOLE|errorTwo} VOLUME(100) RESP(100) NOHANDLE"
           + " {SUBADDR|errorThree|errorFour}(200) {DESTID|errorFive}(10) DESTIDLENG(100)";
+  private static final String ISSUE_ABORT_TRANS_NOLENGTH_INVALID = "ISSUE ABORT {VOLUME(100)|error}";
+  private static final String ISSUE_ADD_TRANS_NOLENGTH_INVALID =
+          "ISSUE {_ADD DESTID({$varFour})VOLUME({$varFour})FROM({$varFour})|errorOne|errorTwo_}";
+  private static final String ISSUE_END_TRANS_NOLENGTH_INVALID =
+          "ISSUE END {_DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
+  private static final String ISSUE_ERASE_TRANS_NOLENGTH_INVALID =
+          "ISSUE {_ERASE RRN RIDFLD({$varFour}) DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
+  private static final String ISSUE_NOTE_TRANS_NOLENGTH_INVALID =
+          "ISSUE {_NOTE RRN RIDFLD({$varFour}) DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
+  private static final String ISSUE_QUERY_TRANS_NOLENGTH_INVALID =
+          "ISSUE {_QUERY DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
+  private static final String ISSUE_RECEIVE_TRANS_NOLENGTH_INVALID = "ISSUE {_RECEIVE SET({$varFour})|error_}";
+  private static final String ISSUE_REPLACE_TRANS_NOLENGTH_INVALID =
+          "ISSUE {_REPLACE DESTID({$varFour}) FROM({$varFour}) VOLUME({$varFour}) RIDFLD({$varFour}) RRN"
+                  + " NOWAIT|errorOne|errorTwo|errorThree_}";
 
+  private static final String ISSUE_SEND_TRANS_NOLENGTH_INVALID =
+          "ISSUE SEND {_FROM({$varOne})|errorOne_} {_DESTID({$varOne})VOLUME({$varOne})|errorTwo|errorThree_}";
+  private static final String ISSUE_WAIT_TRANS_NOLENGTH_INVALID =
+          "ISSUE WAIT {_DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
   @Test
   void testIssueAbendAllOptionsValidOne() {
     CICSTestUtils.noErrorTest(ISSUE_ABEND_ALL_OPTIONS_VALID_ONE);
@@ -578,5 +598,194 @@ public class TestCICSIssue {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_WAIT_DUPLICATE_COMMON_INVALID, expectedDiagnostics);
+  }
+  @Test
+  void testIssueAbortTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ISSUE_ABORT_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueAddTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ISSUE_ADD_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueEndTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())
+                    );
+    CICSTestUtils.errorTest(ISSUE_END_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueEraseTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())
+            );
+    CICSTestUtils.errorTest(ISSUE_ERASE_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueNoteTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())
+            );
+    CICSTestUtils.errorTest(ISSUE_NOTE_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueQueryTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())
+            );
+    CICSTestUtils.errorTest(ISSUE_QUERY_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueReceiveTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: LENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())
+            );
+    CICSTestUtils.errorTest(ISSUE_RECEIVE_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueReplaceTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                            ),
+                    "errorThree",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: LENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()
+                    )
+            );
+    CICSTestUtils.errorTest(ISSUE_REPLACE_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueSendTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(new Position(16, 12), new Position(18,40)),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: VOLUMELENG",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorThree",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: DESTIDLENG",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ISSUE_SEND_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
+  }
+  @Test
+  void testIssueWaitTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostics =
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: DESTIDLENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VOLUMELENG",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())
+            );
+    CICSTestUtils.errorTest(ISSUE_WAIT_TRANS_NOLENGTH_INVALID, expectedDiagnostics,"NOLENGTH");
   }
 }

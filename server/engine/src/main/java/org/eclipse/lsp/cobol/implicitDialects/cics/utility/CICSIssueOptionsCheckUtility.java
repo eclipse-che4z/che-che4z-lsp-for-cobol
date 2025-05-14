@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_issue;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -195,6 +196,10 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
+    if (noLengthOptionsEnabled) {
+        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
+      checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+    }
   }
 
   private void checkConfirmation(CICSParser.Cics_issue_confirmationContext ctx) {
@@ -232,6 +237,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
+    if (noLengthOptionsEnabled) {
+      if (!ctx.VOLUME().isEmpty())
+        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
+      if (!ctx.DESTID().isEmpty())
+        checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+    }
   }
 
   void checkError(CICSParser.Cics_issue_errorContext ctx) {
@@ -251,6 +262,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    if (noLengthOptionsEnabled) {
+      if (!ctx.VOLUME().isEmpty())
+        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
+      if (!ctx.DESTID().isEmpty())
+        checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+    }
   }
 
   void checkPass(CICSParser.Cics_issue_passContext ctx) {
@@ -278,11 +295,20 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    if (noLengthOptionsEnabled) {
+      if (!ctx.VOLUME().isEmpty())
+        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
+      if (!ctx.DESTID().isEmpty())
+        checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+    }
   }
 
   void checkReceive(CICSParser.Cics_issue_receiveContext ctx) {
     checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
     if (ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.SET(), ctx, "INTO or SET");
+    if (noLengthOptionsEnabled) {
+      checkHasMandatoryOptions(ctx.LENGTH(),ctx, "LENGTH");
+      }
   }
 
   void checkReplace(CICSParser.Cics_issue_replaceContext ctx) {
@@ -298,6 +324,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    if (noLengthOptionsEnabled) {
+      checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+      checkHasMandatoryOptions(ctx.LENGTH(),ctx, "LENGTH");
+      if (!ctx.VOLUME().isEmpty())
+        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
+    }
   }
 
   void checkSend(CICSParser.Cics_issue_sendContext ctx) {
@@ -305,6 +337,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     if (ctx.cics_issue_common().isEmpty())
       checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
+    if (noLengthOptionsEnabled) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+      }
     checkIssueCommon(ctx.cics_issue_common());
   }
 
@@ -363,6 +398,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           }
 
           if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
+          if (noLengthOptionsEnabled) {
+            if (!context.VOLUME().isEmpty())
+              checkHasMandatoryOptions(context.VOLUMELENG(),context, "VOLUMELENG");
+            if (!context.DESTID().isEmpty())
+              checkHasMandatoryOptions(context.DESTIDLENG(),context, "DESTIDLENG");
+          }
         });
   }
 }
