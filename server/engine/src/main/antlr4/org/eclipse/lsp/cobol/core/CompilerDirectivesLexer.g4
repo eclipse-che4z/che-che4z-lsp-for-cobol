@@ -394,6 +394,7 @@ ZD: Z D;
 ZWB: Z W B;
 NOZWB: N O Z W B;
 
+XOPT: X O P T S;
 XOPTS: X O P T S;
 APOST: A P O S T;
 CBLCARD: C B L C A R D;
