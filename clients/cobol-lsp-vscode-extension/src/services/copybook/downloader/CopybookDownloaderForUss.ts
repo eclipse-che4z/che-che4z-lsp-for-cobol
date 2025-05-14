@@ -63,7 +63,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
             if (extension) {
               if (
                 allowedCopybooksExtensions?.includes(
-                  extension.toLocaleLowerCase(),
+                  extension.toLowerCase(),
                 )
               ) {
                 members.push({ name, extension });
