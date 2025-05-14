@@ -105,11 +105,11 @@ public class TestCICSTranslatorOptions {
 
   public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
       "       CBL CICS (SP, 'EXCI') \n"
-              + "       IDENTIFICATION DIVISION.\n"
-              + "       PROGRAM-ID.  AB01FORE.\n"
-              + "       ENVIRONMENT DIVISION.\n"
-              + "       DATA DIVISION.\n"
-              + "       WORKING-STORAGE SECTION.";
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.  AB01FORE.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.";
 
   @ParameterizedTest
   @MethodSource("getOptions")
@@ -122,23 +122,25 @@ public class TestCICSTranslatorOptions {
     UseCaseEngine.runTest(
         MIXED_COMPILER_DIRECTIVE_CICS_TRANSLATOR, ImmutableList.of(), ImmutableMap.of());
   }
+
   @Test
   void testCompilerDirectivesLiteralAfterKeywordCICSTranslatorOptions() {
     UseCase useCase =
-     UseCase.builder()
-             .documentUri(UseCaseUtils.DOCUMENT_URI)
-             .text(LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR)
-             .copybooks(ImmutableList.of())
-             .sqlBackend(SQLBackend.DB2_SERVER)
-             .copybookProcessingMode(ENABLED)
-             .dialects(ImmutableList.of())
-             .cicsTranslator(false)
-             .build();
+        UseCase.builder()
+            .documentUri(UseCaseUtils.DOCUMENT_URI)
+            .text(LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR)
+            .copybooks(ImmutableList.of())
+            .sqlBackend(SQLBackend.DB2_SERVER)
+            .copybookProcessingMode(ENABLED)
+            .dialects(ImmutableList.of())
+            .cicsTranslator(false)
+            .build();
     AnalysisResult analyze = UseCaseUtils.analyze(useCase);
     Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
     Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
     Assertions.assertEquals(
-            "No viable alternative at input CICS (SP, 'EXCI'", diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
+        "No viable alternative at input CICS (SP, 'EXCI'",
+        diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
   }
 
   @Test
