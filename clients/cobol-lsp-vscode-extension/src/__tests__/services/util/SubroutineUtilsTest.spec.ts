@@ -94,7 +94,7 @@ describe("SubroutineUtils", () => {
       expect(uri).toEqual("file:///absolute/subroutines/SUB1.cob");
       expect(findFilesSpy).toHaveBeenCalledWith(
         {
-          base: "/absolute/subroutines",
+          baseUri: "/absolute/subroutines",
           pattern: "**/SUB1{.CBL,.COB,.COBOL,.cbl,.cob,.cobol}",
         },
         null,

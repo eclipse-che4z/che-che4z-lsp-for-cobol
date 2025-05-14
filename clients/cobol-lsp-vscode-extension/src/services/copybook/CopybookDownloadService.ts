@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import {
   DATASET,
+  DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
@@ -89,6 +90,7 @@ export class CopybookDownloadService {
       const endevorResult = await this.e4eDownloader?.downloadCopybookE4E(
         documentURI,
         copybookName,
+        dialectType,
       );
 
       return endevorResult?.toString();
@@ -100,15 +102,16 @@ export class CopybookDownloadService {
       dialectType,
     );
 
-    const processorGroupsResult =
-      await this.resolveCopybookUriInProcessorGroups(
-        copybookName,
-        "profile",
-        documentURI,
-        pgConfigs,
-      );
-    if (processorGroupsResult) {
-      return processorGroupsResult.toString();
+    if (pgConfigs.length > 0) {
+      const processorGroupsResult =
+        await this.resolveCopybookUriInProcessorGroups(
+          copybookName,
+          "profile",
+          documentURI,
+          pgConfigs,
+        );
+
+      return processorGroupsResult?.toString();
     }
 
     // search paths-local -> return URI pointing to local file
@@ -132,7 +135,7 @@ export class CopybookDownloadService {
   }
 
   constructor(
-    private storagePath: string,
+    private storagePath: vscode.Uri,
     explorer?: IApiRegisterClient,
     e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
@@ -243,20 +246,12 @@ export class CopybookDownloadService {
       dialectType,
     );
     const results = await Promise.allSettled([
-      ...dsnPaths.map(async (dsn) => {
-        return await this.dsnDownloader?.resolveCopybookUri(
-          profile,
-          dsn,
-          copybookName,
-        );
-      }),
-      ...ussPaths.map(async (uss) => {
-        return await this.ussDownloader?.resolveCopybookUri(
-          profile,
-          uss,
-          copybookName,
-        );
-      }),
+      ...dsnPaths.map((dsn) =>
+        this.dsnDownloader?.resolveCopybookUri(profile, dsn, copybookName),
+      ),
+      ...ussPaths.map((uss) =>
+        this.ussDownloader?.resolveCopybookUri(profile, uss, copybookName),
+      ),
     ]);
 
     for (const result of results) {
@@ -288,6 +283,13 @@ export class CopybookDownloadService {
         }
       } else {
         const profile = config.profile ?? defaultProfile;
+        if (
+          !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [
+            DEFAULT_DIALECT,
+          ]))
+        ) {
+          return;
+        }
         if (DATASET in config && this.dsnDownloader) {
           const dsResult = await this.dsnDownloader.resolveCopybookUri(
             profile,
@@ -328,13 +330,12 @@ export class CopybookDownloadService {
               copybookName,
             ))
           ) {
-            const e4eResult = await this.e4eDownloader.downloadElementE4E(
-              resolvedProfile,
-              element,
-            );
-            if (e4eResult) {
-              return e4eResult;
-            }
+            return {
+              endevorElement: {
+                resolvedProfile,
+                element,
+              },
+            };
           }
         }
       }
@@ -343,9 +344,28 @@ export class CopybookDownloadService {
     const results = await Promise.allSettled(promises);
     for (const result of results) {
       if (result.status === "fulfilled" && result.value) {
-        return result.value;
+        if (result.value instanceof vscode.Uri) {
+          return result.value;
+        } else {
+          const e4eResult = await this.e4eDownloader?.downloadElementE4E(
+            result.value.endevorElement.resolvedProfile,
+            result.value.endevorElement.element,
+          );
+          if (e4eResult) {
+            return e4eResult;
+          }
+        }
+      } else {
+        if (result.status === "rejected") {
+          this.outputChannel?.appendLine(
+            `Error while resolving copybook ${copybookName} - ${JSON.stringify(result.reason)}`,
+          );
+        }
       }
     }
+    this.outputChannel?.appendLine(
+      `Unable to resolve copybook ${copybookName} using processor groups.`,
+    );
   }
 
   private async isPrerequisiteForDownloadSatisfied(

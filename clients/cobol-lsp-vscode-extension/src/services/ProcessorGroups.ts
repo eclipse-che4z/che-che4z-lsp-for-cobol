@@ -97,17 +97,6 @@ export async function loadProcessorGroupCopybookExtensionsConfig(
   );
 }
 
-export async function loadProcessorGroupCopybookEncodingConfig(
-  item: { scopeUri: string },
-  configObject: string,
-): Promise<string> {
-  return loadProcessorGroupSettings(
-    item.scopeUri,
-    "copybook-file-encoding",
-    configObject,
-  );
-}
-
 export async function loadProcessorGroupCompileOptionsConfig(
   item: { scopeUri: string },
   configObject: string,

@@ -99,7 +99,7 @@ async function initialize(context: vscode.ExtensionContext) {
   const maybeE4E = await getE4EAPI();
   const maybeZowe = await Utils.getZoweExplorerAPI();
   const copyBooksDownloader = new CopybookDownloadService(
-    context.globalStorageUri.fsPath,
+    context.globalStorageUri,
     maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,

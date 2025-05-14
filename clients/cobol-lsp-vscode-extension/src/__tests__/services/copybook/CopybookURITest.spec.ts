@@ -31,7 +31,11 @@ describe("CopybooksPathGenerator tests", () => {
 
   it("creates dataset path", () => {
     expect(
-      CopybookURI.createDatasetPath([profile], dataset, "downloadFolder"),
+      CopybookURI.createDatasetPath(
+        [profile],
+        dataset,
+        vscode.Uri.file("/downloadFolder"),
+      ),
     ).toEqual(
       vscode.Uri.file("/downloadFolder/zowe/copybooks/profile/dataset"),
     );

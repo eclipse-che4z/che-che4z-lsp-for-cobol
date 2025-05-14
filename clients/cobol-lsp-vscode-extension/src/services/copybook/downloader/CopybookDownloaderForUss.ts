@@ -40,8 +40,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
 
     const profile = DownloadUtil.loadProfile(profileName, this.explorerAPI);
 
-    const allowedCopybooksExtensions =
+    let allowedCopybooksExtensions =
       await SettingsService.getCopybookExtension();
+    allowedCopybooksExtensions = allowedCopybooksExtensions?.map((ext) =>
+      ext.toLowerCase(),
+    );
     const allowedNoExtension = allowedCopybooksExtensions?.includes("");
 
     const members: MemberCacheItem[] = [];
@@ -58,7 +61,11 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
             const [name, extension] = splitFilename(file.name);
 
             if (extension) {
-              if (allowedCopybooksExtensions?.includes(extension)) {
+              if (
+                allowedCopybooksExtensions?.includes(
+                  extension.toLocaleLowerCase(),
+                )
+              ) {
                 members.push({ name, extension });
               }
             } else if (allowedNoExtension) {
@@ -79,7 +86,8 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: string,
   ): Promise<boolean> {
     const members = await this.getAllMembers(profileName, uss);
-    return members.some((member) => member.name === copybookName);
+    copybookName = copybookName.toUpperCase();
+    return members.some((member) => member.name.toUpperCase() === copybookName);
   }
 
   public async resolveCopybookUri(
@@ -88,7 +96,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     copybookName: string,
   ) {
     const memberList = await this.getAllMembers(profileName, uss);
-    const member = memberList.find((m) => m.name === copybookName);
+    copybookName = copybookName.toUpperCase();
+    const member = memberList.find(
+      (m) => m.name.toUpperCase() === copybookName,
+    );
 
     if (member) {
       return vscode.Uri.parse(

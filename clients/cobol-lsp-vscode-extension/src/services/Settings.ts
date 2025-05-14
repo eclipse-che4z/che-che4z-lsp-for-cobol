@@ -39,7 +39,6 @@ import {
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
-  loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
   loadProcessorGroupDialectConfig,
@@ -64,9 +63,7 @@ interface Item {
 
 const DialectsConfigurationCodec = t.array(t.string);
 export type DialectsConfiguration = t.TypeOf<typeof DialectsConfigurationCodec>;
-const CopybookExtensionsConfigurationCodec = t.array(t.string);
 const TargetSQLBackendConfigurationCodec = t.string;
-const CopybookEncodingConfigurationCodec = t.string;
 const CompileOptionsConfigurationCodec = t.string;
 
 async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
@@ -137,13 +134,7 @@ export async function lspConfigHandler(
           // server should not need to know local paths to copybook folders
           break;
         case SETTINGS_CPY_EXTENSIONS:
-          await handleProcessorGroupConfigurationRequest(
-            CopybookExtensionsConfigurationCodec,
-            loadProcessorGroupCopybookExtensionsConfig,
-            item,
-            result,
-            outputChannel,
-          );
+          // server should not need to know allowed copybook extensions
           break;
         case SETTINGS_SQL_BACKEND:
           await handleProcessorGroupConfigurationRequest(
@@ -155,13 +146,7 @@ export async function lspConfigHandler(
           );
           break;
         case SETTINGS_CPY_FILE_ENCODING:
-          await handleProcessorGroupConfigurationRequest(
-            CopybookEncodingConfigurationCodec,
-            loadProcessorGroupCopybookEncodingConfig,
-            item,
-            result,
-            outputChannel,
-          );
+          // server should not need to know copybook files encodings
           break;
         case SETTINGS_COMPILE_OPTIONS:
           await handleProcessorGroupConfigurationRequest(

@@ -253,8 +253,8 @@ export const FileSystemError = {
 
 export const RelativePattern = jest
   .fn()
-  .mockImplementation((base: string, pattern: string) => ({
-    base,
+  .mockImplementation((baseUri: URI, pattern: string) => ({
+    baseUri,
     pattern,
   }));
 
