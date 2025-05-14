@@ -34,10 +34,12 @@ jest.mock("fs", () => ({
 jest.mock("vscode", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const vscode = jest.requireActual("../../__mocks__/vscode");
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace");
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file("/c:/my/workspace");
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace") as vscode.Uri;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file(
+    "/c:/my/workspace",
+  ) as vscode.Uri;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     ...vscode,
