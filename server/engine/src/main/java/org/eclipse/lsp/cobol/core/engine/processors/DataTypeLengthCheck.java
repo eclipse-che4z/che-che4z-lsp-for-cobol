@@ -26,8 +26,8 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
 
   private static final int MAX_NUMERIC_LENGTH = 18;
-  private static final int MAX_ALPHABETIC_LENGTH = 255;
-  private static final int MAX_ALPHANUMERIC_LENGTH = 255;
+  private static final int MAX_ALPHABETIC_LENGTH = 999999999;
+  private static final int MAX_ALPHANUMERIC_LENGTH = 999999999;
 
   private static final Pattern NUMERIC_PATTERN = Pattern.compile("(?i)9\\((\\d+)\\)");
   private static final Pattern ALPHABETIC_PATTERN = Pattern.compile("(?i)A\\((\\d+)\\)");
