@@ -125,22 +125,16 @@ public class TestCICSTranslatorOptions {
 
   @Test
   void testCompilerDirectivesLiteralAfterKeywordCICSTranslatorOptions() {
-    UseCase useCase =
-        UseCase.builder()
-            .documentUri(UseCaseUtils.DOCUMENT_URI)
-            .text(LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR)
-            .copybooks(ImmutableList.of())
-            .sqlBackend(SQLBackend.DB2_SERVER)
-            .copybookProcessingMode(ENABLED)
-            .dialects(ImmutableList.of())
-            .cicsTranslator(false)
-            .build();
-    AnalysisResult analyze = UseCaseUtils.analyze(useCase);
-    Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
-    Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
-    Assertions.assertEquals(
-        "No viable alternative at input CICS (SP, 'EXCI'",
-        diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
+    UseCaseEngine.runTest(
+        LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "No viable alternative at input CICS (SP, 'EXCI'",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
