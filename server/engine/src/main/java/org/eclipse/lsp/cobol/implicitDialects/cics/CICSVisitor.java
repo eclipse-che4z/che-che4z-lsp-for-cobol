@@ -161,6 +161,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCompilerDirective(CICSParser.CompilerDirectiveContext ctx) {
     cicsOptionsCheckUtility.setExciOptionsEnabled(false);
     cicsOptionsCheckUtility.setSpOptionsEnabled(false);
+    cicsOptionsCheckUtility.setNoLengthOptionsEnabled(false);
 
     for (CICSParser.CompilerOptsContext options : ctx.compilerOpts()) {
       if (options.cicsOptions() != null) {
