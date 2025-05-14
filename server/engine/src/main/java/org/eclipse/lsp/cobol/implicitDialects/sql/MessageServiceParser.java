@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -162,12 +161,14 @@ public abstract class MessageServiceParser extends Parser {
         if ("CLOB".equalsIgnoreCase(dataType) || "BLOB".equalsIgnoreCase(dataType)) {
           // Maximum length of CLOB/BLOB: 2147483647 bytes (2 GB - 1 byte)
           if (size > 2147483647L) {
-            notifyError(start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
+            notifyError(
+                start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
           }
         } else if ("DBCLOB".equalsIgnoreCase(dataType)) {
           // Maximum length of DBCLOB: 1073741823 double-byte characters
           if (size > 1073741823L) {
-            notifyError(start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
+            notifyError(
+                start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
           }
         }
       }

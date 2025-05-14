@@ -712,7 +712,8 @@ public class TestSqlHostVariable {
           + "        Program-Id. 'TEST1'.\n"
           + "        Data Division.\n"
           + "         Working-Storage Section.\n"
-          + "       01 {$*VAR-CLOB-MAX`->VAR-CLOB-MAX`->VAR-CLOB-MAX-LENGTH`->VAR-CLOB-MAX-DATA} USAGE IS SQL TYPE IS {CLOB (3 G)|1}.\n"
+          + "       01 {$*VAR-CLOB-MAX`->VAR-CLOB-MAX`->VAR-CLOB-MAX-LENGTH`->VAR-CLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS {CLOB (3 G)|1}.\n"
           + "        PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VAR-CLOB-MAX}.";
 
@@ -721,7 +722,8 @@ public class TestSqlHostVariable {
           + "        Program-Id. 'TEST1'.\n"
           + "        Data Division.\n"
           + "         Working-Storage Section.\n"
-          + "       01 {$*VAR-BLOB-MAX`->VAR-BLOB-MAX`->VAR-BLOB-MAX-LENGTH`->VAR-BLOB-MAX-DATA} USAGE IS SQL TYPE IS {BLOB (3 G)|1}.\n"
+          + "       01 {$*VAR-BLOB-MAX`->VAR-BLOB-MAX`->VAR-BLOB-MAX-LENGTH`->VAR-BLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS {BLOB (3 G)|1}.\n"
           + "        PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VAR-BLOB-MAX}.";
 
@@ -730,7 +732,9 @@ public class TestSqlHostVariable {
           + "        Program-Id. 'TEST1'.\n"
           + "        Data Division.\n"
           + "         Working-Storage Section.\n"
-          + "       01 {$*VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX-LENGTH`->VAR-DBCLOB-MAX-DATA} USAGE IS SQL TYPE IS {DBCLOB (2 G)|1}.\n"
+          + "       01"
+          + " {$*VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX-LENGTH`->VAR-DBCLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS {DBCLOB (2 G)|1}.\n"
           + "        PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VAR-DBCLOB-MAX}.";
 
