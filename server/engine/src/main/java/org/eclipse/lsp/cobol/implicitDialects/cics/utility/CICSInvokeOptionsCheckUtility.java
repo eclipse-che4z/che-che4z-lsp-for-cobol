@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_invoke;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -92,6 +93,8 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.LENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.COMMAREA(), ctx, "COMMAREA");
     }
+    if(noLengthOptionsEnabled && !ctx.COMMAREA().isEmpty())
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   @SuppressWarnings("unchecked")
@@ -103,5 +106,7 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.SCOPELEN().isEmpty()) {
       checkHasMandatoryOptions(ctx.SCOPE(), ctx, "SCOPE");
     }
+    if(noLengthOptionsEnabled && !ctx.SCOPE().isEmpty())
+      checkHasMandatoryOptions(ctx.SCOPELEN(), ctx, "SCOPELEN");
   }
 }
