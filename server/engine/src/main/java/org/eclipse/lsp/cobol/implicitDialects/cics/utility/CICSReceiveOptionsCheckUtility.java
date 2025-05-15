@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -98,12 +99,16 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.LENGTH(), ctx.FLENGTH());
     else checkHasMutuallyExclusiveOptions("LENGTH or FLENGTH", ctx.LENGTH(), ctx.FLENGTH());
     checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.MAXLENGTH(), ctx.MAXFLENGTH());
+    if (noLengthOptionsEnabled && !ctx.INTO().isEmpty())
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
     checkHasMandatoryOptions(ctx.PARTN(), ctx, "PARTN");
     checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    if (noLengthOptionsEnabled && !ctx.INTO().isEmpty())
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
@@ -113,6 +118,9 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     }
     checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
     checkHasMutuallyExclusiveOptions("TERMINAL or FROM", ctx.TERMINAL(), ctx.FROM());
+    if (noLengthOptionsEnabled && (!ctx.INTO().isEmpty() || !ctx.FROM().isEmpty())) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
@@ -120,6 +128,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!checkMapHasLiteral(ctx)) {
       checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
     }
+    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private boolean checkMapHasLiteral(ParserRuleContext ctx) {

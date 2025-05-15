@@ -16,12 +16,12 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
+
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
@@ -316,6 +316,12 @@ public class TestCicsReceive {
   private static final String[] RECEIVE_INVALID_FOUR = {
     "RECEIVE", "{_MAP({$def})", "MAPPINGDEV({$def})", "FROM({$def})|errorOne_}"
   };
+
+  private static final String MAP_TRANS_NOLENGTH_INVALID =
+      "RECEIVE {_MAP({$varFour}) MAPSET({$varFour}) INTO({$varFour}) TERMINAL ASIS INPARTN({$varFour})|error_}";
+
+  private static final String MAP_MAPPING_DEV_TRANS_NOLENGTH_INVALID =
+      "RECEIVE {_MAP({$varFour}) INTO({$varFour}) MAPPINGDEV({$varFour}) FROM({$varFour})|error_}";
 
   @Test
   void testReceiveInvalidOne() {
@@ -856,5 +862,32 @@ public class TestCicsReceive {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
+  }
+
+  @Test
+  void testMapNoLengthInvalid() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "error",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: LENGTH",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(MAP_TRANS_NOLENGTH_INVALID, expectedDiagnostics, "NOLENGTH");
+  }
+
+  @Test
+  void testMapMappingDevNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+
+    CICSTestUtils.errorTest(MAP_MAPPING_DEV_TRANS_NOLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }
