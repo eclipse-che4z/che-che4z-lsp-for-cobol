@@ -18,7 +18,7 @@
   "ACCEPT FROM": {
     "prefix": "ACCEPT",
     "body": ["ACCEPT ${1:variable} FROM ${2|DATE,DAY,DAY-OF-WEEK,TIME|}", "$0"],
-    "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting:-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time /"
+    "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting."
   },
   "ACCEPT id": {
     "prefix": "ACCEPT id",
@@ -50,7 +50,7 @@
     "body": [
       "ADD ${1:num-literal} TO ${2:num-var} ON SIZE ERROR ${3:error-catch-logic}"
     ],
-    "description": "ADD is an alternative to the COMPUTE statement for simple math operations. ON SIZE ERROR checks for truncation in the sum.-zos/6.3?topic=statements-add-statement"
+    "description": "ADD is an alternative to the COMPUTE statement for simple math operations. ON SIZE ERROR checks for truncation in the sum."
   },
   "ADVANCING": {
     "prefix": "WRITE AFTER ADVANCING",
@@ -94,7 +94,7 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "A COBOL \"class test\" used to determine whether the contents of a variable contains specific upper/lower case values. Used in conjunction with CMPR2/NOCMPR2 as compilation directives.-zos/6.3?topic=expressions-class-condition"
+    "description": "A COBOL \"class test\" used to determine whether the contents of a variable contains specific upper/lower case values. Used in conjunction with CMPR2/NOCMPR2 as compilation directives."
   },
   "ALPHANUMERIC": {
     "prefix": "ALPHANUMERIC",
@@ -103,7 +103,7 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "A COBOL \"class test\" which is used to determine whether the contents of a variable only contain letters and numbers (no special characters).?scope=SS6SG3_6.3.0"
+    "description": "A COBOL \"class test\" which is used to determine whether the contents of a variable only contain letters and numbers (no special characters)."
   },
   "ALSO": {
     "prefix": "ALSO item",
@@ -164,7 +164,7 @@
   "BINARY": {
     "prefix": "BINARY",
     "body": ["${1:numvar} PIC 9(4) BINARY."],
-    "description": "Variables defined with BINARY (and synonyms COMP and COMP-4) are a two's complement data representation in the COBOL language. This example provides two bytes of values in Base 16.-zos/6.4?topic=6-binary-comp-comp-4"
+    "description": "Variables defined with BINARY (and synonyms COMP and COMP-4) are a two's complement data representation in the COBOL language. This example provides two bytes of values in Base 16."
   },
   "BIT TO CHAR": {
     "prefix": "BIT-TO-CHAR",
@@ -196,7 +196,7 @@
   "BOTTOM": {
     "prefix": "LINES AT BOTTOM",
     "body": ["LINES AT BOTTOM."],
-    "description": "Part of the DATA DIVISION file FD, LINAGE clause, LINES AT BOTTOM tells COBOL to setup a bottom margin (blank lines at the bottom of every logical page).-zos/6.4?topic=entries-linage-clause"
+    "description": "Part of the DATA DIVISION file FD, LINAGE clause, LINES AT BOTTOM tells COBOL to setup a bottom margin (blank lines at the bottom of every logical page)."
   },
   "BY": {
     "prefix": "BY",
@@ -245,7 +245,7 @@
       "END-CALL",
       "$0"
     ],
-    "description": "The CALL statement transfers control from one compiled program to another. Note that the BY and RETURNING clauses are optional. For more on CALL:-zos/6.4?topic=statements-call-statement "
+    "description": "The CALL statement transfers control from one compiled program to another. Note that the BY and RETURNING clauses are optional. For more on CALL: "
   },
   "CANCEL": {
     "prefix": "CANCEL",
@@ -287,21 +287,21 @@
     "body": [
       "77 ${1:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-1."
     ],
-    "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION.-zos/6.4?topic=arithmetic-formats-numeric-data"
+    "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-2": {
     "prefix": "COMP-2",
     "body": [
       "77 ${1:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-2."
     ],
-    "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION.-zos/6.4?topic=arithmetic-formats-numeric-data"
+    "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-3": {
     "prefix": "COMP-3",
     "body": [
       "77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-3."
     ],
-    "description": "Internally-packed (efficient) number declared in the DATA DIVISION.-zos/6.4?topic=6-packed-decimal-comp-3"
+    "description": "Internally-packed (efficient) number declared in the DATA DIVISION."
   },
   "COMP-4": {
     "prefix": "COMP-4",
@@ -311,7 +311,7 @@
   "COMP-5": {
     "prefix": "COMP-5",
     "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-5."],
-    "description": "Typically used to communicate data between Java/C/C++/Python/etc. and COBOL. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration.-zos/6.4?topic=arithmetic-formats-numeric-data"
+    "description": "Typically used to communicate data between Java/C/C++/Python/etc. and COBOL. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration."
   },
   "COMPUTE": {
     "prefix": "COMPUTE",
@@ -322,7 +322,7 @@
       "END-COMPUTE",
       "$0"
     ],
-    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow.-zos/6.4?topic=statements-compute-statement"
+    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow."
   },
   "COMPUTE (CICS)": {
     "prefix": "COMPUTE",
@@ -333,7 +333,7 @@
       "END-COMPUTE",
       "$0"
     ],
-    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow.-zos/6.4?topic=statements-compute-statement"
+    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow."
   },
   "COMPUTE EQUAL": {
     "prefix": "COMPUTE EQUAL",
@@ -343,7 +343,7 @@
   "CONFIGURATION": {
     "prefix": "CONFIGURATION",
     "body": ["CONFIGURATION SECTION."],
-    "description": "ENVIRONMENT DIVISION - The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes.-zos/6.4?topic=division-configuration-section"
+    "description": "ENVIRONMENT DIVISION - The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes."
   },
   "CONTAINS": {
     "prefix": "CONTAINS",
@@ -353,7 +353,7 @@
       "\tBLOCK CONTAINS 0 RECORDS",
       "\tDATA RECORD IS ${3:inputFileRec}."
     ],
-    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs.-zos/6.4?topic=entries-block-contains-clause"
+    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs."
   },
   "CONTENT": {
     "prefix": "CONTENT",
@@ -366,7 +366,7 @@
       "COMPUTE ${1:resultNum} = CALC2(CONTENT-OF(${2:arg-1}),${3:arg-2},${4:arg-3})",
       "END-COMPUTE"
     ],
-    "description": "The CONTENT-OF intrinsic function produces a temporary copy of the input argument.-zos/6.4?topic=functions-content"
+    "description": "The CONTENT-OF intrinsic function produces a temporary copy of the input argument."
   },
   "CONTINUE": {
     "prefix": "CONTINUE",
@@ -377,7 +377,7 @@
       "\tCONTINUE",
       "END-IF."
     ],
-    "description": "The CONTINUE statement is a no-op. It indicates that no instruction is present and that execution falls to the next sequential instruction.-zos/6.4?topic=statements-continue-statement"
+    "description": "The CONTINUE statement is a no-op. It indicates that no instruction is present and that execution falls to the next sequential instruction."
   },
   "CONTROL": {
     "prefix": "CONTROL",
@@ -393,7 +393,7 @@
       "END-INSPECT",
       "$0"
     ],
-    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values.-zos/6.4?topic=inspect-examples-statement"
+    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values."
   },
   "COPY": {
     "prefix": "COPY",
@@ -421,7 +421,7 @@
       "END-UNSTRING",
       "$0"
     ],
-    "description": "Part of the UNSTRING statement, the COUNT phrase specifies the field where the count of examined character positions is held.-zos/6.4?topic=statements-unstring-statement"
+    "description": "Part of the UNSTRING statement, the COUNT phrase specifies the field where the count of examined character positions is held."
   },
   "COUNT IN": {
     "prefix": "COUNT IN",
@@ -464,7 +464,7 @@
       "    GO;",
       "END-PERFORM;"
     ],
-    "description": "AT DATE is used with the IBM COBOL Debugger. It gives the Debugger control for each date processing statement within the specified block.-for-zos/14.2?topic=command-date-cobol In the above example: Each time a date processing statement is encountered in the compile unit; 1. Display the location of the statement 2. List a specific variable, and 3. Resume running the program."
+    "description": "AT DATE is used with the IBM COBOL Debugger. It gives the Debugger control for each date processing statement within the specified block. In the above example: Each time a date processing statement is encountered in the compile unit; 1. Display the location of the statement 2. List a specific variable, and 3. Resume running the program."
   },
   "DATE COMPILED YYYY/MM/DD": {
     "prefix": "DATE COMPILED",
@@ -489,12 +489,12 @@
   "DAY": {
     "prefix": "DAY",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable - YY NNN) - from z/OS.-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable - YY NNN) - from z/OS."
   },
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY-OF-WEEK (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc.-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc."
   },
   "DBCS": {
     "prefix": "DBCS",
@@ -524,7 +524,7 @@
       "\tDisplay ${4:VAR1}, ${5:VAR2}, ${6:VAR3}.",
       "END-DECLARATIVES."
     ],
-    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs.-zos/6.4?topic=procedures-example-use-debugging"
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs."
   },
   "DECLARATIVES 2": {
     "prefix": "DECLARATIVES",
@@ -536,7 +536,7 @@
       "\tDisplay ${3:VAR1}, ${4:VAR2}, ${5:VAR3}.",
       "END-DECLARATIVES."
     ],
-    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs.-zos/6.4?topic=procedures-example-use-debugging"
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs."
   },
   "DELETE": {
     "prefix": "DELETE fileName",
@@ -577,7 +577,7 @@
   "DISPLAY-1": {
     "prefix": "DISPLAY-1",
     "body": ["77 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
-    "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage.-leipzig.de/cs/Literature/Textbooks/Cobol/LangRefzOS.pdf"
+    "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage."
   },
   "DIVIDE": {
     "prefix": "DIVIDE",
@@ -619,7 +619,7 @@
   "ALTERNATE RECORD with DUPLICATES": {
     "prefix": "DUPLICATES",
     "body": ["ALTERNATE RECORD KEY IS ${1:FLD-1}", "WITH DUPLICATES."],
-    "description": "DUPLICATES allows an indexed VSAM file to be defined with duplicate values declared in a defined variable within the record in the FD.-zos/6.4?topic=files-using-alternate-keys"
+    "description": "DUPLICATES allows an indexed VSAM file to be defined with duplicate values declared in a defined variable within the record in the FD."
   },
   "SORT with DUPLICATES": {
     "prefix": "DUPLICATES",
@@ -627,7 +627,7 @@
       "SORT ${1:FILENAME} ON ${2|ASCENDING,DESCENDING|} ${3:KEY-FLD}",
       "WITH DUPLICATES${4|., IN ORDER.|}"
     ],
-    "description": "IN ORDER forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that IN ORDER is an optional clause of WITH DUPLICATES.-zos/6.4?topic=merge-preserving-original-sequence-records-equal-keys"
+    "description": "IN ORDER forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that IN ORDER is an optional clause of WITH DUPLICATES."
   },
   "DYNAMIC": {
     "prefix": "DYNAMIC",
@@ -639,7 +639,7 @@
       "RECORD KEY IS ${3:VSAMFILE-KEY}",
       "FILE STATUS IS ${4:WS-VSAMFILE-FIELD}"
     ],
-    "description": "Allows the specific READ/WRITE statement to determine the access mode. Records can be processed sequentially or randomly or both.-zos/6.4?topic=files-vsam-dynamic-access-optional-logic-path"
+    "description": "Allows the specific READ/WRITE statement to determine the access mode. Records can be processed sequentially or randomly or both."
   },
   "EGCS": {
     "prefix": "EGCS",
@@ -648,7 +648,7 @@
       "END-INITIALIZE.",
       "$0"
     ],
-    "description": "Initializes a variable while replacing the EGCS (Extended Graphic Character Set) information by a value or variable.-zos/6.4?topic=statements-initialize-statement"
+    "description": "Initializes a variable while replacing the EGCS (Extended Graphic Character Set) information by a value or variable."
   },
   "IF-ELSE": {
     "prefix": "ELSE",
@@ -660,7 +660,7 @@
       "END-IF.",
       "$0"
     ],
-    "description": "IF ... ELSE codes a choice between two COBOL processing actions.-zos/6.4?topic=actions-coding-choice"
+    "description": "IF ... ELSE codes a choice between two COBOL processing actions."
   },
   "ENTRY": {
     "prefix": "ENTRY",
