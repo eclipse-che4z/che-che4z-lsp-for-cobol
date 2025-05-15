@@ -53,6 +53,10 @@ public class TestCicsPutContainerStatement {
           + " {DATATYPE|errorOne}({$varOne}) APPEND";
   private static final String PUT_BTS_INVALID_2 =
       "PUT {_CONTAINER({$varOne}) ACQACTIVITY|errorOne_}";
+  private static final String PUT_BTS_TRANS_NOLENGTH_INVALID =
+      "PUT {_CONTAINER({$varOne}) ACQACTIVITY FROM({$varOne})|error_}";
+  private static final String PUT_CHANNEL_TRANS_NOLENGTH_INVALID =
+      "PUT {_CONTAINER({$varOne}) FROM({$varOne})|error_}";
 
   // Test Functions
   @Test
@@ -118,5 +122,31 @@ public class TestCicsPutContainerStatement {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(PUT_CHANNEL_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testBTSNoLengthInvalid() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "error",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: FLENGTH",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(PUT_BTS_TRANS_NOLENGTH_INVALID, expectedDiagnostics, "NOLENGTH");
+  }
+
+  @Test
+  void testChannelNoLengthInvalid() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "error",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: FLENGTH",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(PUT_CHANNEL_TRANS_NOLENGTH_INVALID, expectedDiagnostics, "NOLENGTH");
   }
 }

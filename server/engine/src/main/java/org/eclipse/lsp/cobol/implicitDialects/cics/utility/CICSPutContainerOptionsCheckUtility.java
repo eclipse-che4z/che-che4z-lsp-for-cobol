@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_put_container;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -91,6 +92,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
         ctx.ACQPROCESS());
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
   }
 
   private void checkChannel(CICSParser.Cics_put_container_channelContext ctx) {
@@ -101,5 +103,6 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
 
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
   }
 }
