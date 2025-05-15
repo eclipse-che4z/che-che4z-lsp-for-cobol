@@ -52,6 +52,8 @@ public class TestCICSRetrieve {
 
   private static final String RETRIEVE_SUBEVENT_INVALID =
       "RETRIEVE {_SUBEVENT({$varOne}) EVENTTYPE(123)|errorOne_}";
+  private static final String RETRIEVE_TRANS_NOLENGTH_INVALID =
+      "RETRIEVE {_INTO({$varOne}) QUEUE({$varTwo}) WAIT|error_}";
 
   @Test
   void testRetrieveStandardValidOne() {
@@ -116,5 +118,19 @@ public class TestCICSRetrieve {
                 "Missing required option: EVENT",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testRetrieveNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        RETRIEVE_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }
