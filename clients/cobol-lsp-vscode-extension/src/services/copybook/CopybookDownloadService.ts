@@ -41,6 +41,7 @@ import {
 import { DownloadDiagnosticsService } from "../DiagnosticsService";
 import { searchLocalCopybooks } from "./LocalCopybooksService";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
+import { getErrorMessage } from "../util/ErrorsUtils";
 
 export class CopybookName {
   constructor(
@@ -347,20 +348,25 @@ export class CopybookDownloadService {
         if (result.value instanceof vscode.Uri) {
           return result.value;
         } else {
-          const e4eResult = await this.e4eDownloader?.downloadElementE4E(
-            result.value.endevorElement.resolvedProfile,
-            result.value.endevorElement.element,
-          );
-          if (e4eResult) {
-            return e4eResult;
+          try {
+            const e4eResult = await this.e4eDownloader?.downloadElementE4E(
+              result.value.endevorElement.resolvedProfile,
+              result.value.endevorElement.element,
+            );
+
+            if (e4eResult) {
+              return e4eResult;
+            }
+          } catch (err) {
+            this.outputChannel?.appendLine(
+              `Error while downloading copybook from Endevor - ${copybookName} - ${getErrorMessage(err)}`,
+            );
           }
         }
-      } else {
-        if (result.status === "rejected") {
-          this.outputChannel?.appendLine(
-            `Error while resolving copybook ${copybookName} - ${JSON.stringify(result.reason)}`,
-          );
-        }
+      } else if (result.status === "rejected") {
+        this.outputChannel?.appendLine(
+          `Error while resolving copybook ${copybookName} - ${JSON.stringify(result.reason)}`,
+        );
       }
     }
     this.outputChannel?.appendLine(

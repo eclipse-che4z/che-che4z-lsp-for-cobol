@@ -1630,6 +1630,30 @@ describe("Tests copybook download service", () => {
           );
           expect(result).toBeUndefined();
         });
+
+        it("logs the error if copybook download fails", async () => {
+          const getElement = jest.fn().mockRejectedValue("error");
+          const outputChannel = vscode.window.createOutputChannel("log");
+
+          const cds = new CopybookDownloadService(
+            vscode.Uri.file("/globalStorage"),
+            zoweExplorerMock,
+            { ...e4eMock, getElement },
+            outputChannel,
+          );
+
+          await cds.resolveCopybookURI(
+            "file:///endevor.cbl",
+            "COPYBOOK",
+            DEFAULT_DIALECT,
+          );
+
+          expect(outputChannel.appendLine).toHaveBeenCalledWith(
+            expect.stringContaining(
+              "Error while downloading copybook from Endevor",
+            ),
+          );
+        });
       });
 
       describe("copybooks search respects processor group definitions order", () => {
