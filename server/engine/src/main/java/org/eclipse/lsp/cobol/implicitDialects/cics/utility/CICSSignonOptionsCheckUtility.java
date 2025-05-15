@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon_body;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon_token_body;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -99,6 +100,8 @@ public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkPrerequisiteIsMet(ctx.PHRASE(), ctx.NEWPHRASE(), ctx, "NEWPHRASE without PHRASE");
     checkPrerequisiteIsMet(
         ctx.NEWPHRASE(), ctx.NEWPHRASELEN(), ctx, "NEWPHRASELEN without NEWPHRASE");
+    if (noLengthOptionsEnabled && !ctx.PHRASE().isEmpty())
+      checkHasMandatoryOptions(ctx.PHRASELEN(), ctx, "PHRASELEN");
   }
 
   private void checkToken(CICSParser.Cics_signon_token_bodyContext ctx) {

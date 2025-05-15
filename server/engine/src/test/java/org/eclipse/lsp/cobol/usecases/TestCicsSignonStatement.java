@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import java.util.*;
+
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -56,6 +58,8 @@ public class TestCicsSignonStatement {
           + " {KERBEROS|errorTwo}";
   private static final String SIGNONTOKEN_INVALID_2 =
       "SIGNON TOKEN({$varOne}) TOKENLEN({$varOne}) TOKENTYPE({$varOne}) BIT {BASE64|errorOne}";
+  private static final String SIGNON_TRANS_NOLENGTH_INVALID =
+      "SIGNON {_USERID({$varOne})PHRASE({$varFour})|error_}";
 
   // Test Functions
   @Test
@@ -128,5 +132,19 @@ public class TestCicsSignonStatement {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(SIGNONTOKEN_INVALID_2, expectedDiagnostics);
+  }
+
+  @Test
+  void testSignonNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        SIGNON_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PHRASELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }
