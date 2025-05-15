@@ -173,32 +173,44 @@ describe("e4e copybook downloader tests", () => {
   });
   it("check downloadDatasetE4E does not perform IO in case of Error", async () => {
     const getMember = jest.fn(() => Error("failed"));
+    const outputChannel = vscode.window.createOutputChannel("log");
     const e4eDownloader = new CopybookDownloaderForE4E(
       vscode.Uri.file("/storagePath"),
       {
         getMember,
       } as unknown as E4E,
+      outputChannel,
     );
     e4eDownloader.getE4EConfig = async () =>
       await Promise.resolve(e4eResponseDatasetFirst);
     await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
     expect(getMember).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
+    expect(outputChannel.appendLine).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "Error while downloading copybook from Endevor copybook",
+      ),
+    );
   });
 
   it("check downloadElementE4E does not perform IO in case of Error", async () => {
     const getElement = jest.fn(() => Error("failed"));
+    const outputChannel = vscode.window.createOutputChannel("log");
     const e4eDownloader = new CopybookDownloaderForE4E(
       vscode.Uri.file("/storagePath"),
       {
         getElement,
       } as unknown as E4E,
+      outputChannel,
     );
     e4eDownloader.getE4EConfig = async () =>
       Promise.resolve(e4eResponseEndevorFirst);
     await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
     expect(getElement).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
+    expect(outputChannel.appendLine).toHaveBeenCalledWith(
+      expect.stringContaining("Error while downloading copybook from Endevor"),
+    );
   });
 
   it("check hasElement returns correct value when element is in the list", async () => {
