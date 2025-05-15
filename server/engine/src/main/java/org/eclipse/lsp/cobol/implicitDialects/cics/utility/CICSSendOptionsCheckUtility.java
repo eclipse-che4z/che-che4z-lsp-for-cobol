@@ -15,7 +15,10 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_send;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +148,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       default:
         break;
     }
+    if (noLengthOptionsEnabled) checkNoLength(ctx);
     checkDuplicates(ctx);
   }
 
@@ -299,5 +303,23 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       }
     }
     return false;
+  }
+
+  private void checkNoLength(ParserRuleContext ctx) {
+    List<TerminalNode> length = invokeIfExists(ctx, "LENGTH");
+    List<TerminalNode> flength = invokeIfExists(ctx, "FLENGTH");
+    if (flength != null && length != null)
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, length, flength);
+    else if (flength == null && length != null) checkHasMandatoryOptions(length, ctx, "LENGTH");
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<TerminalNode> invokeIfExists(ParserRuleContext ctx, String methodName) {
+    try {
+      Method method = ctx.getClass().getMethod(methodName);
+      return (List<TerminalNode>) method.invoke(ctx);
+    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      return null;
+    }
   }
 }
