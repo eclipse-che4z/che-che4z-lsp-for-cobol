@@ -93,7 +93,7 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.LENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.COMMAREA(), ctx, "COMMAREA");
     }
-    if(noLengthOptionsEnabled && !ctx.COMMAREA().isEmpty())
+    if (noLengthOptionsEnabled && !ctx.COMMAREA().isEmpty())
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
@@ -106,7 +106,7 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.SCOPELEN().isEmpty()) {
       checkHasMandatoryOptions(ctx.SCOPE(), ctx, "SCOPE");
     }
-    if(noLengthOptionsEnabled && !ctx.SCOPE().isEmpty())
+    if (noLengthOptionsEnabled && !ctx.SCOPE().isEmpty())
       checkHasMandatoryOptions(ctx.SCOPELEN(), ctx, "SCOPELEN");
   }
 }

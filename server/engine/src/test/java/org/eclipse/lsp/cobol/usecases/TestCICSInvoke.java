@@ -70,9 +70,10 @@ public class TestCICSInvoke {
           + " OPERATION({$varThree}) URI({$varFour})";
 
   private static final String INVOKE_APPLICATION_TRANS_INVALID =
-          "INVOKE {_APPLICATION({$varOne}) OPERATION({$varTwo}) COMMAREA(100)|error_}";
+      "INVOKE {_APPLICATION({$varOne}) OPERATION({$varTwo}) COMMAREA(100)|error_}";
   private static final String INVOKE_SERVICE_TRANS_INVALID =
-          "INVOKE {_SERVICE({$varOne}) CHANNEL({$varTwo}) OPERATION({$varTwo}) SCOPE(100)|error_}";
+      "INVOKE {_SERVICE({$varOne}) CHANNEL({$varTwo}) OPERATION({$varTwo}) SCOPE(100)|error_}";
+
   @Test
   void testInvokeApplicationValidOne() {
     CICSTestUtils.noErrorTest(INVOKE_APPLICATION_VALID_ONE);
@@ -211,28 +212,32 @@ public class TestCICSInvoke {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
+
   @Test
   void testInvokeApplicationTransLengthInvalid() {
     CICSTestUtils.errorTest(
-            INVOKE_APPLICATION_TRANS_INVALID,
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: LENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())),"NOLENGTH");
+        INVOKE_APPLICATION_TRANS_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
+
   @Test
   void testInvokeServiceTransLengthInvalid() {
     CICSTestUtils.errorTest(
-            INVOKE_SERVICE_TRANS_INVALID,
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: SCOPELEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())),"NOLENGTH");
+        INVOKE_SERVICE_TRANS_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SCOPELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

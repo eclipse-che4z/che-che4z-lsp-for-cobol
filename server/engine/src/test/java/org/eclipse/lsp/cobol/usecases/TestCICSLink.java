@@ -54,6 +54,8 @@ public class TestCICSLink {
 
   private static final String LINK_ACTIVITY_INVALID =
       "LINK {ACTIVITY|errorOne}({$varOne}) {ACQACTIVITY|errorTwo}";
+  private static final String LINK_PROGRAM_TRANS_NOLENGTH_INVALID =
+      "LINK {_PROGRAM({$varOne}) COMMAREA({$varFour}) INPUTMSG({$varFour})|errorOne|errorTwo_}";
 
   @Test
   void testLinkProgramValidOne() {
@@ -163,5 +165,25 @@ public class TestCICSLink {
                     + " ACQACTIVITY",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testLinkProgramNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        LINK_PROGRAM_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INPUTMSGLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }
