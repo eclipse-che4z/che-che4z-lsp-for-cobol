@@ -42,6 +42,9 @@ public class TestCICSSpoolread {
   private static final String SPOOLREAD_INVALID_NO_INTO =
       "SPOOLREAD {_TOKEN({$varOne}) MAXFLENGTH({$varTwo}) NOHANDLE|errorOne_}";
 
+  private static final String SPOOLREAD_TRANS_NOLENGTH_INVALID =
+      "SPOOLREAD {_TOKEN({$varOne}) INTO({$varTwo})|error_}";
+
   @Test
   void testSpoolreadValidMinimal() {
     CICSTestUtils.noErrorTest(SPOOLREAD_VALID_MINIMAL);
@@ -76,5 +79,19 @@ public class TestCICSSpoolread {
                 "Missing required option: INTO",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSpoolreadNoLength() {
+    CICSTestUtils.errorTest(
+        SPOOLREAD_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: MAXFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

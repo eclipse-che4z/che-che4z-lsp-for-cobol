@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_spoolread;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,5 +62,6 @@ public class CICSSpoolreadOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private void checkSpoolread(CICSParser.Cics_spoolread_optionsContext ctx) {
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
     checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO");
+    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.MAXFLENGTH(), ctx, "MAXFLENGTH");
   }
 }
