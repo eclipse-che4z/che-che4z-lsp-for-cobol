@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -113,6 +114,16 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
     checkPrerequisiteIsMet(
         ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN without FAULTSTRING");
+    if (noLengthOptionsEnabled) {
+      checkHasMandatoryOptions(ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN");
+      if (!ctx.FAULTCODESTR().isEmpty())
+        checkHasMandatoryOptions(ctx.FAULTCODELEN(), ctx, "FAULTCODELEN");
+      if (!ctx.FAULTACTOR().isEmpty())
+        checkHasMandatoryOptions(ctx.FAULTACTLEN(), ctx, "FAULTACTLEN");
+      if (!ctx.DETAIL().isEmpty())
+        checkHasMandatoryOptions(ctx.DETAILLENGTH(), ctx, "DETAILLENGTH");
+      if (!ctx.ROLE().isEmpty()) checkHasMandatoryOptions(ctx.ROLELENGTH(), ctx, "ROLELENGTH");
+    }
   }
 
   private void checkAdd(CICSParser.Cics_soapfault_addContext ctx) {
@@ -123,6 +134,12 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
         ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODELEN without SUBCODESTR");
 
     checkHasExactlyOneOption("FAULTSTRING or SUBCODESTR", ctx, ctx.FAULTSTRING(), ctx.SUBCODESTR());
+    if (noLengthOptionsEnabled) {
+      if (!ctx.SUBCODESTR().isEmpty())
+        checkHasMandatoryOptions(ctx.SUBCODELEN(), ctx, "SUBCODELEN");
+      if (!ctx.FAULTSTRING().isEmpty())
+        checkHasMandatoryOptions(ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN");
+    }
   }
 
   private void checkDelete(CICSParser.Cics_soapfault_deleteContext ctx) {
