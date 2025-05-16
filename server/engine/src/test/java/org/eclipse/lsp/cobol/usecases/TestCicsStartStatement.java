@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import java.util.*;
+
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -65,6 +67,10 @@ public class TestCicsStartStatement {
 
   private static final String START_CHANNEL_INVALID_1 =
       "START TRANSID({$varOne}) CHANNEL({$varOne}) TERMID({$varOne}) {USERID|errorOne}({$varOne})";
+  private static final String START_TRANSID_TRANS_NOLENGTH_INVALID =
+      "START {_TRANSID({$varOne}) FROM({$varOne})|error_}";
+  private static final String START_ATTACH_TRANS_NOLENGTH_INVALID =
+      "START {_TRANSID({$varOne}) ATTACH FROM({$varOne})|error_}";
 
   // Test Functions
   @Test
@@ -155,5 +161,33 @@ public class TestCicsStartStatement {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(START_CHANNEL_INVALID_1, expectedDiagnostics);
+  }
+
+  @Test
+  void testStartTransIdNoLength() {
+    CICSTestUtils.errorTest(
+        START_TRANSID_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testStartAttachNoLength() {
+    CICSTestUtils.errorTest(
+        START_ATTACH_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }
