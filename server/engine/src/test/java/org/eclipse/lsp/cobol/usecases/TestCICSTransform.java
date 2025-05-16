@@ -16,6 +16,8 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import java.util.HashMap;
+
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -73,6 +75,16 @@ public class TestCICSTransform {
           + " DATCONTAINER({$varOne}) ELEMNAME({$varOne}) ELEMNAMELEN({$varOne}) ELEMNS({$varOne})"
           + " ELEMNSLEN({$varOne}) TYPENAME({$varOne}) TYPENAMELEN({$varOne}) TYPENS({$varOne})"
           + " TYPENSLEN({$varOne}) XMLCONTAINER({$varOne}) XMLTRANSFORM({$varOne})";
+  private static final String TRANSFORM_DATATOXML_TRANS_NOLENGTH_INVALID =
+      "TRANSFORM {_DATATOXML CHANNEL({$varOne}) DATCONTAINER({$varOne}) ELEMNAME({$varOne})"
+          + "  ELEMNS({$varOne}) TYPENAME({$varOne})"
+          + "  TYPENS({$varOne}) XMLCONTAINER({$varOne})"
+          + " XMLTRANSFORM({$varOne})|error|errorTwo|errorThree|errorFour_}";
+  private static final String TRANSFORM_XMLTODATA_TRANS_NOLENGTH_INVALID =
+      "TRANSFORM {_XMLTODATA CHANNEL({$varOne}) DATCONTAINER({$varOne}) ELEMNAME({$varOne})"
+          + "  ELEMNS({$varOne}) TYPENAME({$varOne})"
+          + "  TYPENS({$varOne}) XMLCONTAINER({$varOne})"
+          + " XMLTRANSFORM({$varOne})|error|errorTwo|errorThree|errorFour_}";
 
   private void callErrorTest(String newCommand, String errorMessage) {
     HashMap<String, Diagnostic> tempDiagnostic = new HashMap<>();
@@ -151,5 +163,69 @@ public class TestCICSTransform {
         TRANSFORM_BOTH_XML_INVALID,
         "Exactly one option required, options are mutually exclusive: DATATOXML or XMLTODATA",
         "Exactly one option required, options are mutually exclusive: DATATOXML or XMLTODATA");
+  }
+
+  @Test
+  void testTransformDataToXMLNoLength() {
+    CICSTestUtils.errorTest(
+        TRANSFORM_DATATOXML_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ELEMNAMELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ELEMNSLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorThree",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TYPENAMELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorFour",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TYPENSLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testTransformXMLToDataNoLength() {
+    CICSTestUtils.errorTest(
+        TRANSFORM_XMLTODATA_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ELEMNAMELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ELEMNSLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorThree",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TYPENAMELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorFour",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TYPENSLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

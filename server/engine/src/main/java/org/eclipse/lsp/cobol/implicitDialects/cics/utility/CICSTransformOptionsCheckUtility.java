@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_transform;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -107,5 +108,13 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     checkPrerequisiteIsMet(ctx.ELEMNS(), ctx.ELEMNSLEN(), ctx, "ELEMNSLEN without ELEMNS");
     checkPrerequisiteIsMet(ctx.TYPENAME(), ctx.TYPENAMELEN(), ctx, "TYPENAMELEN without TYPENAME");
     checkPrerequisiteIsMet(ctx.TYPENS(), ctx.TYPENSLEN(), ctx, "TYPENSLEN without TYPENS");
+    if (noLengthOptionsEnabled) {
+      if (!ctx.ELEMNAME().isEmpty())
+        checkHasMandatoryOptions(ctx.ELEMNAMELEN(), ctx, "ELEMNAMELEN");
+      if (!ctx.ELEMNS().isEmpty()) checkHasMandatoryOptions(ctx.ELEMNSLEN(), ctx, "ELEMNSLEN");
+      if (!ctx.TYPENAME().isEmpty())
+        checkHasMandatoryOptions(ctx.TYPENAMELEN(), ctx, "TYPENAMELEN");
+      if (!ctx.TYPENS().isEmpty()) checkHasMandatoryOptions(ctx.TYPENSLEN(), ctx, "TYPENSLEN");
+    }
   }
 }
