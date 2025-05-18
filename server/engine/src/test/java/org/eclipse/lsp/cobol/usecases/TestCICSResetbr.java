@@ -22,6 +22,8 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 /**
  * Test CICS RESETBR command. Documentation link: <a
  * href="https://www.ibm.com/docs/en/cics-ts/6.x?topic=summary-resetbr">RESETBR Command</a>
@@ -53,6 +55,9 @@ public class TestCICSResetbr {
 
   private static final String RESETBR_INVALID_MULTIPLE_COMPARISON_OPTIONS =
       "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {EQUAL|errorTwo}";
+
+  private static final String RESETBR_SYSID_WITHOUT_REQUIRED_OPTION =
+      "RESETBR {_FILE({$varFour}) RIDFLD({$varFive}) SYSID({$varFour})|error1_}";
 
   @Test
   void testResetbrValidMinimal() {
@@ -162,5 +167,18 @@ public class TestCICSResetbr {
                 "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testReadprevSysidWithoutRequiredOption() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: RBA, RRN, XRBA or KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RESETBR_SYSID_WITHOUT_REQUIRED_OPTION, expectedDiagnostics);
   }
 }
