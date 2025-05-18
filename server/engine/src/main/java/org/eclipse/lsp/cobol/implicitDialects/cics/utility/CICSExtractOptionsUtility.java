@@ -221,6 +221,12 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.CADDRLENGTH(), "CADDRLENGTH without CLIENTADDR");
     if (ctx.SERVERADDR().isEmpty())
       checkHasIllegalOptions(ctx.SADDRLENGTH(), "SADDRLENGTH without SERVERADDR");
+    if (!ctx.SERVERNAME().isEmpty())
+      checkHasMandatoryOptions(ctx.SNAMELENGTH(), ctx, "SNAMELENGTH");
+    if (!ctx.CLIENTADDR().isEmpty())
+      checkHasMandatoryOptions(ctx.CADDRLENGTH(), ctx, "CADDRLENGTH");
+    if (!ctx.SERVERADDR().isEmpty())
+      checkHasMandatoryOptions(ctx.SADDRLENGTH(), ctx, "SADDRLENGTH");
   }
 
   private void checkTCT(CICSParser.Cics_extract_tctContext ctx) {

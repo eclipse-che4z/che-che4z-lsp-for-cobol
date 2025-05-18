@@ -110,6 +110,15 @@ public class TestCICSExtract {
 
   private static final String EXTRACT_TCPIP_INVALID_ONE =
       "EXTRACT TCPIP AUTHENTICATE(100) {SADDRLENGTH|errorOne}(100)";
+      
+  private static final String EXTRACT_TCPIP_SERVERNAME_WITHOUT_SNAMELENGTH =
+      "EXTRACT {_TCPIP SERVERNAME({$varOne})|errorOne_}";
+      
+  private static final String EXTRACT_TCPIP_CLIENTADDR_WITHOUT_CADDRLENGTH =
+      "EXTRACT {_TCPIP CLIENTADDR({$varOne})|errorOne_}";
+      
+  private static final String EXTRACT_TCPIP_SERVERADDR_WITHOUT_SADDRLENGTH =
+      "EXTRACT {_TCPIP SERVERADDR({$varOne})|errorOne_}";
 
   private static final String EXTRACT_TCT_ALL_OPTIONS_VALID_ONE =
       "EXTRACT TCT NETNAME({$varOne}) SYSID({$varOne})";
@@ -349,6 +358,45 @@ public class TestCICSExtract {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_TCPIP_INVALID_ONE, expectedDiagnostics);
+  }
+  
+  @Test
+  void testExtractTCPIPServernameWithoutSnamelength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SNAMELENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_TCPIP_SERVERNAME_WITHOUT_SNAMELENGTH, expectedDiagnostics);
+  }
+  
+  @Test
+  void testExtractTCPIPClientaddrWithoutCaddrlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: CADDRLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_TCPIP_CLIENTADDR_WITHOUT_CADDRLENGTH, expectedDiagnostics);
+  }
+  
+  @Test
+  void testExtractTCPIPServeraddrWithoutSaddrlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SADDRLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_TCPIP_SERVERADDR_WITHOUT_SADDRLENGTH, expectedDiagnostics);
   }
 
   @Test
