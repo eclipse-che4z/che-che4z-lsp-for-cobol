@@ -90,6 +90,12 @@ public class TestCICSExtract {
   private static final String EXTRACT_PROCESS_INVALID_ONE =
       "EXTRACT PROCESS {MAXPROCLEN|errorOne}(100)";
 
+  private static final String EXTRACT_PROCESS_PIPLIST_WITHOUT_PIPLENGTH =
+      "EXTRACT {_PROCESS PIPLIST({$varOne})|errorOne_}";
+
+  private static final String EXTRACT_PROCESS_PROCNAME_WITHOUT_PROCLENGTH =
+      "EXTRACT {_PROCESS PROCNAME({$varOne})|errorOne_}";
+
   private static final String EXTRACT_TCPIP_ALL_OPTIONS_VALID_ONE =
       "EXTRACT TCPIP AUTHENTICATE({$varOne}) CLIENTNAME({$varOne}) CNAMELENGTH({$varOne})"
           + " SERVERNAME({$varOne}) SNAMELENGTH({$varOne}) CLIENTADDR({$varOne})"
@@ -294,6 +300,32 @@ public class TestCICSExtract {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_PROCESS_INVALID_ONE, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractProcessPiplistWithoutPiplength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PIPLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_PROCESS_PIPLIST_WITHOUT_PIPLENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractProcessProcnameWithoutProclength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PROCLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_PROCESS_PROCNAME_WITHOUT_PROCLENGTH, expectedDiagnostics);
   }
 
   @Test
