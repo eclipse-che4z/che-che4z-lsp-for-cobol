@@ -267,5 +267,11 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.HTTPVERSION().isEmpty())
       checkHasIllegalOptions(ctx.VERSIONLEN(), "VERSIONLEN without HTTPVERSION");
     if (ctx.PATH().isEmpty()) checkHasIllegalOptions(ctx.PATHLENGTH(), "PATHLEN without PATH");
+    if (!ctx.HTTPMETHOD().isEmpty())
+      checkHasMandatoryOptions(ctx.METHODLENGTH(), ctx, "METHODLENGTH");
+    if (!ctx.HOST().isEmpty())
+      checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
+    if (!ctx.PATH().isEmpty())
+      checkHasMandatoryOptions(ctx.PATHLENGTH(), ctx, "PATHLENGTH");
   }
 }

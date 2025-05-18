@@ -139,6 +139,15 @@ public class TestCICSExtract {
 
   private static final String EXTRACT_WEB_SERVER_INVALID_ONE =
       "EXTRACT WEB {HOSTTYPE|errorOne}(100)";
+      
+  private static final String EXTRACT_WEB_HTTPMETHOD_WITHOUT_METHODLENGTH =
+      "EXTRACT {_WEB HTTPMETHOD({$varOne})|errorOne_}";
+      
+  private static final String EXTRACT_WEB_HOST_WITHOUT_HOSTLENGTH =
+      "EXTRACT {_WEB HOST({$varOne})|errorOne_}";
+      
+  private static final String EXTRACT_WEB_PATH_WITHOUT_PATHLENGTH =
+      "EXTRACT {_WEB PATH({$varOne})|errorOne_}";
 
   private static final String EXTRACT_WEB_CLIENT_ALL_OPTIONS_VALID_ONE =
       "EXTRACT WEB SESSTOKEN({$varOne}) SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne})"
@@ -397,6 +406,45 @@ public class TestCICSExtract {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_TCPIP_SERVERADDR_WITHOUT_SADDRLENGTH, expectedDiagnostics);
+  }
+  
+  @Test
+  void testExtractWebHttpmethodWithoutMethodlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: METHODLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_WEB_HTTPMETHOD_WITHOUT_METHODLENGTH, expectedDiagnostics);
+  }
+  
+  @Test
+  void testExtractWebHostWithoutHostlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: HOSTLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_WEB_HOST_WITHOUT_HOSTLENGTH, expectedDiagnostics);
+  }
+  
+  @Test
+  void testExtractWebPathWithoutPathlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PATHLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_WEB_PATH_WITHOUT_PATHLENGTH, expectedDiagnostics);
   }
 
   @Test
