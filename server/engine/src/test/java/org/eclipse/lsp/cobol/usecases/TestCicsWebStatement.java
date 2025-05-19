@@ -200,6 +200,9 @@ public class TestCicsWebStatement {
   private static final String WEB_CONVERSE_STATUSCODE_WITHOUT_STATUSTEXT =
       "WEB {_CONVERSE SESSTOKEN({$varOne}) TOLENGTH({$varTwo}) PUT SET({$varThree}) STATUSCODE({$varThree})|errorOne_}";
 
+  private static final String WEB_SEND_USERNAME_PASSWORD_INVALID =
+      "WEB {_SEND SESSTOKEN({$varOne}) USERNAME({$varTwo}) PASSWORD({$varThree})|errorOne_}";
+
   // Test Functions
   @Test
   void testCloseValid() {
@@ -369,5 +372,18 @@ public class TestCicsWebStatement {
                 "If one option is specified, all options must be present: STATUSCODE, STATUSTEXT, STATUSLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSendUsernamePasswordInvalid() {
+    CICSTestUtils.errorTest(
+            WEB_SEND_USERNAME_PASSWORD_INVALID,
+            ImmutableMap.of(
+                    "errorOne",
+                    new Diagnostic(
+                            new Range(),
+                            "Exactly one option required, none provided: NONE, BASICAUTH, AUTHENTICATE",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 }
