@@ -261,6 +261,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
 
+    if (!ctx.TOLENGTH().isEmpty())
+      checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+
     checkAllOptionsArePresentOrAbsent(
         "STATUSCODE, STATUSTEXT, STATUSLEN",
         ctx,
