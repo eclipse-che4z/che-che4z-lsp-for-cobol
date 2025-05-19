@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_wsaepr;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,5 +85,11 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.METADATALEN(), "METADATALEN without METADATA");
     checkHasMutuallyExclusiveOptions(
         "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
+    if (noLengthOptionsEnabled) {
+      if (!ctx.REFPARMS().isEmpty())
+        checkHasMandatoryOptions(ctx.REFPARMSLEN(), ctx, "REFPARMSLEN");
+      if (!ctx.METADATA().isEmpty())
+        checkHasMandatoryOptions(ctx.METADATALEN(), ctx, "METADATALEN");
+    }
   }
 }

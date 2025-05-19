@@ -50,6 +50,8 @@ public class TestCicsXctl {
       "XCTL PROGRAM({$varOne}) CHANNEL({$varThree}) {INPUTMSGLEN|error1}({$varSix})";
   private static final String INVALID_THREE =
       "XCTL PROGRAM({$varOne}) {LENGTH|error1}({$varThree})";
+  private static final String XCTL_NOLENGTH_INVALID =
+      "XCTL {_PROGRAM({$varOne}) COMMAREA({$varTwo})  INPUTMSG({$varFive})|error|errorTwo_}";
 
   @Test
   void testAllOptionsValidOne() {
@@ -113,5 +115,24 @@ public class TestCicsXctl {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(INVALID_THREE, expectedDiagnostic);
+  }
+
+  @Test
+  void testNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INPUTMSGLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(XCTL_NOLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }

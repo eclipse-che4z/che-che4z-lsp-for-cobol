@@ -55,6 +55,8 @@ public class TestCicsWSAEPR {
   private static final String WSAEPR_CREATE_INVALID_FOUR =
       "WSAEPR EPRSET(1) EPRLENGTH(1) METADATA(2) CREATE {FROMCCSID|error1}(1)"
           + " {FROMCODEPAGE|error1}(2)";
+  private static final String WSAEPR_CREATE_NOLENGTH_INVALID =
+      "WSAEPR {_CREATE EPRINTO({$varFour}) REFPARMS({$varFour}) EPRLENGTH({$varOne}) METADATA({$varFour})|error|errorTwo_}";
 
   @Test
   void testWSAEPRCreateAllOptionsValid() {
@@ -157,5 +159,24 @@ public class TestCicsWSAEPR {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(WSAEPR_CREATE_INVALID_FOUR, expectedDiagnostic);
+  }
+
+  @Test
+  void testWSAEPRCreateNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: METADATALEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: REFPARMSLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(WSAEPR_CREATE_NOLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }
