@@ -18,20 +18,14 @@ options {tokenVocab = CompilerDirectivesLexer;}
 compilerOptions: compilerOption | (compilerOption COMMACHAR compilerOptions)+;
 compilerOption
     : deprecatedCompilerOptions
-    | compilerXOpts
-    | cicsTranslatorOptions
+    | cicsTranslatorDirectives
     | cobolCompilerOption
     ;
 
 // compiler translator options
-cicsTranslatorOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL)  RPARENCHAR;
+cicsTranslatorDirectives: (CICS | XOPTS | XOPT) LPARENCHAR (cicsTranslatorOptions | LITERAL ) (COMMACHAR? cicsTranslatorOptions)* RPARENCHAR;
 
-// compiler options
-compilerXOpts
-       : XOPTS LPARENCHAR compilerXOptsOption (COMMACHAR? compilerXOptsOption)* RPARENCHAR
-       ;
-
-compilerXOptsOption
+cicsTranslatorOptions
        : APOST
        | CBLCARD
        | CICS
@@ -75,11 +69,6 @@ compilerXOptsOption
        | SPIE
        | SYSEIB
        | VBREF
-       ;
-
-cicsTranslatorCompileDirectivedKeywords
-       : CBLCARD | CO2 | COBOL2 | CO3 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | LIN | LINKAGE | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
-       | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OP | OPTIONS | Q_CHAR | QUOTE | SP | SPIE | SYSEIB
        ;
 
 deprecatedCompilerOptions:
