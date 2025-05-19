@@ -781,7 +781,7 @@ public class TestCICSCsdSP {
                 "Missing required option: ATTRLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(ALTER_NOLENGTH_INVALID, expectedDiagnostic, "SP,NOLENGTH");
+    CICSTestUtils.errorTest(ALTER_NOLENGTH_INVALID, expectedDiagnostic, "SP","NOLENGTH");
   }
 
   @Test
@@ -794,7 +794,7 @@ public class TestCICSCsdSP {
                 "Missing required option: ATTRLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(GETNEXTRSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP,NOLENGTH");
+    CICSTestUtils.errorTest(GETNEXTRSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP","NOLENGTH");
   }
 
   @Test
@@ -807,7 +807,7 @@ public class TestCICSCsdSP {
                 "Missing required option: ATTRLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(INQUIRERSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP,NOLENGTH");
+    CICSTestUtils.errorTest(INQUIRERSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP","NOLENGTH");
   }
 
   @Test
@@ -820,6 +820,6 @@ public class TestCICSCsdSP {
                 "Missing required option: ATTRLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(USERDEFINE_NOLENGTH_INVALID, expectedDiagnostic, "SP,NOLENGTH");
+    CICSTestUtils.errorTest(USERDEFINE_NOLENGTH_INVALID, expectedDiagnostic, "SP","NOLENGTH");
   }
 }

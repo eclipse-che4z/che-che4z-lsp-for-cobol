@@ -27,6 +27,8 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 /** Checks CICS Extract System Command rules for required and invalid options */
 public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
@@ -158,6 +160,11 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
     checkSubResidOptions(ctx);
     checkLastTimeOptions(ctx);
+    if (noLengthOptionsEnabled) {
+      if (!ctx.RESID().isEmpty()) checkHasMandatoryOptions(ctx.RESIDLEN(), ctx, "RESIDLEN");
+      if (!ctx.SUBRESID().isEmpty())
+        checkHasMandatoryOptions(ctx.SUBRESIDLEN(), ctx, "SUBRESIDLEN");
+    }
   }
 
   /**

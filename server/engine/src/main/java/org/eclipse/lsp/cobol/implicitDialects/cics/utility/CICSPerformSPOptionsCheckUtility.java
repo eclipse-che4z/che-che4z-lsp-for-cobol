@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -259,6 +260,9 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       checkOptsLibertyPresent(ctx);
       checkHasMutuallyExclusiveOptions(
           "OSGIACTION or REFRESHPKGS", ctx.OSGIACTION(), ctx.REFRESHPKGS());
+    }
+    if (noLengthOptionsEnabled && !ctx.APPID().isEmpty()) {
+      checkHasMandatoryOptions(ctx.APPIDLEN(), ctx, "APPIDLEN");
     }
   }
 
