@@ -50,12 +50,11 @@ public class TestCicsConverseStatement {
   private static final String DEFAULT_INVAL_2 =
       "CONVERSE FROM(123) INTO(123) TOLENGTH(123) FROMLENGTH(123) {FROMFLENGTH(123)|errorOne}"
           + " MAXLENGTH(123)";
-  
+
   private static final String FROM_FROMLENGTH_MAXFLENGTH =
       "CONVERSE FROM(123) FROMLENGTH(123) MAXFLENGTH(123)";
-      
-  private static final String FROM_MAXFLENGTH =
-      "CONVERSE FROM(123) MAXFLENGTH(123)";
+
+  private static final String FROM_MAXFLENGTH = "CONVERSE FROM(123) MAXFLENGTH(123)";
 
   private static final String APPC_VALID =
       CONVERSE + "CONVID(123) " + FROM_INTO_TO + "MAXLENGTH(123) STATE(123)";
@@ -218,12 +217,12 @@ public class TestCicsConverseStatement {
   void testT2660Valid() {
     CICSTestUtils.noErrorTest(T2660_VALID);
   }
-  
+
   @Test
   void testFromFromlengthMaxflength() {
     CICSTestUtils.noErrorTest(FROM_FROMLENGTH_MAXFLENGTH);
   }
-  
+
   @Test
   void testFromMaxflength() {
     CICSTestUtils.noErrorTest(FROM_MAXFLENGTH);

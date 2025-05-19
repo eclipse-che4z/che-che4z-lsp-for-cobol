@@ -121,7 +121,7 @@ public class TestCICSIssue {
 
   private static final String ISSUE_PASS_INVALID =
       "ISSUE PASS LUNAME(100) {LENGTH|errorOne}(100) LOGONLOGMODE NOQUIESCE";
-      
+
   private static final String ISSUE_PASS_FROM_WITHOUT_LENGTH =
       "ISSUE {_PASS LUNAME({$varOne}) FROM({$varFour})|errorOne_}";
 
@@ -412,7 +412,7 @@ public class TestCICSIssue {
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_PASS_INVALID, expectedDiagnostics);
   }
-  
+
   @Test
   void testIssuePassFromWithoutLength() {
     Map<String, Diagnostic> expectedDiagnostics =
