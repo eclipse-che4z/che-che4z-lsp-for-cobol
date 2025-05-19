@@ -204,11 +204,9 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.PIPLIST().isEmpty())
       checkHasIllegalOptions(ctx.PIPLENGTH(), "PIPLENGTH without PIPLIST");
 
-    if (!ctx.PIPLIST().isEmpty())
-      checkHasMandatoryOptions(ctx.PIPLENGTH(), ctx, "PIPLENGTH");
+    if (!ctx.PIPLIST().isEmpty()) checkHasMandatoryOptions(ctx.PIPLENGTH(), ctx, "PIPLENGTH");
 
-    if (!ctx.PROCNAME().isEmpty())
-      checkHasMandatoryOptions(ctx.PROCLENGTH(), ctx, "PROCLENGTH");
+    if (!ctx.PROCNAME().isEmpty()) checkHasMandatoryOptions(ctx.PROCLENGTH(), ctx, "PROCLENGTH");
   }
 
   private void checkTcpIp(CICSParser.Cics_extract_tcpipContext ctx) {
@@ -269,9 +267,7 @@ public class CICSExtractOptionsUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.PATH().isEmpty()) checkHasIllegalOptions(ctx.PATHLENGTH(), "PATHLEN without PATH");
     if (!ctx.HTTPMETHOD().isEmpty())
       checkHasMandatoryOptions(ctx.METHODLENGTH(), ctx, "METHODLENGTH");
-    if (!ctx.HOST().isEmpty())
-      checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
-    if (!ctx.PATH().isEmpty())
-      checkHasMandatoryOptions(ctx.PATHLENGTH(), ctx, "PATHLENGTH");
+    if (!ctx.HOST().isEmpty()) checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
+    if (!ctx.PATH().isEmpty()) checkHasMandatoryOptions(ctx.PATHLENGTH(), ctx, "PATHLENGTH");
   }
 }

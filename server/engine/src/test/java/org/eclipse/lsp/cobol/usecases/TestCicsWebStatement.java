@@ -15,9 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import java.util.*;
-
 import com.google.common.collect.ImmutableMap;
+import java.util.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -198,7 +197,8 @@ public class TestCicsWebStatement {
       "WEB {_CONVERSE SESSTOKEN({$varOne}) TOLENGTH({$varTwo}) PUT|errorOne_}";
 
   private static final String WEB_CONVERSE_STATUSCODE_WITHOUT_STATUSTEXT =
-      "WEB {_CONVERSE SESSTOKEN({$varOne}) TOLENGTH({$varTwo}) PUT SET({$varThree}) STATUSCODE({$varThree})|errorOne_}";
+      "WEB {_CONVERSE SESSTOKEN({$varOne}) TOLENGTH({$varTwo}) PUT SET({$varThree})"
+          + " STATUSCODE({$varThree})|errorOne_}";
 
   private static final String WEB_SEND_USERNAME_PASSWORD_INVALID =
       "WEB {_SEND SESSTOKEN({$varOne}) USERNAME({$varTwo}) PASSWORD({$varThree})|errorOne_}";
@@ -369,7 +369,8 @@ public class TestCicsWebStatement {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "If one option is specified, all options must be present: STATUSCODE, STATUSTEXT, STATUSLEN",
+                "If one option is specified, all options must be present: STATUSCODE, STATUSTEXT,"
+                    + " STATUSLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -377,13 +378,13 @@ public class TestCicsWebStatement {
   @Test
   void testSendUsernamePasswordInvalid() {
     CICSTestUtils.errorTest(
-            WEB_SEND_USERNAME_PASSWORD_INVALID,
-            ImmutableMap.of(
-                    "errorOne",
-                    new Diagnostic(
-                            new Range(),
-                            "Exactly one option required, none provided: NONE, BASICAUTH, AUTHENTICATE",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+        WEB_SEND_USERNAME_PASSWORD_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: NONE, BASICAUTH, AUTHENTICATE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

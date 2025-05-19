@@ -75,6 +75,6 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkPrerequisiteIsMet(ctx.KEYLENGTH(), ctx.GENERIC(), ctx, "GENERIC");
     if (!ctx.SYSID().isEmpty())
       checkHasExactlyOneOption(
-              "RBA, RRN, XRBA or KEYLENGTH", ctx, ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
+          "RBA, RRN, XRBA or KEYLENGTH", ctx, ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
   }
 }
