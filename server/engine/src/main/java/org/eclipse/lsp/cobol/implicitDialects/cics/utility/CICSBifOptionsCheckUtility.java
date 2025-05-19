@@ -73,7 +73,6 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (noLengthOptionsEnabled) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
-
   }
 
   private void checkDigest(CICSParser.Cics_bif_digestContext ctx) {

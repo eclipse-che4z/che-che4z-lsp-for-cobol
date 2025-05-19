@@ -33,7 +33,6 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsChe
 public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = CICSParser.RULE_cics_extract_system_programming;
-
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
