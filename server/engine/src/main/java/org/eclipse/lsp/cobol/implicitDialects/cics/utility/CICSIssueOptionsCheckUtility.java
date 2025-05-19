@@ -197,8 +197,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
     if (noLengthOptionsEnabled) {
-        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
-      checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+      checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
 
@@ -238,10 +238,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
     if (noLengthOptionsEnabled) {
-      if (!ctx.VOLUME().isEmpty())
-        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
-      if (!ctx.DESTID().isEmpty())
-        checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+      if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
 
@@ -263,10 +261,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
     if (noLengthOptionsEnabled) {
-      if (!ctx.VOLUME().isEmpty())
-        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
-      if (!ctx.DESTID().isEmpty())
-        checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+      if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
 
@@ -296,10 +292,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
     if (noLengthOptionsEnabled) {
-      if (!ctx.VOLUME().isEmpty())
-        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
-      if (!ctx.DESTID().isEmpty())
-        checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
+      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+      if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
 
@@ -307,8 +301,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
     if (ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.SET(), ctx, "INTO or SET");
     if (noLengthOptionsEnabled) {
-      checkHasMandatoryOptions(ctx.LENGTH(),ctx, "LENGTH");
-      }
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   void checkReplace(CICSParser.Cics_issue_replaceContext ctx) {
@@ -325,10 +319,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
     if (noLengthOptionsEnabled) {
-      checkHasMandatoryOptions(ctx.DESTIDLENG(),ctx, "DESTIDLENG");
-      checkHasMandatoryOptions(ctx.LENGTH(),ctx, "LENGTH");
-      if (!ctx.VOLUME().isEmpty())
-        checkHasMandatoryOptions(ctx.VOLUMELENG(),ctx, "VOLUMELENG");
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
     }
   }
 
@@ -339,7 +332,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
     if (noLengthOptionsEnabled) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-      }
+    }
     checkIssueCommon(ctx.cics_issue_common());
   }
 
@@ -400,9 +393,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
           if (noLengthOptionsEnabled) {
             if (!context.VOLUME().isEmpty())
-              checkHasMandatoryOptions(context.VOLUMELENG(),context, "VOLUMELENG");
+              checkHasMandatoryOptions(context.VOLUMELENG(), context, "VOLUMELENG");
             if (!context.DESTID().isEmpty())
-              checkHasMandatoryOptions(context.DESTIDLENG(),context, "DESTIDLENG");
+              checkHasMandatoryOptions(context.DESTIDLENG(), context, "DESTIDLENG");
           }
         });
   }

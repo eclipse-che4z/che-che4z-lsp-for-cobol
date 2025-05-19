@@ -590,6 +590,7 @@ public class TestCICSPerformSP {
                 "Missing required option: APPIDLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
-        "SP","NOLENGTH");
+        "SP",
+        "NOLENGTH");
   }
 }

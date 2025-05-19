@@ -519,6 +519,7 @@ public class TestCicsExtractSP {
                 "Missing required option: SUBRESIDLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
-        "SP","NOLENGTH");
+        "SP",
+        "NOLENGTH");
   }
 }
