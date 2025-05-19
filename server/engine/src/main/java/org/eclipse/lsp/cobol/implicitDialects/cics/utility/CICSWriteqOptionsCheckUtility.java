@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_writeq;
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,5 +90,8 @@ public class CICSWriteqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.ITEM(), ctx, "ITEM");
     }
     checkHasMutuallyExclusiveOptions("AUXILIARY or MAIN", ctx.AUXILIARY(), ctx.MAIN());
+    if (noLengthOptionsEnabled) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 }

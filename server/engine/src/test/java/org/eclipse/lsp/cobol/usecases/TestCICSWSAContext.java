@@ -77,7 +77,9 @@ public class TestCICSWSAContext {
   private static final String WSACONTEXT_GET_INVALID_FIVE =
       "WSACONTEXT {_GET CONTEXTTYPE({$varOne}) EPRTYPE({$varSix}) EPRFIELD({$varSix})"
           + " EPRLENGTH({$varSix})|errorOne_}";
-
+  private static final String WSACONTEXT_BUILD_NOLENGTH_INVALID =
+      "WSACONTEXT {_BUILD EPRTYPE({$varThree}) EPRFIELD({$varFour}) EPRFROM({$varFive})"
+          + "FROMCCSID({$varSix})|error_}";
   @Test
   void testWSAContextBuildValidOne() {
     CICSTestUtils.noErrorTest(WSACONTEXT_BUILD_VALID_ONE);
@@ -255,5 +257,19 @@ public class TestCICSWSAContext {
                     + " or EPRSET) and EPRLENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testBuildNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        WSACONTEXT_BUILD_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: EPRLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }
