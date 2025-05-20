@@ -15,9 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import java.util.*;
-
 import com.google.common.collect.ImmutableMap;
+import java.util.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;

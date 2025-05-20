@@ -34,6 +34,77 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public class TestCICSCsdSP {
 
+  private static final String CSD_CVDA_MISSING =
+      "Missing required option: RESTYPE or ATOMSERVICE or BUNDLE or CONNECTION or CORBASERVER or"
+          + " DB2CONN or DB2ENTRY or DB2TRAN or DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE"
+          + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN or"
+          + " MQMONITOR or PARTITIONSET or PARTNER or PIPELINE or PROCESSTYPE or PROFILE or PROGRAM"
+          + " or REQUESTMODEL or SESSIONS or TCPIPSERVICE or TDQUEUE or TERMINAL or TRANCLASS or"
+          + " TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICE";
+  private static final String CSD_ADD_INVALID = "CSD {ADD|error|error2}";
+  private static final String CDS_ALTER_INVALID = "CSD {ALTER|error|error2|error3|error4}";
+  private static final String CDS_ALTER_MUTUALEX_INVALID =
+      "CSD ALTER CONNECTION RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour})"
+          + " {NOCOMPAT|error} {COMPAT|error2}";
+  private static final String CDS_ALTER_MUTUALEX2_INVALID =
+      "CSD ALTER CONNECTION {NOCOMPAT|error} RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour}) {COMPAT|error2}";
+  private static final String CDS_APPEND_INVALID = "CSD {APPEND|error|error2}";
+  private static final String CDS_COPY_INVALID =
+      "CSD {_COPY ATOMSERVICE RESID({$varFour}) AS({$varFour}) DUPERROR |error_}";
+  private static final String CDS_COPY_RESID_INVALID =
+      "CSD {_COPY PARTNER GROUP({$varFour}) TO({$varFour})|error_}";
+  private static final String CDS_COPY_MUTUALEX_INVALID =
+      "CSD COPY PARTNER GROUP({$varFour}) RESID({$varFour}) TO({$varFour}) {DUPNOREPLACE|error}"
+          + " {DUPERROR|error2}";
+  private static final String CDS_COPY_MUTUALEX_ASTO_INVALID =
+      "CSD COPY TSMODEL GROUP({$varFour}) RESID({$varFour}) {TO|error}({$varFour})"
+          + " {AS|error2}({$varFour})";
+  private static final String CDS_DEFINE_INVALID = "CSD {DEFINE|error|error2|error3|error4}";
+  private static final String CDS_DELETE_INVALID = "CSD {DELETE|error}";
+  private static final String CDS_DELETE_MUTUALEX_INVALID =
+      "CSD DELETE GROUP({$varFour}) {REMOVE|error} {LISTACTION|error2}({$varOne})";
+  private static final String CDS_GETNEXTGROUP_INVALID = "CSD {GETNEXTGROUP|error}";
+  private static final String CDS_GETNEXTLIST_INVALID = "CSD {GETNEXTLIST|error}";
+  private static final String CDS_GETNEXTRSRCE_INVALID = "CSD {GETNEXTRSRCE|error|error2|error3}";
+  private static final String CDS_INQUIREGROUP_INVALID = "CSD {INQUIREGROUP|error}";
+  private static final String CDS_INQUIRELIST_INVALID = "CSD {INQUIRELIST|error}";
+  private static final String CDS_INQUIRERSRCE_INVALID =
+      "CSD {INQUIRERSRCE|error|error2|error3|error4}";
+  private static final String CDS_INQUIRERSRCE_MUTUALEX_INVALID =
+      "CSD INQUIRERSRCE BUNDLE RESID({$varFour}) GROUP({$varFour}) {ATTRIBUTES|error}({$varFour})"
+          + " {SET|error}({$varFour})";
+  private static final String CDS_INSTALL_INVALID = "CSD {INSTALL|error}";
+  private static final String CDS_INSTALL_CVDA_INVALID =
+      "CSD {_INSTALL GROUP({$varFour}) LSRPOOL|error_}";
+  private static final String CDS_LOCK_INVALID =
+      "CSD LOCK {LIST|error}({$varFour}) {GROUP|error2}({$varFour})";
+  private static final String CDS_REMOVE_INVALID = "CSD {_LIST({$varFour}) REMOVE|error_}";
+  private static final String CDS_RENAME_INVALID =
+      "CSD {_RESID({$varFour}) RENAME|error|error2|error3_}";
+  private static final String CDS_STARTBRRSRCE_INVALID = "CSD {STARTBRRSRCE|error}";
+  private static final String CDS_UNLOCK_INVALID = "CSD {UNLOCK|error}";
+  private static final String CDS_USERDEFINE_INVALID =
+      "CSD {USERDEFINE|error|error2|error3|error4}";
+  private static final String GETNEXTRSRCE_SET_INVALID =
+      "CSD {_GETNEXTRSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour})"
+          + " SET({$varFour})|error_}";
+  private static final String INQUIRERSRCE_SET_INVALID =
+      "CSD {_INQUIRERSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour})"
+          + " SET({$varFour})|error_}";
+  private static final String REMOVE_PRIOR_INVALID = "CSD {_REMOVE GROUP({$varFour})|error_}";
+  private static final String DELETE_LIST_INVALID =
+      "CSD INSTALL LIST({$varFour}) {RESID|error}({$varFour}) {ATOMSERVICE|error2}";
+  private static final String ALTER_NOLENGTH_INVALID =
+      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT ATTRIBUTES({$varFour})|error_}";
+  private static final String GETNEXTRSRCE_NOLENGTH_INVALID =
+      "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
+          + "ATTRIBUTES({$varFour})|error_}";
+  private static final String INQUIRERSRCE_NOLENGTH_INVALID =
+      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour})|error_}";
+  private static final String USERDEFINE_NOLENGTH_INVALID =
+      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
+
   private static Stream<String> getValidOptions() {
     return Stream.of(
         "CSD ADD GROUP({$varFour}) LIST({$varFour}) BEFORE({$varFour})",
@@ -112,78 +183,6 @@ public class TestCICSCsdSP {
         "CSD RENAME RESID({$varFour}) GROUP({$varFour}) AS({$varFour}) URIMAP",
         "CSD RENAME RESID({$varFour}) GROUP({$varFour}) AS({$varFour}) WEBSERVICE");
   }
-
-  private static final String CSD_CVDA_MISSING =
-      "Missing required option: RESTYPE or ATOMSERVICE or BUNDLE or CONNECTION or CORBASERVER or"
-          + " DB2CONN or DB2ENTRY or DB2TRAN or DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE"
-          + " or IPCONN or JOURNALMODEL or JVMSERVER or LIBRARY or LSRPOOL or MAPSET or MQCONN or"
-          + " MQMONITOR or PARTITIONSET or PARTNER or PIPELINE or PROCESSTYPE or PROFILE or PROGRAM"
-          + " or REQUESTMODEL or SESSIONS or TCPIPSERVICE or TDQUEUE or TERMINAL or TRANCLASS or"
-          + " TRANSACTION or TSMODEL or TYPETERM or URIMAP or WEBSERVICE";
-  private static final String CSD_ADD_INVALID = "CSD {ADD|error|error2}";
-  private static final String CDS_ALTER_INVALID = "CSD {ALTER|error|error2|error3|error4}";
-  private static final String CDS_ALTER_MUTUALEX_INVALID =
-      "CSD ALTER CONNECTION RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour})"
-          + " {NOCOMPAT|error} {COMPAT|error2}";
-  private static final String CDS_ALTER_MUTUALEX2_INVALID =
-      "CSD ALTER CONNECTION {NOCOMPAT|error} RESID({$varFour}) GROUP({$varFour})"
-          + " ATTRIBUTES({$varFour}) {COMPAT|error2}";
-  private static final String CDS_APPEND_INVALID = "CSD {APPEND|error|error2}";
-  private static final String CDS_COPY_INVALID =
-      "CSD {_COPY ATOMSERVICE RESID({$varFour}) AS({$varFour}) DUPERROR |error_}";
-  private static final String CDS_COPY_RESID_INVALID =
-      "CSD {_COPY PARTNER GROUP({$varFour}) TO({$varFour})|error_}";
-  private static final String CDS_COPY_MUTUALEX_INVALID =
-      "CSD COPY PARTNER GROUP({$varFour}) RESID({$varFour}) TO({$varFour}) {DUPNOREPLACE|error}"
-          + " {DUPERROR|error2}";
-  private static final String CDS_COPY_MUTUALEX_ASTO_INVALID =
-      "CSD COPY TSMODEL GROUP({$varFour}) RESID({$varFour}) {TO|error}({$varFour})"
-          + " {AS|error2}({$varFour})";
-  private static final String CDS_DEFINE_INVALID = "CSD {DEFINE|error|error2|error3|error4}";
-  private static final String CDS_DELETE_INVALID = "CSD {DELETE|error}";
-  private static final String CDS_DELETE_MUTUALEX_INVALID =
-      "CSD DELETE GROUP({$varFour}) {REMOVE|error} {LISTACTION|error2}({$varOne})";
-  private static final String CDS_GETNEXTGROUP_INVALID = "CSD {GETNEXTGROUP|error}";
-  private static final String CDS_GETNEXTLIST_INVALID = "CSD {GETNEXTLIST|error}";
-  private static final String CDS_GETNEXTRSRCE_INVALID = "CSD {GETNEXTRSRCE|error|error2|error3}";
-  private static final String CDS_INQUIREGROUP_INVALID = "CSD {INQUIREGROUP|error}";
-  private static final String CDS_INQUIRELIST_INVALID = "CSD {INQUIRELIST|error}";
-  private static final String CDS_INQUIRERSRCE_INVALID =
-      "CSD {INQUIRERSRCE|error|error2|error3|error4}";
-  private static final String CDS_INQUIRERSRCE_MUTUALEX_INVALID =
-      "CSD INQUIRERSRCE BUNDLE RESID({$varFour}) GROUP({$varFour}) {ATTRIBUTES|error}({$varFour})"
-          + " {SET|error}({$varFour})";
-  private static final String CDS_INSTALL_INVALID = "CSD {INSTALL|error}";
-  private static final String CDS_INSTALL_CVDA_INVALID =
-      "CSD {_INSTALL GROUP({$varFour}) LSRPOOL|error_}";
-
-  private static final String CDS_LOCK_INVALID =
-      "CSD LOCK {LIST|error}({$varFour}) {GROUP|error2}({$varFour})";
-  private static final String CDS_REMOVE_INVALID = "CSD {_LIST({$varFour}) REMOVE|error_}";
-  private static final String CDS_RENAME_INVALID =
-      "CSD {_RESID({$varFour}) RENAME|error|error2|error3_}";
-  private static final String CDS_STARTBRRSRCE_INVALID = "CSD {STARTBRRSRCE|error}";
-  private static final String CDS_UNLOCK_INVALID = "CSD {UNLOCK|error}";
-  private static final String CDS_USERDEFINE_INVALID =
-      "CSD {USERDEFINE|error|error2|error3|error4}";
-  private static final String GETNEXTRSRCE_SET_INVALID =
-      "CSD {_GETNEXTRSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour})"
-          + " SET({$varFour})|error_}";
-  private static final String INQUIRERSRCE_SET_INVALID =
-      "CSD {_INQUIRERSRCE RESTYPE({$varFour}) RESID({$varFour}) GROUP({$varFour})"
-          + " SET({$varFour})|error_}";
-  private static final String REMOVE_PRIOR_INVALID = "CSD {_REMOVE GROUP({$varFour})|error_}";
-  private static final String DELETE_LIST_INVALID =
-      "CSD INSTALL LIST({$varFour}) {RESID|error}({$varFour}) {ATOMSERVICE|error2}";
-  private static final String ALTER_NOLENGTH_INVALID =
-      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT ATTRIBUTES({$varFour})|error_}";
-  private static final String GETNEXTRSRCE_NOLENGTH_INVALID =
-      "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
-          + "ATTRIBUTES({$varFour})|error_}";
-  private static final String INQUIRERSRCE_NOLENGTH_INVALID =
-      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour})|error_}";
-  private static final String USERDEFINE_NOLENGTH_INVALID =
-      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
 
   @ParameterizedTest
   @MethodSource("getValidOptions")

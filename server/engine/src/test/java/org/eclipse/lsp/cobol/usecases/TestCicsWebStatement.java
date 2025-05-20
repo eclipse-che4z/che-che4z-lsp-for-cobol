@@ -15,9 +15,8 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
-import java.util.*;
-
 import com.google.common.collect.ImmutableMap;
+import java.util.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -98,7 +97,10 @@ public class TestCicsWebStatement {
   private static final String READ_HTTPHEADER_VALID =
       WEB_READ
           + "HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
-
+  private static final String READ_QUERYPARM_INVALID =
+      WEB_READ
+          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
+          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
   private static final String WEB_READNEXT = WEB + "READNEXT ";
   private static final String READNEXT_FORMFIELD_VALID =
       WEB_READNEXT
@@ -110,7 +112,10 @@ public class TestCicsWebStatement {
       WEB_READNEXT
           + "HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) SESSTOKEN({$varOne}) VALUE({$varOne})"
           + " VALUELENGTH({$varOne})";
-
+  private static final String READNEXT_QUERYPARM_INVALID =
+      WEB_READNEXT
+          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
+          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
   private static final String RECEIVE_SERVER_BUFFER_VALID =
       WEB
           + "RECEIVE INTO({$varOne}) LENGTH({$varOne}) MAXLENGTH({$varOne}) NOTRUNCATE"
@@ -120,7 +125,6 @@ public class TestCicsWebStatement {
       WEB
           + "RECEIVE TOCONTAINER({$varOne}) TOCHANNEL({$varOne}) TYPE({$varOne})"
           + " CHARACTERSET({$varOne}) BODYCHARSET({$varOne}) MEDIATYPE({$varOne})";
-
   private static final String RECEIVE_BODY =
       WEB
           + "RECEIVE SESSTOKEN({$varOne}) MEDIATYPE({$varOne}) STATUSCODE({$varOne})"
@@ -131,9 +135,7 @@ public class TestCicsWebStatement {
           + " BODYCHARSET({$varOne})";
   private static final String RECEIVE_CLIENT_CONTAINER_VALID =
       RECEIVE_BODY + "TOCONTAINER({$varOne}) TOCHANNEL({$varOne}) BODYCHARSET({$varOne})";
-
   private static final String RETRIEVE_VALID = WEB + "RETRIEVE DOCTOKEN({$varOne})";
-
   private static final String SEND_SERVER_VALID_1 =
       WEB
           + "SEND DOCTOKEN({$varOne}) NODOCDELETE MEDIATYPE({$varOne}) SRVCONVERT"
@@ -149,7 +151,6 @@ public class TestCicsWebStatement {
           + "SEND CONTAINER({$varOne}) CHANNEL({$varOne}) MEDIATYPE({$varOne}) SRVCONVERT"
           + " CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne})"
           + " STATUSLEN({$varOne}) EVENTUAL CLOSE";
-
   private static final String SEND_CLIENT_VALID_1 =
       WEB
           + "SEND SESSTOKEN({$varOne}) GET PATH({$varOne}) PATHLENGTH({$varOne})"
@@ -163,7 +164,6 @@ public class TestCicsWebStatement {
           + " QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) CLICONVERT CHARACTERSET({$varOne})"
           + " EXPECT NOCLOSE BASICAUTH USERNAME({$varOne}) USERNAMELEN({$varOne})"
           + " PASSWORD({$varOne}) PASSWORDLEN({$varOne})";
-
   private static final String STARTBROWSE_FORMFIELD_VALID =
       WEB
           + "STARTBROWSE FORMFIELD({$varOne}) NAMELENGTH({$varOne}) CHARACTERSET({$varOne})"
@@ -172,22 +172,12 @@ public class TestCicsWebStatement {
       WEB + "STARTBROWSE HTTPHEADER SESSTOKEN({$varOne})";
   private static final String STARTBROWSE_QUERYPARM_VALID =
       WEB + "STARTBROWSE QUERYPARM({$varOne}) NAMELENGTH({$varOne}) HOSTCODEPAGE({$varOne})";
-
   private static final String WRITE_HTTPHEADER_VALID =
       WEB
           + "WRITE HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) SESSTOKEN({$varOne})"
           + " VALUE({$varOne}) VALUELENGTH({$varOne})";
-
   // Invalid use cases
   private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne}";
-  private static final String READ_QUERYPARM_INVALID =
-      WEB_READ
-          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
-          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
-  private static final String READNEXT_QUERYPARM_INVALID =
-      WEB_READNEXT
-          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
-          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
   private static final String SEND_SERVER_INVALID =
       WEB
           + "SEND DOCTOKEN({$varOne}) {FROM|errorOne}({$varOne}) FROMLENGTH({$varOne}) NODOCDELETE"

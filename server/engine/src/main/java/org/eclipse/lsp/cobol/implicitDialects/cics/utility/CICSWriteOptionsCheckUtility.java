@@ -154,6 +154,6 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (noLengthOptionsEnabled) {
       checkHasMandatoryOptions(ctx.TEXTLENGTH(), ctx, "TEXTLENGTH");
-      }
+    }
   }
 }

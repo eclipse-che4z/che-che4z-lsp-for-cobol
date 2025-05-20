@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;

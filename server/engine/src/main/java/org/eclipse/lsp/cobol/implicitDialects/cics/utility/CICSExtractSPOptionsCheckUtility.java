@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
+import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSLexer;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
-
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 /** Checks CICS Extract System Command rules for required and invalid options */
 public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
