@@ -184,11 +184,12 @@ public class TestCicsWebStatement {
           + " MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne})"
           + " STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
   private static final String CONVERSE_TRANS_NOLENGTH_INVALID =
-      "WEB {_CONVERSE SESSTOKEN({$varOne}) NONE GET TOLENGTH({$varOne}) USERNAME({$varFour}) INTO({$varFour}) PASSWORD({$varFour})"
+      "WEB {_CONVERSE SESSTOKEN({$varOne}) NONE GET TOLENGTH({$varOne})"
+          + " USERNAME({$varFour}) INTO({$varFour}) PASSWORD({$varFour})"
           + " PATH({$varFour})|error|errorTwo|errorThree|errorFour_}";
   private static final String CONVERSE_PARSE_NOLENGTH_INVALID =
-      " WEB {_PARSE URL({$varOne}) HOST({$varOne}) URLLENGTH({$varOne}) SCHEMENAME({$varOne})" +
-              " PORTNUMBER({$varOne}) PATH({$varOne})"
+      " WEB {_PARSE URL({$varOne}) HOST({$varOne}) URLLENGTH({$varOne})"
+          + "SCHEMENAME({$varOne}) PORTNUMBER({$varOne}) PATH({$varOne})"
           + "QUERYSTRING({$varOne})|error|errorTwo|errorThree_}";
   private static final String READ_HTTPHEADER_TRANS_NOLENGTH_INVALID =
       "WEB {_READ HTTPHEADER({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})|error_}";
