@@ -538,6 +538,11 @@
     ],
     "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs."
   },
+  "INITIALIZE DEFAULT": {
+    "prefix": "DEFAULT",
+    "body": ["INITIALIZE ${1:VAR1} TO DEFAULT."],
+    "description": "PROCEDURE DIVISION - The INITIALIZE statement sets selected categories of data fields to predetermined values. The INITIALIZE statement is functionally equivalent to one or more MOVE statements."
+  },
   "DELETE": {
     "prefix": "DELETE fileName",
     "body": ["DELETE ${1:fileName}", "END-DELETE."],
