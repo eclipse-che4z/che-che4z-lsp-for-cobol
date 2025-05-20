@@ -83,7 +83,8 @@ public class TestCICSWrite {
       "WRITE {_OPERATOR TEXT({$varOne}) {EVENTUAL|errorTwo} {REPLY|errorThree}({$varTwo})"
           + " TIMEOUT(123)|errorOne_}";
   private static final String WRITE_JOURNALNAME_TRANS_NOLENGTH_INVALID =
-      "WRITE {_JOURNALNAME({$varOne}) JTYPEID({$varTwo}) FROM({$varThree}) PREFIX({$varFour})|error|errorTwo_}";
+      "WRITE {_JOURNALNAME({$varOne}) JTYPEID({$varTwo}) FROM({$varThree})"
+          + " PREFIX({$varFour})|error|errorTwo_}";
   private static final String WRITE_OPERATOR_TRANS_NOLENGTH_INVALID =
       "WRITE {_OPERATOR TEXT({$varOne}) ROUTECODES({$varThree})"
           + " NUMROUTES({$varThree})|error_}";

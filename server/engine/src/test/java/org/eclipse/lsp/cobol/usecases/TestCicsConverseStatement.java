@@ -91,7 +91,8 @@ public class TestCicsConverseStatement {
   private static final String LU61_VALID =
       CONVERSE
           + "SESSION(123) ATTACHID(123) INTO(123) TOLENGTH(123) MAXLENGTH(123) NOTRUNCATE DEFRESP";
-  private static final String CONVERSE_TRANS_FROMLENGTH_INVALID = "CONVERSE {NOTRUNCATE|error|error2}";
+  private static final String CONVERSE_TRANS_FROMLENGTH_INVALID =
+      "CONVERSE {NOTRUNCATE|error|error2}";
 
   private Map<String, Diagnostic> getErrorDiagnostic(String errorMessage) {
     return ImmutableMap.of(
@@ -198,22 +199,23 @@ public class TestCicsConverseStatement {
   void testT2660Valid() {
     CICSTestUtils.noErrorTest(T2660_VALID);
   }
+
   @Test
   void testConverseTransNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FROMLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: TOLENGTH OR TOFLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROMLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TOLENGTH OR TOFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(CONVERSE_TRANS_FROMLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }

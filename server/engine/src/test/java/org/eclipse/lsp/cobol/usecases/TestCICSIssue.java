@@ -184,23 +184,27 @@ public class TestCICSIssue {
   private static final String ISSUE_ABORT_TRANS_NOLENGTH_INVALID =
       "ISSUE ABORT {VOLUME(100)|error}";
   private static final String ISSUE_ADD_TRANS_NOLENGTH_INVALID =
-      "ISSUE {_ADD DESTID({$varFour})VOLUME({$varFour})FROM({$varFour})|errorOne|errorTwo_}";
+      "ISSUE {_ADD DESTID({$varFour})VOLUME({$varFour}" + ")FROM({$varFour})|errorOne|errorTwo_}";
   private static final String ISSUE_END_TRANS_NOLENGTH_INVALID =
       "ISSUE END {_DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
   private static final String ISSUE_ERASE_TRANS_NOLENGTH_INVALID =
-      "ISSUE {_ERASE RRN RIDFLD({$varFour}) DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
+      "ISSUE {_ERASE RRN RIDFLD({$varFour}) DESTID({$varFour})"
+          + "VOLUME({$varFour})|errorOne|errorTwo_}";
   private static final String ISSUE_NOTE_TRANS_NOLENGTH_INVALID =
-      "ISSUE {_NOTE RRN RIDFLD({$varFour}) DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
+      "ISSUE {_NOTE RRN RIDFLD({$varFour}) DESTID({$varFour})"
+          + "VOLUME({$varFour})|errorOne|errorTwo_}";
   private static final String ISSUE_QUERY_TRANS_NOLENGTH_INVALID =
       "ISSUE {_QUERY DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
   private static final String ISSUE_RECEIVE_TRANS_NOLENGTH_INVALID =
       "ISSUE {_RECEIVE SET({$varFour})|error_}";
   private static final String ISSUE_REPLACE_TRANS_NOLENGTH_INVALID =
-      "ISSUE {_REPLACE DESTID({$varFour}) FROM({$varFour}) VOLUME({$varFour}) RIDFLD({$varFour}) RRN"
+      "ISSUE {_REPLACE DESTID({$varFour}) FROM({$varFour})"
+          + " VOLUME({$varFour}) RIDFLD({$varFour}) RRN"
           + " NOWAIT|errorOne|errorTwo|errorThree_}";
 
   private static final String ISSUE_SEND_TRANS_NOLENGTH_INVALID =
-      "ISSUE SEND {_FROM({$varOne})|errorOne_} {_DESTID({$varOne})VOLUME({$varOne})|errorTwo|errorThree_}";
+      "ISSUE SEND {_FROM({$varOne})|errorOne_} {_DESTID({$varOne})"
+          + "VOLUME({$varOne})|errorTwo|errorThree_}";
   private static final String ISSUE_WAIT_TRANS_NOLENGTH_INVALID =
       "ISSUE WAIT {_DESTID({$varFour})VOLUME({$varFour})|errorOne|errorTwo_}";
 

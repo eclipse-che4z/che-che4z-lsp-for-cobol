@@ -78,8 +78,9 @@ public class TestCICSWSAContext {
       "WSACONTEXT {_GET CONTEXTTYPE({$varOne}) EPRTYPE({$varSix}) EPRFIELD({$varSix})"
           + " EPRLENGTH({$varSix})|errorOne_}";
   private static final String WSACONTEXT_BUILD_NOLENGTH_INVALID =
-      "WSACONTEXT {_BUILD EPRTYPE({$varThree}) EPRFIELD({$varFour}) EPRFROM({$varFive})"
-          + "FROMCCSID({$varSix})|error_}";
+      "WSACONTEXT {_BUILD EPRTYPE({$varThree}) EPRFIELD({$varFour})"
+          + "EPRFROM({$varFive}) FROMCCSID({$varSix})|error_}";
+
   @Test
   void testWSAContextBuildValidOne() {
     CICSTestUtils.noErrorTest(WSACONTEXT_BUILD_VALID_ONE);

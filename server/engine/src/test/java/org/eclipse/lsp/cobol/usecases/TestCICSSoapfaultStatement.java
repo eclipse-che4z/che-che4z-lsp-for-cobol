@@ -59,13 +59,17 @@ public class TestCICSSoapfaultStatement {
   private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID =
       "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne})|error_}";
   private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_2 =
-      "SOAPFAULT {_CREATE  FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne}) FAULTCODESTR({$varFour})|error_}";
+      "SOAPFAULT {_CREATE  FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " FAULTCODESTR({$varFour})|error_}";
   private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_3 =
-      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne}) FAULTACTOR({$varFour})|error_}";
+      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " FAULTACTOR({$varFour})|error_}";
   private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_4 =
-      "SOAPFAULT {_CREATE CLIENT  FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne}) DETAIL({$varFour})|error_}";
+      "SOAPFAULT {_CREATE CLIENT  FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " DETAIL({$varFour})|error_}";
   private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_5 =
-      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne}) ROLE({$varFour})|error_}";
+      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " ROLE({$varFour})|error_}";
 
   // Valid Test Cases
   @Test

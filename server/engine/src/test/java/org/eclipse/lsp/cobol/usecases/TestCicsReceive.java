@@ -316,7 +316,8 @@ public class TestCicsReceive {
   };
 
   private static final String MAP_TRANS_NOLENGTH_INVALID =
-      "RECEIVE {_MAP({$varFour}) MAPSET({$varFour}) INTO({$varFour}) TERMINAL ASIS INPARTN({$varFour})|error_}";
+      "RECEIVE {_MAP({$varFour}) MAPSET({$varFour}) INTO({$varFour})"
+          + " TERMINAL ASIS INPARTN({$varFour})|error_}";
 
   private static final String MAP_MAPPING_DEV_TRANS_NOLENGTH_INVALID =
       "RECEIVE {_MAP({$varFour}) INTO({$varFour}) MAPPINGDEV({$varFour}) FROM({$varFour})|error_}";

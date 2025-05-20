@@ -114,7 +114,8 @@ public class TestCicsExtractSP {
   private static final String STATISTICS_WARNING_DUPLICATE_RESTYPE =
       "EXTRACT SET({$varFour}) STATISTICS ASYNCSERVICE {ASYNCSERVICE|warning}";
   private static final String STATISTICS_NOLENGTH_INVALID =
-      "EXTRACT {_STATISTICS SET({$varFour}) BUNDLE RESID({$varTwo}) SUBRESID({$varSix}) POLICYRULE|error|errorTwo_}";
+      "EXTRACT {_STATISTICS SET({$varFour}) BUNDLE RESID({$varTwo})"
+          + " SUBRESID({$varSix}) POLICYRULE|error|errorTwo_}";
 
   @Test
   void testAllExitOptions() {

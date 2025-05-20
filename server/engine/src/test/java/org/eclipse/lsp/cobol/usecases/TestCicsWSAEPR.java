@@ -56,7 +56,8 @@ public class TestCicsWSAEPR {
       "WSAEPR EPRSET(1) EPRLENGTH(1) METADATA(2) CREATE {FROMCCSID|error1}(1)"
           + " {FROMCODEPAGE|error1}(2)";
   private static final String WSAEPR_CREATE_NOLENGTH_INVALID =
-      "WSAEPR {_CREATE EPRINTO({$varFour}) REFPARMS({$varFour}) EPRLENGTH({$varOne}) METADATA({$varFour})|error|errorTwo_}";
+      "WSAEPR {_CREATE EPRINTO({$varFour}) REFPARMS({$varFour}) EPRLENGTH({$varOne})"
+          + " METADATA({$varFour})|error|errorTwo_}";
 
   @Test
   void testWSAEPRCreateAllOptionsValid() {
