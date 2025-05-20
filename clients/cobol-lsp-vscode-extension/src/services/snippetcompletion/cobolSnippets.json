@@ -1501,7 +1501,7 @@
   "MOVE CORR": {
     "prefix": "MOVE CORR",
     "body": ["MOVE ${1|CORR,CORRESPONDING|} ${2:group-1} TO ${3:group-2"],
-    "description": "The MOVE CORRESPONDING statement copies all values in variables with the same name from one group to another group. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The MOVE CORRESPONDING statement copies all values in variables with the same name from one group to another group."
   },
   "MOVE": {
     "prefix": "MOVE",
