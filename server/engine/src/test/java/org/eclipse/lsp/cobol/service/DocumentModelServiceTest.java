@@ -23,18 +23,21 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 /** Test for DocumentModelService */
 class DocumentModelServiceTest {
+  @Mock private SourceUnitGraph sourceUnitGraph;
   private DocumentModelService service;
   private String languageId = "cobol";
 
   @BeforeEach
   void init() {
-    service = new DocumentModelService();
+    service = new DocumentModelService(sourceUnitGraph);
   }
 
   @Test
