@@ -1344,17 +1344,28 @@
   },
   "GREATER": {
     "prefix": "GREATER",
-    "body": ["IF ${1:VAR1} GREATER THEN ${2:VAR2} THEN", "\t${3:ifTrue}", "END-IF.", "$0"],
+    "body": [
+      "IF ${1:VAR1} GREATER THEN ${2:VAR2} THEN",
+      "\t${3:ifTrue}",
+      "END-IF.",
+      "$0"
+    ],
     "description": "GREATER is a general comparison operator - treated like the algebraic \">\" operator."
   },
   "GROUP-USAGE": {
     "prefix": "GROUP-USAGE",
-    "body": ["01 ${1:NAT-GROUP-1} GROUP-USAGE NATIONAL.", "\t02 ${2:GROUP-1}.", "\t\t04 ${3:groupVar} PIC ${4:99}."],
+    "body": [
+      "01 ${1:NAT-GROUP-1} GROUP-USAGE NATIONAL.",
+      "\t02 ${2:GROUP-1}.",
+      "\t\t04 ${3:groupVar} PIC ${4:99}."
+    ],
     "description": "A group item that is described with an explicit or implicit GROUP-USAGE NATIONAL clause is a national group item. Note that NATIONAL data items are represented as UTF-16 characters. "
   },
   "HIGH-VALUE": {
     "prefix": "HIGH-VALUES",
-    "body": ["READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE ${3|HIGH-VALUE,HIGH-VALUES|} TO ${4:INPUT-REC}."],
+    "body": [
+      "READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE ${3|HIGH-VALUE,HIGH-VALUES|} TO ${4:INPUT-REC}."
+    ],
     "description": "HIGH-VALUE equates to binary (Hex) FF - the highest EBCDIC collating sequence value."
   },
   "I-O": {
@@ -1369,7 +1380,13 @@
   },
   "ID DIVISION": {
     "prefix": "ID DIVISION",
-    "body": ["ID DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${2:/UPCASE}/}}.", "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.", "ENVIRONMENT DIVISION.", "$0"],
+    "body": [
+      "ID DIVISION.",
+      "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${2:/UPCASE}/}}.",
+      "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.",
+      "ENVIRONMENT DIVISION.",
+      "$0"
+    ],
     "description": "The ID DIVISION contains paragraphs definining the: PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs. Note that ID is an abbreviation of IDENTIFICATION."
   },
   "INPUT": {
@@ -1410,22 +1427,44 @@
   },
   "IF ELSE": {
     "prefix": "IF",
-    "body": ["IF ${1:CONDITION}", "\t${2:ifTrue}", "ELSE", "\t${3:ifFalse}", "END-IF"],
+    "body": [
+      "IF ${1:CONDITION}",
+      "\t${2:ifTrue}",
+      "ELSE",
+      "\t${3:ifFalse}",
+      "END-IF"
+    ],
     "description": "IF ELSE"
   },
   "IN #1": {
     "prefix": "IN",
-    "body": ["UNSTRING ${2:CUST-TRANS} DELIMITED BY \"${3:|}\"", "\tINTO ${4:CUST-REC-IN}", "COUNT IN ${1:CTR-1}", "END UNSTRING."],
+    "body": [
+      "UNSTRING ${2:CUST-TRANS} DELIMITED BY \"${3:|}\"",
+      "\tINTO ${4:CUST-REC-IN}",
+      "COUNT IN ${1:CTR-1}",
+      "END UNSTRING."
+    ],
     "description": "COUNT IN references an integer field that contains the number of characters placed in the current receiving field."
   },
   "IN #2": {
     "prefix": "IN",
-    "body": ["UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL \"${3:|}\" OR \"${4:/}\"", "\tINTO ${5:CUST-NAME} COUNT IN ${1:CTR-1} DELIMITER IN ${6:DLM-CHAR}", "END-UNSTRING.", "$0"],
+    "body": [
+      "UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL \"${3:|}\" OR \"${4:/}\"",
+      "\tINTO ${5:CUST-NAME} COUNT IN ${1:CTR-1} DELIMITER IN ${6:DLM-CHAR}",
+      "END-UNSTRING.",
+      "$0"
+    ],
     "description": "DELIMITER IN references a PIC X field that contains the DELIMITER character placed found in the UNSTRING field."
   },
   "IN #3": {
     "prefix": "IN #3",
-    "body": ["UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL  \"|\" OR \"/\"", "\t${3:INTO CUST-NAME} COUNT IN ${1:CTR-1}", "\t${4:CUST-ADDR} DELIMITER IN ${5:DLM-CHR}", "TALLYING IN ${6:TOT-FIELDS-FOUND}", "END-UNSTRING."],
+    "body": [
+      "UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL  \"|\" OR \"/\"",
+      "\t${3:INTO CUST-NAME} COUNT IN ${1:CTR-1}",
+      "\t${4:CUST-ADDR} DELIMITER IN ${5:DLM-CHR}",
+      "TALLYING IN ${6:TOT-FIELDS-FOUND}",
+      "END-UNSTRING."
+    ],
     "description": "TALLYING IN references a numeric field that contains a total of the number of fields that are acted on during the UNSTRING."
   },
   "INDEX": {
@@ -1435,12 +1474,21 @@
   },
   "OCCURS x INDEXED BY": {
     "prefix": "INDEXED",
-    "body": ["01 ${3:GROUP-FIELD}", "\t05 ${4:TABLE-ITEM} PIC X(1)", "\t\tOCCURS ${1:100} INDEXED BT ${2:IDX-BTYE}"],
+    "body": [
+      "01 ${3:GROUP-FIELD}",
+      "\t05 ${4:TABLE-ITEM} PIC X(1)",
+      "\t\tOCCURS ${1:100} INDEXED BT ${2:IDX-BTYE}"
+    ],
     "description": "INDEXED BY defines an internal COBOL index data item and associates it with a given COBOL table."
   },
   "ORGANIZATION IS INDEXED": {
     "prefix": "INDEXED",
-    "body": ["SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}", "\tORGANIZATION IS INDEXED", "\tACCESS IS DYNAMIC", "\tRECORD KEY IS ${3:VSAM-RECORD-KEY}"],
+    "body": [
+      "SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}",
+      "\tORGANIZATION IS INDEXED",
+      "\tACCESS IS DYNAMIC",
+      "\tRECORD KEY IS ${3:VSAM-RECORD-KEY}"
+    ],
     "description": "IS INDEXED defines a file entry as a VSAM KSDS (Indexed) Data Set in the ENVIRONMENT DIVISION'S SELECT/ASSIGN paragraph."
   },
   "INTO": {
@@ -1450,12 +1498,19 @@
   },
   "READ INTO": {
     "prefix": "INTO",
-    "body": ["READ ${1:MY-CUSTOMER-FILE} INTO ${2:WE-CUSTOMER-REC}", "END-READ"],
+    "body": [
+      "READ ${1:MY-CUSTOMER-FILE} INTO ${2:WE-CUSTOMER-REC}",
+      "END-READ"
+    ],
     "description": "READ INTO reads then copies records from FD buffers into WORKING-STORAGE data items."
   },
   "RETURN INTO": {
     "prefix": "RETURN INTO",
-    "body": ["RETURN ${1:fileName} INTO TAB-ENTRY(${2:TAB-INDX}", "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-SORT}", "END-RETURN"],
+    "body": [
+      "RETURN ${1:fileName} INTO TAB-ENTRY(${2:TAB-INDX}",
+      "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-SORT}",
+      "END-RETURN"
+    ],
     "description": "RETURN INTO accesses a sorted file record and copies it into a WORKING-STORAGE data item."
   },
   "INSPECT TALLYING": {
@@ -1473,12 +1528,20 @@
   },
   "INVALID KEY (VSAM)": {
     "prefix": "INVALID KEY",
-    "body": ["${2|READ,START,WRITE,REWRITE,DELETE|} ${3:VSAM-FILE}", "\tINVALID KEY GO TO ${1:999-VSAM-FILE-ERROR}", "END-READ."],
+    "body": [
+      "${2|READ,START,WRITE,REWRITE,DELETE|} ${3:VSAM-FILE}",
+      "\tINVALID KEY GO TO ${1:999-VSAM-FILE-ERROR}",
+      "END-READ."
+    ],
     "description": "INVALID KEY can be used in VSAM KSDS and RRDS files for: READ, START, WRITE, REWRITE, and DELETE statements. The INVALID KEY imperative statement is given control if an I/O error occurs due to a defective VSAM file index key."
   },
   "INVALID KEY (QSAM)": {
     "prefix": "INVALID KEY",
-    "body": ["WRITE ${2:QSAM-FILE}", "\tINVALID KEY GO TO ${1:999-DISK-FULL-ERROR}", "END-WRITE."],
+    "body": [
+      "WRITE ${2:QSAM-FILE}",
+      "\tINVALID KEY GO TO ${1:999-DISK-FULL-ERROR}",
+      "END-WRITE."
+    ],
     "description": "For QSAM files, the INVALID KEY phrase can be used in WRITE requests. It is executed if you attempt to write to a I/O disk (VOL=SER) that is full."
   },
   "INVOKE": {
@@ -1493,17 +1556,25 @@
   },
   "USAGE IS": {
     "prefix": "USAGE IS",
-    "body": ["77 ${2:VAR1} PIC ${3:X} USAGE IS ${1|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"],
+    "body": [
+      "77 ${2:VAR1} PIC ${3:X} USAGE IS ${1|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
+    ],
     "description": "Variable declarations with IS. Note that IS is optional."
   },
   "IF x IS": {
     "prefix": "IF x IS",
-    "body": ["IF ${2:VAR1} IS ${1|NUMERIC,ALPHABETIC,ALPHABETIC-LOWER,ALPHABETIC-UPPER,DBCS,KANJI,POSITIVE,NEGATIVE,ZERO|} THEN"],
+    "body": [
+      "IF ${2:VAR1} IS ${1|NUMERIC,ALPHABETIC,ALPHABETIC-LOWER,ALPHABETIC-UPPER,DBCS,KANJI,POSITIVE,NEGATIVE,ZERO|} THEN"
+    ],
     "description": "Class conditional tests with IS."
   },
   "JNIENVPTR": {
     "prefix": "JNIENVPTR",
-    "body": ["CALL \"${1:NEWFIELD}", "\tUSING BY VALUE JNIENVPTR", "\t\tADDRESS OF ${2:STRINGBUF}"],
+    "body": [
+      "CALL \"${1:NEWFIELD}",
+      "\tUSING BY VALUE JNIENVPTR",
+      "\t\tADDRESS OF ${2:STRINGBUF}"
+    ],
     "description": "JNIENVPTR is a COBOL special register that references the JNI pointer as declared in the JNI.cpy copybook. It is used when interfacing Java with COBOL. Note that Special registers are reserved words that name storage areas generated by the compiler."
   },
   "JSON-CODE": {
@@ -1528,7 +1599,10 @@
   },
   "JUST": {
     "prefix": "JUSTIFIED",
-    "body": ["WORKING-STORAGE SECTION.", "\t01 ${1:VAR1} PIC X(40) ${2|JUST,JUSTIFIED|} RIGHT"],
+    "body": [
+      "WORKING-STORAGE SECTION.",
+      "\t01 ${1:VAR1} PIC X(40) ${2|JUST,JUSTIFIED|} RIGHT"
+    ],
     "description": "The JUST/JUSTIFIED clause overrides standard positioning rules for receiving items of category alphabetic, alphanumeric, DBCS, or national."
   },
   "KANJI": {
@@ -1538,17 +1612,30 @@
   },
   "ASCENDING KEY #1": {
     "prefix": "ASCENDING KEY IS",
-    "body": ["01 ${3:TABLE-ENTRIES}", "\t05 ${4:TAB-COLM3} OCCURS ${5:100} TIMES", "\tASCENDING KEY IS ${1:TAB-KEY4} INDEXED BY ${2:TAB-COLM3-IDX}.", "\t\t20 ${1:TAB-KEY4} PIC X(5)."],
+    "body": [
+      "01 ${3:TABLE-ENTRIES}",
+      "\t05 ${4:TAB-COLM3} OCCURS ${5:100} TIMES",
+      "\tASCENDING KEY IS ${1:TAB-KEY4} INDEXED BY ${2:TAB-COLM3-IDX}.",
+      "\t\t20 ${1:TAB-KEY4} PIC X(5)."
+    ],
     "description": "ASCENDING KEY in a table OCCURS clause allows you to use a COBOL SEARCH ALL construct."
   },
   "ASCENDING KEY #2": {
     "prefix": "ASCENDING KEY IS",
-    "body": ["15 ${2:TABLE-ENTRY3} OCCURS ${3:5} TIMES", "ASCENDING KEY IS ${1:KEY1}", "INDEXED BY ${4:TE3-INDEX}.", "20 ${1:KEY1} PIC X(5)."],
+    "body": [
+      "15 ${2:TABLE-ENTRY3} OCCURS ${3:5} TIMES",
+      "ASCENDING KEY IS ${1:KEY1}",
+      "INDEXED BY ${4:TE3-INDEX}.",
+      "20 ${1:KEY1} PIC X(5)."
+    ],
     "description": "ASCENDING KEY in a table OCCURS clause allows you to use a COBOL SEARCH ALL construct."
   },
   "RECORD KEY": {
     "prefix": "KEY",
-    "body": ["SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}", "RECORD KEY IS ${3:VSAMFILE-KEY}"],
+    "body": [
+      "SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}",
+      "RECORD KEY IS ${3:VSAMFILE-KEY}"
+    ],
     "description": "ENVIRONMENT DIVISION / FILE-CONTROL - RECORD KEY declares a field that you define in the FILE SECTION to be used to search the indexed/VSAM data thru.  Note that the same technique can be used for SORT Files."
   },
   "KEY IS": {
@@ -1558,7 +1645,7 @@
   },
   "LABEL RECORDS": {
     "prefix": "LABEL RECORDS",
-    "body": ["FD ${1:inputFile}","LABEL RECORDS ARE STANDARD"],
+    "body": ["FD ${1:inputFile}", "LABEL RECORDS ARE STANDARD"],
     "description": "DATA DIVISION / FILE SECTION - For QSAM files, LABEL RECORDS declares the presence or absence of labels used to identify DASD volumes - for uncataloged files. For VSAM files LABEL RECORDS is syntax checked but ignored."
   },
   "LEADING BY": {
@@ -1573,7 +1660,10 @@
   },
   "LEFT": {
     "prefix": "LEFT",
-    "body": ["01 ${2:GROUP-VAR}", "\t05 ${1:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."],
+    "body": [
+      "01 ${2:GROUP-VAR}",
+      "\t05 ${1:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."
+    ],
     "description": "LEFT Specifies that an elementary COBOL variable is to be positioned in main storage so that byte one begins at the left word boundary. Note that this is an efficiency coding specification."
   },
   "LENGTH OF": {
@@ -1583,7 +1673,12 @@
   },
   "LESS": {
     "prefix": "LESS",
-    "body": ["IF ${1:VAR1} LESS THEN ${2:VAR2} THEN", "\t${3:ifTrue}", "END-IF.", "$0"],
+    "body": [
+      "IF ${1:VAR1} LESS THEN ${2:VAR2} THEN",
+      "\t${3:ifTrue}",
+      "END-IF.",
+      "$0"
+    ],
     "description": "LESS is a general comparison operator - treated like the algebraic \"<\" operator."
   },
   "LINEAGE": {
@@ -1593,12 +1688,17 @@
   },
   "WRITE LINE": {
     "prefix": "LINES",
-    "body": ["WRITE ${1:PRINT-REC} ${2|BEFORE,AFTER|} ADVANCING ${3:numLiteral} ${4|LINE,LINES|}."],
+    "body": [
+      "WRITE ${1:PRINT-REC} ${2|BEFORE,AFTER|} ADVANCING ${3:numLiteral} ${4|LINE,LINES|}."
+    ],
     "description": "Use LINE to control the number of blank lines output for a report file."
   },
   "LINE SEQUENTIAL": {
     "prefix": "LINE SEQUENTIAL",
-    "body": ["\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}", "\tORGANIZATION IS LINE-SEQUENTIAL"],
+    "body": [
+      "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
+      "\tORGANIZATION IS LINE-SEQUENTIAL"
+    ],
     "description": "ENVIRONMENT DIVISION - LINE-SEQUENTIAL defines an input/output file as a line-sequential file - typically Unix or PC."
   },
   "LOC": {
@@ -1613,7 +1713,9 @@
   },
   "READ LOW-VALUE": {
     "prefix": "LOW-VALUE",
-    "body": ["READ ${1:IN-FILE} AT END MOVE ${2|LOW-VALUE,LOW-VALUES|} TO ${3:INPUT-REC}."],
+    "body": [
+      "READ ${1:IN-FILE} AT END MOVE ${2|LOW-VALUE,LOW-VALUES|} TO ${3:INPUT-REC}."
+    ],
     "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "MOVE LOW-VALUE": {
@@ -1623,7 +1725,11 @@
   },
   "IF LOW-VALUE": {
     "prefix": "LOW-VALUE",
-    "body": ["IF ${1:VAR1} = ${2|LOW-VALUE,LOW-VALUES|}", "\t${3:MOVE SPACES TO ${1:VAR}}", "END-IF."],
+    "body": [
+      "IF ${1:VAR1} = ${2|LOW-VALUE,LOW-VALUES|}",
+      "\t${3:MOVE SPACES TO ${1:VAR}}",
+      "END-IF."
+    ],
     "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "LINKAGE SECTION ": {
@@ -1680,7 +1786,14 @@
   },
   "RECORDING MODE": {
     "prefix": "RECORDING MODE",
-    "body": ["FILE SECTION.", "FD ${2:FILENAME}", "LABEL RECORDS ARE STANDARD", "BLOCK CONTAINS 0", "RECORDING MODE IS ${1|F,V,U,S|}", "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS"],
+    "body": [
+      "FILE SECTION.",
+      "FD ${2:FILENAME}",
+      "LABEL RECORDS ARE STANDARD",
+      "BLOCK CONTAINS 0",
+      "RECORDING MODE IS ${1|F,V,U,S|}",
+      "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS"
+    ],
     "description": "RECORDING MODE specifies the physical format of records in a QSAM file: F (fixed), V (variable), U (fixed or variable), S (spanned)"
   },
   "DEBUGGING MODE": {
@@ -1720,7 +1833,11 @@
   },
   "MULTIPLY a BY b GIVING c ON SIZE ERROR": {
     "prefix": "MULTIPLY",
-    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}", "ON SIZE ERROR ${4:imperative_statement}", "END-MULTIPLY."],
+    "body": [
+      "MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}",
+      "ON SIZE ERROR ${4:imperative_statement}",
+      "END-MULTIPLY."
+    ],
     "description": "If ON SIZE ERROR is specified and a size error condition occurs (typically truncation in the product) the error result is not placed in the product and the imperative statement in the ON SIZE ERROR phrase is executed."
   },
   "NAME IS": {
@@ -1740,17 +1857,25 @@
   },
   "NATIONAL-EDITED #1": {
     "prefix": "NATIONAL-EDITED",
-    "body": ["WORKING-STORAGE SECTION.", "01 ${2:ORIG-CUSTOMER-NAME} GROUP-USAGE ${1|NATIONAL,NATIONAL-EDITED|}", "\t05 ${3:SURNAME} PIC N(${4:17})."],
+    "body": [
+      "WORKING-STORAGE SECTION.",
+      "01 ${2:ORIG-CUSTOMER-NAME} GROUP-USAGE ${1|NATIONAL,NATIONAL-EDITED|}",
+      "\t05 ${3:SURNAME} PIC N(${4:17})."
+    ],
     "description": "NATIONAL/NATIONAL-EDITED data items are variables whose content is represented in UTF-16 (often referred to as Unicode)."
   },
   "NATIONAL-EDITED #2": {
     "prefix": "NATIONAL-EDITED",
-    "body": ["INITIALIZE ${2:VAR1} REPLACING ${1|NATIONAL,NATIONAL-EDITED|} DATA BY ${3:VAR2}"],
+    "body": [
+      "INITIALIZE ${2:VAR1} REPLACING ${1|NATIONAL,NATIONAL-EDITED|} DATA BY ${3:VAR2}"
+    ],
     "description": "PROCEDURE DIVISION - NATIONAL/NATIONAL-EDITED data (or data items within a group field) are replaced by the same-named variables in VAR-2 in the given example."
   },
   "NATIVE": {
     "prefix": "NATIVE",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|} USAGE NATIVE."],
+    "body": [
+      "77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|} USAGE NATIVE."
+    ],
     "description": "NATIVE is syntax checked, but has no effect on program execution."
   },
   "NEXT SENTENCE": {
@@ -1760,7 +1885,11 @@
   },
   "NEXT RECORD": {
     "prefix": "NEXT RECORD",
-    "body": ["READ ${1:CUSTOEMR-FILE} NEXT RECORD INTO ${2:WS-CUSTOMER-REC}", "\tAT END MOVE \"Y\" TO ${3:WS-NO-MORE-CUST-RECS}", "END-IF."],
+    "body": [
+      "READ ${1:CUSTOEMR-FILE} NEXT RECORD INTO ${2:WS-CUSTOMER-REC}",
+      "\tAT END MOVE \"Y\" TO ${3:WS-NO-MORE-CUST-RECS}",
+      "END-IF."
+    ],
     "description": "NEXT RECORD is a phrase that reads the next record from an input file. NEXT is optional for QSAM files, but you must specify NEXT RECORD to retrieve records sequentially from a VSAM file."
   },
   "NO ADVANCING": {
@@ -1784,7 +1913,10 @@
   },
   "NOT ON EXCEPTION": {
     "prefix": "NOT ON EXCEPTION",
-    "body": ["SUBTRACT ${2:VAR-2} FROM ${3:VAR-1} GIVING ${4:VAR-3}", "NOT ON EXCEPTION ${1:MOVE ZEROS TO VAR-4}"],
+    "body": [
+      "SUBTRACT ${2:VAR-2} FROM ${3:VAR-1} GIVING ${4:VAR-3}",
+      "NOT ON EXCEPTION ${1:MOVE ZEROS TO VAR-4}"
+    ],
     "description": "NOT is a true/false test - testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4."
   },
   "NOT INVALID": {
@@ -1794,7 +1926,11 @@
   },
   "NULL": {
     "prefix": "NULL",
-    "body": ["IF ${2:PTR-VAR} IS ${1|NULL,NULLS|}", "\tSET ${2:PTR-VAR} TO ${1|NULL,NULLS|}", "END-IF."],
+    "body": [
+      "IF ${2:PTR-VAR} IS ${1|NULL,NULLS|}",
+      "\tSET ${2:PTR-VAR} TO ${1|NULL,NULLS|}",
+      "END-IF."
+    ],
     "description": "NULL which has the value of zero, is a data type used with datatypes of: POINTER, PROCEDURE-POINTER, FUNCTION-POINTER, OBJECT REFERENCE, or the ADDRESS OF a special register."
   },
   "NUMERIC": {
@@ -1804,7 +1940,10 @@
   },
   "NUMERIC-EDITED": {
     "prefix": "NUMERIC-EDITED",
-    "body": ["INITIALIZE ${1:VAR1} REPLACING NUMERIC-EDITED DATA BY ${2:literal or variable}", "END-INITIALIZE."],
+    "body": [
+      "INITIALIZE ${1:VAR1} REPLACING NUMERIC-EDITED DATA BY ${2:literal or variable}",
+      "END-INITIALIZE."
+    ],
     "description": "NUMERIC-EDITED => Numeric data items with insertion characters."
   },
   "OBJECT-COMPUTER": {
@@ -1819,17 +1958,27 @@
   },
   "OCCURS": {
     "prefix": "OCCURS",
-    "body": ["01 ${2:TABLE-GROUP-NAME}.", "\t05 ${3:TABLE-ROW-NAME} OCCURS ${1:5} TIMES."],
+    "body": [
+      "01 ${2:TABLE-GROUP-NAME}.",
+      "\t05 ${3:TABLE-ROW-NAME} OCCURS ${1:5} TIMES."
+    ],
     "description": "OCCURS is used to code a table by defining a number (N) of repeated subordinate rows."
   },
   "OCCURS DEPENDING ON": {
     "prefix": "OCCURS DEPENDING ON",
-    "body": ["01 ${4:TABLE-GROUP-NAME}.", "\t05 ${5:TABLE-ROW-SIZE} PIC 9(4).", "\t05 ${1:FIELD-2} OCCURS ${2:1} TO ${3:5} TIMES", "\t\tDEPENDING ON ${5:TABLE-ROW-SIZE} ${6:arrayEntryCountDefinition}"],
+    "body": [
+      "01 ${4:TABLE-GROUP-NAME}.",
+      "\t05 ${5:TABLE-ROW-SIZE} PIC 9(4).",
+      "\t05 ${1:FIELD-2} OCCURS ${2:1} TO ${3:5} TIMES",
+      "\t\tDEPENDING ON ${5:TABLE-ROW-SIZE} ${6:arrayEntryCountDefinition}"
+    ],
     "description": "OCCURS DEPENDING ON is used to code a table where you do not know how many rows are in the table."
   },
   "MOVE x OF y TO": {
     "prefix": "OF",
-    "body": ["MOVE ${1:CUSTOMER-NO} OF ${2:CUST-IN} TO ${3:CUSTOMER-NO} OF ${4:CUST-OUT}."],
+    "body": [
+      "MOVE ${1:CUSTOMER-NO} OF ${2:CUST-IN} TO ${3:CUSTOMER-NO} OF ${4:CUST-OUT}."
+    ],
     "description": "OF (qualification) allows you to uniquely specify a variable by referencing higher-level variable-names in a struction."
   },
   "SET ADDRESS OF": {
@@ -1849,12 +1998,22 @@
   },
   "RECORDS ARE OMITTED": {
     "prefix": "OMITTED",
-    "body": ["SELECT ${1:TAPE-FILE} ASSIGN TO ${2:TAPEFLXT}", "LABEL RECORDS ARE OMITTED"],
+    "body": [
+      "SELECT ${1:TAPE-FILE} ASSIGN TO ${2:TAPEFLXT}",
+      "LABEL RECORDS ARE OMITTED"
+    ],
     "description": "Used for Tape files without z/OS data set LABELS. Note that the same OMITTED phrase can be used in SORT/MERGE processing."
   },
   "DEPENDING ON": {
     "prefix": "ON",
-    "body": ["01 ${2:DATA-TAB}.", "\t05 ${3:MSG} OCCURS ${4:0} TO ${5:5} DEPENDING ON ${1:TBL-ROW-SIZE}.", "\t\t10 ${6:MSG-VERSION} USAGE COMP-1.", "\t\t10 ${7:USER-ID-IN} PIC 9999 USAGE DISPLAY.", "\t\t10 ${8:TBL-ROW-SIZE} PIC 9(4) COMP.", "\t\t10 ${9:MSG-TXT} PIC X(32)."],
+    "body": [
+      "01 ${2:DATA-TAB}.",
+      "\t05 ${3:MSG} OCCURS ${4:0} TO ${5:5} DEPENDING ON ${1:TBL-ROW-SIZE}.",
+      "\t\t10 ${6:MSG-VERSION} USAGE COMP-1.",
+      "\t\t10 ${7:USER-ID-IN} PIC 9999 USAGE DISPLAY.",
+      "\t\t10 ${8:TBL-ROW-SIZE} PIC 9(4) COMP.",
+      "\t\t10 ${9:MSG-TXT} PIC X(32)."
+    ],
     "description": "ON is used as part of a dynamic table declaration."
   },
   "SET ptr ON": {
@@ -1864,7 +2023,11 @@
   },
   "ON SIZE ERROR": {
     "prefix": "ON SIZE ERROR",
-    "body": ["MULTIPLY ${2:VAR-1} BY ${3:VAR-2} GIVING ${4:VAR-3}", "\tONE SIZE ERROR GO TO ${1:ARITH-PROBLEM}", "END-MULTIPLY."],
+    "body": [
+      "MULTIPLY ${2:VAR-1} BY ${3:VAR-2} GIVING ${4:VAR-3}",
+      "\tONE SIZE ERROR GO TO ${1:ARITH-PROBLEM}",
+      "END-MULTIPLY."
+    ],
     "description": "ON is used to code: ON SIZE ERROR, ON OVERFLOW and ON EXCEPTION error and exception trapping phrases."
   },
   "OPEN EXTEND": {
@@ -1894,37 +2057,60 @@
   },
   "If x OR y": {
     "prefix": "OR",
-    "body": ["IF ${1:statement-1} OR ${2:statement-2} THEN", "\t${3:ifEitherIsTrue}", "END-IF."],
+    "body": [
+      "IF ${1:statement-1} OR ${2:statement-2} THEN",
+      "\t${3:ifEitherIsTrue}",
+      "END-IF."
+    ],
     "description": "A logical comparison operator. The truth value of OR is true when either or both conditions are met."
   },
   "WHEN x OR y": {
     "prefix": "WHEN x OR y",
-    "body": ["EVALUATE ${1:PATIENT-CODE}", "\tWHEN = \"${2:I}\" OR \"${3:E}\"", "\t\t${4:statementWhenIsTrue}", "END-IF."],
+    "body": [
+      "EVALUATE ${1:PATIENT-CODE}",
+      "\tWHEN = \"${2:I}\" OR \"${3:E}\"",
+      "\t\t${4:statementWhenIsTrue}",
+      "END-IF."
+    ],
     "description": "A logical comparison operator that is part of an EVALUATE statement. The truth value of OR is true when either or both conditions are met."
   },
   "DUPLICATES IN ORDER": {
     "prefix": "ORDER",
-    "body": ["SORT ${1:varOrTable} ON ${2|ASCENDING,DESCENDING|} ${3:sort-var-key}", "DUPLICATES IN ORDER."],
+    "body": [
+      "SORT ${1:varOrTable} ON ${2|ASCENDING,DESCENDING|} ${3:sort-var-key}",
+      "DUPLICATES IN ORDER."
+    ],
     "description": "If duplicate records are found, by coding DUPLICATES IN ORDER z/OS will maintain the physical order. Without this phrase, the sorting of duplicate records is undefined."
   },
   "ORGANIZATION (QSAM)": {
     "prefix": "ORGANIZATION",
-    "body": ["SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
+    "body": [
+      "SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
       "\tORGANIZATION IS SEQUENTIAL.",
-      "$0"],
+      "$0"
+    ],
     "description": "QSAM file accessed sequentially (one record after the next)._6.4.0/pdf/pgmvs.pdf"
   },
   "ORGANIZATION (VSAM)": {
     "prefix": "ORGANIZATION",
-    "body": ["SELECT ${2:rptfil} ASSIGN TO ${3:rptfilDD}",
-    "\tORGANIZATION IS ${1|INDEXED,RELATIVE,SEQUENTIAL|}.",
-    "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}",
-    "$0"],
+    "body": [
+      "SELECT ${2:rptfil} ASSIGN TO ${3:rptfilDD}",
+      "\tORGANIZATION IS ${1|INDEXED,RELATIVE,SEQUENTIAL|}.",
+      "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}",
+      "$0"
+    ],
     "description": "VSAM file ORGANIZATION clause for a VSAM file accessed thru the file's index (key1). _6.4.0/pdf/pgmvs.pdf"
   },
   "OTHER": {
     "prefix": "OTHER",
-    "body": ["EVALUATE ${1:VAR-1}", "\tWHEN ${2:statement}", "\t\t${3:doThisWhenTrue}", "\tWHEN OTHER", "\t\t${4:defaultToThis}", "END-EVALUATE."],
+    "body": [
+      "EVALUATE ${1:VAR-1}",
+      "\tWHEN ${2:statement}",
+      "\t\t${3:doThisWhenTrue}",
+      "\tWHEN OTHER",
+      "\t\t${4:defaultToThis}",
+      "END-EVALUATE."
+    ],
     "description": "In an EVALUATE statement if no WHEN phrase is selected and WHEN OTHER is specified, execution continues with the OTHER statement._6.4.0/pdf/pgmvs.pdf"
   },
   "OUTPUT": {
@@ -1934,22 +2120,43 @@
   },
   "OUTPUT PROCEDURE": {
     "prefix": "OUTPUT PROCEDURE",
-    "body": ["${2:000-MAIN}.", "SORT ${3:IN-FILE} ON ${4|ASCENDING,DESCENDING|} KEY ${5:IN-SORT-KEY}", "\t\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}, ", "OUTPUT PROCEDURE IS ${1:procName}."],
+    "body": [
+      "${2:000-MAIN}.",
+      "SORT ${3:IN-FILE} ON ${4|ASCENDING,DESCENDING|} KEY ${5:IN-SORT-KEY}",
+      "\t\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}, ",
+      "OUTPUT PROCEDURE IS ${1:procName}."
+    ],
     "description": "PROCEDURE DIVISION - In a SORT or MERGE statement OUTPUT PROCEDURE specifies the name of a COBOL SECTION or paragraph that selects and/or modies output records from the SORT/MERGE operation."
   },
   "ON OVERFLOW GO TO (Unstring Statement)": {
     "prefix": "OVERFLOW",
-    "body": ["UNSTRING ${2:PATIENT-RCD}", "\tDELIMITED BY ${3:statement}", "\tINTO ${4:PATIENT-NAME}", "\tON OVERFLOW GO TO ${1:UNSTRING-OVERFLOW}", "END-UNSTRING."],
+    "body": [
+      "UNSTRING ${2:PATIENT-RCD}",
+      "\tDELIMITED BY ${3:statement}",
+      "\tINTO ${4:PATIENT-NAME}",
+      "\tON OVERFLOW GO TO ${1:UNSTRING-OVERFLOW}",
+      "END-UNSTRING."
+    ],
     "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime.  Note that after ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (String Statement)": {
     "prefix": "OVERFLOW",
-    "body": ["STRING ${2:PATIENT-NO SPACE PATIENT-NAME INV-NO SPACE DATE-PROCESS SPACE}", "\tDELIMITED BY ${3:SIZE}", "\tINTO ${4:WS-PATIENT-RPT-LINE}", "\tON OVERFLOW GO TO ${1:STRING-OVERFLOW}", "END-STRING."],
+    "body": [
+      "STRING ${2:PATIENT-NO SPACE PATIENT-NAME INV-NO SPACE DATE-PROCESS SPACE}",
+      "\tDELIMITED BY ${3:SIZE}",
+      "\tINTO ${4:WS-PATIENT-RPT-LINE}",
+      "\tON OVERFLOW GO TO ${1:STRING-OVERFLOW}",
+      "END-STRING."
+    ],
     "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime.  Note that after ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (Call Statement)": {
     "prefix": "OVERFLOW",
-    "body": ["CALL \"${1:progName}\"", "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}", "END-CALL."],
+    "body": [
+      "CALL \"${1:progName}\"",
+      "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}",
+      "END-CALL."
+    ],
     "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND.  Note that after ON OVERFLOW you can code any imperative statement."
   },
   "PARSE": {
