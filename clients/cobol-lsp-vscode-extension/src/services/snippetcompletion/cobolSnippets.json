@@ -1349,7 +1349,7 @@
   },
   "GROUP-USAGE": {
     "prefix": "GROUP-USAGE",
-    "body": ["01 ${1:NAT-GROUP-1} GROUP-USAGE NATIONAL.", "\t02 ${2:GROUP-1}.", "\t\t04 ${3:groupVar} PIC ${5:99}."],
+    "body": ["01 ${1:NAT-GROUP-1} GROUP-USAGE NATIONAL.", "\t02 ${2:GROUP-1}.", "\t\t04 ${3:groupVar} PIC ${4:99}."],
     "description": "A group item that is described with an explicit or implicit GROUP-USAGE NATIONAL clause is a national group item. Note that NATIONAL data items are represented as UTF-16 characters. "
   },
   "HIGH-VALUE": {
@@ -1369,7 +1369,7 @@
   },
   "ID DIVISION": {
     "prefix": "ID DIVISION",
-    "body": ["ID DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.", "ENVIRONMENT DIVISION.", "$0"],
+    "body": ["ID DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${2:/UPCASE}/}}.", "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.", "ENVIRONMENT DIVISION.", "$0"],
     "description": "The ID DIVISION contains paragraphs definining the: PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs. Note that ID is an abbreviation of IDENTIFICATION."
   },
   "INPUT": {
@@ -1410,7 +1410,7 @@
   },
   "IF ELSE": {
     "prefix": "IF",
-    "body": ["IF ${1:CONDITION}", "\t${2:ifTrue}", "ELSE", "\t${4:ifFalse}", "END-IF"],
+    "body": ["IF ${1:CONDITION}", "\t${2:ifTrue}", "ELSE", "\t${3:ifFalse}", "END-IF"],
     "description": "IF ELSE"
   },
   "IN #1": {
@@ -1473,7 +1473,7 @@
   },
   "INVALID KEY (VSAM)": {
     "prefix": "INVALID KEY",
-    "body": ["${2|READ,START,WRITE,REWRITE,DELETE|} ${3:VSAM-FILE}", "\tINVALID KEY GO TO ${1:999-VSAM-FILE-ERROR}", "END-READ"],
+    "body": ["${2|READ,START,WRITE,REWRITE,DELETE|} ${3:VSAM-FILE}", "\tINVALID KEY GO TO ${1:999-VSAM-FILE-ERROR}", "END-READ."],
     "description": "INVALID KEY can be used in VSAM KSDS and RRDS files for: READ, START, WRITE, REWRITE, and DELETE statements. The INVALID KEY imperative statement is given control if an I/O error occurs due to a defective VSAM file index key."
   },
   "INVALID KEY (QSAM)": {
@@ -1483,7 +1483,7 @@
   },
   "INVOKE": {
     "prefix": "INVOKE",
-    "body": ["INVOKE ${1:id|CLASS|SELF|SUPER} ${2:LIT|ID|NEW}"],
+    "body": ["INVOKE ${1|id,CLASS,SELF,SUPER|} ${2|LIT,ID,NEW|}"],
     "description": "INVOKE"
   },
   "ACCESS IS": {
@@ -1934,7 +1934,7 @@
   },
   "OUTPUT PROCEDURE": {
     "prefix": "OUTPUT PROCEDURE",
-    "body": ["${2:000-MAIN}.", "SORT ${3:IN-FILE} ON ${4|ASCENDING|DESCENDING} KEY ${5:IN-SORT-KEY}", "\t\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}, ", "OUTPUT PROCEDURE IS ${1:procName}."],
+    "body": ["${2:000-MAIN}.", "SORT ${3:IN-FILE} ON ${4|ASCENDING,DESCENDING|} KEY ${5:IN-SORT-KEY}", "\t\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}, ", "OUTPUT PROCEDURE IS ${1:procName}."],
     "description": "PROCEDURE DIVISION - In a SORT or MERGE statement OUTPUT PROCEDURE specifies the name of a COBOL SECTION or paragraph that selects and/or modies output records from the SORT/MERGE operation."
   },
   "ON OVERFLOW GO TO (Unstring Statement)": {
