@@ -1355,39 +1355,33 @@
   "GROUP-USAGE": {
     "prefix": "GROUP-USAGE",
     "body": [
-      "01 ${1:NAT-GROUP-1} GROUP-USAGE NATIONAL.",
-      "\t02 ${2:GROUP-1}.",
-      "\t\t04 ${3:groupVar} PIC ${4:99}."
+      "01 ${1:NAT-GROUP-1} GROUP-USAGE ${2|NATIONAL,UTF-8|}.",
+      "\t02 ${3:GROUP-1}.",
+      "\t\t04 ${4:groupVar} PIC ${5:99}."
     ],
     "description": "A group item that is described with an explicit or implicit GROUP-USAGE NATIONAL clause is a national group item. Note that NATIONAL data items are represented as UTF-16 characters. "
   },
-  "HIGH-VALUE": {
+  "HIGH-VALUES": {
     "prefix": "HIGH-VALUES",
     "body": [
-      "READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE ${3|HIGH-VALUE,HIGH-VALUES|} TO ${4:INPUT-REC}."
+      "READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE HIGH-VALUES TO ${3:INPUT-REC}."
     ],
     "description": "HIGH-VALUE equates to binary (Hex) FF - the highest EBCDIC collating sequence value."
   },
   "I-O": {
     "prefix": "I-O",
     "body": ["OPEN I-O ${1:fileName}"],
-    "description": "Use the I-O (OPEN) file mode to rewrite QSAM and VSAM file records in place."
-  },
-  "I-O-CONTROL": {
-    "prefix": "I-O-CONTROL",
-    "body": ["I-O-CONTROL."],
-    "description": "The I-O-CONTROL paragraph defines specific data input-output protocols that are applicable for certain files."
+    "description": "Use the input-output file mode to rewrite QSAM and VSAM file records in place."
   },
   "ID DIVISION": {
     "prefix": "ID DIVISION",
     "body": [
-      "ID DIVISION.",
+      "IDENTIFICATION DIVISION.",
       "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${2:/UPCASE}/}}.",
       "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.",
-      "ENVIRONMENT DIVISION.",
       "$0"
     ],
-    "description": "The ID DIVISION contains paragraphs definining the: PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs. Note that ID is an abbreviation of IDENTIFICATION."
+    "description": "The IDENTIFICATION DIVISION contains paragraphs definining the: PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs."
   },
   "INPUT": {
     "prefix": "INPUT",
@@ -1449,8 +1443,8 @@
   "IN #2": {
     "prefix": "IN",
     "body": [
-      "UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL \"${3:|}\" OR \"${4:/}\"",
-      "\tINTO ${5:CUST-NAME} COUNT IN ${1:CTR-1} DELIMITER IN ${6:DLM-CHAR}",
+      "UNSTRING ${2:CUST-FIELD-IN} DELIMITED ${2|BY,BY ALL|} \"${4:|}\" OR \"${5:/}\"",
+      "\tINTO ${6:CUST-NAME} COUNT IN ${1:CTR-1} DELIMITER IN ${7:DLM-CHAR}",
       "END-UNSTRING.",
       "$0"
     ],
@@ -1476,8 +1470,8 @@
     "prefix": "INDEXED",
     "body": [
       "01 ${3:GROUP-FIELD}",
-      "\t05 ${4:TABLE-ITEM} PIC X(1)",
-      "\t\tOCCURS ${1:100} INDEXED BT ${2:IDX-BTYE}"
+      "\t05 ${4:TABLE-ITEM} PIC ${5:X(1)}",
+      "\t\tOCCURS ${1:100} INDEXED BY ${2:IDX-BTYE}"
     ],
     "description": "INDEXED BY defines an internal COBOL index data item and associates it with a given COBOL table."
   },
@@ -1507,7 +1501,7 @@
   "RETURN INTO": {
     "prefix": "RETURN INTO",
     "body": [
-      "RETURN ${1:fileName} INTO TAB-ENTRY(${2:TAB-INDX}",
+      "RETURN ${1:fileName} INTO TAB-ENTRY(${2:TAB-INDX})",
       "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-SORT}",
       "END-RETURN"
     ],
@@ -1557,14 +1551,14 @@
   "USAGE IS": {
     "prefix": "USAGE IS",
     "body": [
-      "77 ${2:VAR1} PIC ${3:X} USAGE IS ${1|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
+      "77 ${1:VAR1} PIC ${2:X} USAGE IS ${3|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
     ],
     "description": "Variable declarations with IS. Note that IS is optional."
   },
   "IF x IS": {
     "prefix": "IF x IS",
     "body": [
-      "IF ${2:VAR1} IS ${1|NUMERIC,ALPHABETIC,ALPHABETIC-LOWER,ALPHABETIC-UPPER,DBCS,KANJI,POSITIVE,NEGATIVE,ZERO|} THEN"
+      "IF ${1:VAR1} IS ${2|NUMERIC,ALPHABETIC,ALPHABETIC-LOWER,ALPHABETIC-UPPER,DBCS,KANJI,POSITIVE,NEGATIVE,ZERO|} THEN"
     ],
     "description": "Class conditional tests with IS."
   },
@@ -1601,7 +1595,7 @@
     "prefix": "JUSTIFIED",
     "body": [
       "WORKING-STORAGE SECTION.",
-      "\t01 ${1:VAR1} PIC X(40) ${2|JUST,JUSTIFIED|} RIGHT"
+      "\t01 ${1:VAR1} PIC X(40) JUSTIFIED RIGHT"
     ],
     "description": "The JUST/JUSTIFIED clause overrides standard positioning rules for receiving items of category alphabetic, alphanumeric, DBCS, or national."
   },
@@ -1613,20 +1607,20 @@
   "ASCENDING KEY #1": {
     "prefix": "ASCENDING KEY IS",
     "body": [
-      "01 ${3:TABLE-ENTRIES}",
-      "\t05 ${4:TAB-COLM3} OCCURS ${5:100} TIMES",
-      "\tASCENDING KEY IS ${1:TAB-KEY4} INDEXED BY ${2:TAB-COLM3-IDX}.",
-      "\t\t20 ${1:TAB-KEY4} PIC X(5)."
+      "01 ${1:TABLE-ENTRIES}",
+      "\t05 ${2:TAB-COLM3} OCCURS ${3:100} TIMES",
+      "\tASCENDING KEY IS ${4:TAB-KEY4} INDEXED BY ${5:TAB-COLM3-IDX}.",
+      "\t\t20 ${4:TAB-KEY4} PIC X(5)."
     ],
     "description": "ASCENDING KEY in a table OCCURS clause allows you to use a COBOL SEARCH ALL construct."
   },
   "ASCENDING KEY #2": {
     "prefix": "ASCENDING KEY IS",
     "body": [
-      "15 ${2:TABLE-ENTRY3} OCCURS ${3:5} TIMES",
-      "ASCENDING KEY IS ${1:KEY1}",
+      "15 ${1:TABLE-ENTRY3} OCCURS ${2:5} TIMES",
+      "ASCENDING KEY IS ${3:KEY1}",
       "INDEXED BY ${4:TE3-INDEX}.",
-      "20 ${1:KEY1} PIC X(5)."
+      "20 ${5:KEY1} PIC X(5)."
     ],
     "description": "ASCENDING KEY in a table OCCURS clause allows you to use a COBOL SEARCH ALL construct."
   },
@@ -1661,7 +1655,7 @@
   "LEFT": {
     "prefix": "LEFT",
     "body": [
-      "01 ${2:GROUP-VAR}",
+      "01 ${2:GROUP-VAR}.",
       "\t05 ${1:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."
     ],
     "description": "LEFT Specifies that an elementary COBOL variable is to be positioned in main storage so that byte one begins at the left word boundary. Note that this is an efficiency coding specification."
@@ -1676,8 +1670,7 @@
     "body": [
       "IF ${1:VAR1} LESS THEN ${2:VAR2} THEN",
       "\t${3:ifTrue}",
-      "END-IF.",
-      "$0"
+      "END-IF."
     ],
     "description": "LESS is a general comparison operator - treated like the algebraic \"<\" operator."
   },
@@ -1714,13 +1707,13 @@
   "READ LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": [
-      "READ ${1:IN-FILE} AT END MOVE ${2|LOW-VALUE,LOW-VALUES|} TO ${3:INPUT-REC}."
+      "READ ${1:IN-FILE} AT END MOVE LOW-VALUES TO ${2:INPUT-REC}."
     ],
     "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "MOVE LOW-VALUE": {
     "prefix": "LOW-VALUE",
-    "body": ["MOVE ${1|LOW-VALUE,LOW-VALUES|} TO ${2:VAR1}."],
+    "body": ["MOVE LOW-VALUES TO ${1:VAR1}."],
     "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "IF LOW-VALUE": {
@@ -1787,14 +1780,13 @@
   "RECORDING MODE": {
     "prefix": "RECORDING MODE",
     "body": [
-      "FILE SECTION.",
-      "FD ${2:FILENAME}",
+      "FD ${1:FILENAME}",
       "LABEL RECORDS ARE STANDARD",
       "BLOCK CONTAINS 0",
-      "RECORDING MODE IS ${1|F,V,U,S|}",
-      "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS"
+      "RECORDING MODE IS ${2|F,V,U,S|}",
+      "\tRECORD CONTAINS ${3:numLiteral} CHARACTERS"
     ],
-    "description": "RECORDING MODE specifies the physical format of records in a QSAM file: F (fixed), V (variable), U (fixed or variable), S (spanned)"
+    "description": "FILE SECTION - RECORDING MODE specifies the physical format of records in a QSAM file: F (fixed), V (variable), U (fixed or variable), S (spanned)"
   },
   "DEBUGGING MODE": {
     "prefix": "DEBUGGING MODE",
@@ -1808,7 +1800,7 @@
   },
   "MOVE CORRESPONDING": {
     "prefix": "MOVE CORRESPONDING",
-    "body": ["MOVE ${1|CORR,CORRESPONDING|} ${2:group-1} TO ${3:group-2}"],
+    "body": ["MOVE CORRESPONDING ${1:group-1} TO ${2:group-2}"],
     "description": "After the above MOVE CORRESPONDING statement, all values in like-named-variables will be copied from GROUP-1 to GROUP-2."
   },
   "MOVE": {
@@ -1858,23 +1850,22 @@
   "NATIONAL-EDITED #1": {
     "prefix": "NATIONAL-EDITED",
     "body": [
-      "WORKING-STORAGE SECTION.",
-      "01 ${2:ORIG-CUSTOMER-NAME} GROUP-USAGE ${1|NATIONAL,NATIONAL-EDITED|}",
-      "\t05 ${3:SURNAME} PIC N(${4:17})."
+      "01 ${1:ORIG-CUSTOMER-NAME} GROUP-USAGE NATIONAL",
+      "\t05 ${2:SURNAME} PIC N(${3:17})."
     ],
-    "description": "NATIONAL/NATIONAL-EDITED data items are variables whose content is represented in UTF-16 (often referred to as Unicode)."
+    "description": "WORKING-STORAGE SECTION - NATIONAL/NATIONAL-EDITED data items are variables whose content is represented in UTF-16 (often referred to as Unicode)."
   },
   "NATIONAL-EDITED #2": {
     "prefix": "NATIONAL-EDITED",
     "body": [
-      "INITIALIZE ${2:VAR1} REPLACING ${1|NATIONAL,NATIONAL-EDITED|} DATA BY ${3:VAR2}"
+      "INITIALIZE ${1:VAR1} REPLACING NATIONAL DATA BY ${2:VAR2}"
     ],
     "description": "PROCEDURE DIVISION - NATIONAL/NATIONAL-EDITED data (or data items within a group field) are replaced by the same-named variables in VAR-2 in the given example."
   },
   "NATIVE": {
     "prefix": "NATIVE",
     "body": [
-      "77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|} USAGE NATIVE."
+      "77 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."
     ],
     "description": "NATIVE is syntax checked, but has no effect on program execution."
   },
@@ -1911,11 +1902,11 @@
     ],
     "description": "NOT is a true/false test - testing true if the comparison fails."
   },
-  "NOT ON EXCEPTION": {
-    "prefix": "NOT ON EXCEPTION",
+  "NOT ON SIZE ERROR": {
+    "prefix": "NOT ON SIZE ERROR",
     "body": [
-      "SUBTRACT ${2:VAR-2} FROM ${3:VAR-1} GIVING ${4:VAR-3}",
-      "NOT ON EXCEPTION ${1:MOVE ZEROS TO VAR-4}"
+      "SUBTRACT ${1:VAR-2} FROM ${2:VAR-1} GIVING ${3:VAR-3}",
+      "NOT ON SIZE ERROR ${4:MOVE ZEROS TO VAR-4}"
     ],
     "description": "NOT is a true/false test - testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4."
   },
@@ -1927,8 +1918,8 @@
   "NULL": {
     "prefix": "NULL",
     "body": [
-      "IF ${2:PTR-VAR} IS ${1|NULL,NULLS|}",
-      "\tSET ${2:PTR-VAR} TO ${1|NULL,NULLS|}",
+      "IF ${1:PTR-VAR} IS NULL",
+      "\tSET ${1:PTR-VAR} TO ${2|identified,ADDRESS OF identified|}",
       "END-IF."
     ],
     "description": "NULL which has the value of zero, is a data type used with datatypes of: POINTER, PROCEDURE-POINTER, FUNCTION-POINTER, OBJECT REFERENCE, or the ADDRESS OF a special register."
@@ -1990,11 +1981,6 @@
     "prefix": "OFF",
     "body": ["INLINE OFF"],
     "description": "This COBOL directive OFF prevents the compiler from inlining procedures referenced by PERFORM statements."
-  },
-  "ALL31 OFF": {
-    "prefix": "OFF",
-    "body": ["ALL31(OFF)"],
-    "description": "Another COBOL directive - specific to external files and DFSMS buffer allocations."
   },
   "RECORDS ARE OMITTED": {
     "prefix": "OMITTED",
@@ -2096,7 +2082,7 @@
     "body": [
       "SELECT ${2:rptfil} ASSIGN TO ${3:rptfilDD}",
       "\tORGANIZATION IS ${1|INDEXED,RELATIVE,SEQUENTIAL|}.",
-      "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}",
+      "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}.",
       "$0"
     ],
     "description": "VSAM file ORGANIZATION clause for a VSAM file accessed thru the file's index (key1). _6.4.0/pdf/pgmvs.pdf"
@@ -2123,8 +2109,8 @@
     "body": [
       "${2:000-MAIN}.",
       "SORT ${3:IN-FILE} ON ${4|ASCENDING,DESCENDING|} KEY ${5:IN-SORT-KEY}",
-      "\t\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}, ",
-      "OUTPUT PROCEDURE IS ${1:procName}."
+      "\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}",
+      "\tOUTPUT PROCEDURE IS ${1:procName}."
     ],
     "description": "PROCEDURE DIVISION - In a SORT or MERGE statement OUTPUT PROCEDURE specifies the name of a COBOL SECTION or paragraph that selects and/or modies output records from the SORT/MERGE operation."
   },
