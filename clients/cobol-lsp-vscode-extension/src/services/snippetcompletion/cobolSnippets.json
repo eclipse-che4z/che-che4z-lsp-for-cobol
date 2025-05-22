@@ -1865,7 +1865,7 @@
   },
   "NEXT SENTENCE": {
     "prefix": "NEXT SENTENCE",
-    "body": ["IF ${1:statement}", "\t$0", "ELSE", "\tNEXT SENTENCE", "END-IF."],
+    "body": ["IF ${1:statement}", "\t$0", "ELSE", "\tNEXT SENTENCE", "END-IF"],
     "description": "NEXT SENTENCE transfers control to the next sequential instruction following the closest period (separator)."
   },
   "NEXT RECORD": {
