@@ -36,12 +36,12 @@ public class DocumentModelService {
       Collections.synchronizedMap(new HashMap<>());
   private final SourceUnitGraph sourceUnitGraph;
 
-    @Inject
-    public DocumentModelService(SourceUnitGraph sourceUnitGraph) {
-        this.sourceUnitGraph = sourceUnitGraph;
-    }
+  @Inject
+  public DocumentModelService(SourceUnitGraph sourceUnitGraph) {
+    this.sourceUnitGraph = sourceUnitGraph;
+  }
 
-    /**
+  /**
    * Mark the document as opened and stores document text
    *
    * @param uri - document uri
@@ -74,7 +74,10 @@ public class DocumentModelService {
   @Synchronized
   public Collection<CobolDocumentModel> findMainSource(String uri) {
     if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
-      return  sourceUnitGraph.getAllAssociatedFilesForACopybook(uri).stream().filter(a -> !sourceUnitGraph.isUserSuppliedCopybook(a)).map(docs::get).collect(Collectors.toList());
+      return sourceUnitGraph.getAllAssociatedFilesForACopybook(uri).stream()
+          .filter(a -> !sourceUnitGraph.isUserSuppliedCopybook(a))
+          .map(docs::get)
+          .collect(Collectors.toList());
     }
 
     if (docs.containsKey(uri) && docs.get(uri).isDocumentSynced()) {

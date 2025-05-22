@@ -60,8 +60,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
       new ConcurrentHashMap<>();
 
   @Inject
-  public SourceUnitGraph(
-      WorkspaceFileService fileService) {
+  public SourceUnitGraph(WorkspaceFileService fileService) {
     this.fileService = fileService;
   }
 

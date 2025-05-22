@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +60,7 @@ public class ReferencesHandler {
     Collection<CobolDocumentModel> models = documentModelService.findMainSource(uri);
     List<Location> locations = new ArrayList<>();
     for (CobolDocumentModel model : models) {
-       locations.addAll(occurrences.findReferences(model, params, params.getContext()));
+      locations.addAll(occurrences.findReferences(model, params, params.getContext()));
     }
     return locations;
   }
