@@ -1706,9 +1706,7 @@
   },
   "READ LOW-VALUE": {
     "prefix": "LOW-VALUE",
-    "body": [
-      "READ ${1:IN-FILE} AT END MOVE LOW-VALUES TO ${2:INPUT-REC}."
-    ],
+    "body": ["READ ${1:IN-FILE} AT END MOVE LOW-VALUES TO ${2:INPUT-REC}."],
     "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "MOVE LOW-VALUE": {
@@ -1857,16 +1855,12 @@
   },
   "NATIONAL-EDITED #2": {
     "prefix": "NATIONAL-EDITED",
-    "body": [
-      "INITIALIZE ${1:VAR1} REPLACING NATIONAL DATA BY ${2:VAR2}"
-    ],
+    "body": ["INITIALIZE ${1:VAR1} REPLACING NATIONAL DATA BY ${2:VAR2}"],
     "description": "PROCEDURE DIVISION - NATIONAL/NATIONAL-EDITED data (or data items within a group field) are replaced by the same-named variables in VAR-2 in the given example."
   },
   "NATIVE": {
     "prefix": "NATIVE",
-    "body": [
-      "77 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."
-    ],
+    "body": ["77 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."],
     "description": "NATIVE is syntax checked, but has no effect on program execution."
   },
   "NEXT SENTENCE": {
