@@ -576,12 +576,22 @@
   },
   "DESCENDING": {
     "prefix": "DESCENDING item",
-    "body": ["01 ${1:BINARY-SORTED-TABLE}.", "\t05 ${2:TABLE-ROW-NAME} OCCURS ${3:5} TIMES", "\t\tDESCENDING ${4:KEY-3}", "\t\tINDEXED BY ${5:INDX-1}.", "\t\t10 ${6:CUST-NBR} PIC 9(6)"],
+    "body": [
+      "01 ${1:BINARY-SORTED-TABLE}.",
+      "\t05 ${2:TABLE-ROW-NAME} OCCURS ${3:5} TIMES",
+      "\t\tDESCENDING ${4:KEY-3}",
+      "\t\tINDEXED BY ${5:INDX-1}.",
+      "\t\t10 ${6:CUST-NBR} PIC 9(6)"
+    ],
     "description": "Using the binary (efficient) table SEARCH ALL option, DESCENDING declares that the internal COBOL table rows are sorted in descending order based upon values in a specified field within the table."
   },
   "DISPLAY": {
     "prefix": "DISPLAY",
-    "body": ["IF ${1:FLD-2 = '....'}", "\tDISPLAY \"${2:messageHere}\"", "END-IF."],
+    "body": [
+      "IF ${1:FLD-2 = '....'}",
+      "\tDISPLAY \"${2:messageHere}\"",
+      "END-IF."
+    ],
     "description": "Show the value of a COBOL variable on a screen or write it to an output file by using a DISPLAY statement."
   },
   "DISPLAY-1": {
@@ -591,7 +601,12 @@
   },
   "DIVIDE": {
     "prefix": "DIVIDE",
-    "body": ["DIVIDE ${1:NUMVAR-1} INTO ${2:NUMVAR-2}", "GIVING ${3:NUMVAR-3} ROUNDED", "ON SIZE ERROR ${3:imperative_statement}", "END-DIVIDE."],
+    "body": [
+      "DIVIDE ${1:NUMVAR-1} INTO ${2:NUMVAR-2}",
+      "GIVING ${3:NUMVAR-3} ROUNDED",
+      "ON SIZE ERROR ${3:imperative_statement}",
+      "END-DIVIDE."
+    ],
     "description": "In this example, NUMVAR-1 is divided by NUMVAR-2 and the result is stored in NUMVAR-3, rounded to the nearest whole number. If NUMVAR-1 = 0 or the quotient is larger than the pic-clause of NUMVAR-3, the ON SIZE ERROR is executed. That would typically be a GO TO statement referencing a paragraph written to handle errors such as this."
   },
   "DIVIDE BY GIVING": {
@@ -853,7 +868,7 @@
   },
   "FD": {
     "prefix": "FD",
-    "body": ["FD ${1|QSAM-FILE,VSAM-FILE|}","\t$0"],
+    "body": ["FD ${1|QSAM-FILE,VSAM-FILE|}", "\t$0"],
     "description": "The FD describes files referred to in the PRODUCTION DIVISION's I/O statements."
   },
   "FILE": {
