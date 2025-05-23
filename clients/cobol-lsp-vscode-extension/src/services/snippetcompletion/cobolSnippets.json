@@ -543,6 +543,11 @@
     "body": ["INITIALIZE ${1:VAR1} TO DEFAULT."],
     "description": "PROCEDURE DIVISION - The INITIALIZE statement sets selected categories of data fields to predetermined values. The INITIALIZE statement is functionally equivalent to one or more MOVE statements."
   },
+  "DEBUG-CONTENTS": {
+    "prefix": "DEBUG-CONTENTS",
+    "body": ["01 DEBUG-ITEM.", "\t05 DEBUG-CONTENTS PICTURE IS X(${1:nn})."],
+    "description": "description"
+  },
   "DELETE": {
     "prefix": "DELETE fileName",
     "body": ["DELETE ${1:fileName}", "END-DELETE."],
@@ -571,13 +576,13 @@
   },
   "DESCENDING": {
     "prefix": "DESCENDING item",
-    "body": ["DESCENDING ${1:item}"],
-    "description": "DESCENDING item"
+    "body": ["01 ${1:BINARY-SORTED-TABLE}.", "\t05 ${2:TABLE-ROW-NAME} OCCURS ${3:5} TIMES", "\t\tDESCENDING ${4:KEY-3}", "\t\tINDEXED BY ${5:INDX-1}.", "\t\t10 ${6:CUST-NBR} PIC 9(6)"],
+    "description": "Using the binary (efficient) table SEARCH ALL option, DESCENDING declares that the internal COBOL table rows are sorted in descending order based upon values in a specified field within the table."
   },
   "DISPLAY": {
     "prefix": "DISPLAY",
-    "body": ["DISPLAY ${1:id}"],
-    "description": "DISPLAY literal"
+    "body": ["IF ${1:FLD-2 = '....'}", "\tDISPLAY \"${2:messageHere}\"", "END-IF."],
+    "description": "Show the value of a COBOL variable on a screen or write it to an output file by using a DISPLAY statement."
   },
   "DISPLAY-1": {
     "prefix": "DISPLAY-1",
@@ -586,8 +591,8 @@
   },
   "DIVIDE": {
     "prefix": "DIVIDE",
-    "body": ["DIVIDE ${1:a} BY ${2:b} GIVING ${3:c} ${4:REMAINDER ${5:d}}"],
-    "description": "DIVIDE a BY b GIVING REMAINDER"
+    "body": ["DIVIDE ${1:NUMVAR-1} INTO ${2:NUMVAR-2}", "GIVING ${3:NUMVAR-3} ROUNDED", "ON SIZE ERROR ${3:imperative_statement}", "END-DIVIDE."],
+    "description": "In this example, NUMVAR-1 is divided by NUMVAR-2 and the result is stored in NUMVAR-3, rounded to the nearest whole number. If NUMVAR-1 = 0 or the quotient is larger than the pic-clause of NUMVAR-3, the ON SIZE ERROR is executed. That would typically be a GO TO statement referencing a paragraph written to handle errors such as this."
   },
   "DIVIDE BY GIVING": {
     "prefix": "DIVIDE BY GIVING",
@@ -694,6 +699,11 @@
     "body": ["END-OF-PAGE ${1:item}"],
     "description": "END-OF-PAGE item"
   },
+  "EOP": {
+    "prefix": "EOP",
+    "body": ["WRITE ${1:QSAM-RECORD} AT EOP."],
+    "description": "EOP is a synonym for END-OF-PAGE."
+  },
   "EQUAL": {
     "prefix": "EQUAL",
     "body": ["${1:var-1} EQUAL ${2:var-2}"],
@@ -790,10 +800,10 @@
     "body": ["EXIT METHOD."],
     "description": "EXIT METHOD transfers control outside the Object COBOL program."
   },
-  "EXTEND": {
+  "ARITH EXTEND": {
     "prefix": "EXTEND",
-    "body": ["EXTEND ${1:fileName}"],
-    "description": "EXTEND fileName"
+    "body": ["ARITH(EXTEND}"],
+    "description": "A compiler directive that provides extended-precision function results that can accurately represent the value of the argument being returned."
   },
   "EXEC SQL": {
     "prefix": "EXEC SQL",
@@ -840,6 +850,11 @@
       "$0"
     ],
     "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each."
+  },
+  "FD": {
+    "prefix": "FD",
+    "body": ["FD ${1|QSAM-FILE,VSAM-FILE|}","\t$0"],
+    "description": "The FD describes files referred to in the PRODUCTION DIVISION's I/O statements."
   },
   "FILE": {
     "prefix": "FILE",
