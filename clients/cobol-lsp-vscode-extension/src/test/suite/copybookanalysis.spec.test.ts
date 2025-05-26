@@ -17,7 +17,7 @@ import * as helper from "./testHelper";
 import * as vscode from "vscode";
 import * as assert from "assert";
 
-suite("TC384131: Analysis Features for copybooks", function () {
+suite.only("TC384131: Analysis Features for copybooks", function () {
   this.timeout(helper.TEST_TIMEOUT);
   this.slow(1000);
   suiteSetup(async function () {
@@ -48,9 +48,11 @@ suite("TC384131: Analysis Features for copybooks", function () {
     await vscode.commands.executeCommand("editor.action.revealDefinition");
     const editor_copybook = vscode.window.activeTextEditor;
 
+    console.log("UI TEST%", editor_copybook?.document?.uri)
+
     //4- Find a paragprah, right click on it, and select "Go To References"
     assert.notEqual(editor_copybook, null);
-    await helper.sleep(1000);
+    await helper.sleep(2000);
 
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
@@ -76,13 +78,15 @@ suite("TC384131: Analysis Features for copybooks", function () {
     await vscode.commands.executeCommand("editor.action.revealDefinition");
     const editor_copybook = vscode.window.activeTextEditor;
 
+    console.log("UI TEST%", editor_copybook?.document?.uri);
+    
     //4- Find a paragprah, right click on it, and select "Go To References"
     assert.notEqual(editor_copybook, null);
     await vscode.languages.setTextDocumentLanguage(
       editor_copybook!.document,
       "cobol",
     );
-    await helper.sleep(1000);
+    await helper.sleep(2000);
 
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
