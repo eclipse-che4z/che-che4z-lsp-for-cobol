@@ -52,6 +52,16 @@ public class PreprocessorStage
   private final GrammarPreprocessor grammarPreprocessor;
   private final CleanerPreprocessor preprocessor;
   private final MessageService messageService;
+  private static final Pattern COMPILER_DIRECTIVE_LINE =
+      Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)>>\\s*(?<compilerDirectives>.+)");
+  private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r?\n");
+  private static final Pattern SECTION_PATTERN =
+      Pattern.compile(
+          "(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
+  private static final Pattern JAVA_SHAREABLE_ON_PATTERN =
+      Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
+  private static final Pattern DIALECT_FILLER_PATTERN =
+          Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
 
   @Override
   public StageResult<CopybooksRepository> run(
@@ -109,25 +119,30 @@ public class PreprocessorStage
 
   private void processCobolJavaInteroperabilityDirectives(AnalysisContext ctx) {
     String text = ctx.getExtendedDocument().getCurrentText().toString();
-    Pattern compilerDirectiveLine =
-        Pattern.compile("(?i)(?:\\d.{5}.*|\\s*)>>\\s*(?<compilerDirectives>.+)");
-    Pattern newLinePattern = Pattern.compile("\n\r?");
-    Pattern sectionPattern =
-        Pattern.compile(
-            "(?i)\\s*DATA\\s+DIVISION.*|\\s*WORKING-STORAGE.*|\\s*PROCEDURE\\s+DIVISION.*");
-    Pattern javaShareableonPattern = Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
 
-    String[] lines = newLinePattern.split(text);
+    String[] lines = NEW_LINE_PATTERN.split(text);
     String section = "";
     boolean isJavaShareableOn = false;
+    StringBuilder lineBuffer = new StringBuilder();
+    final int bufferSize = 100;
+
     for (int i = 0; i < lines.length; i++) {
-      Matcher directivesLine = compilerDirectiveLine.matcher(lines[i]);
-      Matcher sectionLine = sectionPattern.matcher(lines[i]);
-      if (!isJavaShareableOn && javaShareableonPattern.matcher(lines[i]).matches()) {
-        isJavaShareableOn = true;
+      Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(lines[i]);
+
+      lineBuffer.append(" ").append(lines[i].trim());
+      if (lineBuffer.length() > bufferSize) {
+        lineBuffer.delete(0, lineBuffer.length() - bufferSize);
       }
-      if (sectionLine.matches()) {
-        section = sectionLine.group().trim();
+
+      String bufferText = lineBuffer.toString().trim();
+      Matcher sectionMatcher = SECTION_PATTERN.matcher(bufferText);
+      if (sectionMatcher.find()) {
+        section = sectionMatcher.group();
+        lineBuffer.setLength(0);
+      }
+
+      if (!isJavaShareableOn && JAVA_SHAREABLE_ON_PATTERN.matcher(lines[i]).matches()) {
+        isJavaShareableOn = true;
       }
       if (!directivesLine.matches()) {
         continue;
@@ -159,9 +174,7 @@ public class PreprocessorStage
       String section,
       String directiveLineText,
       boolean isJavaShareableOn) {
-    Pattern dialectFillerPattern =
-        Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
-    if (!dialectFillerPattern.matcher(directiveText).matches()) {
+    if (!DIALECT_FILLER_PATTERN.matcher(directiveText).matches()) {
       CompilerDirectivesLexer lexer =
           new CompilerDirectivesLexer(CharStreams.fromString(directiveText));
       lexer.removeErrorListeners();
