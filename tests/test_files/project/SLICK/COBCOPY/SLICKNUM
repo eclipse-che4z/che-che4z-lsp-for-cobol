@@ -1,0 +1,151 @@
+       000-DATE-FIELD.                                                          
+                                                                                
+           MOVE ZERO                 TO WS-DATE-EXTRACT.                        
+                                                                                
+           PERFORM 000-DATE-EXTRACT                                             
+               VARYING I FROM 1 BY 1                                            
+                 UNTIL I > WS-FIELD-SIZE                                        
+                    OR DT-X (I) = '/' OR '-'.                                   
+                                                                                
+           MOVE WS-DATE-EXTRACT      TO WORK-MM.                                
+           MOVE ZERO                 TO WS-DATE-EXTRACT.                        
+           ADD  1                    TO I.                                      
+                                                                                
+           PERFORM 000-DATE-EXTRACT                                             
+               VARYING I FROM I BY 1                                            
+                 UNTIL I > WS-FIELD-SIZE                                        
+                    OR DT-X (I) = '/' OR '-'.                                   
+                                                                                
+           MOVE WS-DATE-EXTRACT      TO WORK-DD.                                
+           MOVE ZERO                 TO WS-DATE-EXTRACT.                        
+           ADD  1                    TO I.                                      
+                                                                                
+           PERFORM 000-DATE-EXTRACT                                             
+               VARYING I FROM I BY 1                                            
+                 UNTIL I > WS-FIELD-SIZE                                        
+                    OR DT-X (I) = '/' OR '-'.                                   
+                                                                                
+           MOVE WS-DATE-EXTRACT      TO WORK-YY.                                
+                                                                                
+       000-DATE-EXTRACT.                                                        
+                                                                                
+           IF DT-X (I) NOT < '0' AND NOT > '9'                                  
+              COMPUTE WS-DATE-EXTRACT = 10 * WS-DATE-EXTRACT + DT-9 (I).        
+                                                                                
+       000-MONEY-FIELD.                                                         
+                                                                                
+           PERFORM 000-NUM-FIELD.                                               
+                                                                                
+           IF WS-FIELD-SIZE = 8                                                 
+               MOVE NUM-8        TO WS-NORMALIZE                                
+               PERFORM 000-NORMALIZE                                            
+               MOVE WS-NORMALIZE TO NUM-8                                       
+               MOVE DOLLARS-8    TO D-8                                         
+               MOVE CENTS-8      TO C-8                                         
+           ELSE                                                                 
+           IF WS-FIELD-SIZE = 7                                                 
+               MOVE NUM-7        TO WS-NORMALIZE                                
+               PERFORM 000-NORMALIZE                                            
+               MOVE WS-NORMALIZE TO NUM-7                                       
+               MOVE DOLLARS-7    TO D-7                                         
+               MOVE CENTS-7      TO C-7                                         
+           ELSE                                                                 
+           IF WS-FIELD-SIZE = 6                                                 
+               MOVE NUM-6        TO WS-NORMALIZE                                
+               PERFORM 000-NORMALIZE                                            
+               MOVE WS-NORMALIZE TO NUM-6                                       
+               MOVE DOLLARS-6    TO D-6                                         
+               MOVE CENTS-6      TO C-6                                         
+           ELSE                                                                 
+           IF WS-FIELD-SIZE = 5                                                 
+               MOVE NUM-5        TO WS-NORMALIZE                                
+               PERFORM 000-NORMALIZE                                            
+               MOVE WS-NORMALIZE TO NUM-5                                       
+               MOVE DOLLARS-5    TO D-5                                         
+               MOVE CENTS-5      TO C-5                                         
+           ELSE                                                                 
+           IF WS-FIELD-SIZE = 4                                                 
+               MOVE NUM-4        TO WS-NORMALIZE                                
+               PERFORM 000-NORMALIZE                                            
+               MOVE WS-NORMALIZE TO NUM-4                                       
+               MOVE CENTS-4      TO C-4.                                        
+                                                                                
+       000-NORMALIZE.                                                           
+                                                                                
+           IF WS-DECIMAL-DIGITS = 0                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE * 100                        
+           ELSE                                                                 
+           IF WS-DECIMAL-DIGITS = 1                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE * 10                         
+           ELSE                                                                 
+           IF WS-DECIMAL-DIGITS = 3                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE / 10                         
+           ELSE                                                                 
+           IF WS-DECIMAL-DIGITS = 4                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE / 100                        
+           ELSE                                                                 
+           IF WS-DECIMAL-DIGITS = 5                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE / 1000                       
+           ELSE                                                                 
+           IF WS-DECIMAL-DIGITS = 6                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE / 10000                      
+           ELSE                                                                 
+           IF WS-DECIMAL-DIGITS = 7                                             
+               COMPUTE WS-NORMALIZE = WS-NORMALIZE / 100000.                    
+                                                                                
+       000-NUM-FIELD.                                                           
+                                                                                
+           MOVE WS-FIELD-SIZE  TO I.                                            
+           MOVE WS-FIELD-SIZE  TO J.                                            
+                                                                                
+           PERFORM 000-TRANSFER-DIGIT                                           
+               UNTIL I = ZERO.                                                  
+                                                                                
+           PERFORM 000-RESET-DIGIT                                              
+               UNTIL J = ZERO.                                                  
+                                                                                
+       000-TRANSFER-DIGIT.                                                      
+                                                                                
+           IF  CH-X (I) NOT < '0'                                               
+           AND CH-X (I) NOT > '9'                                               
+               MOVE CH-X (I) TO    CH-X (J)                                     
+               SUBTRACT 1 FROM  J                                               
+                                                                                
+           ELSE                                                                 
+               IF CH-X (I) = '.'                                                
+                   SUBTRACT J FROM WS-FIELD-SIZE                                
+                       GIVING WS-DECIMAL-DIGITS.                                
+                                                                                
+           SUBTRACT 1 FROM I.                                                   
+                                                                                
+       000-RESET-DIGIT.                                                         
+           MOVE '0' TO CH-X (J).                                                
+           SUBTRACT 1 FROM J.                                                   
+                                                                                
+Y2K    000-Y2K-WINDOW-1.                                                        
+Y2K        IF  Y2K-YYMMDD-1 NOT = ZERO                                          
+Y2K        AND Y2K-YYMMDD-1 NOT = SPACES                                        
+Y2K            IF Y2K-YY-1 > 80                                                 
+Y2K                MOVE 19               TO Y2K-CC-1                            
+Y2K            ELSE                                                             
+Y2K                MOVE 20               TO Y2K-CC-1.                           
+Y2K                                                                             
+Y2K    000-Y2K-WINDOW-2.                                                        
+Y2K        IF  Y2K-YYMMDD-2 NOT = ZERO                                          
+Y2K        AND Y2K-YYMMDD-2 NOT = SPACES                                        
+Y2K            IF Y2K-YY-2 > 80                                                 
+Y2K                MOVE 19               TO Y2K-CC-2                            
+Y2K            ELSE                                                             
+Y2K                MOVE 20               TO Y2K-CC-2.                           
+Y2K                                                                             
+Y2K    000-Y2K-WINDOW-3.                                                        
+Y2K        IF  Y2K-YYMMDD-3 NOT = ZERO                                          
+Y2K        AND Y2K-YYMMDD-3 NOT = SPACES                                        
+Y2K            IF Y2K-YY-3 > 80                                                 
+Y2K                MOVE 19               TO Y2K-CC-3                            
+Y2K            ELSE                                                             
+Y2K                MOVE 20               TO Y2K-CC-3.                           
+Y2K                                                                             
+       000-DUMMY-ROUTINE.                                                       
+           EXIT.                                                                
+                                                                                
