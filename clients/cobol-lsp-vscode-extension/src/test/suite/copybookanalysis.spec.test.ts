@@ -54,8 +54,8 @@ suite("TC384131: Analysis Features for copybooks", function () {
 
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
-      editor_copybook!.document.uri, // vscode.Uri of the file
-      new vscode.Position(4, 26), // vscode.Position where your symbol is
+      editor_copybook!.document.uri,
+      new vscode.Position(4, 26),
     );
 
     //5- Verify number of occurances
@@ -86,8 +86,8 @@ suite("TC384131: Analysis Features for copybooks", function () {
 
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
-      editor_copybook!.document.uri, // vscode.Uri of the file
-      new vscode.Position(0, 16), // vscode.Position where your symbol is
+      editor_copybook!.document.uri,
+      new vscode.Position(0, 16),
     );
 
     //5- Verify number of occurances
