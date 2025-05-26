@@ -48,8 +48,6 @@ suite.only("TC384131: Analysis Features for copybooks", function () {
     await vscode.commands.executeCommand("editor.action.revealDefinition");
     const editor_copybook = vscode.window.activeTextEditor;
 
-    console.log("UI TEST%", editor_copybook?.document?.uri)
-
     //4- Find a paragprah, right click on it, and select "Go To References"
     assert.notEqual(editor_copybook, null);
     await helper.sleep(2000);
@@ -78,8 +76,6 @@ suite.only("TC384131: Analysis Features for copybooks", function () {
     await vscode.commands.executeCommand("editor.action.revealDefinition");
     const editor_copybook = vscode.window.activeTextEditor;
 
-    console.log("UI TEST%", editor_copybook?.document?.uri);
-    
     //4- Find a paragprah, right click on it, and select "Go To References"
     assert.notEqual(editor_copybook, null);
     await vscode.languages.setTextDocumentLanguage(
