@@ -39,14 +39,6 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallableDataWorkingSectionNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWithoutOnNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWorkingSectionNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnWorkingSectionNode;
-import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaCallableDataWorkingSectionProcessor;
-import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableOffWithoutOnProcessor;
-import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableOffWorkingSectionProcessor;
-import org.eclipse.lsp.cobol.core.engine.directives.processor.JavaShareableOnWorkingSectionProcessor;
 import org.eclipse.lsp.cobol.core.engine.processor.AstProcessor;
 import org.eclipse.lsp.cobol.core.engine.processors.*;
 import org.eclipse.lsp.cobol.core.engine.processors.implicit.ImplicitVariablesProcessor;
@@ -365,14 +357,6 @@ public class TransformTreeStage
 
     ctx.register(v, ProcedureDivisionUsingNode.class, new LinkageArgumentsOriginCheck());
     ctx.register(v, ProcedureDivisionReturningNode.class, new LinkageArgumentsOriginCheck());
-
-    ctx.register(
-        v, JavaShareableOnWorkingSectionNode.class, new JavaShareableOnWorkingSectionProcessor());
-    ctx.register(
-        v, JavaShareableOffWorkingSectionNode.class, new JavaShareableOffWorkingSectionProcessor());
-    ctx.register(
-        v, JavaCallableDataWorkingSectionNode.class, new JavaCallableDataWorkingSectionProcessor());
-    ctx.register(v, JavaShareableOffWithoutOnNode.class, new JavaShareableOffWithoutOnProcessor());
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig).stream()
         .map(CobolDialect::getProcessors)

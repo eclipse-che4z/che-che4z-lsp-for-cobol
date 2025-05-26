@@ -17,15 +17,12 @@ package org.eclipse.lsp.cobol.core.engine.directives;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.NonNull;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -33,15 +30,13 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.SectionType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesLexer;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaCallableDataWorkingSectionNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWithoutOnNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOffWorkingSectionNode;
-import org.eclipse.lsp.cobol.core.engine.directives.node.JavaShareableOnWorkingSectionNode;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -194,64 +189,72 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
 
     switch (tokenType) {
       case CompilerDirectivesLexer.JAVA_CALLABLE:
-        return processJavaCallable(ctx);
+        processJavaCallable(ctx);
+        break;
       case CompilerDirectivesLexer.JAVA_SHAREABLE_ON:
-        return processJavaShareableOn(ctx);
+        processJavaShareableOn(ctx);
+        break;
       case CompilerDirectivesLexer.JAVA_SHAREABLE_OFF:
-        return processJavaShareableOff(ctx);
+        processJavaShareableOff(ctx);
+        break;
       default:
-        return super.visitCobolJavaInteroperability(ctx);
     }
+    return super.visitCobolJavaInteroperability(ctx);
   }
 
-  private List<Node> processJavaCallable(
-      CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
+  private void processJavaCallable(CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
     Matcher directiveLine =
         Pattern.compile("(?i).*>>\\s?JAVA-CALLABLE\\s*(?<extraText>.*)")
             .matcher(this.directiveLineText);
     validateDirective(ctx, directiveLine);
     Locality statementLocality = createStatementLocality(ctx);
-    return addTreeNode(
-        ctx,
-        (location) ->
-            new JavaCallableDataWorkingSectionNode(statementLocality, ctx.getText(), section));
+
+    if (!(section.contains(SectionType.WORKING_STORAGE.getType())
+        || section.contains(DivisionType.DATA_DIVISION.getDivName()))) {
+      throwException(
+          "",
+          statementLocality,
+          messageService.getMessage("compilerDirective.validation.dataSection", ctx.getText()));
+    }
   }
 
-  private List<Node> processJavaShareableOn(
+  private void processJavaShareableOn(
       CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
     Matcher directiveLine =
         Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+ON\\s*(?<extraText>.*)")
             .matcher(this.directiveLineText);
     validateDirective(ctx, directiveLine);
-    return addTreeNode(
-        ctx,
-        (location) ->
-            new JavaShareableOnWorkingSectionNode(
-                createStatementLocality(ctx), ctx.getText(), section));
+    Locality statementLocality = createStatementLocality(ctx);
+    if (!section.contains(SectionType.WORKING_STORAGE.getType())) {
+      throwException(
+          "",
+          statementLocality,
+          messageService.getMessage("compilerDirective.validation.workingSection", ctx.getText()));
+    }
   }
 
-  private List<Node> processJavaShareableOff(
+  private void processJavaShareableOff(
       CompilerDirectivesParser.CobolJavaInteroperabilityContext ctx) {
     Matcher directiveLine =
         Pattern.compile("(?i).*>>\\s?JAVA-SHAREABLE\\s+OFF\\s*(?<extraText>.*)")
             .matcher(this.directiveLineText);
     boolean isValid = validateDirective(ctx, directiveLine);
-    List<Node> nodes =
-        new ArrayList<>(
-            addTreeNode(
-                ctx,
-                (location) ->
-                    new JavaShareableOffWorkingSectionNode(
-                        createStatementLocality(ctx), ctx.getText(), section)));
-    if (isValid) {
-      nodes.addAll(
-          addTreeNode(
-              ctx,
-              (location) ->
-                  new JavaShareableOffWithoutOnNode(
-                      createStatementLocality(ctx), ctx.getText(), isJavaShareableOn)));
+    Locality statementLocality = createStatementLocality(ctx);
+    if (!section.contains(SectionType.WORKING_STORAGE.getType())) {
+      throwException(
+          "",
+          statementLocality,
+          messageService.getMessage("compilerDirective.validation.workingSection", ctx.getText()));
     }
-    return nodes;
+    if (isValid) {
+      if (!isJavaShareableOn) {
+        throwException(
+            "",
+            statementLocality,
+            messageService.getMessage(
+                "compilerDirective.validation.javaShareableOff", ctx.getText()));
+      }
+    }
   }
 
   private boolean validateDirective(
@@ -300,17 +303,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     return Stream.concat(aggregate.stream(), nextResult.stream()).collect(toList());
   }
 
-  private List<Node> addTreeNode(ParserRuleContext ctx, Function<Locality, Node> nodeConstructor) {
-    Node node = nodeConstructor.apply(getOriginalLocality(ctx));
-    visitChildren(ctx).forEach(node::addChild);
-    return ImmutableList.of(node);
-  }
-
-  private Locality getOriginalLocality(ParserRuleContext ctx) {
-    Location location = analysisContext.getExtendedDocument().mapLocation(constructRange(ctx));
-    return Locality.builder().uri(location.getUri()).range(location.getRange()).build();
-  }
-
   private Locality getLocality(Location location) {
     Locality.LocalityBuilder builder =
         Locality.builder().uri(location.getUri()).range(location.getRange());
@@ -318,11 +310,13 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+    String formatedMessage =
+        wrongToken.isEmpty() ? message : String.format("%s %s", message, wrongToken);
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(locality.toOriginalLocation())
-            .suggestion(String.format("%s %s", message, wrongToken))
+            .suggestion(formatedMessage)
             .severity(ErrorSeverity.ERROR)
             .build();
 
