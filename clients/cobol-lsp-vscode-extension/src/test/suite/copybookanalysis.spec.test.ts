@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import path = require("path");
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
 import * as assert from "assert";
