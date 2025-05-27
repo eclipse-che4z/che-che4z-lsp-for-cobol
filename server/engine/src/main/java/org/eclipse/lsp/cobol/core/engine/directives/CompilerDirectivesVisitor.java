@@ -66,11 +66,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     this.isJavaShareableOn = isJavaShareableOn;
   }
 
-  public CompilerDirectivesVisitor(
-      AnalysisContext ctx, MessageService messageService, Position startPosition) {
-    this(ctx, messageService, startPosition, "", "", false);
-  }
-
   @Override
   public List<Node> visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
     analysisContext.getConfig().getCompilerOptions().add(ctx.getText().trim());
@@ -156,6 +151,31 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   @Override
   public List<Node> visitCobolJavaInteroperabilityOptions(
       CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
+    String extraText = directiveLineText.replaceAll("\\s+", "").substring(ctx.getText().length());
+    if (!extraText.isEmpty()) {
+      VisitorHelper.retrieveRangeLocality(ctx)
+          .ifPresent(
+              r -> {
+                Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
+                Location location = analysisContext.getExtendedDocument().mapLocation(range);
+                location
+                    .getRange()
+                    .setStart(
+                        new Position(
+                            0,
+                            startPosition.getCharacter()
+                                + directiveLineText.length()
+                                - extraText.length()));
+                location
+                    .getRange()
+                    .setEnd(
+                        new Position(0, startPosition.getCharacter() + directiveLineText.length()));
+                throwException(
+                    extraText,
+                    locationToLocality(location),
+                    messageService.getMessage("compilerOption.invalid"));
+              });
+    }
     return super.visitCobolJavaInteroperabilityOptions(ctx);
   }
 

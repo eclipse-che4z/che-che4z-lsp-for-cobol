@@ -226,12 +226,12 @@ cobolCompilerOption
    ;
 
 cobolJavaInteroperabilityOptions:
-            ((JAVAIOP | JIOP) LPARENCHAR (
+            (JAVAIOP | JIOP) LPARENCHAR (
                 (OUTPATH | OP) LPARENCHAR LITERAL RPARENCHAR
                 | (NOJVMINITOPTIONS | NOJVMI)
                 | (JVMINITOPTIONS | JVMI) LPARENCHAR LITERAL RPARENCHAR
                 | (NOJAVA64 | JAVA64)
-            ) RPARENCHAR | (NOJAVAIOP | NOJIOP)) extraneousInput?;
+            ) RPARENCHAR | (NOJAVAIOP | NOJIOP);
 
 ssrangeSuboptions
    : NOZLEN
