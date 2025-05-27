@@ -217,34 +217,30 @@ function formatString(arg: string) {
 export async function pickSnippet() {
   try {
     const editor = vscode.window.activeTextEditor;
-    const snippetList: vscode.QuickPickItem[] = [];
-    const prefixToKeyMap = new Map<string, string>();
+    type ItemType = { snippet: Snippet } & vscode.QuickPickItem;
+    const snippetList: ItemType[] = [];
     const snippets = await loadSnippets();
-    const input = vscode.window.createQuickPick<vscode.QuickPickItem>();
+    const input = vscode.window.createQuickPick<ItemType>();
     input.matchOnDetail = true;
     input.matchOnDescription = true;
     input.placeholder = "Type to search snippet";
     // Create the snippets list using settings for dialect
     snippets.forEach((snippet, key) => {
       // Also store the key as we are aligning the view with VSCode snippet
-      prefixToKeyMap.set(snippet.prefix, key);
       snippetList.push({
         detail: snippet.description ?? key,
         label: snippet.prefix,
+        snippet,
       });
-      input.items = snippetList;
     });
+    input.items = snippetList;
     input.onDidChangeSelection((items) => {
       const item = items[0];
-      const snippetKey = prefixToKeyMap.get(item.label);
-      if (snippetKey) {
-        const snippet = snippets.get(snippetKey);
-        if (snippet) {
-          const snippetString = new vscode.SnippetString(
-            snippet.body.join("\n"),
-          );
-          editor?.insertSnippet(snippetString);
-        }
+      if (item) {
+        const snippetString = new vscode.SnippetString(
+          item.snippet.body.join("\n"),
+        );
+        editor?.insertSnippet(snippetString);
       }
     });
     input.show();

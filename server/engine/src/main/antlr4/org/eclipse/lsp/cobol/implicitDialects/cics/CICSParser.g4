@@ -1072,7 +1072,7 @@ cics_web_converse: ((CONVERSE | GET | HEAD | PATCH | POST | PUT | TRACE | OPTION
             (SESSTOKEN | URIMAP | PATHLENGTH | QUERYSTRLEN | DOCTOKEN | FROMLENGTH | CONTAINER | CHANNEL | USERNAME | USERNAMELEN | PASSWORD | PASSWORDLEN | TOCONTAINER | TOCHANNEL | MAXLENGTH | STATUSLEN | CHARACTERSET) cics_data_value |
             (PATH | MEDIATYPE | QUERYSTRING | FROM | INTO | TOLENGTH | STATUSCODE | STATUSTEXT | BODYCHARSET) cics_data_area |
             (METHOD | DOCSTATUS | ACTION | CLOSESTATUS | AUTHENTICATE | CLIENTCONV) cics_cvda |
-            SET ptr_ref | cics_handle_response)+;
+            SET cics_ref | cics_handle_response)+;
 cics_web_endbrowse: (ENDBROWSE | FORMFIELD | HTTPHEADER | SESSTOKEN cics_data_value | QUERYPARM | cics_handle_response)+; // All three variants
 cics_web_extract: (EXTRACT | HOSTLENGTH cics_data_value |
             (HOST | HTTPMETHOD | METHODLENGTH | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP | SESSTOKEN | REALM | REALMLEN) cics_data_area |

@@ -122,6 +122,9 @@ public class TestCICSIssue {
   private static final String ISSUE_PASS_INVALID =
       "ISSUE PASS LUNAME(100) {LENGTH|errorOne}(100) LOGONLOGMODE NOQUIESCE";
 
+  private static final String ISSUE_PASS_FROM_WITHOUT_LENGTH =
+      "ISSUE {_PASS LUNAME({$varOne}) FROM({$varFour})|errorOne_}";
+
   private static final String ISSUE_PREPARE_FULL =
       "ISSUE PREPARE CONVID({$varFour}) STATE({$varFour})";
 
@@ -408,6 +411,19 @@ public class TestCICSIssue {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_PASS_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testIssuePassFromWithoutLength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ISSUE_PASS_FROM_WITHOUT_LENGTH, expectedDiagnostics);
   }
 
   @Test

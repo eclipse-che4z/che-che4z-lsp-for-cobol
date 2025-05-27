@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -53,7 +54,7 @@ public class TestCicsWebStatement {
           + " STATUSCODE({$varOne}) STATUSTEXT({$varOne}) STATUSLEN({$varOne})"
           + " CHARACTERSET({$varOne}) NOINCONVERT BODYCHARSET({$varOne})";
   private static final String CONVERSE_VALID_2 =
-      WEB + "CONVERSE SESSTOKEN({$varOne}) GET TOLENGTH({$varOne})";
+      WEB + "CONVERSE SESSTOKEN({$varOne}) GET SET({$varOne}) TOLENGTH({$varOne})";
 
   private static final String ENDBROWSE_VALID = WEB + "ENDBROWSE FORMFIELD";
 
@@ -191,6 +192,16 @@ public class TestCicsWebStatement {
           + "SEND DOCTOKEN({$varOne}) {FROM|errorOne}({$varOne}) FROMLENGTH({$varOne}) NODOCDELETE"
           + " MEDIATYPE({$varOne}) SRVCONVERT CHARACTERSET({$varOne}) STATUSCODE({$varOne})"
           + " STATUSTEXT({$varOne}) STATUSLEN({$varOne}) IMMEDIATE NOCLOSE";
+
+  private static final String WEB_CONVERSE_TOLENGTH_WITHOUT_REQUIRED_OPTION =
+      "WEB {_CONVERSE SESSTOKEN({$varOne}) TOLENGTH({$varTwo}) PUT|errorOne_}";
+
+  private static final String WEB_CONVERSE_STATUSCODE_WITHOUT_STATUSTEXT =
+      "WEB {_CONVERSE SESSTOKEN({$varOne}) TOLENGTH({$varTwo}) PUT SET({$varThree})"
+          + " STATUSCODE({$varThree})|errorOne_}";
+
+  private static final String WEB_SEND_USERNAME_PASSWORD_INVALID =
+      "WEB {_SEND SESSTOKEN({$varOne}) USERNAME({$varTwo}) PASSWORD({$varThree})|errorOne_}";
 
   // Test Functions
   @Test
@@ -335,5 +346,45 @@ public class TestCicsWebStatement {
   @Test
   void testWriteHTTPHeaderValid() {
     CICSTestUtils.noErrorTest(WRITE_HTTPHEADER_VALID);
+  }
+
+  @Test
+  void testTolengthWithoutRequiredOption() {
+    CICSTestUtils.errorTest(
+        WEB_CONVERSE_TOLENGTH_WITHOUT_REQUIRED_OPTION,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: INTO or SET",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testStatusCodeWithoutStatusTextSetOption() {
+    CICSTestUtils.errorTest(
+        WEB_CONVERSE_STATUSCODE_WITHOUT_STATUSTEXT,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "If one option is specified, all options must be present: STATUSCODE, STATUSTEXT,"
+                    + " STATUSLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSendUsernamePasswordInvalid() {
+    CICSTestUtils.errorTest(
+        WEB_SEND_USERNAME_PASSWORD_INVALID,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: NONE, BASICAUTH, AUTHENTICATE",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 }

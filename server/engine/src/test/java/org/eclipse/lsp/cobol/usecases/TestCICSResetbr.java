@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.eclipse.lsp4j.Diagnostic;
@@ -53,6 +54,9 @@ public class TestCICSResetbr {
 
   private static final String RESETBR_INVALID_MULTIPLE_COMPARISON_OPTIONS =
       "RESETBR FILE({$varOne}) RIDFLD({$varTwo}) {GTEQ|errorOne} {EQUAL|errorTwo}";
+
+  private static final String RESETBR_SYSID_WITHOUT_REQUIRED_OPTION =
+      "RESETBR {_FILE({$varFour}) RIDFLD({$varFive}) SYSID({$varFour})|error1_}";
 
   @Test
   void testResetbrValidMinimal() {
@@ -162,5 +166,18 @@ public class TestCICSResetbr {
                 "Exactly one option required, options are mutually exclusive: GTEQ or EQUAL",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testReadprevSysidWithoutRequiredOption() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: RBA, RRN, XRBA or KEYLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RESETBR_SYSID_WITHOUT_REQUIRED_OPTION, expectedDiagnostics);
   }
 }

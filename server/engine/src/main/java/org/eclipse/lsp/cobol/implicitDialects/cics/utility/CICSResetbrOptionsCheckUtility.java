@@ -66,7 +66,6 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkDuplicates(ctx);
   }
 
-  @SuppressWarnings("unchecked")
   private void checkResetbr(CICSParser.Cics_resetbr_optionsContext ctx) {
     checkHasExactlyOneOption("FILE or DATASET", ctx, ctx.FILE(), ctx.DATASET());
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
@@ -74,5 +73,8 @@ public class CICSResetbrOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
         "RBA, RRN, XRBA or KEYLENGTH", ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
     checkHasMutuallyExclusiveOptions("GTEQ or EQUAL", ctx.GTEQ(), ctx.EQUAL());
     checkPrerequisiteIsMet(ctx.KEYLENGTH(), ctx.GENERIC(), ctx, "GENERIC");
+    if (!ctx.SYSID().isEmpty())
+      checkHasExactlyOneOption(
+          "RBA, RRN, XRBA or KEYLENGTH", ctx, ctx.RBA(), ctx.RRN(), ctx.XRBA(), ctx.KEYLENGTH());
   }
 }

@@ -108,5 +108,8 @@ public class CICSReadNextReadPrevOptionsUtility extends CICSOptionsCheckBaseUtil
     }
 
     checkHasMutuallyExclusiveOptions("RBA or RRN or XRBA", ctx.RBA(), ctx.RRN(), ctx.XRBA());
+    if (!ctx.SYSID().isEmpty())
+      checkHasExactlyOneOption(
+          "KEYLENGTH, RBA, XRBA or RRN", ctx, ctx.KEYLENGTH(), ctx.RBA(), ctx.XRBA(), ctx.RRN());
   }
 }

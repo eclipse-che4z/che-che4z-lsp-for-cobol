@@ -261,6 +261,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
 
+    if (!ctx.TOLENGTH().isEmpty())
+      checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+
     checkAllOptionsArePresentOrAbsent(
         "STATUSCODE, STATUSTEXT, STATUSLEN",
         ctx,
@@ -619,6 +622,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkMutuallyExclusiveOptions(
           "NOCLOSE, CLOSE, CLOSESTATUS", ctx.NOCLOSE(), ctx.CLOSE(), ctx.CLOSESTATUS());
     }
+
+    if (!ctx.USERNAME().isEmpty() && !ctx.PASSWORD().isEmpty())
+      checkHasExactlyOneOption(
+          "NONE, BASICAUTH, AUTHENTICATE", ctx, ctx.NONE(), ctx.BASICAUTH(), ctx.AUTHENTICATE());
   }
 
   private void checkStartbrowse(CICSParser.Cics_web_startbrowseContext ctx) {

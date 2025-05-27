@@ -295,6 +295,23 @@ public class CFASTBuilderImpl implements CFASTBuilder {
     int startLine = node.getLocality().getRange().getStart().getLine();
     int stopLine =
         Math.min(startLine + SNIPPET_LENGTH, node.getLocality().getRange().getEnd().getLine() + 1);
+
+    if (stopLine > lines.size() || stopLine < startLine) {
+      LOG.warn(
+          "cutSnippet warning: "
+              + node.getLocality().getUri()
+              + " node has too big range: "
+              + node.getLocality().getRange());
+      stopLine = Math.min(startLine + SNIPPET_LENGTH, lines.size());
+    }
+    if (startLine >= lines.size() || startLine < 0) {
+      LOG.error(
+          "cutSnippet failed: "
+              + node.getLocality().getUri()
+              + " node has wrong range: "
+              + node.getLocality().getRange());
+      return "<snippet creation error>";
+    }
     lines
         .subList(startLine, stopLine)
         .forEach(

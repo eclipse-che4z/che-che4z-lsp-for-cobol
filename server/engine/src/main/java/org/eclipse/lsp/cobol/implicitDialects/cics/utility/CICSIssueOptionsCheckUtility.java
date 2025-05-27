@@ -260,6 +260,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
     if (!ctx.LOGMODE().isEmpty())
       checkHasIllegalOptions(ctx.LOGONLOGMODE(), "LOGONLOGMODE without LOGMODE");
+    if (!ctx.FROM().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   void checkPrepare(CICSParser.Cics_issue_prepareContext ctx) {
