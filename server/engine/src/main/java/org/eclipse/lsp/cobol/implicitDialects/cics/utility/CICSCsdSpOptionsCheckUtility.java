@@ -298,7 +298,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
-    if (noLengthOptionsEnabled() && !ctx.ATTRIBUTES().isEmpty())
+   else if (noLengthOptionsEnabled())
       checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
@@ -323,7 +323,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
-    if (noLengthOptionsEnabled() && !ctx.ATTRIBUTES().isEmpty())
+    else if (noLengthOptionsEnabled())
       checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
