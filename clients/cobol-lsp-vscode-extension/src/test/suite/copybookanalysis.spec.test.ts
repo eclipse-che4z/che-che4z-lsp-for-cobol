@@ -49,9 +49,9 @@ suite("TC384131: Analysis Features for copybooks", function () {
 
     //4- Find a paragprah, right click on it, and select "Go To References"
     assert.notEqual(editor_copybook, null);
-    await vscode.languages.setTextDocumentLanguage(
-      editor_copybook!.document,
-      "cobol",
+    assert.equal(
+      editor_copybook?.document.uri.toString(),
+      (await helper.getUri("copybook-analysis/v1/COPYBOOK")).toString(),
     );
     await helper.sleep(2000);
 
@@ -61,7 +61,15 @@ suite("TC384131: Analysis Features for copybooks", function () {
       new vscode.Position(13, 16),
     );
 
-    //5- Verify number of occurances
+    //5- Verify number of occurances and URIs are matching
     assert.equal(locations.length == 2, true);
+    assert.equal(
+      locations[0].uri.toString(),
+      (await helper.getUri("copybook-analysis/v1/COPYBOOK")).toString(),
+    );
+    assert.equal(
+      locations[1].uri.toString(),
+      (await helper.getUri("copybook-analysis/v1/FUNC1")).toString(),
+    );
   });
 });
