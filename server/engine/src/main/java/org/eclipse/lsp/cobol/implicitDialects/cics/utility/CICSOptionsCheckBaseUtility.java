@@ -62,6 +62,7 @@ public abstract class CICSOptionsCheckBaseUtility {
           put(CICSParser.RULE_cics_into, "INTO or SET");
         }
       };
+  private boolean noLengthEnabled;
 
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
@@ -70,6 +71,11 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
+    if (context.getConfig().getPreprocessorsDirectives().get("CICS") == null)
+      this.noLengthEnabled = false;
+    else
+      this.noLengthEnabled =
+          context.getConfig().getPreprocessorsDirectives().get("CICS").contains("NOLENGTH");
   }
 
   public CICSOptionsCheckBaseUtility(
@@ -81,6 +87,11 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
     this.baseDuplicateRulesOptions.putAll(duplicateRulesOptions);
+    if (context.getConfig().getPreprocessorsDirectives().get("CICS") == null)
+      this.noLengthEnabled = false;
+    else
+      this.noLengthEnabled =
+          context.getConfig().getPreprocessorsDirectives().get("CICS").contains("NOLENGTH");
   }
 
   /**
@@ -678,8 +689,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    *
    * @return isNolength enabled
    */
-  public boolean noLengthOptionsEnabled() {
-    if (context.getCicsTranslatorOptions() == null) return false;
-    return context.getCicsTranslatorOptions().contains("NOLENGTH");
+  protected boolean noLengthOptionsEnabled() {
+    return noLengthEnabled;
   }
 }
