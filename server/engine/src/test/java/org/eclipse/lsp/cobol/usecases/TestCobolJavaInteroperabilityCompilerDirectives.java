@@ -355,14 +355,14 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             new Diagnostic(
                 new Range(),
                 "The JAVA-SHAREABLE ON directive can only be specified in the WORKING-STORAGE"
-                             + " SECTION.",
+                    + " SECTION.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
                 "The JAVA-SHAREABLE OFF directive can only be specified in the WORKING-STORAGE"
-                             + " SECTION.",
+                    + " SECTION.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -378,7 +378,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             new Diagnostic(
                 new Range(),
                 "The JAVA-SHAREABLE OFF directive was found but JAVA-SHAREABLE was already in"
-                            + " the OFF state.",
+                    + " the OFF state.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

@@ -61,7 +61,7 @@ public class PreprocessorStage
   private static final Pattern JAVA_SHAREABLE_ON_PATTERN =
       Pattern.compile("(?i)\\s*>>\\s?JAVA-SHAREABLE\\s+ON\\s*");
   private static final Pattern DIALECT_FILLER_PATTERN =
-          Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
+      Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
 
   @Override
   public StageResult<CopybooksRepository> run(
