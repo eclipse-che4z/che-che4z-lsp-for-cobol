@@ -157,19 +157,9 @@ public abstract class MessageServiceParser extends Parser {
           }
         }
 
-        ((CommonToken) start).setStopIndex(stop.getStopIndex());
-        if ("CLOB".equalsIgnoreCase(dataType) || "BLOB".equalsIgnoreCase(dataType)) {
-          // Maximum length of CLOB/BLOB: 2147483647 bytes (2 GB - 1 byte)
-          if (size > 2147483647L) {
-            notifyError(
-                start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
-          }
-        } else if ("DBCLOB".equalsIgnoreCase(dataType)) {
-          // Maximum length of DBCLOB: 1073741823 double-byte characters
-          if (size > 1073741823L) {
-            notifyError(
-                start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
-          }
+        if (size > maxValue) {
+          notifyError(
+              start, "db2Parser.maxDb2HostVarLengthExceeded", dataType, maxValue.toString());
         }
       }
     }
