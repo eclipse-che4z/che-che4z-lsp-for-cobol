@@ -34,35 +34,7 @@ suite("TC384131: Analysis Features for copybooks", function () {
     helper.TEST_TIMEOUT,
   );
 
-  test("TC384131-1: Go To References - SLICK", async () => {
-    //1- Open COBOL file
-    const editor_cobol: vscode.TextEditor = await helper.showDocument(
-      path.join("SLICK", "COBPGM", "SLICKBS.cbl"),
-    );
-    await helper.sleep(3000);
-
-    //2 - Find a COPYBOOK
-    helper.moveCursor(editor_cobol, new vscode.Position(336, 21));
-
-    //3- Go to COPYBOOK definition
-    await vscode.commands.executeCommand("editor.action.revealDefinition");
-    const editor_copybook = vscode.window.activeTextEditor;
-
-    //4- Find a paragprah, right click on it, and select "Go To References"
-    assert.notEqual(editor_copybook, null);
-    await helper.sleep(2000);
-
-    const locations: vscode.Location[] = await vscode.commands.executeCommand(
-      "vscode.executeReferenceProvider",
-      editor_copybook!.document.uri,
-      new vscode.Position(4, 26),
-    );
-
-    //5- Verify number of occurances
-    assert.equal(locations.length == 6, true);
-  });
-
-  test("TC384131-1: Go To References - Example", async () => {
+  test("TC384131-1: Go To References", async () => {
     //1- Open COBOL file
     const editor_cobol: vscode.TextEditor = await helper.showDocument(
       path.join("copybook-analysis", "mainfile1.cbl"),

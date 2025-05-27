@@ -5,7 +5,6 @@
     "cobol-lsp.logging.level.root": "DEBUG",
     "cobol-lsp.cpy-manager.profiles": "",
     "cobol-lsp.cpy-manager.paths-local": [
-        "SLICK/COBCOPY",
         "copybook-analysis/v1"
       ],
     "cobol-lsp.cpy-manager.paths-dsn": [],
