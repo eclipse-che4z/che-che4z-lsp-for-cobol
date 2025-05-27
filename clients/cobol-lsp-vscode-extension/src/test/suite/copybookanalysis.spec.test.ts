@@ -18,7 +18,7 @@ import * as assert from "assert";
 
 suite("TC384131: Analysis Features for copybooks", function () {
   this.timeout(helper.TEST_TIMEOUT);
-  this.slow(1000);
+  this.slow(6000);
   suiteSetup(async function () {
     await helper.updateConfig("copybook_analysis.json");
     await helper.activate();
