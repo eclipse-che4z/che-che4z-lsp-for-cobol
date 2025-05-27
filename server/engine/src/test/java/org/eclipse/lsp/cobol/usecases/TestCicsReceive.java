@@ -16,7 +16,9 @@ package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import java.util.*;
+
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -314,14 +316,12 @@ public class TestCicsReceive {
   private static final String[] RECEIVE_INVALID_FOUR = {
     "RECEIVE", "{_MAP({$def})", "MAPPINGDEV({$def})", "FROM({$def})|errorOne_}"
   };
-
   private static final String MAP_TRANS_NOLENGTH_INVALID =
-      "RECEIVE {_MAP({$varFour}) MAPSET({$varFour}) INTO({$varFour})"
-          + " TERMINAL ASIS INPARTN({$varFour})|error_}";
+          "RECEIVE {_MAP({$varFour}) MAPSET({$varFour}) INTO({$varFour})"
+                  + " TERMINAL ASIS INPARTN({$varFour})|error_}";
 
   private static final String MAP_MAPPING_DEV_TRANS_NOLENGTH_INVALID =
-      "RECEIVE {_MAP({$varFour}) INTO({$varFour}) MAPPINGDEV({$varFour}) FROM({$varFour})|error_}";
-
+          "RECEIVE {_MAP({$varFour}) INTO({$varFour}) MAPPINGDEV({$varFour}) FROM({$varFour})|error_}";
   private static String getTestString(String[] components) {
     List<String> instances = Arrays.asList(components);
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
@@ -862,30 +862,29 @@ public class TestCicsReceive {
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
   }
-
   @Test
   void testMapNoLengthInvalid() {
     HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
     expectedDiagnostics.put(
-        "error",
-        new Diagnostic(
-            new Range(),
-            "Missing required option: LENGTH",
-            DiagnosticSeverity.Error,
-            ErrorSource.PARSING.getText()));
+            "error",
+            new Diagnostic(
+                    new Range(),
+                    "Missing required option: LENGTH",
+                    DiagnosticSeverity.Error,
+                    ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(MAP_TRANS_NOLENGTH_INVALID, expectedDiagnostics, "NOLENGTH");
   }
 
   @Test
   void testMapMappingDevNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: LENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()));
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: LENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(MAP_MAPPING_DEV_TRANS_NOLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }

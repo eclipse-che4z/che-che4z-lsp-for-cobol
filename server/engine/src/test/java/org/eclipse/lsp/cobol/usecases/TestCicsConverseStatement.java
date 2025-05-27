@@ -64,11 +64,6 @@ public class TestCicsConverseStatement {
   private static final String T3790_3270DISP_VALID_3 = CONVERSE_FROM_INTO_TO;
   private static final String T2660_VALID =
       CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) CTLCHAR(123) LINEADDR(123) LEAVEKB";
-  private static final String FROM_FROMLENGTH_MAXFLENGTH =
-      "CONVERSE FROM(123) FROMLENGTH(123) MAXFLENGTH(123)";
-
-  private static final String FROM_MAXFLENGTH = "CONVERSE FROM(123) MAXFLENGTH(123)";
-
   private static final String APPC_VALID =
       CONVERSE + "CONVID(123) " + FROM_INTO_TO + "MAXLENGTH(123) STATE(123)";
   private static final String MRO_VALID =
@@ -93,6 +88,9 @@ public class TestCicsConverseStatement {
   private static final String DEFAULT_INVAL_2 =
       "CONVERSE FROM(123) INTO(123) TOLENGTH(123) FROMLENGTH(123) {FROMFLENGTH(123)|errorOne}"
           + " MAXLENGTH(123)";
+  private static final String FROM_FROMLENGTH_MAXFLENGTH =
+      "CONVERSE FROM(123) FROMLENGTH(123) MAXFLENGTH(123)";
+  private static final String FROM_MAXFLENGTH = "CONVERSE FROM(123) MAXFLENGTH(123)";
   private static final String LU61_VALID =
       CONVERSE
           + "SESSION(123) ATTACHID(123) INTO(123) TOLENGTH(123) MAXLENGTH(123) NOTRUNCATE DEFRESP";
