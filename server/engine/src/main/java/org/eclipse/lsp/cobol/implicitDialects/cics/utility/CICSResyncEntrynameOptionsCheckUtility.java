@@ -17,7 +17,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_resync_entryname;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_resync_entryname_opts;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -64,7 +64,7 @@ public class CICSResyncEntrynameOptionsCheckUtility extends CICSOptionsCheckBase
   private void checkOpts(CICSParser.Cics_resync_entryname_optsContext ctx) {
     checkHasMandatoryOptions(ctx.ENTRYNAME(), ctx, "ENTRYNAME");
     checkPrerequisiteIsMet(ctx.IDLIST(), ctx.IDLISTLENGTH(), ctx, "IDLISTLENGTH without IDLIST");
-    if (noLengthOptionsEnabled && !ctx.IDLIST().isEmpty()) {
+    if (noLengthOptionsEnabled() && !ctx.IDLIST().isEmpty()) {
       checkHasMandatoryOptions(ctx.IDLISTLENGTH(), ctx, "IDLISTLENGTH");
     }
   }

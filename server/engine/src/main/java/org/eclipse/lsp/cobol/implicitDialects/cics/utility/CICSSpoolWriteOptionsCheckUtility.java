@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_spoolwrite;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +65,6 @@ public class CICSSpoolWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMutuallyExclusiveOptions("LINE or PAGE", ctx.LINE(), ctx.PAGE());
-    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
   }
 }

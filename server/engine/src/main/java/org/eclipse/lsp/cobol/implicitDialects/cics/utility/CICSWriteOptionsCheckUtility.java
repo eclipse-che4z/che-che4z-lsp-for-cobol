@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_write;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +117,7 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.PFXLENG().isEmpty()) {
       checkHasMandatoryOptions(ctx.PREFIX(), ctx, "PREFIX");
     }
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
       if (!ctx.PREFIX().isEmpty()) checkHasMandatoryOptions(ctx.PFXLENG(), ctx, "PFXLENG");
     }
@@ -152,7 +152,7 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.MAXLENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.REPLY(), ctx, "REPLY");
     }
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.TEXTLENGTH(), ctx, "TEXTLENGTH");
     }
   }

@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_web;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -276,7 +276,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.NOOUTCONVERT(),
         ctx.NOCLICONVERT(),
         ctx.CLIENTCONV());
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.PATH().isEmpty()) checkHasMandatoryOptions(ctx.PATHLENGTH(), ctx, "PATHLENGTH");
       if (!ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
       if (!ctx.PASSWORD().isEmpty())
@@ -368,7 +368,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkPrerequisiteIsMet(
         ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
 
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.PATH().isEmpty()) checkHasMandatoryOptions(ctx.PATHLENGTH(), ctx, "PATHLENGTH");
       if (!ctx.HOST().isEmpty()) checkHasMandatoryOptions(ctx.HOSTLENGTH(), ctx, "HOSTLENGTH");
       if (!ctx.QUERYSTRING().isEmpty())
@@ -410,7 +410,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     checkPrerequisiteIsMet(
         ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "CHARACTERSET without FORMFIELD");
-    if (noLengthOptionsEnabled
+    if (noLengthOptionsEnabled()
         && (!ctx.FORMFIELD().isEmpty()
             || !ctx.HTTPHEADER().isEmpty()
             || !ctx.QUERYPARM().isEmpty())) {
@@ -517,7 +517,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           ctx.LENGTH(),
           ctx.TOCONTAINER());
     }
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.SESSTOKEN().isEmpty() && !ctx.STATUSCODE().isEmpty())
         checkHasMandatoryOptions(ctx.STATUSLEN(), ctx, "STATUSLEN");
       if (!ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
@@ -597,7 +597,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           ctx.CLICONVERT(),
           ctx.NOCLICONVERT(),
           ctx.CLIENTCONV());
-      if (noLengthOptionsEnabled) {
+      if (noLengthOptionsEnabled()) {
         if (!ctx.USERNAME().isEmpty())
           checkHasMandatoryOptions(ctx.USERNAMELEN(), ctx, "USERNAMELEN");
         if (!ctx.PASSWORD().isEmpty())
@@ -683,7 +683,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.WRITE(), ctx, "WRITE");
     checkHasMandatoryOptions(ctx.HTTPHEADER(), ctx, "HTTPHEADER");
     checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
       checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
     }

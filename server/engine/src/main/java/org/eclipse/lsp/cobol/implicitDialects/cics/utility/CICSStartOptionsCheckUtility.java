@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -110,7 +110,7 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
     checkPrerequisiteIsMet(ctx.LENGTH(), ctx.FMH(), ctx, "FMH without LENGTH");
-    if (noLengthOptionsEnabled && !ctx.FROM().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty())
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
@@ -119,7 +119,7 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
 
     checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
-    if (noLengthOptionsEnabled && !ctx.FROM().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty())
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 

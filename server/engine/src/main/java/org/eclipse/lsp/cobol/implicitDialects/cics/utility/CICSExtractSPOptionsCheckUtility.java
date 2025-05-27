@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -159,7 +159,7 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
     checkSubResidOptions(ctx);
     checkLastTimeOptions(ctx);
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.RESID().isEmpty()) checkHasMandatoryOptions(ctx.RESIDLEN(), ctx, "RESIDLEN");
       if (!ctx.SUBRESID().isEmpty())
         checkHasMandatoryOptions(ctx.SUBRESIDLEN(), ctx, "SUBRESIDLEN");

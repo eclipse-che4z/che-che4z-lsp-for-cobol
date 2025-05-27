@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.model.tree.Node;
 @Value
 @Builder(toBuilder = true)
 public class DialectProcessingContext {
+  @Builder.Default List<String> cicsTranslatorOptions = new ArrayList<>();
   AnalysisConfig config;
   String programDocumentUri;
   ExtendedDocument extendedDocument;

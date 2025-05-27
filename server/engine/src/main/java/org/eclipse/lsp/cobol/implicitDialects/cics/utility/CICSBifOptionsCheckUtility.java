@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +69,7 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkDeedit(CICSParser.Cics_bif_deeditContext ctx) {
     checkHasMandatoryOptions(ctx.DEEDIT(), ctx, "DEEDIT");
     checkHasMandatoryOptions(ctx.FIELD(), ctx, "FIELD");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
@@ -85,7 +84,7 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.BINARY(),
         ctx.BASE64(),
         ctx.DIGESTTYPE());
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.RECORDLEN(), ctx, "RECORDLEN");
     }
   }

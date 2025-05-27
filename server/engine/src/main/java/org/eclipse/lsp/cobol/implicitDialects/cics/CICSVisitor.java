@@ -161,7 +161,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCompilerDirective(CICSParser.CompilerDirectiveContext ctx) {
     cicsOptionsCheckUtility.setExciOptionsEnabled(false);
     cicsOptionsCheckUtility.setSpOptionsEnabled(false);
-    cicsOptionsCheckUtility.setNoLengthOptionsEnabled(false);
+    context.getCicsTranslatorOptions().clear();
 
     for (CICSParser.CompilerOptsContext options : ctx.compilerOpts()) {
       if (options.cicsOptions() != null) {
@@ -170,7 +170,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         if (options.cicsOptions().getText().contains("EXCI"))
           cicsOptionsCheckUtility.setExciOptionsEnabled(true);
         if (options.cicsOptions().getText().contains("NOLENGTH"))
-          cicsOptionsCheckUtility.setNoLengthOptionsEnabled(true);
+          context.getCicsTranslatorOptions().add("NOLENGTH");
       }
     }
 

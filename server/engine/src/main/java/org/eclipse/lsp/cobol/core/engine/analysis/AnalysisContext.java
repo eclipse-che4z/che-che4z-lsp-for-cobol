@@ -43,6 +43,8 @@ public class AnalysisContext implements BenchmarkSessionProvider {
   private final String text;
   private final CobolLanguageId languageId;
   private final Map<ProcessingPhase, JsonElement> astChanges = new HashMap<>();
+  // Map preprocessors name to list of directives
+  private final Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
 
   private @Setter List<Node> dialectNodes = new ArrayList<>();
   private @Setter CopybooksRepository copybooksRepository;

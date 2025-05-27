@@ -672,4 +672,14 @@ public abstract class CICSOptionsCheckBaseUtility {
       checkBrowsingHasNotParameter(ctx, coreToken);
     } else checkStatementHasParameter(ctx, coreToken);
   }
+
+  /**
+   * Gets whether nolength options is provided in Cics directives
+   *
+   * @return isNolength enabled
+   */
+  public boolean noLengthOptionsEnabled() {
+    if (context.getCicsTranslatorOptions() == null) return false;
+    return context.getCicsTranslatorOptions().contains("NOLENGTH");
+  }
 }

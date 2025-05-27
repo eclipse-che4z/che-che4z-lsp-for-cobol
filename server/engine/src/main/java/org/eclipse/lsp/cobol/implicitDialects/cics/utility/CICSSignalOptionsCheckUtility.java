@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signal;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.FROMLENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     }
-    if (noLengthOptionsEnabled && !ctx.FROM().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty())
       checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
   }
 }

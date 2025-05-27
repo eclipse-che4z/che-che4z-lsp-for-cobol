@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_csd;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -232,7 +232,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions(
         "NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
     checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
-    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
   private void checkAppend(CICSParser.Cics_csd_appendContext ctx) {
@@ -298,7 +298,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
-    if (noLengthOptionsEnabled && !ctx.ATTRIBUTES().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.ATTRIBUTES().isEmpty())
       checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
@@ -323,7 +323,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
-    if (noLengthOptionsEnabled && !ctx.ATTRIBUTES().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.ATTRIBUTES().isEmpty())
       checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
@@ -376,7 +376,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         "NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
     checkPrerequisiteIsMet(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRLEN without ATTRIBUTES");
     checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
-    if (noLengthOptionsEnabled && !ctx.ATTRIBUTES().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.ATTRIBUTES().isEmpty())
       checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 }

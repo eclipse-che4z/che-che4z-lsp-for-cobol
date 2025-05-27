@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_link;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +93,7 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions(
         "INPUTMSG or SYNCONRETURN", ctx.INPUTMSG(), ctx.SYNCONRETURN());
     checkHasMutuallyExclusiveOptions("INPUTMSG or TRANSID", ctx.INPUTMSG(), ctx.TRANSID());
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.COMMAREA().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
       if (!ctx.INPUTMSG().isEmpty())
         checkHasMandatoryOptions(ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN");

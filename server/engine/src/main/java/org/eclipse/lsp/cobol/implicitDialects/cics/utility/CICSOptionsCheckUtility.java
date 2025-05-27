@@ -32,7 +32,6 @@ public class CICSOptionsCheckUtility {
   @Setter private static boolean exciOptionsEnabled = false;
 
   @Setter private static boolean spOptionsEnabled = false;
-  @Setter protected static boolean noLengthOptionsEnabled = false;
 
   public CICSOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
     optionsMap.put(

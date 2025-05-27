@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -32,6 +34,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
   private final Position startPosition;
+  private final List<String> cicsDirectives = new ArrayList<>();
 
   public CompilerDirectivesVisitor(
       AnalysisContext ctx, MessageService messageService, Position startPosition) {
@@ -44,6 +47,20 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   public Object visitCompilerOption(CompilerDirectivesParser.CompilerOptionContext ctx) {
     analysisContext.getConfig().getCompilerOptions().add(ctx.getText().trim());
     return super.visitCompilerOption(ctx);
+  }
+
+  @Override
+  public Object visitCicsTranslatorDirectives(
+      CompilerDirectivesParser.CicsTranslatorDirectivesContext ctx) {
+    this.cicsDirectives.clear();
+    for (CompilerDirectivesParser.CicsTranslatorOptionsContext options :
+        ctx.cicsTranslatorOptions()) {
+      if (options != null && options.NOLENGTH() != null) {
+        this.cicsDirectives.add("NOLENGTH");
+      }
+    }
+    analysisContext.getPreprocessorsDirectives().put("CICS", cicsDirectives);
+    return super.visitCicsTranslatorDirectives(ctx);
   }
 
   @Override

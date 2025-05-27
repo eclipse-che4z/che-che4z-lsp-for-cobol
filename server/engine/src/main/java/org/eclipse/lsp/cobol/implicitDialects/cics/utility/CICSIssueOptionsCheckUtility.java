@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_issue;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -196,7 +196,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
@@ -237,7 +237,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
@@ -260,7 +260,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
@@ -291,7 +291,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
@@ -300,7 +300,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   void checkReceive(CICSParser.Cics_issue_receiveContext ctx) {
     checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
     if (ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.SET(), ctx, "INTO or SET");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
@@ -318,7 +318,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
       if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
@@ -330,7 +330,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     if (ctx.cics_issue_common().isEmpty())
       checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
     checkIssueCommon(ctx.cics_issue_common());
@@ -391,7 +391,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           }
 
           if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
-          if (noLengthOptionsEnabled) {
+          if (noLengthOptionsEnabled()) {
             if (!context.VOLUME().isEmpty())
               checkHasMandatoryOptions(context.VOLUMELENG(), context, "VOLUMELENG");
             if (!context.DESTID().isEmpty())

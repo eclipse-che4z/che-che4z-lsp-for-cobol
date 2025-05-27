@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_send;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -148,7 +148,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       default:
         break;
     }
-    if (noLengthOptionsEnabled) checkNoLength(ctx);
+    if (noLengthOptionsEnabled()) checkNoLength(ctx);
     checkDuplicates(ctx);
   }
 

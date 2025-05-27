@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -72,7 +72,7 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkPrerequisiteIsMet(ctx.COMMAREA(), ctx.LENGTH(), ctx, "LENGTH without COMMAREA");
 
     checkPrerequisiteIsMet(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN without INPUTMSG");
-    if (noLengthOptionsEnabled) {
+    if (noLengthOptionsEnabled()) {
       if (!ctx.COMMAREA().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
       if (!ctx.INPUTMSG().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "INPUTMSGLEN");
     }

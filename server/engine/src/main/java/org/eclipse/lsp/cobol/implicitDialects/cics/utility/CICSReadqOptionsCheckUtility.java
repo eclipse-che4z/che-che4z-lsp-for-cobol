@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.*;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +90,7 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
     checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
     checkHasIllegalOptions(ctx.NOSUSPEND(), "NOSUSPEND");
-    if (noLengthOptionsEnabled) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private void checkSetTs(CICSParser.Cics_into_setContext ctx) {

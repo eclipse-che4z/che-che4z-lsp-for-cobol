@@ -16,7 +16,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_wsacontext;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +97,7 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     }
     checkHasMutuallyExclusiveOptions(
         "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
-    if (noLengthOptionsEnabled && !ctx.EPRTYPE().isEmpty()) {
+    if (noLengthOptionsEnabled() && !ctx.EPRTYPE().isEmpty()) {
       checkHasMandatoryOptions(ctx.EPRLENGTH(), ctx, "EPRLENGTH");
     }
   }

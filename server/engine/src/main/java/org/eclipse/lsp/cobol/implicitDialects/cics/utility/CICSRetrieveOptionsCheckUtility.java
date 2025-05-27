@@ -15,7 +15,7 @@
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_retrieve;
-import static org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility.noLengthOptionsEnabled;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +80,7 @@ public class CICSRetrieveOptionsCheckUtility extends CICSOptionsCheckBaseUtility
   @SuppressWarnings("unchecked")
   private void checkRetrieveStandard(CICSParser.Cics_retrieve_standardContext ctx) {
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
-    if (noLengthOptionsEnabled && !ctx.INTO().isEmpty())
+    if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
