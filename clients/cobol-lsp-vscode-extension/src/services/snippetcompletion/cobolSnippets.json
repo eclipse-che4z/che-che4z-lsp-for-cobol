@@ -866,10 +866,15 @@
     ],
     "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each."
   },
-  "FD": {
+  "FD (QSAM)": {
     "prefix": "FD",
-    "body": ["FD ${1|QSAM-FILE,VSAM-FILE|}", "\t$0"],
-    "description": "The FD describes files referred to in the PRODUCTION DIVISION's I/O statements."
+    "body": ["FD QSAM-FILE", "\tLABEL RECORDS ARE STANDARD", "\tRECORDING MODE IS FBA", "\tBLOCK CONTAINS 0 RECORDS", "\tDATA RECORD IS ${1:RPT-OUT-REC}.", "01 ${1:RPT-OUT-REC} PIC X(${2:132})."],
+    "description": "DATA DIVISION - The FD describes files referred to in the PRODUCTION DIVISION's I/O statements."
+  },
+  "FD (VSAM)": {
+    "prefix": "FD",
+    "body": ["FD VSAM-FILE", "\tRECORD CONTAINS ${1:numLiteral} CHARACTERS", "\tDATA RECORD IS ${2:RPT-OUT-REC}.", "01 ${1:RPT-OUT-REC}.", "\t05 FILLER PIC X(1)."],
+    "description": "DATA DIVISION - The VSAM FD describes files referred to in the PROCEDURE DIVISION's I/O statements."
   },
   "FILE": {
     "prefix": "FILE",
