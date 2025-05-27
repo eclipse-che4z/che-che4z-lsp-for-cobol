@@ -8,7 +8,7 @@
       "\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
     ],
-    "description": "ACCESS MODE defines how records of the file are made available for processing your program. If ACCESS MODE is not specified Sequential (QSAM) is the default. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "ACCESS MODE defines how records of the file are made available for processing your program. If ACCESS MODE is not specified Sequential (QSAM) is the default."
   },
   "ACCEPT": {
     "prefix": "ACCEPT variable",
@@ -17,11 +17,8 @@
   },
   "ACCEPT FROM": {
     "prefix": "ACCEPT",
-    "body": [
-      "ACCEPT ${1:variable} ${2|FROM DATE,FROM DAY,FROM DAY-OF-WEEK,TIME|}",
-      "$0"
-    ],
-    "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting: https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time / https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "body": ["ACCEPT ${1:variable} FROM ${2|DATE,DAY,DAY-OF-WEEK,TIME|}", "$0"],
+    "description": "ACCEPT is typically used to extract the current date/time from z/OS. The other primary use case is ACCEPT from the JOB Step's SYSIN. Each line in SYSIN is tied to an individual ACCEPT statement. There are numerous options for date/time formatting."
   },
   "ACCEPT id": {
     "prefix": "ACCEPT id",
@@ -45,7 +42,7 @@
   },
   "ADD CORRESPONDING": {
     "prefix": "ADD CORRESPONDING",
-    "body": ["ADD CORR ${1:id} TO ${2:id}"],
+    "body": ["ADD CORRESPONDING ${1:id} TO ${2:id}"],
     "description": "ADD CORRESPONDING is used to add the corresponding variables or fields in two identical group variables"
   },
   "ADD ON SIZE ERROR": {
@@ -53,7 +50,7 @@
     "body": [
       "ADD ${1:num-literal} TO ${2:num-var} ON SIZE ERROR ${3:error-catch-logic}"
     ],
-    "description": "ADD is an alternative to the COMPUTE statement for simple math operations. ON SIZE ERROR checks for truncation in the sum. https://www.ibm.com/docs/en/cobol-zos/6.3?topic=statements-add-statement"
+    "description": "ADD is an alternative to the COMPUTE statement for simple math operations. ON SIZE ERROR checks for truncation in the sum."
   },
   "ADVANCING": {
     "prefix": "WRITE AFTER ADVANCING",
@@ -97,17 +94,35 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "IF variable-1 IS ALPHABETIC"
+    "description": "A COBOL \"class test\" used to determine whether the contents of a variable contains specific upper/lower case values. Used in conjunction with CMPR2/NOCMPR2 as compilation directives."
+  },
+  "ALPHANUMERIC": {
+    "prefix": "ALPHANUMERIC",
+    "body": [
+      "IF ${1:variable-1} IS ${2|ALPHANUMERIC,ALPHANUMERIC-EDITED|} THEN",
+      "\t$0",
+      "END-IF."
+    ],
+    "description": "A COBOL \"class test\" which is used to determine whether the contents of a variable only contain letters and numbers (no special characters)."
   },
   "ALSO": {
     "prefix": "ALSO item",
-    "body": ["ALSO ${1:id|exp|TRUE|FALSE}"],
+    "body": ["ALSO ${1|id,exp,TRUE,FALSE|}"],
     "description": "ALSO id|exp|TRUE|FALSE"
   },
   "ALTER TO": {
     "prefix": "ALTER TO",
     "body": ["ALTER ${1:procName-1} TO ${2:procName-2}"],
     "description": "ALTER TO"
+  },
+  "IF x AND y": {
+    "prefix": "AND",
+    "body": [
+      "IF ${1:var-1} = ${2:'AB'} AND ${3:var-2} = ${4:'CD'} THEN",
+      "\t$0",
+      "END-IF."
+    ],
+    "description": "AND is used to connect two or more conditional expressions. When using AND - all expressions connected by AND must test true for the program to take that path."
   },
   "AREA": {
     "prefix": "AREA",
@@ -144,12 +159,12 @@
       "IF ${3:OUTPUT-RECORD-FILE-STATUS-CODE} NOT EQUAL 0 ${4:I/O-Error-Logic}",
       "END-IF."
     ],
-    "description": "The WRITE BEFORE phrase in the PROCEDURE DIVISION gives the COBOL programmer control over file (most often report file) processing pagination. Note that OUTPUT-RECORD-FILE-STATUS-CODE must be defined in the file FD and declared as a two-byte (PIC XX) field in the WORKING-STORAGE SECTION. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf "
+    "description": "The WRITE BEFORE phrase in the PROCEDURE DIVISION gives the COBOL programmer control over file (most often report file) processing pagination. Note that OUTPUT-RECORD-FILE-STATUS-CODE must be defined in the file FD and declared as a two-byte (PIC XX) field in the WORKING-STORAGE SECTION. "
   },
   "BINARY": {
     "prefix": "BINARY",
-    "body": ["BINARY ${1:id}"],
-    "description": "BINARY literal"
+    "body": ["${1:numvar} PIC 9(4) BINARY."],
+    "description": "Variables defined with BINARY (and synonyms COMP and COMP-4) are a two's complement data representation in the COBOL language. This example provides two bytes of values in Base 16."
   },
   "BIT TO CHAR": {
     "prefix": "BIT-TO-CHAR",
@@ -181,12 +196,35 @@
   "BOTTOM": {
     "prefix": "LINES AT BOTTOM",
     "body": ["LINES AT BOTTOM."],
-    "description": "Part of the DATA DIVISION file FD, LINAGE clause, LINES AT BOTTOM tells COBOL to setup a bottom margin (blank lines at the bottom of every logical page). https://www.ibm.com/docs/en/cobol-zos/6.4?topic=entries-linage-clause"
+    "description": "Part of the DATA DIVISION file FD, LINAGE clause, LINES AT BOTTOM tells COBOL to setup a bottom margin (blank lines at the bottom of every logical page)."
   },
   "BY": {
     "prefix": "BY",
     "body": ["BY ${1:item}"],
     "description": "BY Item"
+  },
+  "INDEXED BY": {
+    "prefix": "BY",
+    "body": [
+      "01 ${1:TABLE-X}",
+      "\t05 ${2:RECORD-X} OCCURS ${3:100} TIMES INDEXED BY ${4:X-IND}.",
+      "\t\t10 ${5:elementary-items}"
+    ],
+    "description": "Defines an internal COBOL index for an internal COBOL table."
+  },
+  "SET x UP BY": {
+    "prefix": "BY",
+    "body": ["SET ${1:X-IND} UP BY ${2:1}"],
+    "description": "Adds +1 an internal COBOL table's index - assuming INDEXED BY."
+  },
+  "STRING x DELIMITED BY y": {
+    "prefix": "BY",
+    "body": [
+      "STRING ${1:VAR-1} DELIMITED BY ${2:VAR-2}",
+      "\tINTO ${3:VAR-3}",
+      "END-STRING."
+    ],
+    "description": "BY in the STRING (and UNSTRING) statements defines the transfer operation specifics: INTO VAR-3."
   },
   "BY UNTIL": {
     "prefix": "BY UNTIL",
@@ -207,12 +245,12 @@
       "END-CALL",
       "$0"
     ],
-    "description": "The CALL statement transfers control from one compiled program to another. Note that the BY and RETURNING clauses are optional. For more on CALL: https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-call-statement "
+    "description": "The CALL statement transfers control from one compiled program to another. Note that the BY and RETURNING clauses are optional. For more on CALL: "
   },
   "CANCEL": {
     "prefix": "CANCEL",
     "body": ["CANCEL ${1:id}.", "$0"],
-    "description": "The CANCEL statement terminates the subprogram. This ensures that data in the subprogram reverts to its initial state the next time the subprogram is called. Also when a CANCEL statement is executed all called programs contained within the program referenced in the CANCEL statement are canceled. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+    "description": "The CANCEL statement terminates the subprogram. This ensures that data in the subprogram reverts to its initial state the next time the subprogram is called. Also when a CANCEL statement is executed all called programs contained within the program referenced in the CANCEL statement are canceled."
   },
   "CHARACTERS": {
     "prefix": "CHARACTERS",
@@ -226,13 +264,13 @@
   },
   "CLOSE": {
     "prefix": "CLOSE",
-    "body": ["CLOSE $(1:fileName}"],
+    "body": ["CLOSE ${1:fileName}"],
     "description": "CLOSE filename"
   },
   "CODE SET": {
     "prefix": "CODE-SET",
     "body": ["FD CODE-SET IS ${1:ALPHABET-VAR-NM}.", "$0"],
-    "description": "DATA DIVISION / FILE SECTION - CODE-SET is used in the COBOL DATA DIVISION, FILE SECTION, FD entry. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+    "description": "DATA DIVISION / FILE SECTION - CODE-SET is used in the COBOL DATA DIVISION, FILE SECTION, FD entry."
   },
   "COLLATING": {
     "prefix": "COLLATING",
@@ -249,21 +287,21 @@
     "body": [
       "77 ${1:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-1."
     ],
-    "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=arithmetic-formats-numeric-data"
+    "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-2": {
     "prefix": "COMP-2",
     "body": [
       "77 ${1:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-2."
     ],
-    "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=arithmetic-formats-numeric-data"
+    "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-3": {
     "prefix": "COMP-3",
     "body": [
       "77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-3."
     ],
-    "description": "Internally-packed (efficient) number declared in the DATA DIVISION. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=6-packed-decimal-comp-3"
+    "description": "Internally-packed (efficient) number declared in the DATA DIVISION."
   },
   "COMP-4": {
     "prefix": "COMP-4",
@@ -273,7 +311,7 @@
   "COMP-5": {
     "prefix": "COMP-5",
     "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-5."],
-    "description": "Typically used to communicate data between Java/C/C++/Python/etc. and COBOL. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=arithmetic-formats-numeric-data"
+    "description": "Typically used to communicate data between Java/C/C++/Python/etc. and COBOL. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration."
   },
   "COMPUTE": {
     "prefix": "COMPUTE",
@@ -284,7 +322,7 @@
       "END-COMPUTE",
       "$0"
     ],
-    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-compute-statement"
+    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow."
   },
   "COMPUTE (CICS)": {
     "prefix": "COMPUTE",
@@ -295,7 +333,7 @@
       "END-COMPUTE",
       "$0"
     ],
-    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-compute-statement"
+    "description": "COMPUTE provides an algebraic-style keyword for the specification of complex arithmetic expressions: + (add), - (subtract), * (multiply), / (divide), ** (power of) and any intrinsic functions that return numeric results. ON SIZE ERROR allows you to trap situations such as divide by zero and result overflow."
   },
   "COMPUTE EQUAL": {
     "prefix": "COMPUTE EQUAL",
@@ -305,7 +343,7 @@
   "CONFIGURATION": {
     "prefix": "CONFIGURATION",
     "body": ["CONFIGURATION SECTION."],
-    "description": "ENVIRONMENT DIVISION - The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=division-configuration-section"
+    "description": "ENVIRONMENT DIVISION - The CONFIGURATION SECTION describes the z/OS environment on which the program is compiled and executed. It is an optional section for programs, functions, prototypes, and classes."
   },
   "CONTAINS": {
     "prefix": "CONTAINS",
@@ -315,7 +353,7 @@
       "\tBLOCK CONTAINS 0 RECORDS",
       "\tDATA RECORD IS ${3:inputFileRec}."
     ],
-    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=entries-block-contains-clause"
+    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs."
   },
   "CONTENT": {
     "prefix": "CONTENT",
@@ -328,12 +366,23 @@
       "COMPUTE ${1:resultNum} = CALC2(CONTENT-OF(${2:arg-1}),${3:arg-2},${4:arg-3})",
       "END-COMPUTE"
     ],
-    "description": "The CONTENT-OF intrinsic function produces a temporary copy of the input argument. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=functions-content"
+    "description": "The CONTENT-OF intrinsic function produces a temporary copy of the input argument."
+  },
+  "CONTINUE": {
+    "prefix": "CONTINUE",
+    "body": [
+      "IF ${1:condition}",
+      "\t${2:codeHere}",
+      "ELSE",
+      "\tCONTINUE",
+      "END-IF."
+    ],
+    "description": "The CONTINUE statement is a no-op. It indicates that no instruction is present and that execution falls to the next sequential instruction."
   },
   "CONTROL": {
     "prefix": "CONTROL",
     "body": ["*CONTROL ${1|MAP,NOMAP|)"],
-    "description": "*CONTROL is a compiler option which allows the user to limit (or not limit) the MAP output of a program compile. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf "
+    "description": "*CONTROL is a compiler option which allows the user to limit (or not limit) the MAP output of a program compile. "
   },
   "CONVERTING": {
     "prefix": "CONVERTING",
@@ -344,15 +393,15 @@
       "END-INSPECT",
       "$0"
     ],
-    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=inspect-examples-statement"
+    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values."
   },
   "COPY": {
     "prefix": "COPY",
     "body": ["COPY ${1:copybookName}"],
-    "description": "COPY is used to insert source code stored in a PDS or SCM into a COBOL program when it is compiled. Note that the JCL or Source Management System (Endevor, etc.) must be available and specified correctly during compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "COPY is used to insert source code stored in a PDS or SCM into a COBOL program when it is compiled. Note that the JCL or Source Management System (Endevor, etc.) must be available and specified correctly during compilation."
   },
   "COPY REPLACING": {
-    "prefix": "COPY",
+    "prefix": "COPY REPLACING",
     "body": [
       "COPY \"${1:SUBPROG.CPY}\" REPLCAING",
       "\t ==${2:()}== BY ==${3:lnk-}==."
@@ -372,7 +421,7 @@
       "END-UNSTRING",
       "$0"
     ],
-    "description": "Part of the UNSTRING statement, the COUNT phrase specifies the field where the count of examined character positions is held. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-unstring-statement"
+    "description": "Part of the UNSTRING statement, the COUNT phrase specifies the field where the count of examined character positions is held."
   },
   "COUNT IN": {
     "prefix": "COUNT IN",
@@ -389,7 +438,7 @@
     "body": [
       "CURRENCY SIGN IS \"${1:\\$USD}\" WITH PICTURE SYMBOL \"${2:\\$}\"."
     ],
-    "description": "The CURRENCY SIGN clause is defined in the SPECIAL-NAMES paragraph in the CONFIGURATION SECTION of the ENVIRONMENT DIVISION. You can declare multiple currency signs for multiple currencies. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The CURRENCY SIGN clause is defined in the SPECIAL-NAMES paragraph in the CONFIGURATION SECTION of the ENVIRONMENT DIVISION. You can declare multiple currency signs for multiple currencies."
   },
   "CURSOR": {
     "prefix": "CURSOR",
@@ -415,42 +464,42 @@
       "    GO;",
       "END-PERFORM;"
     ],
-    "description": "AT DATE is used with the IBM COBOL Debugger. It gives the Debugger control for each date processing statement within the specified block. https://www.ibm.com/docs/en/developer-for-zos/14.2?topic=command-date-cobol In the above example: Each time a date processing statement is encountered in the compile unit; 1. Display the location of the statement 2. List a specific variable, and 3. Resume running the program."
+    "description": "AT DATE is used with the IBM COBOL Debugger. It gives the Debugger control for each date processing statement within the specified block. In the above example: Each time a date processing statement is encountered in the compile unit; 1. Display the location of the statement 2. List a specific variable, and 3. Resume running the program."
   },
   "DATE COMPILED YYYY/MM/DD": {
     "prefix": "DATE COMPILED",
     "body": ["DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE."],
-    "description": "DATE-COMPILED is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-COMPILED is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation."
   },
   "DATE COMPILED MM/DD/YYYY": {
     "prefix": "DATE COMPILED",
     "body": ["DATE-COMPILED. $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR."],
-    "description": "DATE-COMPILED is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-COMPILED is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation."
   },
   "DATE WRITTEN YYYY/MM/DD": {
     "prefix": "DATE WRITTEN",
     "body": ["DATE-WRITTEN. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE."],
-    "description": "DATE-WRITTEN is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-WRITTEN is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation."
   },
   "DATE WRITTEN MM/DD/YYYY": {
     "prefix": "DATE WRITTEN",
     "body": ["DATE-WRITTEN. $CURRENT_MONTH/$CURRENT_DATE/$CURRENT_YEAR."],
-    "description": "DATE-WRITTEN is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "DATE-WRITTEN is an optional statement in the IDENTIFICATION DIVISION that describes the specific date of program compilation."
   },
   "DAY": {
     "prefix": "DAY",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a Julian Date receiving field (PiC 9(5) variable - YY NNN) - from z/OS. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable - YY NNN) - from z/OS."
   },
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY-OF-WEEK (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=as-date-date-yyyymmdd-day-day-yyyyddd-day-week-time"
+    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc."
   },
   "DBCS": {
     "prefix": "DBCS",
     "body": ["IF ${1:VAR-1} IS DBCS"],
-    "description": "A class-condition, allowing you to test whether the data in a field is in valid DBCS format. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "A class-condition, allowing you to test whether the data in a field is in valid DBCS format."
   },
   "DEBUG-ITEM": {
     "prefix": "DEBUG",
@@ -458,12 +507,12 @@
       "01 DEBUG-ITEM.",
       "\t05 DEBUG-${1|CONTENTS,NAME,SUB1,SUB2,SUB3|} PIC X(${2:nn})."
     ],
-    "description": "The DEBUG-ITEM special register provides information for a debugging declarative procedure about the conditions that cause debugging section execution. https://publibfp.boulder.ibm.com/epubs/pdf/igy3lr31.pdf"
+    "description": "The DEBUG-ITEM special register provides information for a debugging declarative procedure about the conditions that cause debugging section execution."
   },
   "DECIMAL-POINT": {
     "prefix": "DECIMAL-POINT",
     "body": ["DECIMAL-POINT IS COMMA."],
-    "description": "Part of the SPECIAL-NAMES paragraph, the DECIMAL-POINT IS COMMA clause exchanges the functions of the period and the comma in PIC character-strings and in numeric literals. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Part of the SPECIAL-NAMES paragraph, the DECIMAL-POINT IS COMMA clause exchanges the functions of the period and the comma in PIC character-strings and in numeric literals."
   },
   "DECLARATIVES 1": {
     "prefix": "DECLARATIVES",
@@ -475,7 +524,7 @@
       "\tDisplay ${4:VAR1}, ${5:VAR2}, ${6:VAR3}.",
       "END-DECLARATIVES."
     ],
-    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=procedures-example-use-debugging"
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs."
   },
   "DECLARATIVES 2": {
     "prefix": "DECLARATIVES",
@@ -487,12 +536,12 @@
       "\tDisplay ${3:VAR1}, ${4:VAR2}, ${5:VAR3}.",
       "END-DECLARATIVES."
     ],
-    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=procedures-example-use-debugging"
+    "description": "Declaratives provide one or more special-purpose sections that are executed when an exception occurs."
   },
-  "DEFAULT": {
+  "INITIALIZE DEFAULT": {
     "prefix": "DEFAULT",
-    "body": ["QSAMBUFFINITCHAR={1|DEFAULT,SPACE,BINZERO|}"],
-    "description": "A COBOL Runtime directive to initialize the buffers for QSAM (\"flat\" files). Note that your Systems Programmer will most likely utilize this keyword."
+    "body": ["INITIALIZE ${1:VAR1} TO DEFAULT."],
+    "description": "PROCEDURE DIVISION - The INITIALIZE statement sets selected categories of data fields to predetermined values. The INITIALIZE statement is functionally equivalent to one or more MOVE statements."
   },
   "DELETE": {
     "prefix": "DELETE fileName",
@@ -518,7 +567,7 @@
       "\t\t10 ${4:TBL-FLD1} PIC X(3).",
       "\t\t$0"
     ],
-    "description": "OCCURS DEPENDING ON (ODO) specifies variable-length internal COBOL tables.  https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+    "description": "OCCURS DEPENDING ON (ODO) specifies variable-length internal COBOL tables. "
   },
   "DESCENDING": {
     "prefix": "DESCENDING item",
@@ -533,12 +582,12 @@
   "DISPLAY-1": {
     "prefix": "DISPLAY-1",
     "body": ["77 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
-    "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage. https://www.informatik.uni-leipzig.de/cs/Literature/Textbooks/Cobol/LangRefzOS.pdf"
+    "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage."
   },
   "DIVIDE": {
     "prefix": "DIVIDE",
     "body": ["DIVIDE ${1:a} BY ${2:b} GIVING ${3:c} ${4:REMAINDER ${5:d}}"],
-    "description": "DIVIDE a BY b GIVING [REMAINDER}"
+    "description": "DIVIDE a BY b GIVING REMAINDER"
   },
   "DIVIDE BY GIVING": {
     "prefix": "DIVIDE BY GIVING",
@@ -565,25 +614,25 @@
   "DIVISION": {
     "prefix": "DIVISION",
     "body": ["${1|IDENTIFICATION,ENVIRONMENT,DATA,PROCEDURE|} DIVISION."],
-    "description": "Required Headers for COBOL programs. https://www.ibm.com/docs/en/SS6SG3_6.4.0/pdf/pgmvs.pdf"
+    "description": "Required Headers for COBOL programs."
   },
   "SET x DOWN BY y": {
     "prefix": "DOWN BY",
     "body": ["SET ${1:indexName} DOWN BY ${2:numVarLiteral}"],
     "description": "DOWN BY item"
   },
-  "DUPLICATES #1": {
+  "ALTERNATE RECORD with DUPLICATES": {
     "prefix": "DUPLICATES",
     "body": ["ALTERNATE RECORD KEY IS ${1:FLD-1}", "WITH DUPLICATES."],
-    "description": "DUPLICATES allows an indexed VSAM file to be defined with duplicate values declared in a defined variable within the record in the FD. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=files-using-alternate-keys"
+    "description": "DUPLICATES allows an indexed VSAM file to be defined with duplicate values declared in a defined variable within the record in the FD."
   },
-  "DUPLICATES #2": {
+  "SORT with DUPLICATES": {
     "prefix": "DUPLICATES",
     "body": [
       "SORT ${1:FILENAME} ON ${2|ASCENDING,DESCENDING|} ${3:KEY-FLD}",
       "WITH DUPLICATES${4|., IN ORDER.|}"
     ],
-    "description": "IN ORDER forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that IN ORDER is an optional clause of WITH DUPLICATES. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=merge-preserving-original-sequence-records-equal-keys"
+    "description": "IN ORDER forces the z/OS SORT utility to retain the original order of the input file, if duplicate key-field values are found. Note that IN ORDER is an optional clause of WITH DUPLICATES."
   },
   "DYNAMIC": {
     "prefix": "DYNAMIC",
@@ -595,7 +644,7 @@
       "RECORD KEY IS ${3:VSAMFILE-KEY}",
       "FILE STATUS IS ${4:WS-VSAMFILE-FIELD}"
     ],
-    "description": "Allows the specific READ/WRITE statement to determine the access mode. Records can be processed sequentially or randomly or both. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=files-vsam-dynamic-access-optional-logic-path"
+    "description": "Allows the specific READ/WRITE statement to determine the access mode. Records can be processed sequentially or randomly or both."
   },
   "EGCS": {
     "prefix": "EGCS",
@@ -604,7 +653,7 @@
       "END-INITIALIZE.",
       "$0"
     ],
-    "description": "Initializes a variable while replacing the EGCS (Extended Graphic Character Set) information by a value or variable. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=statements-initialize-statement"
+    "description": "Initializes a variable while replacing the EGCS (Extended Graphic Character Set) information by a value or variable."
   },
   "IF-ELSE": {
     "prefix": "ELSE",
@@ -616,19 +665,12 @@
       "END-IF.",
       "$0"
     ],
-    "description": "IF ... ELSE codes a choice between two COBOL processing actions. https://www.ibm.com/docs/en/cobol-zos/6.4?topic=actions-coding-choice"
-  },
-  "END": {
-    "prefix": "END",
-    "body": [
-      "END-${1|ACCEPT,ADD,CALL,COMPUTE,DELETE,DISPLAY,DIVIDE,EVALUATE,EXEC,IF,INVOKE,JSON,MULTIPLY,OF-PAGE,PERFORM,READ,RECEIVE,RETURN,REWRITE,SEARCH,START,STRING,SUBTRACT,UNSTRING,WRITE,XML|}."
-    ],
-    "description": "Scope terminator - common with many verbs https://www.ibm.com/docs/en/cobol-zos/6.4?topic=appendixes-reserved-words"
+    "description": "IF ... ELSE codes a choice between two COBOL processing actions."
   },
   "ENTRY": {
     "prefix": "ENTRY",
     "body": ["ENTRY ${1:literal}."],
-    "description": "The ENTRY statement establishes an alternate entry point into a COBOL called subprogram. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The ENTRY statement establishes an alternate entry point into a COBOL called subprogram."
   },
   "ENTRY USING": {
     "prefix": "ENTRY USING",
@@ -665,7 +707,7 @@
       "ON SIZE ERROR ${4:imperative_statement}",
       "END-DIVIDE."
     ],
-    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded, the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "NUMVAR-1 is divided into NUMVAR-2. If NUMVAR-1 = 0 or if the quotient is larger than NUMVAR-3 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded, the program abends."
   },
   "ERROR #2": {
     "prefix": "ERROR",
@@ -673,7 +715,7 @@
       "MOVE CORRESPONDING ${1:GROUP-FIELDS-1} TO ${2:GROUP-FIELDS-2}",
       "ON SIZE ERROR ${3:imperative_statement}"
     ],
-    "description": "The like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded, the program abends. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The like-named variables in the COBOL group field GROUP-FIELDS-1 are moved to GROUP-FIELDS-2. If there are any variables in GROUP-FIELDS-1 that are larger than the same named variable in GROUP-FIELDS-2 the ON SIZE ERROR statement is executed. If ON SIZE ERROR is not coded, the program abends."
   },
   "ERROR #3": {
     "prefix": "ERROR",
@@ -683,9 +725,9 @@
       "\tINPUT OUTPUT",
       "\tI-O EXTEND"
     ],
-    "description": "The EXCEPTION/ERROR declarative specifies procedures for input/output exception or error handling that are to be executed in addition to the standard z/OS procedures. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The EXCEPTION/ERROR declarative specifies procedures for input/output exception or error handling that are to be executed in addition to the standard z/OS procedures."
   },
-  "EVERY": {
+  "EVERY (XML)": {
     "prefix": "EVERY",
     "body": [
       "XML GENERATE DOC FROM ${3:VAR-1}",
@@ -694,7 +736,7 @@
       "\tEVERY ${2:NUMERIC ELEMENT WHEN ZERO}",
       "END-XML."
     ],
-    "description": "Part of the COBOL XML statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Part of the COBOL XML statement."
   },
   "EXCEPTION": {
     "prefix": "EXCEPTION",
@@ -711,12 +753,12 @@
     "body": [
       "01 ${2:DOCUMENT-VARIABLE} PIC X(500).",
       "\tXML GENERATE ${2:DOCUMENT-VARIABLE} FROM ${3:MSG-VARIABLE}",
-      "\t\tWITH ATTRIBUTES ${4:attribuesHere}",
+      "\t\tWITH ATTRIBUTES ${4:attributesHere}",
       "\t\tON EXCEPTION ${1:impStatement}",
       "\tEND-XML.",
       "$0"
     ],
-    "description": "An EXCEPTION condition occurs when the XML document cannot be generated. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "An EXCEPTION condition occurs when the XML document cannot be generated."
   },
   "EXCEPTION #3": {
     "prefix": "EXCEPTION",
@@ -726,27 +768,27 @@
       "END-CLOSE",
       "$0"
     ],
-    "description": "An EXCEPTION condition occurs when there is a problem closing a QSAM, VSAM or Line Sequential. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "An EXCEPTION condition occurs when there is a problem closing a QSAM, VSAM or Line Sequential."
   },
   "EXIT": {
     "prefix": "EXIT",
     "body": ["EXIT."],
-    "description": "EXIT statements close the PERFORM CHAIN (internal COBOL iterative control structure). Control is returned to the NSI (Next Sequential Instruction) following the PERFORM statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "EXIT statements close the PERFORM CHAIN (internal COBOL iterative control structure). Control is returned to the NSI (Next Sequential Instruction) following the PERFORM statement."
   },
   "EXIT PROGRAM": {
     "prefix": "EXIT PROGRAM",
     "body": ["EXIT PROGRAM."],
-    "description": "EXIT PROGRAM transfers control outside the COBOL program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "EXIT PROGRAM transfers control outside the COBOL program."
   },
   "EXIT PROGRAM RETURNING": {
     "prefix": "EXIT PROGRAM",
     "body": ["EXIT PROGRAM RETURNING ${1:item}."],
-    "description": "EXIT PROGRAM transfers control outside the COBOL program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "EXIT PROGRAM transfers control outside the COBOL program."
   },
   "EXIT METHOD": {
     "prefix": "EXIT METHOD",
     "body": ["EXIT METHOD."],
-    "description": "EXIT METHOD transfers control outside the Object COBOL program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "EXIT METHOD transfers control outside the Object COBOL program."
   },
   "EXTEND": {
     "prefix": "EXTEND",
@@ -771,7 +813,7 @@
   "EXTERNAL": {
     "prefix": "EXTERNAL",
     "body": ["01 ${1:DATA-NAME} EXTERNAL PIC X(${2:numberLiteral})."],
-    "description": "The EXTERNAL clause specifies that the main storage associated with a data item is associated with the run unit rather than with any particular program. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The EXTERNAL clause specifies that the main storage associated with a data item is associated with the run unit rather than with any particular program."
   },
   "EVALUATE": {
     "prefix": "EVALUATE ",
@@ -784,20 +826,20 @@
       "END-EVALUATE",
       ""
     ],
-    "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each."
   },
   "EVALUATE FALSE": {
     "prefix": "EVALUATE FALSE",
     "body": [
       "EVALUATE FALSE",
       "\tWHEN ${1:VAR-A} = ${2:VAR-B}",
-      "\t\tMOVE \"${1:VAR-A} - ${2:VAR-B} NOT EQUAL\" TO DISP-OUT.",
+      "\t\t*> MOVE \"${1:VAR-A} - ${2:VAR-B} NOT EQUAL\" TO DISP-OUT",
       "\tWHEN ${3:VAR-C} = ${4:VAR-D}",
-      "\t\tMOVE \"${3:VAR-C} - ${4:VAR-D} NOT EQUAL\" TO DISP-OUT.",
+      "\t\t*> MOVE \"${3:VAR-C} - ${4:VAR-D} NOT EQUAL\" TO DISP-OUT",
       "END-EVALUATE.",
       "$0"
     ],
-    "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Use EVALUATE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each."
   },
   "FILE": {
     "prefix": "FILE",
@@ -812,7 +854,7 @@
       "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS",
       "\tDATA RECORD IS ${3:PATIENT-MASTER}."
     ],
-    "description": "DATA DIVISION - The FILE SECTION is where you define specifics of each input/output file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "DATA DIVISION - The FILE SECTION is where you define specifics of each input/output file."
   },
   "FILE STATUS": {
     "prefix": "FILE STATUS",
@@ -824,7 +866,7 @@
       "\tRECORD KEY IS ${5:PATIENT-REC-KEY}",
       "\tFILE STATUS IS ${1:PATVSAM}-FS."
     ],
-    "description": "ENVIRONMENT DIVISION - FILE STATUS defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "ENVIRONMENT DIVISION - FILE STATUS defines a two-byte (PIC XX) field that recieves a code from z/OS based on the disposition of the I/O operation."
   },
   "MULTIPLE FILE TAPE": {
     "prefix": "MULTIPLE FILE TAPE",
@@ -834,7 +876,7 @@
       "\tMULTIPLE FILE TAPE.",
       "\t${3:RPT-OUT-REC} PIC X(${4:132})."
     ],
-    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical volume serial of tape. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical volume serial of tape."
   },
   "FILE CONTROL": {
     "prefix": "FILE CONTROL",
@@ -844,7 +886,7 @@
       "ACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "FILE STATUS IS ${5:WS-FILE-STATUS-VAR}."
     ],
-    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - The FILE-CONTROL paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - The FILE-CONTROL paragraph associates every file in your COBOL program with an external data set. It optionally defines file organization, access mode, etc."
   },
   "FILLER": {
     "prefix": "FILLER",
@@ -855,7 +897,7 @@
       "\t\t10 FILLER PIC X(${1:20}) VALUE SPACE.",
       "\t\t$0"
     ],
-    "description": "A placeholder variable that is not explicitly referred to in a program. FILLER is used to line up variable names with byte-offsets in the physical data record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "A placeholder variable that is not explicitly referred to in a program. FILLER is used to line up variable names with byte-offsets in the physical data record."
   },
   "FIRST #1": {
     "prefix": "FIRST",
@@ -874,7 +916,7 @@
   "FOOTING": {
     "prefix": "FOOTING",
     "body": ["WITH FOOTING AT ${1:literal}"],
-    "description": "Part of the FD LINAGE (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Part of the FD LINAGE (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
   },
   "FOR": {
     "prefix": "FOR",
@@ -887,7 +929,7 @@
       "INSPECT ${2:variable-field} TALLYING ${3:num-field}",
       "FOR CHARACTERS AFTER ${1:X\"40\"}"
     ],
-    "description": "Counts the number of characters after the first occurrence of a specified string. Part of the TALLYING keyword in the INSPECT statement. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "Counts the number of characters after the first occurrence of a specified string. Part of the TALLYING keyword in the INSPECT statement."
   },
   "USE FOR DEBUGGING": {
     "prefix": "USE FOR DEBUGGING",
@@ -896,12 +938,12 @@
       "${2:Debug-Declaratives} SECTION.",
       "\tUSE FOR DEBUGGING ON ${1:paragraph-section-name}."
     ],
-    "description": "PRODECURE DIVISION - Specifies debugging to begin on (specified) routine. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "PRODECURE DIVISION - Specifies debugging to begin on (specified) routine."
   },
   "CLOSE x FOR REMOVAL": {
     "prefix": "CLOSE x FOR REMOVAL",
     "body": ["CLOSE ${1:tape-file} FOR REMOVAL"],
-    "description": "This phrase applies only to TAPE/REEL data sets and is treated as a comment. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "This phrase applies only to TAPE/REEL data sets and is treated as a comment."
   },
   "FROM": {
     "prefix": "FROM",
@@ -913,19 +955,19 @@
     "body": [
       "PERFORM ${1:B-100PARAGRAPH} VARYING ${2:IDX-1} FROM 1 BY 1 UNTIL ${2:IDX-1} > TABLE-MAX-ROWS"
     ],
-    "description": "The \"FROM\" in a PERFORM VARYING clause sets the initial value and the incremental/iterative value(s) for a table subscript or index. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The \"FROM\" in a PERFORM VARYING clause sets the initial value and the incremental/iterative value(s) for a table subscript or index."
   },
   "FROM #2": {
     "prefix": "FROM",
     "body": [
       "${1|WRITE,REWRITE,RELEASE|} ${2:OUTPUT-REC} FROM ${3:WS-OUTPUT-REC}."
     ],
-    "description": "The FROM phrase is equivalent to: MOVE REC-1 to OUTPUT-REC WRITE OUTPUT-REC. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "The FROM phrase is equivalent to: MOVE REC-1 to OUTPUT-REC WRITE OUTPUT-REC."
   },
   "FROM #3": {
     "prefix": "FROM",
     "body": ["ACCEPT ${1:ws-receiving-field} FROM ${2|DATE,DAY,DAY-OF-WEEK|}."],
-    "description": "This statement values the receiving-field with one of the system date registers. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "This statement values the receiving-field with one of the system date registers."
   },
   "FREE": {
     "prefix": "FREE",
@@ -1283,7 +1325,7 @@
   "FUNCTION-POINTER": {
     "prefix": "FUNCTION-POINTER",
     "body": ["77 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
-    "description": "A FUNCTION-POINTER is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
+    "description": "A FUNCTION-POINTER is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point."
   },
   "GENERATE": {
     "prefix": "GENERATE",
@@ -1459,7 +1501,7 @@
   "MOVE CORR": {
     "prefix": "MOVE CORR",
     "body": ["MOVE ${1|CORR,CORRESPONDING|} ${2:group-1} TO ${3:group-2"],
-    "description": "The MOVE CORRESPONDING statement copies all values in variables with the same name from one group to another group. https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdf"
+    "description": "The MOVE CORRESPONDING statement copies all values in variables with the same name from one group to another group."
   },
   "MOVE": {
     "prefix": "MOVE",

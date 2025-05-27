@@ -90,6 +90,12 @@ public class TestCICSExtract {
   private static final String EXTRACT_PROCESS_INVALID_ONE =
       "EXTRACT PROCESS {MAXPROCLEN|errorOne}(100)";
 
+  private static final String EXTRACT_PROCESS_PIPLIST_WITHOUT_PIPLENGTH =
+      "EXTRACT {_PROCESS PIPLIST({$varOne})|errorOne_}";
+
+  private static final String EXTRACT_PROCESS_PROCNAME_WITHOUT_PROCLENGTH =
+      "EXTRACT {_PROCESS PROCNAME({$varOne})|errorOne_}";
+
   private static final String EXTRACT_TCPIP_ALL_OPTIONS_VALID_ONE =
       "EXTRACT TCPIP AUTHENTICATE({$varOne}) CLIENTNAME({$varOne}) CNAMELENGTH({$varOne})"
           + " SERVERNAME({$varOne}) SNAMELENGTH({$varOne}) CLIENTADDR({$varOne})"
@@ -104,6 +110,15 @@ public class TestCICSExtract {
 
   private static final String EXTRACT_TCPIP_INVALID_ONE =
       "EXTRACT TCPIP AUTHENTICATE(100) {SADDRLENGTH|errorOne}(100)";
+
+  private static final String EXTRACT_TCPIP_SERVERNAME_WITHOUT_SNAMELENGTH =
+      "EXTRACT {_TCPIP SERVERNAME({$varOne})|errorOne_}";
+
+  private static final String EXTRACT_TCPIP_CLIENTADDR_WITHOUT_CADDRLENGTH =
+      "EXTRACT {_TCPIP CLIENTADDR({$varOne})|errorOne_}";
+
+  private static final String EXTRACT_TCPIP_SERVERADDR_WITHOUT_SADDRLENGTH =
+      "EXTRACT {_TCPIP SERVERADDR({$varOne})|errorOne_}";
 
   private static final String EXTRACT_TCT_ALL_OPTIONS_VALID_ONE =
       "EXTRACT TCT NETNAME({$varOne}) SYSID({$varOne})";
@@ -124,6 +139,15 @@ public class TestCICSExtract {
 
   private static final String EXTRACT_WEB_SERVER_INVALID_ONE =
       "EXTRACT WEB {HOSTTYPE|errorOne}(100)";
+
+  private static final String EXTRACT_WEB_HTTPMETHOD_WITHOUT_METHODLENGTH =
+      "EXTRACT {_WEB HTTPMETHOD({$varOne})|errorOne_}";
+
+  private static final String EXTRACT_WEB_HOST_WITHOUT_HOSTLENGTH =
+      "EXTRACT {_WEB HOST({$varOne})|errorOne_}";
+
+  private static final String EXTRACT_WEB_PATH_WITHOUT_PATHLENGTH =
+      "EXTRACT {_WEB PATH({$varOne})|errorOne_}";
 
   private static final String EXTRACT_WEB_CLIENT_ALL_OPTIONS_VALID_ONE =
       "EXTRACT WEB SESSTOKEN({$varOne}) SCHEME({$varOne}) HOST({$varOne}) HOSTLENGTH({$varOne})"
@@ -297,6 +321,32 @@ public class TestCICSExtract {
   }
 
   @Test
+  void testExtractProcessPiplistWithoutPiplength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PIPLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_PROCESS_PIPLIST_WITHOUT_PIPLENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractProcessProcnameWithoutProclength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PROCLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_PROCESS_PROCNAME_WITHOUT_PROCLENGTH, expectedDiagnostics);
+  }
+
+  @Test
   void testExtractTCPIOAllOptionsValidOne() {
     CICSTestUtils.noErrorTest(EXTRACT_TCPIP_ALL_OPTIONS_VALID_ONE);
   }
@@ -317,6 +367,84 @@ public class TestCICSExtract {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(EXTRACT_TCPIP_INVALID_ONE, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractTCPIPServernameWithoutSnamelength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SNAMELENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_TCPIP_SERVERNAME_WITHOUT_SNAMELENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractTCPIPClientaddrWithoutCaddrlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: CADDRLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_TCPIP_CLIENTADDR_WITHOUT_CADDRLENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractTCPIPServeraddrWithoutSaddrlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SADDRLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_TCPIP_SERVERADDR_WITHOUT_SADDRLENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractWebHttpmethodWithoutMethodlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: METHODLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_WEB_HTTPMETHOD_WITHOUT_METHODLENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractWebHostWithoutHostlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: HOSTLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_WEB_HOST_WITHOUT_HOSTLENGTH, expectedDiagnostics);
+  }
+
+  @Test
+  void testExtractWebPathWithoutPathlength() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PATHLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(EXTRACT_WEB_PATH_WITHOUT_PATHLENGTH, expectedDiagnostics);
   }
 
   @Test

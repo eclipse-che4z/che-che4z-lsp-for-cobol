@@ -35,10 +35,10 @@ public class TestCICSRetrieve {
       "RETRIEVE INTO({$varOne}) LENGTH({$varTwo}) RTRANSID({$varThree})";
 
   private static final String RETRIEVE_STANDARD_VALID_TWO =
-      "RETRIEVE SET({$varOne}) QUEUE({$varTwo}) WAIT";
+      "RETRIEVE SET({$varOne}) LENGTH({$varTwo}) QUEUE({$varTwo}) WAIT";
 
   private static final String RETRIEVE_STANDARD_INVALID =
-      "RETRIEVE {INTO|errorOne}({$varOne}) {SET|errorTwo}({$varTwo})";
+      "RETRIEVE {INTO|errorOne}({$varOne}) {SET|errorTwo}({$varTwo}) LENGTH({$varTwo})";
 
   // RETRIEVE REATTACH EVENT tests
   private static final String RETRIEVE_REATTACH_VALID =
@@ -54,6 +54,12 @@ public class TestCICSRetrieve {
       "RETRIEVE {_SUBEVENT({$varOne}) EVENTTYPE(123)|errorOne_}";
   private static final String RETRIEVE_TRANS_NOLENGTH_INVALID =
       "RETRIEVE {_INTO({$varOne}) QUEUE({$varTwo}) WAIT|error_}";
+      
+  private static final String RETRIEVE_SET_WITHOUT_LENGTH =
+      "RETRIEVE {_SET({$varOne}) QUEUE({$varTwo}) WAIT|errorOne_}";
+
+  private static final String RETRIEVE_SET_WITHOUT_LENGTH =
+      "RETRIEVE {_SET({$varOne}) QUEUE({$varTwo}) WAIT|errorOne_}";
 
   @Test
   void testRetrieveStandardValidOne() {
@@ -116,6 +122,19 @@ public class TestCICSRetrieve {
             new Diagnostic(
                 new Range(),
                 "Missing required option: EVENT",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testRetrieveSetWithoutLength() {
+    CICSTestUtils.errorTest(
+        RETRIEVE_SET_WITHOUT_LENGTH,
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

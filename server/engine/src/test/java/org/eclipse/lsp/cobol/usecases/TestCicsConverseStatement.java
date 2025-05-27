@@ -64,6 +64,11 @@ public class TestCicsConverseStatement {
   private static final String T3790_3270DISP_VALID_3 = CONVERSE_FROM_INTO_TO;
   private static final String T2660_VALID =
       CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) CTLCHAR(123) LINEADDR(123) LEAVEKB";
+  private static final String FROM_FROMLENGTH_MAXFLENGTH =
+      "CONVERSE FROM(123) FROMLENGTH(123) MAXFLENGTH(123)";
+
+  private static final String FROM_MAXFLENGTH = "CONVERSE FROM(123) MAXFLENGTH(123)";
+
   private static final String APPC_VALID =
       CONVERSE + "CONVID(123) " + FROM_INTO_TO + "MAXLENGTH(123) STATE(123)";
   private static final String MRO_VALID =
@@ -198,6 +203,16 @@ public class TestCicsConverseStatement {
   @Test
   void testT2660Valid() {
     CICSTestUtils.noErrorTest(T2660_VALID);
+  }
+
+  @Test
+  void testFromFromlengthMaxflength() {
+    CICSTestUtils.noErrorTest(FROM_FROMLENGTH_MAXFLENGTH);
+  }
+
+  @Test
+  void testFromMaxflength() {
+    CICSTestUtils.noErrorTest(FROM_MAXFLENGTH);
   }
 
   @Test

@@ -77,9 +77,9 @@ public class CICSRetrieveOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     checkDuplicates(ctx);
   }
 
-  @SuppressWarnings("unchecked")
   private void checkRetrieveStandard(CICSParser.Cics_retrieve_standardContext ctx) {
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+    if (!ctx.SET().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }

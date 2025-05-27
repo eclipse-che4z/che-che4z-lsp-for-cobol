@@ -47,12 +47,13 @@ public class TestCICSReadNextReadPrev {
       "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) CONSISTENT",
       "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) REPEATABLE",
       "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) UPDATE TOKEN({$varFive})",
-      "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) SYSID({$varFour}) LENGTH({$varFive})",
+      "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) SYSID({$varFour}) RBA"
+          + " LENGTH({$varFive})",
       "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) RBA NOSUSPEND",
       "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) UPDATE TOKEN({$varFive})"
-          + " SYSID({$varFour}) LENGTH({$varFive})",
+          + " SYSID({$varFour}) RBA LENGTH({$varFive})",
       "FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) UPDATE TOKEN({$varFive})"
-          + " SYSID({$varFour}) LENGTH(LENGTH OF {$varFive})",
+          + " SYSID({$varFour}) RBA LENGTH(LENGTH OF {$varFive})",
     };
     return Arrays.stream(commands)
         .flatMap(
@@ -76,6 +77,12 @@ public class TestCICSReadNextReadPrev {
   private static final String READPREV_DOUBLE_UPDATE_INVALID =
       "READPREV FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) UPDATE {UPDATE|error1}"
           + " TOKEN({$varFive})";
+
+  private static final String READNEXT_SYSID_WITHOUT_REQUIRED_OPTION =
+      "READNEXT {_FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) SYSID({$varFour})|error1_}";
+
+  private static final String READPREV_SYSID_WITHOUT_REQUIRED_OPTION =
+      "READPREV {_FILE({$varFour}) INTO({$varFive}) RIDFLD({$varFive}) SYSID({$varFour})|error1_}";
 
   @ParameterizedTest
   @MethodSource("provideReadCommands")
@@ -192,5 +199,31 @@ public class TestCICSReadNextReadPrev {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(READPREV_DOUBLE_UPDATE_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testReadnextSysidWithoutRequiredOption() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: KEYLENGTH, RBA, XRBA or RRN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(READNEXT_SYSID_WITHOUT_REQUIRED_OPTION, expectedDiagnostics);
+  }
+
+  @Test
+  void testReadprevSysidWithoutRequiredOption() {
+    Map<String, Diagnostic> expectedDiagnostics =
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: KEYLENGTH, RBA, XRBA or RRN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(READPREV_SYSID_WITHOUT_REQUIRED_OPTION, expectedDiagnostics);
   }
 }
