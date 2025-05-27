@@ -34,7 +34,7 @@ suite("TC384131: Analysis Features for copybooks", function () {
     helper.TEST_TIMEOUT,
   );
 
-  test("TC384131-1: Go To References", async () => {
+  test("TC384131-1: Go To References - Example", async () => {
     //1- Open COBOL file
     const editor_cobol: vscode.TextEditor = await helper.showDocument(
       path.join("copybook-analysis", "mainfile1.cbl"),
@@ -42,7 +42,7 @@ suite("TC384131: Analysis Features for copybooks", function () {
     await helper.sleep(3000);
 
     //2 - Find a COPYBOOK
-    helper.moveCursor(editor_cobol, new vscode.Position(0, 18));
+    helper.moveCursor(editor_cobol, new vscode.Position(13, 18));
 
     //3- Go to COPYBOOK definition
     await vscode.commands.executeCommand("editor.action.revealDefinition");
@@ -59,7 +59,7 @@ suite("TC384131: Analysis Features for copybooks", function () {
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
       editor_copybook!.document.uri,
-      new vscode.Position(0, 16),
+      new vscode.Position(13, 16),
     );
 
     //5- Verify number of occurances
