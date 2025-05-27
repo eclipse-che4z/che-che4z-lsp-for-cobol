@@ -17,7 +17,7 @@ import * as helper from "./testHelper";
 import * as vscode from "vscode";
 import * as assert from "assert";
 
-suite.only("TC384131: Analysis Features for copybooks", function () {
+suite("TC384131: Analysis Features for copybooks", function () {
   this.timeout(helper.TEST_TIMEOUT);
   this.slow(1000);
   suiteSetup(async function () {
