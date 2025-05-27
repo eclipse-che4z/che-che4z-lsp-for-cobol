@@ -62,15 +62,14 @@ suite("TC384131: Analysis Features for copybooks", function () {
     );
 
     //5- Verify number of occurances and URIs are matching
-    assert.equal(locations.length == 2, true);
     const fileURIs = [
       (await helper.getUri("copybook-analysis/v1/COPYBOOK")).toString(),
       (await helper.getUri("copybook-analysis/v1/FUNC1")).toString(),
     ];
 
     assert.deepStrictEqual(
-      fileURIs,
       locations.map((a) => a.uri.toString()).sort(),
+      fileURIs,
     );
   });
 });
