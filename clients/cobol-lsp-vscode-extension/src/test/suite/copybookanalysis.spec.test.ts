@@ -36,7 +36,7 @@ suite("TC384131: Analysis Features for copybooks", function () {
   test("TC384131-1: Go To References - Example", async () => {
     //1- Open COBOL file
     const editor_cobol: vscode.TextEditor = await helper.showDocument(
-      path.join("copybook-analysis", "mainfile1.cbl"),
+      "copybook-analysis/mainfile1.cbl",
     );
     await helper.sleep(3000);
 
