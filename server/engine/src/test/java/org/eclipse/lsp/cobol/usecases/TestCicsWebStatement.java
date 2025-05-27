@@ -97,10 +97,7 @@ public class TestCicsWebStatement {
   private static final String READ_HTTPHEADER_VALID =
       WEB_READ
           + "HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})";
-  private static final String READ_QUERYPARM_INVALID =
-      WEB_READ
-          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
-          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
+
   private static final String WEB_READNEXT = WEB + "READNEXT ";
   private static final String READNEXT_FORMFIELD_VALID =
       WEB_READNEXT
@@ -112,10 +109,7 @@ public class TestCicsWebStatement {
       WEB_READNEXT
           + "HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) SESSTOKEN({$varOne}) VALUE({$varOne})"
           + " VALUELENGTH({$varOne})";
-  private static final String READNEXT_QUERYPARM_INVALID =
-      WEB_READNEXT
-          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
-          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
+
   private static final String RECEIVE_SERVER_BUFFER_VALID =
       WEB
           + "RECEIVE INTO({$varOne}) LENGTH({$varOne}) MAXLENGTH({$varOne}) NOTRUNCATE"
@@ -125,6 +119,7 @@ public class TestCicsWebStatement {
       WEB
           + "RECEIVE TOCONTAINER({$varOne}) TOCHANNEL({$varOne}) TYPE({$varOne})"
           + " CHARACTERSET({$varOne}) BODYCHARSET({$varOne}) MEDIATYPE({$varOne})";
+
   private static final String RECEIVE_BODY =
       WEB
           + "RECEIVE SESSTOKEN({$varOne}) MEDIATYPE({$varOne}) STATUSCODE({$varOne})"
@@ -135,7 +130,9 @@ public class TestCicsWebStatement {
           + " BODYCHARSET({$varOne})";
   private static final String RECEIVE_CLIENT_CONTAINER_VALID =
       RECEIVE_BODY + "TOCONTAINER({$varOne}) TOCHANNEL({$varOne}) BODYCHARSET({$varOne})";
+
   private static final String RETRIEVE_VALID = WEB + "RETRIEVE DOCTOKEN({$varOne})";
+
   private static final String SEND_SERVER_VALID_1 =
       WEB
           + "SEND DOCTOKEN({$varOne}) NODOCDELETE MEDIATYPE({$varOne}) SRVCONVERT"
@@ -151,6 +148,7 @@ public class TestCicsWebStatement {
           + "SEND CONTAINER({$varOne}) CHANNEL({$varOne}) MEDIATYPE({$varOne}) SRVCONVERT"
           + " CHARACTERSET({$varOne}) STATUSCODE({$varOne}) STATUSTEXT({$varOne})"
           + " STATUSLEN({$varOne}) EVENTUAL CLOSE";
+
   private static final String SEND_CLIENT_VALID_1 =
       WEB
           + "SEND SESSTOKEN({$varOne}) GET PATH({$varOne}) PATHLENGTH({$varOne})"
@@ -164,6 +162,7 @@ public class TestCicsWebStatement {
           + " QUERYSTRING({$varOne}) QUERYSTRLEN({$varOne}) CLICONVERT CHARACTERSET({$varOne})"
           + " EXPECT NOCLOSE BASICAUTH USERNAME({$varOne}) USERNAMELEN({$varOne})"
           + " PASSWORD({$varOne}) PASSWORDLEN({$varOne})";
+
   private static final String STARTBROWSE_FORMFIELD_VALID =
       WEB
           + "STARTBROWSE FORMFIELD({$varOne}) NAMELENGTH({$varOne}) CHARACTERSET({$varOne})"
@@ -172,12 +171,22 @@ public class TestCicsWebStatement {
       WEB + "STARTBROWSE HTTPHEADER SESSTOKEN({$varOne})";
   private static final String STARTBROWSE_QUERYPARM_VALID =
       WEB + "STARTBROWSE QUERYPARM({$varOne}) NAMELENGTH({$varOne}) HOSTCODEPAGE({$varOne})";
+
   private static final String WRITE_HTTPHEADER_VALID =
       WEB
           + "WRITE HTTPHEADER({$varOne}) NAMELENGTH({$varOne}) SESSTOKEN({$varOne})"
           + " VALUE({$varOne}) VALUELENGTH({$varOne})";
+
   // Invalid use cases
   private static final String CLOSE_INVALID = WEB + "{CLOSE|errorOne}";
+  private static final String READ_QUERYPARM_INVALID =
+      WEB_READ
+          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
+          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
+  private static final String READNEXT_QUERYPARM_INVALID =
+      WEB_READNEXT
+          + "QUERYPARM({$varOne}) NAMELENGTH({$varOne}) {SESSTOKEN|errorOne}({$varOne})"
+          + " VALUE({$varOne}) VALUELENGTH({$varOne})";
   private static final String SEND_SERVER_INVALID =
       WEB
           + "SEND DOCTOKEN({$varOne}) {FROM|errorOne}({$varOne}) FROMLENGTH({$varOne}) NODOCDELETE"
@@ -194,35 +203,34 @@ public class TestCicsWebStatement {
   private static final String WEB_SEND_USERNAME_PASSWORD_INVALID =
       "WEB {_SEND SESSTOKEN({$varOne}) USERNAME({$varTwo}) PASSWORD({$varThree})|errorOne_}";
   private static final String CONVERSE_TRANS_NOLENGTH_INVALID =
-      "WEB {_CONVERSE SESSTOKEN({$varOne}) NONE GET TOLENGTH({$varOne})"
-          + " USERNAME({$varFour}) INTO({$varFour}) PASSWORD({$varFour})"
-          + " PATH({$varFour})|error|errorTwo|errorThree|errorFour_}";
+          "WEB {_CONVERSE SESSTOKEN({$varOne}) NONE GET TOLENGTH({$varOne})"
+                  + " USERNAME({$varFour}) INTO({$varFour}) PASSWORD({$varFour})"
+                  + " PATH({$varFour})|error|errorTwo|errorThree|errorFour_}";
   private static final String CONVERSE_PARSE_NOLENGTH_INVALID =
-      " WEB {_PARSE URL({$varOne}) HOST({$varOne}) URLLENGTH({$varOne})"
-          + "SCHEMENAME({$varOne}) PORTNUMBER({$varOne}) PATH({$varOne})"
-          + "QUERYSTRING({$varOne})|error|errorTwo|errorThree_}";
+          " WEB {_PARSE URL({$varOne}) HOST({$varOne}) URLLENGTH({$varOne})"
+                  + "SCHEMENAME({$varOne}) PORTNUMBER({$varOne}) PATH({$varOne})"
+                  + "QUERYSTRING({$varOne})|error|errorTwo|errorThree_}";
   private static final String READ_HTTPHEADER_TRANS_NOLENGTH_INVALID =
-      "WEB {_READ HTTPHEADER({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})|error_}";
+          "WEB {_READ HTTPHEADER({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})|error_}";
   private static final String READ_FORMFIELD_TRANS_NOLENGTH_INVALID =
-      "WEB {_READ FORMFIELD({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})"
-          + "CHARACTERSET({$varOne}) HOSTCODEPAGE({$varOne})|error_}";
+          "WEB {_READ FORMFIELD({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})"
+                  + "CHARACTERSET({$varOne}) HOSTCODEPAGE({$varOne})|error_}";
   private static final String READ_QUERYPARAM_TRANS_NOLENGTH_INVALID =
-      "WEB {_READ QUERYPARM({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})|error_}";
+          "WEB {_READ QUERYPARM({$varOne}) VALUE({$varOne}) VALUELENGTH({$varOne})|error_}";
   private static final String RECEIVE_TRANS_NOLENGTH_INVALID =
-      "WEB {_RECEIVE SESSTOKEN({$varOne}) MEDIATYPE({$varOne}) STATUSCODE({$varOne})"
-          + " STATUSTEXT({$varOne}) STATUSLEN({$varOne}) "
-          + "INTO({$varOne}) LENGTH({$varOne}) NOTRUNCATE CLICONVERT"
-          + " BODYCHARSET({$varOne})|error_}";
+          "WEB {_RECEIVE SESSTOKEN({$varOne}) MEDIATYPE({$varOne}) STATUSCODE({$varOne})"
+                  + " STATUSTEXT({$varOne}) STATUSLEN({$varOne}) "
+                  + "INTO({$varOne}) LENGTH({$varOne}) NOTRUNCATE CLICONVERT"
+                  + " BODYCHARSET({$varOne})|error_}";
   private static final String RECEIVE_SEND_NOLENGTH_INVALID =
-      "WEB {_SEND SESSTOKEN({$varOne}) GET PATH({$varOne}) PATHLENGTH({$varOne})"
-          + " QUERYSTRING({$varOne}) MEDIATYPE({$varOne}) QUERYSTRLEN({$varOne})"
-          + " DOCTOKEN({$varOne}) DOCDELETE CLICONVERT CHARACTERSET({$varOne}) EXPECT NOCLOSE"
-          + " BASICAUTH USERNAME({$varOne}) PASSWORD({$varOne})"
-          + " |error|errorTwo_}";
+          "WEB {_SEND SESSTOKEN({$varOne}) GET PATH({$varOne}) PATHLENGTH({$varOne})"
+                  + " QUERYSTRING({$varOne}) MEDIATYPE({$varOne}) QUERYSTRLEN({$varOne})"
+                  + " DOCTOKEN({$varOne}) DOCDELETE CLICONVERT CHARACTERSET({$varOne}) EXPECT NOCLOSE"
+                  + " BASICAUTH USERNAME({$varOne}) PASSWORD({$varOne})"
+                  + " |error|errorTwo_}";
   private static final String WRTITE_HTTPHEADER_NOLENGTH_INVALID =
-      "WEB {_WRITE HTTPHEADER({$varOne}) SESSTOKEN({$varOne})"
-          + " VALUE({$varOne})|error|errorTwo_}";
-
+          "WEB {_WRITE HTTPHEADER({$varOne}) SESSTOKEN({$varOne})"
+                  + " VALUE({$varOne})|error|errorTwo_}";
   // Test Functions
   @Test
   void testCloseValid() {
@@ -407,158 +415,157 @@ public class TestCicsWebStatement {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
-
   @Test
   void testConverseNoLength() {
     CICSTestUtils.errorTest(
-        CONVERSE_TRANS_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: PATHLENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorTwo",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: MAXLENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorThree",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: PASSWORDLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorFour",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: USERNAMELEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            CONVERSE_TRANS_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: PATHLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: MAXLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorThree",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: PASSWORDLEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorFour",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: USERNAMELEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testParseNoLength() {
     CICSTestUtils.errorTest(
-        CONVERSE_PARSE_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: PATHLENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorTwo",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: QUERYSTRLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorThree",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: HOSTLENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            CONVERSE_PARSE_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: PATHLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: QUERYSTRLEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorThree",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: HOSTLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testReadFormFieldNoLength() {
     CICSTestUtils.errorTest(
-        READ_FORMFIELD_TRANS_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: NAMELENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            READ_FORMFIELD_TRANS_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: NAMELENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testReadHttpHeaderNoLength() {
     CICSTestUtils.errorTest(
-        READ_HTTPHEADER_TRANS_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: NAMELENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            READ_HTTPHEADER_TRANS_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: NAMELENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testReadQueryParamNoLength() {
     CICSTestUtils.errorTest(
-        READ_QUERYPARAM_TRANS_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: NAMELENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            READ_QUERYPARAM_TRANS_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: NAMELENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testReceiveNoLength() {
     CICSTestUtils.errorTest(
-        RECEIVE_TRANS_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: MAXLENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            RECEIVE_TRANS_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: MAXLENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testSendNoLength() {
     CICSTestUtils.errorTest(
-        RECEIVE_SEND_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: USERNAMELEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorTwo",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: PASSWORDLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            RECEIVE_SEND_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: USERNAMELEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: PASSWORDLEN",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 
   @Test
   void testWriteHttpHeaderNoLength() {
     CICSTestUtils.errorTest(
-        WRTITE_HTTPHEADER_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: NAMELENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()),
-            "errorTwo",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: VALUELENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
+            WRTITE_HTTPHEADER_NOLENGTH_INVALID,
+            ImmutableMap.of(
+                    "error",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: NAMELENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "errorTwo",
+                    new Diagnostic(
+                            new Range(),
+                            "Missing required option: VALUELENGTH",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())),
+            "NOLENGTH");
   }
 }
