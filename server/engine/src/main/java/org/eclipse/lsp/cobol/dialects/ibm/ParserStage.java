@@ -185,30 +185,4 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     }
   }
 
-  private List<Node> processCompilerDirective(
-      String directiveText,
-      AnalysisContext ctx,
-      Position startPosition,
-      String section,
-      String directiveLineText,
-      boolean isJavaShareableOn,
-      CompilerDirectivesLexer lexer,
-      CompilerDirectivesParser parser) {
-
-    lexer.setInputStream(CharStreams.fromString(directiveText));
-    lexer.reset();
-
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    parser.setTokenStream(tokens);
-    parser.reset();
-
-    parser.removeErrorListeners();
-    parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
-
-    CompilerDirectivesVisitor visitor =
-        new CompilerDirectivesVisitor(
-            ctx, messageService, startPosition, section, directiveLineText, isJavaShareableOn);
-
-    return visitor.visitCompilerDirectives(parser.compilerDirectives());
-  }
 }
