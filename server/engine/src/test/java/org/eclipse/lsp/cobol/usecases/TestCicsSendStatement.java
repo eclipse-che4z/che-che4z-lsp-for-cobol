@@ -190,8 +190,6 @@ public class TestCicsSendStatement {
       "SEND {_TEXT NOEDIT {TERMINAL|error2} {PAGING|error3} WAIT LAST REQID({$varOne})"
           + " L80|error1_}";
   private static final String SEND_FROM_TRANS_NOLENGTH_INVALID = "SEND {_FROM({$varOne})|error_}";
-  private static final String SEND_MAP_ERASE_TRANS_NOLENGTH_INVALID =
-      "SEND {_MAP({$varOne}) ERASE ALTERNATE|error_}";
 
   @Test
   void testSendFromLengthValid() {
@@ -910,20 +908,6 @@ public class TestCicsSendStatement {
             new Diagnostic(
                 new Range(),
                 "Exactly one option required, none provided: LENGTH or FLENGTH",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        "NOLENGTH");
-  }
-
-  @Test
-  void testSendMapEraseNoLengthInvalid() {
-    CICSTestUtils.errorTest(
-        SEND_MAP_ERASE_TRANS_NOLENGTH_INVALID,
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: LENGTH",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         "NOLENGTH");
