@@ -104,8 +104,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
       AnalysisContext context, CommonTokenStream tokenStream) {
     List<Token> compilerLineTokens =
         tokenStream.getTokens().stream()
-            .filter(token -> token.getChannel() == Lexer.HIDDEN)
-            .filter(token -> token.getType() == CobolLexer.COMPILERLINE)
+            .filter(token -> token.getType() == CobolLexer.COMPILERLINE || == IDENTIFICATION  ||  ==DATA || PROCEDURE)
             .collect(Collectors.toList());
 
     List<Token> sectionLineTokens =
