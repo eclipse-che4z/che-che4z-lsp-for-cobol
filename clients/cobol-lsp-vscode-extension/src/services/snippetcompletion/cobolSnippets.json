@@ -869,12 +869,12 @@
   "FD (QSAM)": {
     "prefix": "FD",
     "body": [
-      "FD QSAM-FILE",
+      "FD ${1:QSAM-FILE}",
       "\tLABEL RECORDS ARE STANDARD",
       "\tRECORDING MODE IS FBA",
       "\tBLOCK CONTAINS 0 RECORDS",
-      "\tDATA RECORD IS ${1:RPT-OUT-REC}.",
-      "01 ${1:RPT-OUT-REC} PIC X(${2:132})."
+      "\tDATA RECORD IS ${2:RPT-OUT-REC}.",
+      "01 ${2:RPT-OUT-REC} PIC X(${3:132})."
     ],
     "description": "DATA DIVISION - The FD describes files referred to in the PRODUCTION DIVISION's I/O statements."
   },
