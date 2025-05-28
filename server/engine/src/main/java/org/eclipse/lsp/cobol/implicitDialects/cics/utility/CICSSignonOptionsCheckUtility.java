@@ -18,7 +18,6 @@ import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_s
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon_body;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_signon_token_body;
 
-
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
