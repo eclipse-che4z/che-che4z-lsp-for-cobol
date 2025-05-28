@@ -54,9 +54,6 @@ public class TestCICSRetrieve {
       "RETRIEVE {_SUBEVENT({$varOne}) EVENTTYPE(123)|errorOne_}";
   private static final String RETRIEVE_TRANS_NOLENGTH_INVALID =
       "RETRIEVE {_INTO({$varOne}) QUEUE({$varTwo}) WAIT|error_}";
-      
-  private static final String RETRIEVE_SET_WITHOUT_LENGTH =
-      "RETRIEVE {_SET({$varOne}) QUEUE({$varTwo}) WAIT|errorOne_}";
 
   private static final String RETRIEVE_SET_WITHOUT_LENGTH =
       "RETRIEVE {_SET({$varOne}) QUEUE({$varTwo}) WAIT|errorOne_}";

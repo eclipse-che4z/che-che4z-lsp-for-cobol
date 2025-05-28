@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
