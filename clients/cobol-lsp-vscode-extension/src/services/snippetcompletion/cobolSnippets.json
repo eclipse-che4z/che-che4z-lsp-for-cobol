@@ -881,10 +881,10 @@
   "FD (VSAM)": {
     "prefix": "FD",
     "body": [
-      "FD VSAM-FILE",
-      "\tRECORD CONTAINS ${1:numLiteral} CHARACTERS",
-      "\tDATA RECORD IS ${2:RPT-OUT-REC}.",
-      "01 ${1:RPT-OUT-REC}.",
+      "FD ${1:VSAM-FILE}",
+      "\tRECORD CONTAINS ${2:numLiteral} CHARACTERS",
+      "\tDATA RECORD IS ${3:RPT-OUT-REC}.",
+      "01 ${3:RPT-OUT-REC}.",
       "\t05 FILLER PIC X(1)."
     ],
     "description": "DATA DIVISION - The VSAM FD describes files referred to in the PROCEDURE DIVISION's I/O statements."
