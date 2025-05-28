@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_csd;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +29,9 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 /** Checks CICS CSD System Command rules for required and invalid options */
 public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
+  public static final int RULE_INDEX = RULE_cics_csd;
   private static final String MISSING_ATTRBUTES_OR_SET =
       "Missing required option for ATTRLEN: ATTRIBUTES or SET";
-  public static final int RULE_INDEX = RULE_cics_csd;
   private static final String CVDA_OPTS =
       "RESTYPE or ATOMSERVICE or BUNDLE or CONNECTION or CORBASERVER or DB2CONN or DB2ENTRY or"
           + " DB2TRAN or DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE or IPCONN or"
@@ -298,8 +297,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
-   else if (noLengthOptionsEnabled())
-      checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
+    else if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
   private void checkInquireGroup(CICSParser.Cics_csd_inquiregroupContext ctx) {
@@ -323,8 +321,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
-    else if (noLengthOptionsEnabled())
-      checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
+    else if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
   private void checkInstall(CICSParser.Cics_csd_installContext ctx) {

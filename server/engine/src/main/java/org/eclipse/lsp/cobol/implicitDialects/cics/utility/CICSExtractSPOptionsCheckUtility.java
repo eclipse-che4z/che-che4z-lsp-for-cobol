@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_resync_entryname;
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_resync_entryname_opts;
 
-
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;

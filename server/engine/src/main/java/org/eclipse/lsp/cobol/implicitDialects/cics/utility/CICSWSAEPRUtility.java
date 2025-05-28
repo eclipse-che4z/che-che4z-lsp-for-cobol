@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_wsaepr;
 
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

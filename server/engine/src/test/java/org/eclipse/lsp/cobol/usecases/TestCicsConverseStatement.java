@@ -38,27 +38,40 @@ public class TestCicsConverseStatement {
   private static final String FROM = "FROM(123) FROMLENGTH(123) ";
   private static final String FROM_INTO = FROM + "INTO(123) ";
   private static final String FROM_INTO_TO = FROM_INTO + "TOLENGTH(123) ";
-
-  private static final String CONVERSE_FROM_INTO = CONVERSE + FROM_INTO;
   private static final String CONVERSE_FROM_INTO_TO = CONVERSE + FROM_INTO_TO;
-
   // Test Strings
   private static final String DEFAULT_VALID_1 = CONVERSE_FROM_INTO_TO + "MAXLENGTH(123)";
   private static final String DEFAULT_VALID_2 = CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) NOTRUNCATE";
   private static final String DEFAULT_INVAL_1 =
       CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) NOTRUNCATE {NOTRUNCATE|errorOne}";
-  private static final String DEFAULT_INVAL_2 =
-      "CONVERSE FROM(123) INTO(123) TOLENGTH(123) FROMLENGTH(123) {FROMFLENGTH(123)|errorOne}"
-          + " MAXLENGTH(123)";
-
-  private static final String FROM_FROMLENGTH_MAXFLENGTH =
-      "CONVERSE FROM(123) FROMLENGTH(123) MAXFLENGTH(123)";
-
-  private static final String FROM_MAXFLENGTH = "CONVERSE FROM(123) MAXFLENGTH(123)";
-
+  private static final String LU4_VALID = CONVERSE_FROM_INTO_TO + "DEFRESP FMH NOTRUNCATE";
+  private static final String SCS_VALID =
+      CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) DEFRESP STRFIELD NOTRUNCATE";
+  private static final String T3601_VALID =
+      CONVERSE_FROM_INTO_TO + "LDC(123) DEFRESP MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3614_3653_3767_VALID =
+      CONVERSE_FROM_INTO_TO + "DEFRESP MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3650INT_3770_VALID =
+      CONVERSE_FROM_INTO_TO + "DEFRESP FMH MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3650_3270_VALID =
+      CONVERSE_FROM_INTO_TO + "CTLCHAR(123) ERASE DEFAULT DEFRESP FMH MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3650_3680_3790_VALID =
+      CONVERSE_FROM_INTO_TO + "FMH DEFRESP MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3790_3270DISP_VALID_1 =
+      CONVERSE_FROM_INTO_TO + "DEFRESP CTLCHAR(123) ERASE DEFAULT MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3790_3270DISP_VALID_2 =
+      CONVERSE_FROM_INTO_TO + "DEFRESP CTLCHAR(123) ERASE ALTERNATE MAXLENGTH(123) NOTRUNCATE";
+  private static final String T3790_3270DISP_VALID_3 = CONVERSE_FROM_INTO_TO;
+  private static final String T2660_VALID =
+      CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) CTLCHAR(123) LINEADDR(123) LEAVEKB";
   private static final String APPC_VALID =
       CONVERSE + "CONVID(123) " + FROM_INTO_TO + "MAXLENGTH(123) STATE(123)";
-
+  private static final String MRO_VALID =
+      CONVERSE
+          + "SESSION(123) ATTACHID(123) "
+          + FROM_INTO_TO
+          + "MAXLENGTH(123) NOTRUNCATE DEFRESP STATE(123)";
+  private static final String CONVERSE_FROM_INTO = CONVERSE + FROM_INTO;
   private static final String LU23_3270_VALID_1 =
       CONVERSE_FROM_INTO + "ERASE DEFAULT TOLENGTH(123) MAXLENGTH(123) DEFRESP NOTRUNCATE ASIS";
   private static final String LU23_3270_VALID_2 =
@@ -72,59 +85,30 @@ public class TestCicsConverseStatement {
       CONVERSE_FROM_INTO + "CTLCHAR(123) TOLENGTH(123) MAXLENGTH(123)";
   private static final String LU23_3270_VALID_6 =
       CONVERSE_FROM_INTO + "STRFIELD TOLENGTH(123) MAXLENGTH(123)";
-
-  private static final String LU4_VALID = CONVERSE_FROM_INTO_TO + "DEFRESP FMH NOTRUNCATE";
-
+  private static final String DEFAULT_INVAL_2 =
+      "CONVERSE FROM(123) INTO(123) TOLENGTH(123) FROMLENGTH(123) {FROMFLENGTH(123)|errorOne}"
+          + " MAXLENGTH(123)";
+  private static final String FROM_FROMLENGTH_MAXFLENGTH =
+      "CONVERSE FROM(123) FROMLENGTH(123) MAXFLENGTH(123)";
+  private static final String FROM_MAXFLENGTH = "CONVERSE FROM(123) MAXFLENGTH(123)";
   private static final String LU61_VALID =
       CONVERSE
           + "SESSION(123) ATTACHID(123) INTO(123) TOLENGTH(123) MAXLENGTH(123) NOTRUNCATE DEFRESP";
-
-  private static final String SCS_VALID =
-      CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) DEFRESP STRFIELD NOTRUNCATE";
-
-  private static final String T3601_VALID =
-      CONVERSE_FROM_INTO_TO + "LDC(123) DEFRESP MAXLENGTH(123) NOTRUNCATE";
-
-  private static final String T3614_3653_3767_VALID =
-      CONVERSE_FROM_INTO_TO + "DEFRESP MAXLENGTH(123) NOTRUNCATE";
-
-  private static final String T3650INT_3770_VALID =
-      CONVERSE_FROM_INTO_TO + "DEFRESP FMH MAXLENGTH(123) NOTRUNCATE";
-
-  private static final String T3650_3270_VALID =
-      CONVERSE_FROM_INTO_TO + "CTLCHAR(123) ERASE DEFAULT DEFRESP FMH MAXLENGTH(123) NOTRUNCATE";
-
-  private static final String T3650_3680_3790_VALID =
-      CONVERSE_FROM_INTO_TO + "FMH DEFRESP MAXLENGTH(123) NOTRUNCATE";
-
-  private static final String T3790_3270DISP_VALID_1 =
-      CONVERSE_FROM_INTO_TO + "DEFRESP CTLCHAR(123) ERASE DEFAULT MAXLENGTH(123) NOTRUNCATE";
-  private static final String T3790_3270DISP_VALID_2 =
-      CONVERSE_FROM_INTO_TO + "DEFRESP CTLCHAR(123) ERASE ALTERNATE MAXLENGTH(123) NOTRUNCATE";
-  private static final String T3790_3270DISP_VALID_3 = CONVERSE_FROM_INTO_TO;
-
-  private static final String MRO_VALID =
-      CONVERSE
-          + "SESSION(123) ATTACHID(123) "
-          + FROM_INTO_TO
-          + "MAXLENGTH(123) NOTRUNCATE DEFRESP STATE(123)";
-
-  private static final String T2660_VALID =
-      CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) CTLCHAR(123) LINEADDR(123) LEAVEKB";
   private static final String CONVERSE_TRANS_FROMLENGTH_INVALID =
-          "CONVERSE {NOTRUNCATE|error|error2}";
+      "CONVERSE {NOTRUNCATE|error|error2}";
   private static final String ALTER_NOLENGTH_INVALID =
-          "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT"
-                  + " ATTRIBUTES({$varFour})|error_}";
+      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT"
+          + " ATTRIBUTES({$varFour})|error_}";
   private static final String GETNEXTRSRCE_NOLENGTH_INVALID =
-          "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
-                  + "ATTRIBUTES({$varFour})|error_}";
+      "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
+          + "ATTRIBUTES({$varFour})|error_}";
   private static final String INQUIRERSRCE_NOLENGTH_INVALID =
-          "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour})"
-                  + " ATTRIBUTES({$varFour})|error_}";
+      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour})|error_}";
   private static final String USERDEFINE_NOLENGTH_INVALID =
-          "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour})"
-                  + " ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
+      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
+
   private Map<String, Diagnostic> getErrorDiagnostic(String errorMessage) {
     return ImmutableMap.of(
         "errorOne",
@@ -240,73 +224,75 @@ public class TestCicsConverseStatement {
   void testFromMaxflength() {
     CICSTestUtils.noErrorTest(FROM_MAXFLENGTH);
   }
+
   @Test
   void testConverseTransNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: FROMLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "error2",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: TOLENGTH OR TOFLENGTH",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROMLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TOLENGTH OR TOFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(CONVERSE_TRANS_FROMLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
+
   @Test
   void testCdsAlterNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: ATTRLEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ALTER_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 
   @Test
   void testCdsGetNextRsrceNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: ATTRLEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(GETNEXTRSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 
   @Test
   void testInquireRsrceNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: ATTRLEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(INQUIRERSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 
   @Test
   void testUserDefineNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
-            ImmutableMap.of(
-                    "error",
-                    new Diagnostic(
-                            new Range(),
-                            "Missing required option: ATTRLEN",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()));
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(USERDEFINE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 }

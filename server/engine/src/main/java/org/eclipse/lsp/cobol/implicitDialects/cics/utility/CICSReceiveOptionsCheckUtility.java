@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_receive;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
