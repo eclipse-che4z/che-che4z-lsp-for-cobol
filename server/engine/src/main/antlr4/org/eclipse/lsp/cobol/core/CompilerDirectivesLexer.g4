@@ -465,7 +465,6 @@ DOT: '.';
 
 IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
 FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
-NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 
 fragment STRINGLITERAL:
 	'"' (~["\n\r] | '""' | '\'')* '"'
