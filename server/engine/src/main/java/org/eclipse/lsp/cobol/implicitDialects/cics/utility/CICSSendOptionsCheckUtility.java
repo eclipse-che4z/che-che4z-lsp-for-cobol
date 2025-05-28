@@ -16,9 +16,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_send;
 
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,13 +145,14 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       default:
         break;
     }
-    if (noLengthOptionsEnabled()) checkNoLength(ctx);
     checkDuplicates(ctx);
   }
 
   @SuppressWarnings("unchecked")
   private void checkGroup1(CICSParser.Cics_send_group1Context ctx) {
-    checkHasMutuallyExclusiveOptions("LENGTH or FLENGTH", ctx.LENGTH(), ctx.FLENGTH());
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.LENGTH(), ctx.FLENGTH());
+    } else checkHasMutuallyExclusiveOptions("LENGTH or FLENGTH", ctx.LENGTH(), ctx.FLENGTH());
     checkHasMutuallyExclusiveOptions("INVITE or LAST", ctx.INVITE(), ctx.LAST());
     checkHasMutuallyExclusiveOptions("STRFIELD or ERASE", ctx.STRFIELD(), ctx.ERASE());
     checkHasMutuallyExclusiveOptions("DEFAULT or ALTERNATE", ctx.DEFAULT(), ctx.ALTERNATE());
@@ -200,6 +198,9 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         || !ctx.NOFLUSH().isEmpty()) {
       checkHasMandatoryOptions(ctx.MAP(), ctx, "MAP");
     }
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -217,6 +218,9 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!checkMapHasLiteral(ctx)) {
       checkHasMandatoryOptions(
           ctx.FROM(), ctx, "FROM when specifying MAP or MAPSET parameter without literal");
+    }
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
 
@@ -250,6 +254,9 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         "JUSTIFY or JUSFIRST or JUSLAST", ctx.JUSTIFY(), ctx.JUSFIRST(), ctx.JUSLAST());
     checkHasMutuallyExclusiveOptions(
         "HONEOM or L40 or L64 or L80", ctx.HONEOM(), ctx.L40(), ctx.L64(), ctx.L80());
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -260,6 +267,9 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions("TERMINAL or PAGING", ctx.TERMINAL(), ctx.PAGING());
     if (!ctx.LENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    }
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
 
@@ -277,6 +287,9 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         "HONEOM or L40 or L64 or L80", ctx.HONEOM(), ctx.L40(), ctx.L64(), ctx.L80());
     if (!ctx.LENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
+    }
+    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
 
@@ -303,23 +316,5 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       }
     }
     return false;
-  }
-
-  private void checkNoLength(ParserRuleContext ctx) {
-    List<TerminalNode> length = invokeIfExists(ctx, "LENGTH");
-    List<TerminalNode> flength = invokeIfExists(ctx, "FLENGTH");
-    if (flength != null && length != null)
-      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, length, flength);
-    else if (flength == null && length != null) checkHasMandatoryOptions(length, ctx, "LENGTH");
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<TerminalNode> invokeIfExists(ParserRuleContext ctx, String methodName) {
-    try {
-      Method method = ctx.getClass().getMethod(methodName);
-      return (List<TerminalNode>) method.invoke(ctx);
-    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-      return null;
-    }
   }
 }

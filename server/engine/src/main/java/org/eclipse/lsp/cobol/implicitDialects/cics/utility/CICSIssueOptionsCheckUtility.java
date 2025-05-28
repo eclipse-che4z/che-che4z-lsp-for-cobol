@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_issue;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -379,6 +378,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasIllegalOptions(context.WPMEDIA2(), "WPMEDIA2 with DESTID");
             checkHasIllegalOptions(context.WPMEDIA3(), "WPMEDIA3 with DESTID");
             checkHasIllegalOptions(context.WPMEDIA4(), "WPMEDIA4 with DESTID");
+            if (noLengthOptionsEnabled())
+              checkHasMandatoryOptions(context.DESTIDLENG(), context, "DESTIDLENG");
           } else {
             checkHasIllegalOptions(context.DESTIDLENG(), "DESTIDLENG with SUBADDR");
             checkHasMutuallyExclusiveOptions(
@@ -392,12 +393,10 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 context.WPMEDIA4());
           }
 
-          if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
-          if (noLengthOptionsEnabled()) {
-            if (!context.VOLUME().isEmpty())
+          if (!hasVolume) {
+            checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
+            if (noLengthOptionsEnabled())
               checkHasMandatoryOptions(context.VOLUMELENG(), context, "VOLUMELENG");
-            if (!context.DESTID().isEmpty())
-              checkHasMandatoryOptions(context.DESTIDLENG(), context, "DESTIDLENG");
           }
         });
   }
