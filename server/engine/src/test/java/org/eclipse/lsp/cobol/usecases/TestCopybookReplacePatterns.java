@@ -328,14 +328,6 @@ class TestCopybookReplacePatterns {
           + "           STOP RUN.   ";
   public static final String ATHITS_1 = "         01 {$*XYZ-:RCTR:-TX^XYZ-XOD-TX} pic x(01).\n";
 
-  /**
-   * Examples - https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statement-comparison-replacement-examples
-   *    000009                COPY ATHITS
-   *    000010                    REPLACING ==:RCTR:== BY ==XOD==
-   *    000011                            ==(01)== BY ==(02)==
-   *    000012                            == 01 == BY == 05 ==.
-   *    000013C                   05 XYZ-XOD-TX pic x(02).                                                        000000000 2C
-   */
   @Test
   void testLevelReplacement_picClauseReplacement_variableReplacement() {
     AnalysisResult analysisResult =
@@ -375,11 +367,6 @@ class TestCopybookReplacePatterns {
           + "           STOP RUN.   ";
   public static final String ATHITS_2 = "         01 {$*XYZ-RCTR-TX} :oi x(01):.";
 
-  /**
-   *    000008                COPY ATHITS
-   *    000009                    REPLACING ==:oi x(01):== BY ==pic x(05)==.
-   *    000010C                 01 XYZ-RCTR-TX pic x(05).                                                         000000000 5C
-   */
   @Test
   void testPicClauseReplacementWithSpaces() {
     AnalysisResult analysisResult =
