@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 import static org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser.RULE_cics_converse;
 
-
 import java.util.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -108,10 +107,6 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     if (!ctx.STRFIELD().isEmpty()) {
       checkHasIllegalOptions(ctx.cics_converse_erase(), "ERASE");
     }
-
-    if (!ctx.cics_maxlength().isEmpty())
-      checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
-
     if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.cics_converse_fromlength(), ctx, "FROMLENGTH");
       checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
