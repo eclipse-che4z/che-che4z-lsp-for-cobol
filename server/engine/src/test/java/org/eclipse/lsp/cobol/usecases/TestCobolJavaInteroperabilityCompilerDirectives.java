@@ -275,6 +275,16 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       >>JAVA-SHAREABLE ON {fdgfd|error2}\n"
           + "       01 {$*varTwo}   PIC S9 VALUE +100.";
 
+  private static final String TEXT_SHAREABLE_ON_VALID =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*N1} PIC X(50) VALUE ' PROCEDURE DIVISION '.\n"
+          + "       >> JAVA-SHAREABLE ON\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           GOBACK.\n";
+
   @Test
   void testValid1() {
     UseCaseEngine.runTest(TEXT_VALID1, ImmutableList.of(), ImmutableMap.of());
@@ -536,5 +546,10 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                 "An invalid option was found: fdgfd",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testShareableOnValid() {
+    UseCaseEngine.runTest(TEXT_SHAREABLE_ON_VALID, ImmutableList.of(), ImmutableMap.of());
   }
 }

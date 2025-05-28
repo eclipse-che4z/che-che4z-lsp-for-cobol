@@ -54,7 +54,7 @@ public class HpTrueCobolDialect implements TrueCobolDialect {
     pipeline.add(new DialectCompilerDirectiveStage(dialectService));
     pipeline.add(new CompilerDirectivesStage(messageService));
     pipeline.add(new HpCopybookProcessingStage(messageService, copybookService));
-    pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor, messageService));
+    pipeline.add(new PreprocessorStage(grammarPreprocessor, preprocessor));
     pipeline.add(new ImplicitDialectProcessingStage(dialectService));
     pipeline.add(new ParserStage(messageService, treeListener));
     pipeline.add(
