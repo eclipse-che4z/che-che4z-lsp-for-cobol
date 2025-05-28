@@ -15,9 +15,19 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
+import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
@@ -272,5 +282,127 @@ class TestCopybookReplacePatterns {
         TEXT_MULTI_REPLACE_SAME_COPYBOOK,
         ImmutableList.of(new CobolText("COPYBK", MULTI_REPLACE_COPYBOOK)),
         ImmutableMap.of());
+  }
+
+  /**
+   * SYSPRINT OUTPUT: 000008 COPY ATHITS 000009 REPLACING 'XXXX' BY XYZ. 000010C 16105A 01
+   * XYZ-BASE-RCRD-TX PIC X(421). 000000000 421C
+   */
+  public static final String TEXT11 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "       INPUT-OUTPUT SECTION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       COPY {~ATHITS}\n"
+          + "           REPLACING 'XXXX' BY XYZ.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$XYZ-BASE-RCRD-TX}.\n"
+          + "           STOP RUN.";
+
+  public static final String ATHITS_NAME = "ATHITS";
+  public static final String ATHITS =
+      "16105A 01  {$*'XXXX'-BASE-RCRD-TX^XYZ-BASE-RCRD-TX}                  PIC X(421).\n";
+
+  @Test
+  void testLiteralReplacing() {
+    UseCaseEngine.runTest(
+        TEXT11, ImmutableList.of(new CobolText(ATHITS_NAME, ATHITS)), ImmutableMap.of());
+  }
+
+  public static final String TEXT12 =
+      "       IDENTIFICATION DIVISION.                                         \n"
+          + "       PROGRAM-ID.                                                      \n"
+          + "           SM206A.                                                      \n"
+          + "       DATA DIVISION.                                                   \n"
+          + "       WORKING-STORAGE SECTION.                                         \n"
+          + "       01 {$*tes}.\n"
+          + "       COPY {~ATHITS}\n"
+          + "           REPLACING ==:RCTR:== BY ==XOD==\n"
+          + "                   ==(01)== BY ==(02)==\n"
+          + "                   == 01 == BY == 05 ==.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$XYZ-XOD-TX}.\n"
+          + "           STOP RUN.   ";
+  public static final String ATHITS_1 = "         01 {$*XYZ-:RCTR:-TX^XYZ-XOD-TX} pic x(01).\n";
+
+  /**
+   * Examples - https://www.ibm.com/docs/en/cobol-zos/6.4.0?topic=statement-comparison-replacement-examples
+   *    000009                COPY ATHITS
+   *    000010                    REPLACING ==:RCTR:== BY ==XOD==
+   *    000011                            ==(01)== BY ==(02)==
+   *    000012                            == 01 == BY == 05 ==.
+   *    000013C                   05 XYZ-XOD-TX pic x(02).                                                        000000000 2C
+   */
+  @Test
+  void testLevelReplacement_picClauseReplacement_variableReplacement() {
+    AnalysisResult analysisResult =
+        UseCaseEngine.runTest(
+            TEXT12,
+            ImmutableList.of(new CobolText(ATHITS_NAME, ATHITS_1)),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            CobolLanguageId.COBOL);
+    ProgramNode firstProgramNode = analysisResult.getRootNode().findFirstProgramNode();
+    List<VariableNode> variableNodes =
+        analysisResult
+            .getSymbolTableMap()
+            .get(SymbolTable.generateKey(firstProgramNode))
+            .getVariables()
+            .stream()
+            .filter(v -> v.getName().equals("XYZ-XOD-TX"))
+            .collect(Collectors.toList());
+    assertEquals(variableNodes.size(), 1);
+    assertInstanceOf(ElementaryItemNode.class, variableNodes.get(0));
+
+    ElementaryItemNode elementaryVariable = (ElementaryItemNode) variableNodes.get(0);
+    assertEquals(elementaryVariable.getPicClause(), "x(02)");
+    assertEquals(elementaryVariable.getLevel(), 5);
+  }
+
+  public static final String TEXT13 =
+      "       IDENTIFICATION DIVISION.                                         \n"
+          + "       PROGRAM-ID.                                                      \n"
+          + "           SM206A.                                                      \n"
+          + "       DATA DIVISION.                                                   \n"
+          + "       WORKING-STORAGE SECTION.                                         \n"
+          + "       COPY {~ATHITS}\n"
+          + "           REPLACING ==:oi x(01):== BY ==pic x(05)==.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$XYZ-RCTR-TX}.\n"
+          + "           STOP RUN.   ";
+  public static final String ATHITS_2 = "         01 {$*XYZ-RCTR-TX} :oi x(01):.";
+
+  /**
+   *    000008                COPY ATHITS
+   *    000009                    REPLACING ==:oi x(01):== BY ==pic x(05)==.
+   *    000010C                 01 XYZ-RCTR-TX pic x(05).                                                         000000000 5C
+   */
+  @Test
+  void testPicClauseReplacementWithSpaces() {
+    AnalysisResult analysisResult =
+        UseCaseEngine.runTest(
+            TEXT13,
+            ImmutableList.of(new CobolText(ATHITS_NAME, ATHITS_2)),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            CobolLanguageId.COBOL);
+    ProgramNode firstProgramNode = analysisResult.getRootNode().findFirstProgramNode();
+    List<VariableNode> variableNodes =
+        analysisResult
+            .getSymbolTableMap()
+            .get(SymbolTable.generateKey(firstProgramNode))
+            .getVariables()
+            .stream()
+            .filter(v -> v.getName().equals("XYZ-RCTR-TX"))
+            .collect(Collectors.toList());
+    assertEquals(variableNodes.size(), 1);
+    assertInstanceOf(ElementaryItemNode.class, variableNodes.get(0));
+
+    ElementaryItemNode elementaryVariable = (ElementaryItemNode) variableNodes.get(0);
+    assertEquals(elementaryVariable.getPicClause(), "x(05)");
+    assertEquals(elementaryVariable.getLevel(), 1);
   }
 }

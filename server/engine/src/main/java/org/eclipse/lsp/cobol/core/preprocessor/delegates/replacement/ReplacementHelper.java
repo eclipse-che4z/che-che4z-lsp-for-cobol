@@ -45,10 +45,15 @@ public class ReplacementHelper {
       if (child instanceof ParserRuleContext) {
         children.add(createClause((ParserRuleContext) child));
       } else {
-        children.add(child.getText());
+        if (child.getParent() instanceof CobolPreprocessor.PseudoReplacementContext
+            || child.getParent() instanceof CobolPreprocessor.PseudoReplaceableContext) {
+          children.add(child.getText());
+        } else {
+          children.add(" " + child.getText());
+        }
       }
     }
-    return String.join(" ", children);
+    return String.join("", children);
   }
 
   /**

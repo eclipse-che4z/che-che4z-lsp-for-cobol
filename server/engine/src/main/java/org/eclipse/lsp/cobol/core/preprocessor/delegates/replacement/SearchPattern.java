@@ -41,18 +41,26 @@ public enum SearchPattern {
   EXACT {
     @Override
     public String apply(String trim) {
-      trim = getActualWordToReplace(trim);
+      if (isEnclosedWithinValidSeparator(trim)) return getPatternWithinEnclosedSeparator(trim);
       if (isQuotedString(trim)) return Pattern.quote(trim);
       return SEPARATOR_REGEX_PREFIX
           + adjustSpaces(escapeSpecialCharacters(trim))
           + SEPARATOR_REGEX_SUFFIX;
     }
 
-    private String getActualWordToReplace(String trim) {
-      if (COBOL_SEPARATORS_START.contains(trim.substring(0, 1))) trim = trim.substring(1);
-      if (trim.length() > 1 && COBOL_SEPARATORS_END.contains(trim.substring(trim.length() - 1)))
-        trim = trim.substring(0, trim.length() - 1);
-      return trim;
+    private String getPatternWithinEnclosedSeparator(String trim) {
+      trim = trim.substring(1);
+      trim = trim.substring(0, trim.length() - 1);
+      return "[;\\(:,]\\s*" + escapeSpecialCharacters(trim) + "\\s*[;\\):,]";
+    }
+
+    private boolean isEnclosedWithinValidSeparator(String input) {
+      for (Pattern pattern : COBOL_REPLACE_PATTERN_SEPARATORS) {
+        if (pattern.matcher(input).matches()) {
+          return true;
+        }
+      }
+      return false;
     }
   };
 
@@ -74,10 +82,18 @@ public enum SearchPattern {
   // Parentheses { ( } ... {  //NOSONAR
   // ) }, Colon { : }  //NOSONAR
   // Ref - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
-  private static final String SEPARATOR_REGEX_SUFFIX = "(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)[\\):,;]?";
-  private static final String SEPARATOR_REGEX_PREFIX = "(\\(|:|[,;]\\s)?(?<=^|[.,;]\\s|\\s|[\\(:])";
+  private static final String SEPARATOR_REGEX_SUFFIX = "(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)";
+  private static final String SEPARATOR_REGEX_PREFIX = "(?<=^|[.,;]\\s|\\s|[\\(:])";
   private static final List<String> COBOL_SEPARATORS_START = ImmutableList.of(";", "(", ":", ",");
   private static final List<String> COBOL_SEPARATORS_END = ImmutableList.of(";", ")", ":", ",");
+  //  public static final List<String>
+  // Patterns for the enclosures
+  private static final Pattern[] COBOL_REPLACE_PATTERN_SEPARATORS = {
+    Pattern.compile("^;.+;$"),
+    Pattern.compile("^\\(.+\\)$"),
+    Pattern.compile("^:.+:$"),
+    Pattern.compile("^,.+,$")
+  };
   private static final String WORD_BOUNDARY = "\\b";
   private static final List<String> META_CHARACTERS =
       ImmutableList.of(
