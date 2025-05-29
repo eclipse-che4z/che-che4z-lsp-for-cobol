@@ -69,6 +69,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   public AsyncAnalysisService(
       TrueDialectService dialectService,
       DocumentModelService documentModelService,
+      SourceUnitGraph sourceUnitGraph,
       AnalysisService analysisService,
       CopybookService copybookService,
       SubroutineService subroutineService,
@@ -80,6 +81,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     this.subroutineService = subroutineService;
     this.communications = communications;
     analysisStateListeners = new ArrayList<>();
+    this.analysisStateListeners.add(sourceUnitGraph);
   }
 
   /**
@@ -391,11 +393,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    */
   public void openDocument(String uri, String text, String languageId) {
     documentModelService.openDocument(uri, text, languageId);
-  }
-
-  @Override
-  public void register(List<AnalysisStateListener> analysisStateListeners) {
-    this.analysisStateListeners.addAll(analysisStateListeners);
   }
 
   @Override

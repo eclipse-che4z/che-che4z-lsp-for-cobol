@@ -43,6 +43,7 @@ class AsyncAnalysisServiceTest {
   @Mock private CopybookServiceImpl copybookService;
   @Mock private SubroutineService subroutineService;
   @Mock private Communications communication;
+  @Mock private SourceUnitGraph sourceUnitGraph;
 
   private AsyncAnalysisService asyncAnalysisService;
 
@@ -52,6 +53,7 @@ class AsyncAnalysisServiceTest {
         new AsyncAnalysisService(
             mock(TrueDialectService.class),
             documentModelService,
+            sourceUnitGraph,
             analysisService,
             copybookService,
             subroutineService,

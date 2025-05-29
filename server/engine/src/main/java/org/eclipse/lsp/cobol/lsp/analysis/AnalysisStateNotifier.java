@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.lsp.analysis;
 
-import java.util.List;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 
@@ -23,13 +22,6 @@ import org.eclipse.lsp.cobol.service.CobolDocumentModel;
  * AnalysisStateListener}
  */
 public interface AnalysisStateNotifier {
-  /**
-   * registers the listeners, which are interested in the {@link AnalysisStateListener}
-   *
-   * @param analysisStateListeners
-   */
-  void register(List<AnalysisStateListener> analysisStateListeners);
-
   /**
    * notify all listeners the analysis state
    *

@@ -36,6 +36,7 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.core.model.extendedapi.Paragraph;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
@@ -47,10 +48,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 
 /** Test for @link({@link CFASTBuilderImpl}. */
 @Slf4j
 class CFASTBuilderTest {
+  @Mock private SourceUnitGraph sourceUnitGraph;
+
   static Stream<Arguments> casesToTest() throws IOException {
     return Files.list(Paths.get("src", "test", "resources", "cfast"))
         .filter(p -> p.toString().endsWith(".cbl"))
@@ -69,7 +73,7 @@ class CFASTBuilderTest {
   void cfastBuilderTest(String src, String jsonTree, String caseName) {
     AnalysisResult analysisResult =
         UseCaseUtils.analyze(UseCase.builder().documentUri("fake/path").text(src).build());
-    DocumentModelService documentModelService = new DocumentModelService();
+    DocumentModelService documentModelService = new DocumentModelService(sourceUnitGraph);
 
     documentModelService.openDocument("fake/path", src, "COBOL");
     CFASTBuilder builder = new CFASTBuilderImpl(documentModelService);
@@ -104,7 +108,7 @@ class CFASTBuilderTest {
         UseCaseEngine.runTest(
             cobolProgram, ImmutableList.of(new CobolText("ABCD", copybook)), ImmutableMap.of());
 
-    DocumentModelService modelService = new DocumentModelService();
+    DocumentModelService modelService = new DocumentModelService(sourceUnitGraph);
     Optional<Node> paragraphNode =
         result
             .getRootNode()
