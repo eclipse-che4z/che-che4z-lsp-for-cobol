@@ -15,7 +15,6 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import java.util.Arrays;
-import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
