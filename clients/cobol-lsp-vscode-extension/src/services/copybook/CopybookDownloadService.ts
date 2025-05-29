@@ -31,6 +31,7 @@ import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn"
 import { SettingsService } from "../Settings";
 import {
   loadProcessorGroupCopybookPathsConfig,
+  loadProcessorGroupCopybooksLibs,
   ProcessorGroupCopybookPathConfig,
 } from "../ProcessorGroups";
 import {

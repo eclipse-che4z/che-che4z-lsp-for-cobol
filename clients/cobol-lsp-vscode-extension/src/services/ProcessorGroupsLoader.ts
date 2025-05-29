@@ -65,7 +65,11 @@ export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
 export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
 export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
 export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
-
+export type ProcessorGroupLibModel =
+  | string
+  | EndevorConfigModel
+  | ZoweUssConfigModel
+  | ZoweDatasetConfigModel;
 const PreprocessorModel = t.union([
   t.string,
   t.intersection([

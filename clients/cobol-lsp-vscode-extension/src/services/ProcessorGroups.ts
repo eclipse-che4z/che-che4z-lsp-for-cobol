@@ -23,6 +23,7 @@ import {
   EndevorConfigModel,
   Preprocessor,
   ProcessorGroup,
+  ProcessorGroupLibModel,
   ProcessorIndex,
   ProgramsConfig,
   readProcessorGroupsFileContent,
@@ -30,7 +31,10 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { USS } from "../constants";
+import { PATHS_LOCAL_KEY, USS } from "../constants";
+import LocalPathLib from "./processorGroups/LocalProcessorGroupLib";
+import { UssPathLib, UssPathLibFactory } from "./processorGroups/UssPathConfig";
+import { CopybookDownloaderForUss } from "./copybook/downloader/CopybookDownloaderForUss";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: string,
@@ -39,6 +43,31 @@ export async function loadProcessorGroupCopybookPaths(
   return (
     await loadProcessorGroupSettings(documentUri, "libs", [], dialectType)
   ).filter((element) => typeof element == "string");
+}
+
+export async function loadProcessorGroupCopybooksLibs(
+  documentUri: Uri,
+  dialectType: string,
+  defaultProfile: string,
+  ussDownloader: CopybookDownloaderForUss,
+) {
+  const configs = await loadProcessorGroupSettings(
+    documentUri.toString(),
+    "libs",
+    [],
+    dialectType,
+  );
+
+  const processorGroupLibTypes = [
+    LocalPathLib,
+    new UssPathLibFactory(ussDownloader, defaultProfile),
+  ];
+
+  const libs = processorGroupLibTypes
+    .map((pg) => pg.create(configs, documentUri))
+    .flat();
+
+  return libs;
 }
 
 export type ProcessorGroupCopybookPathConfig =
@@ -52,7 +81,7 @@ export async function loadProcessorGroupCopybookPathsConfig(
   configObject: string[],
   dialect?: string,
 ): Promise<ProcessorGroupCopybookPathConfig[]> {
-  const allConfigs: ProcessorGroupCopybookPathConfig[] = [
+  const allConfigs = [
     ...(await loadProcessorGroupSettings(item.scopeUri, "libs", [], dialect)),
     ...configObject.map((path) => Uri.file(path)),
   ];
@@ -244,7 +273,7 @@ function selectProcessorGroup(
 }
 
 type AttributeTypes = {
-  libs: ProcessorGroupCopybookPathConfig[];
+  libs: ProcessorGroupLibModel[];
   name: string;
   "target-sql-backend": string;
   "compiler-options": string;
