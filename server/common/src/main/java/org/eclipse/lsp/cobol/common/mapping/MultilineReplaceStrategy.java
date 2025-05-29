@@ -58,8 +58,6 @@ class MultilineReplaceStrategy implements ReplaceStrategy {
   }
 
   private static boolean doAppendToSameLine(String[] newLines) {
-    Optional<String> nonEmptyNewLinesOptional =
-        Arrays.stream(newLines).filter(line -> !StringUtils.isEmpty(line)).findAny();
-    return newLines.length == 0 || !nonEmptyNewLinesOptional.isPresent();
+    return newLines.length == 0 || Arrays.stream(newLines).allMatch(StringUtils::isEmpty);
   }
 }
