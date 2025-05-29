@@ -92,15 +92,15 @@ pseudoReplaceable
    ;
 
 pseudoReplacement
-   : (openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR | DOUBLEEQUALCHAR2)*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
+   : (openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR2)*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
    ;
 
 openingPseudoTextDelimiter
-   : DOUBLEEQUALCHAR | DOUBLEEQUALCHAR2
+   : DOUBLEEQUALCHAR
    ;
 
 closingPseudoTextDelimiter
-   : (DOUBLEEQUALCHAR | DOUBLEEQUALCHAR2) (COMMACHAR | SEMICOLON_FS)?
+   : DOUBLEEQUALCHAR2 (COMMACHAR | SEMICOLON_FS)?
    ;
 
 replaceable
