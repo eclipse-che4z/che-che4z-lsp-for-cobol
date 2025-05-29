@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -391,5 +392,28 @@ class TestCopybookReplacePatterns {
     ElementaryItemNode elementaryVariable = (ElementaryItemNode) variableNodes.get(0);
     assertEquals(elementaryVariable.getPicClause(), "x(05)");
     assertEquals(elementaryVariable.getLevel(), 1);
+  }
+
+  public static final String TEXT14 =
+      "       IDENTIFICATION DIVISION.                                         \n"
+          + "       PROGRAM-ID.                                                      \n"
+          + "           SM206A.                                                      \n"
+          + "       DATA DIVISION.                                                   \n"
+          + "       WORKING-STORAGE SECTION.                                         \n"
+          + "       COPY {~ATHITS}\n"
+          + "0000           REPLACING ==     AJSKA   BAJSK== BY ==UI==.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$UI}.\n"
+          + "           STOP RUN.   ";
+  public static final String ATHITS_3 =
+      "         01 {_AJSKA \n"
+          + "               BAJSK^UI_}            \n"
+          + "               pic x(01).";
+
+  @Disabled("Not supported by Usecase engine yet")
+  @Test
+  void testReplacementWithSpaces() {
+    UseCaseEngine.runTest(
+        TEXT13, ImmutableList.of(new CobolText(ATHITS_NAME, ATHITS_3)), ImmutableMap.of());
   }
 }
