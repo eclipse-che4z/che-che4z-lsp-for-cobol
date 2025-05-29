@@ -18,8 +18,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * ENUM class for different search patterns in replace clauses. Also, decides the matching pattern
@@ -41,11 +43,27 @@ public enum SearchPattern {
   EXACT {
     @Override
     public String apply(String trim) {
-      if (isEnclosedWithinValidSeparator(trim)) return getPatternWithinEnclosedSeparator(trim);
-      if (isQuotedString(trim)) return Pattern.quote(trim);
+      if (isEnclosedWithinValidSeparator(trim)) {
+        return getPatternWithinEnclosedSeparator(trim);
+      }
+      if (isQuotedString(trim)) {
+        return getPatternForQuotedString(trim);
+      }
       return SEPARATOR_REGEX_PREFIX
           + adjustSpaces(escapeSpecialCharacters(trim))
           + SEPARATOR_REGEX_SUFFIX;
+    }
+
+    private String getPatternForQuotedString(String trim) {
+      Matcher matcher = NEW_LINE_PATTERN.matcher(trim);
+      if (matcher.find()) {
+        String[] split = trim.split(NEW_LINE_PATTERN.pattern());
+        return Arrays.stream(split)
+            .map(String::trim)
+            .filter(sd -> !StringUtils.isEmpty(sd))
+            .collect(Collectors.joining("( *)(?:(\\n.{7})? ?)+"));
+      }
+      return Pattern.quote(trim);
     }
 
     private String getPatternWithinEnclosedSeparator(String trim) {
@@ -65,7 +83,7 @@ public enum SearchPattern {
   };
 
   private static String adjustSpaces(String escapeSpecialCharacters) {
-    return String.join("\\s*", escapeSpecialCharacters.split("[\\r\\n]*\\s"));
+    return String.join("\\s+", escapeSpecialCharacters.split("[\\r\\n]*\\s+"));
   }
 
   private static boolean isQuotedString(String text) {
@@ -84,8 +102,7 @@ public enum SearchPattern {
   // Ref - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
   private static final String SEPARATOR_REGEX_SUFFIX = "(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)";
   private static final String SEPARATOR_REGEX_PREFIX = "(?<=^|[.,;]\\s|\\s|[\\(:])";
-  private static final List<String> COBOL_SEPARATORS_START = ImmutableList.of(";", "(", ":", ",");
-  private static final List<String> COBOL_SEPARATORS_END = ImmutableList.of(";", ")", ":", ",");
+  private static final Pattern NEW_LINE_PATTERN = Pattern.compile("[\\r\\n]");
   //  public static final List<String>
   // Patterns for the enclosures
   private static final Pattern[] COBOL_REPLACE_PATTERN_SEPARATORS = {

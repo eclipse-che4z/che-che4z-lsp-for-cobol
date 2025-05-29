@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.common.mapping;
 
+import java.util.Arrays;
+import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -34,7 +37,7 @@ class MultilineReplaceStrategy implements ReplaceStrategy {
 
   private void addLines(
       ExtendedText extendedText, int firstLine, String[] newLines, Location instantLocation) {
-    if (newLines.length == 0) {
+    if (doAppendToSameLine(newLines)) {
       extendedText.append(firstLine, extendedText.getLines().get(firstLine + 1));
       extendedText.delete(firstLine + 1);
     } else {
@@ -52,5 +55,11 @@ class MultilineReplaceStrategy implements ReplaceStrategy {
         }
       }
     }
+  }
+
+  private static boolean doAppendToSameLine(String[] newLines) {
+    Optional<String> nonEmptyNewLinesOptional =
+        Arrays.stream(newLines).filter(line -> !StringUtils.isEmpty(line)).findAny();
+    return newLines.length == 0 || !nonEmptyNewLinesOptional.isPresent();
   }
 }

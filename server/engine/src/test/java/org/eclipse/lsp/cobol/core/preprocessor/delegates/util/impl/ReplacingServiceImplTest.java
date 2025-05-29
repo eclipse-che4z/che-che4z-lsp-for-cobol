@@ -83,8 +83,7 @@ class ReplacingServiceImplTest {
         replacingService.retrievePseudoTextReplacingPattern("", locality));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of(
-                "(?<=^|[.,;]\\s|\\s|[\\(:])a\\s*b\\s*\\s*c(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
+            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])a\\s+b\\s+c(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
             Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern("==a   b  \nc== bY ====", locality));
     assertEquals(

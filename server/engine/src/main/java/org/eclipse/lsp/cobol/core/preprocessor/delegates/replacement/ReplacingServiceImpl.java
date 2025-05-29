@@ -100,8 +100,7 @@ public class ReplacingServiceImpl implements ReplacingService {
     String rightAttribute = "";
     if (isPatternCorrect(pattern)) {
       String extractPseudoText1 = extractPseudoText(pattern[0], true);
-      leftAttribute =
-          processedSearchClause.getSearchPattern().apply(extractPseudoText1).replace(" ", " +");
+      leftAttribute = processedSearchClause.getSearchPattern().apply(extractPseudoText1);
 
       rightAttribute = extractPseudoText(pattern[1], false);
       checkInvalidWordUsage(new String[] {extractPseudoText1, rightAttribute}, locality)
@@ -222,8 +221,7 @@ public class ReplacingServiceImpl implements ReplacingService {
    */
   @NonNull
   private String extractPseudoText(@NonNull String text, boolean isOperandOne) {
-    String processedText =
-        text.trim().replaceAll("^==", "").replaceAll("==$", "").replaceAll(" +", " ");
+    String processedText = text.trim().replaceAll("^==", "").replaceAll("==$", "");
     if (isOperandOne && processedText.trim().equals(",") || processedText.trim().equals(";"))
       return processedText.trim();
     return handleSeparator(processedText).trim();
