@@ -196,7 +196,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
     if (noLengthOptionsEnabled()) {
-      checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
