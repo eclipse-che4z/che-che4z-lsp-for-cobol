@@ -168,12 +168,7 @@ public final class IdmsDialect implements CobolDialect {
       Deque<CopyNode> copybookStack,
       CopyNode copyNode) {
 
-    processCopybooks(ctx, currentDocument, errors, copybookStack);
-    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocument);
-    IdmsCopyParser.StartRuleContext startRule =
-        parseCopyIdms(
-            currentDocument.getCurrentText().toString(), ctx.getProgramDocumentUri(), errors);
-    copyVisitor.visitStartRule(startRule);
+    IdmsCopyVisitor copyVisitor = processCopybooks(ctx, currentDocument, errors, copybookStack);
     int firstLevel =
         copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
     for (Pair<Range, Integer> p : copyVisitor.getVariableLevels()) {
@@ -195,7 +190,7 @@ public final class IdmsDialect implements CobolDialect {
     }
   }
 
-  private void processCopybooks(
+  private IdmsCopyVisitor processCopybooks(
       DialectProcessingContext ctx,
       ExtendedDocument currentDocument,
       List<SyntaxError> errors,
@@ -203,9 +198,17 @@ public final class IdmsDialect implements CobolDialect {
     IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocument);
     IdmsCopyParser.StartRuleContext startRule =
         parseCopyIdms(currentDocument.toString(), ctx.getProgramDocumentUri(), errors);
-    for (IdmsCopybookDescriptor cb : copyVisitor.visitStartRule(startRule)) {
+    List<IdmsCopybookDescriptor> idmsCopybookDescriptors = copyVisitor.visitStartRule(startRule);
+    for (IdmsCopybookDescriptor cb : idmsCopybookDescriptors) {
       insertIdmsCopybook(ctx, currentDocument, errors, cb, currentDocument.getUri(), copybookStack);
     }
+    if (!idmsCopybookDescriptors.isEmpty()) {
+      copyVisitor = new IdmsCopyVisitor(currentDocument);
+      copyVisitor.visitStartRule(
+          parseCopyIdms(
+              currentDocument.getCurrentText().toString(), ctx.getProgramDocumentUri(), errors));
+    }
+    return copyVisitor;
   }
 
   /**
