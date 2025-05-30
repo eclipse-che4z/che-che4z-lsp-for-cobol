@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.dialects;
 
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -30,7 +30,7 @@ public class DialectOutcome {
 
   public DialectOutcome(DialectProcessingContext context) {
     this.context = context;
-    this.dialectNodes = new ArrayList<>();
+    this.dialectNodes = ImmutableList.of();
     this.dialectMissed = false;
   }
 
@@ -42,7 +42,7 @@ public class DialectOutcome {
 
   public DialectOutcome(DialectProcessingContext context, boolean hasMissedDialect) {
     this.context = context;
-    this.dialectNodes = new ArrayList<>();
+    this.dialectNodes = ImmutableList.of();
     this.dialectMissed = hasMissedDialect;
   }
 }

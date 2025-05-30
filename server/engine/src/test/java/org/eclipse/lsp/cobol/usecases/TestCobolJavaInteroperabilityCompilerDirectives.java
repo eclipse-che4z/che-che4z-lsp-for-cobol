@@ -331,19 +331,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: aaabbb",
+                "An invalid option was found: aaa bbb",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: cccdddff",
+                "An invalid option was found: ccc ddd ff",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: gghhi",
+                "An invalid option was found: gg hh i",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

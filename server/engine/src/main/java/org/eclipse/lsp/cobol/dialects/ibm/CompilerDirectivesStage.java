@@ -55,18 +55,17 @@ public class CompilerDirectivesStage
     String[] lines = NEW_LINE_PATTERN.split(text);
     for (int i = 0; i < lines.length; i++) {
       Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(lines[i]);
-      if (lines[i].matches("(?i)\\s+IDENTIFICATION\\s+DIVISION.\\s*")) {
-        break;
+      if (!directivesLine.matches()) {
+        // we could stop on "IDENTIFICATION DIVISION"
+        continue;
       }
-      if (directivesLine.matches()) {
-        process(
-            directivesLine.group("directives"),
-            ctx,
-            new Position(i, directivesLine.start("directives")));
-        String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
-        Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
-        ctx.getExtendedDocument().replace(range, newText);
-      }
+      process(
+          directivesLine.group("directives"),
+          ctx,
+          new Position(i, directivesLine.start("directives")));
+      String newText = new String(new char[lines[i].length()]).replace('\0', ' ');
+      Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
+      ctx.getExtendedDocument().replace(range, newText);
     }
 
     return new StageResult<>(null);
@@ -81,7 +80,7 @@ public class CompilerDirectivesStage
       parser.removeErrorListeners();
       parser.setErrorHandler(new CobolErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
-      new CompilerDirectivesVisitor(ctx, messageService, startPosition, "", directives, false)
+      new CompilerDirectivesVisitor(ctx, messageService, startPosition, directives)
           .visit(parser.compilerOptions());
     }
   }
