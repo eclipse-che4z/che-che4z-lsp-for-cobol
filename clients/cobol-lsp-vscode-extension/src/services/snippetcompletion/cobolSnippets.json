@@ -1375,15 +1375,28 @@
     "body": ["77 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
     "description": "A FUNCTION-POINTER is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point."
   },
-  "GENERATE": {
+  "JSON GENERATE": {
     "prefix": "GENERATE",
-    "body": ["GENERATE ${1:id}"],
-    "description": "GENERATE id"
+    "body": [
+      "JSON GENERATE ${1:JSON-STMT} FROM ${2:IN-FILE-TEXT} IN ${3:JSON-CHAR-CTR}",
+      "\tON EXCEPTION ${4:DISPLAY 'JSON GENERATE ERROR: ' WS-JS-CODE",
+      "END-JSON"
+    ],
+    "description": "Manipulate COBOL data items as JSON text by using the JSON GENERATE statement."
   },
   "GIVING": {
     "prefix": "GIVING",
     "body": ["GIVING ${1:item}"],
     "description": "GIVING item"
+  },
+  "GOBACK": {
+    "prefix": "GOBACK",
+    "body": [
+      "IF ${1:WS-STATUS-CODE NOT EQUAL 0} THEN",
+      "\t${2:statement}",
+      "\tGOBACK."
+    ],
+    "description": "Ends program and returns control to the application module that invoked the program. Note, if this is a standalone batch program, GOBACK returns control to z/OS."
   },
   "GO DEPENDING": {
     "prefix": "GO DEPENDING",
@@ -1533,6 +1546,16 @@
     ],
     "description": "IS INDEXED defines a file entry as a VSAM KSDS (Indexed) Data Set in the ENVIRONMENT DIVISION'S SELECT/ASSIGN paragraph."
   },
+  "INITIALIZE": {
+    "prefix": "INITIALIZE",
+    "body": ["INITIALIZE ${1:INSURED-NAME-ADDR}"],
+    "description": "Use INITIALIZE instead of multiple MOVE statements to set a Group data structure to its initial values (Spaces and zeroes)."
+  },
+  "INPUT-OUTPUT": {
+    "prefix": "INPUT-OUTPUT",
+    "body": ["INPUT-OUTPUT SECTION."],
+    "description": "ENVIRONMENT DIVISION - The INPUT-OUTPUT SECTION of the ENVIRONMENT DIVISION contains FILE-CONTROL and I-O-CONTROL paragraphs.The contents of the INPUT-OUTPUT SECTION depend on specific file organization and access methods."
+  },
   "INTO": {
     "prefix": "INTO",
     "body": ["INTO ${1:item}"],
@@ -1562,6 +1585,11 @@
       "INSPECT ${1:SOURCE} TALLYING ${2:COUNTER} FOR ${3|ALL SPACES,ALL $4,CHARACTERS|}"
     ],
     "description": "INSPECT A TALLYING COUNTER FOR ..."
+  },
+  "INSTALLATION": {
+    "prefix": "INSTALLATION",
+    "body": ["INSTALLATION. ${1:machineName}"],
+    "description": "IDENTIFICATION DIVISION - Use the optional INSTALLATION clause to uniquely name the z/OS system."
   },
   "INVALID": {
     "prefix": "INVALID",
@@ -1708,10 +1736,12 @@
     ],
     "description": "LEFT Specifies that an elementary COBOL variable is to be positioned in main storage so that byte one begins at the left word boundary. Note that this is an efficiency coding specification."
   },
-  "LENGTH OF": {
-    "prefix": "LENGTH OF",
-    "body": ["LENGTH OF ${1:id}"],
-    "description": "LENGTH OF"
+  "LENGTH": {
+    "prefix": "LENGTH",
+    "body": [
+      "MOVE ${1:INS-ADDR} TO ${2:OUTPUT-REC}(1:FUNCTION LENGTH(${3:CUST-NAME}))."
+    ],
+    "description": "Find and use the LENGTH of COBOL variables and group structures."
   },
   "LESS": {
     "prefix": "LESS",
@@ -1746,6 +1776,11 @@
     "prefix": "LOC",
     "body": ["LOC ${1:integer}"],
     "description": "LOC"
+  },
+  "LOCAL-STORAGE": {
+    "prefix": "LOCAL-STORAGE",
+    "body": ["LOCAL-STORAGE SECTION."],
+    "description": "LOCAL-STORAGE defines variables that are allocated and freed on a per-program invocation basis. Every program invocation reallocates the LOCAL-STORAGE variables and resets variable values to their declared initial values."
   },
   "CLOSE x WITH LOCK": {
     "prefix": "LOCK",
@@ -1823,14 +1858,30 @@
     "body": ["MOVE CORR ${1:id}"],
     "description": "MERGE USING"
   },
+  "MERGE ASCENDING": {
+    "prefix": "MERGE ASCENDING",
+    "body": ["MERGE ${1:fileName} ON ASCENDING ${2:file-section-variable}"],
+    "description": "The Merge statement fuses two or more identially sorted files on one or more variable-keys and makes the merged records available to an OUTPUT PROCEDURE or putput file. Note that there are several options available to customize the MERGE operation."
+  },
+  "ACCESS MODE": {
+    "prefix": "ACCESS MODE",
+    "body": [
+      "FD ${1:FILENAME}",
+      "LABEL RECORDS ARE STANDARD",
+      "BLOCK CONTAINS ${2:0}",
+      "ACCESS MODE IS ${3|SEQUENTIAL,INDEXED,RELATIVE,LINE-SEQUENTIAL|}",
+      "\tRECORD CONTAINS ${4:numLiteral} CHARACTERS"
+    ],
+    "description": "description"
+  },
   "RECORDING MODE": {
     "prefix": "RECORDING MODE",
     "body": [
       "FD ${1:FILENAME}",
       "LABEL RECORDS ARE STANDARD",
-      "BLOCK CONTAINS 0",
-      "RECORDING MODE IS ${2|F,V,U,S|}",
-      "\tRECORD CONTAINS ${3:numLiteral} CHARACTERS"
+      "BLOCK CONTAINS ${2:0}",
+      "RECORDING MODE IS ${3|F,V,U,S|}",
+      "\tRECORD CONTAINS ${4:numLiteral} CHARACTERS"
     ],
     "description": "FILE SECTION - RECORDING MODE specifies the physical format of records in a QSAM file: F (fixed), V (variable), U (fixed or variable), S (spanned)"
   },
@@ -2143,7 +2194,7 @@
   },
   "OUTPUT": {
     "prefix": "OUTPUT",
-    "body": ["OUTPUT ${1:fileName}"],
+    "body": ["OPEN OUTPUT ${1:fileName}", "${2| ,WITH NO REWIND|}"],
     "description": "OUTPUT FILENAME"
   },
   "OUTPUT PROCEDURE": {
