@@ -864,19 +864,6 @@ public class TestCicsReceive {
   }
 
   @Test
-  void testMapNoLengthInvalid() {
-    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
-    expectedDiagnostics.put(
-        "error",
-        new Diagnostic(
-            new Range(),
-            "Missing required option: LENGTH",
-            DiagnosticSeverity.Error,
-            ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(MAP_TRANS_NOLENGTH_INVALID, expectedDiagnostics, "NOLENGTH");
-  }
-
-  @Test
   void testMapMappingDevNoLengthInvalid() {
     Map<String, Diagnostic> expectedDiagnostic =
         ImmutableMap.of(

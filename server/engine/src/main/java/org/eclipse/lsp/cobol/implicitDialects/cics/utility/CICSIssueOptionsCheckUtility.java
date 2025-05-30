@@ -391,6 +391,11 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           }
 
           if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
+          if (noLengthOptionsEnabled()) {
+            checkHasMandatoryOptions(context.DESTIDLENG(), context, "DESTIDLENG");
+            if (!context.VOLUME().isEmpty())
+              checkHasMandatoryOptions(context.VOLUMELENG(), context, "VOLUMELENG");
+          }
         });
   }
 }

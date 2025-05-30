@@ -185,7 +185,7 @@ public class TestCICSIssue {
       "ISSUE WAIT {SUBADDR|errorOne}(100) {CONSOLE|errorTwo} VOLUME(100) RESP(100) NOHANDLE"
           + " {SUBADDR|errorThree|errorFour}(200) {DESTID|errorFive}(10) DESTIDLENG(100)";
   private static final String ISSUE_ABORT_TRANS_NOLENGTH_INVALID =
-      "ISSUE ABORT {VOLUME(100)|error}";
+      "ISSUE ABORT {_VOLUME({$varFour})|error_}";
   private static final String ISSUE_ADD_TRANS_NOLENGTH_INVALID =
       "ISSUE {_ADD DESTID({$varFour})VOLUME({$varFour}" + ")FROM({$varFour})|errorOne|errorTwo_}";
   private static final String ISSUE_END_TRANS_NOLENGTH_INVALID =
