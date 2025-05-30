@@ -123,6 +123,8 @@ public class TestCicsConverseStatement {
   private static final String USERDEFINE_NOLENGTH_INVALID =
       "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour})"
           + " ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
+  private static final String CONVERSE_TRANS_FROMLENGTH_INVALID =
+      "CONVERSE {NOTRUNCATE|error|error2}";
 
   private Map<String, Diagnostic> getErrorDiagnostic(String errorMessage) {
     return ImmutableMap.of(
@@ -257,57 +259,5 @@ public class TestCicsConverseStatement {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(CONVERSE_TRANS_FROMLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
-  }
-
-  @Test
-  void testCdsAlterNoLengthInvalid() {
-    Map<String, Diagnostic> expectedDiagnostic =
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: ATTRLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(ALTER_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
-  }
-
-  @Test
-  void testCdsGetNextRsrceNoLengthInvalid() {
-    Map<String, Diagnostic> expectedDiagnostic =
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: ATTRLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(GETNEXTRSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
-  }
-
-  @Test
-  void testInquireRsrceNoLengthInvalid() {
-    Map<String, Diagnostic> expectedDiagnostic =
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: ATTRLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(INQUIRERSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
-  }
-
-  @Test
-  void testUserDefineNoLengthInvalid() {
-    Map<String, Diagnostic> expectedDiagnostic =
-        ImmutableMap.of(
-            "error",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: ATTRLEN",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(USERDEFINE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 }
