@@ -377,8 +377,6 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
             checkHasIllegalOptions(context.WPMEDIA2(), "WPMEDIA2 with DESTID");
             checkHasIllegalOptions(context.WPMEDIA3(), "WPMEDIA3 with DESTID");
             checkHasIllegalOptions(context.WPMEDIA4(), "WPMEDIA4 with DESTID");
-            if (noLengthOptionsEnabled())
-              checkHasMandatoryOptions(context.DESTIDLENG(), context, "DESTIDLENG");
           } else {
             checkHasIllegalOptions(context.DESTIDLENG(), "DESTIDLENG with SUBADDR");
             checkHasMutuallyExclusiveOptions(
@@ -392,11 +390,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
                 context.WPMEDIA4());
           }
 
-          if (!hasVolume) {
-            checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
-          }
-          if (noLengthOptionsEnabled())
-            checkHasMandatoryOptions(context.VOLUMELENG(), context, "VOLUMELENG");
+          if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
         });
   }
 }
