@@ -99,7 +99,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     else checkHasMutuallyExclusiveOptions("LENGTH or FLENGTH", ctx.LENGTH(), ctx.FLENGTH());
     checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.MAXLENGTH(), ctx.MAXFLENGTH());
     if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.LENGTH(), ctx.FLENGTH());
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
