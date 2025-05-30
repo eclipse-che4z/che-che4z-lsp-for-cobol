@@ -238,7 +238,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (noLengthOptionsEnabled()) {
       if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
-      if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
 
