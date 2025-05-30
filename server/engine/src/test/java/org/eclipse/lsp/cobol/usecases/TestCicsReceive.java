@@ -322,14 +322,6 @@ public class TestCicsReceive {
   private static final String MAP_MAPPING_DEV_TRANS_NOLENGTH_INVALID =
       "RECEIVE {_MAP({$varFour}) INTO({$varFour}) MAPPINGDEV({$varFour}) FROM({$varFour})|error_}";
 
-  private static String getTestString(String[] components) {
-    List<String> instances = Arrays.asList(components);
-    instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
-    ArrayList<String> base = new ArrayList<String>(Arrays.asList(GROUP_ONE_BASE_TEXT.split("\n")));
-    base.addAll(base.size() - 1, instances);
-    return String.join("\n", base);
-  }
-
   @Test
   void testReceiveInvalidOne() {
     UseCaseEngine.runTest(
@@ -410,6 +402,14 @@ public class TestCicsReceive {
   @Test
   void testReveiveMapValidOne() {
     UseCaseEngine.runTest(getTestString(RECEIVE_MAP_VALID), ImmutableList.of(), ImmutableMap.of());
+  }
+
+  private static String getTestString(String[] components) {
+    List<String> instances = Arrays.asList(components);
+    instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
+    ArrayList<String> base = new ArrayList<String>(Arrays.asList(GROUP_ONE_BASE_TEXT.split("\n")));
+    base.addAll(base.size() - 1, instances);
+    return String.join("\n", base);
   }
 
   @Test
