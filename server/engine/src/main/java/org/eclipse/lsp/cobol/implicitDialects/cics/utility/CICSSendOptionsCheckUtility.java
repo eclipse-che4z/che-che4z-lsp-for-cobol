@@ -265,10 +265,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.MAPPED(), ctx, "MAPPED");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMutuallyExclusiveOptions("TERMINAL or PAGING", ctx.TERMINAL(), ctx.PAGING());
-    if (!ctx.LENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    }
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
