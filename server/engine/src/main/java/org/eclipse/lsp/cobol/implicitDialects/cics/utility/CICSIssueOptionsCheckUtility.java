@@ -289,12 +289,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (ctx.DESTID().isEmpty())
       checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
+    else if (noLengthOptionsEnabled())
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     if (ctx.VOLUME().isEmpty())
       checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-    if (noLengthOptionsEnabled()) {
-      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
-      if (!ctx.DESTID().isEmpty()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
-    }
+    else if (noLengthOptionsEnabled())
+      checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
   }
 
   void checkReceive(CICSParser.Cics_issue_receiveContext ctx) {
