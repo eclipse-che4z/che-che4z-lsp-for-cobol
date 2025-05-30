@@ -412,10 +412,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     checkPrerequisiteIsMet(
         ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "CHARACTERSET without FORMFIELD");
-    if (noLengthOptionsEnabled()
-        && (!ctx.FORMFIELD().isEmpty()
-            || !ctx.HTTPHEADER().isEmpty()
-            || !ctx.QUERYPARM().isEmpty())) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
     }
   }
