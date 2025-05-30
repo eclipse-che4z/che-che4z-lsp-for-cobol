@@ -254,7 +254,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         "JUSTIFY or JUSFIRST or JUSLAST", ctx.JUSTIFY(), ctx.JUSFIRST(), ctx.JUSLAST());
     checkHasMutuallyExclusiveOptions(
         "HONEOM or L40 or L64 or L80", ctx.HONEOM(), ctx.L40(), ctx.L64(), ctx.L80());
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
+    if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
   }
