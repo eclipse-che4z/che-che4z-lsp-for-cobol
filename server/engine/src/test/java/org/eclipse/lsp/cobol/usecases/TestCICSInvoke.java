@@ -72,7 +72,8 @@ public class TestCICSInvoke {
   private static final String INVOKE_APPLICATION_TRANS_INVALID =
       "INVOKE {_APPLICATION({$varOne}) OPERATION({$varTwo}) COMMAREA({$varThree})|error_}";
   private static final String INVOKE_SERVICE_TRANS_INVALID =
-      "INVOKE {_SERVICE({$varOne}) CHANNEL({$varTwo}) OPERATION({$varTwo}) SCOPE({$varFive})|error_}";
+      "INVOKE {_SERVICE({$varOne}) CHANNEL({$varTwo}) OPERATION({$varTwo})"
+          + " SCOPE({$varFive})|error_}";
 
   @Test
   void testInvokeApplicationValidOne() {
