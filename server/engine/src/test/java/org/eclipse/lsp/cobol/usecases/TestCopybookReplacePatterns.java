@@ -235,4 +235,39 @@ class TestCopybookReplacePatterns {
     UseCaseEngine.runTest(
         TEXT10, ImmutableList.of(new CobolText(REPL9_NAME, REPL9)), ImmutableMap.of());
   }
+
+  public static final String TEXT_MULTI_REPLACE_SAME_COPYBOOK =
+      "       IDENTIFICATION DIVISION.                                         \n"
+          + "       PROGRAM-ID.                                                      \n"
+          + "           SM206A.                                                      \n"
+          + "       DATA DIVISION.                                                   \n"
+          + "       WORKING-STORAGE SECTION.                                         \n"
+          + "       COPY {~COPYBK} REPLACING CDBPCB BY ==OCA-PCB== \n"
+          + "                       CALL-STAT BY STATUS-CODE.                             \n"
+          + "       COPY {~COPYBK} \n"
+          + "               REPLACING CDBPCB BY ==BTB-PCB== \n"
+          + "               CALL-STAT BY BTUS-CODE. \n"
+          + "       PROCEDURE DIVISION. \n"
+          + "           DISPLAY {$BTB-PCB}.  \n"
+          + "           DISPLAY {$OCA-PCB}.\n"
+          + "           STOP RUN.               ";
+  public static final String MULTI_REPLACE_COPYBOOK =
+      "000100 01         {$*CDBPCB`->OCA-PCB`->BTB-PCB}.                                               00010000\n"
+          + "000200   03       {$*DBD-NAME}             PIC X(8).                        00020000\n"
+          + "000300   03       {$*SEG-LEVEL}            PIC XX.                          00030000\n"
+          + "000400   03       {$*CALL-STAT`->STATUS-CODE`->BTUS-CODE}            PIC XX.                          00040000\n"
+          + "000500   03       {$*PROC-OPTS}            PIC X(4).                        00050000\n"
+          + "000600   03       {$*RESERVED}             PIC S9(5) COMPUTATIONAL.         00060000\n"
+          + "000700   03       {$*SEG-NAME-FB}          PIC X(8).                        00070000\n"
+          + "000800   03       {$*LENGTH-FB-KEY}        PIC S9(5) COMPUTATIONAL.         00080000\n"
+          + "000900   03       {$*NUMB-SEN-SEGS}        PIC S9(5) COMPUTATIONAL.         00090000\n"
+          + "001000   03       {$*KEY-FB-AREA}          PIC X(80).                       00100000\n";
+
+  @Test
+  void testWhenSameCopybookIsReplacedMultipleTime_thenVariablesAreResolvedCorrectly() {
+    UseCaseEngine.runTest(
+        TEXT_MULTI_REPLACE_SAME_COPYBOOK,
+        ImmutableList.of(new CobolText("COPYBK", MULTI_REPLACE_COPYBOOK)),
+        ImmutableMap.of());
+  }
 }
