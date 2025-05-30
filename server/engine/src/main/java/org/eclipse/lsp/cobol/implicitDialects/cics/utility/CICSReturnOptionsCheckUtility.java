@@ -73,7 +73,7 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkPrerequisiteIsMet(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN without INPUTMSG");
     if (noLengthOptionsEnabled()) {
       if (!ctx.COMMAREA().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-      if (!ctx.INPUTMSG().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "INPUTMSGLEN");
+      if (!ctx.INPUTMSG().isEmpty()) checkHasMandatoryOptions(ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN");
     }
   }
 }
