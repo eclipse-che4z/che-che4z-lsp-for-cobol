@@ -176,14 +176,17 @@ public class TestCICSCsdSP {
   private static final String DELETE_LIST_INVALID =
       "CSD INSTALL LIST({$varFour}) {RESID|error}({$varFour}) {ATOMSERVICE|error2}";
   private static final String ALTER_NOLENGTH_INVALID =
-      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT ATTRIBUTES({$varFour})|error_}";
+      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT"
+          + " ATTRIBUTES({$varFour})|error_}";
   private static final String GETNEXTRSRCE_NOLENGTH_INVALID =
       "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
           + "ATTRIBUTES({$varFour})|error_}";
   private static final String INQUIRERSRCE_NOLENGTH_INVALID =
-      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour})|error_}";
+      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour})|error_}";
   private static final String USERDEFINE_NOLENGTH_INVALID =
-      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
+      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) NOHANDLE"
+          + " PIPELINE|error_}";
 
   @ParameterizedTest
   @MethodSource("getValidOptions")
