@@ -52,9 +52,9 @@ public class TestCICSBif {
           + " {BASE64|errorDigestType2}|errorResultMissing_}";
   private static final String BIF_DIGEST_RESULT_MISSING_INVALID =
       "BIF {_DIGEST RECORD(100) RECORDLEN(100)|errorResultMissing_}";
-  private static final String BIF_DEEDIT_TRANS_INVALID = "BIF {_DEEDIT FIELD(100)|error_}";
+  private static final String BIF_DEEDIT_TRANS_INVALID = "BIF {_DEEDIT FIELD({$varFour})|error_}";
   private static final String BIF_DIGEST_TRANS_INVALID =
-      "BIF {_DIGEST RECORD(100) RESULT(100)|error_}";
+      "BIF {_DIGEST RECORD({$varFour}) RESULT({$varFour})|error_}";
 
   @Test
   void testBifDeeditField() {

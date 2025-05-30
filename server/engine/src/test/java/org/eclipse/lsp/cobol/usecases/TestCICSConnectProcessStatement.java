@@ -44,9 +44,10 @@ public class TestCICSConnectProcessStatement {
           + "SYNCLEVEL(100) PROCNAME(100)|errorPiplength_}";
 
   private static final String CONNECT_PROCESS_TRANS_PIPLENGTH_INVALID =
-      "CONNECT {_PROCESS CONVID(100) PARTNER(100) PIPLIST(100) \n " + "SYNCLEVEL(100)|error_}";
+      "CONNECT {_PROCESS CONVID({$varFour}) PARTNER(100) PIPLIST({$varFour}) \n "
+          + "SYNCLEVEL({$varFour})|error_}";
   private static final String CONNECT_PROCESS_TRANS_PROCLENGTH_INVALID =
-      "CONNECT {_PROCESS CONVID(100) \n " + "SYNCLEVEL(100) PROCNAME(100)|error_}";
+      "CONNECT {_PROCESS CONVID({$varFour}) \n " + "SYNCLEVEL(100) PROCNAME({$varFour})|error_}";
 
   @Test
   void testConnectProcessValid() {
