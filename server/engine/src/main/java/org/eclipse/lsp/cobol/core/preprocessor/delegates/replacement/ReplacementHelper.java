@@ -14,9 +14,10 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -42,18 +43,15 @@ public class ReplacementHelper {
     }
     List<String> children = new LinkedList<>();
     for (ParseTree child : ctx.children) {
-      if (child instanceof ParserRuleContext) {
-        children.add(createClause((ParserRuleContext) child));
+      if (child instanceof CobolPreprocessor.PseudoReplacementContext
+          || child instanceof CobolPreprocessor.PseudoReplaceableContext
+          || !(child instanceof ParserRuleContext)) {
+        children.add(child.getText());
       } else {
-        if (child.getParent() instanceof CobolPreprocessor.PseudoReplacementContext
-            || child.getParent() instanceof CobolPreprocessor.PseudoReplaceableContext) {
-          children.add(child.getText());
-        } else {
-          children.add(" " + child.getText());
-        }
+        children.add(createClause((ParserRuleContext) child));
       }
     }
-    return String.join("", children);
+    return String.join(" ", children);
   }
 
   /**
@@ -63,24 +61,15 @@ public class ReplacementHelper {
    * @return a string
    */
   public List<Pair<String, Range>> createClause(List<ParseTree> children) {
-    List<Pair<String, Range>> clauses = new LinkedList<>();
-    for (ParseTree parseTree : children) {
-      if (parseTree instanceof CobolPreprocessor.ReplacingPhraseContext) {
-        for (ParseTree clause : ((CobolPreprocessor.ReplacingPhraseContext) parseTree).children) {
-          if (clause instanceof CobolPreprocessor.ReplaceClauseContext) {
-            CobolPreprocessor.ReplacePseudoTextContext pseudoTextContext =
-                ((CobolPreprocessor.ReplaceClauseContext) clause).replacePseudoText();
-            CobolPreprocessor.ReplaceLiteralContext literalContext =
-                ((CobolPreprocessor.ReplaceClauseContext) clause).replaceLiteral();
-            ParserRuleContext context =
-                Optional.ofNullable((ParserRuleContext) pseudoTextContext).orElse(literalContext);
-
-            String clauseString = createClause(context).replace(" : ", ":").replace(" .", ".");
-            clauses.add(ImmutablePair.of(clauseString, AntlrRangeUtils.constructRange(context)));
-          }
-        }
-      }
-    }
-    return clauses;
+    if (children == null) return Collections.emptyList();
+    return children.stream()
+        .filter(t -> t instanceof CobolPreprocessor.ReplacingPhraseContext)
+        .flatMap(t -> ((CobolPreprocessor.ReplacingPhraseContext) t).children.stream())
+        .filter(c -> c instanceof CobolPreprocessor.ReplaceClauseContext)
+        .map(
+            c ->
+                ImmutablePair.of(
+                    createClause((ParserRuleContext) c), AntlrRangeUtils.constructRange(c)))
+        .collect(Collectors.toList());
   }
 }
