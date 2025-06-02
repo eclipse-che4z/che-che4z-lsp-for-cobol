@@ -52,7 +52,7 @@ public class TestCICSResyncEntrynameSP {
             "error",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: IDLISTLENGTH without IDLIST",
+                "Missing required option: IDLISTLENGTH without IDLIST",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(RESYNC_INVALID, expectedDiagnostic, "SP");

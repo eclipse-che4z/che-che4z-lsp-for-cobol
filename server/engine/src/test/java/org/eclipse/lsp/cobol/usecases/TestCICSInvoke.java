@@ -146,7 +146,7 @@ public class TestCICSInvoke {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: LENGTH without COMMAREA",
+                "Missing required option: LENGTH without COMMAREA",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -188,7 +188,7 @@ public class TestCICSInvoke {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: SCOPELEN without SCOPE",
+                "Missing required option: SCOPELEN without SCOPE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

@@ -134,7 +134,7 @@ public class TestCICSWSAContext {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: EPRLENGTH without EPRTYPE",
+                "Missing required option: EPRLENGTH without EPRTYPE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

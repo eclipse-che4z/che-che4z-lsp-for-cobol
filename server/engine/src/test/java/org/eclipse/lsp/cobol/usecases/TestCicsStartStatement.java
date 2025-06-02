@@ -117,7 +117,7 @@ public class TestCicsStartStatement {
         "errorOne",
         new Diagnostic(
             new Range(),
-            "Missing required option for: LENGTH without FROM",
+            "Missing required option: LENGTH without FROM",
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(START_TRANSID_INVALID_2, expectedDiagnostics);
@@ -130,7 +130,7 @@ public class TestCicsStartStatement {
         "errorOne",
         new Diagnostic(
             new Range(),
-            "Missing required option for: LENGTH without FROM",
+            "Missing required option: LENGTH without FROM",
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(START_ATTACH_INVALID_1, expectedDiagnostics);

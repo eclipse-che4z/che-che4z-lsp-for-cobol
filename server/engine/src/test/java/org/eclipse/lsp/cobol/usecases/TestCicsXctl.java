@@ -98,7 +98,7 @@ public class TestCicsXctl {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: INPUTMSGLEN without INPUTMSG",
+                "Missing required option: INPUTMSGLEN without INPUTMSG",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(INVALID_TWO, expectedDiagnostic);
@@ -111,7 +111,7 @@ public class TestCicsXctl {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: LENGTH without COMMAREA",
+                "Missing required option: LENGTH without COMMAREA",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(INVALID_THREE, expectedDiagnostic);

@@ -141,7 +141,7 @@ public class TestCICSIssue {
   private static final String ISSUE_QUERY_PARTIAL = "ISSUE QUERY DESTID({$varOne})";
 
   private static final String ISSUE_QUERY_INVALID =
-      "ISSUE QUERY DESTID(100) {VOLUMELENG|errorOne}(100)";
+      "ISSUE {_QUERY DESTID({$varOne}) VOLUMELENG({$varOne})|errorOne_}";
 
   private static final String ISSUE_RECEIVE_FULL =
       "ISSUE RECEIVE INTO({$varFour}) LENGTH({$varone})";
@@ -158,8 +158,9 @@ public class TestCICSIssue {
           + " NOWAIT";
 
   private static final String ISSUE_REPLACE_INVALID =
-      "ISSUE {_REPLACE DESTID(100) {VOLUMELENG|errorTwo}(100) FROM(101) LENGTH(100) RIDFLD(101)"
-          + " NOWAIT|errorOne_}";
+      "ISSUE {_REPLACE DESTID({$varOne}) VOLUMELENG({$varFour}) FROM({$varFour})"
+          + " LENGTH({$varFour}) RIDFLD({$varFour})"
+          + " NOWAIT|errorOne|errorTwo_}";
 
   private static final String ISSUE_SEND_FULL =
       "ISSUE SEND SUBADDR({$varOne}) CARD VOLUME({$varTwo}) VOLUMELENG({$varThree}) FROM({$varOne})"
@@ -412,7 +413,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: VOLUMELENG without VOLUME",
+                "Missing required option: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_NOTE_INVALID, expectedDiagnostics);
@@ -486,7 +487,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: VOLUMELENG without VOLUME",
+                "Missing required option: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_QUERY_INVALID, expectedDiagnostics);
@@ -525,7 +526,7 @@ public class TestCICSIssue {
             "errorTwo",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: VOLUMELENG without VOLUME",
+                "Missing required option: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_REPLACE_INVALID, expectedDiagnostics);

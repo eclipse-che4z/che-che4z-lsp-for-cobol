@@ -131,7 +131,7 @@ public class TestCicsWSAEPR {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: REFPARMSLEN without REFPARMS",
+                "Missing required option: REFPARMSLEN without REFPARMS",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(WSAEPR_CREATE_INVALID_TWO, expectedDiagnostic);
@@ -144,7 +144,7 @@ public class TestCicsWSAEPR {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: METADATALEN without METADATA",
+                "Missing required option: METADATALEN without METADATA",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(WSAEPR_CREATE_INVALID_THREE, expectedDiagnostic);
