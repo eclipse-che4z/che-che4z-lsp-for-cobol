@@ -715,8 +715,7 @@ public abstract class CICSOptionsCheckBaseUtility {
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
           optionalFieldName + " without " + fieldName);
-    }
-    else if (noLengthEnabled && !field.isEmpty() && optionalField.isEmpty()) {
+    } else if (noLengthEnabled && !field.isEmpty() && optionalField.isEmpty()) {
       throwException(
           ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),
