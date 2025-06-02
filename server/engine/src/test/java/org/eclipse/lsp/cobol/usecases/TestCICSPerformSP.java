@@ -357,7 +357,7 @@ public class TestCICSPerformSP {
             "error",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: APPIDLEN without APPID",
+                "Missing required option: APPIDLEN without APPID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(
