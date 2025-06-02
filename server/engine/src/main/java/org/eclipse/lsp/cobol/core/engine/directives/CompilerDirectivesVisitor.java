@@ -14,13 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
-import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -34,17 +32,12 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
   private final Position startPosition;
-  private final String directiveLineText;
 
   public CompilerDirectivesVisitor(
-      AnalysisContext ctx,
-      MessageService messageService,
-      Position startPosition,
-      String directiveLineText) {
+      AnalysisContext ctx, MessageService messageService, Position startPosition) {
     this.analysisContext = ctx;
     this.messageService = messageService;
     this.startPosition = startPosition;
-    this.directiveLineText = directiveLineText;
   }
 
   @Override
@@ -127,61 +120,5 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                           .build());
             });
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
-  }
-
-  @Override
-  public Object visitCobolJavaInteroperabilityOptions(
-      CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
-    String extraText = directiveLineText.replaceAll("\\s+", "").substring(ctx.getText().length());
-    if (!extraText.isEmpty()) {
-      VisitorHelper.retrieveRangeLocality(ctx)
-          .ifPresent(
-              r -> {
-                Range range = CompilerDirectivesUtils.shiftRange(r, startPosition);
-                Location location = analysisContext.getExtendedDocument().mapLocation(range);
-                location
-                    .getRange()
-                    .setStart(
-                        new Position(
-                            0,
-                            startPosition.getCharacter()
-                                + directiveLineText.length()
-                                - extraText.length()));
-                location
-                    .getRange()
-                    .setEnd(
-                        new Position(0, startPosition.getCharacter() + directiveLineText.length()));
-                throwException(
-                    locationToLocality(location),
-                    messageService.getMessage("compilerOption.invalid", extraText));
-              });
-    }
-    return super.visitCobolJavaInteroperabilityOptions(ctx);
-  }
-
-  private void throwException(@NonNull Locality locality, String message) {
-    SyntaxError error =
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .location(locality.toOriginalLocation())
-            .suggestion(message)
-            .severity(ErrorSeverity.ERROR)
-            .build();
-
-    if (!analysisContext.getAccumulatedErrors().contains(error)) {
-      analysisContext.getAccumulatedErrors().add(error);
-    }
-  }
-
-  private Locality locationToLocality(Location location) {
-    Locality.LocalityBuilder builder =
-        Locality.builder().range(location.getRange()).uri(location.getUri());
-
-    if (analysisContext.getCopybooksRepository() != null) {
-      builder.copybookId(
-          analysisContext.getCopybooksRepository().getCopybookIdByUri(location.getUri()));
-    }
-
-    return builder.build();
   }
 }

@@ -173,8 +173,8 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
 
-  private static final String TEXT_SETTING_NOJAVA64_JAVA64_INVALID =
-      "       CBL JAVAIOP(NOJAVA64 {JAVA64|error1})\n"
+  private static final String TEXT_SETTING_NOJAVA64_JAVA64_VALID =
+      "       CBL JAVAIOP(NOJAVA64 JAVA64)\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -184,8 +184,8 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
 
-  private static final String TEXT_SETTING_JVMI_INVALID =
-      "       CBL JAVAIOP(JVMI('-Djava.library.path=.') {NOJVMI|error1})\n"
+  private static final String TEXT_SETTING_JVMI_VALID =
+      "       CBL JAVAIOP(JVMI('-Djava.library.path=.') NOJVMI)\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -195,8 +195,8 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
 
-  private static final String TEXT_SETTING_OUTPATH_JVMI_INVALID =
-      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir') {JVMI|error1}('-Djava.library.path=.'))\n"
+  private static final String TEXT_SETTING_OUTPATH_JVMI_VALID =
+      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir') JVMI('-Xms512m'))\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -218,7 +218,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_JAVAIOP_NOJAVAIOP_INVALID =
-      "       CBL JAVAIOP(JAVA64) {NOJAVAIOP|error1}\n"
+      "       CBL JAVAIOP({NOJAVAIOP|error1})\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -436,48 +436,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   }
 
   @Test
-  void testSettingNoJava64Java64Invalid() {
+  void testSettingNoJava64Java64Valid() {
     UseCaseEngine.runTest(
-        TEXT_SETTING_NOJAVA64_JAVA64_INVALID,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "error1",
-            new Diagnostic(
-                new Range(),
-                "No viable alternative at input JAVAIOP(NOJAVA64 JAVA64",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        ImmutableList.of());
+        TEXT_SETTING_NOJAVA64_JAVA64_VALID, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testSettingJvmiInvalid() {
-    UseCaseEngine.runTest(
-        TEXT_SETTING_JVMI_INVALID,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "error1",
-            new Diagnostic(
-                new Range(),
-                "No viable alternative at input JAVAIOP(JVMI('-Djava.library.path=.') NOJVMI",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        ImmutableList.of());
+  void testSettingJvmiValid() {
+    UseCaseEngine.runTest(TEXT_SETTING_JVMI_VALID, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
-  void testSettingOutPathJvmiInvalid() {
-    UseCaseEngine.runTest(
-        TEXT_SETTING_OUTPATH_JVMI_INVALID,
-        ImmutableList.of(),
-        ImmutableMap.of(
-            "error1",
-            new Diagnostic(
-                new Range(),
-                "No viable alternative at input JAVAIOP(OUTPATH('/a/folder/compdir') JVMI",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())),
-        ImmutableList.of());
+  void testSettingOutPathJvmiValid() {
+    UseCaseEngine.runTest(TEXT_SETTING_OUTPATH_JVMI_VALID, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
@@ -494,7 +465,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: NOJAVAIOP",
+                "No viable alternative at input JAVAIOP(NOJAVAIOP",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

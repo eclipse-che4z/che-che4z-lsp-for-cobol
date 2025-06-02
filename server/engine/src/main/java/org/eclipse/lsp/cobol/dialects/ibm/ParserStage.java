@@ -49,6 +49,12 @@ import org.eclipse.lsp4j.Range;
 public class ParserStage implements Stage<AnalysisContext, ParserStageResult, DialectOutcome> {
   private final MessageService messageService;
   private final ParseTreeListener treeListener;
+  private static final Pattern JAVA_CALLABLE_PATTERN =
+      Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-CALLABLE)(?:\\s+(.+))?\\s*$");
+  private static final Pattern JAVA_SHAREABLE_ON_PATTERN =
+      Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-SHAREABLE\\s+ON)(?:\\s+(.+))?\\s*$");
+  private static final Pattern JAVA_SHAREABLE_OFF_PATTERN =
+      Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-SHAREABLE\\s+OFF)(?:\\s+(.+))?\\s*$");
 
   @Override
   public StageResult<ParserStageResult> run(
@@ -118,13 +124,6 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     Stack<Integer> shareableOnStack = new Stack<>();
     String currentSection = "";
 
-    Pattern javaCallablePattern =
-        Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-CALLABLE)(?:\\s+(.+))?\\s*$");
-    Pattern javaShareableOnPattern =
-        Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-SHAREABLE\\s+ON)(?:\\s+(.+))?\\s*$");
-    Pattern javaShareableOffPattern =
-        Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-SHAREABLE\\s+OFF)(?:\\s+(.+))?\\s*$");
-
     for (int i = 0; i < compilerLineTokens.size(); i++) {
       Token token = compilerLineTokens.get(i);
 
@@ -147,7 +146,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
       if (token.getType() == CobolLexer.COMPILERLINE) {
         String tokenText = token.getText();
 
-        Matcher callableMatcher = javaCallablePattern.matcher(tokenText);
+        Matcher callableMatcher = JAVA_CALLABLE_PATTERN.matcher(tokenText);
         if (callableMatcher.matches()) {
           validateDirective(
               analysisContext,
@@ -158,7 +157,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
           continue;
         }
 
-        Matcher shareableOnMatcher = javaShareableOnPattern.matcher(tokenText);
+        Matcher shareableOnMatcher = JAVA_SHAREABLE_ON_PATTERN.matcher(tokenText);
         if (shareableOnMatcher.matches()) {
           shareableOnStack.push(i);
           validateDirective(
@@ -170,7 +169,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
           continue;
         }
 
-        Matcher shareableOffMatcher = javaShareableOffPattern.matcher(tokenText);
+        Matcher shareableOffMatcher = JAVA_SHAREABLE_OFF_PATTERN.matcher(tokenText);
         if (shareableOffMatcher.matches()) {
           if (shareableOnStack.isEmpty()) {
             createError(

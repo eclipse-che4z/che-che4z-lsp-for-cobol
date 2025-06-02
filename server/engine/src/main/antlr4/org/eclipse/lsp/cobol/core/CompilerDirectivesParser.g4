@@ -220,7 +220,7 @@ cobolJavaInteroperabilityOptions:
                 | (NOJVMINITOPTIONS | NOJVMI)
                 | (JVMINITOPTIONS | JVMI) LPARENCHAR LITERAL RPARENCHAR
                 | (NOJAVA64 | JAVA64)
-            ) RPARENCHAR | (NOJAVAIOP | NOJIOP);
+            )+ RPARENCHAR | (NOJAVAIOP | NOJIOP);
 
 ssrangeSuboptions
    : NOZLEN

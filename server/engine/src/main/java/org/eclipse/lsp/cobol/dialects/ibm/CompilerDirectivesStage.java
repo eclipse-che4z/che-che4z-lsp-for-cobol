@@ -80,7 +80,7 @@ public class CompilerDirectivesStage
       parser.removeErrorListeners();
       parser.setErrorHandler(new CobolErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
-      new CompilerDirectivesVisitor(ctx, messageService, startPosition, directives)
+      new CompilerDirectivesVisitor(ctx, messageService, startPosition)
           .visit(parser.compilerOptions());
     }
   }
