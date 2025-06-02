@@ -301,10 +301,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.RRN(), ctx, "RRN");
     } else checkHasIllegalOptions(ctx.RRN(), "RRN with KEYLENGTH");
 
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-    else if (noLengthOptionsEnabled())
-      checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), "VOLUME", "VOLUMELENG");
     if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
