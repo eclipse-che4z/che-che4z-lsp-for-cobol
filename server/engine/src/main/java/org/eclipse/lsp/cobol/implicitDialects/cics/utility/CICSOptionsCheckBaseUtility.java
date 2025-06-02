@@ -709,8 +709,19 @@ public abstract class CICSOptionsCheckBaseUtility {
       ParserRuleContext ctx,
       String fieldName,
       String optionalFieldName) {
-    checkPrerequisiteIsMet(field, optionalField, ctx, optionalFieldName + " without " + fieldName);
-    if (noLengthEnabled && !field.isEmpty())
-      checkHasMandatoryOptions(optionalField, ctx, optionalFieldName);
+    if (field.isEmpty() && !optionalField.isEmpty()) {
+      throwException(
+          ErrorSeverity.ERROR,
+          VisitorUtility.constructLocality(ctx, context),
+          "Missing required option: ",
+          optionalFieldName + " without " + fieldName);
+    }
+    else if (noLengthEnabled && !field.isEmpty() && optionalField.isEmpty()) {
+      throwException(
+          ErrorSeverity.ERROR,
+          VisitorUtility.constructLocality(ctx, context),
+          "Missing required option: ",
+          optionalFieldName);
+    }
   }
 }
