@@ -98,8 +98,6 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
 
     checkHasMandatoryOptions(ctx.FAULTSTRING(), ctx, "FAULTSTRING");
 
-    checkPrerequisiteIsMet(
-        ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN without FAULTSTRING");
     checkOptionalWithLength(
         ctx.FAULTCODESTR(), ctx.FAULTCODELEN(), ctx, "FAULTCODESTR", "FAULTCODELEN");
     checkOptionalWithLength(ctx.FAULTACTOR(), ctx.FAULTACTLEN(), ctx, "FAULTACTOR", "FAULTACTLEN");
