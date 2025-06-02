@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -28,6 +29,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingServiceImpl;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.SearchPattern;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -77,21 +79,26 @@ class ReplacingServiceImplTest {
         new ResultWithErrors<>(
             Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])01(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", "BY"),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==  01  == BY == BY   ==", locality));
+        replacingService.retrievePseudoTextReplacingPattern(
+            ImmutablePair.of("  01  ", " BY   "), locality, SearchPattern.EXACT));
     assertEquals(
-        new ResultWithErrors<>(Pair.of("", ""), Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("", locality));
+        new ResultWithErrors<>(
+            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
+            Collections.emptyList()),
+        replacingService.retrievePseudoTextReplacingPattern(
+            ImmutablePair.of("", ""), locality, SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
             Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])a\\s+b\\s+c(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
             Collections.emptyList()),
-        replacingService.retrievePseudoTextReplacingPattern("==a   b  \nc== bY ====", locality));
+        replacingService.retrievePseudoTextReplacingPattern(
+            ImmutablePair.of("a   b  \nc", ""), locality, SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", "by =="),
+            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])BY(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
             Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
-            "==BY== by ==\n      \r\n   ==", locality));
+            ImmutablePair.of("BY", "\n" + "      \n" + "   "), locality, SearchPattern.EXACT));
   }
 
   /**
@@ -104,13 +111,15 @@ class ReplacingServiceImplTest {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
         Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"),
-        replacingService.retrieveTokenReplacingPattern("01 BY 05"));
-    assertEquals(Pair.of("", ""), replacingService.retrieveTokenReplacingPattern(""));
+        replacingService.retrieveTokenReplacingPattern(Pair.of("01", "05")));
+    assertEquals(
+        Pair.of("(?<=[\\.\\s\\r\\n])(?=[\\.\\s\\r\\n])", ""),
+        replacingService.retrieveTokenReplacingPattern(Pair.of("", "")));
     assertEquals(
         Pair.of("(?<=[\\.\\s\\r\\n])IDENTIFICATION(?=[\\.\\s\\r\\n])", "DIVISION"),
-        replacingService.retrieveTokenReplacingPattern("IDENTIFICATION by DIVISION"));
+        replacingService.retrieveTokenReplacingPattern(Pair.of("IDENTIFICATION", "DIVISION")));
     assertEquals(
         Pair.of("(?<=[\\.\\s\\r\\n])A(?=[\\.\\s\\r\\n])", "B"),
-        replacingService.retrieveTokenReplacingPattern("\r\nA bY \r\n  B "));
+        replacingService.retrieveTokenReplacingPattern(Pair.of("\n" + "A", "\n" + "  B ")));
   }
 }

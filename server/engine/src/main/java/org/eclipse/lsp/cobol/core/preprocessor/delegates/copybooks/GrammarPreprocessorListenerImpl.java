@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
@@ -188,8 +189,13 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
     if (!ctx.replacePseudoText().isEmpty()) {
       replacementContext =
           ctx.replacePseudoText().stream()
-              .map(ReplacementHelper::createClause)
-              .map(c -> replacingService.retrievePseudoTextReplacingPattern(c, locality))
+              .map(
+                  c ->
+                      replacingService.retrievePseudoTextReplacingPattern(
+                          new ImmutablePair<>(
+                              c.pseudoReplaceable().getText(), c.pseudoReplacement().getText()),
+                          locality,
+                          ReplacementHelper.getSearchPattern(c)))
               .map(r -> r.unwrap(errors::addAll))
               .map(r -> new ReplacementContext(r, locality))
               .collect(Collectors.toList());

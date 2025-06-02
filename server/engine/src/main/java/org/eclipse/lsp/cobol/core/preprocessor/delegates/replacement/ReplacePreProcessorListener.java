@@ -22,6 +22,7 @@ import com.google.inject.assistedinject.Assisted;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -85,7 +86,10 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
               new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
       replacingService
           .retrievePseudoTextReplacingPattern(
-              ReplacementHelper.createClause(ctx), retrieveLocality(ctx))
+              new ImmutablePair<>(
+                  ctx.pseudoReplaceable().getText(), ctx.pseudoReplacement().getText()),
+              retrieveLocality(ctx),
+              ReplacementHelper.getSearchPattern(ctx))
           .processIfNoErrorsFound(
               pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);
     }

@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
@@ -38,9 +39,7 @@ import org.eclipse.lsp.cobol.core.model.CopybookUsage;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacementContext;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacementHelper;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
+import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.*;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.LocalityUtils;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 import org.eclipse.lsp4j.Location;
@@ -142,20 +141,74 @@ class CopybookPreprocessorService {
   }
 
   private void prepareReplacements(ParserRuleContext ctx) {
-    ReplacementHelper.createClause(ctx.children)
-        .forEach(
-            c -> {
-              Pair<String, String> replacing;
-              if (c.getKey().contains("==")) {
-                replacing =
-                    replacingService
-                        .retrievePseudoTextReplacingPattern(c.getKey(), mapLocality(c.getValue()))
-                        .unwrap(errors::addAll);
-              } else {
-                replacing = replacingService.retrieveTokenReplacingPattern(c.getKey());
-              }
-              hierarchy.addCopyReplacing(replacing);
-            });
+    if (!(ctx instanceof CobolPreprocessor.CopyStatementContext)) {
+      return;
+    }
+    CobolPreprocessor.CopyStatementContext copyCtx = (CobolPreprocessor.CopyStatementContext) ctx;
+    CobolPreprocessor.ReplacingPhraseContext replacingPhraseContext = copyCtx.replacingPhrase();
+    if (replacingPhraseContext == null) {
+      return;
+    }
+    boolean isPseudoTextReplacement = false;
+    List<CobolPreprocessor.ReplaceClauseContext> replaceClauseContexts =
+        replacingPhraseContext.replaceClause();
+    for (CobolPreprocessor.ReplaceClauseContext replaceClauseContext : replaceClauseContexts) {
+      Pair<String, String> pattern;
+      SearchPattern searchPattern = SearchPattern.EXACT;
+      CobolPreprocessor.ReplacePseudoTextContext replacePseudoTextContext =
+          replaceClauseContext.replacePseudoText();
+      if (replacePseudoTextContext != null) {
+        isPseudoTextReplacement = true;
+        boolean isLeading = replacePseudoTextContext.LEADING() != null;
+        boolean isTrailing = replacePseudoTextContext.TRAILING() != null;
+
+        if (isLeading) {
+          searchPattern = SearchPattern.STARTS_WITH;
+        } else if (isTrailing) {
+          searchPattern = SearchPattern.ENDS_WITH;
+        }
+        pattern =
+            new ImmutablePair<>(
+                replacePseudoTextContext.pseudoReplaceable().getText(),
+                replacePseudoTextContext.pseudoReplacement().getText());
+      } else {
+        CobolPreprocessor.ReplaceLiteralContext replaceLiteralContext =
+            replaceClauseContext.replaceLiteral();
+        CobolPreprocessor.ReplaceableContext replaceable = replaceLiteralContext.replaceable();
+        CobolPreprocessor.ReplacementContext replacement = replaceLiteralContext.replacement();
+
+        String left;
+        CobolPreprocessor.PseudoReplaceableContext pseudoReplaceableContext =
+            replaceable.pseudoReplaceable();
+        if (pseudoReplaceableContext != null) {
+          isPseudoTextReplacement = true;
+          left = pseudoReplaceableContext.getText();
+        } else {
+          left = ReplacementHelper.createClause(replaceable);
+        }
+        String right;
+        CobolPreprocessor.PseudoReplacementContext pseudoReplacementContext =
+            replacement.pseudoReplacement();
+        if (pseudoReplacementContext != null) {
+          isPseudoTextReplacement = true;
+          right = pseudoReplacementContext.getText();
+        } else {
+          right = ReplacementHelper.createClause(replacement);
+        }
+        pattern = new ImmutablePair<>(left, right);
+      }
+      if (!isPseudoTextReplacement) {
+        hierarchy.addCopyReplacing(replacingService.retrieveTokenReplacingPattern(pattern));
+      } else {
+        ResultWithErrors<Pair<String, String>> pairResultWithErrors =
+            replacingService.retrievePseudoTextReplacingPattern(
+                pattern,
+                mapLocality(AntlrRangeUtils.constructRange(replaceClauseContext)),
+                searchPattern);
+        errors.addAll(pairResultWithErrors.getErrors());
+        hierarchy.addCopyReplacing(pairResultWithErrors.getResult());
+      }
+    }
   }
 
   private ExtendedDocument processCopybookWithReplacement(

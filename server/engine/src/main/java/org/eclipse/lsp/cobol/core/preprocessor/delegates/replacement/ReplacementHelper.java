@@ -14,18 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
-import org.eclipse.lsp4j.Range;
 
 /** Helper for replacement functionality */
 @UtilityClass
@@ -43,33 +37,27 @@ public class ReplacementHelper {
     }
     List<String> children = new LinkedList<>();
     for (ParseTree child : ctx.children) {
-      if (child instanceof CobolPreprocessor.PseudoReplacementContext
-          || child instanceof CobolPreprocessor.PseudoReplaceableContext
-          || !(child instanceof ParserRuleContext)) {
-        children.add(child.getText());
-      } else {
+      if (child instanceof ParserRuleContext) {
         children.add(createClause((ParserRuleContext) child));
+      } else {
+        children.add(child.getText());
       }
     }
     return String.join(" ", children);
   }
 
   /**
-   * Creates a string for replacement parsing from a given list of clauses
+   * Returns a searchPattern strategy based on the passed antlr context
    *
-   * @param children - list of clauses
-   * @return a string
+   * @param replacePseudoTextContext Antlr replacePseudoText context
+   * @return SearchPattern
    */
-  public List<Pair<String, Range>> createClause(List<ParseTree> children) {
-    if (children == null) return Collections.emptyList();
-    return children.stream()
-        .filter(t -> t instanceof CobolPreprocessor.ReplacingPhraseContext)
-        .flatMap(t -> ((CobolPreprocessor.ReplacingPhraseContext) t).children.stream())
-        .filter(c -> c instanceof CobolPreprocessor.ReplaceClauseContext)
-        .map(
-            c ->
-                ImmutablePair.of(
-                    createClause((ParserRuleContext) c), AntlrRangeUtils.constructRange(c)))
-        .collect(Collectors.toList());
+  public static SearchPattern getSearchPattern(
+      CobolPreprocessor.ReplacePseudoTextContext replacePseudoTextContext) {
+    return replacePseudoTextContext.LEADING() != null
+        ? SearchPattern.STARTS_WITH
+        : replacePseudoTextContext.TRAILING() != null
+            ? SearchPattern.ENDS_WITH
+            : SearchPattern.EXACT;
   }
 }

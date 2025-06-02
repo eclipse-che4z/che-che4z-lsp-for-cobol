@@ -36,22 +36,22 @@ public interface ReplacingService {
    * Retrieve pseudo-text replacing pattern from the given string. If the pseudo text consist of
    * whitespaces, or is empty, the empty pattern returns.
    *
-   * @param clause string representation of the replacing clause in the format "==replaceable== BY
-   *     ==replacement=="
+   * @param pattern pair of string representation of the replacing clause in the format replaceable
+   *     -> replacement
    * @param locality the locality of the context
+   * @param searchPattern {@link SearchPattern} strategy for the pattern replacement.
    * @return {@link ResultWithErrors} of pair of cleaned-up replaceable and replacement
    */
-  @NonNull
   ResultWithErrors<Pair<String, String>> retrievePseudoTextReplacingPattern(
-      @NonNull String clause, @NonNull Locality locality);
+      Pair<String, String> pattern, @NonNull Locality locality, SearchPattern searchPattern);
 
   /**
    * Retrieve full-token replacing pattern from the given string.
    *
-   * @param clause - string representation of the replacing clause in the format "replaceable BY
-   *     replacement"
+   * @param clause - Pair of string representation of the replacing clause in the format
+   *     "replaceable BY replacement"
    * @return pair of cleaned-up replaceable and replacement
    */
   @NonNull
-  Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause);
+  Pair<String, String> retrieveTokenReplacingPattern(@NonNull Pair<String, String> clause);
 }

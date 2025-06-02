@@ -28,8 +28,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -60,16 +58,8 @@ public class ReplacingServiceImpl implements ReplacingService {
   private static final String SEPARATE_TOKEN_PATTERN = "(?<=[\\.\\s\\r\\n])%s(?=[\\.\\s\\r\\n])";
 
   private static final String SINGLE_QUOTED_SEPARATE_TOKEN_PATTERN = "(?<=[\\.\\s\\r\\n])%s";
-
-  private static final Pattern LEAD_OR_TRAIL_CLAUSE =
-      Pattern.compile("\\s*(LEADING|TRAILING).*", Pattern.CASE_INSENSITIVE);
-
   private static final Pattern FUNCTION_IDENTIFIER =
       Pattern.compile("\\s*function\\s+\\w+\\([^)]*+\\)", Pattern.CASE_INSENSITIVE);
-
-  private static final Pattern PSEUDO_TEXT_PATTERN = Pattern.compile("(?s)(?i)(.*?)\\s*BY\\s*(.*)");
-  private static final String EMPTY_PSEUDO_TEXT = "====";
-
   private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
   private static final int INDIVIDUAL_WORD_VALID_LENGTH = 322;
 
@@ -88,26 +78,23 @@ public class ReplacingServiceImpl implements ReplacingService {
     }
   }
 
-  @NonNull
   @Override
   public ResultWithErrors<Pair<String, String>> retrievePseudoTextReplacingPattern(
-      @NonNull String clause, @NonNull Locality locality) {
-    ProcessedSearchClause processedSearchClause = getProcessedSearchClause(clause);
-    String[] pattern = retrievePattern(processedSearchClause.clause);
+      @NonNull Pair<String, String> pattern,
+      @NonNull Locality locality,
+      SearchPattern searchPattern) {
     List<SyntaxError> errors = new ArrayList<>();
+    String leftAttribute = pattern.getLeft();
+    String rightAttribute = pattern.getRight();
 
-    String leftAttribute = "";
-    String rightAttribute = "";
-    if (isPatternCorrect(pattern)) {
-      String extractPseudoText1 = extractPseudoText(pattern[0], true);
-      leftAttribute = processedSearchClause.getSearchPattern().apply(extractPseudoText1);
+    String extractPseudoText1 = extractPseudoText(leftAttribute, true);
+    leftAttribute = searchPattern.apply(extractPseudoText1);
 
-      rightAttribute = extractPseudoText(pattern[1], false);
-      checkInvalidWordUsage(new String[] {extractPseudoText1, rightAttribute}, locality)
-          .ifPresent(errors::add);
-      checkInvalidTextWordLength(new String[] {extractPseudoText1, rightAttribute}, locality)
-          .ifPresent(errors::add);
-    }
+    rightAttribute = extractPseudoText(rightAttribute, false);
+    checkInvalidWordUsage(new String[] {extractPseudoText1, rightAttribute}, locality)
+        .ifPresent(errors::add);
+    checkInvalidTextWordLength(new String[] {extractPseudoText1, rightAttribute}, locality)
+        .ifPresent(errors::add);
     Pair<String, String> replacePattern = Pair.of(leftAttribute, rightAttribute);
 
     return new ResultWithErrors<>(replacePattern, errors);
@@ -157,22 +144,9 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public Pair<String, String> retrieveTokenReplacingPattern(@NonNull String clause) {
-    String[] pattern = retrievePattern(clause);
-    return isPatternCorrect(pattern)
-        ? Pair.of(getPatternForFullTokens(pattern[0]), getReplacementPattern(pattern[1]))
-        : Pair.of("", "");
-  }
-
-  @NonNull
-  private String[] retrievePattern(@NonNull String clause) {
-    Matcher matcher = PSEUDO_TEXT_PATTERN.matcher(clause);
-    if (matcher.find()) return new String[] {matcher.group(1), matcher.group(2)};
-    return new String[] {EMPTY_PSEUDO_TEXT};
-  }
-
-  private boolean isPatternCorrect(@NonNull String[] pattern) {
-    return pattern.length == 2;
+  public Pair<String, String> retrieveTokenReplacingPattern(@NonNull Pair<String, String> clause) {
+    return Pair.of(
+        getPatternForFullTokens(clause.getLeft()), getReplacementPattern(clause.getRight()));
   }
 
   /**
@@ -264,25 +238,5 @@ public class ReplacingServiceImpl implements ReplacingService {
   private Function<String, Boolean> checkContainWord(String check) {
     return text ->
         Arrays.stream(text.toUpperCase().split("\b")).anyMatch(txt -> txt.equalsIgnoreCase(check));
-  }
-
-  @NonNull
-  private ProcessedSearchClause getProcessedSearchClause(@NonNull String clause) {
-    SearchPattern searchPattern = SearchPattern.EXACT;
-    Matcher matcher = LEAD_OR_TRAIL_CLAUSE.matcher(clause);
-    if (matcher.matches()) {
-      if (matcher.group(1).equalsIgnoreCase("LEADING")) searchPattern = SearchPattern.STARTS_WITH;
-      else if (matcher.group(1).equalsIgnoreCase("TRAILING"))
-        searchPattern = SearchPattern.ENDS_WITH;
-      clause = matcher.group(0).replace(matcher.group(1), "");
-    }
-    return new ProcessedSearchClause(clause, searchPattern);
-  }
-
-  @AllArgsConstructor
-  @Getter
-  private static class ProcessedSearchClause {
-    String clause;
-    SearchPattern searchPattern;
   }
 }
