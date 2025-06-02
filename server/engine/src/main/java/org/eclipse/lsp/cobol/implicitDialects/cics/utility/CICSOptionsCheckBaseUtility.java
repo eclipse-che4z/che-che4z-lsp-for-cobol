@@ -692,4 +692,25 @@ public abstract class CICSOptionsCheckBaseUtility {
   protected boolean noLengthOptionsEnabled() {
     return noLengthEnabled;
   }
+
+  /**
+   * Helper method to collect analysis errors if option becomes mandatory when no length directive
+   * specified
+   *
+   * @param field required field
+   * @param optionalField optional field
+   * @param ctx Context to extrapolate locality against
+   * @param fieldName required field name
+   * @param optionalFieldName required field name
+   */
+  protected void checkOptionalWithLength(
+      List<TerminalNode> field,
+      List<TerminalNode> optionalField,
+      ParserRuleContext ctx,
+      String fieldName,
+      String optionalFieldName) {
+    checkPrerequisiteIsMet(field, optionalField, ctx, optionalFieldName + " without " + fieldName);
+    if (noLengthEnabled && !field.isEmpty())
+      checkHasMandatoryOptions(optionalField, ctx, optionalFieldName);
+  }
 }

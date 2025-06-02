@@ -78,17 +78,10 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
             .flatMap(List::stream)
             .collect(Collectors.toList());
     checkHasMandatoryOptions(options, ctx, "ADDRESS or REFPARMS or METADATA");
-    if (ctx.REFPARMS().isEmpty())
-      checkHasIllegalOptions(ctx.REFPARMSLEN(), "REFPARMSLEN without REFPARMS");
-    if (ctx.METADATA().isEmpty())
-      checkHasIllegalOptions(ctx.METADATALEN(), "METADATALEN without METADATA");
+
     checkHasMutuallyExclusiveOptions(
         "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
-    if (noLengthOptionsEnabled()) {
-      if (!ctx.REFPARMS().isEmpty())
-        checkHasMandatoryOptions(ctx.REFPARMSLEN(), ctx, "REFPARMSLEN");
-      if (!ctx.METADATA().isEmpty())
-        checkHasMandatoryOptions(ctx.METADATALEN(), ctx, "METADATALEN");
-    }
+    checkOptionalWithLength(ctx.REFPARMS(), ctx.REFPARMSLEN(), ctx, "REFPARMS", "REFPARMSLEN");
+    checkOptionalWithLength(ctx.METADATA(), ctx.METADATALEN(), ctx, "METADATA", "METADATALEN");
   }
 }

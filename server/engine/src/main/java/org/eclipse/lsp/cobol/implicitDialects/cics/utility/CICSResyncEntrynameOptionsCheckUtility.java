@@ -62,9 +62,6 @@ public class CICSResyncEntrynameOptionsCheckUtility extends CICSOptionsCheckBase
   @SuppressWarnings("unchecked")
   private void checkOpts(CICSParser.Cics_resync_entryname_optsContext ctx) {
     checkHasMandatoryOptions(ctx.ENTRYNAME(), ctx, "ENTRYNAME");
-    checkPrerequisiteIsMet(ctx.IDLIST(), ctx.IDLISTLENGTH(), ctx, "IDLISTLENGTH without IDLIST");
-    if (noLengthOptionsEnabled() && !ctx.IDLIST().isEmpty()) {
-      checkHasMandatoryOptions(ctx.IDLISTLENGTH(), ctx, "IDLISTLENGTH");
-    }
+    checkOptionalWithLength(ctx.IDLIST(), ctx.IDLISTLENGTH(), ctx, "IDLIST", "IDLISTLENGTH");
   }
 }

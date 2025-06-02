@@ -68,13 +68,7 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
     checkMutuallyExclusiveOptions("TRANSID or ENDACTIVITY", ctx.TRANSID(), ctx.ENDACTIVITY());
 
-    checkPrerequisiteIsMet(ctx.COMMAREA(), ctx.LENGTH(), ctx, "LENGTH without COMMAREA");
-
-    checkPrerequisiteIsMet(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN without INPUTMSG");
-    if (noLengthOptionsEnabled()) {
-      if (!ctx.COMMAREA().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-      if (!ctx.INPUTMSG().isEmpty())
-        checkHasMandatoryOptions(ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN");
-    }
+    checkOptionalWithLength(ctx.COMMAREA(), ctx.LENGTH(), ctx, "COMMAREA", "LENGTH");
+    checkOptionalWithLength(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSG", "INPUTMSGLEN");
   }
 }

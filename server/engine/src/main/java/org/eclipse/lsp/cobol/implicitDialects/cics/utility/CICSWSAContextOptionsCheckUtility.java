@@ -91,14 +91,9 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     checkPrerequisiteIsMet(ctx.RELATESURI(), ctx.RELATESTYPE(), ctx, "RELATESTYPE");
     checkAllOptionsArePresentOrAbsent(
         "EPRTYPE, EPRFIELD and EPRFROM", ctx, ctx.EPRTYPE(), ctx.EPRFIELD(), ctx.EPRFROM());
-    if (!ctx.EPRLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.EPRTYPE(), ctx, "EPRTYPE");
-    }
     checkHasMutuallyExclusiveOptions(
         "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
-    if (noLengthOptionsEnabled() && !ctx.EPRTYPE().isEmpty()) {
-      checkHasMandatoryOptions(ctx.EPRLENGTH(), ctx, "EPRLENGTH");
-    }
+    checkOptionalWithLength(ctx.EPRTYPE(), ctx.EPRLENGTH(), ctx, "EPRTYPE", "EPRLENGTH");
   }
 
   private void checkWSAContextDelete(CICSParser.Cics_wsacontext_deleteContext ctx) {

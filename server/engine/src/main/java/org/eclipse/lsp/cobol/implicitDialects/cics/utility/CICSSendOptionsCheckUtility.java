@@ -198,9 +198,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         || !ctx.NOFLUSH().isEmpty()) {
       checkHasMandatoryOptions(ctx.MAP(), ctx, "MAP");
     }
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    }
+    checkOptionalWithLength(ctx.FROM(), ctx.LENGTH(), ctx, "FROM", "LENGTH");
   }
 
   @SuppressWarnings("unchecked")
@@ -219,9 +217,7 @@ public class CICSSendOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(
           ctx.FROM(), ctx, "FROM when specifying MAP or MAPSET parameter without literal");
     }
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty()) {
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    }
+    checkOptionalWithLength(ctx.FROM(), ctx.LENGTH(), ctx, "FROM", "LENGTH");
   }
 
   @SuppressWarnings("unchecked")

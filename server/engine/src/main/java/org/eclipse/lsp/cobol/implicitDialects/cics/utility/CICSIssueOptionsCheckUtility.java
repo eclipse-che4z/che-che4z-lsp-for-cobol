@@ -195,8 +195,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
     if (noLengthOptionsEnabled()) {
-      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
@@ -228,16 +228,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-
     checkHasExactlyOneOption("RRN or KEYLENGTH", ctx, ctx.RRN(), ctx.KEYLENGTH());
-
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
     }
     if (noLengthOptionsEnabled()) {
-      if (!ctx.VOLUME().isEmpty()) checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
@@ -256,11 +252,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.RRN(), ctx, "RRN");
-
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-    else if (noLengthOptionsEnabled())
-      checkHasMandatoryOptions(ctx.VOLUMELENG(), ctx, "VOLUMELENG");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
     if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
   }
 

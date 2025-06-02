@@ -371,9 +371,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
     checkHasMutuallyExclusiveOptions(
         "NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
-    checkPrerequisiteIsMet(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRLEN without ATTRIBUTES");
     checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
-    if (noLengthOptionsEnabled() && !ctx.ATTRIBUTES().isEmpty())
-      checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
+    checkOptionalWithLength(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRIBUTES", "ATTRLEN");
   }
 }

@@ -99,46 +99,21 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     checkHasMandatoryOptions(ctx.FAULTSTRING(), ctx, "FAULTSTRING");
 
     checkPrerequisiteIsMet(
-        ctx.FAULTCODESTR(), ctx.FAULTCODELEN(), ctx, "FAULTCODELEN without FAULTCODESTR");
-
-    checkPrerequisiteIsMet(ctx.ROLE(), ctx.ROLELENGTH(), ctx, "ROLELENGTH without ROLE");
-
-    checkPrerequisiteIsMet(
-        ctx.FAULTACTOR(), ctx.FAULTACTLEN(), ctx, "FAULTACTLEN without FAULTACTOR");
-
-    checkPrerequisiteIsMet(ctx.DETAIL(), ctx.DETAILLENGTH(), ctx, "DETAILLENGTH without DETAIL");
-
-    checkPrerequisiteIsMet(
-        ctx.FAULTCODE(), ctx.FAULTCODELEN(), ctx, "FAULTCODELEN without FAULTCODE");
-
-    checkPrerequisiteIsMet(
         ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN without FAULTSTRING");
+    checkOptionalWithLength(
+        ctx.FAULTCODESTR(), ctx.FAULTCODELEN(), ctx, "FAULTCODESTR", "FAULTCODELEN");
+    checkOptionalWithLength(ctx.FAULTACTOR(), ctx.FAULTACTLEN(), ctx, "FAULTACTOR", "FAULTACTLEN");
+    checkOptionalWithLength(ctx.DETAIL(), ctx.DETAILLENGTH(), ctx, "DETAIL", "DETAILLENGTH");
+    checkOptionalWithLength(ctx.ROLE(), ctx.ROLELENGTH(), ctx, "ROLE", "ROLELENGTH");
     if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN");
-      if (!ctx.FAULTCODESTR().isEmpty())
-        checkHasMandatoryOptions(ctx.FAULTCODELEN(), ctx, "FAULTCODELEN");
-      if (!ctx.FAULTACTOR().isEmpty())
-        checkHasMandatoryOptions(ctx.FAULTACTLEN(), ctx, "FAULTACTLEN");
-      if (!ctx.DETAIL().isEmpty())
-        checkHasMandatoryOptions(ctx.DETAILLENGTH(), ctx, "DETAILLENGTH");
-      if (!ctx.ROLE().isEmpty()) checkHasMandatoryOptions(ctx.ROLELENGTH(), ctx, "ROLELENGTH");
     }
   }
 
   private void checkAdd(CICSParser.Cics_soapfault_addContext ctx) {
-    checkPrerequisiteIsMet(
-        ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN without FAULTSTRING");
-
-    checkPrerequisiteIsMet(
-        ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODELEN without SUBCODESTR");
-
     checkHasExactlyOneOption("FAULTSTRING or SUBCODESTR", ctx, ctx.FAULTSTRING(), ctx.SUBCODESTR());
-    if (noLengthOptionsEnabled()) {
-      if (!ctx.SUBCODESTR().isEmpty())
-        checkHasMandatoryOptions(ctx.SUBCODELEN(), ctx, "SUBCODELEN");
-      if (!ctx.FAULTSTRING().isEmpty())
-        checkHasMandatoryOptions(ctx.FAULTSTRLEN(), ctx, "FAULTSTRLEN");
-    }
+    checkOptionalWithLength(ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODESTR", "SUBCODELEN");
+    checkOptionalWithLength(ctx.FAULTSTRING(), ctx.SUBCODELEN(), ctx, "SUBCODESTR", "FAULTSTRLEN");
   }
 
   private void checkDelete(CICSParser.Cics_soapfault_deleteContext ctx) {

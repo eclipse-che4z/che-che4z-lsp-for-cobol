@@ -113,12 +113,9 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.JOURNALNAME(), ctx, "JOURNALNAME");
     checkHasMandatoryOptions(ctx.JTYPEID(), ctx, "JTYPEID");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    if (!ctx.PFXLENG().isEmpty()) {
-      checkHasMandatoryOptions(ctx.PREFIX(), ctx, "PREFIX");
-    }
+    checkOptionalWithLength(ctx.PREFIX(), ctx.PFXLENG(), ctx, "PREFIX", "PFXLENG");
     if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
-      if (!ctx.PREFIX().isEmpty()) checkHasMandatoryOptions(ctx.PFXLENG(), ctx, "PFXLENG");
     }
   }
 

@@ -77,21 +77,8 @@ public class CICSConnectProcessOptionsCheckUtility extends CICSOptionsCheckBaseU
       checkHasIllegalOptions(ctx.PARTNER(), "PARTNER");
       checkHasMandatoryOptions(ctx.PROCNAME(), ctx, "PROCNAME");
     }
-    if (!ctx.PROCLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.PROCNAME(), ctx, "PROCNAME");
-    }
-    if (!ctx.PIPLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.PIPLIST(), ctx, "PIPLIST");
-    }
-
     checkHasMandatoryOptions(ctx.SYNCLEVEL(), ctx, "SYNCLEVEL");
-    if (noLengthOptionsEnabled()) {
-      if (!ctx.PROCNAME().isEmpty()) {
-        checkHasMandatoryOptions(ctx.PROCLENGTH(), ctx, "PROCLENGTH");
-      }
-      if (!ctx.PIPLIST().isEmpty()) {
-        checkHasMandatoryOptions(ctx.PIPLENGTH(), ctx, "PIPLENGTH");
-      }
-    }
+    checkOptionalWithLength(ctx.PROCNAME(), ctx.PROCLENGTH(), ctx, "PROCNAME", "PROCLENGTH");
+    checkOptionalWithLength(ctx.PIPLIST(), ctx.PIPLENGTH(), ctx, "PIPLIST", "PIPLENGTH");
   }
 }

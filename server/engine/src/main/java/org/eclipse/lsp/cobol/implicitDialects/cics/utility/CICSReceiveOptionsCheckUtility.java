@@ -106,8 +106,6 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     checkHasMandatoryOptions(ctx.PARTN(), ctx, "PARTN");
     checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
     checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-    if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {

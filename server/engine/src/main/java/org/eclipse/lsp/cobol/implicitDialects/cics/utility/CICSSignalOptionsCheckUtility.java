@@ -61,10 +61,6 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkSignalEvent(CICSParser.Cics_signal_optionsContext ctx) {
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     checkHasMutuallyExclusiveOptions("FROMCHANNEL or FROM", ctx.FROMCHANNEL(), ctx.FROM());
-    if (!ctx.FROMLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    }
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty())
-      checkHasMandatoryOptions(ctx.FROMLENGTH(), ctx, "FROMLENGTH");
+    checkOptionalWithLength(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROM", "FROMLENGTH");
   }
 }

@@ -82,21 +82,16 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkLinkProgram(CICSParser.Cics_link_programContext ctx) {
     checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
     checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
-    if (!ctx.LENGTH().isEmpty() || !ctx.DATALENGTH().isEmpty()) {
+    if (!ctx.DATALENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.COMMAREA(), ctx, "COMMAREA");
     }
-    if (!ctx.INPUTMSGLEN().isEmpty()) {
-      checkHasMandatoryOptions(ctx.INPUTMSG(), ctx, "INPUTMSG");
-    }
+
     checkHasMutuallyExclusiveOptions("INPUTMSG or SYSID", ctx.INPUTMSG(), ctx.SYSID());
     checkHasMutuallyExclusiveOptions(
         "INPUTMSG or SYNCONRETURN", ctx.INPUTMSG(), ctx.SYNCONRETURN());
     checkHasMutuallyExclusiveOptions("INPUTMSG or TRANSID", ctx.INPUTMSG(), ctx.TRANSID());
-    if (noLengthOptionsEnabled()) {
-      if (!ctx.COMMAREA().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-      if (!ctx.INPUTMSG().isEmpty())
-        checkHasMandatoryOptions(ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN");
-    }
+    checkOptionalWithLength(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSG", "INPUTMSGLEN");
+    checkOptionalWithLength(ctx.COMMAREA(), ctx.LENGTH(), ctx, "COMMAREA", "LENGTH");
   }
 
   private void checkLinkAcqprocess(CICSParser.Cics_link_acqprocessContext ctx) {

@@ -112,7 +112,8 @@ public class TestCICSIssue {
           + " RIDFLD({$varFour}) RRN";
 
   private static final String ISSUE_NOTE_INVALID =
-      "ISSUE NOTE DESTID(100) DESTIDLENG(111) {VOLUMELENG|errorOne}(100) RIDFLD(111) RRN";
+      "ISSUE {_NOTE DESTID(100) DESTIDLENG(111) VOLUMELENG({$varOne})"
+          + " RIDFLD({$varOne}) RRN|errorOne_} ";
 
   private static final String ISSUE_PASS_FULL =
       "ISSUE PASS LUNAME({$varOne}) FROM({$varFour}) LENGTH({$varone}) LOGONLOGMODE NOQUIESCE";
@@ -411,7 +412,7 @@ public class TestCICSIssue {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: VOLUMELENG without VOLUME",
+                "Missing required option for: VOLUMELENG without VOLUME",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ISSUE_NOTE_INVALID, expectedDiagnostics);

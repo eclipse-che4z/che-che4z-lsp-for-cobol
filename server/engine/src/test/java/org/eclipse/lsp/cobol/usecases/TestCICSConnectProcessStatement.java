@@ -85,7 +85,7 @@ public class TestCICSConnectProcessStatement {
             "errorPiplength",
             new Diagnostic(
                 new Range(),
-                "Missing required option: PIPLIST",
+                "Missing required option for: PIPLENGTH without PIPLIST",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(CONNECT_PROCESS_PIPLENGTH_INVALID, expectedDiagnostic);

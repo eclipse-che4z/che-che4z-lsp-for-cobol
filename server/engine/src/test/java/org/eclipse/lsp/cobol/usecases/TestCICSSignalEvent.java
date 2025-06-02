@@ -103,7 +103,7 @@ public class TestCICSSignalEvent {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: FROM",
+                "Missing required option for: FROMLENGTH without FROM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

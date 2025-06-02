@@ -106,20 +106,14 @@ public class CICSStartOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasAtLeastOneOption(
           "HOURS, MINUTES or SECONDS", ctx, ctx.HOURS(), ctx.MINUTES(), ctx.SECONDS());
     }
-
-    checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
     checkPrerequisiteIsMet(ctx.LENGTH(), ctx.FMH(), ctx, "FMH without LENGTH");
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty())
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    checkOptionalWithLength(ctx.FROM(), ctx.LENGTH(), ctx, "FROM", "LENGTH");
   }
 
   private void checkStartAttach(CICSParser.Cics_start_attachContext ctx) {
     checkHasMandatoryOptions(ctx.ATTACH(), ctx, "ATTACH");
     checkHasMandatoryOptions(ctx.TRANSID(), ctx, "TRANSID");
-
-    checkPrerequisiteIsMet(ctx.FROM(), ctx.LENGTH(), ctx, "LENGTH without FROM");
-    if (noLengthOptionsEnabled() && !ctx.FROM().isEmpty())
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    checkOptionalWithLength(ctx.FROM(), ctx.LENGTH(), ctx, "FROM", "LENGTH");
   }
 
   private void checkStartBrexit(CICSParser.Cics_start_brexitContext ctx) {

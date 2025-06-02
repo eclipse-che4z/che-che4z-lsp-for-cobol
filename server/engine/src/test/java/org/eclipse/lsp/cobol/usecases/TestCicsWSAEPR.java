@@ -49,9 +49,9 @@ public class TestCicsWSAEPR {
   private static final String WSAEPR_CREATE_INVALID_ONE =
       "WSAEPR CREATE {EPRINTO|error1}(1) EPRLENGTH(1) {EPRSET|error1}(1) ADDRESS(2)";
   private static final String WSAEPR_CREATE_INVALID_TWO =
-      "WSAEPR {REFPARMSLEN|error1}(2) CREATE EPRLENGTH(1) EPRSET(1) ADDRESS(2)";
+      "WSAEPR {_REFPARMSLEN({$varOne}) CREATE EPRLENGTH({$varOne}) EPRSET({$varFour}) ADDRESS({$varOne})|error1_}";
   private static final String WSAEPR_CREATE_INVALID_THREE =
-      "WSAEPR EPRINTO(1) EPRLENGTH(1) {METADATALEN|error1}(2) CREATE REFPARMS(2)";
+      "WSAEPR {_EPRINTO({$varFour}) EPRLENGTH({$varFour}) METADATALEN({$varOne})CREATE REFPARMS({$varFour})|error1_} ";
   private static final String WSAEPR_CREATE_INVALID_FOUR =
       "WSAEPR EPRSET(1) EPRLENGTH(1) METADATA(2) CREATE {FROMCCSID|error1}(1)"
           + " {FROMCODEPAGE|error1}(2)";
@@ -129,7 +129,7 @@ public class TestCicsWSAEPR {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: REFPARMSLEN without REFPARMS",
+                "Missing required option for: REFPARMSLEN without REFPARMS",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(WSAEPR_CREATE_INVALID_TWO, expectedDiagnostic);
@@ -142,7 +142,7 @@ public class TestCicsWSAEPR {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: METADATALEN without METADATA",
+                "Missing required option for: METADATALEN without METADATA",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(WSAEPR_CREATE_INVALID_THREE, expectedDiagnostic);

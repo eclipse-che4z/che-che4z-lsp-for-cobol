@@ -89,11 +89,7 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.EXACTMATCH().isEmpty() || !ctx.MINIMUM().isEmpty()) {
       checkHasMandatoryOptions(ctx.MINORVERSION(), ctx, "MINORVERSION");
     }
-    if (!ctx.LENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.COMMAREA(), ctx, "COMMAREA");
-    }
-    if (noLengthOptionsEnabled() && !ctx.COMMAREA().isEmpty())
-      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    checkOptionalWithLength(ctx.COMMAREA(), ctx.LENGTH(), ctx, "COMMAREA", "LENGTH");
   }
 
   @SuppressWarnings("unchecked")
@@ -102,10 +98,6 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
     checkHasMandatoryOptions(ctx.OPERATION(), ctx, "OPERATION");
     checkHasMutuallyExclusiveOptions("URI or URIMAP", ctx.URI(), ctx.URIMAP());
-    if (!ctx.SCOPELEN().isEmpty()) {
-      checkHasMandatoryOptions(ctx.SCOPE(), ctx, "SCOPE");
-    }
-    if (noLengthOptionsEnabled() && !ctx.SCOPE().isEmpty())
-      checkHasMandatoryOptions(ctx.SCOPELEN(), ctx, "SCOPELEN");
+    checkOptionalWithLength(ctx.SCOPE(), ctx.SCOPELEN(), ctx, "SCOPE", "SCOPELEN");
   }
 }
