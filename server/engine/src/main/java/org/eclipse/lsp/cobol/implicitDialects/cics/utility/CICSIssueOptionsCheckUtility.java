@@ -278,8 +278,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.QUERY(), ctx, "QUERY");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
-    checkOptionalWithLength(ctx.DESTID(), ctx.DESTIDLENG(), "DESTID", "DESTIDLENG");
-    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), "VOLUME", "VOLUMELENG");
+    checkOptionalWithLength(ctx.DESTID(), ctx.DESTIDLENG(), ctx, "DESTID", "DESTIDLENG");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
   }
 
   void checkReceive(CICSParser.Cics_issue_receiveContext ctx) {
@@ -301,7 +301,7 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.RRN(), ctx, "RRN");
     } else checkHasIllegalOptions(ctx.RRN(), "RRN with KEYLENGTH");
 
-    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), "VOLUME", "VOLUMELENG");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
     if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
