@@ -49,9 +49,11 @@ public class TestCicsWSAEPR {
   private static final String WSAEPR_CREATE_INVALID_ONE =
       "WSAEPR CREATE {EPRINTO|error1}(1) EPRLENGTH(1) {EPRSET|error1}(1) ADDRESS(2)";
   private static final String WSAEPR_CREATE_INVALID_TWO =
-      "WSAEPR {_REFPARMSLEN({$varOne}) CREATE EPRLENGTH({$varOne}) EPRSET({$varFour}) ADDRESS({$varOne})|error1_}";
+      "WSAEPR {_REFPARMSLEN({$varOne}) CREATE EPRLENGTH({$varOne}) EPRSET({$varFour})"
+          + " ADDRESS({$varOne})|error1_}";
   private static final String WSAEPR_CREATE_INVALID_THREE =
-      "WSAEPR {_EPRINTO({$varFour}) EPRLENGTH({$varFour}) METADATALEN({$varOne})CREATE REFPARMS({$varFour})|error1_} ";
+      "WSAEPR {_EPRINTO({$varFour}) EPRLENGTH({$varFour}) METADATALEN({$varOne})CREATE"
+          + " REFPARMS({$varFour})|error1_} ";
   private static final String WSAEPR_CREATE_INVALID_FOUR =
       "WSAEPR EPRSET(1) EPRLENGTH(1) METADATA(2) CREATE {FROMCCSID|error1}(1)"
           + " {FROMCODEPAGE|error1}(2)";
