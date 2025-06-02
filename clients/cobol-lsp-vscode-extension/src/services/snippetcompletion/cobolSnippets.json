@@ -1396,7 +1396,7 @@
       "\t${2:statement}",
       "\tGOBACK."
     ],
-    "description": "Ends program and returns control to the application module that invoked the program. Note, if this is a standalone batch program, GOBACK returns control to z/OS."
+    "description": "Ends program and returns control to the application module that invoked the program. If this is a standalone batch program, GOBACK returns control to z/OS."
   },
   "GO DEPENDING": {
     "prefix": "GO DEPENDING",
@@ -1442,7 +1442,7 @@
       "DATE-COMPILED. $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE.",
       "$0"
     ],
-    "description": "The IDENTIFICATION DIVISION contains paragraphs definining the: PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs."
+    "description": "The IDENTIFICATION DIVISION contains the PROGRAM-ID, AUTHOR, INSTALLATION, DATE-WRITTEN, and SECURITY paragraphs."
   },
   "INPUT": {
     "prefix": "INPUT",
@@ -1509,7 +1509,7 @@
       "END-UNSTRING.",
       "$0"
     ],
-    "description": "DELIMITER IN references a PIC X field that contains the DELIMITER character placed found in the UNSTRING field."
+    "description": "DELIMITER IN references a PIC X field that contains the DELIMITER character placed in the UNSTRING field."
   },
   "IN #3": {
     "prefix": "IN #3",
@@ -1549,12 +1549,12 @@
   "INITIALIZE": {
     "prefix": "INITIALIZE",
     "body": ["INITIALIZE ${1:INSURED-NAME-ADDR}"],
-    "description": "Use INITIALIZE instead of multiple MOVE statements to set a Group data structure to its initial values (Spaces and zeroes)."
+    "description": "Use INITIALIZE instead of multiple MOVE statements to set a Group data structure to its initial values."
   },
   "INPUT-OUTPUT": {
     "prefix": "INPUT-OUTPUT",
     "body": ["INPUT-OUTPUT SECTION."],
-    "description": "ENVIRONMENT DIVISION - The INPUT-OUTPUT SECTION of the ENVIRONMENT DIVISION contains FILE-CONTROL and I-O-CONTROL paragraphs.The contents of the INPUT-OUTPUT SECTION depend on specific file organization and access methods."
+    "description": "ENVIRONMENT DIVISION - The INPUT-OUTPUT SECTION of the ENVIRONMENT DIVISION contains FILE-CONTROL and I-O-CONTROL paragraphs. The contents of the INPUT-OUTPUT SECTION depend on specific file organization and access methods."
   },
   "INTO": {
     "prefix": "INTO",
@@ -1622,14 +1622,14 @@
   "ACCESS IS": {
     "prefix": "IS",
     "body": ["ACCESS IS ${1|SEQUENTIAL,RANDOM,DYNAMIC|}"],
-    "description": "File specifics with IS. Note that IS is optional."
+    "description": "File specifics with IS. (IS is optional)"
   },
   "USAGE IS": {
     "prefix": "USAGE IS",
     "body": [
       "77 ${1:VAR1} PIC ${2:X} USAGE IS ${3|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
     ],
-    "description": "Variable declarations with IS. Note that IS is optional."
+    "description": "Variable declarations with IS. (IS is optional)"
   },
   "IF x IS": {
     "prefix": "IF x IS",
@@ -1678,7 +1678,7 @@
   "KANJI": {
     "prefix": "KANJI",
     "body": ["IF ${1:VAR1} IS KANJI", "\t${2:MOVE \"Y\" TO ${3:WS-KANJI-DOC}}"],
-    "description": "description"
+    "description": "One of several class conditional statements. Checks whether a variable entirely contains KANJI characters."
   },
   "ASCENDING KEY #1": {
     "prefix": "ASCENDING KEY IS",
@@ -1706,7 +1706,7 @@
       "SELECT ${1:VSAM-FILE} ASSIGN TO ${2:VSMKSDS}",
       "RECORD KEY IS ${3:VSAMFILE-KEY}"
     ],
-    "description": "ENVIRONMENT DIVISION / FILE-CONTROL - RECORD KEY declares a field that you define in the FILE SECTION to be used to search the indexed/VSAM data thru.  Note that the same technique can be used for SORT Files."
+    "description": "ENVIRONMENT DIVISION / FILE-CONTROL - RECORD KEY declares a field that you define in the FILE SECTION to be used to search the indexed/VSAM data. The same technique can be used for SORT Files."
   },
   "KEY IS": {
     "prefix": "KEY IS",
@@ -1755,7 +1755,7 @@
   "LINEAGE": {
     "prefix": "LINEAGE",
     "body": ["FD ${2:FILENAME}", "\tLINEAGE ${1:50}", "\t$0"],
-    "description": "DATA DIVISION - The LINEAGE clause of a FD entry controls the size/lines of a printed page."
+    "description": "DATA DIVISION - The LINEAGE clause of a FD entry controls the size and number of lines of a printed page."
   },
   "WRITE LINE": {
     "prefix": "LINES",
@@ -1861,7 +1861,7 @@
   "MERGE ASCENDING": {
     "prefix": "MERGE ASCENDING",
     "body": ["MERGE ${1:fileName} ON ASCENDING ${2:file-section-variable}"],
-    "description": "The Merge statement fuses two or more identially sorted files on one or more variable-keys and makes the merged records available to an OUTPUT PROCEDURE or putput file. Note that there are several options available to customize the MERGE operation."
+    "description": "The Merge statement fuses two or more identially sorted files on one or more variable-keys and makes the merged records available to an OUTPUT PROCEDURE or output file."
   },
   "ACCESS MODE": {
     "prefix": "ACCESS MODE",
@@ -2081,7 +2081,7 @@
       "SELECT ${1:TAPE-FILE} ASSIGN TO ${2:TAPEFLXT}",
       "LABEL RECORDS ARE OMITTED"
     ],
-    "description": "Used for Tape files without z/OS data set LABELS. Note that the same OMITTED phrase can be used in SORT/MERGE processing."
+    "description": "Used for Tape files without z/OS data set LABELS."
   },
   "DEPENDING ON": {
     "prefix": "ON",
@@ -2132,7 +2132,7 @@
   "OPTIONAL": {
     "prefix": "OPTIONAL",
     "body": ["SELECT OPTIONAL ${1:filename}", "ASSIGN TO ${2:EXTFILE}"],
-    "description": "If SELECT OPTIONAL is specified in the file-control entry for this file, and the file is not available at runtime, execution of the first READ statement causes an at-end condition - and not an ABEND. Note that this is the case for QSAM and VSAM opened for INPUT, I-O, or EXTEND."
+    "description": "If SELECT OPTIONAL is specified in the file-control entry for this file, and the file is not available at runtime, execution of the first READ statement causes an at-end condition rather than an ABEND. This applies to QSAM and VSAM files opened for INPUT, I-O, or EXTEND."
   },
   "If x OR y": {
     "prefix": "OR",
@@ -2168,7 +2168,7 @@
       "\tORGANIZATION IS SEQUENTIAL.",
       "$0"
     ],
-    "description": "QSAM file accessed sequentially (one record after the next)._6.4.0/pdf/pgmvs.pdf"
+    "description": "QSAM file accessed sequentially (one record after the next)."
   },
   "ORGANIZATION (VSAM)": {
     "prefix": "ORGANIZATION",
@@ -2178,7 +2178,7 @@
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}.",
       "$0"
     ],
-    "description": "VSAM file ORGANIZATION clause for a VSAM file accessed thru the file's index (key1). _6.4.0/pdf/pgmvs.pdf"
+    "description": "VSAM file ORGANIZATION clause for a VSAM file accessed through the file's index (key1)."
   },
   "OTHER": {
     "prefix": "OTHER",
@@ -2190,7 +2190,7 @@
       "\t\t${4:defaultToThis}",
       "END-EVALUATE."
     ],
-    "description": "In an EVALUATE statement if no WHEN phrase is selected and WHEN OTHER is specified, execution continues with the OTHER statement._6.4.0/pdf/pgmvs.pdf"
+    "description": "In an EVALUATE statement if no WHEN phrase is selected and WHEN OTHER is specified, execution continues with the OTHER statement."
   },
   "OUTPUT": {
     "prefix": "OUTPUT",
@@ -2205,7 +2205,7 @@
       "\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}",
       "\tOUTPUT PROCEDURE IS ${1:procName}."
     ],
-    "description": "PROCEDURE DIVISION - In a SORT or MERGE statement OUTPUT PROCEDURE specifies the name of a COBOL SECTION or paragraph that selects and/or modies output records from the SORT/MERGE operation."
+    "description": "PROCEDURE DIVISION - In a SORT or MERGE statement OUTPUT PROCEDURE specifies the name of a COBOL SECTION or paragraph that selects and/or modifies output records from the SORT/MERGE operation."
   },
   "ON OVERFLOW GO TO (Unstring Statement)": {
     "prefix": "OVERFLOW",
@@ -2216,7 +2216,7 @@
       "\tON OVERFLOW GO TO ${1:UNSTRING-OVERFLOW}",
       "END-UNSTRING."
     ],
-    "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime.  Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (String Statement)": {
     "prefix": "OVERFLOW",
@@ -2227,7 +2227,7 @@
       "\tON OVERFLOW GO TO ${1:STRING-OVERFLOW}",
       "END-STRING."
     ],
-    "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime.  Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (Call Statement)": {
     "prefix": "OVERFLOW",
@@ -2236,7 +2236,7 @@
       "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}",
       "END-CALL."
     ],
-    "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND.  Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND. Note that after ON OVERFLOW you can code any imperative statement."
   },
   "PARSE": {
     "prefix": "PARSE",
