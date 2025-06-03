@@ -6,23 +6,13 @@ import ProcessorGroupLib from "./ProcessorGroupLib";
 import * as vscode from "vscode";
 
 export default class LocalPathLib implements ProcessorGroupLib {
-  private uris: vscode.Uri[];
+  constructor(private path: string) {}
 
-  constructor(path: string, documentUri: vscode.Uri) {
-    const variables = getVariablesFromUri(documentUri, false);
-    const evaluatedPaths = SettingsService.evaluateVariables([path], variables);
-
-    this.uris = SettingsService.prepareLocalSearchUris(
-      evaluatedPaths,
-      vscode.workspace.workspaceFolders ?? [],
-    );
-  }
-
-  static create(configs: ProcessorGroupLibModel[], documentUri: vscode.Uri) {
+  static create(configs: ProcessorGroupLibModel[]) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "string") {
-        libs.push(new LocalPathLib(config, documentUri));
+        libs.push(new LocalPathLib(config));
       }
     }
     return libs;
@@ -32,10 +22,21 @@ export default class LocalPathLib implements ProcessorGroupLib {
     copybookName: string,
     documentUri: vscode.Uri,
   ): Promise<vscode.Uri | undefined> {
+    const variables = getVariablesFromUri(documentUri, false);
+    const evaluatedPaths = SettingsService.evaluateVariables(
+      [this.path],
+      variables,
+    );
+
+    const uris = SettingsService.prepareLocalSearchUris(
+      evaluatedPaths,
+      vscode.workspace.workspaceFolders ?? [],
+    );
+
     const allowedExtensions = await SettingsService.getCopybookExtension(
       documentUri.toString(),
     );
-    const promises = this.uris.map(async (uri) => {
+    const promises = uris.map(async (uri) => {
       return await LocalFilesystemResourceService.searchDirectory(
         uri,
         copybookName,

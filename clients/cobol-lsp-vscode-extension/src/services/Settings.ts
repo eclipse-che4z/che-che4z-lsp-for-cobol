@@ -69,7 +69,7 @@ const CompileOptionsConfigurationCodec = t.string;
 async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   codec: t.Type<Type, Output, unknown>,
   processorGroupLoader: (
-    requestItem: { section: string; scopeUri: string },
+    requestItem: { section: string; scopeUri: vscode.Uri },
     cfg: Type,
   ) => Promise<R>,
   item: Item,
@@ -84,7 +84,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       if (typeof configuration !== "undefined") {
         const decodedConfiguration = decodeUnknown(codec, configuration);
         const itemWithScope = {
-          scopeUri: item.scopeUri,
+          scopeUri: vscode.Uri.parse(item.scopeUri),
           section: item.section,
         };
         const object = await processorGroupLoader(

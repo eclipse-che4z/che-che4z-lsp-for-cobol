@@ -124,3 +124,10 @@ function whitespaceAsUndefined(s: string) {
   for (const c of s) if (c !== " ") return s;
   return undefined;
 }
+
+export function asArray<T>(input: T | T[]): T[] {
+  if (Array.isArray(input)) {
+    return input;
+  }
+  return [input];
+}

@@ -15,29 +15,25 @@
 import * as path from "path";
 import { Minimatch } from "minimatch";
 import { Uri, workspace } from "vscode";
-import { getVariablesFromUri } from "./util/FSUtils";
 import { DialectsConfiguration, SettingsService } from "./Settings";
-import { B4GTypeMetadata, loadBridgeJsonContent } from "./BridgeForGitLoader";
+import { loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
   clearWorkspaceConfigCache,
   EndevorConfigModel,
-  Preprocessor,
-  ProcessorGroup,
-  ProcessorGroupLibModel,
-  ProcessorIndex,
-  ProgramsConfig,
-  readProcessorGroupsFileContent,
-  readProgramConfigFileContent,
+  ProcessorGroupProperties,
+  readWorkspaceConfig,
+  TransformedProcessorGroup,
+  WorkspaceConfig,
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { PATHS_LOCAL_KEY, USS } from "../constants";
+import { PATHS_LOCAL_KEY } from "../constants";
 import LocalPathLib from "./processorGroups/LocalProcessorGroupLib";
-import { UssPathLib, UssPathLibFactory } from "./processorGroups/UssPathConfig";
+import { UssPathLibFactory } from "./processorGroups/UssPathConfig";
 import { CopybookDownloaderForUss } from "./copybook/downloader/CopybookDownloaderForUss";
 
 export async function loadProcessorGroupCopybookPaths(
-  documentUri: string,
+  documentUri: Uri,
   dialectType: string,
 ): Promise<string[]> {
   return (
@@ -52,7 +48,7 @@ export async function loadProcessorGroupCopybooksLibs(
   ussDownloader: CopybookDownloaderForUss,
 ) {
   const configs = await loadProcessorGroupSettings(
-    documentUri.toString(),
+    documentUri,
     "libs",
     [],
     dialectType,
@@ -76,73 +72,74 @@ export type ProcessorGroupCopybookPathConfig =
   | ZoweUssConfigModel
   | EndevorConfigModel;
 
-export async function loadProcessorGroupCopybookPathsConfig(
-  item: { scopeUri: string },
-  configObject: string[],
-  dialect?: string,
-): Promise<ProcessorGroupCopybookPathConfig[]> {
-  const allConfigs = [
-    ...(await loadProcessorGroupSettings(item.scopeUri, "libs", [], dialect)),
-    ...configObject.map((path) => Uri.file(path)),
-  ];
+// export async function loadProcessorGroupCopybookPathsConfig(
+//   documentUri: Uri,
+//   dialect?: string,
+// ): Promise<ProcessorGroupCopybookPathConfig[]> {
+//   const allConfigs = await loadProcessorGroupSettings(
+//     documentUri,
+//     "libs",
+//     [],
+//     dialect,
+//   );
 
-  const configs: ProcessorGroupCopybookPathConfig[] = [];
-  const variables = getVariablesFromUri(item.scopeUri, false);
+//   const configs: ProcessorGroupCopybookPathConfig[] = [];
+//   const variables = getVariablesFromUri(documentUri, false);
 
-  for (const config of allConfigs) {
-    if (typeof config === "string") {
-      const evaluatedPaths = SettingsService.evaluateVariables(
-        [config],
-        variables,
-      );
+//   for (const config of allConfigs) {
+//     if (typeof config === "string") {
+//       const evaluatedPaths = SettingsService.evaluateVariables(
+//         [config],
+//         variables,
+//       );
 
-      const searchUris = SettingsService.prepareLocalSearchUris(
-        evaluatedPaths,
-        workspace.workspaceFolders ?? [],
-      );
+//       const searchUris = SettingsService.prepareLocalSearchUris(
+//         evaluatedPaths,
+//         workspace.workspaceFolders ?? [],
+//       );
 
-      configs.push(...searchUris);
-    } else {
-      if (USS in config) {
-        config.uss = SettingsService.evaluateVariables(
-          [config.uss],
-          variables,
-        )[0];
-      }
-      configs.push(config);
-    }
-  }
-  return configs;
-}
+//       configs.push(...searchUris);
+//     } else {
+//       if (USS in config) {
+//         config.uss = SettingsService.evaluateVariables(
+//           [config.uss],
+//           variables,
+//         )[0];
+//       }
+//       configs.push(config);
+//     }
+//   }
+//   return configs;
+// }
 
 export async function loadProcessorGroupCopybookExtensionsConfig(
-  item: { scopeUri: string },
+  documentUri: Uri,
   configObject: string[],
 ): Promise<string[]> {
   return loadProcessorGroupSettings(
-    item.scopeUri,
+    documentUri,
     "copybook-extensions",
     configObject,
   );
 }
 
 export async function loadProcessorGroupCompileOptionsConfig(
-  item: { scopeUri: string },
-  configObject: string,
-): Promise<string> {
+  documentUri: Uri,
+  configObject: string[],
+): Promise<string[]> {
   return loadProcessorGroupSettings(
-    item.scopeUri,
+    documentUri,
     "compiler-options",
     configObject,
   );
 }
 
 export async function loadProcessorGroupSqlBackendConfig(
-  item: { scopeUri: string },
+  documentUri: Uri,
   configObject: string,
 ): Promise<string> {
   return loadProcessorGroupSettings(
-    item.scopeUri,
+    documentUri,
     "target-sql-backend",
     configObject,
     "SQL",
@@ -150,68 +147,45 @@ export async function loadProcessorGroupSqlBackendConfig(
 }
 
 export async function loadProcessorGroupDialectConfig(
-  item: { scopeUri: string },
+  documentUri: Uri,
   dialectConfig: DialectsConfiguration,
 ) {
-  try {
-    const pgCfg = loadProcessorsConfigForDocument(
-      item.scopeUri,
-      await readProcessorGroupsFileContent(Uri.parse(item.scopeUri)),
-      await readProgramConfigFileContent(Uri.parse(item.scopeUri)),
-      await loadBridgeJsonContent(Uri.parse(item.scopeUri)),
-    );
-    if (pgCfg === undefined || pgCfg.preprocessor == undefined) {
-      return dialectConfig;
-    }
-
-    const dialects: Preprocessor[] = [];
-
-    const preprocessors = Array.isArray(pgCfg.preprocessor)
-      ? pgCfg.preprocessor
-      : [pgCfg.preprocessor];
-    for (const pp of preprocessors) {
-      if (typeof pp === "object" && pp) {
-        dialects.push(pp["name"]);
-      }
-      if (typeof pp === "string" && pp) {
-        dialects.push(pp);
-      }
-    }
-
-    // "SQL" is not a real dialect, we will use it only to set up sql backend for now
-    const result = dialects.filter((name) => name != "SQL");
-    return result.length > 0 ? result : dialectConfig;
-  } catch (e) {
-    console.error(JSON.stringify(e));
+  // try {
+  const pgCfg = await loadProcessorGroup(documentUri);
+  if (pgCfg === undefined || pgCfg.preprocessors == undefined) {
     return dialectConfig;
   }
+
+  const dialects = pgCfg.preprocessors.map((p) => p.name);
+
+  // "SQL" is not a real dialect, we will use it only to set up sql backend for now
+  const result = dialects.filter((name) => name != "SQL");
+  return result.length > 0 ? result : dialectConfig;
+  // } catch (e) {
+  //   console.error(JSON.stringify(e));
+  //   return dialectConfig;
+  // }
 }
 
-function matchProcessorGroup(
-  pgmCfg: ProgramsConfig,
-  documentUri: Uri,
-  workspaceUri: Uri,
-): string | undefined {
-  const relativeDocPath = path.relative(
-    workspaceUri.fsPath,
-    documentUri.fsPath,
-  );
-  const candidates: string[] = [];
-  for (const v of pgmCfg.pgms) {
+function matchProcessorGroup(wsCfg: WorkspaceConfig, documentUri: Uri) {
+  const relativeDocPath = workspace.asRelativePath(documentUri, false);
+
+  const candidates: TransformedProcessorGroup[] = [];
+  for (const programConfig of wsCfg.programs) {
     // exact match
-    if (path.isAbsolute(v.program)) {
-      if (pathMatches(v.program, documentUri.fsPath)) {
-        return v.pgroup;
+    if (path.isAbsolute(programConfig.program)) {
+      if (pathMatches(programConfig.program, documentUri.fsPath)) {
+        return programConfig.processorGroup;
       }
     } else {
-      if (relativeDocPath === v.program) {
-        candidates.push(v.pgroup);
+      if (relativeDocPath === programConfig.program) {
+        candidates.push(programConfig.processorGroup);
       }
     }
 
-    const m = new Minimatch(v.program, { nocase: true, dot: true });
+    const m = new Minimatch(programConfig.program, { nocase: true, dot: true });
     if (m.match(relativeDocPath)) {
-      candidates.push(v.pgroup);
+      candidates.push(programConfig.processorGroup);
     }
   }
   if (candidates.length === 0) {
@@ -230,122 +204,126 @@ function pathMatches(program: string, documentPath: string) {
   );
 }
 
-export const loadProcessorsConfigForDocument = (
-  documentUriString: string,
-  pgroups: ProcessorGroup[],
-  pgmCfg: ProgramsConfig,
-  b4g: B4GTypeMetadata | undefined,
-): ProcessorGroup | undefined => {
-  if (pgroups.length === 0) {
-    return undefined;
-  }
-  const documentUri = Uri.parse(documentUriString);
-  const wsUri = workspace.getWorkspaceFolder(documentUri)?.uri;
-  if (wsUri === undefined) {
-    return undefined;
-  }
-  const pgroup = selectProcessorGroup(pgmCfg, documentUri, wsUri, b4g);
-  let result;
-  pgroups.forEach((p) => {
-    if (pgroup === p.name) {
-      result = p;
-      return;
-    }
-  });
-  return result;
-};
+// export const loadProcessorsConfigForDocument = (
+//   documentUriString: string,
+//   pgroups: ProcessorGroup[],
+//   pgmCfg: ProgramsConfig,
+//   b4g: B4GTypeMetadata | undefined,
+// ): ProcessorGroup | undefined => {
+//   if (pgroups.length === 0) {
+//     return undefined;
+//   }
+//   const documentUri = Uri.parse(documentUriString);
+//   const wsUri = workspace.getWorkspaceFolder(documentUri)?.uri;
+//   if (wsUri === undefined) {
+//     return undefined;
+//   }
+//   const pgroup = selectProcessorGroup(pgmCfg, documentUri, wsUri, b4g);
+//   let result;
+//   pgroups.forEach((p) => {
+//     if (pgroup === p.name) {
+//       result = p;
+//       return;
+//     }
+//   });
+//   return result;
+// };
 
-function selectProcessorGroup(
-  pgmCfg: ProgramsConfig,
-  documentUri: Uri,
-  workspaceUri: Uri,
-  b4g: B4GTypeMetadata | undefined,
-): string | undefined {
-  if (b4g === undefined) {
-    return matchProcessorGroup(pgmCfg, documentUri, workspaceUri);
+// function selectProcessorGroup(
+//   wsCfg: WorkspaceConfig,
+//   documentUri: Uri,
+//   b4g: B4GTypeMetadata | undefined,
+// ): TransformedProcessorGroup | undefined {
+//   if (b4g === undefined) {
+//     return matchProcessorGroup(wsCfg, documentUri);
+//   }
+//   const selectedElement = b4g.fileExtension
+//     ? path.basename(documentUri.fsPath, "." + b4g.fileExtension)
+//     : path.basename(documentUri.fsPath);
+//   const processorGroupName =
+//     b4g.elements[selectedElement] === undefined
+//       ? b4g.defaultProcessorGroup
+//       : b4g.elements[selectedElement].processorGroup;
+//   return wsCfg.processorGroups[processorGroupName];
+// }
+
+// type AttributeTypes = {
+//   libs: TransformedLibs[];
+//   name: string;
+//   "target-sql-backend": string;
+//   "compiler-options": string;
+//   "copybook-file-encoding": string;
+//   "copybook-extensions": string[];
+// };
+
+async function loadProcessorGroup(documentUri: Uri) {
+  const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
+  if (workspaceUri === undefined) {
+    return undefined;
   }
-  const selectedElement = b4g.fileExtension
-    ? path.basename(documentUri.fsPath, "." + b4g.fileExtension)
-    : path.basename(documentUri.fsPath);
-  return b4g.elements[selectedElement] === undefined
-    ? b4g.defaultProcessorGroup
-    : b4g.elements[selectedElement].processorGroup;
+
+  const workspaceConfig = await readWorkspaceConfig(workspaceUri);
+  const b4gConfig = await loadBridgeJsonContent(documentUri);
+  if (b4gConfig) {
+    const selectedElement = b4gConfig.fileExtension
+      ? path.basename(documentUri.fsPath, "." + b4gConfig.fileExtension)
+      : path.basename(documentUri.fsPath);
+    const processorGroupName =
+      b4gConfig.elements[selectedElement] === undefined
+        ? b4gConfig.defaultProcessorGroup
+        : b4gConfig.elements[selectedElement].processorGroup;
+    return workspaceConfig?.processorGroups[processorGroupName];
+  }
+
+  return matchProcessorGroup(workspaceConfig, documentUri);
+  // const processorGroup = selectProcessorGroup(documentUri, workspaceConfig);
+
+  // const workspaceProcessorGroups = await readWorkspaceProcessorGroups(wsUri)
 }
 
-type AttributeTypes = {
-  libs: ProcessorGroupLibModel[];
-  name: string;
-  "target-sql-backend": string;
-  "compiler-options": string;
-  "copybook-file-encoding": string;
-  "copybook-extensions": string[];
-};
-
-async function loadProcessorGroupSettings<A extends keyof AttributeTypes>(
-  documentUri: string,
-  attribute: A,
-  configObject: AttributeTypes[A],
+async function loadProcessorGroupSettings<
+  P extends keyof ProcessorGroupProperties,
+>(
+  documentUri: Uri,
+  attribute: P,
+  defaultValue: ProcessorGroupProperties[P],
   dialect: string = "COBOL",
-): Promise<AttributeTypes[A]> {
-  const docURI = Uri.parse(documentUri);
-  const pgCfg: ProcessorGroup | undefined = loadProcessorsConfigForDocument(
-    documentUri,
-    await readProcessorGroupsFileContent(docURI),
-    await readProgramConfigFileContent(docURI),
-    await loadBridgeJsonContent(docURI),
-  );
-  if (pgCfg === undefined) {
-    return configObject;
+) {
+  const processorGroup = await loadProcessorGroup(documentUri);
+  if (processorGroup === undefined) {
+    return defaultValue;
   }
-  try {
-    if (dialect && dialect !== "COBOL" && "preprocessor" in pgCfg) {
-      for (const pp of pgCfg.preprocessor as Preprocessor[]) {
-        if (
-          pp &&
-          typeof pp === "object" &&
-          pp["name"] === dialect &&
-          pp[attribute] !== undefined
-        ) {
-          return pp[attribute] as AttributeTypes[A];
-        }
-      }
-    } else {
-      if (pgCfg[attribute] !== undefined) {
-        return pgCfg[attribute] as AttributeTypes[A];
+
+  if (dialect && dialect !== "COBOL" && processorGroup.preprocessors) {
+    for (const preprocessor of processorGroup.preprocessors) {
+      if (
+        preprocessor.name === dialect &&
+        preprocessor[attribute] !== undefined
+      ) {
+        return preprocessor[attribute];
       }
     }
-
-    return configObject;
-  } catch (e) {
-    console.error(JSON.stringify(e));
-    return configObject;
+  } else {
+    if (processorGroup[attribute] !== undefined) {
+      return processorGroup[attribute];
+    }
   }
+
+  return defaultValue;
 }
 
 export function setUpProgramConfigWatcher() {
   const watcher = workspace.createFileSystemWatcher("**/pgm_conf.json");
-  watcher.onDidChange((_uri) =>
-    clearWorkspaceConfigCache(ProcessorIndex.PROGRAM_CONFIG),
-  );
-  watcher.onDidDelete((_uri) =>
-    clearWorkspaceConfigCache(ProcessorIndex.PROGRAM_CONFIG),
-  );
-  watcher.onDidCreate((_uri) =>
-    clearWorkspaceConfigCache(ProcessorIndex.PROGRAM_CONFIG),
-  );
+  watcher.onDidChange((_uri) => clearWorkspaceConfigCache());
+  watcher.onDidDelete((_uri) => clearWorkspaceConfigCache());
+  watcher.onDidCreate((_uri) => clearWorkspaceConfigCache());
   return watcher;
 }
 
 export function setUpProcessorGroupConfigWatcher() {
   const watcher = workspace.createFileSystemWatcher("**/proc_grps.json");
-  watcher.onDidChange((_uri) =>
-    clearWorkspaceConfigCache(ProcessorIndex.PROCESSOR_GROUP),
-  );
-  watcher.onDidDelete((_uri) =>
-    clearWorkspaceConfigCache(ProcessorIndex.PROCESSOR_GROUP),
-  );
-  watcher.onDidCreate((_uri) =>
-    clearWorkspaceConfigCache(ProcessorIndex.PROCESSOR_GROUP),
-  );
+  watcher.onDidChange((_uri) => clearWorkspaceConfigCache());
+  watcher.onDidDelete((_uri) => clearWorkspaceConfigCache());
+  watcher.onDidCreate((_uri) => clearWorkspaceConfigCache());
   return watcher;
 }
