@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,17 +12,19 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.common;
+package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 
-import java.net.URI;
 import lombok.Value;
+import org.eclipse.lsp4j.Location;
 
-/** Contains dialect registrin info, such as name, path, extensionId, etc. */
+import java.util.Map;
+
+/** Represents general COBOL Dialect node with metadata information **/
 @Value
-public class DialectRegistryItem {
+public class CobolDialectNode {
+  String id;
   String name;
-  int protocolVersion;
-  URI uri;
-  String description;
-  String extensionId;
+  String dialectName;
+  Location location;
+  Map<String, String> meta;
 }

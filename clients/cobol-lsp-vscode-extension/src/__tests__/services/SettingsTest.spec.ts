@@ -292,15 +292,16 @@ describe("SettingService lspConfigHandler", () => {
       name: "testDialect",
       uri: vscode.Uri.file(""),
       description: "test-dialect",
+      protocolVersion: 1,
       snippetPath: "",
       extensionId: "",
     };
 
     beforeAll(() => {
-      DialectRegistry.register(
+      DialectRegistry.registerV1(
         dialect.extensionId,
         dialect.name,
-        dialect.uri,
+        dialect.uri!,
         dialect.description,
         dialect.snippetPath,
       );

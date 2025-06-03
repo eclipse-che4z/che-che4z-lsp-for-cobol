@@ -139,7 +139,7 @@ export class LanguageClientService {
     return this.getLanguageClient()?.stop();
   }
 
-  private getLanguageClient() {
+  public getLanguageClient() {
     if (!this.languageClient) {
       this.languageClient = new LanguageClient(
         LANGUAGE_ID,

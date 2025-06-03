@@ -41,6 +41,7 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.CobolDialectFactory;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
 import org.eclipse.lsp4j.Location;
@@ -54,16 +55,19 @@ public class DialectService {
   private final DialectDiscoveryService discoveryService;
   private final CopybookService copybookService;
   private final MessageService messageService;
+  private final CobolDialectFactory dialectFactory;
 
   @Inject
   public DialectService(
       DialectDiscoveryService discoveryService,
       CopybookService copybookService,
-      MessageService messageService) {
+      MessageService messageService,
+      CobolDialectFactory dialectFactory) {
     this.dialectSuppliers = new HashMap<>();
     this.discoveryService = discoveryService;
     this.copybookService = copybookService;
     this.messageService = messageService;
+    this.dialectFactory = dialectFactory;
 
     List<CobolDialect> dialects = discoveryService.loadDialects(copybookService, messageService);
     dialects.forEach(dialect -> dialectSuppliers.put(dialect.getName(), dialect));
@@ -308,11 +312,8 @@ public class DialectService {
             dialectSuppliers.computeIfAbsent(
                 r.getName(),
                 name ->
-                    discoveryService
-                        .loadDialects(r.getUri(), copybookService, messageService)
-                        .stream()
-                        .filter(d -> d.getName().equals(name))
-                        .findFirst()
+                    dialectFactory
+                        .create(r)
                         .map(
                             dialect -> {
                               registerDialectCodeActions(dialect);

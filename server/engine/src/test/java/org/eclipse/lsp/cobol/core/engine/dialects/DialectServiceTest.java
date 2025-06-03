@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.CobolDialectFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -38,15 +39,17 @@ class DialectServiceTest {
   DialectDiscoveryService ddService;
   CopybookService copybookService;
   MessageService messageService;
+  CobolDialectFactory dialectFactory;
 
   @BeforeEach
   void init() {
     ddService = mock(DialectDiscoveryService.class);
     copybookService = mock(CopybookService.class);
     messageService = mock(MessageService.class);
+    dialectFactory = new CobolDialectFactory(mock(), ddService, copybookService, messageService);
     when(ddService.loadDialects(copybookService, messageService)).thenReturn(ImmutableList.of());
 
-    dialectService = new DialectService(ddService, copybookService, messageService);
+    dialectService = new DialectService(ddService, copybookService, messageService, dialectFactory);
   }
 
   private CobolDialect configureDialect(DialectProcessingContext context, String name) {
@@ -75,7 +78,7 @@ class DialectServiceTest {
         .thenReturn(ImmutableList.of(dialect));
     List<DialectRegistryItem> dialectRegistry =
         ImmutableList.of(
-            new DialectRegistryItem(dialect.getName(), URI.create(""), "", "extensionId"));
+            new DialectRegistryItem(dialect.getName(), 1, URI.create(""), "", "extensionId"));
     dialectService.updateDialects(dialectRegistry);
 
     dialectService.process(ImmutableList.of("dialect"), context);
@@ -101,8 +104,8 @@ class DialectServiceTest {
 
     List<DialectRegistryItem> dialectRegistry =
         ImmutableList.of(
-            new DialectRegistryItem(dialect1.getName(), URI.create(""), "", "extensionId"),
-            new DialectRegistryItem(dialect2.getName(), URI.create(""), "", "extensionId"));
+            new DialectRegistryItem(dialect1.getName(), 1, URI.create(""), "", "extensionId"),
+            new DialectRegistryItem(dialect2.getName(), 1, URI.create(""), "", "extensionId"));
 
     InOrder inOrder = inOrder(dialect1, dialect2);
 

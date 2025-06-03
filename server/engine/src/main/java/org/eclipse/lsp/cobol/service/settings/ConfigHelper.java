@@ -27,6 +27,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 
 /** Config helper class */
 @Slf4j
@@ -73,6 +74,9 @@ public class ConfigHelper {
               }
               return new DialectRegistryItem(
                   o.get("name").getAsString(),
+                  Optional.ofNullable(o.get("protocolVersion"))
+                      .map(JsonElement::getAsInt)
+                      .orElse(CobolDialect.COBOL_DIALECT_JAVA_VERSION),
                   uri,
                   o.get("description").getAsString(),
                   o.get("extensionId").getAsString());

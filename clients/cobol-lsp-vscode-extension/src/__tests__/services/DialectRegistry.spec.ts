@@ -21,7 +21,13 @@ describe("DialectRegistry test", () => {
   });
 
   it("register/unregister new dialect in the registry", () => {
-    DialectRegistry.register("dialectId", "new", Uri.file("/"), "desc", "path");
+    DialectRegistry.registerV1(
+      "dialectId",
+      "new",
+      Uri.file("/"),
+      "desc",
+      "path",
+    );
     expect(DialectRegistry.getDialects().length).toBe(1);
 
     DialectRegistry.unregister("new");
@@ -29,7 +35,7 @@ describe("DialectRegistry test", () => {
   });
 
   it("retrieve dialects from the registry", () => {
-    DialectRegistry.register(
+    DialectRegistry.registerV1(
       "id",
       "dialect",
       Uri.file("jar"),
@@ -42,7 +48,7 @@ describe("DialectRegistry test", () => {
     expect(result[0].name).toBe("dialect");
     expect(result[0].description).toBe("desc");
     expect(result[0].extensionId).toBe("id");
-    expect(result[0].uri.toString()).toBe(Uri.file("jar").toString());
+    expect(result[0].uri?.toString()).toBe(Uri.file("jar").toString());
     expect(result[0].snippetPath).toBe("snippetPath");
   });
 });

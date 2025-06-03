@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,17 +12,14 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.common;
+package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import java.net.URI;
 import lombok.Value;
 
-/** Contains dialect registrin info, such as name, path, extensionId, etc. */
+/** Data transport object that hold information about resolved copybook * */
 @Value
-public class DialectRegistryItem {
-  String name;
-  int protocolVersion;
-  URI uri;
-  String description;
-  String extensionId;
+public class CopybookResult {
+  String copybookName;
+  String uri;
+  String text;
 }

@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingManager;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
@@ -121,6 +122,7 @@ class CobolTextDocumentServiceTest {
         new HoverHandler(asyncAnalysisService, hoverProvider, documentModelService, documentGraph);
     FoldingRangeHandler foldingRangeHandler =
         new FoldingRangeHandler(documentModelService, asyncAnalysisService, analysisService);
+    DialectProcessingManager dialectManager = mock(DialectProcessingManager.class);
 
     service =
         new CobolTextDocumentService(
@@ -137,7 +139,8 @@ class CobolTextDocumentServiceTest {
             documentHighlightHandler,
             referencesHandler,
             hoverHandler,
-            foldingRangeHandler);
+            foldingRangeHandler,
+            dialectManager);
   }
 
   @AfterEach

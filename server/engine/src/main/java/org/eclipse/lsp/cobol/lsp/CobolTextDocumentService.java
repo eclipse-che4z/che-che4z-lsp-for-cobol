@@ -22,11 +22,17 @@ import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingManager;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DialectFinishedNotification;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DialectInsertCopybookNotification;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
 import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
+import org.eclipse.lsp.cobol.lsp.events.queries.DialectResolveCopybookQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
+import org.eclipse.lsp.cobol.lsp.jrpc.CopybookResult;
+import org.eclipse.lsp.cobol.lsp.jrpc.DialectServerApi;
 import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp4j.*;
@@ -45,7 +51,8 @@ import org.eclipse.lsp4j.services.TextDocumentService;
  */
 @Slf4j
 @Singleton
-public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
+public class CobolTextDocumentService
+    implements TextDocumentService, ExtendedApi, DialectServerApi {
   private final LspMessageBroker lspMessageBroker;
   private final CompletionHandler completionHandler;
   private final CodeActionHandler codeActionHandler;
@@ -60,6 +67,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   private final ReferencesHandler referencesHandler;
   private final HoverHandler hoverHandler;
   private final FoldingRangeHandler foldingRangeHandler;
+  private final DialectProcessingManager dialectProcessingManager;
 
   @Inject
   public CobolTextDocumentService(
@@ -76,7 +84,8 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       DocumentHighlightHandler documentHighlightHandler,
       ReferencesHandler referencesHandler,
       HoverHandler hoverHandler,
-      FoldingRangeHandler foldingRangeHandler) {
+      FoldingRangeHandler foldingRangeHandler,
+      DialectProcessingManager dialectProcessingManager) {
     this.lspMessageBroker = lspMessageBroker;
     this.completionHandler = completionHandler;
     this.codeActionHandler = codeActionHandler;
@@ -91,6 +100,7 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.referencesHandler = referencesHandler;
     this.hoverHandler = hoverHandler;
     this.foldingRangeHandler = foldingRangeHandler;
+    this.dialectProcessingManager = dialectProcessingManager;
   }
 
   @Override
@@ -170,5 +180,20 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public CompletableFuture<List<FoldingRange>> foldingRange(FoldingRangeRequestParams params) {
     return lspMessageBroker.query(foldingRangeHandler.createEvent(params));
+  }
+
+  @Override
+  public CompletableFuture<CopybookResult> resolveCopybook(@NonNull JsonObject json) {
+    return lspMessageBroker.query(new DialectResolveCopybookQuery(json, dialectProcessingManager));
+  }
+
+  @Override
+  public void insertCopybook(@NonNull JsonObject json) {
+    lspMessageBroker.notify(new DialectInsertCopybookNotification(json, dialectProcessingManager));
+  }
+
+  @Override
+  public void finish(@NonNull JsonObject json) {
+    lspMessageBroker.notify(new DialectFinishedNotification(json, dialectProcessingManager));
   }
 }
