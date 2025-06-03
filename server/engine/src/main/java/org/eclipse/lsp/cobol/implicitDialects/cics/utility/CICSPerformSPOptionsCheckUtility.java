@@ -258,7 +258,6 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       checkHasMutuallyExclusiveOptions(
           "OSGIACTION or REFRESHPKGS", ctx.OSGIACTION(), ctx.REFRESHPKGS());
     }
-    checkOptionalWithLength(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPID", "APPIDLEN");
   }
 
   private void checkOptsLibertyPresent(CICSParser.Cics_perform_jvmserverContext ctx) {
