@@ -4,7 +4,7 @@
   "description": "Sample Dialect Support With Basic Functionality",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "1.0.5",
+  "version": "0.0.1",
   "preview": false,
   "publisher": "BroadcomMFD",
   "keywords": [
@@ -38,7 +38,9 @@
     "commands": [],
     "grammars": [
       {
-        "injectTo": ["source.cobol"],
+        "injectTo": [
+          "source.cobol"
+        ],
         "scopeName": "sample.injection",
         "path": "./syntaxes/sample.injection.json"
       }

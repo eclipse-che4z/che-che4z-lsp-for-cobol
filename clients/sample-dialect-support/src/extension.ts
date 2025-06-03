@@ -64,10 +64,9 @@ async function handleProcessDialect(
   text: string,
 ): Promise<Map<string, vscode.Diagnostic[]>> {
   const lines = text.split("\n");
+  const startDate = new Date();
   outputChannel.appendLine(
-    `Start processing program ${programUri}, line count: ${
-      lines.length
-    }. Time: ${new Date().toLocaleString()}`,
+    `Start processing program ${programUri}, line count: ${lines.length}`,
   );
   const diagnostics = new Map<string, vscode.Diagnostic[]>();
   for (let i = 0; i < lines.length; i++) {
@@ -81,8 +80,11 @@ async function handleProcessDialect(
       undefined,
     );
   }
+  const endDate = new Date();
   outputChannel.appendLine(
-    `Finish processing program ${programUri}. Time: ${new Date().toLocaleString()}`,
+    `Finish processing program ${programUri}. Processing time: ${
+      endDate.getTime() - startDate.getTime()
+    }`,
   );
   return diagnostics;
 }
