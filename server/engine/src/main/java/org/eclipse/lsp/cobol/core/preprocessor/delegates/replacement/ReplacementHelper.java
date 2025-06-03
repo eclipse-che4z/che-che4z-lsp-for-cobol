@@ -54,10 +54,10 @@ public class ReplacementHelper {
    */
   public static SearchPattern getSearchPattern(
       CobolPreprocessor.ReplacePseudoTextContext replacePseudoTextContext) {
-    return replacePseudoTextContext.LEADING() != null
-        ? SearchPattern.STARTS_WITH
-        : replacePseudoTextContext.TRAILING() != null
-            ? SearchPattern.ENDS_WITH
-            : SearchPattern.EXACT;
+    if (replacePseudoTextContext.LEADING() != null)
+      return SearchPattern.STARTS_WITH;
+    if (replacePseudoTextContext.TRAILING() != null)
+      return SearchPattern.ENDS_WITH;
+    return SearchPattern.EXACT;
   }
 }
