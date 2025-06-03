@@ -285,6 +285,30 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
 
+  private static final String TEXT_NESTED_PROGRAM_VALID =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       >>JAVA-SHAREABLE ON\n"
+          + "       01 {$*N1} PIC X(50) VALUE 'DIVISION'.\n"
+          + "       >>JAVA-SHAREABLE OFF\n"
+          + "       >>JAVA-CALLABLE\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST2.\n"
+          + "       DATA DIVISION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           GOBACK.\n"
+          + "       END PROGRAM TEST2.\n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST3.\n"
+          + "       DATA DIVISION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           GOBACK.\n"
+          + "       END PROGRAM TEST3.\n"
+          + "       END PROGRAM TEST1.\n";
+
   private static final String TEXT_NESTED_PROGRAM_INVALID =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -540,6 +564,11 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   @Test
   void testShareableOnValid() {
     UseCaseEngine.runTest(TEXT_SHAREABLE_ON_VALID, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testNestedProgramValid() {
+    UseCaseEngine.runTest(TEXT_NESTED_PROGRAM_VALID, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test
