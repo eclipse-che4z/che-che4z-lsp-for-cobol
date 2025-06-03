@@ -285,6 +285,24 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
 
+  private static final String TEXT_NESTED_PROGRAM_INVALID =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       >>{_JAVA-SHAREABLE ON|error1_}\n"
+          + "       01 {$*N1} PIC X(50) VALUE 'DIVISION'.\n"
+          + "       >>{_JAVA-SHAREABLE OFF|error2_}\n"
+          + "       >>{JAVA-CALLABLE|error3}\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           GOBACK.\n"
+          + "       END PROGRAM TEST2.\n"
+          + "       END PROGRAM TEST1.\n";
+
   @Test
   void testValid1() {
     UseCaseEngine.runTest(TEXT_VALID1, ImmutableList.of(), ImmutableMap.of());
@@ -522,5 +540,32 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   @Test
   void testShareableOnValid() {
     UseCaseEngine.runTest(TEXT_SHAREABLE_ON_VALID, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testNestedProgramInvalid() {
+    UseCaseEngine.runTest(
+        TEXT_NESTED_PROGRAM_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "The JAVA-SHAREABLE ON directive cannot be used in a nested program.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "The JAVA-SHAREABLE OFF directive cannot be used in a nested program.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error3",
+            new Diagnostic(
+                new Range(),
+                "The JAVA-CALLABLE directive cannot be used in a nested program.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
   }
 }

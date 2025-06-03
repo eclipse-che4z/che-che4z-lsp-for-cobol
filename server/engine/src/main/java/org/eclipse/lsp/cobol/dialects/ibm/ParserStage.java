@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.dialects.ibm;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -121,77 +120,113 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
 
   private void validateJavaInteroperabilityDirectives(
       AnalysisContext analysisContext, List<Token> compilerLineTokens) {
-    Stack<Integer> shareableOnStack = new Stack<>();
-    String currentSection = "";
+    DirectiveValidationState state = new DirectiveValidationState();
 
-    for (int i = 0; i < compilerLineTokens.size(); i++) {
-      Token token = compilerLineTokens.get(i);
-
-      switch (token.getType()) {
-        case CobolLexer.IDENTIFICATION:
-          currentSection = "IDENTIFICATION";
-          continue;
-        case CobolLexer.DATA:
-          currentSection = "DATA";
-          continue;
-        case CobolLexer.WORKING_STORAGE:
-          currentSection = "WORKING-STORAGE";
-          continue;
-        case CobolLexer.PROCEDURE:
-          currentSection = "PROCEDURE";
-          continue;
-        default:
-      }
+    for (Token token : compilerLineTokens) {
+      updateStateForToken(state, token);
 
       if (token.getType() == CobolLexer.COMPILERLINE) {
-        String tokenText = token.getText();
-
-        Matcher callableMatcher = JAVA_CALLABLE_PATTERN.matcher(tokenText);
-        if (callableMatcher.matches()) {
-          validateDirective(
-              analysisContext,
-              token,
-              callableMatcher,
-              currentSection.equals("DATA") || currentSection.equals("WORKING-STORAGE"),
-              "compilerDirective.validation.dataSection");
-          continue;
-        }
-
-        Matcher shareableOnMatcher = JAVA_SHAREABLE_ON_PATTERN.matcher(tokenText);
-        if (shareableOnMatcher.matches()) {
-          shareableOnStack.push(i);
-          validateDirective(
-              analysisContext,
-              token,
-              shareableOnMatcher,
-              currentSection.equals("WORKING-STORAGE"),
-              "compilerDirective.validation.workingSection");
-          continue;
-        }
-
-        Matcher shareableOffMatcher = JAVA_SHAREABLE_OFF_PATTERN.matcher(tokenText);
-        if (shareableOffMatcher.matches()) {
-          if (shareableOnStack.isEmpty()) {
-            createError(
-                analysisContext,
-                token,
-                callOffsetForToken(tokenText),
-                messageService.getMessage(
-                    "compilerDirective.validation.javaShareableOff",
-                    tokenText.replaceAll(">>\\s?", "")));
-          } else {
-            shareableOnStack.pop();
-          }
-
-          validateDirective(
-              analysisContext,
-              token,
-              shareableOffMatcher,
-              currentSection.equals("WORKING-STORAGE"),
-              "compilerDirective.validation.workingSection");
-        }
+        validateCompilerDirective(analysisContext, token, state);
       }
     }
+  }
+
+  private void updateStateForToken(DirectiveValidationState state, Token token) {
+    switch (token.getType()) {
+      case CobolLexer.IDENTIFICATION:
+        state.programDepth++;
+        state.currentSection = "IDENTIFICATION";
+        break;
+      case CobolLexer.DATA:
+        state.currentSection = "DATA";
+        break;
+      case CobolLexer.WORKING_STORAGE:
+        state.currentSection = "WORKING-STORAGE";
+        break;
+      case CobolLexer.PROCEDURE:
+        state.currentSection = "PROCEDURE";
+        break;
+      default:
+    }
+  }
+
+  private void validateCompilerDirective(
+      AnalysisContext analysisContext, Token token, DirectiveValidationState state) {
+    String tokenText = token.getText();
+
+    Matcher callableMatcher = JAVA_CALLABLE_PATTERN.matcher(tokenText);
+    if (callableMatcher.matches()) {
+      if (validateNestedProgramRestriction(analysisContext, token, tokenText, state)) {
+        validateDirective(
+            analysisContext,
+            token,
+            callableMatcher,
+            state.currentSection.equals("DATA") || state.currentSection.equals("WORKING-STORAGE"),
+            "compilerDirective.validation.dataSection");
+      }
+      return;
+    }
+
+    Matcher shareableOnMatcher = JAVA_SHAREABLE_ON_PATTERN.matcher(tokenText);
+    if (shareableOnMatcher.matches()) {
+      if (validateNestedProgramRestriction(analysisContext, token, tokenText, state)) {
+        state.isJavaShareableOn = true;
+        validateDirective(
+            analysisContext,
+            token,
+            shareableOnMatcher,
+            state.currentSection.equals("WORKING-STORAGE"),
+            "compilerDirective.validation.workingSection");
+      }
+      return;
+    }
+
+    Matcher shareableOffMatcher = JAVA_SHAREABLE_OFF_PATTERN.matcher(tokenText);
+    if (shareableOffMatcher.matches()) {
+      if (validateNestedProgramRestriction(analysisContext, token, tokenText, state)) {
+        if (!state.isJavaShareableOn) {
+          createError(
+              analysisContext,
+              token,
+              callOffsetForToken(tokenText),
+              messageService.getMessage(
+                  "compilerDirective.validation.javaShareableOff",
+                  tokenText.replaceAll(">>\\s?", "")));
+        } else {
+          state.isJavaShareableOn = false;
+        }
+
+        validateDirective(
+            analysisContext,
+            token,
+            shareableOffMatcher,
+            state.currentSection.equals("WORKING-STORAGE"),
+            "compilerDirective.validation.workingSection");
+      }
+    }
+  }
+
+  private boolean validateNestedProgramRestriction(
+      AnalysisContext analysisContext,
+      Token token,
+      String tokenText,
+      DirectiveValidationState state) {
+    if (state.programDepth > 1) {
+      createError(
+          analysisContext,
+          token,
+          callOffsetForToken(tokenText),
+          messageService.getMessage(
+              "compilerDirective.validation.nestedProgram", tokenText.replaceAll(">>\\s?", "")));
+      return false;
+    }
+    return true;
+  }
+
+  private static class DirectiveValidationState {
+    boolean isJavaShareableOn = false;
+    String currentSection = "";
+    int programDepth = 0;
   }
 
   private void validateDirective(
