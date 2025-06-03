@@ -30,3 +30,4 @@
             MOVE FUNCTION FUNC1 to A.
              
              STOP RUN.
+       COPY PARS.

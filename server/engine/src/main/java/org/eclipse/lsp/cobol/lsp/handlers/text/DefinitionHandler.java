@@ -16,6 +16,9 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +60,16 @@ public class DefinitionHandler {
    * @throws InterruptedException forward exception.
    */
   public Either<List<? extends Location>, List<? extends LocationLink>> definition(
-      DefinitionParams params) throws ExecutionException, InterruptedException {
-    CobolDocumentModel doc = documentModelService.get(params.getTextDocument().getUri());
-    List<Location> definitions = occurrences.findDefinitions(doc, params);
-    return Either.forLeft(definitions);
+          DefinitionParams params) throws ExecutionException, InterruptedException {
+    Collection<CobolDocumentModel> docs =
+            documentModelService.findMainSource(params.getTextDocument().getUri());
+    List<Location> locations = new ArrayList<>();
+    for (CobolDocumentModel doc : docs) {
+      locations.addAll(occurrences.findDefinitions(doc, params));
+    }
+    return Either.forLeft(locations);
   }
+
 
   /**
    * Create definition LSP request event.
