@@ -246,6 +246,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
           ctx.REFRESH(),
           ctx.SERVERDUMP());
       if (!ctx.REFRESH().isEmpty()) {
+        checkPrerequisiteIsMet(ctx.APPLICATION(), ctx.APPID(), ctx, "APPID without APPLICATION");
         checkOptionalWithLength(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPID", "APPIDLEN");
         checkHasMutuallyExclusiveOptions(
             "RESOURCETYPE or APPLICATION or CONFIG",
