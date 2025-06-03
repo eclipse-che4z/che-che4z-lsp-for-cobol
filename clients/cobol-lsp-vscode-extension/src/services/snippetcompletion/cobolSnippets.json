@@ -2332,13 +2332,8 @@
   },
   "POSITION": {
     "prefix": "POSITION",
-    "body": [
-      "ENVIRONMENT DIVISION.",
-      "INPUT-OUTPUT SECTION.",
-      "I-O-CONTROL.",
-      "\t\tMULTIPLE FILE TAPE CONTAINS ${1:file-name-5} POSITION ${2:n}."
-    ],
-    "description": "POSITION is used to specify a given (integer) file on TAPE reel."
+    "body": ["MULTIPLE FILE TAPE CONTAINS ${1:file-name-5} POSITION ${2:n}."],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - POSITION is used to specify a given (integer) file on TAPE reel."
   },
   "POSITIVE": {
     "prefix": "POSITIVE",
@@ -2373,11 +2368,10 @@
   "PROCEDURE IS": {
     "prefix": "PROCEDURE IS",
     "body": [
-      "PROCEDURE DIVISION.",
       "SORT ${1:fileName}",
       "${2|INPUT,OUTPUT|} PROCEDURE IS ${3:100-RECORD-SEL} SECTION"
     ],
-    "description": "The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT - and process records returned from a SORT."
+    "description": "PROCEDURE DIVISION - The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT - and process records returned from a SORT."
   },
   "PROCEDURE-POINTER": {
     "prefix": "PROCEDURE-POINTER",
@@ -2412,12 +2406,8 @@
   },
   "PROGRAM-ID": {
     "prefix": "PROGRAM-ID.",
-    "body": [
-      "IDENTIFICATION DIVISION.",
-      "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.",
-      "$0"
-    ],
-    "description": "PROGRAM-ID"
+    "body": ["PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "$0"],
+    "description": "IDENTIFICATION DIVISION - PROGRAM-ID provides a unique name for a COBOL program."
   },
   "PROPERTY": {
     "prefix": "PROPERTY",
@@ -2438,7 +2428,6 @@
   "QUEUE": {
     "prefix": "QUEUE",
     "body": [
-      "COMMUNICATION SECTION.",
       "CD ${1:CD-1} FOR INPUT",
       "\tSYMBOLIC QUEUE IS ${2:SQ1}",
       "\tMESSAGE DATE IS ${3:MD1}",
@@ -2449,7 +2438,7 @@
       "\tSTATUS KEY IS ${8:SK2}",
       "\tMESSAGE COUNT IS ${9:MC3}."
     ],
-    "description": "The QUEUE runtime option can used only in an OS/VS (or Bull) COBOL program with a RECEIVE statement in a COMMUNICATION DESCRIPTION."
+    "description": "COMMUNICATION SECTION - The QUEUE runtime option can used only in an OS/VS (or Bull) COBOL program with a RECEIVE statement in a COMMUNICATION DESCRIPTION."
   },
   "QUOTE": {
     "prefix": "QUOTE",
@@ -2486,56 +2475,48 @@
   "RECORD": {
     "prefix": "RECORD",
     "body": [
-      "DATA DIVISION.",
-      "FILE SECTION.",
       "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause - which defines the size (in bytes) of each logical record in the file."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause - which defines the size (in bytes) of each logical record in the file."
   },
   "RECORDING": {
     "prefix": "RECORDING",
     "body": [
-      "DATA DIVISION.",
-      "FILE SECTION.",
       "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
       "RECORDING MODE IS ${2|F,FB,V,U,S|}",
       "\tRECORD CONTAINS ${3:80} CHARACTERS."
     ],
-    "description": "As part of a COBOL FD, RECORDING MODE is used with QSAM files to describe the file/record data: F-Fixed (one record per/block), FB-Fixed/Blocked, V-Variable, U-Undefined (use for Load Modules) and S-Spanned records (extremely long records: I.E. larger than a Block)."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDING MODE is used with QSAM files to describe the file/record data: F-Fixed (one record per/block), FB-Fixed/Blocked, V-Variable, U-Undefined (use for Load Modules) and S-Spanned records (extremely long records: I.E. larger than a Block)."
   },
   "RECORDS": {
     "prefix": "RECORDS",
     "body": [
-      "DATA DIVISION.",
-      "FILE SECTION.",
       "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. Note that this is typically used with QSAM files."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. Note that this is typically used with QSAM files."
   },
   "RECURSIVE": {
     "prefix": "RECURSIVE",
     "body": [
-      "IDENTIFICATION DIVISION.",
       "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}} RECURSIVE."
     ],
-    "description": "An optional language element that allows programs to be reentered recursively."
+    "description": "IDENTIFICATION DIVISION - An optional language element that allows programs to be reentered recursively."
   },
   "REDEFINES": {
     "prefix": "REDEFINES",
     "body": [
-      "WORKING-STORAGE SECTION.",
       "01 ${1:LAB-REC}.",
       "\t05 ${2:M-UNITS} PIC 9(6).",
       "\t05 ${3:SERUM} PIC 9(6).",
       "\t05 ${4:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.",
       "\t05 ${5:SERUM-CLASS} PIC X(3)."
     ],
-    "description": "REDEFINES allows one variable to share the same storage as another. It is a way to declare multiple fields for a single storage area in files and WORKING-STORAGE."
+    "description": "WORKING-STORAGE SECTION - REDEFINES allows one variable to share the same storage as another. It is a way to declare multiple fields for a single storage area in files and WORKING-STORAGE."
   },
   "USING BY REFERENCE": {
     "prefix": "REFERENCE",
