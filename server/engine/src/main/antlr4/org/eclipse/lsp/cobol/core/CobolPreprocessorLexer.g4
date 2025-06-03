@@ -76,4 +76,4 @@ COMMASEPARATOR2 : ', ' ;
 mode REPLACEMODE;
 DOUBLEEQUALCHAR2 : '==' ->popMode;
 TEXT : ~('\n' | '\r');
-NEXTLINE: ('\n');
+NEXTLINE: ('\n' | '\r');
