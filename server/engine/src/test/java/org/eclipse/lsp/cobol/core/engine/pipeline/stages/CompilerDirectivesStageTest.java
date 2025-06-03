@@ -21,11 +21,13 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.dialects.ibm.CompilerDirectivesStage;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,7 +48,9 @@ class CompilerDirectivesStageTest {
     when(ctx.getExtendedDocument()).thenReturn(doc);
     when(ctx.getConfig()).thenReturn(configuration);
 
-    stage.run(ctx, null);
+    StageResult stageResult = mock(StageResult.class);
+    when(stageResult.getData()).thenReturn(Collections.emptyList());
+    stage.run(ctx, stageResult);
     assertEquals(options, ctx.getConfig().getCompilerOptions());
     assertEquals(code.length(), doc.getCurrentText().toString().length());
     assertNotEquals(code, doc.getCurrentText().toString());
@@ -64,7 +68,9 @@ class CompilerDirectivesStageTest {
     when(ctx.getExtendedDocument()).thenReturn(doc);
     when(ctx.getConfig()).thenReturn(configuration);
 
-    stage.run(ctx, null);
+    StageResult stageResult = mock(StageResult.class);
+    when(stageResult.getData()).thenReturn(Collections.emptyList());
+    stage.run(ctx, stageResult);
     assertEquals(options, ctx.getConfig().getCompilerOptions());
     assertEquals(code.length(), doc.getCurrentText().toString().length());
   }

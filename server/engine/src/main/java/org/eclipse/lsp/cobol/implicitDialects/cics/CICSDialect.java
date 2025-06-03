@@ -35,6 +35,7 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.SectionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.CicsTranslatorOptionNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.processor.CICSExecBlockProcessor;
 import org.eclipse.lsp.cobol.implicitDialects.cics.processor.CICSImplicitVariablesProcessor;
@@ -45,11 +46,9 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.processor.CICSTranslateMandat
 public class CICSDialect implements CobolDialect {
 
   public static final String DIALECT_NAME = "cics";
-  private final CopybookService copybookService;
   private final MessageService messageService;
 
   public CICSDialect(CopybookService copybookService, MessageService messageService) {
-    this.copybookService = copybookService;
     this.messageService = messageService;
   }
 
@@ -85,6 +84,8 @@ public class CICSDialect implements CobolDialect {
 
   @Override
   public List<ProcessorDescription> getProcessors() {
+    CICSTranslatorOptionValidator cicsTranslatorOptionValidator =
+        new CICSTranslatorOptionValidator(messageService);
     return ImmutableList.of(
         new ProcessorDescription(
             ProgramNode.class,
@@ -97,7 +98,13 @@ public class CICSDialect implements CobolDialect {
         new ProcessorDescription(
             ExecCicsNode.class,
             ProcessingPhase.VALIDATION,
-            new CICSExecBlockProcessor(messageService)));
+            new CICSExecBlockProcessor(messageService)),
+        new ProcessorDescription(
+            CicsTranslatorOptionNode.class,
+            ProcessingPhase.VALIDATION,
+            cicsTranslatorOptionValidator),
+        new ProcessorDescription(
+            ProgramNode.class, ProcessingPhase.VALIDATION, cicsTranslatorOptionValidator));
   }
 
   @Override

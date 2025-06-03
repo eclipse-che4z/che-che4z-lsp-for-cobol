@@ -67,7 +67,7 @@ public class CompilerDirectivesStage
       Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
       ctx.getExtendedDocument().replace(range, newText);
     }
-
+    ctx.getDialectNodes().addAll(prevStageResult.getData());
     return new StageResult<>(null);
   }
 

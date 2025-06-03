@@ -55,6 +55,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.CicsTranslatorOptionNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
@@ -172,6 +173,11 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     }
 
     return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitCompilerOpts(CICSParser.CompilerOptsContext ctx) {
+    return addTreeNode(ctx, location -> new CicsTranslatorOptionNode(location, ctx.getText()));
   }
 
   @Override

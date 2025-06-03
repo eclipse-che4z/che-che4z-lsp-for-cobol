@@ -46,7 +46,7 @@ public class PreprocessorStage
         runPreprocessor(context.getExtendedDocument().getUri(), context);
     applyDialectCopybooks(copybooksRepository, prevStageResult.getData().getDialectNodes());
 
-    context.setDialectNodes(prevStageResult.getData().getDialectNodes());
+    context.getDialectNodes().addAll(prevStageResult.getData().getDialectNodes());
     context.setCopybooksRepository(copybooksRepository);
     return new StageResult<>(copybooksRepository);
   }
