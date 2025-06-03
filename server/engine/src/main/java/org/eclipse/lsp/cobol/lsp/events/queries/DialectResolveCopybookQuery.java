@@ -23,13 +23,13 @@ import java.util.concurrent.ExecutionException;
 import lombok.Value;
 import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingManager;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
-import org.eclipse.lsp.cobol.lsp.jrpc.CopybookResult;
+import org.eclipse.lsp.cobol.lsp.jrpc.CopybookResolutionResult;
 import org.eclipse.lsp4j.Location;
 
 /** Dialect Resolve Copybook Query **/
-public class DialectResolveCopybookQuery implements LspQuery<CopybookResult> {
+public class DialectResolveCopybookQuery implements LspQuery<CopybookResolutionResult> {
   private final DialectProcessingManager dialectProcessingManager;
-  private final CompletableFuture<CopybookResult> result;
+  private final CompletableFuture<CopybookResolutionResult> result;
   private final DialectResolveCopybookEvent event;
 
   @Value
@@ -50,7 +50,7 @@ public class DialectResolveCopybookQuery implements LspQuery<CopybookResult> {
   }
 
   @Override
-  public CopybookResult query() throws ExecutionException, InterruptedException {
+  public CopybookResolutionResult query() throws ExecutionException, InterruptedException {
     return dialectProcessingManager.resolveCopybook(
         event.getDialectName(),
         event.getProgramUri(),
@@ -59,7 +59,7 @@ public class DialectResolveCopybookQuery implements LspQuery<CopybookResult> {
   }
 
   @Override
-  public CompletableFuture<CopybookResult> getResult() {
+  public CompletableFuture<CopybookResolutionResult> getResult() {
     return result;
   }
 }

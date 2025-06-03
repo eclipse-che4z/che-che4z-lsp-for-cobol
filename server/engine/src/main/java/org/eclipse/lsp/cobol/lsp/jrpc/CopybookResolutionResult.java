@@ -18,7 +18,7 @@ import lombok.Value;
 
 /** Data transport object that hold information about resolved copybook * */
 @Value
-public class CopybookResult {
+public class CopybookResolutionResult {
   String copybookName;
   String uri;
   String text;

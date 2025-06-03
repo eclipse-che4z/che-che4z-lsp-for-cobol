@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.DialectResolveCopybookQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
-import org.eclipse.lsp.cobol.lsp.jrpc.CopybookResult;
+import org.eclipse.lsp.cobol.lsp.jrpc.CopybookResolutionResult;
 import org.eclipse.lsp.cobol.lsp.jrpc.DialectServerApi;
 import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -183,7 +183,7 @@ public class CobolTextDocumentService
   }
 
   @Override
-  public CompletableFuture<CopybookResult> resolveCopybook(@NonNull JsonObject json) {
+  public CompletableFuture<CopybookResolutionResult> resolveCopybook(@NonNull JsonObject json) {
     return lspMessageBroker.query(new DialectResolveCopybookQuery(json, dialectProcessingManager));
   }
 

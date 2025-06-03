@@ -29,7 +29,7 @@ public interface DialectServerApi {
    * @return copybook content and uri object
    */
   @JsonRequest("dialect/resolveCopybook")
-  CompletableFuture<CopybookResult> resolveCopybook(@NonNull JsonObject json);
+  CompletableFuture<CopybookResolutionResult> resolveCopybook(@NonNull JsonObject json);
 
   /**
    * Change the document fragment with given location to the provided text

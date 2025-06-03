@@ -118,13 +118,13 @@ public class DialectProcessingManager {
    * @param statementLocation is a copybook statement location
    * @return copybook content and uri object
    */
-  public CopybookResult resolveCopybook(
+  public CopybookResolutionResult resolveCopybook(
       String dialectName, String programUri, String copybookName, Location statementLocation) {
     DialectProcessingContextData contextData =
         dialectProcesses.get(createKey(dialectName, programUri));
     if (contextData == null) {
       LOG.warn("Dialect {} was not found, resolve copybook operation ignored", dialectName);
-      return new CopybookResult(null, null, null);
+      return new CopybookResolutionResult(null, null, null);
     }
     CopybookName name = new CopybookName(copybookName, dialectName);
     String programDocumentUri = contextData.getContext().getProgramDocumentUri();
@@ -145,12 +145,12 @@ public class DialectProcessingManager {
               .uri(statementLocation.getUri())
               .build();
       contextData.getErrorList().add(missingCopybooks(locality, copybookName));
-      return new CopybookResult(null, null, null);
+      return new CopybookResolutionResult(null, null, null);
     }
     ExtendedDocument copybook = new ExtendedDocument(copybookModel.getContent(), copybookModel.getUri());
 
     contextData.getDocuments().put(copybookModel.getUri(), new DocumentInfo(copybookName, copybook));
-    return new CopybookResult(copybookName, copybookModel.getUri(), copybookModel.getContent());
+    return new CopybookResolutionResult(copybookName, copybookModel.getUri(), copybookModel.getContent());
   }
 
   /**
