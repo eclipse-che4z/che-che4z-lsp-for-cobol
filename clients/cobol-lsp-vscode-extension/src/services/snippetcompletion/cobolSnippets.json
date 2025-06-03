@@ -2259,19 +2259,19 @@
   "PADDING CHARACTER IS": {
     "prefix": "PADDING CHARACTER IS",
     "body": [
-      "SELECT ${2:INTERNAL-FILENAME} ASSIGN ${3:EXTFILE}",
-      "BLOCK CONTAINS ${4:170}",
-      "PADDING CHARACTER IS \"${1:B}\"."
+      "SELECT ${1:INTERNAL-FILENAME} ASSIGN ${2:EXTFILE}",
+      "BLOCK CONTAINS ${3:170}",
+      "PADDING CHARACTER IS \"${4:B}\"."
     ],
     "description": "`PADDING CHARACTER` specifies a character (variable, defined in `WORKING-STORAGE`) to be used for record-blocking-factor padding on sequential files. (ie. Filling out a `BLOCK` of records - BLOCK being the unit of file I/O between DFSMS and your program's `DATA DIVISION`.)"
   },
   "PASSWORD": {
     "prefix": "PASSWORD",
     "body": [
-      "SELECT ${2:PATIENT-VSAM-FILE} ASSIGN TO ${3:VSMIDXD}",
-      "\tORGANIZATION IS ${4|INDEXED,RELATIVE,SEQUENTIAL|}.",
-      "\tFILE STATUS IS ${5:WS-VSM-FILE-STATUS}",
-      "\tPASSWORD IS ${1:BASE-PASS}."
+      "SELECT ${1:PATIENT-VSAM-FILE} ASSIGN TO ${2:VSMIDXD}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL|}.",
+      "\tFILE STATUS IS ${4:WS-VSM-FILE-STATUS}",
+      "\tPASSWORD IS ${5:BASE-PASS}."
     ],
     "description": "`PASSWORD` names a `PIC X` or `PIC A` field in `WORKING-STORAGE`. The first 8 characters are assumed to be the `VSAM` file password. Note that VSAM ESDS, KSDS and RRDS filetypes can all be password protected."
   },
@@ -2283,9 +2283,9 @@
   "PERFORM": {
     "prefix": "PERFORM UNTIL",
     "body": [
-      "MOVE ${2:1} TO SUB.",
-      "PERFORM UNTIL SUB <= ${3:100}",
-      "\t${4:codeHere}",
+      "MOVE ${1:1} TO SUB.",
+      "PERFORM UNTIL SUB <= ${2:100}",
+      "\t${3:codeHere}",
       "ADD +1 TO SUB",
       "END-PERFORM."
     ],
@@ -2322,7 +2322,7 @@
   },
   "PICTURE": {
     "prefix": "PICTURE",
-    "body": ["77 ${2:VAR-NAME} ${1|PIC,PICTURE|} ${3:X(111) VALUE SPACE}."],
+    "body": ["77 ${1:VAR-NAME} ${2|PIC,PICTURE|} ${3:X(111) VALUE SPACE}."],
     "description": "The reserved word `PICTURE` or `PIC` describes a data variable to the COBOL compiler (and program)."
   },
   "POINTER": {
@@ -2374,8 +2374,8 @@
     "prefix": "PROCEDURE IS",
     "body": [
       "PROCEDURE DIVISION.",
-      "SORT ${2:fileName}",
-      "${1|INPUT,OUTPUT|} PROCEDURE IS ${2:100-RECORD-SEL} SECTION"
+      "SORT ${1:fileName}",
+      "${2|INPUT,OUTPUT|} PROCEDURE IS ${3:100-RECORD-SEL} SECTION"
     ],
     "description": "The `INPUT` and `OUTPUT PROCEDURE`s are used to select specific records that will be released to a `SORT` - and process records returned from a `SORT`."
   },
@@ -2399,9 +2399,9 @@
   "PROCESSING": {
     "prefix": "PROCESSING",
     "body": [
-      "XML PARSE ${2:intentifier-1} RETURNING NATIONAL",
-      "VALIDATING WITH ${3:indentifier-2} FILE ${4:xml-schema-name-1}",
-      "PROCESSING PROCEDURE IS ${1:procedure-name-1}."
+      "XML PARSE ${1:intentifier-1} RETURNING NATIONAL",
+      "VALIDATING WITH ${2:indentifier-2} FILE ${3:xml-schema-name-1}",
+      "PROCESSING PROCEDURE IS ${4:procedure-name-1}."
     ],
     "description": "`XML PARSE` translates an XML document into individual pieces, then passes each piece to a user-written COBOL paragraph."
   },
@@ -2422,14 +2422,14 @@
   "PROPERTY": {
     "prefix": "PROPERTY",
     "body": [
-      "01 ${2:_PROP} ${3:BINARY-LONG} PRIVATE.",
-      "METHOD-ID. GET PROPERTY #${1:PROP}.",
-      "PROCEDURE DIVISION RETURNING RET AS ${3:BINARY-LONG}.",
-      "    SET RET TO ${2:_PROP}",
+      "01 ${1:_PROP} ${2:BINARY-LONG} PRIVATE.",
+      "METHOD-ID. GET PROPERTY #${3:PROP}.",
+      "PROCEDURE DIVISION RETURNING RET AS ${2:BINARY-LONG}.",
+      "    SET RET TO ${1:_PROP}",
       "END METHOD.",
-      "METHOD-ID. SET PROPERTY #${1:PROP}.",
-      "PROCEDURE DIVISION USING BY VALUE VAL AS ${3:BINARY-LONG}.",
-      "    SET ${2:_PROP} TO 0",
+      "METHOD-ID. SET PROPERTY #${3:PROP}.",
+      "PROCEDURE DIVISION USING BY VALUE VAL AS ${2:BINARY-LONG}.",
+      "    SET ${1:_PROP} TO 0",
       "END METHOD.",
       ""
     ],
@@ -2439,8 +2439,8 @@
     "prefix": "QUEUE",
     "body": [
       "COMMUNICATION SECTION.",
-      "CD ${2:CD-1} FOR INPUT",
-      "\tSYMBOLIC QUEUE IS ${1:SQ1}",
+      "CD ${1:CD-1} FOR INPUT",
+      "\tSYMBOLIC QUEUE IS ${2:SQ1}",
       "\tMESSAGE DATE IS ${3:MD1}",
       "\tMESSAGE TIME IS ${4:MT2}",
       "\tSYMBOLIC SOURCE IS ${5:SS2}",
@@ -2453,7 +2453,7 @@
   },
   "QUOTE": {
     "prefix": "QUOTE",
-    "body": ["77 ${2:WS-QUOTE-FIELD} PIC ${3:X(01)} VALUE ${1|QUOTE,QUOTES|}."],
+    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE ${3|QUOTE,QUOTES|}."],
     "description": "`QUOTE`/`QUOTES` is a figurative constant. It can be used in a comparison or `MOVE` statement."
   },
   "RD": {
@@ -2473,8 +2473,8 @@
     "prefix": "READ",
     "body": [
       "READ ${1:VSAM-File} INTO ${2:WS-Record-Layout}",
-      "KEY IS ${2:Key-field}",
-      "INVALID KEY ${3:imperative-statement}"
+      "KEY IS ${3:Key-field}",
+      "INVALID KEY ${4:imperative-statement}"
     ],
     "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier - which moves the record from the I-O buffer into program `WORKING-STORAGE`, and the `INVALID KEY` modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field."
   },
@@ -2488,9 +2488,9 @@
     "body": [
       "DATA DIVISION.",
       "FILE SECTION.",
-      "FD ${2:CARPOOL}",
+      "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
-      "\tRECORD CONTAINS ${1:80} CHARACTERS."
+      "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
     "description": "As part of a COBOL `FD`, `RECORD` (singular) is used with the `RECORD CONTAINS` clause - which defines the size (in bytes) of each logical record in the file."
   },
@@ -2499,10 +2499,10 @@
     "body": [
       "DATA DIVISION.",
       "FILE SECTION.",
-      "FD ${3:CARPOOL}",
+      "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
-      "RECORDING MODE IS ${1|F,FB,V,U,S|}",
-      "\tRECORD CONTAINS ${2:80} CHARACTERS."
+      "RECORDING MODE IS ${2|F,FB,V,U,S|}",
+      "\tRECORD CONTAINS ${3:80} CHARACTERS."
     ],
     "description": "As part of a COBOL FD, `RECORDING MODE` is used with `QSAM` files to describe the file/record data: `F`-Fixed (one record per/block), `FB`-Fixed/Blocked, `V`-Variable, `U`-Undefined (use for Load Modules) and `S`-Spanned records (extremely long records: I.E. larger than a Block)."
   },
@@ -2511,9 +2511,9 @@
     "body": [
       "DATA DIVISION.",
       "FILE SECTION.",
-      "FD ${2:CARPOOL}",
+      "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
-      "\tRECORD CONTAINS ${1:80} CHARACTERS."
+      "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
     "description": "As part of a COBOL FD, `RECORDS` (plural) is used with the `LABEL RECORDS` clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. Note that this is typically used with QSAM files."
   },
@@ -2529,10 +2529,10 @@
     "prefix": "REDEFINES",
     "body": [
       "WORKING-STORAGE SECTION.",
-      "01 ${2:LAB-REC}.",
-      "\t05 ${3:M-UNITS} PIC 9(6).",
-      "\t05 ${4:SERUM} PIC 9(6).",
-      "\t05 ${1:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.",
+      "01 ${1:LAB-REC}.",
+      "\t05 ${2:M-UNITS} PIC 9(6).",
+      "\t05 ${3:SERUM} PIC 9(6).",
+      "\t05 ${4:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.",
       "\t05 ${5:SERUM-CLASS} PIC X(3)."
     ],
     "description": "`REDEFINES` allows one variable to share the same storage as another. It is a way to declare multiple fields for a single storage area in files and `WORKING-STORAGE`."
@@ -2548,8 +2548,8 @@
       "SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
       "\tORGANIZATION IS RELATIVE.",
       "\tACCESS MODE IS ${3|SEQUENTIAL,RANDOM,DYNAMIC|}",
-      "\tRELATIVE KEY IS ${5:key1}",
-      "\tFILE STATUS IS ${6:WS-FILE-STATUS-VAR}.",
+      "\tRELATIVE KEY IS ${4:key1}",
+      "\tFILE STATUS IS ${5:WS-FILE-STATUS-VAR}.",
       "$0"
     ],
     "description": "Identify VSAM RRDS files in your program by using `ORGANIZATION IS RELATIVE`. `RELATIVE KEY IS` associates a logical record with its relative record number."
@@ -2567,10 +2567,10 @@
   "RELEASE FROM": {
     "prefix": "RELEASE FROM",
     "body": [
-      "MOVE ${3:SORT-EXT-RECORD} TO ${1:SORT-RECORD}",
-      "PERFORM ${4:RELEASE-SORT-RECORD}",
+      "MOVE ${1:SORT-EXT-RECORD} TO ${2:SORT-RECORD}",
+      "PERFORM ${3:RELEASE-SORT-RECORD}",
       "\t",
-      "RELEASE ${1:SORT-RECORD} FROM ${2:SORT-FILE-IN}"
+      "RELEASE ${2:SORT-RECORD} FROM ${4:SORT-FILE-IN}"
     ],
     "description": "`RELEASE FROM` moves data from one group field to the SORT field, then transfers records from an input/output area to the initial phase of a SORT. NOTE: `RELEASE FROM` can only be used in an `INPUT PROCEDURE` `SECTION`."
   },
@@ -2624,9 +2624,9 @@
   "RESERVE": {
     "prefix": "RESERVE",
     "body": [
-      "SELECT ${2:TESTDATA}",
-      "ASSIGN TO ${3:UT-S-TESTDATA}",
-      "\tRESERVE ${1:4} AREAS."
+      "SELECT ${1:TESTDATA}",
+      "ASSIGN TO ${2:UT-S-TESTDATA}",
+      "\tRESERVE ${3:4} AREAS."
     ],
     "description": "`RESERVE` allows you to specify the number of I/O buffers to be allocated at run time for QSAM and VSAM files."
   },
@@ -2680,8 +2680,8 @@
   "RIGHT": {
     "prefix": "RIGHT",
     "body": [
-      "01 ${3:GROUP-FLD}.",
-      "\t05 ${1:ACCTG-CODE} ${2:PIC X(999)} JUSTIFIED RIGHT."
+      "01 ${1:GROUP-FLD}.",
+      "\t05 ${2:ACCTG-CODE} ${3:PIC X(999)} JUSTIFIED RIGHT."
     ],
     "description": "`JUSTIFIED` overrides COBOL's standard byte-movement rules for receiving data of type: `PIC A`, `PIC X`, `DBCS`, `NATIONAL`."
   },
