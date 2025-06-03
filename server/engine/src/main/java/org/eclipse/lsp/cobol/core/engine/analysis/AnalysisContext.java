@@ -46,6 +46,7 @@ public class AnalysisContext implements BenchmarkSessionProvider {
 
   private @Setter List<Node> dialectNodes = new ArrayList<>();
   private @Setter CopybooksRepository copybooksRepository;
+  Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
 
   public AnalysisContext(
       ExtendedDocument extendedDocument,
