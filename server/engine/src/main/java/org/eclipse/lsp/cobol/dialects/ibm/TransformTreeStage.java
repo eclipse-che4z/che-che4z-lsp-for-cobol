@@ -99,23 +99,40 @@ public class TransformTreeStage
               rootNode,
               dialectNode.getLocality().getUri(),
               dialectNode.getLocality().getRange().getStart());
-
       addChild(nodeByPosition.orElse(rootNode), dialectNode);
     }
   }
 
   private void addChild(Node node, Node dialectNode) {
-    int index = 0;
-    for (Node child : node.getChildren()) {
-      if (child.getLocality().getUri().equals(dialectNode.getLocality().getUri())
-          && (child.getLocality().getRange().getStart().getLine()
-              >= dialectNode.getLocality().getRange().getStart().getLine())) {
-        break;
+    int targetIndex = node.getChildren().size();
+    String cpyUrl = null;
+    boolean cpyFound = false;
+    if (dialectNode.getNodeType() == NodeType.COPY) {
+      cpyUrl = ((CopyNode) dialectNode).getUri();
+    }
+    List<Node> children = node.getChildren();
+    for (int i = 0; i < children.size(); i++) {
+      Node child = children.get(i);
+      String childUri = child.getLocality().getUri();
+      if (childUri.equals(dialectNode.getLocality().getUri())) {
+        int childLine = child.getLocality().getRange().getStart().getLine();
+        if (childLine < dialectNode.getLocality().getRange().getStart().getLine()) {
+          targetIndex = i + 1;
+        } else {
+          if (!cpyFound) {
+            targetIndex = i;
+          }
+          break;
+        }
+      } else if (Objects.equals(childUri, cpyUrl)) {
+        if (!cpyFound) {
+          targetIndex = i;
+          cpyFound = true;
+        }
       }
-      index++;
     }
     dialectNode.setParent(node);
-    node.getChildren().add(index, dialectNode);
+    children.add(targetIndex, dialectNode);
   }
 
   private void addCopyNodes(AnalysisContext context, Node rootNode) {

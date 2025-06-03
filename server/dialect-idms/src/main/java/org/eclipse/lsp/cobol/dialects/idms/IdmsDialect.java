@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -72,13 +73,7 @@ public final class IdmsDialect implements CobolDialect {
         cb -> {
           String currentUri = context.getExtendedDocument().getUri();
           insertIdmsCopybook(
-              context,
-              context.getExtendedDocument(),
-              errors,
-              cb,
-              context.getProgramDocumentUri(),
-              currentUri,
-              new LinkedList<>());
+              context, context.getExtendedDocument(), errors, cb, currentUri, new LinkedList<>());
         });
     return errors;
   }
@@ -88,15 +83,14 @@ public final class IdmsDialect implements CobolDialect {
       ExtendedDocument extendedDocument,
       List<SyntaxError> errors,
       IdmsCopybookDescriptor cb,
-      String programDocumentUri,
       String currentUri,
-      Deque<String> copybookStack) {
+      Deque<CopyNode> copybookStack) {
     CopybookName copybookName = new CopybookName(cb.getName(), IdmsDialect.NAME);
     ResultWithErrors<CopybookModel> resolvedCopybook =
         copybookService.resolve(
-            copybookName.toCopybookId(programDocumentUri),
+            copybookName.toCopybookId(ctx.getProgramDocumentUri()),
             copybookName,
-            programDocumentUri,
+            ctx.getProgramDocumentUri(),
             currentUri,
             ctx.getPreprocessor());
     CopybookModel copybookModel = resolvedCopybook.getResult();
@@ -129,13 +123,14 @@ public final class IdmsDialect implements CobolDialect {
     range = ctx.getExtendedDocument().mapLocation(copyNode.getNameLocation().getRange()).getRange();
     copyNode.getNameLocation().setRange(range);
 
-    copybookStack.push(copyNode.getName());
+    copybookStack.push(copyNode);
 
     ExtendedDocument copybookDocument =
         new ExtendedDocument(copybookModel.getContent(), copybookModel.getUri());
     processTextTransformation(
-        ctx, copybookDocument, errors, programDocumentUri, cb.getLevel(), copybookStack, copyNode);
+        ctx, copybookDocument, errors, cb.getLevel(), copybookStack, copyNode);
     copybookDocument.commitTransformations();
+
     if (cb.isInsert()) {
       extendedDocument.insertCopybook(
           cb.getStatement().getRange().getStart().getLine() + 1, copybookDocument.getCurrentText());
@@ -161,62 +156,59 @@ public final class IdmsDialect implements CobolDialect {
         .build();
   }
 
-  private boolean recursiveCall(Deque<String> copybookStack, String name) {
-    return copybookStack.contains(name);
+  private boolean recursiveCall(Deque<CopyNode> copybookStack, String name) {
+    return copybookStack.stream().anyMatch(cb -> cb.getName().equals(name));
   }
 
   private void processTextTransformation(
       DialectProcessingContext ctx,
       ExtendedDocument currentDocument,
       List<SyntaxError> errors,
-      String programDocumentUri,
       int copybookLevel,
-      Deque<String> copybookStack,
+      Deque<CopyNode> copybookStack,
       CopyNode copyNode) {
-    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocument);
-    IdmsCopyParser.StartRuleContext context =
-        parseCopyIdms(currentDocument.toString(), programDocumentUri, errors);
 
-    List<IdmsCopybookDescriptor> cbs = copyVisitor.visitStartRule(context);
+    IdmsCopyVisitor copyVisitor = processCopybooks(ctx, currentDocument, errors, copybookStack);
     int firstLevel =
         copyVisitor.getVariableLevels().stream().findFirst().map(Pair::getRight).orElse(0);
-    copyVisitor
-        .getVariableLevels()
-        .forEach(
-            p -> {
-              if (copybookLevel > 0 && p.getRight() != null) {
-                CopyIdmsAdjustmentProcessor copyIdmsAdjustmentProcessor =
-                    new CopyIdmsAdjustmentProcessor(
-                        copyNode,
-                        currentDocument.getUri(),
-                        copybookLevel,
-                        firstLevel,
-                        p,
-                        messageService);
-                currentDocument.replace(
-                    p.getLeft(),
-                    String.format(
-                        "%02d",
-                        copyIdmsAdjustmentProcessor.calculateLevel(
-                            copybookLevel, firstLevel, p.getRight())));
-                copyIdmsAdjustmentProcessor.processError(errors);
-              }
-            });
-    cbs.forEach(
-        cb -> {
-          if (copybookLevel > 0) {
-            cb.setLevel(copybookLevel);
-          }
+    for (Pair<Range, Integer> p : copyVisitor.getVariableLevels()) {
+      if (copybookLevel <= 0 || p.getRight() == null) {
+        continue;
+      }
+      CopyIdmsAdjustmentProcessor copyIdmsAdjustmentProcessor =
+          new CopyIdmsAdjustmentProcessor(
+              copyNode, currentDocument.getUri(), copybookLevel, firstLevel, p, messageService);
+      String formatted =
+          String.format(
+              "%02d",
+              copyIdmsAdjustmentProcessor.calculateLevel(copybookLevel, firstLevel, p.getRight()));
+      Location location =
+          new Location(
+              currentDocument.getCurrentText().mapLocation(p.getLeft()).getUri(), p.getLeft());
+      currentDocument.getCurrentText().replace(p.getLeft(), formatted, location);
+      copyIdmsAdjustmentProcessor.processError(errors);
+    }
+  }
 
-          insertIdmsCopybook(
-              ctx,
-              currentDocument,
-              errors,
-              cb,
-              programDocumentUri,
-              currentDocument.getUri(),
-              copybookStack);
-        });
+  private IdmsCopyVisitor processCopybooks(
+      DialectProcessingContext ctx,
+      ExtendedDocument currentDocument,
+      List<SyntaxError> errors,
+      Deque<CopyNode> copybookStack) {
+    IdmsCopyVisitor copyVisitor = new IdmsCopyVisitor(currentDocument);
+    IdmsCopyParser.StartRuleContext startRule =
+        parseCopyIdms(currentDocument.toString(), ctx.getProgramDocumentUri(), errors);
+    List<IdmsCopybookDescriptor> idmsCopybookDescriptors = copyVisitor.visitStartRule(startRule);
+    for (IdmsCopybookDescriptor cb : idmsCopybookDescriptors) {
+      insertIdmsCopybook(ctx, currentDocument, errors, cb, currentDocument.getUri(), copybookStack);
+    }
+    if (!idmsCopybookDescriptors.isEmpty()) {
+      copyVisitor = new IdmsCopyVisitor(currentDocument);
+      copyVisitor.visitStartRule(
+          parseCopyIdms(
+              currentDocument.getCurrentText().toString(), ctx.getProgramDocumentUri(), errors));
+    }
+    return copyVisitor;
   }
 
   /**
