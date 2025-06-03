@@ -247,7 +247,6 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
           ctx.SERVERDUMP());
       if (!ctx.REFRESH().isEmpty()) {
         checkPrerequisiteIsMet(ctx.APPLICATION(), ctx.APPID(), ctx, "APPID without APPLICATION");
-        checkOptionalWithLength(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPID", "APPIDLEN");
         checkHasMutuallyExclusiveOptions(
             "RESOURCETYPE or APPLICATION or CONFIG",
             ctx.RESOURCETYPE(),
@@ -260,6 +259,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       checkHasMutuallyExclusiveOptions(
           "OSGIACTION or REFRESHPKGS", ctx.OSGIACTION(), ctx.REFRESHPKGS());
     }
+    checkOptionalWithLength(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPID", "APPIDLEN");
   }
 
   private void checkOptsLibertyPresent(CICSParser.Cics_perform_jvmserverContext ctx) {
