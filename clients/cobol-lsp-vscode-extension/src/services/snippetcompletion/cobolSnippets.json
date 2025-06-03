@@ -1803,21 +1803,21 @@
   "READ LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": ["READ ${1:IN-FILE} AT END MOVE LOW-VALUES TO ${2:INPUT-REC}."],
-    "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "MOVE LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": ["MOVE LOW-VALUES TO ${1:VAR1}."],
-    "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "IF LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": [
-      "IF ${1:VAR1} = ${2|LOW-VALUE,LOW-VALUES|}",
-      "\t${3:MOVE SPACES TO ${1:VAR}}",
+      "IF ${1:VAR1} = LOW-VALUES",
+      "\t${2:MOVE SPACES TO ${1:VAR}}",
       "END-IF."
     ],
-    "description": "For Alphanumeric fields - LOW-VALUE equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
   },
   "LINKAGE SECTION ": {
     "prefix": "LINKAGE SECTION",
