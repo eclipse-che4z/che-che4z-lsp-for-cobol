@@ -157,10 +157,11 @@ public class ReplacingServiceImpl implements ReplacingService {
   @NonNull
   private String getPatternForFullTokens(@NonNull String text) {
     if (handleFunctionalIdentifiers(text)) return "";
-    if (org.eclipse.lsp.cobol.common.utils.StringUtils.isEnclosedInSingleQuotes(text.trim())) {
-      return format(SINGLE_QUOTED_SEPARATE_TOKEN_PATTERN, text.trim());
+    final String trimmed = text.trim();
+    if (org.eclipse.lsp.cobol.common.utils.StringUtils.isEnclosedInSingleQuotes(trimmed )) {
+      return format(SINGLE_QUOTED_SEPARATE_TOKEN_PATTERN, trimmed );
     }
-    return format(SEPARATE_TOKEN_PATTERN, text.trim());
+    return format(SEPARATE_TOKEN_PATTERN, trimmed );
   }
 
   private boolean handleFunctionalIdentifiers(String text) {
