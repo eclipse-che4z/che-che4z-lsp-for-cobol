@@ -194,7 +194,8 @@ public class DialectProcessingManager {
                 copybookInfo.getDocument().replace(replacement.getRange(), replacement.getText());
               } catch (Exception e) {
                 LOG.warn(
-                    "Error processing document {} with replacement {}, insert copybook operation ignored",
+                    "Error processing document {} with replacement {}, insert copybook operation"
+                        + " ignored",
                     copybookUri,
                     replacement);
                 Locality locality =
