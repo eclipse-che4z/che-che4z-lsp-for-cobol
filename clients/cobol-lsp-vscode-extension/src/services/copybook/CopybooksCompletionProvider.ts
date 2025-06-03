@@ -104,7 +104,7 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
           copybooksLoadingPromises.push(
             (async () => {
               const list = await this.cds?.listRemoteCopybooks(
-                document.uri.toString(),
+                document.uri,
                 dialect.name,
               );
               list?.forEach((copybook) => {
@@ -117,7 +117,7 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
           copybooksLoadingPromises.push(
             (async () => {
               const list = await listLocalCopybooks(
-                document.uri.toString(),
+                document.uri,
                 dialect.name,
                 this.outputChannel,
               );

@@ -160,7 +160,7 @@ export async function lspConfigHandler(
         case DIALECT_LIBS:
           if (item.dialect && item.scopeUri) {
             const dialectLibs = await SettingsService.getCopybookLocalPath(
-              item.scopeUri,
+              vscode.Uri.parse(item.scopeUri),
               item.dialect,
             );
             result.push(dialectLibs);
@@ -209,7 +209,7 @@ export class SettingsService {
    * @returns a list of local path
    */
   public static async getCopybookLocalPath(
-    documentUri: string,
+    documentUri: vscode.Uri,
     dialectType: string,
     convertToAbsolutePaths = true,
   ): Promise<string[]> {
@@ -239,17 +239,14 @@ export class SettingsService {
   }
 
   public static async getCopybookExtension(
-    documentUri?: string,
+    documentUri?: vscode.Uri,
   ): Promise<string[] | undefined> {
     const global: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(COPYBOOK_EXTENSIONS);
     return documentUri === undefined
       ? global
-      : loadProcessorGroupCopybookExtensionsConfig(
-          { scopeUri: documentUri },
-          global!,
-        );
+      : loadProcessorGroupCopybookExtensionsConfig(documentUri, global!);
   }
 
   /**
@@ -268,7 +265,10 @@ export class SettingsService {
    * @param dialectType name of the cobol dialect type
    * @returns a list of dsn path
    */
-  public static getDsnPath(documentUri: string, dialectType: string): string[] {
+  public static getDsnPath(
+    documentUri: vscode.Uri,
+    dialectType: string,
+  ): string[] {
     return SettingsService.getCopybookConfigValues(
       PATHS_DSN,
       documentUri,
@@ -282,7 +282,10 @@ export class SettingsService {
    * @param dialectType name of the cobol dialect type
    * @returns a list of uss path
    */
-  public static getUssPath(documentUri: string, dialectType: string): string[] {
+  public static getUssPath(
+    documentUri: vscode.Uri,
+    dialectType: string,
+  ): string[] {
     return SettingsService.getCopybookConfigValues(
       PATHS_USS,
       documentUri,

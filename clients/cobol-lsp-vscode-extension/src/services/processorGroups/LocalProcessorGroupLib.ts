@@ -1,5 +1,5 @@
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { ProcessorGroupLibModel } from "../ProcessorGroupsLoader";
+import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
 import ProcessorGroupLib from "./ProcessorGroupLib";
@@ -8,7 +8,7 @@ import * as vscode from "vscode";
 export default class LocalPathLib implements ProcessorGroupLib {
   constructor(private path: string) {}
 
-  static create(configs: ProcessorGroupLibModel[]) {
+  static create(configs: CopybookLibs) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "string") {
@@ -33,9 +33,8 @@ export default class LocalPathLib implements ProcessorGroupLib {
       vscode.workspace.workspaceFolders ?? [],
     );
 
-    const allowedExtensions = await SettingsService.getCopybookExtension(
-      documentUri.toString(),
-    );
+    const allowedExtensions =
+      await SettingsService.getCopybookExtension(documentUri);
     const promises = uris.map(async (uri) => {
       return await LocalFilesystemResourceService.searchDirectory(
         uri,

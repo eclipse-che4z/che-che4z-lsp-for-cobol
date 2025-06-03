@@ -28,9 +28,6 @@ import {
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
 import { PATHS_LOCAL_KEY } from "../constants";
-import LocalPathLib from "./processorGroups/LocalProcessorGroupLib";
-import { UssPathLibFactory } from "./processorGroups/UssPathConfig";
-import { CopybookDownloaderForUss } from "./copybook/downloader/CopybookDownloaderForUss";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: Uri,
@@ -44,24 +41,13 @@ export async function loadProcessorGroupCopybookPaths(
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
   dialectType: string,
-  defaultProfile: string,
-  ussDownloader: CopybookDownloaderForUss,
 ) {
-  const configs = await loadProcessorGroupSettings(
+  const libs = await loadProcessorGroupSettings(
     documentUri,
     "libs",
     [],
     dialectType,
   );
-
-  const processorGroupLibTypes = [
-    LocalPathLib,
-    new UssPathLibFactory(ussDownloader, defaultProfile),
-  ];
-
-  const libs = processorGroupLibTypes
-    .map((pg) => pg.create(configs, documentUri))
-    .flat();
 
   return libs;
 }
@@ -124,22 +110,20 @@ export async function loadProcessorGroupCopybookExtensionsConfig(
 }
 
 export async function loadProcessorGroupCompileOptionsConfig(
-  documentUri: Uri,
-  configObject: string[],
+  item: { scopeUri: Uri },
+  configObject: string,
 ): Promise<string[]> {
-  return loadProcessorGroupSettings(
-    documentUri,
-    "compiler-options",
+  return loadProcessorGroupSettings(item.scopeUri, "compiler-options", [
     configObject,
-  );
+  ]);
 }
 
 export async function loadProcessorGroupSqlBackendConfig(
-  documentUri: Uri,
+  item: { scopeUri: Uri },
   configObject: string,
 ): Promise<string> {
   return loadProcessorGroupSettings(
-    documentUri,
+    item.scopeUri,
     "target-sql-backend",
     configObject,
     "SQL",
@@ -147,11 +131,11 @@ export async function loadProcessorGroupSqlBackendConfig(
 }
 
 export async function loadProcessorGroupDialectConfig(
-  documentUri: Uri,
+  item: { scopeUri: Uri },
   dialectConfig: DialectsConfiguration,
 ) {
   // try {
-  const pgCfg = await loadProcessorGroup(documentUri);
+  const pgCfg = await loadProcessorGroup(item.scopeUri);
   if (pgCfg === undefined || pgCfg.preprocessors == undefined) {
     return dialectConfig;
   }

@@ -19,7 +19,7 @@ import { LocalFilesystemResourceService } from "../LocalFilesystemResourceServic
 export const localCopybooks = new LocalFilesystemResourceService();
 
 export async function listLocalCopybooks(
-  documentUri: string,
+  documentUri: vscode.Uri,
   dialect: string,
   outputChannel?: vscode.OutputChannel,
 ): Promise<string[]> {
@@ -59,7 +59,7 @@ export async function listLocalCopybooks(
 }
 
 export async function searchLocalCopybooks(
-  documentUri: string,
+  documentUri: vscode.Uri,
   copybookName: string,
   dialect: string,
 ): Promise<vscode.Uri | undefined> {

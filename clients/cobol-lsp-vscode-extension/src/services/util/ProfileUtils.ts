@@ -17,14 +17,14 @@ import { SettingsService } from "../Settings";
 
 export class ProfileUtils {
   public static getProfileNameForCopybook(
-    cobolFileName: string,
+    documentUri: vscode.Uri,
     zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
     if (!zoweExplorerApi) {
       return undefined;
     }
     return ProfileUtils.getValidProfileForCopybookDownload(
-      cobolFileName,
+      documentUri,
       zoweExplorerApi,
     );
   }
@@ -45,11 +45,11 @@ export class ProfileUtils {
   }
 
   private static getValidProfileForCopybookDownload(
-    programUri: string,
+    documentUri: vscode.Uri,
     zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
     const profileFromDoc = ProfileUtils.getProfileFromDocument(
-      programUri,
+      documentUri,
       zoweExplorerApi,
     );
     const passedProfile = SettingsService.getProfileName();
@@ -60,22 +60,21 @@ export class ProfileUtils {
   }
 
   public static getProfileFromDocument(
-    programUri: string,
+    documentUri: vscode.Uri,
     zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
-    const uri = vscode.Uri.parse(programUri);
-    if (uri.scheme === "zowe-ds" || uri.scheme === "zowe-uss") {
-      const profile = uri.path.split("/")[1];
+    if (documentUri.scheme === "zowe-ds" || documentUri.scheme === "zowe-uss") {
+      const profile = documentUri.path.split("/")[1];
       if (!profile) return undefined;
       return profile;
     }
 
-    if (uri.scheme !== "file") return;
+    if (documentUri.scheme !== "file") return;
 
     if (!zoweExplorerApi) return;
     const eeApi = zoweExplorerApi.getExplorerExtenderApi();
 
-    const fsPath = uri.fsPath;
+    const fsPath = documentUri.fsPath;
 
     const openedFile =
       (eeApi.ussFileProvider.openFiles &&

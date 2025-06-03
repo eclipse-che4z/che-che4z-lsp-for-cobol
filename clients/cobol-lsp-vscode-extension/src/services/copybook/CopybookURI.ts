@@ -56,7 +56,7 @@ export class CopybookURI {
    * connection name needed to download copybooks from mainframe.
    */
   public static createPathForCopybookDownloaded(
-    documentUri: string,
+    documentUri: vscode.Uri,
     dialectType: string,
     downloadFolder: string,
     zoweExplorerApi: IApiRegisterClient | undefined,

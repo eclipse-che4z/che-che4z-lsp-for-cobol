@@ -1,8 +1,8 @@
 import { DATASET } from "../../constants";
 import { CopybookDownloaderForDsn } from "../copybook/downloader/CopybookDownloaderForDsn";
-import { ProcessorGroupLibModel } from "../ProcessorGroupsLoader";
 import * as vscode from "vscode";
 import ProcessorGroupLib from "./ProcessorGroupLib";
+import { CopybookLibs } from "../ProcessorGroupsLoader";
 
 export class DatasetLibFactory {
   constructor(
@@ -10,14 +10,13 @@ export class DatasetLibFactory {
     private defaultProfile: string,
   ) {}
 
-  create(configs: ProcessorGroupLibModel[]) {
+  create(configs: CopybookLibs) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "object" && DATASET in config) {
         libs.push(
           new DatasetPGLib(
             config.dataset,
-            this.dsnDownloader,
             config.profile ?? this.defaultProfile,
           ),
         );
@@ -28,27 +27,22 @@ export class DatasetLibFactory {
 }
 
 export class DatasetPGLib implements ProcessorGroupLib {
-  private uss: string;
+  private dsn: string;
   private profile: string;
-  private downloader: CopybookDownloaderForDsn;
 
-  constructor(
-    dsn: string,
-    downloader: CopybookDownloaderForDsn,
-    profile: string,
-  ) {
-    this.uss = dsn;
+  constructor(dsn: string, profile: string) {
+    this.dsn = dsn;
     this.profile = profile;
-    this.downloader = downloader;
   }
 
   resolveCopybookUri(
     copybookName: string,
     _documentUri: vscode.Uri,
+    dsnDownloader: CopybookDownloaderForDsn,
   ): Promise<vscode.Uri | undefined> {
-    return this.downloader.resolveCopybookUri(
+    return dsnDownloader.resolveCopybookUri(
       this.profile,
-      this.uss,
+      this.dsn,
       copybookName,
     );
   }

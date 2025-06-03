@@ -117,7 +117,7 @@ const LibsModel = t.array(
     ZoweUssConfigModel,
   ]),
 );
-type Libs = t.TypeOf<typeof LibsModel>;
+export type CopybookLibs = t.TypeOf<typeof LibsModel>;
 
 const PreprocessorItemModel = t.union([
   t.string,
@@ -164,12 +164,12 @@ export type TransformedProcessorGroup = {
   // "compiler-options"?: string[];
   // "copybook-file-encoding"?: string;
   // "target-sql-backend"?: string;
-} & ProcessorGroupProperties;
+} & Partial<ProcessorGroupProperties>;
 
 export type TransformedLibs = LocalPathLib | UssPathLib;
 export type TransformedPreprocessor = {
   name: string;
-} & ProcessorGroupProperties;
+} & Partial<ProcessorGroupProperties>;
 
 export interface ProcessorGroupProperties {
   libs: TransformedLibs[];
@@ -221,7 +221,7 @@ function transformProcessorGroup(
   return result;
 }
 
-function transformLibs(libs?: Libs): TransformedLibs[] {
+function transformLibs(libs?: CopybookLibs): TransformedLibs[] {
   if (!libs) {
     return [];
   }
@@ -237,13 +237,18 @@ function transformPreprocessor(
   input?: Preprocessor,
 ): TransformedPreprocessor[] {
   const preprocessors = asArray(input);
-  return preprocessors.map((preprocessor) => {
+  const transformed = preprocessors.map((preprocessor) => {
     if (typeof preprocessor === "string") {
       return { name: preprocessor, libs: [] };
     } else {
-      throw new Error("Unsupported processor definition");
+      return {
+        name: preprocessor?.name ?? "",
+        libs: transformLibs(preprocessor?.libs),
+      };
     }
   });
+
+  return transformed;
 }
 
 async function readProgramConfig(workspaceUri: Uri): Promise<ProgramsConfig> {

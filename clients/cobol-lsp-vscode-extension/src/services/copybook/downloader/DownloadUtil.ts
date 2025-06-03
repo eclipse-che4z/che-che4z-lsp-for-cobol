@@ -128,7 +128,7 @@ export class DownloadUtil {
    * configurations are present, null otherwise
    */
   public static areCopybookDownloadConfigurationsPresent(
-    documentUri: string,
+    documentUri: vscode.Uri,
     dialects: string[],
   ): MainframeRemoteLocation | null {
     const uniqueDialects = new Set(

@@ -30,7 +30,7 @@ import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss"
 import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn";
 import { SettingsService } from "../Settings";
 import {
-  loadProcessorGroupCopybookPathsConfig,
+  // loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupCopybooksLibs,
   ProcessorGroupCopybookPathConfig,
 } from "../ProcessorGroups";
@@ -40,7 +40,9 @@ import {
   ZoweUssConfigModel,
 } from "../ProcessorGroupsLoader";
 import { DownloadDiagnosticsService } from "../DiagnosticsService";
-import { localCopybooks, searchLocalCopybooks } from "./LocalCopybooksService";
+import { localCopybooks } from "./LocalCopybooksService";
+// import { searchLocalCopybooks } from "./LocalCopybooksService";
+import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
 import { getErrorMessage } from "../util/ErrorsUtils";
 
 export class CopybookName {
@@ -177,12 +179,14 @@ export class CopybookDownloadService {
   }
 
   public async listRemoteCopybooks(
-    documentUri: string,
+    documentUri: vscode.Uri,
     dialect: string,
   ): Promise<string[]> {
     // is document is endevor element - return list of copybooks from endevor
-    if (this.handleAsEndevorElement(documentUri)) {
-      return this.e4eDownloader?.listRemoteCopybooksE4E(documentUri) ?? [];
+    if (this.handleAsEndevorElement(documentUri.toString())) {
+      return (
+        this.e4eDownloader?.listRemoteCopybooksE4E(documentUri.toString()) ?? []
+      );
     }
 
     if (
@@ -230,54 +234,55 @@ export class CopybookDownloadService {
     return copybooks;
   }
 
-  async searchRemoteCopybooks(
-    documentURI: string,
-    copybookName: string,
-    dialectType: string,
-  ): Promise<vscode.Uri | undefined> {
-    if (
-      !(await this.isPrerequisiteForDownloadSatisfied(documentURI, [
-        dialectType,
-      ]))
-    ) {
-      return;
-    }
+  // async searchRemoteCopybooks(
+  //   documentURI: string,
+  //   copybookName: string,
+  //   dialectType: string,
+  // ): Promise<vscode.Uri | undefined> {
+  //   if (
+  //     !(await this.isPrerequisiteForDownloadSatisfied(documentURI, [
+  //       dialectType,
+  //     ]))
+  //   ) {
+  //     return;
+  //   }
 
-    const profile = ProfileUtils.getProfileNameForCopybook(
-      documentURI,
-      this.explorerApi,
-    );
-    if (!profile) {
-      return;
-    }
+  //   const profile = ProfileUtils.getProfileNameForCopybook(
+  //     documentURI,
+  //     this.explorerApi,
+  //   );
+  //   if (!profile) {
+  //     return;
+  //   }
 
-    const dsnPaths: string[] = SettingsService.getDsnPath(
-      documentURI,
-      dialectType,
-    );
-    const ussPaths: string[] = SettingsService.getUssPath(
-      documentURI,
-      dialectType,
-    );
-    const results = await Promise.allSettled([
-      ...dsnPaths.map((dsn) =>
-        this.dsnDownloader?.resolveCopybookUri(profile, dsn, copybookName),
-      ),
-      ...ussPaths.map((uss) =>
-        this.ussDownloader?.resolveCopybookUri(profile, uss, copybookName),
-      ),
-    ]);
+  //   const dsnPaths: string[] = SettingsService.getDsnPath(
+  //     documentURI,
+  //     dialectType,
+  //   );
+  //   const ussPaths: string[] = SettingsService.getUssPath(
+  //     documentURI,
+  //     dialectType,
+  //   );
+  //   const results = await Promise.allSettled([
+  //     ...dsnPaths.map((dsn) =>
+  //       this.dsnDownloader?.resolveCopybookUri(profile, dsn, copybookName),
+  //     ),
+  //     ...ussPaths.map((uss) =>
+  //       this.ussDownloader?.resolveCopybookUri(profile, uss, copybookName),
+  //     ),
+  //   ]);
 
-    for (const result of results) {
-      if (result.status === "fulfilled" && result.value) {
-        return result.value;
-      }
-    }
-  }
+  //   for (const result of results) {
+  //     if (result.status === "fulfilled" && result.value) {
+  //       return result.value;
+  //     }
+  //   }
+  // }
 
   async resolveCopybookUriInProcessorGroups(
     copybookName: string,
-    documentUri: string,
+    defaultProfile: string,
+    documentUri: vscode.Uri,
     pgConfigs: ProcessorGroupCopybookPathConfig[],
   ): Promise<vscode.Uri | undefined> {
     const allowedExtensions =
@@ -395,11 +400,11 @@ export class CopybookDownloadService {
   }
 
   private async isPrerequisiteForDownloadSatisfied(
-    documentUri: string,
+    documentUri: vscode.Uri,
     dialects: string[],
   ): Promise<boolean> {
-    if (this.handleAsEndevorElement(documentUri)) {
-      return !!(await this.e4eDownloader?.getE4EConfig(documentUri));
+    if (this.handleAsEndevorElement(documentUri.toString())) {
+      return !!(await this.e4eDownloader?.getE4EConfig(documentUri.toString()));
     }
 
     const profile = ProfileUtils.getProfileNameForCopybook(
@@ -412,16 +417,17 @@ export class CopybookDownloadService {
       | ZoweUssConfigModel
       | EndevorConfigModel
     )[] = [];
-    const uniqueDialects = [...new Set(dialects)];
-    for (const dialect of uniqueDialects) {
-      configs.push(
-        ...(await loadProcessorGroupCopybookPathsConfig(
-          { scopeUri: documentUri },
-          [],
-          dialect,
-        )),
-      );
-    }
+    // TODO: reimplement using libs
+    // const uniqueDialects = [...new Set(dialects)];
+    // for (const dialect of uniqueDialects) {
+    //   configs.push(
+    //     ...(await loadProcessorGroupCopybooksLibs(
+    //       { scopeUri: documentUri },
+    //       [],
+    //       dialect,
+    //     )),
+    //   );
+    // }
 
     if (
       await this.isProcessorGroupConfigsSatisfiesDownload(
@@ -466,8 +472,8 @@ export class CopybookDownloadService {
       ))
     );
   }
-  private missingExtension(documentUri: string, message: string) {
-    this.diagnosticsService?.showDiagnostics(vscode.Uri.parse(documentUri), [
+  private missingExtension(documentUri: vscode.Uri, message: string) {
+    this.diagnosticsService?.showDiagnostics(documentUri, [
       {
         range: new vscode.Range(
           new vscode.Position(0, 0),
@@ -494,7 +500,7 @@ export class CopybookDownloadService {
   }
 
   private async isProcessorGroupConfigsSatisfiesDownload(
-    documentUri: string,
+    documentUri: vscode.Uri,
     defaultProfile: string | undefined,
     configs: (
       | vscode.Uri
