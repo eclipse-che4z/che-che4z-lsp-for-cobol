@@ -2229,7 +2229,7 @@
       "\tON OVERFLOW GO TO ${4:UNSTRING-OVERFLOW}",
       "END-UNSTRING."
     ],
-    "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime. After ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (String Statement)": {
     "prefix": "OVERFLOW",
@@ -2240,7 +2240,7 @@
       "\tON OVERFLOW GO TO ${4:STRING-OVERFLOW}",
       "END-STRING."
     ],
-    "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime. After ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (Call Statement)": {
     "prefix": "OVERFLOW",
@@ -2249,12 +2249,12 @@
       "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}",
       "END-CALL."
     ],
-    "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND. Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND. After ON OVERFLOW you can code any imperative statement."
   },
   "PACKED-DECIMAL": {
     "prefix": "PACKED-DECIMAL",
     "body": ["77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
-    "description": "PACKED-DECIMAL variables (internally) are stroed with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. Note that PACKED-DECIMAL is identical to: COMP-3/COMPUTATIONAL-3."
+    "description": "PACKED-DECIMAL variables (internally) are stored with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. PACKED-DECIMAL is identical to: COMP-3/COMPUTATIONAL-3."
   },
   "PADDING CHARACTER IS": {
     "prefix": "PADDING CHARACTER IS",
@@ -2273,7 +2273,7 @@
       "\tFILE STATUS IS ${4:WS-VSM-FILE-STATUS}",
       "\tPASSWORD IS ${5:BASE-PASS}."
     ],
-    "description": "PASSWORD names a PIC X or PIC A field in WORKING-STORAGE. The first 8 characters are assumed to be the VSAM file password. Note that VSAM ESDS, KSDS and RRDS filetypes can all be password protected."
+    "description": "PASSWORD names a PIC X or PIC A field in WORKING-STORAGE. The first 8 characters are assumed to be the VSAM file password. VSAM ESDS, KSDS and RRDS filetypes can all be password protected."
   },
   "PARSE": {
     "prefix": "PARSE",
@@ -2388,7 +2388,7 @@
     "body": [
       "ALTER ${1:oldSectionOrParagraph} TO PROCEED TO ${2:newSectionOrParagraph"
     ],
-    "description": "The ALTER statement changes the code at run-time, transferring to other paragraphs like a GO TO statement. Note that ALTER is frowned upon - as it creates \"spaghetti code\" which can be extremely difficult to understand."
+    "description": "The ALTER statement changes the code at run-time, transferring to other paragraphs like a GO TO statement. ALTER is frowned upon - as it creates \"spaghetti code\" which can be extremely difficult to understand."
   },
   "PROCESSING": {
     "prefix": "PROCESSING",
@@ -2402,7 +2402,7 @@
   "END PROGRAM": {
     "prefix": "END PROGRAM",
     "body": ["${1|END,EXIT|} PROGRAM ${2:programName}."],
-    "description": "END PROGRAM designates the end of a called module and returns control to the calling module. Note that the programName must be identical to its PROGRAM-ID."
+    "description": "END PROGRAM designates the end of a called module and returns control to the calling module. The program name must be identical to its PROGRAM-ID."
   },
   "PROGRAM-ID": {
     "prefix": "PROGRAM-ID.",
@@ -2498,7 +2498,7 @@
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. Note that this is typically used with QSAM files."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. This is typically used with QSAM files."
   },
   "RECURSIVE": {
     "prefix": "RECURSIVE",
@@ -2590,12 +2590,12 @@
       "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES",
       "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."
     ],
-    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. Note that this is a Compilation (not run-time) level statement is similar to REPLACING except that it replaces text across an entire file - not simply a copybook."
+    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement that is similar to REPLACING except that it replaces text across an entire file - not simply a copybook."
   },
   "REPLACING": {
     "prefix": "REPLACING",
     "body": ["COPY ${1:PAYLIB} REPLACING ==${2::TAG:}== BY ==${3:EMP-PAY}==."],
-    "description": "REPLACING allows you to rename source text within a COBOL Copybook. This is typically used when the same physical record layout can assume multiple logical business terms within a program. Note that this is a Compilation (not run-time) level statement."
+    "description": "REPLACING allows you to rename source text within a COBOL Copybook. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement."
   },
   "RERUN": {
     "prefix": "RERUN",
