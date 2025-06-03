@@ -1507,9 +1507,9 @@
   "IN #1": {
     "prefix": "IN",
     "body": [
-      "UNSTRING ${2:CUST-TRANS} DELIMITED BY \"${3:|}\"",
-      "\tINTO ${4:CUST-REC-IN}",
-      "COUNT IN ${1:CTR-1}",
+      "UNSTRING ${1:CUST-TRANS} DELIMITED BY \"${2:|}\"",
+      "\tINTO ${3:CUST-REC-IN}",
+      "COUNT IN ${4:CTR-1}",
       "END UNSTRING."
     ],
     "description": "COUNT IN references an integer field that contains the number of characters placed in the current receiving field."
@@ -1517,8 +1517,8 @@
   "IN #2": {
     "prefix": "IN",
     "body": [
-      "UNSTRING ${2:CUST-FIELD-IN} DELIMITED ${2|BY,BY ALL|} \"${4:|}\" OR \"${5:/}\"",
-      "\tINTO ${6:CUST-NAME} COUNT IN ${1:CTR-1} DELIMITER IN ${7:DLM-CHAR}",
+      "UNSTRING ${1:CUST-FIELD-IN} DELIMITED ${2|BY,BY ALL|} \"${3:|}\" OR \"${4:/}\"",
+      "\tINTO ${5:CUST-NAME} COUNT IN ${6:CTR-1} DELIMITER IN ${7:DLM-CHAR}",
       "END-UNSTRING.",
       "$0"
     ],
@@ -1527,8 +1527,8 @@
   "IN #3": {
     "prefix": "IN #3",
     "body": [
-      "UNSTRING ${2:CUST-FIELD-IN} DELIMITED BY ALL  \"|\" OR \"/\"",
-      "\t${3:INTO CUST-NAME} COUNT IN ${1:CTR-1}",
+      "UNSTRING ${1:CUST-FIELD-IN} DELIMITED BY ALL  \"|\" OR \"/\"",
+      "\t${2:INTO CUST-NAME} COUNT IN ${3:CTR-1}",
       "\t${4:CUST-ADDR} DELIMITER IN ${5:DLM-CHR}",
       "TALLYING IN ${6:TOT-FIELDS-FOUND}",
       "END-UNSTRING."
@@ -1543,9 +1543,9 @@
   "OCCURS x INDEXED BY": {
     "prefix": "INDEXED",
     "body": [
-      "01 ${3:GROUP-FIELD}",
-      "\t05 ${4:TABLE-ITEM} PIC ${5:X(1)}",
-      "\t\tOCCURS ${1:100} INDEXED BY ${2:IDX-BTYE}"
+      "01 ${1:GROUP-FIELD}",
+      "\t05 ${2:TABLE-ITEM} PIC ${3:X(1)}",
+      "\t\tOCCURS ${4:100} INDEXED BY ${5:IDX-BTYE}"
     ],
     "description": "INDEXED BY defines an internal COBOL index data item and associates it with a given COBOL table."
   },
@@ -1594,8 +1594,8 @@
   "INSPECT TALLYING": {
     "prefix": "INSPECT",
     "body": [
-      "MOVE 0 TO ${2:COUNTER}",
-      "INSPECT ${1:SOURCE} TALLYING ${2:COUNTER} FOR ${3|ALL SPACES,ALL $4,CHARACTERS|}"
+      "MOVE 0 TO ${1:COUNTER}",
+      "INSPECT ${2:SOURCE} TALLYING ${1:COUNTER} FOR ${3|ALL SPACES,ALL $4,CHARACTERS|}"
     ],
     "description": "INSPECT A TALLYING COUNTER FOR ..."
   },
@@ -1612,8 +1612,8 @@
   "INVALID KEY (VSAM)": {
     "prefix": "INVALID KEY",
     "body": [
-      "${2|READ,START,WRITE,REWRITE,DELETE|} ${3:VSAM-FILE}",
-      "\tINVALID KEY GO TO ${1:999-VSAM-FILE-ERROR}",
+      "${1|READ,START,WRITE,REWRITE,DELETE|} ${2:VSAM-FILE}",
+      "\tINVALID KEY GO TO ${3:999-VSAM-FILE-ERROR}",
       "END-READ."
     ],
     "description": "INVALID KEY can be used in VSAM KSDS and RRDS files for: READ, START, WRITE, REWRITE, and DELETE statements. The INVALID KEY imperative statement is given control if an I/O error occurs due to a defective VSAM file index key."
@@ -1621,8 +1621,8 @@
   "INVALID KEY (QSAM)": {
     "prefix": "INVALID KEY",
     "body": [
-      "WRITE ${2:QSAM-FILE}",
-      "\tINVALID KEY GO TO ${1:999-DISK-FULL-ERROR}",
+      "WRITE ${1:QSAM-FILE}",
+      "\tINVALID KEY GO TO ${2:999-DISK-FULL-ERROR}",
       "END-WRITE."
     ],
     "description": "For QSAM files, the INVALID KEY phrase can be used in WRITE requests. It is executed if you attempt to write to a I/O disk (VOL=SER) that is full."
@@ -2056,18 +2056,18 @@
   "OCCURS": {
     "prefix": "OCCURS",
     "body": [
-      "01 ${2:TABLE-GROUP-NAME}.",
-      "\t05 ${3:TABLE-ROW-NAME} OCCURS ${1:5} TIMES."
+      "01 ${1:TABLE-GROUP-NAME}.",
+      "\t05 ${2:TABLE-ROW-NAME} OCCURS ${3:5} TIMES."
     ],
     "description": "OCCURS is used to code a table by defining a number (N) of repeated subordinate rows."
   },
   "OCCURS DEPENDING ON": {
     "prefix": "OCCURS DEPENDING ON",
     "body": [
-      "01 ${4:TABLE-GROUP-NAME}.",
-      "\t05 ${5:TABLE-ROW-SIZE} PIC 9(4).",
-      "\t05 ${1:FIELD-2} OCCURS ${2:1} TO ${3:5} TIMES",
-      "\t\tDEPENDING ON ${5:TABLE-ROW-SIZE} ${6:arrayEntryCountDefinition}"
+      "01 ${1:TABLE-GROUP-NAME}.",
+      "\t05 ${2:TABLE-ROW-SIZE} PIC 9(4).",
+      "\t05 ${3:FIELD-2} OCCURS ${4:1} TO ${5:5} TIMES",
+      "\t\tDEPENDING ON ${2:TABLE-ROW-SIZE} ${6:arrayEntryCountDefinition}"
     ],
     "description": "OCCURS DEPENDING ON is used to code a table where you do not know how many rows are in the table."
   },
@@ -2099,8 +2099,8 @@
   "DEPENDING ON": {
     "prefix": "ON",
     "body": [
-      "01 ${2:DATA-TAB}.",
-      "\t05 ${3:MSG} OCCURS ${4:0} TO ${5:5} DEPENDING ON ${1:TBL-ROW-SIZE}.",
+      "01 ${1:DATA-TAB}.",
+      "\t05 ${2:MSG} OCCURS ${3:0} TO ${4:5} DEPENDING ON ${5:TBL-ROW-SIZE}.",
       "\t\t10 ${6:MSG-VERSION} USAGE COMP-1.",
       "\t\t10 ${7:USER-ID-IN} PIC 9999 USAGE DISPLAY.",
       "\t\t10 ${8:TBL-ROW-SIZE} PIC 9(4) COMP.",
@@ -2116,8 +2116,8 @@
   "ON SIZE ERROR": {
     "prefix": "ON SIZE ERROR",
     "body": [
-      "MULTIPLY ${2:VAR-1} BY ${3:VAR-2} GIVING ${4:VAR-3}",
-      "\tONE SIZE ERROR GO TO ${1:ARITH-PROBLEM}",
+      "MULTIPLY ${1:VAR-1} BY ${2:VAR-2} GIVING ${3:VAR-3}",
+      "\tONE SIZE ERROR GO TO ${4:ARITH-PROBLEM}",
       "END-MULTIPLY."
     ],
     "description": "ON is used to code: ON SIZE ERROR, ON OVERFLOW and ON EXCEPTION error and exception trapping phrases."
@@ -2186,8 +2186,8 @@
   "ORGANIZATION (VSAM)": {
     "prefix": "ORGANIZATION",
     "body": [
-      "SELECT ${2:rptfil} ASSIGN TO ${3:rptfilDD}",
-      "\tORGANIZATION IS ${1|INDEXED,RELATIVE,SEQUENTIAL|}.",
+      "SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL|}.",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|} RECORD KEY IS ${5:key1}.",
       "$0"
     ],
@@ -2213,20 +2213,20 @@
   "OUTPUT PROCEDURE": {
     "prefix": "OUTPUT PROCEDURE",
     "body": [
-      "${2:000-MAIN}.",
-      "SORT ${3:IN-FILE} ON ${4|ASCENDING,DESCENDING|} KEY ${5:IN-SORT-KEY}",
-      "\tINPUT PROCEDURE IS ${6:PATIENT-EDIT-INPUT}",
-      "\tOUTPUT PROCEDURE IS ${1:procName}."
+      "${1:000-MAIN}.",
+      "SORT ${2:IN-FILE} ON ${3|ASCENDING,DESCENDING|} KEY ${4:IN-SORT-KEY}",
+      "\tINPUT PROCEDURE IS ${5:PATIENT-EDIT-INPUT}",
+      "\tOUTPUT PROCEDURE IS ${6:procName}."
     ],
     "description": "PROCEDURE DIVISION - In a SORT or MERGE statement OUTPUT PROCEDURE specifies the name of a COBOL SECTION or paragraph that selects and/or modifies output records from the SORT/MERGE operation."
   },
   "ON OVERFLOW GO TO (Unstring Statement)": {
     "prefix": "OVERFLOW",
     "body": [
-      "UNSTRING ${2:PATIENT-RCD}",
-      "\tDELIMITED BY ${3:statement}",
-      "\tINTO ${4:PATIENT-NAME}",
-      "\tON OVERFLOW GO TO ${1:UNSTRING-OVERFLOW}",
+      "UNSTRING ${1:PATIENT-RCD}",
+      "\tDELIMITED BY ${2:statement}",
+      "\tINTO ${3:PATIENT-NAME}",
+      "\tON OVERFLOW GO TO ${4:UNSTRING-OVERFLOW}",
       "END-UNSTRING."
     ],
     "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
@@ -2234,10 +2234,10 @@
   "ON OVERFLOW GO TO (String Statement)": {
     "prefix": "OVERFLOW",
     "body": [
-      "STRING ${2:PATIENT-NO SPACE PATIENT-NAME INV-NO SPACE DATE-PROCESS SPACE}",
-      "\tDELIMITED BY ${3:SIZE}",
-      "\tINTO ${4:WS-PATIENT-RPT-LINE}",
-      "\tON OVERFLOW GO TO ${1:STRING-OVERFLOW}",
+      "STRING ${1:PATIENT-NO SPACE PATIENT-NAME INV-NO SPACE DATE-PROCESS SPACE}",
+      "\tDELIMITED BY ${2:SIZE}",
+      "\tINTO ${3:WS-PATIENT-RPT-LINE}",
+      "\tON OVERFLOW GO TO ${4:STRING-OVERFLOW}",
       "END-STRING."
     ],
     "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
