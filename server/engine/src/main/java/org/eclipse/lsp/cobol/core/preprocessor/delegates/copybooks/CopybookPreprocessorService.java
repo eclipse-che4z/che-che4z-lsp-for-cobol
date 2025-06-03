@@ -149,10 +149,10 @@ class CopybookPreprocessorService {
     if (replacingPhraseContext == null) {
       return;
     }
-    boolean isPseudoTextReplacement = false;
     List<CobolPreprocessor.ReplaceClauseContext> replaceClauseContexts =
         replacingPhraseContext.replaceClause();
     for (CobolPreprocessor.ReplaceClauseContext replaceClauseContext : replaceClauseContexts) {
+      boolean isPseudoTextReplacement = false;
       Pair<String, String> pattern;
       SearchPattern searchPattern = SearchPattern.EXACT;
       CobolPreprocessor.ReplacePseudoTextContext replacePseudoTextContext =
