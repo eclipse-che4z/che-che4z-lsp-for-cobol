@@ -2253,19 +2253,26 @@
   },
   "PACKED-DECIMAL": {
     "prefix": "PACKED-DECIMAL",
-    "body": [
-      "77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."
-    ],
+    "body": ["77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
     "description": "`PACKED-DECIMAL` variables (internally) are stroed with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. Note that `PACKED-DECIMAL` is identical to: `COMP-3`/`COMPUTATIONAL-3`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PADDING CHARACTER IS": {
     "prefix": "PADDING CHARACTER IS",
-    "body": ["SELECT ${2:INTERNAL-FILENAME} ASSIGN ${3:EXTFILE}", "BLOCK CONTAINS ${4:170}", "PADDING CHARACTER IS \"${1:B}\"."],
+    "body": [
+      "SELECT ${2:INTERNAL-FILENAME} ASSIGN ${3:EXTFILE}",
+      "BLOCK CONTAINS ${4:170}",
+      "PADDING CHARACTER IS \"${1:B}\"."
+    ],
     "description": "`PADDING CHARACTER` specifies a character (variable, defined in `WORKING-STORAGE`) to be used for record-blocking-factor padding on sequential files. (ie. Filling out a `BLOCK` of records - BLOCK being the unit of file I/O between DFSMS and your program's `DATA DIVISION`.) https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PASSWORD": {
     "prefix": "PASSWORD",
-    "body": ["SELECT ${2:PATIENT-VSAM-FILE} ASSIGN TO ${3:VSMIDXD}", "\tORGANIZATION IS ${4|INDEXED,RELATIVE,SEQUENTIAL|}.", "\tFILE STATUS IS ${5:WS-VSM-FILE-STATUS}", "\tPASSWORD IS ${1:BASE-PASS}."],
+    "body": [
+      "SELECT ${2:PATIENT-VSAM-FILE} ASSIGN TO ${3:VSMIDXD}",
+      "\tORGANIZATION IS ${4|INDEXED,RELATIVE,SEQUENTIAL|}.",
+      "\tFILE STATUS IS ${5:WS-VSM-FILE-STATUS}",
+      "\tPASSWORD IS ${1:BASE-PASS}."
+    ],
     "description": "`PASSWORD` names a `PIC X` or `PIC A` field in `WORKING-STORAGE`. The first 8 characters are assumed to be the `VSAM` file password. Note that VSAM ESDS, KSDS and RRDS filetypes can all be password protected. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PARSE": {
@@ -2275,7 +2282,13 @@
   },
   "PERFORM": {
     "prefix": "PERFORM UNTIL",
-    "body": ["MOVE ${2:1} TO SUB.", "PERFORM UNTIL SUB <= ${3:100}", "\t${4:codeHere}", "ADD +1 TO SUB", "END-PERFORM."],
+    "body": [
+      "MOVE ${2:1} TO SUB.",
+      "PERFORM UNTIL SUB <= ${3:100}",
+      "\t${4:codeHere}",
+      "ADD +1 TO SUB",
+      "END-PERFORM."
+    ],
     "description": "PERFORM PARAGRAPH X TIMES"
   },
   "PERFORM TIMES": {
@@ -2285,7 +2298,11 @@
   },
   "PERFORM THRU": {
     "prefix": "PERFORM THRU",
-    "body": ["PERFORM ${1:100-OPEN-FILES}", "\tTHRU ${2:100-FILES-EXIT}", "END-PERFORM."],
+    "body": [
+      "PERFORM ${1:100-OPEN-FILES}",
+      "\tTHRU ${2:100-FILES-EXIT}",
+      "END-PERFORM."
+    ],
     "description": "`PERFORM THRU` transfers control to one or more paragraphs or SECTIONS and returns control to the next sequential executable statement after the the `THRU` paragraph or `SECTION` finishes. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PERFORM-END-PERFORM": {
@@ -2315,7 +2332,12 @@
   },
   "POSITION": {
     "prefix": "POSITION",
-    "body": ["ENVIRONMENT DIVISION.", "INPUT-OUTPUT SECTION.", "I-O-CONTROL.", "\t\tMULTIPLE FILE TAPE CONTAINS ${1:file-name-5} POSITION ${2:n}."],
+    "body": [
+      "ENVIRONMENT DIVISION.",
+      "INPUT-OUTPUT SECTION.",
+      "I-O-CONTROL.",
+      "\t\tMULTIPLE FILE TAPE CONTAINS ${1:file-name-5} POSITION ${2:n}."
+    ],
     "description": "`POSITION` is used to specify a given (integer) file on TAPE reel. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "POSITIVE": {
@@ -2340,12 +2362,21 @@
   },
   "PROCEDURE DIVISION USING": {
     "prefix": "PROCEDURE DIVISION USING",
-    "body": ["DATA DIVISION.", "LINKAGE SECTION.", "01 ${1:EXTERNAL-DATA} ${2:PIC X(872)}.", "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}/"],
+    "body": [
+      "DATA DIVISION.",
+      "LINKAGE SECTION.",
+      "01 ${1:EXTERNAL-DATA} ${2:PIC X(872)}.",
+      "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}/"
+    ],
     "description": "`PROCEDURE DIVISION USING` allows you reference-ability to data being passed from a calling module to your program through the `LINKAGE SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PROCEDURE IS": {
     "prefix": "PROCEDURE IS",
-    "body": ["PROCEDURE DIVISION.", "SORT ${2:fileName}", "${1|INPUT,OUTPUT|} PROCEDURE IS ${2:100-RECORD-SEL} SECTION"],
+    "body": [
+      "PROCEDURE DIVISION.",
+      "SORT ${2:fileName}",
+      "${1|INPUT,OUTPUT|} PROCEDURE IS ${2:100-RECORD-SEL} SECTION"
+    ],
     "description": "The `INPUT` and `OUTPUT PROCEDURE`s are used to select specific records that will be released to a `SORT` - and process records returned from a `SORT`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PROCEDURE-POINTER": {
@@ -2360,12 +2391,18 @@
   },
   "PROCEED": {
     "prefix": "PROCEED",
-    "body": ["ALTER ${1:oldSectionOrParagraph} TO PROCEED TO ${2:newSectionOrParagraph"],
+    "body": [
+      "ALTER ${1:oldSectionOrParagraph} TO PROCEED TO ${2:newSectionOrParagraph"
+    ],
     "description": "The `ALTER` statement changes the code at run-time, transferring to other paragraphs like a `GO TO` statement. Note that `ALTER` is frowned upon - as it creates \"spaghetti code\" which can be extremely difficult to understand. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "PROCESSING": {
     "prefix": "PROCESSING",
-    "body": ["XML PARSE ${2:intentifier-1} RETURNING NATIONAL", "VALIDATING WITH ${3:indentifier-2} FILE ${4:xml-schema-name-1}", "PROCESSING PROCEDURE IS ${1:procedure-name-1}."],
+    "body": [
+      "XML PARSE ${2:intentifier-1} RETURNING NATIONAL",
+      "VALIDATING WITH ${3:indentifier-2} FILE ${4:xml-schema-name-1}",
+      "PROCESSING PROCEDURE IS ${1:procedure-name-1}."
+    ],
     "description": "`XML PARSE` translates an XML document into individual pieces, then passes each piece to a user-written COBOL paragraph. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "END PROGRAM": {
@@ -2375,7 +2412,11 @@
   },
   "PROGRAM-ID": {
     "prefix": "PROGRAM-ID.",
-    "body": ["IDENTIFICATION DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "$0"],
+    "body": [
+      "IDENTIFICATION DIVISION.",
+      "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.",
+      "$0"
+    ],
     "description": "PROGRAM-ID"
   },
   "PROPERTY": {
@@ -2396,7 +2437,18 @@
   },
   "QUEUE": {
     "prefix": "QUEUE",
-    "body": ["COMMUNICATION SECTION.", "CD ${2:CD-1} FOR INPUT", "\tSYMBOLIC QUEUE IS ${1:SQ1}", "\tMESSAGE DATE IS ${3:MD1}", "\tMESSAGE TIME IS ${4:MT2}", "\tSYMBOLIC SOURCE IS ${5:SS2}", "\tTEXT LENGTH IS ${6:TL2}", "\tEND KEY IS ${7:EK2}", "\tSTATUS KEY IS ${8:SK2}", "\tMESSAGE COUNT IS ${9:MC3}."],
+    "body": [
+      "COMMUNICATION SECTION.",
+      "CD ${2:CD-1} FOR INPUT",
+      "\tSYMBOLIC QUEUE IS ${1:SQ1}",
+      "\tMESSAGE DATE IS ${3:MD1}",
+      "\tMESSAGE TIME IS ${4:MT2}",
+      "\tSYMBOLIC SOURCE IS ${5:SS2}",
+      "\tTEXT LENGTH IS ${6:TL2}",
+      "\tEND KEY IS ${7:EK2}",
+      "\tSTATUS KEY IS ${8:SK2}",
+      "\tMESSAGE COUNT IS ${9:MC3}."
+    ],
     "description": "The `QUEUE` runtime option can used only in an OS/VS (or Bull) COBOL program with a `RECEIVE` statement in a `COMMUNICATION DESCRIPTION`."
   },
   "QUOTE": {
@@ -2411,12 +2463,19 @@
   },
   "READ (QSAM)": {
     "prefix": "READ",
-    "body": ["READ ${1:QSAM-File} INTO ${2:WS-Record-Layout}", "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-Switch}"],
+    "body": [
+      "READ ${1:QSAM-File} INTO ${2:WS-Record-Layout}",
+      "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-Switch}"
+    ],
     "description": "For QSAM file access, the READ statement makes the next record from a sequential file available to the program. In the given example, READ includes the INTO modifier - which moves the record from the I-O buffer into program `WORKING-STORAGE`, and the AT END modifier which forces z/OS to signal the program that the last record in the file has been read. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "READ (VSAM)": {
     "prefix": "READ",
-    "body": ["READ ${1:VSAM-File} INTO ${2:WS-Record-Layout}", "KEY IS ${2:Key-field}", "INVALID KEY ${3:imperative-statement}"],
+    "body": [
+      "READ ${1:VSAM-File} INTO ${2:WS-Record-Layout}",
+      "KEY IS ${2:Key-field}",
+      "INVALID KEY ${3:imperative-statement}"
+    ],
     "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier - which moves the record from the I-O buffer into program `WORKING-STORAGE`, and the `INVALID KEY` modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "READY": {
@@ -2426,27 +2485,56 @@
   },
   "RECORD": {
     "prefix": "RECORD",
-    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${2:CARPOOL}", "\tLABEL RECORDS STANDARD", "\tRECORD CONTAINS ${1:80} CHARACTERS."],
+    "body": [
+      "DATA DIVISION.",
+      "FILE SECTION.",
+      "FD ${2:CARPOOL}",
+      "\tLABEL RECORDS STANDARD",
+      "\tRECORD CONTAINS ${1:80} CHARACTERS."
+    ],
     "description": "As part of a COBOL `FD`, `RECORD` (singular) is used with the `RECORD CONTAINS` clause - which defines the size (in bytes) of each logical record in the file. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RECORDING": {
     "prefix": "RECORDING",
-    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${3:CARPOOL}", "\tLABEL RECORDS STANDARD", "RECORDING MODE IS ${1|F,FB,V,U,S|}", "\tRECORD CONTAINS ${2:80} CHARACTERS."],
+    "body": [
+      "DATA DIVISION.",
+      "FILE SECTION.",
+      "FD ${3:CARPOOL}",
+      "\tLABEL RECORDS STANDARD",
+      "RECORDING MODE IS ${1|F,FB,V,U,S|}",
+      "\tRECORD CONTAINS ${2:80} CHARACTERS."
+    ],
     "description": "As part of a COBOL FD, `RECORDING MODE` is used with `QSAM` files to describe the file/record data: `F`-Fixed (one record per/block), `FB`-Fixed/Blocked, `V`-Variable, `U`-Undefined (use for Load Modules) and `S`-Spanned records (extremely long records: I.E. larger than a Block). https://www.ibm.com/docs/en/cobol-zos/6.3?topic=entries-recording-mode-clause"
   },
   "RECORDS": {
     "prefix": "RECORDS",
-    "body": ["DATA DIVISION.", "FILE SECTION.", "FD ${2:CARPOOL}", "\tLABEL RECORDS STANDARD", "\tRECORD CONTAINS ${1:80} CHARACTERS."],
+    "body": [
+      "DATA DIVISION.",
+      "FILE SECTION.",
+      "FD ${2:CARPOOL}",
+      "\tLABEL RECORDS STANDARD",
+      "\tRECORD CONTAINS ${1:80} CHARACTERS."
+    ],
     "description": "As part of a COBOL FD, `RECORDS` (plural) is used with the `LABEL RECORDS` clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. Note that this is typically used with QSAM files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RECURSIVE": {
     "prefix": "RECURSIVE",
-    "body": ["IDENTIFICATION DIVISION.", "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}} RECURSIVE."],
+    "body": [
+      "IDENTIFICATION DIVISION.",
+      "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}} RECURSIVE."
+    ],
     "description": "An optional language element that allows programs to be reentered recursively. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "REDEFINES": {
     "prefix": "REDEFINES",
-    "body": ["WORKING-STORAGE SECTION.", "01 ${2:LAB-REC}.", "\t05 ${3:M-UNITS} PIC 9(6).", "\t05 ${4:SERUM} PIC 9(6).", "\t05 ${1:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.", "\t05 ${5:SERUM-CLASS} PIC X(3)."],
+    "body": [
+      "WORKING-STORAGE SECTION.",
+      "01 ${2:LAB-REC}.",
+      "\t05 ${3:M-UNITS} PIC 9(6).",
+      "\t05 ${4:SERUM} PIC 9(6).",
+      "\t05 ${1:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.",
+      "\t05 ${5:SERUM-CLASS} PIC X(3)."
+    ],
     "description": "`REDEFINES` allows one variable to share the same storage as another. It is a way to declare multiple fields for a single storage area in files and `WORKING-STORAGE`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "USING BY REFERENCE": {
@@ -2456,22 +2544,34 @@
   },
   "RELATIVE": {
     "prefix": "RELATIVE",
-    "body": ["SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
-    "\tORGANIZATION IS RELATIVE.",
-    "\tACCESS MODE IS ${3|SEQUENTIAL,RANDOM,DYNAMIC|}", 
-    "\tRELATIVE KEY IS ${5:key1}",
-    "\tFILE STATUS IS ${6:WS-FILE-STATUS-VAR}.",
-    "$0"],
+    "body": [
+      "SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
+      "\tORGANIZATION IS RELATIVE.",
+      "\tACCESS MODE IS ${3|SEQUENTIAL,RANDOM,DYNAMIC|}",
+      "\tRELATIVE KEY IS ${5:key1}",
+      "\tFILE STATUS IS ${6:WS-FILE-STATUS-VAR}.",
+      "$0"
+    ],
     "description": "Identify VSAM RRDS files in your program by using `ORGANIZATION IS RELATIVE`. `RELATIVE KEY IS` associates a logical record with its relative record number. https://www.ibm.com/docs/en/SS6SG3_6.3.0/pdf/cg.pdf"
   },
   "RELEASE": {
     "prefix": "RELEASE",
-    "body": ["MOVE ${2:SORT-EXT-RECORD} TO ${1:SORT-RECORD}", "PERFORM ${3:RELEASE-SORT-RECORD}", "\t", "RELEASE ${1:SORT-RECORD}"],
+    "body": [
+      "MOVE ${2:SORT-EXT-RECORD} TO ${1:SORT-RECORD}",
+      "PERFORM ${3:RELEASE-SORT-RECORD}",
+      "\t",
+      "RELEASE ${1:SORT-RECORD}"
+    ],
     "description": "`RELEASE` transfers records from an input/output area to the initial phase of a SORT. NOTE: `RELEASE` can only be used in an `INPUT PROCEDURE` `SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RELEASE FROM": {
     "prefix": "RELEASE FROM",
-    "body": ["MOVE ${3:SORT-EXT-RECORD} TO ${1:SORT-RECORD}", "PERFORM ${4:RELEASE-SORT-RECORD}", "\t", "RELEASE ${1:SORT-RECORD} FROM ${2:SORT-FILE-IN}"],
+    "body": [
+      "MOVE ${3:SORT-EXT-RECORD} TO ${1:SORT-RECORD}",
+      "PERFORM ${4:RELEASE-SORT-RECORD}",
+      "\t",
+      "RELEASE ${1:SORT-RECORD} FROM ${2:SORT-FILE-IN}"
+    ],
     "description": "`RELEASE FROM` moves data from one group field to the SORT field, then transfers records from an input/output area to the initial phase of a SORT. NOTE: `RELEASE FROM` can only be used in an `INPUT PROCEDURE` `SECTION`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "SERVICE RELOAD": {
@@ -2501,7 +2601,14 @@
   },
   "REPLACE": {
     "prefix": "REPLACE",
-    "body": ["REPLACE ==${1::TAG:}== BY ==${2:EMP-PAY}==.", "\t01 ${1::TAG:}.", "\t\t02 ${1::TAG:}-WEEK PIC S99.", "\t\t02 ${1::TAG:}-GROSS-PAY PIC S9(5)V99.", "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES", "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."],
+    "body": [
+      "REPLACE ==${1::TAG:}== BY ==${2:EMP-PAY}==.",
+      "\t01 ${1::TAG:}.",
+      "\t\t02 ${1::TAG:}-WEEK PIC S99.",
+      "\t\t02 ${1::TAG:}-GROSS-PAY PIC S9(5)V99.",
+      "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES",
+      "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."
+    ],
     "description": "`REPLACE` allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. Note that this is a Compilation (not run-time) level statement is similar to REPLACING except that it replaces text across an entire file - not simply a copybook. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "REPLACING": {
@@ -2516,7 +2623,11 @@
   },
   "RESERVE": {
     "prefix": "RESERVE",
-    "body": ["SELECT ${2:TESTDATA}", "ASSIGN TO ${3:UT-S-TESTDATA}", "\tRESERVE ${1:4} AREAS."],
+    "body": [
+      "SELECT ${2:TESTDATA}",
+      "ASSIGN TO ${3:UT-S-TESTDATA}",
+      "\tRESERVE ${1:4} AREAS."
+    ],
     "description": "`RESERVE` allows you to specify the number of I/O buffers to be allocated at run time for QSAM and VSAM files. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RESET TRACE": {
@@ -2526,7 +2637,11 @@
   },
   "RETURN": {
     "prefix": "RETURN",
-    "body": ["RETURN ${1:SORT-FILE-NAME}", "\tAT END MOVE \"${2:YES}\" TO ${3:WS-EOF-SRT-OUTPUT-SW}", "\tGO TO ${4:RETURN-SRTD-REC-EXIT}."],
+    "body": [
+      "RETURN ${1:SORT-FILE-NAME}",
+      "\tAT END MOVE \"${2:YES}\" TO ${3:WS-EOF-SRT-OUTPUT-SW}",
+      "\tGO TO ${4:RETURN-SRTD-REC-EXIT}."
+    ],
     "description": "The `RETURN` statement in the `OUTPUT PROCEDURE` of a COBOL `SORT` program is a request for the next sorted record. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "RETURN-CODE": {
@@ -2536,7 +2651,10 @@
   },
   "RETURNING": {
     "prefix": "RETURNING",
-    "body": ["INVOKE ${1:OO-CLASS-NAME} USING ${2:SENDING-FLD}", "\tRETURNING ${3:RECEIVING-FLD}."],
+    "body": [
+      "INVOKE ${1:OO-CLASS-NAME} USING ${2:SENDING-FLD}",
+      "\tRETURNING ${3:RECEIVING-FLD}."
+    ],
     "description": "The RETURNING phrase specifies a data item that will contain the value returned from the invoked method. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "REVERSED": {
@@ -2561,12 +2679,18 @@
   },
   "RIGHT": {
     "prefix": "RIGHT",
-    "body": ["01 ${3:GROUP-FLD}.", "\t05 ${1:ACCTG-CODE} ${2:PIC X(999)} JUSTIFIED RIGHT."],
+    "body": [
+      "01 ${3:GROUP-FLD}.",
+      "\t05 ${1:ACCTG-CODE} ${2:PIC X(999)} JUSTIFIED RIGHT."
+    ],
     "description": "`JUSTIFIED` overrides COBOL's standard byte-movement rules for receiving data of type: `PIC A`, `PIC X`, `DBCS`, `NATIONAL`. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "ROUNDED": {
     "prefix": "ROUNDED",
-    "body": ["77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.", "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."],
+    "body": [
+      "77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.",
+      "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."
+    ],
     "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5. https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf"
   },
   "SEARCH ALL WHEN": {
