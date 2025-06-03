@@ -27,11 +27,15 @@ import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /** Visitor */
 public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisitor<Object> {
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
   private final Position startPosition;
+  private final List<String> cicsDirectives = new ArrayList<>();
 
   public CompilerDirectivesVisitor(
       AnalysisContext ctx, MessageService messageService, Position startPosition) {
@@ -120,5 +124,23 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                           .build());
             });
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
+  }
+
+  @Override
+  public Object visitCicsTranslatorDirectives(
+      CompilerDirectivesParser.CicsTranslatorDirectivesContext ctx) {
+    for (CompilerDirectivesParser.CicsTranslatorOptionsContext options :
+        ctx.cicsTranslatorOptions()) {
+      if (options != null) {
+        this.cicsDirectives.add(options.getText());
+      }
+    }
+    List<String> directivesConfig =
+        analysisContext.getConfig().getPreprocessorsDirectives().get("CICS");
+    if (directivesConfig != null) cicsDirectives.addAll(directivesConfig);
+
+    analysisContext.getPreprocessorsDirectives().put("CICS", cicsDirectives);
+
+    return super.visitCicsTranslatorDirectives(ctx);
   }
 }

@@ -33,4 +33,5 @@ public class DialectProcessingContext {
   CleanerPreprocessor preprocessor;
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();
   @Builder.Default String languageId = "cobol";
+  @Builder.Default List<String> cicsTranslatorOptions = new ArrayList<>();
 }
