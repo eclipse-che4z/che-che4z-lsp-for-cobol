@@ -26,7 +26,7 @@ import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.jrpc.CopybookResolutionResult;
 import org.eclipse.lsp4j.Location;
 
-/** Dialect Resolve Copybook Query **/
+/** Dialect Resolve Copybook Query */
 public class DialectResolveCopybookQuery implements LspQuery<CopybookResolutionResult> {
   private final DialectProcessingManager dialectProcessingManager;
   private final CompletableFuture<CopybookResolutionResult> result;

@@ -24,7 +24,7 @@ import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacement;
 import org.eclipse.lsp4j.Location;
 
-/** Dialect Insert Copybook Notification **/
+/** Dialect Insert Copybook Notification */
 public class DialectInsertCopybookNotification implements LspNotification {
 
   private final DialectProcessingManager dialectProcessingManager;

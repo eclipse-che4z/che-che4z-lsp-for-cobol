@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.lsp.events.notifications;
 
+import static java.util.Optional.ofNullable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Value;
@@ -21,9 +23,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingManager;
 import org.eclipse.lsp.cobol.lsp.LspNotification;
 import org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacement;
 
-import static java.util.Optional.ofNullable;
-
-/** Dialect Finish Processing Notification **/
+/** Dialect Finish Processing Notification * */
 public class DialectFinishedNotification implements LspNotification {
 
   @Value
@@ -41,10 +41,8 @@ public class DialectFinishedNotification implements LspNotification {
     this.dialectProcessingManager = dialectProcessingManager;
     this.event =
         ofNullable(
-            new Gson()
-                .fromJson(
-                    params.toString(),
-                    DialectFinishedNotification.FinishEvent.class))
+                new Gson()
+                    .fromJson(params.toString(), DialectFinishedNotification.FinishEvent.class))
             .orElseGet(
                 () ->
                     new DialectFinishedNotification.FinishEvent(
@@ -53,6 +51,7 @@ public class DialectFinishedNotification implements LspNotification {
 
   @Override
   public void execute() {
-    dialectProcessingManager.finish(event.getDialectName(), event.getProgramUri(), event.getReplacements());
+    dialectProcessingManager.finish(
+        event.getDialectName(), event.getProgramUri(), event.getReplacements());
   }
 }

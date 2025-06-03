@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
 
 import com.google.inject.Provider;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,9 +42,9 @@ import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
+import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
 
 /** Dialect Api Client * */
 @Slf4j
@@ -99,7 +98,9 @@ public class DialectProcessingManager {
 
     DialectProcessingContextData contextData = new DialectProcessingContextData(context, errorList);
     dialectProcesses.put(createKey(name, context.getProgramDocumentUri()), contextData);
-    contextData.getDocuments().put(context.getProgramDocumentUri(), new DocumentInfo("", context.getExtendedDocument()));
+    contextData
+        .getDocuments()
+        .put(context.getProgramDocumentUri(), new DocumentInfo("", context.getExtendedDocument()));
 
     dialectClientApi.processDialect(
         name, context.getExtendedDocument().getUri(), context.getExtendedDocument().toString());
@@ -147,10 +148,14 @@ public class DialectProcessingManager {
       contextData.getErrorList().add(missingCopybooks(locality, copybookName));
       return new CopybookResolutionResult(null, null, null);
     }
-    ExtendedDocument copybook = new ExtendedDocument(copybookModel.getContent(), copybookModel.getUri());
+    ExtendedDocument copybook =
+        new ExtendedDocument(copybookModel.getContent(), copybookModel.getUri());
 
-    contextData.getDocuments().put(copybookModel.getUri(), new DocumentInfo(copybookName, copybook));
-    return new CopybookResolutionResult(copybookName, copybookModel.getUri(), copybookModel.getContent());
+    contextData
+        .getDocuments()
+        .put(copybookModel.getUri(), new DocumentInfo(copybookName, copybook));
+    return new CopybookResolutionResult(
+        copybookName, copybookModel.getUri(), copybookModel.getContent());
   }
 
   /**
@@ -177,45 +182,63 @@ public class DialectProcessingManager {
         contextData -> {
           // Prepare copybook for insertion
           DocumentInfo copybookInfo = contextData.getDocuments().get(copybookUri);
-          Locality statementLocality = Locality.builder()
-              .uri(statementLocation.getUri())
-              .range(statementLocation.getRange())
-              .build();
+          Locality statementLocality =
+              Locality.builder()
+                  .uri(statementLocation.getUri())
+                  .range(statementLocation.getRange())
+                  .build();
 
           if (copybookInfo != null) {
             for (DocumentReplacement replacement : replacements) {
               try {
-                copybookInfo.getDocument().replace(
-                    replacement.getRange(),
-                    replacement.getText());
+                copybookInfo.getDocument().replace(replacement.getRange(), replacement.getText());
               } catch (Exception e) {
-                LOG.warn("Error processing document {} with replacement {}, insert copybook operation ignored", copybookUri, replacement);
-                Locality locality = Locality.builder()
-                    .uri(copybookUri)
-                    .range(replacement.getRange())
-                    .copybookId(copybookInfo.getName())
-                    .build();
-                contextData.getErrorList().add(processingError(locality, dialectName, e.getMessage()));
+                LOG.warn(
+                    "Error processing document {} with replacement {}, insert copybook operation ignored",
+                    copybookUri,
+                    replacement);
+                Locality locality =
+                    Locality.builder()
+                        .uri(copybookUri)
+                        .range(replacement.getRange())
+                        .copybookId(copybookInfo.getName())
+                        .build();
+                contextData
+                    .getErrorList()
+                    .add(processingError(locality, dialectName, e.getMessage()));
               }
             }
 
             DocumentInfo targetDocument =
                 contextData.getDocuments().get(statementLocation.getUri());
             if (targetDocument != null) {
-              targetDocument.getDocument().insertCopybook(statementLocation.getRange(), copybookInfo.getDocument().getCurrentText());
-              contextData.getNodes().add(new CopyNode(statementLocality, nameLocation, copybookInfo.getName(), copybookUri));
+              targetDocument
+                  .getDocument()
+                  .insertCopybook(
+                      statementLocation.getRange(), copybookInfo.getDocument().getCurrentText());
+              contextData
+                  .getNodes()
+                  .add(
+                      new CopyNode(
+                          statementLocality, nameLocation, copybookInfo.getName(), copybookUri));
             } else {
-              String message = String.format("Target document %s for insertion of the dialect copybook %s was not found",
-                  dialectName,
-                  copybookUri);
-              contextData.getErrorList().add(processingError(statementLocality, dialectName, message));
+              String message =
+                  String.format(
+                      "Target document %s for insertion of the dialect copybook %s was not found",
+                      dialectName, copybookUri);
+              contextData
+                  .getErrorList()
+                  .add(processingError(statementLocality, dialectName, message));
             }
           } else {
-            String message = String.format("Dialect %s copybook %s was not found, operation ignored",
-                dialectName,
-                copybookUri);
+            String message =
+                String.format(
+                    "Dialect %s copybook %s was not found, operation ignored",
+                    dialectName, copybookUri);
             LOG.warn(message);
-            contextData.getErrorList().add(processingError(statementLocality, dialectName, message));
+            contextData
+                .getErrorList()
+                .add(processingError(statementLocality, dialectName, message));
           }
         });
   }
@@ -284,10 +307,10 @@ public class DialectProcessingManager {
         .errorSource(ErrorSource.DIALECT)
         .location(locality.toOriginalLocation())
         .suggestion(
-            messageService.getMessage("GrammarPreprocessorListener.errorProcessingDialect", dialect, message))
+            messageService.getMessage(
+                "GrammarPreprocessorListener.errorProcessingDialect", dialect, message))
         .severity(ERROR)
         .errorCode(ErrorCodes.MISSING_COPYBOOK)
         .build();
   }
-
 }

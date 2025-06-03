@@ -59,7 +59,8 @@ class CobolDialectV2 implements CobolDialect {
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<SyntaxError> errorList = new ArrayList<>();
     CompletableFuture<List<Node>> future =
-        CompletableFuture.supplyAsync(() -> dialectManager.processDialect(getName(), context, errorList));
+        CompletableFuture.supplyAsync(
+            () -> dialectManager.processDialect(getName(), context, errorList));
     boolean processed = true;
     List<Node> dialectNodes = new ArrayList<>();
     try {
