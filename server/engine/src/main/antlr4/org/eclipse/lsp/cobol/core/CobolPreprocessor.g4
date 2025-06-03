@@ -92,7 +92,7 @@ pseudoReplaceable
    ;
 
 pseudoReplacement
-   : (openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR2)*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
+   : openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR2)* closingPseudoTextDelimiter | EMPTYPSEUDOTEXT
    ;
 
 openingPseudoTextDelimiter
