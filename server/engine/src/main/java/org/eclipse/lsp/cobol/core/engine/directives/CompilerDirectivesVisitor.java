@@ -128,17 +128,20 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   @Override
   public Object visitCicsTranslatorDirectives(
       CompilerDirectivesParser.CicsTranslatorDirectivesContext ctx) {
+    List<String> cicsDirectives = analysisContext.getPreprocessorsDirectives().computeIfAbsent("CICS", () -> {
+      List<String> initial = new ArrayList<>();
+      List<String> directivesConfig = analysisContext.getConfig().getPreprocessorsDirectives().get("CICS");
+      if (directivesConfig != null) initial .addAll(directivesConfig);
+      return initial;
+    });
     for (CompilerDirectivesParser.CicsTranslatorOptionsContext options :
         ctx.cicsTranslatorOptions()) {
       if (options != null) {
-        this.cicsDirectives.add(options.getText());
+        cicsDirectives.add(options.getText());
       }
     }
-    List<String> directivesConfig =
-        analysisContext.getConfig().getPreprocessorsDirectives().get("CICS");
-    if (directivesConfig != null) cicsDirectives.addAll(directivesConfig);
 
-    analysisContext.getPreprocessorsDirectives().put("CICS", cicsDirectives);
+    return super.visitCicsTranslatorDirectives(ctx);
 
     return super.visitCicsTranslatorDirectives(ctx);
   }
