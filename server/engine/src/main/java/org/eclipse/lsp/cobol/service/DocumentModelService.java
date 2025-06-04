@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.service;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.function.Predicate;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp4j.Diagnostic;
 
@@ -32,6 +34,12 @@ public class DocumentModelService {
   private final Map<String, CobolDocumentModel> docs = new HashMap<>();
   private final Map<String, List<Diagnostic>> diagnosticRepo =
       Collections.synchronizedMap(new HashMap<>());
+  private final SourceUnitGraph sourceUnitGraph;
+
+  @Inject
+  public DocumentModelService(SourceUnitGraph sourceUnitGraph) {
+    this.sourceUnitGraph = sourceUnitGraph;
+  }
 
   /**
    * Mark the document as opened and stores document text
@@ -56,6 +64,27 @@ public class DocumentModelService {
   @Synchronized
   public CobolDocumentModel get(String uri) {
     return docs.get(uri);
+  }
+
+  /***
+   * Returns all possible source models
+   * @param uri - document uri
+   * @return list of document models
+   */
+  @Synchronized
+  public Collection<CobolDocumentModel> findMainSource(String uri) {
+    if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
+      return sourceUnitGraph.getAllAssociatedFilesForACopybook(uri).stream()
+          .filter(a -> !sourceUnitGraph.isUserSuppliedCopybook(a))
+          .map(docs::get)
+          .collect(Collectors.toList());
+    }
+
+    if (docs.containsKey(uri) && docs.get(uri).isDocumentSynced()) {
+      return Collections.singletonList(docs.get(uri));
+    }
+
+    return Collections.emptyList();
   }
 
   /**

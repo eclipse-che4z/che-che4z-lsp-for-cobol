@@ -196,7 +196,7 @@ public class SectionNodeProcessorHelper {
         Locality variableLocality = variable.getLocality();
         if (RangeUtils.isBefore(
             variableLocality.getRange().getStart(), copybNodeChildLocality.getRange().getStart())) {
-          break;
+          return;
         }
       }
       if (!isVariableNodeAlreadyPresentIn(copyNode, (VariableDefinitionNode) variable)) {

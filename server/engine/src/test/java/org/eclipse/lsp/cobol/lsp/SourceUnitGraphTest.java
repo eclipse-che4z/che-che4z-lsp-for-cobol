@@ -45,7 +45,7 @@ class SourceUnitGraphTest {
 
   @Test
   void testNotifyState() {
-    SourceUnitGraph sourceUnitGraph = new SourceUnitGraph(fileService, asyncAnalysisService);
+    SourceUnitGraph sourceUnitGraph = new SourceUnitGraph(fileService);
     String initialDocumentText = "sample text for test";
     String updatedContent = "Updated content";
     sourceUnitGraph.notifyState(
@@ -67,7 +67,7 @@ class SourceUnitGraphTest {
     String copy1Uri = "file://copy1.cpy";
     String copy2Uri = "file://copy2.cpy";
     String copy3Uri = "file://copy3.cpy";
-    SourceUnitGraph sourceUnitGraph = new SourceUnitGraph(fileService, asyncAnalysisService);
+    SourceUnitGraph sourceUnitGraph = new SourceUnitGraph(fileService);
     RootNode rootNode = mock(RootNode.class);
     when(fileService.getPathFromURI(anyString())).thenReturn(Paths.get(""));
     when(fileService.getContentByPath(any()))

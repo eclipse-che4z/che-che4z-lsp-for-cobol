@@ -15,26 +15,35 @@
 package org.eclipse.lsp.cobol.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
+import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp4j.Diagnostic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /** Test for DocumentModelService */
+@ExtendWith(MockitoExtension.class)
 class DocumentModelServiceTest {
+  @Mock private SourceUnitGraph sourceUnitGraph;
   private DocumentModelService service;
   private String languageId = "cobol";
 
   @BeforeEach
   void init() {
-    service = new DocumentModelService();
+    service = new DocumentModelService(sourceUnitGraph);
   }
 
   @Test
@@ -135,5 +144,36 @@ class DocumentModelServiceTest {
     Map<String, List<Diagnostic>> diagnostics = service.getOpenedDiagnostic();
     assertEquals(0, diagnostics.get(uri).size());
     assertNotNull(service.get(uri));
+  }
+
+  @Test
+  void testFindMainSource() {
+    String uri = UUID.randomUUID().toString();
+    service.openDocument(uri, UUID.randomUUID().toString(), languageId);
+    service.processAnalysisResult(uri, createAnalysisResult(uri), "text");
+
+    when(sourceUnitGraph.getAllAssociatedFilesForACopybook(uri))
+        .thenReturn(ImmutableList.of("file1", "file2"));
+
+    // uri is userSuppliedCopybook, and one associated file meets the condition
+    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(true, false, true);
+    Collection<CobolDocumentModel> mainSources1 = service.findMainSource(uri);
+    assertEquals(1, mainSources1.size());
+
+    // uri is userSuppliedCopybook, and no file meets the condition
+    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(true, true, true);
+    Collection<CobolDocumentModel> mainSources2 = service.findMainSource(uri);
+    assertEquals(0, mainSources2.size());
+
+    // uri is NOT userSuppliedCopybook, doc is in the list and synced
+    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    Collection<CobolDocumentModel> mainSources3 = service.findMainSource(uri);
+    assertEquals(1, mainSources3.size());
+    assertEquals(uri, mainSources3.iterator().next().getUri());
+
+    // uri is not recognised
+    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    Collection<CobolDocumentModel> mainSources4 = service.findMainSource(uri + "foo");
+    assertEquals(0, mainSources4.size());
   }
 }

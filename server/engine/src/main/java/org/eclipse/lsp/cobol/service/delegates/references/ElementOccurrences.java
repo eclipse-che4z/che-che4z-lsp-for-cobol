@@ -45,9 +45,6 @@ public class ElementOccurrences implements Occurrences {
   public @NonNull List<Location> findDefinitions(
       @NonNull CobolDocumentModel document, @NonNull TextDocumentPositionParams position) {
     String uri = position.getTextDocument().getUri();
-    if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
-      return getCopybookLocation(position, uri);
-    }
     return SymbolsRepository.findElementByPosition(
             uri, document.getLastAnalysisResult(), position.getPosition())
         .map(DefinedAndUsedStructure::getDefinitions)
