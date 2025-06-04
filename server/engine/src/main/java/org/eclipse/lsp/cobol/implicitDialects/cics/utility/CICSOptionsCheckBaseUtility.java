@@ -62,7 +62,7 @@ public abstract class CICSOptionsCheckBaseUtility {
           put(CICSParser.RULE_cics_into, "INTO or SET");
         }
       };
-  private boolean noLengthEnabled;
+  private CICSCheckUtilityParameters utilityParameters;
 
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
