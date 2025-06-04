@@ -243,11 +243,12 @@ class TestReplaceCompilerDirective {
   @Test
   void testReplace_whenPseudoTextEndsWithEqualChars() {
     UseCaseEngine.runTest(
-            TEXT_PSEUDO_TEXT_ENDS_WITH_EQUAL_CHAR,
-            ImmutableList.of(),
-            ImmutableMap.of(),
-            Collections.emptyList());
+        TEXT_PSEUDO_TEXT_ENDS_WITH_EQUAL_CHAR,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        Collections.emptyList());
   }
+
   // TODO: Add use case test scenario
   // 1. Add support in usecase test engine
   // 2. Diagnostics - IGYDS1082-E A period was required. is wrong and should be fixed.
