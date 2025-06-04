@@ -30,7 +30,10 @@ import {
   COPYBOOK_COMPLETIONS_SORT_PREFIX,
   DEFAULT_DIALECT,
 } from "../../constants";
-import { CopyStatementParser, DialectRegistry } from "../DialectRegistry";
+import {
+  CopyStatementParser,
+  DialectRegistry,
+} from "../../dialect/DialectRegistry";
 import { listLocalCopybooks } from "./LocalCopybooksService";
 
 const isDefaultCopyStatement: CopyStatementParser = (statement: string) => {

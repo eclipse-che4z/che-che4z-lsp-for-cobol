@@ -13,7 +13,7 @@
  */
 import * as vscode from "vscode";
 import { LANGUAGE_ID, SETTINGS_DIALECT } from "../../constants";
-import { DialectRegistry } from "../DialectRegistry";
+import { DialectRegistry } from "../../dialect/DialectRegistry";
 import cobolSnippets = require("./cobolSnippets.json");
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";

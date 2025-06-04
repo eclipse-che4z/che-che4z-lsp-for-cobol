@@ -36,7 +36,10 @@ import {
   SETTINGS_UNREACHABLE_CODE_SEVERITY,
   SETTINGS_MAXIMUM_VM_COUNT,
 } from "../constants";
-import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
+import {
+  DialectRegistry,
+  DIALECT_REGISTRY_SECTION,
+} from "../dialect/DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookEncodingConfig,

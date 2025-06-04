@@ -22,10 +22,7 @@ import {
 import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
 import { Uri } from "../../../__mocks__/UriMock";
-import {
-  DialectInfo,
-  DialectRegistry,
-} from "../../../services/DialectRegistry";
+import { DialectInfo, DialectRegistry } from "../../../dialect/DialectRegistry";
 import { DEFAULT_DIALECT } from "../../../constants";
 import * as LocalCopybookService from "../../../services/copybook/LocalCopybooksService";
 

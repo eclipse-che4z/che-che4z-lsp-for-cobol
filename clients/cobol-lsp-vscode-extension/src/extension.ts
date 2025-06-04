@@ -43,7 +43,7 @@ import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
 import {
   CopyStatementParser,
   DialectRegistry,
-} from "./services/DialectRegistry";
+} from "./dialect/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { lspConfigHandler, SettingsService } from "./services/Settings";
 import {
@@ -69,7 +69,7 @@ import {
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
 import { DownloadDiagnosticsService } from "./services/DiagnosticsService";
-import { DialectService } from "./services/DialectService";
+import { DialectService } from "./dialect/DialectService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;

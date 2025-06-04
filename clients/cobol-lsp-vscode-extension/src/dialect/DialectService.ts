@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { V2StartProcessingHandler } from "@code4z/cobol-dialect-api";
-import { LanguageClientService } from "./LanguageClientService";
+import { LanguageClientService } from "../services/LanguageClientService";
 import { Location } from "vscode";
 
 type DocumentReplacement = {
@@ -78,6 +78,13 @@ export class DialectService {
     );
   }
 
+  public registerStartHandler(
+    dialectName: string,
+    handler: V2StartProcessingHandler,
+  ) {
+    this.handlers.set(dialectName, handler);
+  }
+
   public async resolveCopybook(
     dialectName: string,
     programUri: string,
@@ -93,10 +100,6 @@ export class DialectService {
         statementLocation: this.serializeLocation(statementLocation),
       });
     return result as { copybookName: string; uri: string; text: string };
-  }
-
-  public registerStartHandler(name: string, handler: V2StartProcessingHandler) {
-    this.handlers.set(name, handler);
   }
 
   public async insertCopybook(

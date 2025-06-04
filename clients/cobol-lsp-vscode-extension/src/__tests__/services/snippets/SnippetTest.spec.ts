@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { SnippetCompletionProvider } from "../../../services/snippetcompletion/SnippetCompletionProvider";
-import { DialectRegistry } from "../../../services/DialectRegistry";
+import { DialectRegistry } from "../../../dialect/DialectRegistry";
 import path = require("path");
 import { createExtensionContextMock } from "../../../__mocks__/ExtensionContext.utility";
 

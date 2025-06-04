@@ -20,7 +20,7 @@ import {
   DIALECT_REGISTRY_SECTION,
   DialectInfo,
   DialectRegistry,
-} from "../../services/DialectRegistry";
+} from "../../dialect/DialectRegistry";
 
 import { asMutable } from "../../test/suite/testHelper";
 import {

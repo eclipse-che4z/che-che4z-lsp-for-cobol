@@ -13,7 +13,7 @@
  */
 
 import { Uri } from "vscode";
-import { DialectRegistry } from "../../services/DialectRegistry";
+import { DialectRegistry } from "../../dialect/DialectRegistry";
 
 describe("DialectRegistry test", () => {
   beforeEach(() => {
