@@ -17,8 +17,9 @@ import { PathReporter } from "io-ts/lib/PathReporter";
 import { isLeft } from "fp-ts/Either";
 import { TextDecoder } from "util";
 import { asArray, hasMember } from "./util/Utils";
-import LocalPathLib from "./processorGroups/LocalProcessorGroupLib";
-import { UssPathLib } from "./processorGroups/UssPathConfig";
+import LocalPathLib from "./copybookLibs/LocalPathLib";
+import { UssPathLib } from "./copybookLibs/UssPathConfig";
+import { DatasetLib } from "./copybookLibs/DatasetLib";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -165,7 +166,7 @@ export type TransformedProcessorGroup = {
   // "target-sql-backend"?: string;
 } & Partial<ProcessorGroupProperties>;
 
-export type TransformedLibs = LocalPathLib | UssPathLib;
+export type TransformedLibs = LocalPathLib | DatasetLib | UssPathLib;
 export type TransformedPreprocessor = {
   name: string;
 } & Partial<ProcessorGroupProperties>;
@@ -225,7 +226,7 @@ export function transformLibs(libs?: CopybookLibs): TransformedLibs[] {
     return [];
   }
 
-  const processorGroupLibTypes = [LocalPathLib];
+  const processorGroupLibTypes = [LocalPathLib, DatasetLib];
 
   const results = processorGroupLibTypes.map((pg) => pg.create(libs)).flat();
 

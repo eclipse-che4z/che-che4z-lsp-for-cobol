@@ -2,10 +2,10 @@ import { LocalFilesystemResourceService } from "../LocalFilesystemResourceServic
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
-import ProcessorGroupLib from "./ProcessorGroupLib";
+import CopybookLib from "./ProcessorGroupLib";
 import * as vscode from "vscode";
 
-export default class LocalPathLib implements ProcessorGroupLib {
+export default class LocalPathLib implements CopybookLib {
   constructor(private path: string) {}
 
   static create(configs: CopybookLibs) {

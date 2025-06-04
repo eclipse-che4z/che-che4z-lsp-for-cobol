@@ -1,5 +1,5 @@
 import { Uri } from "vscode";
-import ProcessorGroupLib from "./ProcessorGroupLib";
+import CopybookLib from "./ProcessorGroupLib";
 import * as vscode from "vscode";
 import { USS } from "../../constants";
 import { getVariablesFromUri } from "../util/FSUtils";
@@ -28,7 +28,7 @@ export class UssPathLibFactory {
   }
 }
 
-export class UssPathLib implements ProcessorGroupLib {
+export class UssPathLib implements CopybookLib {
   private uss: string;
   private profile: string;
 
@@ -43,6 +43,7 @@ export class UssPathLib implements ProcessorGroupLib {
     _documentUri: Uri,
     _dsnDownloader: CopybookDownloaderForDsn,
     ussDownloader: CopybookDownloaderForUss,
+    explorerApi?: IApiRegisterClient,
   ): Promise<Uri | undefined> {
     return ussDownloader.resolveCopybookUri(
       this.profile,
