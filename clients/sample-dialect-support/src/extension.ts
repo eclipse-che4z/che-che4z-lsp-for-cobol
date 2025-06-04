@@ -15,7 +15,7 @@
 import * as vscode from "vscode";
 import { getV2Api, V2Api } from "@code4z/cobol-dialect-api";
 
-const DIALECT_NAME = "Sample";
+const DIALECT_NAME = "SAMPLE";
 
 let outputChannel: vscode.OutputChannel;
 let unregisterDialect = () => {};

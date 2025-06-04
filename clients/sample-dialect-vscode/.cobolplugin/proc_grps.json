@@ -1,0 +1,10 @@
+{
+    "pgroups": [
+        {
+            "name": "SAMPLE",
+            "libs": [
+                "copybook"
+            ]
+        }
+    ]
+}

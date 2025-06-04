@@ -4,7 +4,7 @@
   "description": "Sample Dialect Support With Basic Functionality",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "0.0.1",
+  "version": "0.0.1-TEMPLATE",
   "preview": false,
   "publisher": "BroadcomMFD",
   "keywords": [
@@ -46,14 +46,14 @@
       }
     ],
     "configuration": {
-      "title": "COBOL Language Support for Sample Dialect",
+      "title": "COBOL Language Support for SAMPLE Dialect",
       "properties": {
         "cobol-lsp.cpy-manager.sample.paths-local": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Default list of local paths to search for Sample Dialect copybooks",
+          "description": "Default list of local paths to search for SAMPLE Dialect copybooks",
           "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.sample.paths-dsn": {
@@ -61,7 +61,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Default list of datasets to search for Sample Dialect copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "description": "Default list of datasets to search for SAMPLE Dialect copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
           "uniqueItems": true
         },
         "cobol-lsp.cpy-manager.sample.paths-uss": {
@@ -69,7 +69,7 @@
           "items": {
             "type": "string"
           },
-          "description": "Default list of USS paths to search for Sample Dialect copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
+          "description": "Default list of USS paths to search for SAMPLE Dialect copybooks\nZowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe",
           "uniqueItems": true
         }
       }
