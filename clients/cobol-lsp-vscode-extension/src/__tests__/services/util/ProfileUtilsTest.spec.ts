@@ -62,7 +62,7 @@ function getZoweExplorerMock(): IApiRegisterClient {
 }
 
 describe("Test profile Utils", () => {
-  const programName = "COBOLFILE.cbl";
+  const programUri = vscode.Uri.file("/COBOLFILE.cbl");
   const profile = "profile";
   it("checks a profile passed through settings is always given preference over profile from doc path for copybook download", () => {
     const zoweApiMock = getZoweExplorerMock();
@@ -71,7 +71,7 @@ describe("Test profile Utils", () => {
     });
     ProfileUtils.getAvailableProfiles = () => [profile];
     expect(
-      ProfileUtils.getProfileNameForCopybook(programName, zoweApiMock),
+      ProfileUtils.getProfileNameForCopybook(programUri, zoweApiMock),
     ).toBe("profileInSettings");
   });
 
@@ -81,7 +81,7 @@ describe("Test profile Utils", () => {
       get: jest.fn().mockReturnValue("profile2"),
     });
     expect(
-      ProfileUtils.getProfileNameForCopybook(programName, zoweApiMock),
+      ProfileUtils.getProfileNameForCopybook(programUri, zoweApiMock),
     ).toBe("profile2");
   });
   it("test zowe v3 profile extraction", () => {
@@ -93,15 +93,26 @@ describe("Test profile Utils", () => {
         fsPath: match?.[2]?.replace("/", path.sep),
       };
     });
-    expect(ProfileUtils.getProfileFromDocument("", undefined)).toBeUndefined();
     expect(
-      ProfileUtils.getProfileFromDocument("zowe-ds:", undefined),
+      ProfileUtils.getProfileFromDocument(vscode.Uri.parse(""), undefined),
     ).toBeUndefined();
     expect(
-      ProfileUtils.getProfileFromDocument("zowe-ds:/", undefined),
+      ProfileUtils.getProfileFromDocument(
+        vscode.Uri.parse("zowe-ds:"),
+        undefined,
+      ),
     ).toBeUndefined();
     expect(
-      ProfileUtils.getProfileFromDocument("zowe-ds:/profile", undefined),
+      ProfileUtils.getProfileFromDocument(
+        vscode.Uri.parse("zowe-ds:/"),
+        undefined,
+      ),
+    ).toBeUndefined();
+    expect(
+      ProfileUtils.getProfileFromDocument(
+        vscode.Uri.parse("zowe-ds:/profile"),
+        undefined,
+      ),
     ).toBe("profile");
   });
 });

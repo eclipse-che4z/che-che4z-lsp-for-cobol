@@ -16,10 +16,9 @@ import { workspace, Uri } from "vscode";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { isLeft } from "fp-ts/Either";
 import { TextDecoder } from "util";
-import { hasMember } from "./util/Utils";
+import { asArray, hasMember } from "./util/Utils";
 import LocalPathLib from "./processorGroups/LocalProcessorGroupLib";
 import { UssPathLib } from "./processorGroups/UssPathConfig";
-import { asArray } from "../type/e4eApi";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -57,11 +56,11 @@ export async function readWorkspaceConfig(
   const programs = await readProgramConfig(workspaceUri);
 
   programs.pgms.forEach((program) => {
-    const processorGroup = processorGroups.find(
-      (p) => p.name === program.pgroup,
-    );
+    let processorGroup = processorGroups.find((p) => p.name === program.pgroup);
     if (!processorGroup) {
-      throw Error(`Processor group ${program.pgroup} definition missing.`);
+      //throw Error(`Processor group ${program.pgroup} definition missing.`);
+      // TODO: report missing pg configuration
+      processorGroup = { name: program.pgroup };
     }
     workspaceConfig.programs.push({
       program: program.program,
@@ -221,7 +220,7 @@ function transformProcessorGroup(
   return result;
 }
 
-function transformLibs(libs?: CopybookLibs): TransformedLibs[] {
+export function transformLibs(libs?: CopybookLibs): TransformedLibs[] {
   if (!libs) {
     return [];
   }

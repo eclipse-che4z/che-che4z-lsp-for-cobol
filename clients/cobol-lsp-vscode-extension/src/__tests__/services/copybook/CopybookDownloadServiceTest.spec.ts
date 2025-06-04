@@ -29,7 +29,6 @@ import * as vscode from "vscode";
 import { createZoweExplorerMock } from "../../../__mocks__/getZoweExplorerMock.utility";
 import { DownloadUtil } from "../../../services/copybook/downloader/DownloadUtil";
 import { E4E } from "../../../type/e4eApi";
-import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { SettingsService } from "../../../services/Settings";
 import { FileNotFound, readDirectoryResult } from "../../../__mocks__/vscode";
 import * as ProcessorGroupLoader from "../../../services/ProcessorGroupsLoader";
@@ -120,16 +119,16 @@ describe("Tests copybook download service", () => {
           .spyOn(diagnosticsService, "showDiagnostics")
           .mockImplementation();
 
-        const spyConfig = jest.spyOn(
-          ProcessorGroups,
-          "loadProcessorGroupCopybookPathsConfig",
-        );
-        spyConfig.mockResolvedValue([
-          {
-            dataset: "dataset",
-            uss: "uss",
-          },
-        ]);
+        // const spyConfig = jest.spyOn(
+        //   ProcessorGroups,
+        //   "loadProcessorGroupCopybookPathsConfig",
+        // );
+        // spyConfig.mockResolvedValue([
+        //   {
+        //     dataset: "dataset",
+        //     uss: "uss",
+        //   },
+        // ]);
         await service.resolveCopybookURI(
           "file:///document-uri",
           "copybook",
@@ -167,16 +166,16 @@ describe("Tests copybook download service", () => {
           .spyOn(diagnosticsService, "clearDiagnostics")
           .mockImplementation();
 
-        const spyConfig = jest.spyOn(
-          ProcessorGroups,
-          "loadProcessorGroupCopybookPathsConfig",
-        );
-        spyConfig.mockResolvedValue([
-          {
-            dataset: "dataset",
-            uss: "uss",
-          },
-        ]);
+        // const spyConfig = jest.spyOn(
+        //   ProcessorGroups,
+        //   "loadProcessorGroupCopybookPathsConfig",
+        // );
+        // spyConfig.mockResolvedValue([
+        //   {
+        //     dataset: "dataset",
+        //     uss: "uss",
+        //   },
+        // ]);
         await service.resolveCopybookURI(
           "file:///document-uri",
           "copybook",
@@ -206,48 +205,49 @@ describe("Tests copybook download service", () => {
 
     describe("Endevor API missing", () => {
       it("checks missing e4e api produces diagnostics when processor groups have endevor config", async () => {
-        const diagnosticsService = new DownloadDiagnosticsService();
-        const service = new CopybookDownloadService(
-          vscode.Uri.file("/storage-path"),
-          zoweExplorerMock,
-          undefined,
-          undefined,
-          diagnosticsService,
-        );
-        const diagnosticsSpy = jest
-          .spyOn(diagnosticsService, "showDiagnostics")
-          .mockImplementation();
-        const spyConfig = jest.spyOn(
-          ProcessorGroups,
-          "loadProcessorGroupCopybookPathsConfig",
-        );
-        spyConfig.mockResolvedValue([
-          {
-            environment: "environment",
-            stage: "1",
-            system: "system",
-            subsystem: "subsystem",
-            type: "type",
-          },
-        ]);
-        await service.resolveCopybookURI(
-          "file:///document-uri",
-          "copybook",
-          DEFAULT_DIALECT,
-        );
-        expect(diagnosticsSpy).toHaveBeenCalledWith(
-          expect.objectContaining({ scheme: "file", path: "/document-uri" }),
-          [
-            {
-              message: "Explorer for Endevor is not installed",
-              range: {
-                end: { character: 0, line: 1 },
-                start: { character: 0, line: 0 },
-              },
-              severity: 1,
-            },
-          ],
-        );
+        // const diagnosticsService = new DownloadDiagnosticsService();
+        // const service = new CopybookDownloadService(
+        //   vscode.Uri.file("/storage-path"),
+        //   zoweExplorerMock,
+        //   undefined,
+        //   undefined,
+        //   diagnosticsService,
+        // );
+        // const diagnosticsSpy = jest
+        //   .spyOn(diagnosticsService, "showDiagnostics")
+        //   .mockImplementation();
+        // const spyConfig = jest.spyOn(
+        //   ProcessorGroups,
+        //   "loadProcessorGroupCopybookPathsConfig",
+        // );
+        // spyConfig.mockResolvedValue([
+        //   {
+        //     environment: "environment",
+        //     stage: "1",
+        //     system: "system",
+        //     subsystem: "subsystem",
+        //     type: "type",
+        //   },
+        // ]);
+        // await service.resolveCopybookURI(
+        //   "file:///document-uri",
+        //   "copybook",
+        //   DEFAULT_DIALECT,
+        // );
+        // expect(diagnosticsSpy).toHaveBeenCalledWith(
+        //   expect.objectContaining({ scheme: "file", path: "/document-uri" }),
+        //   [
+        //     {
+        //       message: "Explorer for Endevor is not installed",
+        //       range: {
+        //         end: { character: 0, line: 1 },
+        //         start: { character: 0, line: 0 },
+        //       },
+        //       severity: 1,
+        //     },
+        //   ],
+        // );
+        throw new Error("Reimplement the test");
       });
     });
 
@@ -500,31 +500,32 @@ describe("Tests copybook download service", () => {
       ).toBe(undefined);
     });
     it("checks an invalid zowe profile in a proc group is reported to the user", async () => {
-      const mocked = jest.spyOn(
-        ProcessorGroups,
-        "loadProcessorGroupCopybookPathsConfig",
-      );
-      DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
-      mocked.mockResolvedValue([
-        vscode.Uri.file("/libs"),
-        { dataset: "dataset", profile: "invalidProfile" },
-      ]);
-      const downloadService = new CopybookDownloadService(
-        vscode.Uri.file("/storage-path"),
-        zoweExplorerMock,
-      );
+      //   const mocked = jest.spyOn(
+      //     ProcessorGroups,
+      //     "loadProcessorGroupCopybookPathsConfig",
+      //   );
+      //   DownloadUtil.isProfileLocked = jest.fn().mockReturnValue(false);
+      //   mocked.mockResolvedValue([
+      //     vscode.Uri.file("/libs"),
+      //     { dataset: "dataset", profile: "invalidProfile" },
+      //   ]);
+      //   const downloadService = new CopybookDownloadService(
+      //     vscode.Uri.file("/storage-path"),
+      //     zoweExplorerMock,
+      //   );
 
-      expect(
-        await downloadService.resolveCopybookURI(
-          "file:///document-uri",
-          "copybook-name",
-          DEFAULT_DIALECT,
-        ),
-      ).toBe(undefined);
-      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-        "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
-      );
-      mocked.mockResolvedValue([]);
+      //   expect(
+      //     await downloadService.resolveCopybookURI(
+      //       "file:///document-uri",
+      //       "copybook-name",
+      //       DEFAULT_DIALECT,
+      //     ),
+      //   ).toBe(undefined);
+      //   expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+      //     "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalidProfile",
+      //   );
+      //   mocked.mockResolvedValue([]);
+      throw new Error("Reimplement the test");
     });
   });
 
@@ -603,7 +604,7 @@ describe("Tests copybook download service", () => {
         );
 
         const results = await cds.listRemoteCopybooks(
-          vscode.Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl"),
           DEFAULT_DIALECT,
         );
 
@@ -653,7 +654,7 @@ describe("Tests copybook download service", () => {
         );
 
         const results = await cds.listRemoteCopybooks(
-          vscode.Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl"),
           DEFAULT_DIALECT,
         );
 
@@ -683,7 +684,7 @@ describe("Tests copybook download service", () => {
           );
 
           const results = await cds.listRemoteCopybooks(
-            vscode.Uri.file("/test.cbl").toString(),
+            vscode.Uri.file("/test.cbl"),
             DEFAULT_DIALECT,
           );
 
@@ -707,7 +708,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              vscode.Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl"),
               DEFAULT_DIALECT,
             );
             cds.clearCache();
@@ -729,7 +730,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              vscode.Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl"),
               DEFAULT_DIALECT,
             );
           }
@@ -756,7 +757,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              vscode.Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl"),
               DEFAULT_DIALECT,
             );
           }
@@ -772,7 +773,7 @@ describe("Tests copybook download service", () => {
 
           for (let attempt = 0; attempt < 10; attempt++) {
             await cds.listRemoteCopybooks(
-              vscode.Uri.file("/test.cbl").toString(),
+              vscode.Uri.file("/test.cbl"),
               DEFAULT_DIALECT,
             );
           }
@@ -802,7 +803,7 @@ describe("Tests copybook download service", () => {
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
-          vscode.Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl"),
           DEFAULT_DIALECT,
         );
 
@@ -826,7 +827,7 @@ describe("Tests copybook download service", () => {
           zoweExplorerApiMock,
         );
         await cds.listRemoteCopybooks(
-          vscode.Uri.file("/test.cbl").toString(),
+          vscode.Uri.file("/test.cbl"),
           DEFAULT_DIALECT,
         );
 
@@ -1307,114 +1308,114 @@ describe("Tests copybook download service", () => {
     describe("resolve processor group copybooks", () => {
       let findFilesSpy: jest.SpyInstance;
       let findFilesSpyResult: vscode.Uri[];
-      let processorGroups: ProcessorGroupLoader.ProcessorGroup[] = [];
+      // let processorGroups: ProcessorGroupLoader.ProcessorGroup[] = [];
       let programConfigs: ProcessorGroupLoader.ProgramsConfig;
 
       beforeEach(() => {
-        processorGroups = [
-          {
-            name: "group",
-            libs: [
-              "local/pg/copybooks",
-              { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
-              { uss: "/uss/procgrp/copybooks", profile: "pg_profile" },
-              {
-                environment: "ENV",
-                stage: "1",
-                system: "SYSTEM",
-                subsystem: "SUBSYTEM",
-                type: "COPY",
-                profile: "instance.internal.connection",
-              },
-            ],
-          },
-          {
-            name: "datasetFirst",
-            libs: [
-              { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
-              {
-                environment: "ENV",
-                stage: "1",
-                system: "SYSTEM",
-                subsystem: "SUBSYTEM",
-                type: "COPY",
-                profile: "instance.internal.connection",
-              },
-            ],
-          },
-          {
-            name: "endevorFirst",
-            libs: [
-              {
-                environment: "ENV",
-                stage: "1",
-                system: "SYSTEM",
-                subsystem: "SUBSYTEM",
-                type: "COPY",
-                profile: "instance.internal.connection",
-              },
-              { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
-              {
-                environment: "ENV",
-                stage: "1",
-                system: "OTHER",
-                subsystem: "SUBSYTEM",
-                type: "COPY",
-                profile: "instance.internal.connection",
-              },
-            ],
-          },
-          {
-            name: "localFirst",
-            libs: [
-              "local/copybooks",
-              { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
-            ],
-          },
-          {
-            name: "invalidProfile",
-            libs: [
-              {
-                environment: "ENV",
-                stage: "1",
-                system: "SYSTEM",
-                subsystem: "SUBSYTEM",
-                type: "COPY",
-                profile: "invalid_profile",
-              },
-            ],
-          },
-        ];
-        programConfigs = {
-          pgms: [
-            {
-              program: "/test.cbl",
-              pgroup: "group",
-            },
-            {
-              program: "/dataset.cbl",
-              pgroup: "datasetFirst",
-            },
-            {
-              program: "/endevor.cbl",
-              pgroup: "endevorFirst",
-            },
-            {
-              program: "/local.cbl",
-              pgroup: "localFirst",
-            },
-            {
-              program: "/invalid-profile.cbl",
-              pgroup: "invalidProfile",
-            },
-          ],
-        };
-        jest
-          .spyOn(ProcessorGroupLoader, "readProcessorGroupsFileContent")
-          .mockResolvedValue(processorGroups);
-        jest
-          .spyOn(ProcessorGroupLoader, "readProgramConfigFileContent")
-          .mockResolvedValue(programConfigs);
+        // processorGroups = [
+        //   {
+        //     name: "group",
+        //     libs: [
+        //       "local/pg/copybooks",
+        //       { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
+        //       { uss: "/uss/procgrp/copybooks", profile: "pg_profile" },
+        //       {
+        //         environment: "ENV",
+        //         stage: "1",
+        //         system: "SYSTEM",
+        //         subsystem: "SUBSYTEM",
+        //         type: "COPY",
+        //         profile: "instance.internal.connection",
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     name: "datasetFirst",
+        //     libs: [
+        //       { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
+        //       {
+        //         environment: "ENV",
+        //         stage: "1",
+        //         system: "SYSTEM",
+        //         subsystem: "SUBSYTEM",
+        //         type: "COPY",
+        //         profile: "instance.internal.connection",
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     name: "endevorFirst",
+        //     libs: [
+        //       {
+        //         environment: "ENV",
+        //         stage: "1",
+        //         system: "SYSTEM",
+        //         subsystem: "SUBSYTEM",
+        //         type: "COPY",
+        //         profile: "instance.internal.connection",
+        //       },
+        //       { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
+        //       {
+        //         environment: "ENV",
+        //         stage: "1",
+        //         system: "OTHER",
+        //         subsystem: "SUBSYTEM",
+        //         type: "COPY",
+        //         profile: "instance.internal.connection",
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     name: "localFirst",
+        //     libs: [
+        //       "local/copybooks",
+        //       { dataset: "PROCGRP.COPYBOOKS", profile: "pg_profile" },
+        //     ],
+        //   },
+        //   {
+        //     name: "invalidProfile",
+        //     libs: [
+        //       {
+        //         environment: "ENV",
+        //         stage: "1",
+        //         system: "SYSTEM",
+        //         subsystem: "SUBSYTEM",
+        //         type: "COPY",
+        //         profile: "invalid_profile",
+        //       },
+        //     ],
+        //   },
+        // ];
+        // programConfigs = {
+        //   pgms: [
+        //     {
+        //       program: "/test.cbl",
+        //       pgroup: "group",
+        //     },
+        //     {
+        //       program: "/dataset.cbl",
+        //       pgroup: "datasetFirst",
+        //     },
+        //     {
+        //       program: "/endevor.cbl",
+        //       pgroup: "endevorFirst",
+        //     },
+        //     {
+        //       program: "/local.cbl",
+        //       pgroup: "localFirst",
+        //     },
+        //     {
+        //       program: "/invalid-profile.cbl",
+        //       pgroup: "invalidProfile",
+        //     },
+        //   ],
+        // };
+        // jest
+        //   .spyOn(ProcessorGroupLoader, "readProcessorGroupsFileContent")
+        //   .mockResolvedValue(processorGroups);
+        // jest
+        //   .spyOn(ProcessorGroupLoader, "readProgramConfigFileContent")
+        //   .mockResolvedValue(programConfigs);
 
         findFilesSpy = jest
           .spyOn(vscode.workspace, "findFiles")

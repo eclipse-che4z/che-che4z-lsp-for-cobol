@@ -19,15 +19,17 @@ import { DialectsConfiguration, SettingsService } from "./Settings";
 import { loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
   clearWorkspaceConfigCache,
+  CopybookLibs,
   EndevorConfigModel,
   ProcessorGroupProperties,
   readWorkspaceConfig,
   TransformedProcessorGroup,
+  transformLibs,
   WorkspaceConfig,
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { PATHS_LOCAL_KEY } from "../constants";
+import { DEFAULT_DIALECT, PATHS_LOCAL_KEY } from "../constants";
 
 export async function loadProcessorGroupCopybookPaths(
   documentUri: Uri,
@@ -259,7 +261,12 @@ async function loadProcessorGroup(documentUri: Uri) {
     return workspaceConfig?.processorGroups[processorGroupName];
   }
 
-  return matchProcessorGroup(workspaceConfig, documentUri);
+  const matchedGroup = matchProcessorGroup(workspaceConfig, documentUri);
+  if (matchedGroup) {
+    return matchedGroup;
+  } else {
+    return settingsProcessorGroup(documentUri, DEFAULT_DIALECT);
+  }
   // const processorGroup = selectProcessorGroup(documentUri, workspaceConfig);
 
   // const workspaceProcessorGroups = await readWorkspaceProcessorGroups(wsUri)

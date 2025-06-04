@@ -51,7 +51,7 @@ describe("SettingsService evaluate variables", () => {
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
     const paths = await SettingsService.getCopybookLocalPath(
-      "file:///program",
+      vscode.Uri.parse("file:///program"),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program"));
@@ -62,7 +62,7 @@ describe("SettingsService evaluate variables", () => {
       get: jest.fn().mockReturnValue(["copybook/${fileBasenameNoExtension}"]),
     });
     const paths = await SettingsService.getCopybookLocalPath(
-      "file:///program.cbl",
+      vscode.Uri.parse("file:///program.cbl"),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program"));
@@ -74,7 +74,7 @@ describe("SettingsService evaluate variables", () => {
     });
 
     const paths = await SettingsService.getCopybookLocalPath(
-      "file:///program.file.cbl",
+      vscode.Uri.parse("file:///program.file.cbl"),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/copybook/program.file"));
@@ -85,7 +85,7 @@ describe("SettingsService evaluate variables", () => {
       get: jest.fn().mockReturnValue(["${fileDirname}/copybooks"]),
     });
     const paths = await SettingsService.getCopybookLocalPath(
-      "file://" + makePath("/toplevel/program"),
+      vscode.Uri.parse("file://" + makePath("/toplevel/program")),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/toplevel") + `${path.sep}copybooks`);
@@ -96,7 +96,7 @@ describe("SettingsService evaluate variables", () => {
       get: jest.fn().mockReturnValue(["${fileDirnameBasename}/copybooks"]),
     });
     const paths = await SettingsService.getCopybookLocalPath(
-      "file:///toplevel/program",
+      vscode.Uri.parse("file:///toplevel/program"),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws/toplevel/copybooks"));
@@ -107,7 +107,7 @@ describe("SettingsService evaluate variables", () => {
       get: jest.fn().mockReturnValue(["${workspaceFolder}/copybooks"]),
     });
     const paths = await SettingsService.getCopybookLocalPath(
-      "file://" + makePath("/toplevel/program"),
+      vscode.Uri.parse("file://" + makePath("/toplevel/program")),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws") + `${path.sep}copybooks`);
@@ -120,7 +120,7 @@ describe("SettingsService evaluate variables", () => {
         .mockReturnValue(["${workspaceFolder:workspace}/copybooks"]),
     });
     const paths = await SettingsService.getCopybookLocalPath(
-      "file://" + makePath("/toplevel/program"),
+      vscode.Uri.parse("file://" + makePath("/toplevel/program")),
       "COBOL",
     );
     expect(paths[0]).toEqual(makefsPath("/tmp-ws") + `${path.sep}copybooks`);
@@ -131,7 +131,10 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: tracking,
     });
-    await SettingsService.getCopybookLocalPath("file:///PROGRAM", "COBOL");
+    await SettingsService.getCopybookLocalPath(
+      vscode.Uri.parse("file:///PROGRAM"),
+      "COBOL",
+    );
     expect(tracking).toHaveBeenCalledWith("paths-local");
   });
 
@@ -140,7 +143,10 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: tracking,
     });
-    await SettingsService.getCopybookLocalPath("file:///PROGRAM", "MAID");
+    await SettingsService.getCopybookLocalPath(
+      vscode.Uri.parse("file:///PROGRAM"),
+      "MAID",
+    );
     expect(tracking).toHaveBeenCalledWith("maid.paths-local");
   });
 
@@ -225,7 +231,10 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       undefined,
     );
     expect(
-      SettingsService.getUssPath("file:///doc-uri", "dialect"),
+      SettingsService.getUssPath(
+        vscode.Uri.parse("file:///doc-uri"),
+        "dialect",
+      ),
     ).toHaveLength(0);
   });
 
@@ -235,7 +244,7 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       ["configured-dialect-settings"],
     );
     const configuredValue = SettingsService.getUssPath(
-      "file:///doc-uri",
+      vscode.Uri.parse("file:///doc-uri"),
       "dialect",
     );
     expect(configuredValue).toHaveLength(1);
@@ -247,7 +256,7 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "configured-cobol-settings",
     ]);
     const configuredValue = SettingsService.getUssPath(
-      "file:///doc-uri",
+      vscode.Uri.parse("file:///doc-uri"),
       SettingsService.DEFAULT_DIALECT,
     );
     expect(configuredValue).toHaveLength(1);

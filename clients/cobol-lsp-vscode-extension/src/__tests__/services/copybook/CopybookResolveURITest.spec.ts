@@ -65,7 +65,7 @@ function buildResultArrayFrom(
     .fn()
     .mockImplementation(() => profileName);
   const result = CopybookURI.createPathForCopybookDownloaded(
-    filename,
+    vscode.Uri.parse(filename),
     SettingsService.DEFAULT_DIALECT,
     path.join("file:///downloadFolder", ZOWE_FOLDER),
     {} as unknown as IApiRegisterClient,

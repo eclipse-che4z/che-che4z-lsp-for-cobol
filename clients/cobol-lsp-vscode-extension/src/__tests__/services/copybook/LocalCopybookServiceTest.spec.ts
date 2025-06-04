@@ -56,7 +56,7 @@ describe("LocalCopybookService tests", () => {
 
       it("return copybooks", async () => {
         const results = await listLocalCopybooks(
-          "file:///PROGRAM.cbl",
+          vscode.Uri.parse("file:///PROGRAM.cbl"),
           DEFAULT_DIALECT,
         );
 
