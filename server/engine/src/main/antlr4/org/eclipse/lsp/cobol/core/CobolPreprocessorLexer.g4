@@ -74,6 +74,6 @@ SEMICOLONSEPARATOR2 : '; ' ;
 COMMASEPARATOR2 : ', ' ;
 
 mode REPLACEMODE;
-DOUBLEEQUALCHAR2 : '==' ->popMode;
+DOUBLEEQUALCHAR2 : {_input.LA(3) != '='}? '==' ->popMode;
 TEXT : ~('\n' | '\r');
 NEXTLINE: ('\n' | '\r');

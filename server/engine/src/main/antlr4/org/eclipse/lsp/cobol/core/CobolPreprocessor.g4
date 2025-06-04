@@ -88,7 +88,7 @@ replacePseudoText
    ;
 
 pseudoReplaceable
-   : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter)
+   : (openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR2)* closingPseudoTextDelimiter)
    ;
 
 pseudoReplacement

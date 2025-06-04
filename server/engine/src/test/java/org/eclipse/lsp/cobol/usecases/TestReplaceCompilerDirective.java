@@ -227,6 +227,27 @@ class TestReplaceCompilerDirective {
         Collections.emptyList());
   }
 
+  public static final String TEXT_PSEUDO_TEXT_ENDS_WITH_EQUAL_CHAR =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. PGMNAME.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "          replace ==abcd== by ==abcd==   ==asdf=== by ==abcd==.\n"
+          + "          01 {$*ASDF=^abcd}.\n"
+          + "                05 {$*abcd1} pic x.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$abcd}.\n"
+          + "               EXIT PROGRAM.\n";
+
+  @Test
+  void testReplace_whenPseudoTextEndsWithEqualChars() {
+    UseCaseEngine.runTest(
+            TEXT_PSEUDO_TEXT_ENDS_WITH_EQUAL_CHAR,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            Collections.emptyList());
+  }
   // TODO: Add use case test scenario
   // 1. Add support in usecase test engine
   // 2. Diagnostics - IGYDS1082-E A period was required. is wrong and should be fixed.
