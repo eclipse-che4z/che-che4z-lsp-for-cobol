@@ -83,11 +83,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
     this.baseDuplicateRulesOptions.putAll(duplicateRulesOptions);
-    if (context.getConfig().getPreprocessorsDirectives().get("CICS") == null)
-      this.noLengthEnabled = false;
-    else
-      this.noLengthEnabled =
-          context.getConfig().getPreprocessorsDirectives().get("CICS").contains("NOLENGTH");
+    this.utilityParameters = utilityParameters;
   }
 
   /**
