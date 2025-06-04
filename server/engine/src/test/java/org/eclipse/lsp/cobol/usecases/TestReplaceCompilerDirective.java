@@ -190,6 +190,43 @@ class TestReplaceCompilerDirective {
     UseCaseEngine.runTest(TEXT6, ImmutableList.of(), ImmutableMap.of(), Collections.emptyList());
   }
 
+  public static final String TEXT_MULTI_REPLACE_ON_OFF =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.        \n"
+          + "       WORKING-STORAGE SECTION.                            \n"
+          + "       01  {$*TEST-VAR-1}.\n"
+          + "       REPLACE ==:PFX:==  BY ==BLQ1==.\n"
+          + "           COPY {~CPY1}.\n"
+          + "           REPLACE OFF.\n"
+          + "       01  {$*TEST-VAR-2}.\n"
+          + "           REPLACE ==:PFX:== BY ==BPP1==.\n"
+          + "           COPY {~CPY1}.\n"
+          + "           REPLACE OFF.\n"
+          + "       REPLACE OFF.           \n"
+          + "       PROCEDURE DIVISION.       \n"
+          + "           DISPLAY {$BLQ1-PARM-AREA}.  \n"
+          + "           DISPLAY {$BPP1-PARM-AREA}.  \n"
+          + "               EXIT PROGRAM.            ";
+
+  public static final String CPY1_CONTENT =
+      "           05  {$*:PFX:-PARM-AREA`->BLQ1-PARM-AREA`->BPP1-PARM-AREA}.\n"
+          + "            07 "
+          + " {$*:PFX:-COMMON-LINKAGE`->BLQ1-COMMON-LINKAGE`->BPP1-COMMON-LINKAGE}.\n"
+          + "               10 "
+          + " {$*:PFX:-CALLING-PROGRAM`->BLQ1-CALLING-PROGRAM`->BPP1-CALLING-PROGRAM}          PIC "
+          + " X(08).";
+
+  @Test
+  void test_whenMultiCopybookUsedWithReplacePattern_thenResolutionWorksOnReplaceRange() {
+    UseCaseEngine.runTest(
+        TEXT_MULTI_REPLACE_ON_OFF,
+        ImmutableList.of(new CobolText("CPY1", CPY1_CONTENT)),
+        ImmutableMap.of(),
+        Collections.emptyList());
+  }
+
   // TODO: Add use case test scenario
   // 1. Add support in usecase test engine
   // 2. Diagnostics - IGYDS1082-E A period was required. is wrong and should be fixed.

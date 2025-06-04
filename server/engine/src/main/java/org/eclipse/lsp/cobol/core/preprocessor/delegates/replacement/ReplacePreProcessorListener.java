@@ -69,6 +69,11 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
 
   @Override
   public void enterReplaceAreaStartOrOffStatement(ReplaceAreaStartOrOffStatementContext ctx) {
+    if (ctx.OFF() != null && currentTextReplaceData != null) {
+      currentTextReplaceData
+          .getRange(extendedDocument.getUri())
+          .setEnd(new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
+    }
     restartReplace(ctx.getStart());
     if (!ctx.replacePseudoText().isEmpty()) {
       applyReplacing();
@@ -137,7 +142,9 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     }
     if (hierarchy.getLastTextReplacing() != null) {
       Range range = hierarchy.getLastTextReplacing().getRange(extendedDocument.getUri());
-      range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
+      if (range.getEnd() == null) {
+        range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
+      }
     }
   }
 }
