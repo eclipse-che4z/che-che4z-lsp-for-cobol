@@ -71,8 +71,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
-    if (context.getCicsTranslatorOptions() == null) this.noLengthEnabled = false;
-    else this.noLengthEnabled = context.getCicsTranslatorOptions().contains("NOLENGTH");
+    this.utilityParameters = utilityParameters;
   }
 
   public CICSOptionsCheckBaseUtility(
