@@ -84,7 +84,7 @@ async function handleProcessDialect(
   outputChannel.appendLine(
     `Finish processing program ${programUri}. Processing time: ${
       endDate.getTime() - startDate.getTime()
-    }`,
+    } mills.`,
   );
   return diagnostics;
 }

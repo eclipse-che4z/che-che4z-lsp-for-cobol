@@ -12,28 +12,45 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { Diagnostic, OutputChannel, Uri } from "vscode";
+import { Diagnostic, OutputChannel } from "vscode";
 import { DialectService } from "../../dialect/DialectService";
 import { LanguageClientService } from "../../services/LanguageClientService";
+import { GenericNotificationHandler } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 
-let languageclient: LanguageClientService;
+let languageClientService: LanguageClientService;
 let outputChannel: OutputChannel;
+let dialectHandler: GenericNotificationHandler;
+let languageClient: LanguageClient;
 
 describe("DialectService test", () => {
   beforeEach(() => {
-    languageclient = {
-      addNotificationHandler: jest.fn(),
+    languageClient = {
+      sendNotification: jest.fn(),
+    } as unknown as LanguageClient;
+
+    languageClientService = {
+      addNotificationHandler: (
+        route: string,
+        handler: GenericNotificationHandler,
+      ) => {
+        dialectHandler = handler;
+      },
+      getLanguageClient: () => languageClient,
     } as unknown as LanguageClientService;
-    outputChannel = {} as OutputChannel;
+    outputChannel = {
+      appendLine: jest.fn(),
+    } as unknown as OutputChannel;
   });
 
   test("Test DialectService constructor creates handlers for LSP client", () => {
-    new DialectService(languageclient, outputChannel);
-    expect(languageclient.addNotificationHandler).toHaveBeenCalled();
+    languageClientService.addNotificationHandler = jest.fn();
+    new DialectService(languageClientService, outputChannel);
+    expect(languageClientService.addNotificationHandler).toHaveBeenCalled();
   });
 
   test("Test DialectService registerStartHandler creates handlers for LSP client", () => {
-    const service = new DialectService(languageclient, outputChannel);
+    const service = new DialectService(languageClientService, outputChannel);
 
     service.registerStartHandler(
       "DIALECT",
@@ -42,5 +59,28 @@ describe("DialectService test", () => {
       },
     );
     expect(service["handlers"].size).toBe(1);
+  });
+
+  test("Test DialectService log error to the output channel if handler was not found", () => {
+    new DialectService(languageClientService, outputChannel);
+    dialectHandler("DIALECT", "URI", "TEXT");
+    expect(outputChannel.appendLine).toHaveBeenCalledWith(
+      "Handler for the dialect DIALECT was not found, dialect processing ignored",
+    );
+  });
+
+  test("Test DialectService handles dialect processing event", () => {
+    const service = new DialectService(languageClientService, outputChannel);
+    let processDialect = false;
+
+    service.registerStartHandler(
+      "DIALECT",
+      (_programUri: string, _text: string) => {
+        processDialect = true;
+        return Promise.resolve(new Map<string, Diagnostic[]>());
+      },
+    );
+    dialectHandler("DIALECT", "URI", "TEXT");
+    expect(processDialect).toBeTruthy();
   });
 });
