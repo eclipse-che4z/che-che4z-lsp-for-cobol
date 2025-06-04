@@ -110,16 +110,16 @@ class ReplacingServiceImplTest {
   void testRetrieveTokenReplacingPattern() {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
-        Pair.of("(?<=[\\.\\s\\r\\n])01(?=[\\.\\s\\r\\n])", "05"),
+        Pair.of("(?<=[.,;]?\\s)01(?=[,;]?\\s|\\.)", "05"),
         replacingService.retrieveTokenReplacingPattern(Pair.of("01", "05")));
     assertEquals(
-        Pair.of("(?<=[\\.\\s\\r\\n])(?=[\\.\\s\\r\\n])", ""),
+        Pair.of("(?<=[.,;]?\\s)(?=[,;]?\\s|\\.)", ""),
         replacingService.retrieveTokenReplacingPattern(Pair.of("", "")));
     assertEquals(
-        Pair.of("(?<=[\\.\\s\\r\\n])IDENTIFICATION(?=[\\.\\s\\r\\n])", "DIVISION"),
+        Pair.of("(?<=[.,;]?\\s)IDENTIFICATION(?=[,;]?\\s|\\.)", "DIVISION"),
         replacingService.retrieveTokenReplacingPattern(Pair.of("IDENTIFICATION", "DIVISION")));
     assertEquals(
-        Pair.of("(?<=[\\.\\s\\r\\n])A(?=[\\.\\s\\r\\n])", "B"),
+        Pair.of("(?<=[.,;]?\\s)A(?=[,;]?\\s|\\.)", "B"),
         replacingService.retrieveTokenReplacingPattern(Pair.of("\n" + "A", "\n" + "  B ")));
   }
 }
