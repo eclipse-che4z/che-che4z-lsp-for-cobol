@@ -140,8 +140,11 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSCsdSpOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS);
+  public CICSCsdSpOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS, params);
   }
 
   /**

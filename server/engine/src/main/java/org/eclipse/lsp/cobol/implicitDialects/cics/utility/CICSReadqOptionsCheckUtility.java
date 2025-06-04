@@ -47,8 +47,11 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSReadqOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSReadqOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

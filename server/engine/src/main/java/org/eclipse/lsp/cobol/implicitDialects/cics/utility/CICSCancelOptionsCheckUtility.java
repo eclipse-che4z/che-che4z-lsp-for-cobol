@@ -47,8 +47,11 @@ public class CICSCancelOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSCancelOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSCancelOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

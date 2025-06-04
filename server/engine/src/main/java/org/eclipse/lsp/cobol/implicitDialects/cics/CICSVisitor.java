@@ -58,6 +58,7 @@ import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSCheckUtilityParameters;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -77,7 +78,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   CICSVisitor(DialectProcessingContext context, MessageService messageService) {
     this.context = context;
     this.messageService = messageService;
-    this.cicsOptionsCheckUtility = new CICSOptionsCheckUtility(context, errors);
+    this.cicsOptionsCheckUtility = new CICSOptionsCheckUtility(context, errors, getCheckParams());
   }
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
@@ -385,5 +386,15 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
             token.getLine() - 1,
             token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
     return new Range(p, p);
+  }
+
+  private CICSCheckUtilityParameters getCheckParams() {
+    CICSCheckUtilityParameters cicsCheckUtilityParameters = new CICSCheckUtilityParameters();
+    if (context.getPreprocessorsDirectives().get("CICS") == null)
+      cicsCheckUtilityParameters.noLengthEnabled = false;
+    else
+      cicsCheckUtilityParameters.noLengthEnabled =
+          context.getPreprocessorsDirectives().get("CICS").contains("NOLENGTH");
+    return cicsCheckUtilityParameters;
   }
 }

@@ -52,10 +52,13 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
    *
    * @param dialectProcessingContext
    * @param errors
+   * @param params
    */
   public CICSStartbrowseOptionsCheckUtility(
-      DialectProcessingContext dialectProcessingContext, List<SyntaxError> errors) {
-    super(dialectProcessingContext, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext dialectProcessingContext,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(dialectProcessingContext, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

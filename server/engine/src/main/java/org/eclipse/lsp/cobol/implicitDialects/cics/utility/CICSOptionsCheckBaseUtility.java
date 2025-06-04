@@ -67,7 +67,8 @@ public abstract class CICSOptionsCheckBaseUtility {
   public CICSOptionsCheckBaseUtility(
       DialectProcessingContext context,
       List<SyntaxError> errors,
-      Map<Integer, ErrorSeverity> duplicateOptions) {
+      Map<Integer, ErrorSeverity> duplicateOptions,
+      CICSCheckUtilityParameters utilityParameters) {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
@@ -78,7 +79,8 @@ public abstract class CICSOptionsCheckBaseUtility {
       DialectProcessingContext context,
       List<SyntaxError> errors,
       Map<Integer, ErrorSeverity> duplicateOptions,
-      Map<Integer, String> duplicateRulesOptions) {
+      Map<Integer, String> duplicateRulesOptions,
+      CICSCheckUtilityParameters utilityParameters) {
     this.context = context;
     this.errors = errors;
     this.baseDuplicateOptions.putAll(duplicateOptions);
@@ -707,7 +709,7 @@ public abstract class CICSOptionsCheckBaseUtility {
           VisitorUtility.constructLocality(ctx, context),
           "Missing required option: ",
           optionalFieldName + " without " + fieldName);
-    } else if (noLengthEnabled && !field.isEmpty() && optionalField.isEmpty()) {
+    } else if (utilityParameters.noLengthEnabled && !field.isEmpty() && optionalField.isEmpty()) {
       throwException(
           ErrorSeverity.ERROR,
           VisitorUtility.constructLocality(ctx, context),

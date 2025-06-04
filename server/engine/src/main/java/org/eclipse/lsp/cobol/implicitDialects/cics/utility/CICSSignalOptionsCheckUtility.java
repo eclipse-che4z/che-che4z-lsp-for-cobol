@@ -40,8 +40,11 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSSignalOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSSignalOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

@@ -51,8 +51,11 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSLinkOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSLinkOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

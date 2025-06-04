@@ -43,8 +43,11 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSReturnOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSReturnOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

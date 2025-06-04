@@ -54,8 +54,11 @@ public class CICSWaitOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSWaitOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSWaitOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
