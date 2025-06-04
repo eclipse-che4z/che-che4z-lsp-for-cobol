@@ -92,7 +92,8 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
       replacingService
           .retrievePseudoTextReplacingPattern(
               new ImmutablePair<>(
-                  ctx.pseudoReplaceable().getText(), ctx.pseudoReplacement().getText()),
+                  ctx.pseudoReplaceable().pseudoTextContent().getText(),
+                  ctx.pseudoReplacement().pseudoTextContent().getText()),
               retrieveLocality(ctx),
               ReplacementHelper.getSearchPattern(ctx))
           .processIfNoErrorsFound(

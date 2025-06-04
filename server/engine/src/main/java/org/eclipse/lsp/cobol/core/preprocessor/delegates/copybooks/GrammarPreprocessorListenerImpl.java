@@ -193,7 +193,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
                   c ->
                       replacingService.retrievePseudoTextReplacingPattern(
                           new ImmutablePair<>(
-                              c.pseudoReplaceable().getText(), c.pseudoReplacement().getText()),
+                              c.pseudoReplaceable().pseudoTextContent().getText(),
+                              c.pseudoReplacement().pseudoTextContent().getText()),
                           locality,
                           ReplacementHelper.getSearchPattern(c)))
               .map(r -> r.unwrap(errors::addAll))

@@ -169,8 +169,8 @@ class CopybookPreprocessorService {
         }
         pattern =
             new ImmutablePair<>(
-                replacePseudoTextContext.pseudoReplaceable().getText(),
-                replacePseudoTextContext.pseudoReplacement().getText());
+                replacePseudoTextContext.pseudoReplaceable().pseudoTextContent().getText(),
+                replacePseudoTextContext.pseudoReplacement().pseudoTextContent().getText());
       } else {
         CobolPreprocessor.ReplaceLiteralContext replaceLiteralContext =
             replaceClauseContext.replaceLiteral();
@@ -182,7 +182,7 @@ class CopybookPreprocessorService {
             replaceable.pseudoReplaceable();
         if (pseudoReplaceableContext != null) {
           isPseudoTextReplacement = true;
-          left = pseudoReplaceableContext.getText();
+          left = pseudoReplaceableContext.pseudoTextContent().getText();
         } else {
           left = ReplacementHelper.createClause(replaceable);
         }
@@ -191,7 +191,7 @@ class CopybookPreprocessorService {
             replacement.pseudoReplacement();
         if (pseudoReplacementContext != null) {
           isPseudoTextReplacement = true;
-          right = pseudoReplacementContext.getText();
+          right = pseudoReplacementContext.pseudoTextContent().getText();
         } else {
           right = ReplacementHelper.createClause(replacement);
         }

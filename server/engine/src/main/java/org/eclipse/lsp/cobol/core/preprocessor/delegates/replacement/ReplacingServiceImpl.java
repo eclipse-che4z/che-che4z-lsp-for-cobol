@@ -84,13 +84,13 @@ public class ReplacingServiceImpl implements ReplacingService {
       @NonNull Locality locality,
       SearchPattern searchPattern) {
     List<SyntaxError> errors = new ArrayList<>();
-    String leftAttribute = pattern.getLeft();
-    String rightAttribute = pattern.getRight();
+    String leftAttribute = pattern.getLeft().trim();
+    String rightAttribute = pattern.getRight().trim();
 
-    String extractPseudoText1 = extractPseudoText(leftAttribute, true);
-    leftAttribute = searchPattern.apply(extractPseudoText1);
+    String extractPseudoText1 = leftAttribute.trim();
+    leftAttribute = searchPattern.apply(leftAttribute);
 
-    rightAttribute = extractPseudoText(rightAttribute, false);
+    rightAttribute = rightAttribute.trim();
     checkInvalidWordUsage(new String[] {extractPseudoText1, rightAttribute}, locality)
         .ifPresent(errors::add);
     checkInvalidTextWordLength(new String[] {extractPseudoText1, rightAttribute}, locality)
@@ -178,32 +178,6 @@ public class ReplacingServiceImpl implements ReplacingService {
   private String getReplacementPattern(@NonNull String text) {
     if (handleFunctionalIdentifiers(text)) return "";
     return quoteReplacement(text.trim());
-  }
-
-  /**
-   * Extract the pseudo text-based pattern for replacing in accordance with COBOL rules. Double
-   * equals chars should be removed at the beginning and at the end, all the whitespaces should be
-   * collapsed.
-   *
-   * <p>For matching purposes, each occurrence of a separator comma, a separator semicolon, or a
-   * sequence of one or more separator spaces is considered to be a single space. However, when
-   * operand-1 or partial-word-1 consists solely of a separator comma or separator semicolon, the
-   * operand-1 or partial-word-1 participates in the match as a text word. In this case, the space
-   * that follows the comma or semicolon separator can be omitted.
-   *
-   * @param text a pseudo-text string
-   * @return a pattern for replacing
-   */
-  @NonNull
-  private String extractPseudoText(@NonNull String text, boolean isOperandOne) {
-    String processedText = text.trim().replaceAll("^==", "").replaceAll("==$", "");
-    if (isOperandOne && processedText.trim().equals(",") || processedText.trim().equals(";"))
-      return processedText.trim();
-    return handleSeparator(processedText).trim();
-  }
-
-  private String handleSeparator(String trim) {
-    return trim.replace(", ", " ").replace("; ", " ");
   }
 
   private void replace(

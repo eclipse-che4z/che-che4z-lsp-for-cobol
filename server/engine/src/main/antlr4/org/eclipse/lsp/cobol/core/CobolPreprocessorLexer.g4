@@ -64,7 +64,7 @@ SKIP3 : S K I P '3' DOT_FS? -> channel(HIDDEN);
 
 // symbols
 DOUBLEEQUALCHAR : '==' -> pushMode(REPLACEMODE);
-EMPTYPSEUDOTEXT : '====';
+//EMPTYPSEUDOTEXT : '====';
 PIPECHAR : '||';
 PIPECHAR2: '!!';
 SELECT_ALL : '.*';

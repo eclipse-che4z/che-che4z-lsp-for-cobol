@@ -88,11 +88,15 @@ replacePseudoText
    ;
 
 pseudoReplaceable
-   : (openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR2)* closingPseudoTextDelimiter)
+   : (openingPseudoTextDelimiter pseudoTextContent closingPseudoTextDelimiter)
    ;
 
 pseudoReplacement
-   : openingPseudoTextDelimiter ~(DOUBLEEQUALCHAR2)* closingPseudoTextDelimiter | EMPTYPSEUDOTEXT
+   : openingPseudoTextDelimiter pseudoTextContent closingPseudoTextDelimiter
+   ;
+
+pseudoTextContent
+   : ~(DOUBLEEQUALCHAR2)*
    ;
 
 openingPseudoTextDelimiter
