@@ -34,7 +34,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   private final AnalysisContext analysisContext;
   private final MessageService messageService;
   private final Position startPosition;
-  private final List<String> cicsDirectives = new ArrayList<>();
 
   public CompilerDirectivesVisitor(
       AnalysisContext ctx, MessageService messageService, Position startPosition) {
