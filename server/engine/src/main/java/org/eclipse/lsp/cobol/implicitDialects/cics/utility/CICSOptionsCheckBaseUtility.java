@@ -687,7 +687,7 @@ public abstract class CICSOptionsCheckBaseUtility {
    * @return isNolength enabled
    */
   protected boolean noLengthOptionsEnabled() {
-    return noLengthEnabled;
+    return utilityParameters.noLengthEnabled;
   }
 
   /**
