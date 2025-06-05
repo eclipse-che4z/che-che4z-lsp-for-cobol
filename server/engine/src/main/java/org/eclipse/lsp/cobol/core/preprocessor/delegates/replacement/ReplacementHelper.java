@@ -58,4 +58,32 @@ public class ReplacementHelper {
     if (replacePseudoTextContext.TRAILING() != null) return SearchPattern.ENDS_WITH;
     return SearchPattern.EXACT;
   }
+
+  /**
+   * Gives replaceable pseudo text used in `{replaceable} BY {replacement}` replac(e/ing) context of
+   * COBOL source.
+   *
+   * @param pseudoReplaceableContext
+   * @return a pseudo text String.
+   */
+  public String getPseudoText(CobolPreprocessor.PseudoReplaceableContext pseudoReplaceableContext) {
+    if (pseudoReplaceableContext == null || pseudoReplaceableContext.pseudoTextContent() == null) {
+      return "";
+    }
+    return pseudoReplaceableContext.pseudoTextContent().getText();
+  }
+
+  /**
+   * Gives replacement pseudo text used in `{replaceable} BY {replacement}` replac(e/ing) context of
+   * COBOL source.
+   *
+   * @param pseudoReplacementContext
+   * @return a pseudo text String.
+   */
+  public String getPseudoText(CobolPreprocessor.PseudoReplacementContext pseudoReplacementContext) {
+    if (pseudoReplacementContext == null || pseudoReplacementContext.pseudoTextContent() == null) {
+      return "";
+    }
+    return pseudoReplacementContext.pseudoTextContent().getText();
+  }
 }
