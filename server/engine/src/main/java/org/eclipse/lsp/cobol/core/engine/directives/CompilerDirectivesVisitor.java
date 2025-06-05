@@ -150,7 +150,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
         cicsDirectives.add(options.getText());
       }
     }
-    analysisContext.getPreprocessorsDirectives().put("CICS", cicsDirectives);
     return super.visitCicsTranslatorDirectives(ctx);
   }
 }
