@@ -25,6 +25,7 @@ import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import java.util.*;
 import java.util.function.Function;
@@ -168,35 +169,27 @@ public class UseCaseEngine {
   }
 
   /**
-   * Check if the language engine applies required syntax and semantic checks for "cobol" language
-   * id. All the semantic elements in the given text, as well as syntax errors, should be wrapped
-   * with according tags. The same extraction operation applied also for the given copybooks.
-   * Copybooks processing enabled.
-   *
-   * <p>Expected diagnostics should contain the full of list of syntax and semantic
-   * errors/warnings/info messages for the document and copybooks. Existing positions, if they are,
-   * for the diagnostics will be dropped and replaced with ones extracted by engine by their IDs.
-   *
    * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
    *     technical tokens and collect syntax and semantic elements
    * @param copybooks - list of the copybooks used in the document
    * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
    *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
-   * @param analysisConfig config to be processed.
+   * @param preprocessorsDirectives - initial preprocessor directives
    * @return analysis result object
    */
   public AnalysisResult runTest(
       String text,
       List<CobolText> copybooks,
       Map<String, Diagnostic> expectedDiagnostics,
-      AnalysisConfig analysisConfig) {
+      Map<String, List<String>> preprocessorsDirectives) {
     return runTest(
         text,
         copybooks,
         expectedDiagnostics,
         ImmutableList.of(),
-        analysisConfig,
-        CobolLanguageId.COBOL);
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED),
+        CobolLanguageId.COBOL,
+        preprocessorsDirectives);
   }
 
   /**
@@ -256,7 +249,8 @@ public class UseCaseEngine {
         expectedDiagnostics,
         subroutineNames,
         AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED),
-        languageId);
+        languageId,
+        ImmutableMap.of());
   }
 
   /**
@@ -278,6 +272,7 @@ public class UseCaseEngine {
    * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the
    *     analysis
    * @param languageId - language Id
+   * @param preprocessorsDirectives - initial preprocessor directives
    * @return analysis result object
    */
   public AnalysisResult runTest(
@@ -286,7 +281,8 @@ public class UseCaseEngine {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
       AnalysisConfig analysisConfig,
-      CobolLanguageId languageId) {
+      CobolLanguageId languageId,
+      Map<String, List<String>> preprocessorsDirectives) {
 
     SQLBackend sqlBackendSetting =
         Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
@@ -315,7 +311,7 @@ public class UseCaseEngine {
                 .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .compilerOptions(analysisConfig.getCompilerOptions())
-                .preprocessorsDirectives(analysisConfig.getPreprocessorsDirectives())
+                .preprocessorsDirectives(preprocessorsDirectives)
                 .build(),
             languageId);
     assertResultEquals(actual, document.getTestData());
@@ -356,7 +352,8 @@ public class UseCaseEngine {
         expectedDiagnostics,
         subroutineNames,
         analysisConfig,
-        CobolLanguageId.COBOL);
+        CobolLanguageId.COBOL,
+        ImmutableMap.of());
   }
 
   /**

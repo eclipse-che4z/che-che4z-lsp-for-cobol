@@ -16,5 +16,7 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
 /** CICS check utility parameters */
 public class CICSCheckUtilityParameters {
-  public boolean noLengthEnabled;
+  public boolean noLengthEnabled = false;
+  public boolean spEnabled = false;
+  public boolean exciEnabled = false;
 }

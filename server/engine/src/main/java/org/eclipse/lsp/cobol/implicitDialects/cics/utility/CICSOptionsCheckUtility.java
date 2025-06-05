@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -29,14 +28,13 @@ public class CICSOptionsCheckUtility {
 
   private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
 
-  @Setter private static boolean exciOptionsEnabled = false;
-
-  @Setter private static boolean spOptionsEnabled = false;
+  private CICSCheckUtilityParameters utilityParameters;
 
   public CICSOptionsCheckUtility(
       DialectProcessingContext context,
       List<SyntaxError> errors,
       CICSCheckUtilityParameters cicsCheckUtilityParameters) {
+    this.utilityParameters = cicsCheckUtilityParameters;
     optionsMap.put(
         CICSReceiveOptionsCheckUtility.RULE_INDEX,
         new CICSReceiveOptionsCheckUtility(context, errors, cicsCheckUtilityParameters));
@@ -366,7 +364,7 @@ public class CICSOptionsCheckUtility {
     CICSOptionsCheckBaseUtility spOptions = spOptionsMap.get(ctx.parent.getRuleIndex());
     if (utility != null) utility.checkOptions(ctx);
     else if (spOptions != null) {
-      if (spOptionsEnabled) spOptions.checkOptions(ctx);
+      if (utilityParameters.spEnabled) spOptions.checkOptions(ctx);
       else spOptions.throwIfMissingTranslatorOption(ctx, "\"SP\"");
     }
   }

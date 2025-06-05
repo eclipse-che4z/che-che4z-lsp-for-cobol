@@ -159,22 +159,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitCompilerDirective(CICSParser.CompilerDirectiveContext ctx) {
-    cicsOptionsCheckUtility.setExciOptionsEnabled(false);
-    cicsOptionsCheckUtility.setSpOptionsEnabled(false);
-
-    for (CICSParser.CompilerOptsContext options : ctx.compilerOpts()) {
-      if (options.cicsOptions() != null) {
-        if (options.cicsOptions().getText().contains("SP"))
-          cicsOptionsCheckUtility.setSpOptionsEnabled(true);
-        if (options.cicsOptions().getText().contains("EXCI"))
-          cicsOptionsCheckUtility.setExciOptionsEnabled(true);
-      }
-    }
-    return visitChildren(ctx);
-  }
-
-  @Override
   public List<Node> visitAllExciRules(CICSParser.AllExciRulesContext ctx) {
     // TODO: uncomment and adjust below when we decide to support this feature based on compiler
     // directive
@@ -399,6 +383,12 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
           break;
         case "NOLENGTH":
           cicsCheckUtilityParameters.noLengthEnabled = true;
+          break;
+        case "SP":
+          cicsCheckUtilityParameters.spEnabled = true;
+          break;
+        case "EXCI":
+          cicsCheckUtilityParameters.exciEnabled = true;
           break;
         default:
           break;

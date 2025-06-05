@@ -20,8 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.NonNull;
-import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 
@@ -98,10 +96,8 @@ public class CICSTestUtils {
    */
   public static void errorTest(
       String newCommand, Map<String, Diagnostic> expectedDiagnostic, String... options) {
-    AnalysisConfig config = AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED);
-    config.getPreprocessorsDirectives().put("CICS", Arrays.asList(options));
     UseCaseEngine.runTest(
-        getTestString(newCommand, null, options), ImmutableList.of(), expectedDiagnostic, config);
+        getTestString(newCommand, null, options), ImmutableList.of(), expectedDiagnostic);
   }
 
   /**

@@ -153,7 +153,7 @@ public class CobolLanguageEngine {
 
     BenchmarkSession session = benchmarkService.startSession();
     AnalysisContext ctx =
-        new AnalysisContext(analysisConfig, session, documentUri, text, languageId);
+        new AnalysisContext(null, analysisConfig, session, documentUri, text, languageId);
 
     Pipeline pipeline = trueDialectService.getPipeline(languageId);
 

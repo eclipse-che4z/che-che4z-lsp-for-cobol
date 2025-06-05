@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.analysis;
 import com.google.gson.JsonElement;
 import java.util.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -33,7 +32,6 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 /** Contains related to analysis state */
 @Slf4j
 @Getter
-@RequiredArgsConstructor
 public class AnalysisContext implements BenchmarkSessionProvider {
   private @Setter ExtendedDocument extendedDocument;
   private final AnalysisConfig config;
@@ -61,6 +59,15 @@ public class AnalysisContext implements BenchmarkSessionProvider {
     this.documentUri = documentUri;
     this.text = text;
     this.languageId = languageId;
+
+    final Map<String, List<String>> pd = config.getPreprocessorsDirectives();
+    if (pd != null) {
+      pd.entrySet()
+          .forEach(
+              e -> {
+                preprocessorsDirectives.put(e.getKey(), new ArrayList<String>(e.getValue()));
+              });
+    }
   }
 
   /**
