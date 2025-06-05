@@ -117,15 +117,17 @@ class ReplacingServiceImplTest {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
         Pair.of("(?<=^|[.,;]?\\s)01(?=[,;]?\\s|\\.|$)", "05"),
-        replacingService.retrieveTokenReplacingPattern(Pair.of("01", "05")));
+        replacingService.retrieveTokenReplacingPattern(Pair.of("01", "05"), CobolLanguageId.COBOL));
     assertEquals(
         Pair.of("(?<=^|[.,;]?\\s)(?=[,;]?\\s|\\.|$)", ""),
-        replacingService.retrieveTokenReplacingPattern(Pair.of("", "")));
+        replacingService.retrieveTokenReplacingPattern(Pair.of("", ""), CobolLanguageId.COBOL));
     assertEquals(
         Pair.of("(?<=^|[.,;]?\\s)IDENTIFICATION(?=[,;]?\\s|\\.|$)", "DIVISION"),
-        replacingService.retrieveTokenReplacingPattern(Pair.of("IDENTIFICATION", "DIVISION")));
+        replacingService.retrieveTokenReplacingPattern(
+            Pair.of("IDENTIFICATION", "DIVISION"), CobolLanguageId.COBOL));
     assertEquals(
-        Pair.of("(?<=^|[.,;]?\\s)A(?=[,;]?\\s|\\.|$)", "B"),
-        replacingService.retrieveTokenReplacingPattern(Pair.of("\n" + "A", "\n" + "  B ")));
+        Pair.of("(?<=^|[.,;]?\\s)\\s+A(?=[,;]?\\s|\\.|$)", "B"),
+        replacingService.retrieveTokenReplacingPattern(
+            Pair.of("\n" + "A", "\n" + "  B "), CobolLanguageId.COBOL));
   }
 }

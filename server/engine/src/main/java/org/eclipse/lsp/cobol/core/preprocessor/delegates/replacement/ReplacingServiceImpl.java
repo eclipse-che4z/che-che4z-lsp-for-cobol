@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import static java.lang.String.format;
 import static java.util.regex.Matcher.quoteReplacement;
-import static org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.SearchPattern.SEPARATE_TOKEN_PATTERN;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -52,12 +51,6 @@ import org.eclipse.lsp4j.Range;
 @Singleton
 @Slf4j
 public class ReplacingServiceImpl implements ReplacingService {
-
-  /**
-   * Look-before and look-ahead pattern to check that the token wrapped with separators, i.e.
-   * whitespaces, dots ot line breaks. Not includes separators to the found substring.
-   */
-  private static final String SINGLE_QUOTED_SEPARATE_TOKEN_PATTERN = "(?<=[.,;]?\\s)%s";
 
   private static final Pattern FUNCTION_IDENTIFIER =
       Pattern.compile("\\s*function\\s+\\w+\\([^)]*+\\)", Pattern.CASE_INSENSITIVE);
@@ -146,24 +139,11 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   @NonNull
   @Override
-  public Pair<String, String> retrieveTokenReplacingPattern(@NonNull Pair<String, String> clause) {
+  public Pair<String, String> retrieveTokenReplacingPattern(
+      @NonNull Pair<String, String> clause, CobolLanguageId languageId) {
     return Pair.of(
-        getPatternForFullTokens(clause.getLeft()), getReplacementPattern(clause.getRight()));
-  }
-
-  /**
-   * Get pattern that matches only full tokens
-   *
-   * @return pattern that matches only full tokens
-   */
-  @NonNull
-  private String getPatternForFullTokens(@NonNull String text) {
-    if (handleFunctionalIdentifiers(text)) return "";
-    final String trimmed = text.trim();
-    if (org.eclipse.lsp.cobol.common.utils.StringUtils.isEnclosedInSingleQuotes(trimmed)) {
-      return format(SINGLE_QUOTED_SEPARATE_TOKEN_PATTERN, trimmed);
-    }
-    return format(SEPARATE_TOKEN_PATTERN, trimmed);
+        SearchPattern.EXACT.apply(clause.getLeft(), languageId),
+        getReplacementPattern(clause.getRight()));
   }
 
   private boolean handleFunctionalIdentifiers(String text) {

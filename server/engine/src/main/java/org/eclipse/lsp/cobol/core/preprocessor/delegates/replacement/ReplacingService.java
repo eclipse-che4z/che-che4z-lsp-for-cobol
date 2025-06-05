@@ -55,8 +55,10 @@ public interface ReplacingService {
    *
    * @param clause - Pair of string representation of the replacing clause in the format
    *     "replaceable BY replacement"
+   * @param languageId
    * @return pair of cleaned-up replaceable and replacement
    */
   @NonNull
-  Pair<String, String> retrieveTokenReplacingPattern(@NonNull Pair<String, String> clause);
+  Pair<String, String> retrieveTokenReplacingPattern(
+      @NonNull Pair<String, String> clause, CobolLanguageId languageId);
 }

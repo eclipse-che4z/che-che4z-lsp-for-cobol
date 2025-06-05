@@ -202,7 +202,8 @@ class CopybookPreprocessorService {
         pattern = new ImmutablePair<>(left, right);
       }
       if (!isPseudoTextReplacement) {
-        hierarchy.addCopyReplacing(replacingService.retrieveTokenReplacingPattern(pattern));
+        hierarchy.addCopyReplacing(
+            replacingService.retrieveTokenReplacingPattern(pattern, languageId));
       } else {
         ResultWithErrors<Pair<String, String>> pairResultWithErrors =
             replacingService.retrievePseudoTextReplacingPattern(
