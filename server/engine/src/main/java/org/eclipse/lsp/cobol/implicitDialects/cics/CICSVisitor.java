@@ -394,12 +394,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (opts == null) return cicsCheckUtilityParameters;
     for (String opt : opts) {
       switch (opt.toUpperCase()) {
-      case "LENGTH":
-        cicsCheckUtilityParameters.noLengthEnabled = false;
-        break;
-      case "NOLENGTH":
-        cicsCheckUtilityParameters.noLengthEnabled = true;
-        break;
+        case "LENGTH":
+          cicsCheckUtilityParameters.noLengthEnabled = false;
+          break;
+        case "NOLENGTH":
+          cicsCheckUtilityParameters.noLengthEnabled = true;
+          break;
+        default:
+          break;
       }
     }
     return cicsCheckUtilityParameters;
