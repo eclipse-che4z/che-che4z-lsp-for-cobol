@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -82,13 +83,14 @@ public class ReplacingServiceImpl implements ReplacingService {
   public ResultWithErrors<Pair<String, String>> retrievePseudoTextReplacingPattern(
       @NonNull Pair<String, String> pattern,
       @NonNull Locality locality,
+      @NonNull CobolLanguageId languageId,
       SearchPattern searchPattern) {
     List<SyntaxError> errors = new ArrayList<>();
     String leftAttribute = pattern.getLeft().trim();
     String rightAttribute = pattern.getRight().trim();
 
     String extractPseudoText1 = leftAttribute.trim();
-    leftAttribute = searchPattern.apply(leftAttribute);
+    leftAttribute = searchPattern.apply(leftAttribute, languageId);
 
     rightAttribute = rightAttribute.trim();
     checkInvalidWordUsage(new String[] {extractPseudoText1, rightAttribute}, locality)

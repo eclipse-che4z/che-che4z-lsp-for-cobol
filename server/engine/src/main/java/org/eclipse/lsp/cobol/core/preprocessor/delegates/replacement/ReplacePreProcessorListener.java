@@ -23,6 +23,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -40,6 +41,7 @@ import org.eclipse.lsp4j.Range;
 @Slf4j
 public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   private final List<SyntaxError> errors = new ArrayList<>();
+  private final CobolLanguageId languageId;
   private final ReplacingService replacingService;
   private final ExtendedDocument extendedDocument;
   private final CopybookHierarchy hierarchy;
@@ -50,7 +52,9 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   public ReplacePreProcessorListener(
       @Assisted ExtendedDocument extendedDocument,
       @Assisted CopybookHierarchy hierarchy,
+      @Assisted CobolLanguageId languageId,
       ReplacingService replacingService) {
+    this.languageId = languageId;
     this.replacingService = replacingService;
     this.extendedDocument = extendedDocument;
     this.hierarchy = hierarchy;
@@ -95,6 +99,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
                   ctx.pseudoReplaceable().pseudoTextContent().getText(),
                   ctx.pseudoReplacement().pseudoTextContent().getText()),
               retrieveLocality(ctx),
+              languageId,
               ReplacementHelper.getSearchPattern(ctx))
           .processIfNoErrorsFound(
               pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);

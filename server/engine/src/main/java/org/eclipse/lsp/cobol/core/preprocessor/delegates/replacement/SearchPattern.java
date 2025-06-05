@@ -22,6 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 
 /**
  * ENUM class for different search patterns in replace clauses. Also, decides the matching pattern
@@ -30,38 +32,41 @@ import org.apache.commons.lang3.StringUtils;
 public enum SearchPattern {
   STARTS_WITH {
     @Override
-    public String apply(String trim) {
+    public String apply(String trim, CobolLanguageId languageId) {
       return WORD_BOUNDARY + adjustSpaces(escapeSpecialCharacters(trim));
     }
   },
   ENDS_WITH {
     @Override
-    public String apply(String trim) {
+    public String apply(String trim, CobolLanguageId languageId) {
       return adjustSpaces(escapeSpecialCharacters(trim)) + WORD_BOUNDARY;
     }
   },
   EXACT {
     @Override
-    public String apply(String trim) {
+    public String apply(String trim, CobolLanguageId languageId) {
       if (isEnclosedWithinValidSeparator(trim)) {
         return getPatternWithinEnclosedSeparator(trim);
       }
       if (isQuotedString(trim)) {
-        return getPatternForQuotedString(trim);
+        return getPatternForQuotedString(trim, languageId);
       }
       return SEPARATOR_REGEX_PREFIX
           + adjustSpaces(escapeSpecialCharacters(trim))
           + SEPARATOR_REGEX_SUFFIX;
     }
 
-    private String getPatternForQuotedString(String trim) {
+    private String getPatternForQuotedString(String trim, CobolLanguageId languageId) {
       Matcher matcher = NEW_LINE_PATTERN.matcher(trim);
+      CobolProgramLayout layout = languageId.getLayout();
+      int avoidCharLength = layout.getIndicatorLength() + layout.getSequenceLength();
+      String regex = String.format("( *)(?:(\\n.{%d})? ?)+", avoidCharLength);
       if (matcher.find()) {
         String[] split = trim.split(NEW_LINE_PATTERN.pattern());
         return Arrays.stream(split)
             .map(String::trim)
             .filter(sd -> !StringUtils.isEmpty(sd))
-            .collect(Collectors.joining("( *)(?:(\\n.{7})? ?)+"));
+            .collect(Collectors.joining(regex));
       }
       return Pattern.quote(trim);
     }
@@ -100,8 +105,8 @@ public enum SearchPattern {
   // Parentheses { ( } ... {  //NOSONAR
   // ) }, Colon { : }  //NOSONAR
   // Ref - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
-  private static final String SEPARATOR_REGEX_SUFFIX = "(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)";
-  private static final String SEPARATOR_REGEX_PREFIX = "(?<=^|[.,;]\\s|\\s|[\\(:])";
+  private static final String SEPARATOR_REGEX_SUFFIX = "(?=[):]|[,;]?\\s|\\.|$)";
+  private static final String SEPARATOR_REGEX_PREFIX = "(?<=^|[.,;]?\\s|[(:])";
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("[\\r\\n]");
   //  public static final List<String>
   // Patterns for the enclosures
@@ -133,7 +138,8 @@ public enum SearchPattern {
    * https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
    *
    * @param text Input text
+   * @param languageId
    * @return string
    */
-  public abstract String apply(String text);
+  public abstract String apply(String text, CobolLanguageId languageId);
 }

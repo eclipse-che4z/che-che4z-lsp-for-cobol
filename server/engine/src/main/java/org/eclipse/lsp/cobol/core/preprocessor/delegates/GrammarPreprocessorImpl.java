@@ -25,6 +25,7 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
@@ -60,19 +61,21 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     List<SyntaxError> errors = new ArrayList<>();
 
     String replacedCode =
-        replace(context.getCurrentDocument(), context.getHierarchy()).unwrap(errors::addAll);
+        replace(context.getCurrentDocument(), context.getHierarchy(), context.getLanguageId())
+            .unwrap(errors::addAll);
 
     return preprocess(context, preprocessor, replacedCode).accumulateErrors(errors);
   }
 
   private ResultWithErrors<String> replace(
-      ExtendedDocument extendedDocument, CopybookHierarchy hierarchy) {
+      ExtendedDocument extendedDocument, CopybookHierarchy hierarchy, CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     CobolPreprocessor preprocessorParser =
         new CobolPreprocessor(makeTokens(extendedDocument.toString()));
     preprocessorParser.removeErrorListeners();
 
-    ReplacePreProcessorListener listener = replacingFactory.create(extendedDocument, hierarchy);
+    ReplacePreProcessorListener listener =
+        replacingFactory.create(extendedDocument, hierarchy, languageId);
     new ParseTreeWalker().walk(listener, preprocessorParser.startRule());
     listener.applyReplacing();
     return new ResultWithErrors<>(extendedDocument.toString(), listener.getErrors());

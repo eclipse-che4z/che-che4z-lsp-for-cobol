@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
@@ -39,11 +40,15 @@ public interface ReplacingService {
    * @param pattern pair of string representation of the replacing clause in the format replaceable
    *     -> replacement
    * @param locality the locality of the context
+   * @param languageId
    * @param searchPattern {@link SearchPattern} strategy for the pattern replacement.
    * @return {@link ResultWithErrors} of pair of cleaned-up replaceable and replacement
    */
   ResultWithErrors<Pair<String, String>> retrievePseudoTextReplacingPattern(
-      Pair<String, String> pattern, @NonNull Locality locality, SearchPattern searchPattern);
+      Pair<String, String> pattern,
+      @NonNull Locality locality,
+      @NonNull CobolLanguageId languageId,
+      SearchPattern searchPattern);
 
   /**
    * Retrieve full-token replacing pattern from the given string.

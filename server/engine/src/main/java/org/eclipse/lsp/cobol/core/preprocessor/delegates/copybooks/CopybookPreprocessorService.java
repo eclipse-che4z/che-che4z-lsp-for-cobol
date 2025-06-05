@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
@@ -64,6 +65,7 @@ class CopybookPreprocessorService {
   private final ReplacingService replacingService;
   private final CopybookErrorService copybookErrorService;
   private final CleanerPreprocessor preprocessor;
+  private final CobolLanguageId languageId;
 
   private static final String HYPHEN = "-";
   private static final String UNDERSCORE = "_";
@@ -78,7 +80,8 @@ class CopybookPreprocessorService {
       CopybookHierarchy hierarchy,
       MessageService messageService,
       ReplacingService replacingService,
-      CleanerPreprocessor preprocessor) {
+      CleanerPreprocessor preprocessor,
+      CobolLanguageId languageId) {
     this.programDocumentUri = programDocumentUri;
     this.grammarPreprocessor = grammarPreprocessor;
     this.currentDocument = currentDocument;
@@ -89,6 +92,7 @@ class CopybookPreprocessorService {
     this.replacingService = replacingService;
     this.copybookErrorService = new CopybookErrorService(messageService);
     this.preprocessor = preprocessor;
+    this.languageId = languageId;
   }
 
   void addCopybook(
@@ -204,6 +208,7 @@ class CopybookPreprocessorService {
             replacingService.retrievePseudoTextReplacingPattern(
                 pattern,
                 mapLocality(AntlrRangeUtils.constructRange(replaceClauseContext)),
+                languageId,
                 searchPattern);
         errors.addAll(pairResultWithErrors.getErrors());
         hierarchy.addCopyReplacing(pairResultWithErrors.getResult());
@@ -240,7 +245,7 @@ class CopybookPreprocessorService {
 
     PreprocessorContext copybookContext =
         new PreprocessorContext(
-            programDocumentUri, copybookDocument, copybookConfig, hierarchy, copybooks);
+            programDocumentUri, copybookDocument, copybookConfig, hierarchy, copybooks, languageId);
     List<SyntaxError> copybookErrors = new LinkedList<>();
     grammarPreprocessor.preprocess(copybookContext, preprocessor).unwrap(copybookErrors::addAll);
 

@@ -23,6 +23,7 @@ import java.util.Collections;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -77,28 +78,35 @@ class ReplacingServiceImplTest {
     ReplacingService replacingService = new ReplacingServiceImpl(messageService);
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])01(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", "BY"),
+            Pair.of("(?<=^|[.,;]?\\s|[(:])01(?=[):]|[,;]?\\s|\\.|$)", "BY"),
             Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
-            ImmutablePair.of("  01  ", " BY   "), locality, SearchPattern.EXACT));
+            ImmutablePair.of("  01  ", " BY   "),
+            locality,
+            CobolLanguageId.COBOL,
+            SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
-            Collections.emptyList()),
+            Pair.of("(?<=^|[.,;]?\\s|[(:])(?=[):]|[,;]?\\s|\\.|$)", ""), Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
-            ImmutablePair.of("", ""), locality, SearchPattern.EXACT));
+            ImmutablePair.of("", ""), locality, CobolLanguageId.COBOL, SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])a\\s+b\\s+c(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
+            Pair.of("(?<=^|[.,;]?\\s|[(:])a\\s+b\\s+c(?=[):]|[,;]?\\s|\\.|$)", ""),
             Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
-            ImmutablePair.of("a   b  \nc", ""), locality, SearchPattern.EXACT));
+            ImmutablePair.of("a   b  \nc", ""),
+            locality,
+            CobolLanguageId.COBOL,
+            SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("(?<=^|[.,;]\\s|\\s|[\\(:])BY(?=[\\):]|[,;]\\s|\\.\\s*|\\s|$)", ""),
-            Collections.emptyList()),
+            Pair.of("(?<=^|[.,;]?\\s|[(:])BY(?=[):]|[,;]?\\s|\\.|$)", ""), Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
-            ImmutablePair.of("BY", "\n" + "      \n" + "   "), locality, SearchPattern.EXACT));
+            ImmutablePair.of("BY", "\n" + "      \n" + "   "),
+            locality,
+            CobolLanguageId.COBOL,
+            SearchPattern.EXACT));
   }
 
   /**
