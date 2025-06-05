@@ -84,8 +84,6 @@ public class CICSDialect implements CobolDialect {
 
   @Override
   public List<ProcessorDescription> getProcessors() {
-    CICSTranslatorOptionValidator cicsTranslatorOptionValidator =
-        new CICSTranslatorOptionValidator(messageService);
     return ImmutableList.of(
         new ProcessorDescription(
             ProgramNode.class,
@@ -102,9 +100,7 @@ public class CICSDialect implements CobolDialect {
         new ProcessorDescription(
             CicsTranslatorOptionNode.class,
             ProcessingPhase.VALIDATION,
-            cicsTranslatorOptionValidator),
-        new ProcessorDescription(
-            ProgramNode.class, ProcessingPhase.VALIDATION, cicsTranslatorOptionValidator));
+            new CICSTranslatorOptionValidator(messageService)));
   }
 
   @Override

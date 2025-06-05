@@ -18,8 +18,8 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.CicsTranslatorOptionNode;
@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.CicsTranslatorOptionNod
 /** Validate CICS translator option. */
 public class CICSTranslatorOptionValidator implements Processor<Node> {
   private final MessageService messageService;
-  private boolean afterIdentificationDivision = false;
 
   public CICSTranslatorOptionValidator(MessageService messageService) {
     this.messageService = messageService;
@@ -35,21 +34,30 @@ public class CICSTranslatorOptionValidator implements Processor<Node> {
 
   @Override
   public void accept(Node node, ProcessingContext processingContext) {
-    if (node instanceof CicsTranslatorOptionNode && afterIdentificationDivision) {
-      processingContext
-          .getErrors()
-          .add(
-              SyntaxError.syntaxError()
-                  .location(node.getLocality().toOriginalLocation())
-                  .severity(ErrorSeverity.ERROR)
-                  .errorSource(ErrorSource.PARSING)
-                  .suggestion(
-                      messageService.getMessage(
-                          "cics.translaterOption.mustBeBeforeIdentificationDivision"))
-                  .build());
+    Node parent = node.getParent();
+    if (parent.getNodeType() != NodeType.ROOT) {
+      reportError(node, processingContext);
     }
-    if (node instanceof ProgramNode) {
-      afterIdentificationDivision = true;
+    for (Node child : parent.getChildren()) {
+      if (child == node) {
+        return;
+      }
+      if (!(child instanceof CicsTranslatorOptionNode)) {
+        reportError(node, processingContext);
+        return;
+      }
     }
+  }
+
+  private void reportError(Node node, ProcessingContext processingContext) {
+    processingContext
+        .getErrors()
+        .add(
+            SyntaxError.syntaxError()
+                .location(node.getLocality().toOriginalLocation())
+                .severity(ErrorSeverity.ERROR)
+                .errorSource(ErrorSource.PARSING)
+                .suggestion(messageService.getMessage("cics.translaterOption.mustBeAtBeginning"))
+                .build());
   }
 }
