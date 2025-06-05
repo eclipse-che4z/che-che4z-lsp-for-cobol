@@ -129,7 +129,8 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     }
     if (hierarchy.getLastTextReplacing() != null) {
       Range range = hierarchy.getLastTextReplacing().getRange(extendedDocument.getUri());
-      range.setEnd(new Position(ctx.getStop().getLine(), ctx.getStop().getCharPositionInLine()));
+      range.setEnd(
+          new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
     }
     applyReplacing();
   }
@@ -149,7 +150,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     if (hierarchy.getLastTextReplacing() != null) {
       Range range = hierarchy.getLastTextReplacing().getRange(extendedDocument.getUri());
       if (range.getEnd() == null) {
-        range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
+        range.setEnd(new Position(start.getLine() - 1, start.getCharPositionInLine()));
       }
     }
   }
