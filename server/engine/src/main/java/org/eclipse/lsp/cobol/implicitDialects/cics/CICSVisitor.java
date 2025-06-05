@@ -390,11 +390,18 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   private CICSCheckUtilityParameters getCheckParams() {
     CICSCheckUtilityParameters cicsCheckUtilityParameters = new CICSCheckUtilityParameters();
-    if (context.getPreprocessorsDirectives().get("CICS") == null)
-      cicsCheckUtilityParameters.noLengthEnabled = false;
-    else
-      cicsCheckUtilityParameters.noLengthEnabled =
-          context.getPreprocessorsDirectives().get("CICS").contains("NOLENGTH");
+    final List<String> opts = context.getPreprocessorsDirectives().get("CICS");
+    if (opts == null) return cicsCheckUtilityParameters;
+    for (String opt : opts) {
+      switch (opt.toUpperCase()) {
+      case "LENGTH":
+        cicsCheckUtilityParameters.noLengthEnabled = false;
+        break;
+      case "NOLENGTH":
+        cicsCheckUtilityParameters.noLengthEnabled = true;
+        break;
+      }
+    }
     return cicsCheckUtilityParameters;
   }
 }
