@@ -15,6 +15,8 @@
 
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
+import static java.lang.String.format;
+
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,9 +53,7 @@ public enum SearchPattern {
       if (isQuotedString(trim)) {
         return getPatternForQuotedString(trim, languageId);
       }
-      return SEPARATOR_REGEX_PREFIX
-          + adjustSpaces(escapeSpecialCharacters(trim))
-          + SEPARATOR_REGEX_SUFFIX;
+      return format(SEPARATE_TOKEN_PATTERN, adjustSpaces(escapeSpecialCharacters(trim)));
     }
 
     private String getPatternForQuotedString(String trim, CobolLanguageId languageId) {
@@ -105,10 +105,8 @@ public enum SearchPattern {
   // Parentheses { ( } ... {  //NOSONAR
   // ) }, Colon { : }  //NOSONAR
   // Ref - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
-  private static final String SEPARATOR_REGEX_SUFFIX = "(?=[):]|[,;]?\\s|\\.|$)";
-  private static final String SEPARATOR_REGEX_PREFIX = "(?<=^|[.,;]?\\s|[(:])";
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("[\\r\\n]");
-  //  public static final List<String>
+  public static final String SEPARATE_TOKEN_PATTERN = "(?<=^|[.,;]?\\s)%s(?=[,;]?\\s|\\.|$)";
   // Patterns for the enclosures
   private static final Pattern[] COBOL_REPLACE_PATTERN_SEPARATORS = {
     Pattern.compile("^;.+;$"),

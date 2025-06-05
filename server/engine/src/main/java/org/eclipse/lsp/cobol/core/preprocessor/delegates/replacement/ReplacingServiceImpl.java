@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import static java.lang.String.format;
 import static java.util.regex.Matcher.quoteReplacement;
+import static org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.SearchPattern.SEPARATE_TOKEN_PATTERN;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -56,9 +57,8 @@ public class ReplacingServiceImpl implements ReplacingService {
    * Look-before and look-ahead pattern to check that the token wrapped with separators, i.e.
    * whitespaces, dots ot line breaks. Not includes separators to the found substring.
    */
-  private static final String SEPARATE_TOKEN_PATTERN = "(?<=[.,;]?\\s)%s(?=[,;]?\\s|\\.)";
-
   private static final String SINGLE_QUOTED_SEPARATE_TOKEN_PATTERN = "(?<=[.,;]?\\s)%s";
+
   private static final Pattern FUNCTION_IDENTIFIER =
       Pattern.compile("\\s*function\\s+\\w+\\([^)]*+\\)", Pattern.CASE_INSENSITIVE);
   private static final String ERROR_REPLACING = "Error replacing on text: %s with the pattern: %s";
