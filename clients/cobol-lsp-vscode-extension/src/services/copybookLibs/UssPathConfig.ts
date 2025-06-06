@@ -1,4 +1,3 @@
-import { Uri } from "vscode";
 import CopybookLib from "./ProcessorGroupLib";
 import { getVariablesFromUri } from "../util/FSUtils";
 import { SettingsService } from "../Settings";
@@ -7,6 +6,7 @@ import { CopybookDownloaderForDsn } from "../copybook/downloader/CopybookDownloa
 import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { USS } from "../../constants";
+import * as vscode from "vscode";
 
 export class UssPathLib implements CopybookLib {
   constructor(
@@ -26,11 +26,11 @@ export class UssPathLib implements CopybookLib {
 
   resolveCopybookUri(
     copybookName: string,
-    documentUri: Uri,
+    documentUri: vscode.Uri,
     _dsnDownloader: CopybookDownloaderForDsn,
     ussDownloader: CopybookDownloaderForUss,
     explorerApi?: IApiRegisterClient,
-  ): Promise<Uri | undefined> {
+  ): Promise<vscode.Uri | undefined> {
     const variables = getVariablesFromUri(documentUri, false);
     const evaluatedUri = SettingsService.evaluateVariables(
       [this.uss],
@@ -49,5 +49,27 @@ export class UssPathLib implements CopybookLib {
       evaluatedUri,
       copybookName,
     );
+  }
+
+  async listCopybooks(
+    documentUri: vscode.Uri,
+    _outputChannel?: vscode.OutputChannel,
+    _dsnDownloader?: CopybookDownloaderForDsn,
+    ussDownloader?: CopybookDownloaderForUss,
+    explorerApi?: IApiRegisterClient,
+  ): Promise<string[]> {
+    if (!this.profile) {
+      this.profile = ProfileUtils.getProfileNameForCopybook(
+        documentUri,
+        explorerApi,
+      );
+    }
+
+    const members = await ussDownloader?.getAllMembers(
+      this.profile ?? "profile",
+      this.uss,
+    );
+
+    return members?.map((m) => m.name) ?? [];
   }
 }

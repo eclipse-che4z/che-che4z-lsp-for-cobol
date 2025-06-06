@@ -42,4 +42,26 @@ export class DatasetLib implements CopybookLib {
       copybookName,
     );
   }
+
+  async listCopybooks(
+    documentUri: vscode.Uri,
+    outputChannel?: vscode.OutputChannel,
+    dsnDownloader?: CopybookDownloaderForDsn,
+    _ussDownloader?: CopybookDownloaderForUss,
+    explorerApi?: IApiRegisterClient,
+  ): Promise<string[]> {
+    if (!this.profile) {
+      this.profile = ProfileUtils.getProfileNameForCopybook(
+        documentUri,
+        explorerApi,
+      );
+    }
+
+    const members = await dsnDownloader?.getAllMembers(
+      this.profile ?? "profile",
+      this.dsn,
+    );
+
+    return members?.map((m) => m.name) ?? [];
+  }
 }

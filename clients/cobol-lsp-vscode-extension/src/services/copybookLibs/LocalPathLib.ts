@@ -20,20 +20,24 @@ export default class LocalPathLib implements CopybookLib {
     return libs;
   }
 
-  async resolveCopybookUri(
-    copybookName: string,
-    documentUri: vscode.Uri,
-  ): Promise<vscode.Uri | undefined> {
+  private getUris(documentUri: vscode.Uri) {
     const variables = getVariablesFromUri(documentUri, false);
     const evaluatedPaths = SettingsService.evaluateVariables(
       [this.path],
       variables,
     );
 
-    const uris = SettingsService.prepareLocalSearchUris(
+    return SettingsService.prepareLocalSearchUris(
       evaluatedPaths,
       vscode.workspace.workspaceFolders ?? [],
     );
+  }
+
+  async resolveCopybookUri(
+    copybookName: string,
+    documentUri: vscode.Uri,
+  ): Promise<vscode.Uri | undefined> {
+    const uris = this.getUris(documentUri);
 
     const allowedExtensions =
       await SettingsService.getCopybookExtension(documentUri);
@@ -51,5 +55,35 @@ export default class LocalPathLib implements CopybookLib {
         return result.value;
       }
     }
+  }
+
+  async listCopybooks(
+    documentUri: vscode.Uri,
+    outputChannel?: vscode.OutputChannel,
+  ): Promise<string[]> {
+    const uris = this.getUris(documentUri);
+
+    const allowedExtensions =
+      await SettingsService.getCopybookExtension(documentUri);
+
+    const results = await Promise.allSettled(
+      uris.map(async (directoryUri) =>
+        localCopybooks.listDirectory(directoryUri, allowedExtensions ?? []),
+      ),
+    );
+
+    const copybooks: string[] = [];
+
+    results.forEach((result) => {
+      if (result.status === "fulfilled") {
+        result.value.forEach((copybook) => copybooks.push(copybook.filename));
+      } else {
+        outputChannel?.appendLine(
+          `Unable to load copybooks completions: ${result.reason}`,
+        );
+      }
+    });
+
+    return copybooks;
   }
 }

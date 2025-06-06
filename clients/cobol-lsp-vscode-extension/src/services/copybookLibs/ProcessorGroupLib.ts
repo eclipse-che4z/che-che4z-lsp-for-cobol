@@ -10,4 +10,9 @@ export default interface CopybookLib {
     ussDownloader?: CopybookDownloaderForUss,
     explorerApi?: IApiRegisterClient,
   ): Promise<vscode.Uri | undefined>;
+
+  listCopybooks(
+    documentUri: vscode.Uri,
+    outputChannel?: vscode.OutputChannel,
+  ): Promise<string[]>;
 }
