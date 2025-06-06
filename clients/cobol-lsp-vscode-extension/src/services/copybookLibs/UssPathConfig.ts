@@ -1,53 +1,52 @@
 import { Uri } from "vscode";
 import CopybookLib from "./ProcessorGroupLib";
-import * as vscode from "vscode";
-import { USS } from "../../constants";
 import { getVariablesFromUri } from "../util/FSUtils";
 import { SettingsService } from "../Settings";
 import { CopybookDownloaderForUss } from "../copybook/downloader/CopybookDownloaderForUss";
-import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { CopybookDownloaderForDsn } from "../copybook/downloader/CopybookDownloaderForDsn";
+import { ProfileUtils } from "../util/ProfileUtils";
+import { CopybookLibs } from "../ProcessorGroupsLoader";
+import { USS } from "../../constants";
 
-export class UssPathLibFactory {
-  constructor(private defaultProfile: string) {}
+export class UssPathLib implements CopybookLib {
+  constructor(
+    private uss: string,
+    private profile?: string,
+  ) {}
 
-  create(configs: CopybookLibs, documentUri: vscode.Uri) {
+  static create(configs: CopybookLibs) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "object" && USS in config) {
-        libs.push(
-          new UssPathLib(
-            config.uss,
-            documentUri,
-            config.profile ?? this.defaultProfile,
-          ),
-        );
+        libs.push(new UssPathLib(config.uss, config.profile));
       }
     }
     return libs;
   }
-}
-
-export class UssPathLib implements CopybookLib {
-  private uss: string;
-  private profile: string;
-
-  constructor(uss: string, documentUri: vscode.Uri, profile: string) {
-    const variables = getVariablesFromUri(documentUri, false);
-    this.uss = SettingsService.evaluateVariables([uss], variables)[0];
-    this.profile = profile;
-  }
 
   resolveCopybookUri(
     copybookName: string,
-    _documentUri: Uri,
+    documentUri: Uri,
     _dsnDownloader: CopybookDownloaderForDsn,
     ussDownloader: CopybookDownloaderForUss,
     explorerApi?: IApiRegisterClient,
   ): Promise<Uri | undefined> {
+    const variables = getVariablesFromUri(documentUri, false);
+    const evaluatedUri = SettingsService.evaluateVariables(
+      [this.uss],
+      variables,
+    )[0];
+
+    if (!this.profile) {
+      this.profile = ProfileUtils.getProfileNameForCopybook(
+        documentUri,
+        explorerApi,
+      );
+    }
+
     return ussDownloader.resolveCopybookUri(
-      this.profile,
-      this.uss,
+      this.profile ?? "profile",
+      evaluatedUri,
       copybookName,
     );
   }

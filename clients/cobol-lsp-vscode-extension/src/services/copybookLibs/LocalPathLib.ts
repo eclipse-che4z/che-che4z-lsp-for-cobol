@@ -5,6 +5,8 @@ import { getVariablesFromUri } from "../util/FSUtils";
 import CopybookLib from "./ProcessorGroupLib";
 import * as vscode from "vscode";
 
+export const localCopybooks = new LocalFilesystemResourceService();
+
 export default class LocalPathLib implements CopybookLib {
   constructor(private path: string) {}
 
@@ -36,7 +38,7 @@ export default class LocalPathLib implements CopybookLib {
     const allowedExtensions =
       await SettingsService.getCopybookExtension(documentUri);
     const promises = uris.map(async (uri) => {
-      return await LocalFilesystemResourceService.searchDirectory(
+      return await localCopybooks.searchDirectory(
         uri,
         copybookName,
         allowedExtensions ?? [],

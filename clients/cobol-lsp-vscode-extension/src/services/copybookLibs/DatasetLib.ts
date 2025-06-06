@@ -7,17 +7,13 @@ import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookDownloaderForUss } from "../copybook/downloader/CopybookDownloaderForUss";
 
 export class DatasetLib implements CopybookLib {
-  private dsn: string;
-  private profile?: string;
-
-  constructor(dsn: string, profile?: string) {
-    this.dsn = dsn;
-    this.profile = profile;
-  }
+  constructor(
+    private dsn: string,
+    private profile?: string,
+  ) {}
 
   static create(configs: CopybookLibs) {
     const libs = [];
-    z;
     for (const config of configs) {
       if (typeof config === "object" && DATASET in config) {
         libs.push(new DatasetLib(config.dataset, config.profile));

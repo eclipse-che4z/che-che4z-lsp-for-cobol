@@ -221,12 +221,12 @@ function transformProcessorGroup(
   return result;
 }
 
-export function transformLibs(libs?: CopybookLibs): TransformedLibs[] {
+export function transformLibs(libs?: CopybookLibs) {
   if (!libs) {
     return [];
   }
 
-  const processorGroupLibTypes = [LocalPathLib, DatasetLib];
+  const processorGroupLibTypes = [LocalPathLib, DatasetLib, UssPathLib];
 
   const results = processorGroupLibTypes.map((pg) => pg.create(libs)).flat();
 
