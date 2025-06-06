@@ -23,19 +23,21 @@ suite("Integration Test Suite: Subroutines resolving", () => {
     await helper.activate();
   });
 
-  suiteTeardown(async () => await helper.closeAllEditors());
+  suiteTeardown(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("Diagnostics report missing subroutine", async function () {
     this.timeout(helper.TEST_TIMEOUT);
-    await helper.showDocument("CALL.cbl");
-    const editor = helper.getEditor("CALL.cbl");
+    const editor = await helper.showDocument("CALL.cbl");
 
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
-    );
-    helper.hasDiagnosticMatches(
+    const diagnostics = await helper.waitForDiagnosticCount(
       editor.document.uri,
-      (d) => d.message === "SUB2: Subroutine not found",
+      1,
+    );
+    assert.ok(
+      diagnostics.some((d) => d.message === "SUB2: Subroutine not found"),
     );
   });
 

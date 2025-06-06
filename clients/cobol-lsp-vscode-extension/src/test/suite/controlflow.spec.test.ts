@@ -14,7 +14,6 @@
 
 import * as assert from "assert";
 import * as helper from "./testHelper";
-import * as vscode from "vscode";
 
 suite("Integration Test Suite", function () {
   suiteSetup(async function () {
@@ -23,31 +22,33 @@ suite("Integration Test Suite", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
-  this.afterAll(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("Show errors only for opened files", async () => {
     // Open program with error inside a copybook
-    await helper.showDocument("TESTCPY1.cbl");
-    const progUri = await helper.getUri("TESTCPY1.cbl");
-
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(progUri).length === 2,
+    const editor = await helper.showDocument("TESTCPY1.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      2,
     );
-    const diagnostics = vscode.languages.getDiagnostics(progUri);
+
     assert.strictEqual(
       diagnostics.length,
       2,
       "got: " + JSON.stringify(diagnostics),
     );
-    helper.hasDiagnosticMatches(
-      progUri,
-      (d) => d.message === "Implicit EXIT PROGRAM statement executed",
+    assert.ok(
+      diagnostics.some(
+        (d) => d.message === "Implicit EXIT PROGRAM statement executed",
+      ),
     );
   })
     .timeout(helper.TEST_TIMEOUT)

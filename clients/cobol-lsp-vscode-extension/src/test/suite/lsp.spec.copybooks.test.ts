@@ -25,13 +25,15 @@ suite("Integration Test Suite: Copybooks", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
-  this.afterAll(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("TC174655: Copybook - Nominal", async () => {
     const editor = await helper.showDocument("USERC1N1.cbl");
@@ -103,8 +105,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174952 Copybook - not exist, but dynamically appears", async () => {
-    await helper.showDocument("VAR.cbl");
-    const editor = helper.getEditor("VAR.cbl");
+    const editor = await helper.showDocument("VAR.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 2);
     helper.assertRangeIsEqual(
@@ -128,8 +129,7 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   test("TC174952 / TC174953 Copybook - definition not exist, but dynamically appears", async () => {
-    await helper.showDocument("USERC1F.cbl");
-    const editor = helper.getEditor("USERC1F.cbl");
+    const editor = await helper.showDocument("USERC1F.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.assertRangeIsEqual(
       diagnostics[2].range,
@@ -173,7 +173,8 @@ suite("Integration Test Suite: Copybooks", function () {
     .slow(1000);
 
   suite("Default local copybooks paths configuration", () => {
-    suite("local copybook path is configured", () => {
+    suite("local copybook path is configured", function () {
+      this.timeout(helper.TEST_TIMEOUT);
       suiteSetup(async () => {
         await helper.updateConfig("testing.json");
         await helper.activate();
@@ -199,7 +200,8 @@ suite("Integration Test Suite: Copybooks", function () {
       });
     });
 
-    suite("remote dns copybook path is configured", () => {
+    suite("remote dns copybook path is configured", function () {
+      this.timeout(helper.TEST_TIMEOUT);
       suiteSetup(async () => {
         await helper.updateConfig("default.json");
         await helper.updateConfigValue("cobol-lsp.cpy-manager.paths-dsn", [
@@ -229,7 +231,8 @@ suite("Integration Test Suite: Copybooks", function () {
     });
   });
 
-  suite("Copybooks auto completions", () => {
+  suite("Copybooks auto completions", function () {
+    this.timeout(helper.TEST_TIMEOUT);
     suiteSetup(async () => {
       await helper.updateConfig("basic.json");
       await helper.activate();

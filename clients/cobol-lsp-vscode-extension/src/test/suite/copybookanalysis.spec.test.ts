@@ -25,39 +25,43 @@ suite("TC384131: Analysis Features for copybooks", function () {
     await helper.sleep(1000);
   });
 
-  this.afterEach(async () => {
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
     await helper.closeAllEditors();
   });
 
-  this.afterAll(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("TC384131-1: Go To References", async () => {
     //1- Open COBOL file
     const editor_cobol: vscode.TextEditor = await helper.showDocument(
       "copybook-analysis/mainfile1.cbl",
     );
-    await helper.sleep(3000);
 
-    //2 - Find a COPYBOOK
-    helper.moveCursor(editor_cobol, new vscode.Position(13, 18));
+    const copybookUri = (
+      await helper.getUri("copybook-analysis/v1/COPYBOOK")
+    ).toString();
+    let editor_copybook;
 
-    //3- Go to COPYBOOK definition
-    await vscode.commands.executeCommand("editor.action.revealDefinition");
-    const editor_copybook = vscode.window.activeTextEditor;
+    while (true) {
+      //2 - Find a COPYBOOK
+      helper.moveCursor(editor_cobol, new vscode.Position(13, 18));
+
+      //3- Go to COPYBOOK definition
+      await vscode.commands.executeCommand("editor.action.revealDefinition");
+      editor_copybook = vscode.window.activeTextEditor;
+      if (editor_copybook?.document.uri.toString() === copybookUri) break;
+
+      await helper.sleep(1000);
+    }
 
     //4- Find a paragprah, right click on it, and select "Go To References"
-    assert.notEqual(editor_copybook, null);
-    assert.equal(
-      editor_copybook?.document.uri.toString(),
-      (await helper.getUri("copybook-analysis/v1/COPYBOOK")).toString(),
-    );
-    await helper.sleep(2000);
-
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeReferenceProvider",
-      editor_copybook!.document.uri,
+      editor_copybook.document.uri,
       new vscode.Position(13, 16),
     );
 
@@ -78,26 +82,28 @@ suite("TC384131: Analysis Features for copybooks", function () {
     const editor_cobol: vscode.TextEditor = await helper.showDocument(
       "copybook-analysis/mainfile1.cbl",
     );
-    await helper.sleep(3000);
 
-    //2 - Find a COPYBOOK
-    helper.moveCursor(editor_cobol, new vscode.Position(32, 15));
+    const copybookUri = (
+      await helper.getUri("copybook-analysis/v1/PARS")
+    ).toString();
+    let editor_copybook;
 
-    //3- Go to COPYBOOK definition
-    await vscode.commands.executeCommand("editor.action.revealDefinition");
-    const editor_copybook = vscode.window.activeTextEditor;
+    while (true) {
+      //2 - Find a COPYBOOK
+      helper.moveCursor(editor_cobol, new vscode.Position(32, 15));
+
+      //3- Go to COPYBOOK definition
+      await vscode.commands.executeCommand("editor.action.revealDefinition");
+      editor_copybook = vscode.window.activeTextEditor;
+      if (editor_copybook?.document.uri.toString() === copybookUri) break;
+
+      await helper.sleep(1000);
+    }
 
     //4- Find a perform statement, right click and select "Go To Definition"
-    assert.notEqual(editor_copybook, null);
-    assert.equal(
-      editor_copybook?.document.uri.toString(),
-      (await helper.getUri("copybook-analysis/v1/PARS")).toString(),
-    );
-    await helper.sleep(2000);
-
     const locations: vscode.Location[] = await vscode.commands.executeCommand(
       "vscode.executeDefinitionProvider",
-      editor_copybook!.document.uri,
+      editor_copybook.document.uri,
       new vscode.Position(14, 28),
     );
 

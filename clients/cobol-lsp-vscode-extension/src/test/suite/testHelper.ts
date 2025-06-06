@@ -13,7 +13,6 @@
  */
 import * as assert from "assert";
 import * as vscode from "vscode";
-import * as path from "path";
 import { LANGUAGE_ID } from "../../constants";
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
@@ -55,15 +54,6 @@ export function getWorkspace(): vscode.WorkspaceFolder {
   throw new Error("Workspace not found");
 }
 
-export function getEditor(workspace_file: string): vscode.TextEditor {
-  const editor = vscode.window.activeTextEditor!;
-  assert.strictEqual(
-    editor.document.uri.fsPath,
-    path.join(getWorkspacePath(), workspace_file),
-  );
-  return editor;
-}
-
 export async function getUri(workspace_file: string): Promise<vscode.Uri> {
   const files = await vscode.workspace.findFiles(workspace_file);
   assert.ok(files && files[0], `Cannot find file ${workspace_file}`);
@@ -92,11 +82,13 @@ export async function openUntitledDocument(languageId = LANGUAGE_ID) {
   });
 }
 
+const plaintext = "plaintext";
+
 export async function closeActiveEditor() {
   const doc = vscode.window.activeTextEditor;
   if (!doc) return;
   // simulate didClose by changing the languageID
-  await vscode.languages.setTextDocumentLanguage(doc.document, "plaintext");
+  await vscode.languages.setTextDocumentLanguage(doc.document, plaintext);
   await vscode.commands.executeCommand(
     "workbench.action.revertAndCloseActiveEditor",
   );
@@ -105,6 +97,11 @@ export async function closeActiveEditor() {
 export async function closeAllEditors() {
   await vscode.commands.executeCommand("workbench.action.files.revert");
   await vscode.commands.executeCommand("workbench.action.closeAllEditors");
+  await Promise.all(
+    vscode.workspace.textDocuments
+      .filter((d) => !d.isClosed && d.languageId != plaintext)
+      .map((d) => vscode.languages.setTextDocumentLanguage(d, plaintext)),
+  );
 }
 
 export function moveCursor(
@@ -150,6 +147,10 @@ export async function insertString(
   return movePosition;
 }
 
+function basename(s: string) {
+  return /[^\\/]*$/.exec(s)![0];
+}
+
 export async function waitForDiagnostics(
   uri: vscode.Uri,
   timeout: number = 50000,
@@ -161,7 +162,24 @@ export async function waitForDiagnostics(
       return diagnostics.length > 0;
     },
     timeout,
-    "diagnostics (" + path.basename(uri.fsPath) + ")",
+    "diagnostics (" + basename(uri.path) + ")",
+  );
+  return diagnostics;
+}
+
+export async function waitForDiagnosticCount(
+  uri: vscode.Uri,
+  count: number,
+  timeout: number = 50000,
+) {
+  let diagnostics: vscode.Diagnostic[] = [];
+  await waitFor(
+    () => {
+      diagnostics = vscode.languages.getDiagnostics(uri);
+      return diagnostics.length === count;
+    },
+    timeout,
+    "diagnostics (" + basename(uri.path) + ")",
   );
   return diagnostics;
 }

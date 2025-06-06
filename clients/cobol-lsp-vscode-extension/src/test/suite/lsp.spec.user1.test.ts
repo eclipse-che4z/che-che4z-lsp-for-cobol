@@ -28,17 +28,19 @@ suite("Tests with USER1.cbl", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
   this.beforeEach(async () => {
-    await helper.showDocument(WORKSPACE_FILE);
-    editor = helper.getEditor(WORKSPACE_FILE);
+    editor = await helper.showDocument(WORKSPACE_FILE);
   });
 
-  this.afterAll(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   // open 'open' file, should be recognized as COBOL
   test("TC152048: Cobol file is recognized by LSP", async () => {
@@ -157,13 +159,11 @@ suite("Tests with USER1.cbl", function () {
       pos(34, 57),
       "                                ",
     );
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length > 0,
-    );
-    assert.strictEqual(
-      vscode.languages.getDiagnostics(editor.document.uri).length,
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
       1,
     );
+    assert.strictEqual(diagnostics.length, 1);
     await vscode.workspace
       .getConfiguration()
       .update("cobol-lsp.formatting", "None");

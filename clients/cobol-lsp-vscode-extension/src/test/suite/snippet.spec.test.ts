@@ -28,14 +28,15 @@ suite(
       await helper.updateConfig("basic.json");
       await helper.activate();
     });
-    this.afterEach(async () => await helper.closeAllEditors()).timeout(
-      helper.TEST_TIMEOUT,
-    );
+
+    this.afterEach(async function () {
+      this.timeout(helper.TEST_TIMEOUT);
+      await helper.closeAllEditors();
+    });
 
     test("Autocompletion basic dialect", async () => {
       await helper.updateConfig("basic.json");
-      await helper.showDocument("SNIPPET.cbl");
-      const editor = helper.getEditor("SNIPPET.cbl");
+      const editor = await helper.showDocument("SNIPPET.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(2, 0), "   IDENTIFICATION");
       await helper.triggerCompletionsAndWaitForResults();
@@ -48,8 +49,7 @@ suite(
     // Skipped because dialects are not possible to run on Java-less machine
     test.skip("Autocompletion with IDMS dialect", async () => {
       await helper.updateConfig("idms.json");
-      await helper.showDocument("SNIPPET_IDMS.cbl");
-      const editor = helper.getEditor("SNIPPET_IDMS.cbl");
+      const editor = await helper.showDocument("SNIPPET_IDMS.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(1, 0), "   COPY");
       await helper.triggerCompletionsAndWaitForResults();
@@ -61,8 +61,7 @@ suite(
 
     // Skipped because dialects are not possible to run on Java-less machine
     test.skip("Keywords Autocompletion for IDMS dialect", async () => {
-      await helper.showDocument("SNIPPET_IDMS.cbl");
-      const editor = helper.getEditor("SNIPPET_IDMS.cbl");
+      const editor = await helper.showDocument("SNIPPET_IDMS.cbl");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(1, 0), "   IDMS-STATIST");
       await helper.executeCommandMultipleTimes("selectNextSuggestion", 1);
@@ -75,8 +74,7 @@ suite(
     });
 
     test("TC152058 Autocompletion basic dialect", async () => {
-      await helper.showDocument("USER1.cbl");
-      const editor = helper.getEditor("USER1.cbl");
+      const editor = await helper.showDocument("USER1.cbl");
       await helper.updateConfig("basic.json");
       await helper.waitFor(() => editor.document.languageId === "cobol");
       await helper.insertString(editor, pos(39, 0), "           A");
@@ -112,18 +110,20 @@ suite(
 );
 
 suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
+  this.timeout(helper.TEST_TIMEOUT);
+
   suiteSetup(async function () {
     this.timeout(helper.TEST_TIMEOUT);
     await helper.updateConfig("basic.json");
     await helper.activate();
   });
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("TC289633 Provide default COBOL code snippets - basic scenario", async () => {
-    await helper.showDocument("SNIPPET.cbl");
-    const editor = helper.getEditor("SNIPPET.cbl");
+    const editor = await helper.showDocument("SNIPPET.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
     await helper.triggerCompletionsAndWaitForResults();
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
@@ -136,27 +136,23 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   });
 
   test("TC289635 Provide default COBOL code snippets - upper case", async () => {
-    await helper.showDocument("SNIPPET_IDMS.cbl");
-    const editor = helper.getEditor("SNIPPET_IDMS.cbl");
+    const editor = await helper.showDocument("SNIPPET_IDMS.cbl");
     await helper.insertString(editor, pos(2, 0), "sh");
     await helper.triggerCompletionsAndWaitForResults();
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     await helper.waitFor(() => editor.document.getText().length > 5);
     await helper.insertString(editor, pos(14, 0), "           COPY AB.");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
     );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
 
     await helper.insertString(editor, pos(15, 0), "\n");
     await helper.insertString(editor, pos(15, 0), "           FUNCTION CO");
     await helper.triggerCompletionsAndWaitForResults();
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
-      1000,
-    );
+    await helper.waitForDiagnosticCount(editor.document.uri, 2);
     await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     const lines = editor.document.getText().split(/\r\n|\r|\n/);
@@ -164,28 +160,24 @@ suite("TF42379 COBOL LS F96588 - Insert code snippets", function () {
   });
 
   test("TC289636 Provide default COBOL code snippets - lower case", async () => {
-    await helper.showDocument("SNIPPET2.cbl");
-    const editor = helper.getEditor("SNIPPET2.cbl");
+    const editor = await helper.showDocument("SNIPPET2.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     await helper.insertString(editor, pos(2, 0), "sh");
     await helper.triggerCompletionsAndWaitForResults();
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     await helper.waitFor(() => editor.document.getText().length > 5);
     await helper.insertString(editor, pos(14, 0), "           COPY AB.");
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 1,
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
     );
-    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 1);
     assert.strictEqual(diagnostics[0].message, "AB: Copybook not found");
 
     await helper.insertString(editor, pos(15, 0), "\n");
     await helper.insertString(editor, pos(15, 0), "           function co");
     await helper.triggerCompletionsAndWaitForResults();
-    await helper.waitFor(
-      () => vscode.languages.getDiagnostics(editor.document.uri).length === 3,
-      1000,
-    );
+    await helper.waitForDiagnosticCount(editor.document.uri, 2);
     await helper.executeCommandMultipleTimes("selectNextSuggestion", 0);
     await vscode.commands.executeCommand("acceptSelectedSuggestion");
     const lines = editor.document.getText().split(/\r\n|\r|\n/);
