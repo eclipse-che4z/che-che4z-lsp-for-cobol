@@ -1,7 +1,7 @@
 import { DATASET } from "../../constants";
 import { CopybookDownloaderForDsn } from "../copybook/downloader/CopybookDownloaderForDsn";
 import * as vscode from "vscode";
-import CopybookLib from "./ProcessorGroupLib";
+import CopybookLib from "./CopybookLib";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookDownloaderForUss } from "../copybook/downloader/CopybookDownloaderForUss";

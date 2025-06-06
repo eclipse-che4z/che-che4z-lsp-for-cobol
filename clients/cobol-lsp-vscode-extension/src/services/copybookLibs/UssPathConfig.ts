@@ -1,4 +1,4 @@
-import CopybookLib from "./ProcessorGroupLib";
+import CopybookLib from "./CopybookLib";
 import { getVariablesFromUri } from "../util/FSUtils";
 import { SettingsService } from "../Settings";
 import { CopybookDownloaderForUss } from "../copybook/downloader/CopybookDownloaderForUss";

@@ -2,7 +2,7 @@ import { LocalFilesystemResourceService } from "../LocalFilesystemResourceServic
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
-import CopybookLib from "./ProcessorGroupLib";
+import CopybookLib from "./CopybookLib";
 import * as vscode from "vscode";
 
 export const localCopybooks = new LocalFilesystemResourceService();
