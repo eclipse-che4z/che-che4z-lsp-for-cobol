@@ -122,7 +122,10 @@ export class CopybookDownloaderForE4E {
     if (!this.e4e.isEndevorElement(uri)) return undefined;
 
     const response = this.getE4EConfigImpl(uri).catch((err) => {
-      this.E4EConfigs.delete(uri);
+      this.E4EConfigs.set(uri, Promise.resolve(undefined));
+      vscode.window.showErrorMessage(
+        "An error occured while retrieving endevor configurations, cancelling further attemps",
+      );
       throw err;
     });
     this.E4EConfigs.set(uri, response);
