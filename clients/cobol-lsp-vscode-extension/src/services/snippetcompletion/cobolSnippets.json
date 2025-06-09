@@ -2481,7 +2481,7 @@
     "body": [
       "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
-      "RECORDING MODE IS ${2|F,FB,V,U,S|}",
+      "\tRECORDING MODE IS ${2|F,FB,V,U,S|}",
       "\tRECORD CONTAINS ${3:80} CHARACTERS."
     ],
     "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDING MODE is used with QSAM files to describe the file/record data: F-Fixed (one record per/block), FB-Fixed/Blocked, V-Variable, U-Undefined (use for Load Modules) and S-Spanned records (extremely long records: I.E. larger than a Block)."
