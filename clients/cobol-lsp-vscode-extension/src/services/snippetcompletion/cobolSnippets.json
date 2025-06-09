@@ -1829,31 +1829,6 @@
     "body": ["LOCAL-STORAGE SECTION.", "$0"],
     "description": "LOCAL-STORAGE SECTION"
   },
-  "MAIN METHOD-ID": {
-    "prefix": "MAIN",
-    "body": [
-      "*>> <SUMMARY>METHOD MAIN</SUMMARY>",
-      "METHOD-ID MAIN PUBLIC STATIC.",
-      "PROCEDURE DIVISION USING",
-      "           BY VALUE ARGS AS STRING OCCURS ANY.",
-      "    $0",
-      "END METHOD.",
-      ""
-    ],
-    "description": "METHOD-ID (MAIN)"
-  },
-  "METHOD-ID": {
-    "prefix": "METHOD-ID",
-    "body": [
-      "*>> <SUMMARY>METHOD $1</SUMMARY>",
-      "METHOD-ID $1.",
-      "PROCEDURE DIVISION.",
-      "    $0",
-      "END METHOD.",
-      ""
-    ],
-    "description": "METHOD-ID"
-  },
   "MERGE": {
     "prefix": "MERGE",
     "body": ["MERGE ${1:fileName} ${2:snipasc|DESC} ${3:dataname}"],
@@ -2265,16 +2240,6 @@
     ],
     "description": "PADDING CHARACTER specifies a character (variable, defined in WORKING-STORAGE) to be used for record-blocking-factor padding on sequential files. (ie. Filling out a BLOCK of records - BLOCK being the unit of file I/O between DFSMS and your program's DATA DIVISION.)"
   },
-  "PASSWORD": {
-    "prefix": "PASSWORD",
-    "body": [
-      "SELECT ${1:PATIENT-VSAM-FILE} ASSIGN TO ${2:VSMIDXD}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL|}.",
-      "\tFILE STATUS IS ${4:WS-VSM-FILE-STATUS}",
-      "\tPASSWORD IS ${5:BASE-PASS}."
-    ],
-    "description": "PASSWORD names a PIC X or PIC A field in WORKING-STORAGE. The first 8 characters are assumed to be the VSAM file password. VSAM ESDS, KSDS and RRDS filetypes can all be password protected."
-  },
   "PARSE": {
     "prefix": "PARSE",
     "body": ["PARSE ${1:item}"],
@@ -2334,11 +2299,6 @@
     "prefix": "POINTER-32",
     "body": ["01 ${1:WS-JAVA-NI-VAR} USAGE POINTER-32"],
     "description": "POINTER-32 defines a variable as a 4 byte field. This is independent of the LP(nn) Compiler directive, which contains the address of a variable, instead of its contents."
-  },
-  "POSITION": {
-    "prefix": "POSITION",
-    "body": ["MULTIPLE FILE TAPE CONTAINS ${1:file-name-5} POSITION ${2:n}."],
-    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - POSITION is used to specify a given (integer) file on TAPE reel."
   },
   "POSITIVE": {
     "prefix": "POSITIVE",
