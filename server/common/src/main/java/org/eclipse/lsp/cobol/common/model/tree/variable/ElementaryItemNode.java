@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 public class ElementaryItemNode extends ElementaryNode {
   private final String value;
   @Setter private boolean isDb2HostVariable;
+  @Setter private boolean isLobWithSizeVariable;
 
   public ElementaryItemNode(
       Locality location,
