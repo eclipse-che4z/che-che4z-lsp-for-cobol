@@ -123,7 +123,7 @@ export class CopybookDownloaderForE4E {
     const response = this.getE4EConfigImpl(uri).catch(
       (err: Error): undefined => {
         vscode.window.showErrorMessage(
-          `${err.message}. Cancelling further attempts`,
+          `An error occurred while retrieving Endevor configuration: ${err.message}.`,
         );
       },
     );
