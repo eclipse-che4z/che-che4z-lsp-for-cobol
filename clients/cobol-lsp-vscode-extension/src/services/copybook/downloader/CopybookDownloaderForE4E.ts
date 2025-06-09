@@ -50,7 +50,7 @@ export class CopybookDownloaderForE4E {
     private outputChannel?: vscode.OutputChannel,
   ) {}
 
-  private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
+  private E4EConfigs = new Map<string, E4EConfig>();
   private E4EProfiles = new Map<string, ResolvedProfile | undefined>();
   private E4EElements = new Map<string, EndevorElement[] | undefined>();
 
@@ -58,7 +58,11 @@ export class CopybookDownloaderForE4E {
     this.E4EConfigs.clear();
   }
   public async clearInvalidConfig(uri: string) {
-    if (this.E4EConfigs.has(uri) && !(await this.E4EConfigs.get(uri)))
+    if (
+      this.E4EConfigs.has(uri) &&
+      this.E4EConfigs.get(uri)?.resolved &&
+      !(await this.E4EConfigs.get(uri)?.config)
+    )
       this.E4EConfigs.delete(uri);
   }
 
@@ -119,9 +123,9 @@ export class CopybookDownloaderForE4E {
   }
 
   public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
-    const config = this.E4EConfigs.get(uri);
-    if (config) {
-      return config;
+    const e4eConfig = this.E4EConfigs.get(uri);
+    if (e4eConfig) {
+      return e4eConfig.config;
     }
     if (!this.e4e.isEndevorElement(uri)) return undefined;
     const response = this.getE4EConfigImpl(uri).catch(
@@ -131,7 +135,18 @@ export class CopybookDownloaderForE4E {
         );
       },
     );
-    this.E4EConfigs.set(uri, response);
+    this.E4EConfigs.set(uri, { config: response, resolved: false });
+    response
+      .then(() => {
+        const conf = this.E4EConfigs.get(uri);
+        if (conf) conf.resolved = true;
+      })
+      .catch(() => {
+        this.E4EConfigs.set(uri, {
+          config: Promise.resolve(undefined),
+          resolved: true,
+        });
+      });
     return response;
   }
 
@@ -405,4 +420,8 @@ export class CopybookDownloaderForE4E {
   ) {
     return `${profile.instance}-${profile.profile}-${endevorType.environment}-${endevorType.stage}-${endevorType.system}-${endevorType.subsystem}-${endevorType.type}-${endevorType.use_map}`;
   }
+}
+interface E4EConfig {
+  config: Promise<e4eResponse | undefined>;
+  resolved: boolean;
 }
