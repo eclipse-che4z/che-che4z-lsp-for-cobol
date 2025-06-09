@@ -2322,7 +2322,7 @@
   },
   "PICTURE": {
     "prefix": "PICTURE",
-    "body": ["77 ${1:VAR-NAME} ${2|PIC,PICTURE|} ${3:X(111) VALUE SPACE}."],
+    "body": ["77 ${1:VAR-NAME} PIC ${2:X(111) VALUE SPACE}."],
     "description": "The reserved word PICTURE or PIC describes a data variable to the COBOL compiler (and program)."
   },
   "POINTER": {
