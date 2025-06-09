@@ -2552,7 +2552,7 @@
   },
   "SERVICE RELOAD": {
     "prefix": "RELOAD",
-    "body": ["SERVICE RELOAD."],
+    "body": ["SERVICE RELOAD ${1:data-name}."],
     "description": "SERVICE RELOAD, a compiler directive. Is syntax checked, but has no effect on the execution of the program."
   },
   "REMAINDER": {
