@@ -2447,7 +2447,7 @@
   },
   "QUOTE": {
     "prefix": "QUOTE",
-    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE ${3|QUOTE,QUOTES|}."],
+    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
     "description": "QUOTE/QUOTES is a figurative constant. It can also be used in a comparison or MOVE statement."
   },
   "READ (QSAM)": {
