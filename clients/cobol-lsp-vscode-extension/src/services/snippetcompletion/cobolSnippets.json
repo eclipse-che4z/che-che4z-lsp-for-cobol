@@ -2467,11 +2467,6 @@
     ],
     "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier, which moves the record from the I-O buffer into program WORKING-STORAGE, and the INVALID KEY modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field."
   },
-  "READY": {
-    "prefix": "READY",
-    "body": ["READY TRACE."],
-    "description": "READY TRACE was (in older compiler releases) designed to trace the execution of your program's paragraphs and SECTIONs. It is ignored and has been replaced with USE FOR DEBUGGING code patterns."
-  },
   "RECORD": {
     "prefix": "RECORD",
     "body": [
