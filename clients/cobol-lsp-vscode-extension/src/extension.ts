@@ -186,9 +186,10 @@ export async function activate(
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidCloseTextDocument((document) =>
-      analysisService.invalidate(document.uri.toString(), true),
-    ),
+    vscode.workspace.onDidCloseTextDocument((document) => {
+      void analysisService.invalidate(document.uri.toString(), true);
+      copyBooksDownloader.clearE4EConfig(document.uri.toString());
+    }),
   );
 
   configurationWatcher.watchConfigurationChanges();

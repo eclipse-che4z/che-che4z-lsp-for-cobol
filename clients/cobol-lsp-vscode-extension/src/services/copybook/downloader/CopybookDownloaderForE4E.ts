@@ -57,6 +57,10 @@ export class CopybookDownloaderForE4E {
   public clearConfigs() {
     this.E4EConfigs.clear();
   }
+  public async clearInvalidConfig(uri: string) {
+    if (this.E4EConfigs.has(uri) && !(await this.E4EConfigs.get(uri)))
+      this.E4EConfigs.delete(uri);
+  }
 
   private async getE4EConfigImpl(
     uri: string,
