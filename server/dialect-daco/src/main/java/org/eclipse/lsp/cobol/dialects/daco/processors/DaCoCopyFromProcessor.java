@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -43,9 +44,9 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
       VariableAccumulator variableAccumulator, DaCoCopyFromNode node, List<SyntaxError> errors) {
 
     List<GroupItemNode> protoCandidates =
-        node.getNearestParentByType(NodeType.PROGRAM)
-            .orElseThrow(RuntimeException::new)
-            .getDepthFirstStream()
+        node.getProgram()
+            .map(Node::getDepthFirstStream)
+            .orElseGet(Stream::empty)
             .filter(GroupItemNode.class::isInstance)
             .map(GroupItemNode.class::cast)
             .filter(
