@@ -2249,7 +2249,7 @@
     "prefix": "PERFORM UNTIL",
     "body": [
       "MOVE ${1:1} TO SUB.",
-      "PERFORM UNTIL SUB <= ${2:100}",
+      "PERFORM UNTIL SUB > ${2:100}",
       "\t${3:codeHere}",
       "ADD +1 TO SUB",
       "END-PERFORM."
@@ -2287,7 +2287,7 @@
   },
   "PICTURE": {
     "prefix": "PICTURE",
-    "body": ["77 ${1:VAR-NAME} ${2|PIC,PICTURE|} ${3:X(111) VALUE SPACE}."],
+    "body": ["77 ${1:VAR-NAME} PIC ${2:X(111) VALUE SPACE}."],
     "description": "The reserved word PICTURE or PIC describes a data variable to the COBOL compiler (and program)."
   },
   "POINTER": {
@@ -2407,7 +2407,7 @@
   },
   "QUOTE": {
     "prefix": "QUOTE",
-    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE ${3|QUOTE,QUOTES|}."],
+    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
     "description": "QUOTE/QUOTES is a figurative constant. It can also be used in a comparison or MOVE statement."
   },
   "READ (QSAM)": {
@@ -2441,7 +2441,7 @@
     "body": [
       "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
-      "RECORDING MODE IS ${2|F,FB,V,U,S|}",
+      "\tRECORDING MODE IS ${2|F,FB,V,U,S|}",
       "\tRECORD CONTAINS ${3:80} CHARACTERS."
     ],
     "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDING MODE is used with QSAM files to describe the file/record data: F-Fixed (one record per/block), FB-Fixed/Blocked, V-Variable, U-Undefined (use for Load Modules) and S-Spanned records (extremely long records: I.E. larger than a Block)."
@@ -2512,7 +2512,7 @@
   },
   "SERVICE RELOAD": {
     "prefix": "RELOAD",
-    "body": ["SERVICE RELOAD."],
+    "body": ["SERVICE RELOAD ${1:data-name}."],
     "description": "SERVICE RELOAD, a compiler directive. Is syntax checked, but has no effect on the execution of the program."
   },
   "REMAINDER": {
