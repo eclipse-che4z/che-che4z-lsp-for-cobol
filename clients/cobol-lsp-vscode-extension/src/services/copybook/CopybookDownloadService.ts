@@ -16,6 +16,7 @@ import * as vscode from "vscode";
 import {
   DATASET,
   DEFAULT_DIALECT,
+  E4E_INCOMPATIBLE,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
   PROVIDE_PROFILE_MSG,
@@ -27,7 +28,7 @@ import { DownloadUtil } from "./downloader/DownloadUtil";
 import { E4E, EndevorElement } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
-import { CopybookDownloaderForDsn } from "./downloader/CopybookDownloaderForDsn";
+import { ZoweDSNService as ZoweDSNService } from "./downloader/CopybookDownloaderForDsn";
 import { SettingsService } from "../Settings";
 import {
   // loadProcessorGroupCopybookPathsConfig,
@@ -42,8 +43,9 @@ import {
 import { DownloadDiagnosticsService } from "../DiagnosticsService";
 import { localCopybooks } from "./LocalCopybooksService";
 // import { searchLocalCopybooks } from "./LocalCopybooksService";
-import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
 import { getErrorMessage } from "../util/ErrorsUtils";
+import { getE4EAPI } from "./E4ECopybookService";
+import { Utils } from "../util/Utils";
 
 export class CopybookName {
   constructor(
@@ -52,19 +54,52 @@ export class CopybookName {
   ) {}
 }
 
-export class CopybookDownloadService {
-  private explorerApi: IApiRegisterClient | undefined;
-  private e4eApi: E4E | undefined;
-  private dsnDownloader?: CopybookDownloaderForDsn;
-  private ussDownloader?: CopybookDownloaderForUss;
-  private e4eDownloader?: CopybookDownloaderForE4E;
+export let externalApis: ExternalAPIsService;
+
+export async function initializeExternalAPIs(
+  storagePath: vscode.Uri,
+  outputChannel: vscode.OutputChannel,
+  configurationInvalidation?: () => unknown,
+) {
+  const maybeE4E = await getE4EAPI();
+  const maybeZowe = await Utils.getZoweExplorerAPI();
+
+  externalApis = new ExternalAPIsService(
+    storagePath,
+    maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
+    maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
+    outputChannel,
+    new DownloadDiagnosticsService(),
+    configurationInvalidation,
+  );
+
+  if (maybeZowe && "futureApi" in maybeZowe) {
+    void maybeZowe.futureApi.then((api) => {
+      if (api) externalApis.explorerAppeared(api.api);
+    });
+  }
+
+  if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
+  else if ("futureApi" in maybeE4E)
+    void maybeE4E.futureApi.then((api) => {
+      if (api) externalApis.e4eAppeared(api.api);
+      else outputChannel.appendLine(E4E_INCOMPATIBLE);
+    });
+}
+
+class ExternalAPIsService {
+  explorerApi: IApiRegisterClient | undefined;
+  e4eApi: E4E | undefined;
+  dsnService?: ZoweDSNService;
+  ussService?: CopybookDownloaderForUss;
+  e4eDownloader?: CopybookDownloaderForE4E;
 
   /**
    * Clears downloaders cache
    */
   clearCache() {
-    this.dsnDownloader?.clearMemberListCache();
-    this.ussDownloader?.clearMemberListCache();
+    this.dsnService?.clearMemberListCache();
+    this.ussService?.clearMemberListCache();
     this.e4eDownloader?.clearConfigs();
     this.e4eDownloader?.clearProfiles();
   }
@@ -164,8 +199,8 @@ export class CopybookDownloadService {
 
   public explorerAppeared(api: IApiRegisterClient) {
     this.explorerApi = api;
-    this.ussDownloader = new CopybookDownloaderForUss(this.explorerApi);
-    this.dsnDownloader = new CopybookDownloaderForDsn(this.explorerApi);
+    this.ussService = new CopybookDownloaderForUss(this.explorerApi);
+    this.dsnService = new ZoweDSNService(this.explorerApi);
     this.diagnosticsService?.clearDiagnostics();
     if (this.explorerApi.onProfileUpdated) {
       this.explorerApi.onProfileUpdated((profile: IProfileLoaded) => {
@@ -209,14 +244,11 @@ export class CopybookDownloadService {
 
     const results = await Promise.allSettled([
       ...dsnPaths.map(async (dsn) => {
-        const dsnMembers = await this.dsnDownloader?.getAllMembers(
-          profile,
-          dsn,
-        );
+        const dsnMembers = await this.dsnService?.getAllMembers(profile, dsn);
         return dsnMembers ?? [];
       }),
       ...ussPaths.map(async (uss) => {
-        const ussFiles = await this.ussDownloader?.getAllMembers(profile, uss);
+        const ussFiles = await this.ussService?.getAllMembers(profile, uss);
         return ussFiles ?? [];
       }),
     ]);
@@ -316,8 +348,8 @@ export class CopybookDownloadService {
         ) {
           return;
         }
-        if (DATASET in config && this.dsnDownloader) {
-          const dsResult = await this.dsnDownloader.resolveCopybookUri(
+        if (DATASET in config && this.dsnService) {
+          const dsResult = await this.dsnService.resolveCopybookUri(
             profile,
             config.dataset,
             copybookName,
@@ -325,8 +357,8 @@ export class CopybookDownloadService {
           if (dsResult) {
             return dsResult;
           }
-        } else if (USS in config && this.ussDownloader) {
-          const ussResult = await this.ussDownloader.resolveCopybookUri(
+        } else if (USS in config && this.ussService) {
+          const ussResult = await this.ussService.resolveCopybookUri(
             profile,
             config.uss,
             copybookName,
@@ -495,8 +527,8 @@ export class CopybookDownloadService {
   }
 
   public reenableFailedRequests() {
-    this.dsnDownloader?.reenableFailedRequests();
-    this.ussDownloader?.reenableFailedRequests();
+    this.dsnService?.reenableFailedRequests();
+    this.ussService?.reenableFailedRequests();
   }
 
   private async isProcessorGroupConfigsSatisfiesDownload(

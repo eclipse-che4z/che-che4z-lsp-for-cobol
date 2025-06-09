@@ -1,12 +1,11 @@
 import CopybookLib from "./CopybookLib";
 import { getVariablesFromUri } from "../util/FSUtils";
 import { SettingsService } from "../Settings";
-import { CopybookDownloaderForUss } from "../copybook/downloader/CopybookDownloaderForUss";
-import { CopybookDownloaderForDsn } from "../copybook/downloader/CopybookDownloaderForDsn";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { USS } from "../../constants";
 import * as vscode from "vscode";
+import { externalApis } from "../copybook/CopybookDownloadService";
 
 export class UssPathLib implements CopybookLib {
   constructor(
@@ -24,12 +23,9 @@ export class UssPathLib implements CopybookLib {
     return libs;
   }
 
-  resolveCopybookUri(
+  async resolveCopybookUri(
     copybookName: string,
     documentUri: vscode.Uri,
-    _dsnDownloader: CopybookDownloaderForDsn,
-    ussDownloader: CopybookDownloaderForUss,
-    explorerApi?: IApiRegisterClient,
   ): Promise<vscode.Uri | undefined> {
     const variables = getVariablesFromUri(documentUri, false);
     const evaluatedUri = SettingsService.evaluateVariables(
@@ -40,11 +36,11 @@ export class UssPathLib implements CopybookLib {
     if (!this.profile) {
       this.profile = ProfileUtils.getProfileNameForCopybook(
         documentUri,
-        explorerApi,
+        externalApis.explorerApi,
       );
     }
 
-    return ussDownloader.resolveCopybookUri(
+    return await externalApis.ussService?.resolveCopybookUri(
       this.profile ?? "profile",
       evaluatedUri,
       copybookName,
@@ -54,18 +50,15 @@ export class UssPathLib implements CopybookLib {
   async listCopybooks(
     documentUri: vscode.Uri,
     _outputChannel?: vscode.OutputChannel,
-    _dsnDownloader?: CopybookDownloaderForDsn,
-    ussDownloader?: CopybookDownloaderForUss,
-    explorerApi?: IApiRegisterClient,
   ): Promise<string[]> {
     if (!this.profile) {
       this.profile = ProfileUtils.getProfileNameForCopybook(
         documentUri,
-        explorerApi,
+        externalApis.explorerApi,
       );
     }
 
-    const members = await ussDownloader?.getAllMembers(
+    const members = await externalApis.ussService?.getAllMembers(
       this.profile ?? "profile",
       this.uss,
     );

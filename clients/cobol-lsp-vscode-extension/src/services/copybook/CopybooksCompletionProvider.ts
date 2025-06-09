@@ -25,7 +25,7 @@ import {
   TextDocument,
   window,
 } from "vscode";
-import { CopybookDownloadService } from "./CopybookDownloadService";
+import { ExternalAPIsService } from "./CopybookDownloadService";
 import {
   COPYBOOK_COMPLETIONS_SORT_PREFIX,
   DEFAULT_DIALECT,
@@ -53,7 +53,7 @@ const isSQLCopyStatement: CopyStatementParser = (statement: string) => {
 
 export class CopybooksCompletionProvider implements CompletionItemProvider {
   constructor(
-    private cds?: CopybookDownloadService,
+    private cds?: ExternalAPIsService,
     private outputChannel?: OutputChannel,
   ) {}
 

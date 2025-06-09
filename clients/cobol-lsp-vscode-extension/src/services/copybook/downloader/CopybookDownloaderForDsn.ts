@@ -21,7 +21,7 @@ import * as vscode from "vscode";
 /**
  * Copybook downloader from MVS using Zowe Explorer
  */
-export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
+export class ZoweDSNService extends ZoweExplorerDownloader {
   protected schema = "zowe-ds";
   protected separator = "/";
 

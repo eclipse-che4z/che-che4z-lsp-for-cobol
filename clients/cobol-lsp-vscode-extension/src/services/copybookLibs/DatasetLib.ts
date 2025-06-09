@@ -1,10 +1,9 @@
 import { DATASET } from "../../constants";
-import { CopybookDownloaderForDsn } from "../copybook/downloader/CopybookDownloaderForDsn";
 import * as vscode from "vscode";
 import CopybookLib from "./CopybookLib";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { ProfileUtils } from "../util/ProfileUtils";
-import { CopybookDownloaderForUss } from "../copybook/downloader/CopybookDownloaderForUss";
+import { externalApis } from "../copybook/CopybookDownloadService";
 
 export class DatasetLib implements CopybookLib {
   constructor(
@@ -25,18 +24,15 @@ export class DatasetLib implements CopybookLib {
   async resolveCopybookUri(
     copybookName: string,
     documentUri: vscode.Uri,
-    dsnDownloader?: CopybookDownloaderForDsn,
-    _ussDownloader?: CopybookDownloaderForUss,
-    explorerApi?: IApiRegisterClient,
   ): Promise<vscode.Uri | undefined> {
     if (!this.profile) {
       this.profile = ProfileUtils.getProfileNameForCopybook(
         documentUri,
-        explorerApi,
+        externalApis.explorerApi,
       );
     }
 
-    return await dsnDownloader?.resolveCopybookUri(
+    return await externalApis.dsnService?.resolveCopybookUri(
       this.profile ?? "profile",
       this.dsn,
       copybookName,
@@ -45,19 +41,16 @@ export class DatasetLib implements CopybookLib {
 
   async listCopybooks(
     documentUri: vscode.Uri,
-    outputChannel?: vscode.OutputChannel,
-    dsnDownloader?: CopybookDownloaderForDsn,
-    _ussDownloader?: CopybookDownloaderForUss,
-    explorerApi?: IApiRegisterClient,
+    _outputChannel?: vscode.OutputChannel,
   ): Promise<string[]> {
     if (!this.profile) {
       this.profile = ProfileUtils.getProfileNameForCopybook(
         documentUri,
-        explorerApi,
+        externalApis.explorerApi,
       );
     }
 
-    const members = await dsnDownloader?.getAllMembers(
+    const members = await externalApis.dsnService?.getAllMembers(
       this.profile ?? "profile",
       this.dsn,
     );

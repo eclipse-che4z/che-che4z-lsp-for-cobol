@@ -20,7 +20,7 @@ import {
   TextLine,
   Uri,
 } from "vscode";
-import { CopybookDownloadService } from "../../../services/copybook/CopybookDownloadService";
+import { ExternalAPIsService } from "../../../services/copybook/CopybookDownloadService";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
 import {
   DialectInfo,
@@ -30,7 +30,7 @@ import { DEFAULT_DIALECT } from "../../../constants";
 import * as LocalCopybookService from "../../../services/copybook/LocalCopybooksService";
 
 describe("CopybooksCompletionProvider", () => {
-  let cdsMock: CopybookDownloadService;
+  let cdsMock: ExternalAPIsService;
   const remoteCopybooks = ["AAA", "ABC", "BBB", "CCC"];
   const localCopybooks = ["LOCAL"];
   let documentMock: TextDocument;
@@ -43,7 +43,7 @@ describe("CopybooksCompletionProvider", () => {
   beforeEach(() => {
     cdsMock = {
       listRemoteCopybooks: jest.fn().mockResolvedValue(remoteCopybooks),
-    } as unknown as CopybookDownloadService;
+    } as unknown as ExternalAPIsService;
     jest
       .spyOn(LocalCopybookService, "listLocalCopybooks")
       .mockResolvedValue(localCopybooks);

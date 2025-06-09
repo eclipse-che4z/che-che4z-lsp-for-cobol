@@ -18,7 +18,6 @@ import { isV1RuntimeDialectDetail } from "./dialect/utils";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
   ANALYSIS_MODE,
-  E4E_INCOMPATIBLE,
   EXP_LANGUAGE_ID,
   FAIL_CREATE_COPYBOOK_FOLDER_MSG,
   FAIL_CREATE_GLOBAL_STORAGE_MSG,
@@ -26,7 +25,10 @@ import {
   LANGUAGE_ID,
   ZOWE_FOLDER,
 } from "./constants";
-import { CopybookDownloadService } from "./services/copybook/CopybookDownloadService";
+import {
+  externalApis,
+  initializeExternalAPIs,
+} from "./services/copybook/CopybookDownloadService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
 import { RunAnalysis } from "./commands/RunAnalysisCLI";
@@ -48,8 +50,6 @@ import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
-import { Utils } from "./services/util/Utils";
-import { getE4EAPI } from "./services/copybook/E4ECopybookService";
 import { getErrorMessage } from "./services/util/ErrorsUtils";
 import {
   initTelemetry,
@@ -62,7 +62,6 @@ import {
   AnalysisResult,
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
-import { DownloadDiagnosticsService } from "./services/DiagnosticsService";
 import { readFileContent } from "./services/copybook/CopybookMessageHandler";
 
 interface __AnalysisApi {
@@ -97,8 +96,6 @@ async function initialize(context: vscode.ExtensionContext) {
     outputChannel.appendLine(message);
     throw Error(message);
   }
-  const maybeE4E = await getE4EAPI();
-  const maybeZowe = await Utils.getZoweExplorerAPI();
 
   languageClientService = new LanguageClientService(
     outputChannel,
@@ -106,39 +103,20 @@ async function initialize(context: vscode.ExtensionContext) {
     {
       executeCommand: (command, args, next) => {
         if (command == "missing copybook") {
-          copyBooksDownloader.clearProfiles();
+          externalApis.clearProfiles();
         }
         next(command, args);
       },
     },
   );
 
-  const copyBooksDownloader = new CopybookDownloadService(
-    context.globalStorageUri,
-    maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
-    maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
-    outputChannel,
-    new DownloadDiagnosticsService(),
-    () => languageClientService.invalidateConfiguration(),
+  await initializeExternalAPIs(context.globalStorageUri, outputChannel, () =>
+    languageClientService.invalidateConfiguration(),
   );
-
-  if (maybeZowe && "futureApi" in maybeZowe) {
-    void maybeZowe.futureApi.then((api) => {
-      if (api) copyBooksDownloader.explorerAppeared(api.api);
-    });
-  }
-
-  if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
-  else if ("futureApi" in maybeE4E)
-    void maybeE4E.futureApi.then((api) => {
-      if (api) copyBooksDownloader.e4eAppeared(api.api);
-      else outputChannel.appendLine(E4E_INCOMPATIBLE);
-    });
 
   const configurationWatcher = new ConfigurationWatcher();
 
   return {
-    copyBooksDownloader,
     configurationWatcher,
   };
 }
@@ -148,8 +126,7 @@ export async function activate(
 ): Promise<__ExtensionApi & __AnalysisApi> {
   await initTelemetry(context);
   DialectRegistry.clear();
-  const { copyBooksDownloader, configurationWatcher } =
-    await initialize(context);
+  const { configurationWatcher } = await initialize(context);
   initSmartTab(context);
   registerEvent(
     "log",
@@ -163,7 +140,7 @@ export async function activate(
   );
 
   // Register Commands
-  registerCommands(context, copyBooksDownloader);
+  registerCommands(context);
 
   registerCodeActions(context);
 
@@ -177,7 +154,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-      new CopybooksCompletionProvider(copyBooksDownloader, outputChannel),
+      new CopybooksCompletionProvider(externalApis, outputChannel),
     ),
   );
 
@@ -238,7 +215,7 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/uri",
-    copyBooksDownloader.makeResolveCopybookUriHandler(),
+    externalApis.makeResolveCopybookUriHandler(),
   );
   languageClientService.addRequestHandler("file/content", readFileContent);
 
@@ -339,10 +316,7 @@ const registerNewDialect = async (
   return unregisterDialect;
 };
 
-function registerCommands(
-  context: vscode.ExtensionContext,
-  copyBooksDownloader: CopybookDownloadService,
-) {
+function registerCommands(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "cobol-lsp.cpy-manager.goto-settings",
@@ -362,7 +336,7 @@ function registerCommands(
       "cobol-lsp.clear.downloaded.copybooks",
       async () => {
         await clearCache(context.globalStorageUri);
-        copyBooksDownloader.clearCache();
+        externalApis.clearCache();
       },
     ),
   );
@@ -457,7 +431,7 @@ function registerCommands(
     vscode.commands.registerCommand(
       "cobol-lsp.cpy-manager.reenable.failed.zowe.requests",
       () => {
-        copyBooksDownloader.reenableFailedRequests();
+        externalApis.reenableFailedRequests();
       },
     ),
   );
