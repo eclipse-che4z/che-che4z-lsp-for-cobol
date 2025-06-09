@@ -2284,7 +2284,7 @@
     "prefix": "PERFORM UNTIL",
     "body": [
       "MOVE ${1:1} TO SUB.",
-      "PERFORM UNTIL SUB <= ${2:100}",
+      "PERFORM UNTIL SUB > ${2:100}",
       "\t${3:codeHere}",
       "ADD +1 TO SUB",
       "END-PERFORM."
