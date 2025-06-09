@@ -343,6 +343,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             false,
             false,
             false);
+    variableLenNode.setLobWithSizeVariable(true);
     variableLenNode.setDb2HostVariable(variableDefinitionNode.isDb2HostVariable());
 
     ElementaryItemNode variableTextNode =
@@ -357,6 +358,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             false,
             false,
             false);
+    variableTextNode.setLobWithSizeVariable(true);
     variableTextNode.setDb2HostVariable(variableDefinitionNode.isDb2HostVariable());
 
     variableLenNode

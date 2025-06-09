@@ -66,8 +66,8 @@ result_set_locator: RESULT_SET_LOCATOR VARYING;
 
 tableLocators: TABLE LIKE entry_name AS LOCATOR;
 
-lobWithSize : T1=lobWithSize_maxSize_1g { validateLobSize($T1.start, $T1.stop, $T1.text, 1073741823);} |
-                T2=lobWithSize_maxSize_2g { validateLobSize($T2.start, $T2.stop, $T2.text, 2147483647);} ;
+lobWithSize : T1=lobWithSize_maxSize_1g { validateLobSize($T1.text, $T1.ctx, 1073741823);} |
+                T2=lobWithSize_maxSize_2g { validateLobSize($T2.text, $T2.ctx, 2147483647);} ;
 
 lobWithSize_maxSize_1g : DBCLOB LPARENCHAR lobSize RPARENCHAR;
 

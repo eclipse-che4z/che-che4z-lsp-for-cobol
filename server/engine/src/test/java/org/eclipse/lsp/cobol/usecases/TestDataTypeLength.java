@@ -42,7 +42,8 @@ public class TestDataTypeLength {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*VALID-ALPHA} PIC A(255).\n"
-          + "       01 {$*INVALID-ALPHA|3} PIC A(1000000000).\n"
+          + "       01 {$*INVALID-ALPHA|1} PIC A(1000000000).\n"
+          + "       01 {$*INVALID1-ALPHA|2} PIC A(9999999999).\n"
           + "       PROCEDURE DIVISION.";
 
   private static final String TEXT_ALPHA_NUMERIC =
@@ -52,7 +53,8 @@ public class TestDataTypeLength {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*VALID-ALPHANUM} PIC X(255).\n"
-          + "       01 {$*INVALID-ALPHANUM|4} PIC X(1000000000).\n"
+          + "       01 {$*INVALID-ALPHANUM|1} PIC X(1000000000).\n"
+          + "       01 {$*INVALID1-ALPHANUM|2} PIC X(9999999999).\n"
           + "       PROCEDURE DIVISION.";
 
   @Test
@@ -76,10 +78,17 @@ public class TestDataTypeLength {
         TEXT_ALPHA,
         ImmutableList.of(),
         ImmutableMap.of(
-            "3",
+            "1",
             new Diagnostic(
                 new Range(),
                 "Alphabetic field 'INVALID-ALPHA' with length 1000000000 exceeds maximum allowed"
+                    + " length of 999999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Alphabetic field 'INVALID1-ALPHA' with length 9999999999 exceeds maximum allowed"
                     + " length of 999999999 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
@@ -91,10 +100,17 @@ public class TestDataTypeLength {
         TEXT_ALPHA_NUMERIC,
         ImmutableList.of(),
         ImmutableMap.of(
-            "4",
+            "1",
             new Diagnostic(
                 new Range(),
                 "Alphanumeric field 'INVALID-ALPHANUM' with length 1000000000 exceeds maximum"
+                    + " allowed length of 999999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Alphanumeric field 'INVALID1-ALPHANUM' with length 9999999999 exceeds maximum"
                     + " allowed length of 999999999 characters",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
