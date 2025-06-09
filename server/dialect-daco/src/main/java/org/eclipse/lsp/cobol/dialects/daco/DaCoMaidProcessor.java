@@ -108,7 +108,7 @@ public class DaCoMaidProcessor {
         }
         Matcher copyFrom = dataDescriptionEntryWithCopyFromPattern.matcher(line);
         if (copyFrom.find()) {
-          createCopyFromNode(copyFrom, lineNumber, context, errors).ifPresent(dacoNodes::add);
+          dacoNodes.add(createCopyFromNode(copyFrom, lineNumber, context, errors));
         }
       } else if (dataDivisionPattern.matcher(line).find()) {
         state = DaCoMaidProcessingState.DATA_DIVISION;
@@ -119,7 +119,7 @@ public class DaCoMaidProcessor {
     return new DialectOutcome(dacoNodes, context);
   }
 
-  private Optional<Node> createCopyFromNode(
+  private Node createCopyFromNode(
       Matcher copyFrom,
       int lineNumber,
       DialectProcessingContext context,
@@ -153,12 +153,8 @@ public class DaCoMaidProcessor {
               .build());
     }
 
-    return Optional.of(
-        new DaCoCopyFromNode(
-            locality,
-            prototypeName,
-            newSuffix.orElse(""),
-            Integer.parseInt(copyFrom.group("lvl"))));
+    return new DaCoCopyFromNode(
+        locality, prototypeName, newSuffix.orElse(""), Integer.parseInt(copyFrom.group("lvl")));
   }
 
   private void collectCopyMaid(
