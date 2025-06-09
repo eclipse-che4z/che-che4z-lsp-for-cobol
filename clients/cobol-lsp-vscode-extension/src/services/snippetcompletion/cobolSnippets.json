@@ -2324,16 +2324,6 @@
     "body": ["IF ${1:CONDITION} IS POSITIVE", "\t$0", "END-IF."],
     "description": "POSITIVE is a \"sign condition\" used to determines whether the algebraic value of a numeric variable is greater than zero."
   },
-  "PRESENT WHEN": {
-    "prefix": "PRESENT WHEN",
-    "body": ["PRESENT WHEN ${1:x}"],
-    "description": "The PRESENT WHEN clauses allows lines and printable items, or groups of them, to be printed or not, depending on the truth value of a condition."
-  },
-  "SUPPRESS PRINTING": {
-    "prefix": "PRINTING",
-    "body": ["COPY ${1:copyfile} SUPPRESS PRINTING."],
-    "description": "SUPPRESS PRINTING suppresses the text of the copied file in the program compilation listing."
-  },
   "PROCEDURE DIVISION": {
     "prefix": "PROCEDURE-DIVISION",
     "body": ["PROCEDURE DIVISION.", "$0"],
@@ -2385,7 +2375,7 @@
   },
   "END PROGRAM": {
     "prefix": "END PROGRAM",
-    "body": ["END PROGRAM ${1:programName}."],
+    "body": ["END PROGRAM ${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}."],
     "description": "END PROGRAM designates the end of a called module and returns control to the calling module. The program name must be identical to its PROGRAM-ID."
   },
   "PROGRAM-ID": {
@@ -2514,7 +2504,6 @@
     "body": [
       "MOVE ${1:SORT-EXT-RECORD} TO ${2:SORT-RECORD}",
       "PERFORM ${3:RELEASE-SORT-RECORD}",
-      "\t",
       "RELEASE ${2:SORT-RECORD}"
     ],
     "description": "RELEASE transfers records from an input/output area to the initial phase of a SORT. NOTE: RELEASE can only be used in an INPUT PROCEDURE SECTION."
@@ -2524,7 +2513,6 @@
     "body": [
       "MOVE ${1:SORT-EXT-RECORD} TO ${2:SORT-RECORD}",
       "PERFORM ${3:RELEASE-SORT-RECORD}",
-      "\t",
       "RELEASE ${2:SORT-RECORD} FROM ${4:SORT-FILE-IN}"
     ],
     "description": "RELEASE FROM moves data from one group field to the SORT field, then transfers records from an input/output area to the initial phase of a SORT. RELEASE FROM can only be used in an INPUT PROCEDURE SECTION."
