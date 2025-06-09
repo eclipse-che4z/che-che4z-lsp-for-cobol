@@ -931,13 +931,8 @@
   },
   "MULTIPLE FILE TAPE": {
     "prefix": "MULTIPLE FILE TAPE",
-    "body": [
-      "FD ${1:QSAM-FILE}",
-      "\tLABEL RECORDS ARE STANDARD",
-      "\tMULTIPLE FILE TAPE.",
-      "\t${3:RPT-OUT-REC} PIC X(${4:132})."
-    ],
-    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical volume serial of tape."
+    "body": ["MULTIPLE FILE TAPE ${1:file1}, ${2:file2}"],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files, separated by commas, share the same physical volume serial of tape."
   },
   "FILE CONTROL": {
     "prefix": "FILE CONTROL",
@@ -1392,10 +1387,20 @@
     "prefix": "GENERATE",
     "body": [
       "JSON GENERATE ${1:JSON-STMT} FROM ${2:IN-FILE-TEXT} IN ${3:JSON-CHAR-CTR}",
-      "\tON EXCEPTION ${4:DISPLAY 'JSON GENERATE ERROR: ' WS-JS-CODE",
+      "\tON EXCEPTION ${4:DISPLAY 'JSON GENERATE ERROR: ' WS-JS-CODE}",
       "END-JSON"
     ],
     "description": "Manipulate COBOL data items as JSON text by using the JSON GENERATE statement."
+  },
+  "XML GENERATE": {
+    "prefix": "XML GENERATE",
+    "body": [
+      "XML GENERATE ${1:XML-DATA} FROM ${2:IN-FILE-TEXT} IN ${3:XML-CHAR-CTR}",
+      "\tON EXCEPTION ${4:DISPLAY 'XML TRANSLATE ERROR: ' WS-XML-CODE}",
+      "\tGO TO ${5:XML-ERROR-PARAGRAPH}",
+      "END-XML."
+    ],
+    "description": "description"
   },
   "GIVING": {
     "prefix": "GIVING",
@@ -1469,20 +1474,25 @@
   },
   "INSPECT CONVERTING": {
     "prefix": "INSPECT ID CONVERTING",
-    "body": ["INPUT PROCEDURE ${1:procName}"],
-    "description": "INSPECT CONVERTING"
-  },
-  "INSPECT": {
-    "prefix": "INSPECT",
-    "body": ["INSPECT ${1:id}"],
-    "description": "INSPECT id"
+    "body": [
+      "INPUT ${1:id}",
+      "\tCONVERTING '${2:abcdefg}' TO '${3:ABCDEFG}`",
+      "\tAFTER INITIAL '${4:|}' BEFORE INITIAL '${5:*}'."
+    ],
+    "description": "INSPECT is a string parsing verb for alphanumeric fields."
   },
   "INSPECT REPLACING": {
     "prefix": "INSPECT REPLACING",
-    "body": ["INSPECT ${1:id} REPLACING ${2:SNIP}"],
-    "description": "INSPECT REPLACING"
+    "body": [
+      "INSPECT ${1:id} ${2|REPLACING,REPLACING ALL LOW-VALUES BY|} ${3:SNIP}"
+    ],
+    "description": "INSPECT is a string parsing verb for alphanumeric fields."
   },
-
+  "INSPECT TALLYING": {
+    "prefix": "INSPECT",
+    "body": ["INSPECT ${1:id} "],
+    "description": "description"
+  },
   "IDENTIFICATION DIVISION": {
     "prefix": "IDENTIFICATION-DIVISION",
     "body": ["IDENTIFICATION DIVISION.", "$0"],
@@ -1559,6 +1569,15 @@
     ],
     "description": "IS INDEXED defines a file entry as a VSAM KSDS (Indexed) Data Set in the ENVIRONMENT DIVISION'S SELECT/ASSIGN paragraph."
   },
+  "ACCESS MODE IS INPUT": {
+    "prefix": "INPUT",
+    "body": [
+      "SELECT ${1:CARPOOL} ASSIGN TO ${2:CARFILE}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ACCESS MODE IS INPUT."
+    ],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - File I/O mode that denotes if input is to be read from a file."
+  },
   "INITIALIZE": {
     "prefix": "INITIALIZE",
     "body": ["INITIALIZE ${1:INSURED-NAME-ADDR}"],
@@ -1591,11 +1610,11 @@
     ],
     "description": "RETURN INTO accesses a sorted file record and copies it into a WORKING-STORAGE data item."
   },
-  "INSPECT TALLYING": {
+  "INSPECT TALLYING (COUNTER)": {
     "prefix": "INSPECT",
     "body": [
       "MOVE 0 TO ${1:COUNTER}",
-      "INSPECT ${2:SOURCE} TALLYING ${1:COUNTER} FOR ${3|ALL SPACES,ALL $4,CHARACTERS|}"
+      "INSPECT ${2:SOURCE} TALLYING ${1:COUNTER} FOR ${3|ALL SPACES,ALL ,CHARACTERS|}"
     ],
     "description": "INSPECT A TALLYING COUNTER FOR ..."
   },
@@ -1824,11 +1843,6 @@
     "body": ["LINKAGE SECTION.", "$0"],
     "description": "LINKAGE SECTION."
   },
-  "LOCAL-STORAGE SECTION": {
-    "prefix": "LOCAL-STORAGE",
-    "body": ["LOCAL-STORAGE SECTION.", "$0"],
-    "description": "LOCAL-STORAGE SECTION"
-  },
   "MERGE": {
     "prefix": "MERGE",
     "body": ["MERGE ${1:fileName} ${2:snipasc|DESC} ${3:dataname}"],
@@ -1900,18 +1914,18 @@
   },
   "MULTIPLY BY": {
     "prefix": "MULTIPLY BY",
-    "body": ["MULTIPLY ${1:id} BY ${2:id}"],
+    "body": ["MULTIPLY ${1:id} BY ${2:id} ROUNDED"],
     "description": "MULTIPLY"
   },
   "MULTIPLY a BY b GIVING c": {
     "prefix": "MULTIPLY",
-    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}"],
+    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C} ROUNDED"],
     "description": "MULTIPLY a BY b GIVING c"
   },
   "MULTIPLY a BY b GIVING c ON SIZE ERROR": {
     "prefix": "MULTIPLY",
     "body": [
-      "MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}",
+      "MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C} ROUNDED",
       "ON SIZE ERROR ${4:imperative_statement}",
       "END-MULTIPLY."
     ],
@@ -2000,7 +2014,7 @@
     "prefix": "NULL",
     "body": [
       "IF ${1:PTR-VAR} IS NULL",
-      "\tSET ${1:PTR-VAR} TO ${2|identified,ADDRESS OF identified|}",
+      "\tSET ${1:PTR-VAR} TO ${2|identifier,ADDRESS OF identifier,NULL|}",
       "END-IF."
     ],
     "description": "NULL which has the value of zero, is a data type used with datatypes of: POINTER, PROCEDURE-POINTER, FUNCTION-POINTER, OBJECT REFERENCE, or the ADDRESS OF a special register."
@@ -2071,6 +2085,11 @@
     ],
     "description": "Used for Tape files without z/OS data set LABELS."
   },
+  "NAME IS OMITTED": {
+    "prefix": "OMITTED",
+    "body": ["JSON PARSE ${1:VAR-1} INTO ${2:VAR-2} NAME IS OMITTED."],
+    "description": "Can use the NAME IS OMITTED phrase to parse an anonymous JSON array in addition to an anonymous JSON object."
+  },
   "DEPENDING ON": {
     "prefix": "ON",
     "body": [
@@ -2092,7 +2111,7 @@
     "prefix": "ON SIZE ERROR",
     "body": [
       "MULTIPLY ${1:VAR-1} BY ${2:VAR-2} GIVING ${3:VAR-3}",
-      "\tONE SIZE ERROR GO TO ${4:ARITH-PROBLEM}",
+      "\tON SIZE ERROR GO TO ${4:ARITH-PROBLEM}",
       "END-MULTIPLY."
     ],
     "description": "ON is used to code: ON SIZE ERROR, ON OVERFLOW and ON EXCEPTION error and exception trapping phrases."
@@ -2182,7 +2201,7 @@
   },
   "OUTPUT": {
     "prefix": "OUTPUT",
-    "body": ["OPEN OUTPUT ${1:fileName}", "${2| ,WITH NO REWIND|}"],
+    "body": ["OPEN OUTPUT ${1:fileName}${2|., WITH NO REWIND.|}"],
     "description": "OUTPUT FILENAME"
   },
   "OUTPUT PROCEDURE": {
@@ -2804,11 +2823,6 @@
     "prefix": "WRITE item",
     "body": ["WRITE ${1:item}"],
     "description": "WRITE item"
-  },
-  "XML GENERATE": {
-    "prefix": "XML GENERATE",
-    "body": ["XML GENERATE ${1:item}"],
-    "description": "XML GENERATE item"
   },
   "XML PARSE": {
     "prefix": "XML PARSE",
