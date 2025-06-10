@@ -134,17 +134,6 @@ export class CopybookDownloaderForE4E {
       },
     );
     this.E4EConfigs.set(uri, { config: response, resolved: false });
-    response
-      .then(() => {
-        const conf = this.E4EConfigs.get(uri);
-        if (conf) conf.resolved = true;
-      })
-      .catch(() => {
-        this.E4EConfigs.set(uri, {
-          config: Promise.resolve(undefined),
-          resolved: true,
-        });
-      });
     return response;
   }
 
