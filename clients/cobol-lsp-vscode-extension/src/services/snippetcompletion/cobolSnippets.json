@@ -830,7 +830,7 @@
   },
   "ARITH EXTEND": {
     "prefix": "EXTEND",
-    "body": ["ARITH(EXTEND}"],
+    "body": ["ARITH(EXTEND)"],
     "description": "A compiler directive that provides extended-precision function results that can accurately represent the value of the argument being returned."
   },
   "EXEC SQL": {
