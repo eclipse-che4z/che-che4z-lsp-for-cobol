@@ -1400,7 +1400,7 @@
       "\tGO TO ${5:XML-ERROR-PARAGRAPH}",
       "END-XML."
     ],
-    "description": "description"
+    "description": "Use an XML GENERATE statement to transform COBOL data to XML."
   },
   "GIVING": {
     "prefix": "GIVING",
