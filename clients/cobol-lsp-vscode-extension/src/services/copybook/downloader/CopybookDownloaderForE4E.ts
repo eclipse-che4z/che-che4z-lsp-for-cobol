@@ -59,7 +59,7 @@ export class CopybookDownloaderForE4E {
   }
   public clearInvalidConfig(uri: string) {
     const config = this.E4EConfigs.get(uri);
-    if (config) config.resolved = true;
+    if (config) config.closed = true;
   }
 
   private async getE4EConfigImpl(
@@ -121,7 +121,7 @@ export class CopybookDownloaderForE4E {
   public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
     const e4eConfig = this.E4EConfigs.get(uri);
     if (e4eConfig) {
-      if (!e4eConfig.resolved) return e4eConfig.config;
+      if (!e4eConfig.closed) return e4eConfig.config;
       const result = await e4eConfig.config;
       if (result) return result;
     }
@@ -133,7 +133,7 @@ export class CopybookDownloaderForE4E {
         );
       },
     );
-    this.E4EConfigs.set(uri, { config: response, resolved: false });
+    this.E4EConfigs.set(uri, { config: response, closed: false });
     return response;
   }
 
