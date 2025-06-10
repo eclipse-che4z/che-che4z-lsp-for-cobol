@@ -2399,21 +2399,6 @@
     ],
     "description": "SET/GET PROPERTY"
   },
-  "QUEUE": {
-    "prefix": "QUEUE",
-    "body": [
-      "CD ${1:CD-1} FOR INPUT",
-      "\tSYMBOLIC QUEUE IS ${2:SQ1}",
-      "\tMESSAGE DATE IS ${3:MD1}",
-      "\tMESSAGE TIME IS ${4:MT2}",
-      "\tSYMBOLIC SOURCE IS ${5:SS2}",
-      "\tTEXT LENGTH IS ${6:TL2}",
-      "\tEND KEY IS ${7:EK2}",
-      "\tSTATUS KEY IS ${8:SK2}",
-      "\tMESSAGE COUNT IS ${9:MC3}."
-    ],
-    "description": "COMMUNICATION SECTION - The QUEUE runtime option can used only in an OS/VS (or Bull) COBOL program with a RECEIVE statement in a COMMUNICATION DESCRIPTION."
-  },
   "QUOTE": {
     "prefix": "QUOTE",
     "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
