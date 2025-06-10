@@ -421,5 +421,5 @@ export class CopybookDownloaderForE4E {
 }
 interface E4EConfig {
   config: Promise<e4eResponse | undefined>;
-  resolved: boolean;
+  closed: boolean;
 }
