@@ -129,8 +129,8 @@ export class CopybookDownloadService {
   clearProfiles() {
     this.e4eDownloader?.clearProfiles();
   }
-  async clearE4EConfig(uri: string) {
-    await this.e4eDownloader?.clearInvalidConfig(uri);
+  clearE4EConfig(uri: string) {
+    this.e4eDownloader?.clearInvalidConfig(uri);
   }
   private async downloadFromPaths(
     downloader: CopybookDownloaderForDsn | CopybookDownloaderForUss,

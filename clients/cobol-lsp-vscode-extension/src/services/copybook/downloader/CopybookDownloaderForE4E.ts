@@ -57,13 +57,9 @@ export class CopybookDownloaderForE4E {
   public clearConfigs() {
     this.E4EConfigs.clear();
   }
-  public async clearInvalidConfig(uri: string) {
-    if (
-      this.E4EConfigs.has(uri) &&
-      this.E4EConfigs.get(uri)?.resolved &&
-      !(await this.E4EConfigs.get(uri)?.config)
-    )
-      this.E4EConfigs.delete(uri);
+  public clearInvalidConfig(uri: string) {
+    const config = this.E4EConfigs.get(uri);
+    if (config) config.resolved = true;
   }
 
   private async getE4EConfigImpl(
@@ -125,7 +121,9 @@ export class CopybookDownloaderForE4E {
   public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
     const e4eConfig = this.E4EConfigs.get(uri);
     if (e4eConfig) {
-      return e4eConfig.config;
+      if (!e4eConfig.resolved) return e4eConfig.config;
+      const result = await e4eConfig.config;
+      if (result) return result;
     }
     if (!this.e4e.isEndevorElement(uri)) return undefined;
     const response = this.getE4EConfigImpl(uri).catch(
