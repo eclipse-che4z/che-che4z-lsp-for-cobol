@@ -1491,7 +1491,7 @@
   "INSPECT TALLYING": {
     "prefix": "INSPECT",
     "body": ["INSPECT ${1:id} "],
-    "description": "description"
+    "description": "Specifies search characters, in INSPECT verb."
   },
   "IDENTIFICATION DIVISION": {
     "prefix": "IDENTIFICATION-DIVISION",
