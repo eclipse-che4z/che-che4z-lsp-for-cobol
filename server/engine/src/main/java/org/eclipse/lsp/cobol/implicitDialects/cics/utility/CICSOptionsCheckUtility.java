@@ -21,6 +21,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 /** Manages traffic for CICS parser options checking */
 public class CICSOptionsCheckUtility {
@@ -366,6 +367,16 @@ public class CICSOptionsCheckUtility {
     else if (spOptions != null) {
       if (utilityParameters.spEnabled) spOptions.checkOptions(ctx);
       else spOptions.throwIfMissingTranslatorOption(ctx, "\"SP\"");
+    }
+    if (ctx.getRuleIndex() == CICSParser.RULE_variableNameUsage) {
+      CICSParser.VariableNameUsageContext context = (CICSParser.VariableNameUsageContext) ctx;
+      if ((context.NONNUMERICLITERAL() != null || context.NUMERICLITERAL() != null)) {
+        utility = optionsMap.get(10); // TODO this will change
+        if (utilityParameters.quoteEnabled && context.getText().contains("\'"))
+          utility.throwIfWrongApostQuoteTranslatorOption(context, "QUOTE");
+        else if (utilityParameters.apostEnabled && context.getText().contains("\""))
+          utility.throwIfWrongApostQuoteTranslatorOption(context, "APOST");
+      }
     }
   }
 }

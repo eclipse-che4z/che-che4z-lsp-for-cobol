@@ -394,6 +394,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         case "EXCI":
           cicsCheckUtilityParameters.exciEnabled = true;
           break;
+        case "APOST":
+          cicsCheckUtilityParameters.quoteEnabled = false;
+          cicsCheckUtilityParameters.apostEnabled = true;
+          break;
+        case "QUOTE":
+          cicsCheckUtilityParameters.apostEnabled = false;
+          cicsCheckUtilityParameters.quoteEnabled = true;
+          break;
         default:
           break;
       }

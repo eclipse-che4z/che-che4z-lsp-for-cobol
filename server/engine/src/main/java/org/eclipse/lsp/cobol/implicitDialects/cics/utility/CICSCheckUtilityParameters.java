@@ -19,4 +19,6 @@ public class CICSCheckUtilityParameters {
   public boolean noLengthEnabled = false;
   public boolean spEnabled = false;
   public boolean exciEnabled = false;
+  public boolean apostEnabled = true;
+  public boolean quoteEnabled = false;
 }
