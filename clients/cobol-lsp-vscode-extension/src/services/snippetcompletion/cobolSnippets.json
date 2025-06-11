@@ -3150,11 +3150,10 @@
   "VALUE": {
     "prefix": "VALUE",
     "body": [
-      "WORKING-STORAGE SECTION.",
       "01 ${1:WS-VAR} PIC X(20) VALUE \"${2:textHere}\".",
       "\t88 ${3:WS-SUBVAR} VALUE \"${4:textHere}\". "
     ],
-    "description": "VALUE/VALUES specifies the initial contents of a variable or the value(s) associated with an 88-level condition name."
+    "description": "WORKING-STORAGE SECTION - VALUE/VALUES specifies the initial contents of a variable or the value(s) associated with an 88-level condition name."
   },
   "VALUE OF": {
     "prefix": "VALUE OF",
