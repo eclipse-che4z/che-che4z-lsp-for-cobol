@@ -2616,16 +2616,12 @@
   },
   "SAME AREA": {
     "prefix": "SAME",
-    "body": [
-      "SAME ${1|AREA,SORT,SORT-MERGE|} FOR ${2:filename}."
-    ],
+    "body": ["SAME ${1|AREA,SORT,SORT-MERGE|} FOR ${2:filename}."],
     "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - The SAME AREA clause is syntax checked but not executable."
   },
   "SAME RECORD AREA": {
     "prefix": "SAME RECORD AREA",
-    "body": [
-      "SAME RECORD AREA FOR ${1:filename}."
-    ],
+    "body": ["SAME RECORD AREA FOR ${1:filename}."],
     "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - The SAME RECORD AREA clause specifies that the same main storage be used for two or more files."
   },
   "SD": {
@@ -2946,10 +2942,7 @@
   },
   "SYNCHRONIZED": {
     "prefix": "SYNCHRONIZED",
-    "body": [
-      "01 ${1:GROUP-VAR}",
-      "\t05 ${2:IDX-VAR} PIC S9(4) COMP SYNC."
-    ],
+    "body": ["01 ${1:GROUP-VAR}", "\t05 ${2:IDX-VAR} PIC S9(4) COMP SYNC."],
     "description": "The SYNC/SYNCHRONIZED clause specifies the alignment of an elementary item on a natural boundary in Z/OS main storage."
   },
   "TALLY": {
@@ -2990,9 +2983,7 @@
   },
   "PERFORM x THRU y": {
     "prefix": "PERFORM THRU",
-    "body": [
-      "PERFORM ${1:PROCESS-PATIENT} THRU ${2:PROCESS-PATIENT-EXIT}"
-    ],
+    "body": ["PERFORM ${1:PROCESS-PATIENT} THRU ${2:PROCESS-PATIENT-EXIT}"],
     "description": "THROUGH (or THRU) in a PERFORM statement tells the runtime to execute all paragraphs and statements from the named-paragraph THRU the EXIT paragraph."
   },
   "VALUE x THRU y": {
@@ -3296,9 +3287,7 @@
   },
   "APPLY WRITE ONLY": {
     "prefix": "WRITE-ONLY",
-    "body": [
-      "AWO."
-    ],
+    "body": ["AWO."],
     "description": "ENVIRONMENT DIVISION / FILE-CONTROL / I-O-CONTROL - Use the comiler option AWO (APPLY WRITE-ONLY) to make optimum use of buffering on the I/O device. Note that Enterprise COBOL v6 describes I/O efficiency savings as being upwards of 90%."
   },
   "XML PARSE": {
@@ -3357,9 +3346,7 @@
   },
   "VALUE ZERO": {
     "prefix": "ZERO",
-    "body": [
-      "01 ${1:VAR-BIN} PIC S9(4)V99 COMP-3 VALUE ZERO."
-    ],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4)V99 COMP-3 VALUE ZERO."],
     "description": "VALUE ZERO when used in a variable declaration initiaizes the field to the numeric value zero (0)."
   }
 }
