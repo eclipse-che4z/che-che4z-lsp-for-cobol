@@ -122,7 +122,7 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "AND is used to connect two or more conditional expressions. When using AND - all expressions connected by AND must test true for the program to take that path."
+    "description": "AND is used to connect two or more conditional expressions. When using AND all expressions connected by AND must test true for the program to take that path."
   },
   "AREA": {
     "prefix": "AREA",
@@ -183,7 +183,7 @@
   "BLOCK": {
     "prefix": "BLOCK",
     "body": ["BLOCK CONTAINS 0 RECORDS"],
-    "description": "The BLOCK CONTAINS clause in the FD entry in the DATA DIVISION dictates the size of the physical (I/O) records. If you specify BLOCK CONTAINS 0, z/OS chooses the optimal \"blocking factor\" for most efficient file I/O - taking into account channels and DASD along with the file specifics."
+    "description": "The BLOCK CONTAINS clause in the FD entry in the DATA DIVISION dictates the size of the physical (I/O) records. If you specify BLOCK CONTAINS 0, z/OS chooses the optimal \"blocking factor\" for most efficient file I/O, taking into account channels and DASD along with the file specifics."
   },
   "BOOLEAN": {
     "prefix": "JSON GENERATE FROM then CONVERT TO BOOLEAN",
@@ -215,7 +215,7 @@
   "SET x UP BY": {
     "prefix": "BY",
     "body": ["SET ${1:X-IND} UP BY ${2:1}"],
-    "description": "Adds +1 an internal COBOL table's index - assuming INDEXED BY."
+    "description": "Adds +1 an internal COBOL table's index, assuming INDEXED BY."
   },
   "STRING x DELIMITED BY y": {
     "prefix": "BY",
@@ -353,7 +353,7 @@
       "\tBLOCK CONTAINS 0 RECORDS",
       "\tDATA RECORD IS ${3:inputFileRec}."
     ],
-    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs."
+    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS and is the preferred way to specify most QSAM file FDs."
   },
   "CONTENT": {
     "prefix": "CONTENT",
@@ -393,7 +393,7 @@
       "END-INSPECT",
       "$0"
     ],
-    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values."
+    "description": "CONVERTING is a parameter of the INSPECT keyword. Used to replace character values."
   },
   "COPY": {
     "prefix": "COPY",
@@ -489,12 +489,12 @@
   "DAY": {
     "prefix": "DAY",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable - YY NNN) - from z/OS."
+    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable in the format YY NNN) from z/OS."
   },
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY-OF-WEEK (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc."
+    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc."
   },
   "DBCS": {
     "prefix": "DBCS",
@@ -972,7 +972,7 @@
   "FOOTING": {
     "prefix": "FOOTING",
     "body": ["WITH FOOTING AT ${1:literal}"],
-    "description": "Part of the FD LINAGE (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
+    "description": "Part of the FD LINAGE (logical page size) clause. Available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
   },
   "FOR": {
     "prefix": "FOR",
@@ -1429,7 +1429,7 @@
       "END-IF.",
       "$0"
     ],
-    "description": "GREATER is a general comparison operator - treated like the algebraic \">\" operator."
+    "description": "GREATER is a general comparison operator. Treated like the algebraic \">\" operator."
   },
   "GROUP-USAGE": {
     "prefix": "GROUP-USAGE",
@@ -1445,7 +1445,7 @@
     "body": [
       "READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE HIGH-VALUES TO ${3:INPUT-REC}."
     ],
-    "description": "HIGH-VALUE equates to binary (Hex) FF - the highest EBCDIC collating sequence value."
+    "description": "HIGH-VALUE equates to binary (Hex) FF. The highest EBCDIC collating sequence value."
   },
   "I-O": {
     "prefix": "I-O",
@@ -1748,7 +1748,7 @@
   "LABEL RECORDS": {
     "prefix": "LABEL RECORDS",
     "body": ["FD ${1:inputFile}", "LABEL RECORDS ARE STANDARD"],
-    "description": "DATA DIVISION / FILE SECTION - For QSAM files, LABEL RECORDS declares the presence or absence of labels used to identify DASD volumes - for uncataloged files. For VSAM files LABEL RECORDS is syntax checked but ignored."
+    "description": "DATA DIVISION / FILE SECTION - For QSAM files, LABEL RECORDS declares the presence or absence of labels used to identify DASD volumes for uncataloged files. For VSAM files LABEL RECORDS is syntax checked but ignored."
   },
   "LEADING BY": {
     "prefix": "LEADING BY",
@@ -1782,7 +1782,7 @@
       "\t${3:ifTrue}",
       "END-IF."
     ],
-    "description": "LESS is a general comparison operator - treated like the algebraic \"<\" operator."
+    "description": "LESS is a general comparison operator. Treated like the algebraic \"<\" operator."
   },
   "LINEAGE": {
     "prefix": "LINEAGE",
@@ -1802,7 +1802,7 @@
       "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
       "\tORGANIZATION IS LINE-SEQUENTIAL"
     ],
-    "description": "ENVIRONMENT DIVISION - LINE-SEQUENTIAL defines an input/output file as a line-sequential file - typically Unix or PC."
+    "description": "ENVIRONMENT DIVISION - LINE-SEQUENTIAL defines an input/output file as a line-sequential file, typically Unix or PC."
   },
   "LOC": {
     "prefix": "LOC",
@@ -1822,12 +1822,12 @@
   "READ LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": ["READ ${1:IN-FILE} AT END MOVE LOW-VALUES TO ${2:INPUT-REC}."],
-    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00, the lowest EBCDIC collating sequence value."
   },
   "MOVE LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": ["MOVE LOW-VALUES TO ${1:VAR1}."],
-    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00, the lowest EBCDIC collating sequence value."
   },
   "IF LOW-VALUE": {
     "prefix": "LOW-VALUE",
@@ -1836,7 +1836,7 @@
       "\t${2:MOVE SPACES TO ${1:VAR}}",
       "END-IF."
     ],
-    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00, the lowest EBCDIC collating sequence value."
   },
   "LINKAGE SECTION ": {
     "prefix": "LINKAGE SECTION",
@@ -1995,7 +1995,7 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "NOT is a true/false test - testing true if the comparison fails."
+    "description": "NOT is a true/false test. Testing true if the comparison fails."
   },
   "NOT ON SIZE ERROR": {
     "prefix": "NOT ON SIZE ERROR",
@@ -2003,7 +2003,7 @@
       "SUBTRACT ${1:VAR-2} FROM ${2:VAR-1} GIVING ${3:VAR-3}",
       "NOT ON SIZE ERROR ${4:MOVE ZEROS TO VAR-4}"
     ],
-    "description": "NOT is a true/false test - testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4."
+    "description": "NOT is a true/false test. Testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4."
   },
   "NOT INVALID": {
     "prefix": "NAMESPACE-prefix",
@@ -2345,7 +2345,7 @@
       "SORT ${1:fileName}",
       "${2|INPUT,OUTPUT|} PROCEDURE IS ${3:100-RECORD-SEL} SECTION"
     ],
-    "description": "PROCEDURE DIVISION - The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT - and process records returned from a SORT."
+    "description": "PROCEDURE DIVISION - The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT and process records returned from a SORT."
   },
   "PROCEDURE-POINTER": {
     "prefix": "PROCEDURE-POINTER",
@@ -2421,7 +2421,7 @@
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause - which defines the size (in bytes) of each logical record in the file."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause, which defines the size (in bytes) of each logical record in the file."
   },
   "RECORDING": {
     "prefix": "RECORDING",
@@ -2440,7 +2440,7 @@
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. This is typically used with QSAM files."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause, which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. This is typically used with QSAM files."
   },
   "RECURSIVE": {
     "prefix": "RECURSIVE",
@@ -2530,7 +2530,7 @@
       "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES",
       "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."
     ],
-    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement that is similar to REPLACING except that it replaces text across an entire file - not simply a copybook."
+    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement that is similar to REPLACING except that it replaces text across an entire file, not simply a copybook."
   },
   "REPLACING": {
     "prefix": "REPLACING",
@@ -2586,7 +2586,7 @@
   "WITH NO REWIND": {
     "prefix": "REWIND",
     "body": ["CLOSE ${1:QSAM-FILE} WITH NO REWIND"],
-    "description": "REWIND is typically used after WITH NO - an option that positions a QSAM file at its end."
+    "description": "REWIND is typically used after WITH NO. An option that positions a QSAM file at its end."
   },
   "REWRITE": {
     "prefix": "REWRITE",
@@ -2649,7 +2649,7 @@
       "\tDISPLAY \"FOUND IN TABLE\"",
       "END-SEARCH."
     ],
-    "description": "SEARCH searches a table SEQUENTIALLY (top to bottom) - for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
+    "description": "SEARCH searches a table SEQUENTIALLY (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
   },
   "SEARCH ALL": {
     "prefix": "SEARCH ALL",
@@ -2660,7 +2660,7 @@
       "\tDISPLAY \"FOUND IN TABLE\"",
       "END-SEARCH."
     ],
-    "description": "SEARCH searches a table SEQUENTIALLY (top to bottom) - for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
+    "description": "SEARCH searches a table SEQUENTIALLY (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
   },
   "SEARCH WHEN": {
     "prefix": "SEARCH WHEN",
@@ -2735,7 +2735,7 @@
     "body": [
       "SORT ${1:varOrTable} ON ${2|ASCENDING,DESCENDING|} ${3:sort-var-key}."
     ],
-    "description": "SORT sorts internal COBOL table rows according to the specified COBOL table key fields. It is especially useful for tables used with SEARCH ALL - which is more efficient than default SEARCH."
+    "description": "SORT sorts internal COBOL table rows according to the specified COBOL table key fields. It is especially useful for tables used with SEARCH ALL, which is more efficient than default SEARCH."
   },
   "SORT-CONTROL": {
     "prefix": "SORT-CONTROL",
@@ -2767,7 +2767,7 @@
       "01 SORT-MESSAGE GLOBAL PICTURE X(8) USAGE DISPLAY",
       "\tVALUE \"SYSOUT\"."
     ],
-    "description": "The register SORT-MESSAGE contains the JCL ddname of the data set that holds output messages of a sort operation at run-time - in place of the MSGDDN= sort control statement."
+    "description": "The register SORT-MESSAGE contains the JCL ddname of the data set that holds output messages of a sort operation at run-time, in place of the MSGDDN= sort control statement."
   },
   "SORT-MODE-SIZE": {
     "prefix": "SORT-MODE-SIZE",
@@ -2790,7 +2790,7 @@
     "body": [
       "SOURCE-COMPUTER. ${1:COMPUTER-NAME}${2|., WITH DEBUGGING MODE.|}"
     ],
-    "description": "The SOURCE-COMPUTER paragraph is syntax checked - only - unless it contains a WITH DEBUGGING clause which then sets a compile-time switch for debugging."
+    "description": "The SOURCE-COMPUTER paragraph is syntax checked unless it contains a WITH DEBUGGING clause which then sets a compile-time switch for debugging."
   },
   "SPACE": {
     "prefix": "SPACE",
