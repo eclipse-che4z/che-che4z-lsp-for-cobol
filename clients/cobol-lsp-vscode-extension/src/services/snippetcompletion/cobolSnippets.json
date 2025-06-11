@@ -169,7 +169,7 @@
   "BIT TO CHAR": {
     "prefix": "BIT-TO-CHAR",
     "body": [
-      "77 ${1:BIT-FLD} PIC X(16).",
+      "01 ${1:BIT-FLD} PIC X(16).",
       "\tMOVE '${2:0000000000000000}' TO ${1:BIT-FLD}.",
       "\tFUNCTION BIT-TO-CHAR(${1:BIT-FLD})."
     ],
@@ -177,7 +177,7 @@
   },
   "BLANK WHEN ZERO": {
     "prefix": "BLANK",
-    "body": ["77 ${1:variableName} PIC S9(5)V99 BLANK WHEN ZERO."],
+    "body": ["01 ${1:variableName} PIC S9(5)V99 BLANK WHEN ZERO."],
     "description": "BLANK WHEN ZERO specifies that an elementary field contains spaces when its value is zero."
   },
   "BLOCK": {
@@ -279,38 +279,38 @@
   },
   "COMP": {
     "prefix": "COMP",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}."],
     "description": "BINARY, and its synonyms COMP and COMP-4, are used next to numeric fields in the DATA DIVISION to specify that the data is represented in two's complement hex (EBCDIC) format."
   },
   "COMP-1": {
     "prefix": "COMP-1",
     "body": [
-      "77 ${1:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-1."
+      "01 ${1:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-1."
     ],
     "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-2": {
     "prefix": "COMP-2",
     "body": [
-      "77 ${1:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-2."
+      "01 ${1:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-2."
     ],
     "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-3": {
     "prefix": "COMP-3",
     "body": [
-      "77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-3."
+      "01 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-3."
     ],
     "description": "Internally-packed (efficient) number declared in the DATA DIVISION."
   },
   "COMP-4": {
     "prefix": "COMP-4",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-4."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-4."],
     "description": "BINARY, and its synonyms COMP and COMP-4, are used next to numeric fields in the DATA DIVISION to specify that the data is represented in two's complement hex (EBCDIC) format."
   },
   "COMP-5": {
     "prefix": "COMP-5",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-5."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-5."],
     "description": "Typically used to communicate data between Java/C/C++/Python/etc. and COBOL. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration."
   },
   "COMPUTE": {
@@ -609,7 +609,7 @@
   },
   "DISPLAY-1": {
     "prefix": "DISPLAY-1",
-    "body": ["77 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
+    "body": ["01 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
     "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage."
   },
   "DIVIDE": {
@@ -1380,7 +1380,7 @@
   },
   "FUNCTION-POINTER": {
     "prefix": "FUNCTION-POINTER",
-    "body": ["77 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
+    "body": ["01 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
     "description": "A FUNCTION-POINTER is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point."
   },
   "JSON GENERATE": {
@@ -1547,7 +1547,7 @@
   },
   "INDEX": {
     "prefix": "INDEX",
-    "body": ["77 ${1:TBL-IDX} USAGE IS INDEX."],
+    "body": ["01 ${1:TBL-IDX} USAGE IS INDEX."],
     "description": "USAGE IS INDEX creates an index data item, which can used as an index variable into any COBOL internal table (OCCURS clause)."
   },
   "OCCURS x INDEXED BY": {
@@ -1659,7 +1659,7 @@
   "USAGE IS": {
     "prefix": "USAGE IS",
     "body": [
-      "77 ${1:VAR1} PIC ${2:X} USAGE IS ${3|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
+      "01 ${1:VAR1} PIC ${2:X} USAGE IS ${3|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
     ],
     "description": "Variable declarations with IS. (IS is optional)"
   },
@@ -1757,7 +1757,7 @@
   },
   "LEADING": {
     "prefix": "LEADING",
-    "body": ["77 ${1:VAR-NUM} ${2:PIC S9999} DISPLAY SIGN LEADING"],
+    "body": ["01 ${1:VAR-NUM} ${2:PIC S9999} DISPLAY SIGN LEADING"],
     "description": "SIGN LEADING/TRAILING declares the position of the operational sign for a numeric variable."
   },
   "LEFT": {
@@ -1961,7 +1961,7 @@
   },
   "NATIVE": {
     "prefix": "NATIVE",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."],
     "description": "NATIVE is syntax checked, but has no effect on program execution."
   },
   "NEXT SENTENCE": {
@@ -2039,7 +2039,7 @@
   },
   "OBJECT-REFERENCE": {
     "prefix": "OBJECT-REFERENCE",
-    "body": ["77 ${1:VAR-OBJ-REF} PIC X(36) USAGE OBJECT-REFERENCE."],
+    "body": ["01 ${1:VAR-OBJ-REF} PIC X(36) USAGE OBJECT-REFERENCE."],
     "description": "An OBJECT-REFERENCE data item is a 4 or 8 byte (depending on your z/OS system) that references valid objects."
   },
   "OCCURS": {
@@ -2247,7 +2247,7 @@
   },
   "PACKED-DECIMAL": {
     "prefix": "PACKED-DECIMAL",
-    "body": ["77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
+    "body": ["01 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
     "description": "PACKED-DECIMAL variables (internally) are stored with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. PACKED-DECIMAL is identical to COMP-3/COMPUTATIONAL-3."
   },
   "PADDING CHARACTER IS": {
@@ -2349,7 +2349,7 @@
   },
   "PROCEDURE-POINTER": {
     "prefix": "PROCEDURE-POINTER",
-    "body": ["77 ${1:LE-UTILITY} USAGE IS PROCEDURE-POINTER."],
+    "body": ["01 ${1:LE-UTILITY} USAGE IS PROCEDURE-POINTER."],
     "description": "A PROCEDURE-POINTER is a variable which contains the address of a procedure \"entry point\". PROCEDURE-POINTER variables are often used to CALL z/OS LE (Language Environment) utilities."
   },
   "USE FOR DEBUGGING ON ALL PROCEDURES": {
@@ -2394,7 +2394,7 @@
   },
   "QUOTE": {
     "prefix": "QUOTE",
-    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
+    "body": ["01 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
     "description": "QUOTE/QUOTES is a figurative constant. It can also be used in a comparison or MOVE statement."
   },
   "READ (QSAM)": {
@@ -2609,7 +2609,7 @@
   "ROUNDED": {
     "prefix": "ROUNDED",
     "body": [
-      "77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.",
+      "01 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.",
       "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."
     ],
     "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5."
