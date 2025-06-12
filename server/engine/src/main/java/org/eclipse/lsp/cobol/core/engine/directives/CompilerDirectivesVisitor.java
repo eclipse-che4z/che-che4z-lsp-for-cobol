@@ -143,7 +143,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   private static final Pattern CICS_DIRECTIVES_IN_LITERAL =
-      Pattern.compile("\\b(SP|LENGTH|NOLENGTH|EXCI)\\b", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("\\b(SP|LENGTH|NOLENGTH|EXCI|APOST|QUOTE)\\b", Pattern.CASE_INSENSITIVE);
 
   @Override
   public Object visitCicsTranslatorDirectives(

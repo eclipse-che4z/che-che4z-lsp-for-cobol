@@ -718,7 +718,7 @@ public abstract class CICSOptionsCheckBaseUtility {
     }
   }
 
-  public <E> void throwIfWrongApostQuoteTranslatorOption(E rule, String directiveOption) {
+  public <E> void throwWrongApostQuoteTranslatorOption(E rule, String directiveOption) {
     throwException(
         ErrorSeverity.ERROR, getLocality(rule), "Enabled translator option: ", directiveOption);
   }

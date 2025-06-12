@@ -371,11 +371,11 @@ public class CICSOptionsCheckUtility {
     if (ctx.getRuleIndex() == CICSParser.RULE_variableNameUsage) {
       CICSParser.VariableNameUsageContext context = (CICSParser.VariableNameUsageContext) ctx;
       if ((context.NONNUMERICLITERAL() != null || context.NUMERICLITERAL() != null)) {
-        utility = optionsMap.get(10); // TODO this will change
-        if (utilityParameters.quoteEnabled && context.getText().contains("\'"))
-          utility.throwIfWrongApostQuoteTranslatorOption(context, "QUOTE");
-        else if (utilityParameters.apostEnabled && context.getText().contains("\""))
-          utility.throwIfWrongApostQuoteTranslatorOption(context, "APOST");
+        utility = optionsMap.entrySet().iterator().next().getValue();
+        if (utilityParameters.quoteEnabled && context.getText().endsWith("\'"))
+          utility.throwWrongApostQuoteTranslatorOption(context, "QUOTE");
+        else if (utilityParameters.apostEnabled && context.getText().endsWith("\""))
+          utility.throwWrongApostQuoteTranslatorOption(context, "APOST");
       }
     }
   }
