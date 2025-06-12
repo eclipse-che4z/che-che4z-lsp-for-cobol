@@ -62,7 +62,10 @@ import {
   AnalysisResult,
   ControlFlowAnalysisService,
 } from "./services/ControlFlowService";
-import { readFileContent } from "./services/copybook/CopybookMessageHandler";
+import {
+  readFileContent,
+  resolveCopybookURI,
+} from "./services/copybook/CopybookMessageHandler";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -215,7 +218,8 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "copybook/uri",
-    externalApis.makeResolveCopybookUriHandler(),
+    resolveCopybookURI,
+    // externalApis.makeResolveCopybookUriHandler(),
   );
   languageClientService.addRequestHandler("file/content", readFileContent);
 

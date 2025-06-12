@@ -40,12 +40,12 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "../ProcessorGroupsLoader";
-import { DownloadDiagnosticsService } from "../DiagnosticsService";
 import { localCopybooks } from "./LocalCopybooksService";
 // import { searchLocalCopybooks } from "./LocalCopybooksService";
 import { getErrorMessage } from "../util/ErrorsUtils";
 import { getE4EAPI } from "./E4ECopybookService";
 import { Utils } from "../util/Utils";
+import { clearDiagnostics, showDiagnostics } from "../DiagnosticsService";
 
 export class CopybookName {
   constructor(
@@ -69,7 +69,6 @@ export async function initializeExternalAPIs(
     maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
     outputChannel,
-    new DownloadDiagnosticsService(),
     configurationInvalidation,
   );
 
@@ -85,6 +84,19 @@ export async function initializeExternalAPIs(
       if (api) externalApis.e4eAppeared(api.api);
       else outputChannel.appendLine(E4E_INCOMPATIBLE);
     });
+}
+
+export function missingExtension(documentUri: vscode.Uri, message: string) {
+  showDiagnostics(documentUri, [
+    {
+      range: new vscode.Range(
+        new vscode.Position(0, 0),
+        new vscode.Position(1, 0),
+      ),
+      message: message,
+      severity: vscode.DiagnosticSeverity.Warning,
+    },
+  ]);
 }
 
 class ExternalAPIsService {
@@ -111,7 +123,7 @@ class ExternalAPIsService {
     this.e4eDownloader?.clearInvalidConfig(uri);
   }
 
-  private handleAsEndevorElement(documentUri: string) {
+  public handleAsEndevorElement(documentUri: string) {
     return (
       SettingsService.getCopybookEndevorDependencySettings() ===
         ENDEVOR_PROCESSOR && this.e4eApi?.isEndevorElement(documentUri)
@@ -180,7 +192,6 @@ class ExternalAPIsService {
     explorer?: IApiRegisterClient,
     e4e?: E4E,
     private outputChannel?: vscode.OutputChannel,
-    private diagnosticsService?: DownloadDiagnosticsService,
     private configurationInvalidation?: () => unknown,
   ) {
     if (e4e) this.e4eAppeared(e4e);
@@ -194,14 +205,14 @@ class ExternalAPIsService {
       this.e4eApi,
       this.outputChannel,
     );
-    this.diagnosticsService?.clearDiagnostics();
+    clearDiagnostics();
   }
 
   public explorerAppeared(api: IApiRegisterClient) {
     this.explorerApi = api;
     this.ussService = new CopybookDownloaderForUss(this.explorerApi);
     this.dsnService = new ZoweDSNService(this.explorerApi);
-    this.diagnosticsService?.clearDiagnostics();
+    clearDiagnostics();
     if (this.explorerApi.onProfileUpdated) {
       this.explorerApi.onProfileUpdated((profile: IProfileLoaded) => {
         this.outputChannel?.appendLine(`Zowe profile ${profile.name} updated`);
@@ -504,18 +515,18 @@ class ExternalAPIsService {
       ))
     );
   }
-  private missingExtension(documentUri: vscode.Uri, message: string) {
-    this.diagnosticsService?.showDiagnostics(documentUri, [
-      {
-        range: new vscode.Range(
-          new vscode.Position(0, 0),
-          new vscode.Position(1, 0),
-        ),
-        message: message,
-        severity: vscode.DiagnosticSeverity.Warning,
-      },
-    ]);
-  }
+  // private missingExtension(documentUri: vscode.Uri, message: string) {
+  //   this.diagnosticsService?.showDiagnostics(documentUri, [
+  //     {
+  //       range: new vscode.Range(
+  //         new vscode.Position(0, 0),
+  //         new vscode.Position(1, 0),
+  //       ),
+  //       message: message,
+  //       severity: vscode.DiagnosticSeverity.Warning,
+  //     },
+  //   ]);
+  // }
 
   private processDownloadError(title: string): void {
     const actionSettings = "Change settings";

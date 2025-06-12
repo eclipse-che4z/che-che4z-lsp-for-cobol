@@ -4,7 +4,7 @@ export default interface CopybookLib {
   resolveCopybookUri(
     copybookName: string,
     documentUri: vscode.Uri,
-  ): Promise<vscode.Uri | undefined>;
+  ): Promise<vscode.Uri | (() => Promise<vscode.Uri | undefined>) | undefined>;
 
   listCopybooks(
     documentUri: vscode.Uri,

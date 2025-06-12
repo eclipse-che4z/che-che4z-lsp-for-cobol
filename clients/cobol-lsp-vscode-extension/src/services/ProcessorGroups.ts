@@ -22,6 +22,7 @@ import {
   CopybookLibs,
   EndevorConfigModel,
   ProcessorGroupProperties,
+  readEndevorConfig,
   readWorkspaceConfig,
   TransformedProcessorGroup,
   transformLibs,
@@ -243,12 +244,16 @@ function pathMatches(program: string, documentPath: string) {
 // };
 
 async function loadProcessorGroup(documentUri: Uri) {
-  const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
-  if (workspaceUri === undefined) {
-    return undefined;
-  }
+  let workspaceConfig = await readEndevorConfig(documentUri);
 
-  const workspaceConfig = await readWorkspaceConfig(workspaceUri);
+  if (!workspaceConfig) {
+    const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
+    if (workspaceUri === undefined) {
+      return undefined;
+    }
+
+    workspaceConfig = await readWorkspaceConfig(workspaceUri);
+  }
   const b4gConfig = await loadBridgeJsonContent(documentUri);
   if (b4gConfig) {
     const selectedElement = b4gConfig.fileExtension
@@ -258,7 +263,7 @@ async function loadProcessorGroup(documentUri: Uri) {
       b4gConfig.elements[selectedElement] === undefined
         ? b4gConfig.defaultProcessorGroup
         : b4gConfig.elements[selectedElement].processorGroup;
-    return workspaceConfig?.processorGroups[processorGroupName];
+    return workspaceConfig.processorGroups[processorGroupName];
   }
 
   const matchedGroup = matchProcessorGroup(workspaceConfig, documentUri);

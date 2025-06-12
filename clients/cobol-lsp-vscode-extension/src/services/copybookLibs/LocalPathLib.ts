@@ -33,10 +33,7 @@ export default class LocalPathLib implements CopybookLib {
     );
   }
 
-  async resolveCopybookUri(
-    copybookName: string,
-    documentUri: vscode.Uri,
-  ): Promise<vscode.Uri | undefined> {
+  async resolveCopybookUri(copybookName: string, documentUri: vscode.Uri) {
     const uris = this.getUris(documentUri);
 
     const allowedExtensions =

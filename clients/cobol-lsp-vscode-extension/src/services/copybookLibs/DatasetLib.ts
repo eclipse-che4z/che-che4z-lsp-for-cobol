@@ -4,21 +4,30 @@ import CopybookLib from "./CopybookLib";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { externalApis } from "../copybook/CopybookDownloadService";
+import { ZoweLib } from "./ZoweLib";
+import { MainframeRemoteLocation } from "../copybook/downloader/DownloadUtil";
 
-export class DatasetLib implements CopybookLib {
+export class DatasetLib extends ZoweLib implements CopybookLib {
   constructor(
     private dsn: string,
-    private profile?: string,
-  ) {}
+    profile?: string,
+  ) {
+    super(profile);
+  }
 
   static create(configs: CopybookLibs) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "object" && DATASET in config) {
+        // if (hasMember(config, 'DATASET') && typeof config[DATASET] === 'string') {
         libs.push(new DatasetLib(config.dataset, config.profile));
       }
     }
     return libs;
+  }
+
+  credentialsTestLocation(): MainframeRemoteLocation {
+    return { dsn: this.dsn };
   }
 
   async resolveCopybookUri(
@@ -30,6 +39,10 @@ export class DatasetLib implements CopybookLib {
         documentUri,
         externalApis.explorerApi,
       );
+    }
+
+    if (!(await this.configCheck(documentUri))) {
+      return;
     }
 
     return await externalApis.dsnService?.resolveCopybookUri(
@@ -48,6 +61,10 @@ export class DatasetLib implements CopybookLib {
         documentUri,
         externalApis.explorerApi,
       );
+    }
+
+    if (!(await this.configCheck(documentUri))) {
+      return [];
     }
 
     const members = await externalApis.dsnService?.getAllMembers(

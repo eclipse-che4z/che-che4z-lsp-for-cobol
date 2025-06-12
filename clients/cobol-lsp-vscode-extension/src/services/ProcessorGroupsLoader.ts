@@ -20,6 +20,9 @@ import { asArray, hasMember } from "./util/Utils";
 import LocalPathLib from "./copybookLibs/LocalPathLib";
 import { UssPathLib } from "./copybookLibs/UssPathConfig";
 import { DatasetLib } from "./copybookLibs/DatasetLib";
+import { externalApis } from "./copybook/CopybookDownloadService";
+import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
+import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -37,6 +40,88 @@ export interface WorkspaceConfig {
 }
 
 let workspaceConfigs: { [key: string]: WorkspaceConfig } = {};
+
+export async function readEndevorConfig(
+  documentUri: Uri,
+): Promise<WorkspaceConfig | undefined> {
+  if (!externalApis.handleAsEndevorElement(documentUri.toString())) {
+    return;
+  }
+
+  const workspaceKey = documentUri.toString();
+  let workspaceConfig = workspaceConfigs[workspaceKey];
+  if (workspaceConfig) {
+    return workspaceConfig;
+  }
+
+  workspaceConfig = {
+    processorGroups: {},
+    programs: [],
+  };
+
+  const endevorData =
+    await externalApis.e4eDownloader?.getEndevorProcessorGroupConfig(
+      documentUri,
+    );
+  if (endevorData) {
+    // const decodedGroups = ProcessorGroupsModel.decode(
+    //   endevorData.pgroups.map((p) => ({ name: p.name, libs: p.libs })),
+    // );
+    // if (isLeft(decodedGroups)) {
+    //   const msg = `Could not validate data: ${PathReporter.report(decodedGroups).join("\n")}`;
+    //   throw Error(msg);
+    // }
+    const decodedGroups = endevorData.pgroups.map((p) => ({
+      name: p.name,
+      libs: p.libs.map((l) => {
+        if (hasMember(l, "dataset")) {
+          const el: EndevorDatasetConfigModel = {
+            endevorDataset: l.dataset,
+          };
+          if (hasMember(l, "profile") && typeof l.profile === "string") {
+            el.profile = l.profile;
+          }
+          return el;
+        } else return l;
+      }),
+    }));
+
+    const processorGroups = decodedGroups.map(transformProcessorGroup);
+    processorGroups.forEach((pg) => {
+      workspaceConfig.processorGroups[pg.name] = pg;
+    });
+
+    const decodedPrograms = ProgramsConfigModel.decode({
+      pgms: endevorData.pgms.map((pgm) => ({
+        ...pgm,
+        program: `**/${pgm.program.split("/").reverse().join(".")}`,
+      })),
+    });
+    if (isLeft(decodedPrograms)) {
+      throw Error(
+        `Could not validate data: ${PathReporter.report(decodedPrograms).join("\n")}`,
+      );
+    }
+    decodedPrograms.right.pgms.forEach((program) => {
+      let processorGroup = processorGroups.find(
+        (p) => p.name === program.pgroup,
+      );
+      if (!processorGroup) {
+        //throw Error(`Processor group ${program.pgroup} definition missing.`);
+        // TODO: report missing pg configuration
+        processorGroup = { name: program.pgroup };
+      }
+      workspaceConfig.programs.push({
+        program: program.program,
+        processorGroup: processorGroup,
+      });
+    });
+  }
+
+  workspaceConfigs[workspaceKey] = workspaceConfig;
+
+  return workspaceConfig;
+}
 
 export async function readWorkspaceConfig(
   workspaceUri: Uri,
@@ -97,6 +182,16 @@ const EndevorConfigModel = t.intersection([
 ]);
 export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
 
+const EndevorDatasetModel = t.intersection([
+  t.type({
+    endevorDataset: t.string,
+  }),
+  t.partial({
+    profile: t.string,
+  }),
+]);
+export type EndevorDatasetConfigModel = t.TypeOf<typeof EndevorDatasetModel>;
+
 const ZoweDatasetConfigModel = t.intersection([
   t.type({ dataset: t.string }),
   t.partial({ profile: t.string }),
@@ -113,6 +208,7 @@ const LibsModel = t.array(
   t.union([
     t.string,
     EndevorConfigModel,
+    EndevorDatasetModel,
     ZoweDatasetConfigModel,
     ZoweUssConfigModel,
   ]),
@@ -154,6 +250,10 @@ const ProcessorGroupModel = t.intersection([
   }),
 ]);
 
+const ProcessorGroupsModel = t.type({
+  pgroups: t.array(ProcessorGroupModel),
+});
+
 type ProcessorGroup = t.TypeOf<typeof ProcessorGroupModel>;
 
 export type TransformedProcessorGroup = {
@@ -166,7 +266,13 @@ export type TransformedProcessorGroup = {
   // "target-sql-backend"?: string;
 } & Partial<ProcessorGroupProperties>;
 
-export type TransformedLibs = LocalPathLib | DatasetLib | UssPathLib;
+export type TransformedLibs =
+  | LocalPathLib
+  | DatasetLib
+  | UssPathLib
+  | EndevorElementLib
+  | EndevorMemberLib;
+
 export type TransformedPreprocessor = {
   name: string;
 } & Partial<ProcessorGroupProperties>;
@@ -188,9 +294,6 @@ async function readProcessorGroupsFile(
       await workspace.fs.readFile(procCfgPath),
     );
     // update new cache
-    const ProcessorGroupsModel = t.type({
-      pgroups: t.array(ProcessorGroupModel),
-    });
     const json: unknown = JSON.parse(fileContent);
     const decoded = ProcessorGroupsModel.decode(json);
     if (isLeft(decoded)) {
@@ -226,7 +329,13 @@ export function transformLibs(libs?: CopybookLibs) {
     return [];
   }
 
-  const processorGroupLibTypes = [LocalPathLib, DatasetLib, UssPathLib];
+  const processorGroupLibTypes = [
+    LocalPathLib,
+    DatasetLib,
+    UssPathLib,
+    EndevorElementLib,
+    EndevorMemberLib,
+  ];
 
   const results = processorGroupLibTypes.map((pg) => pg.create(libs)).flat();
 
@@ -236,6 +345,7 @@ export function transformLibs(libs?: CopybookLibs) {
 function transformPreprocessor(
   input?: Preprocessor,
 ): TransformedPreprocessor[] {
+  if (!input) return [];
   const preprocessors = asArray(input);
   const transformed = preprocessors.map((preprocessor) => {
     if (typeof preprocessor === "string") {

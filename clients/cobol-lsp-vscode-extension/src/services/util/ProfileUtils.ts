@@ -29,7 +29,7 @@ export class ProfileUtils {
     );
   }
 
-  public static getAvailableProfiles(zoweExplorerApi: IApiRegisterClient) {
+  public static getAvailableProfiles(zoweExplorerApi?: IApiRegisterClient) {
     let availableProfiles: string[] = [];
     if (!zoweExplorerApi) return availableProfiles;
     zoweExplorerApi.registeredApiTypes().forEach((profileType) => {

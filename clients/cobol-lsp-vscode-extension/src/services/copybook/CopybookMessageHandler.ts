@@ -12,17 +12,38 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { Uri, workspace } from "vscode";
+import * as vscode from "vscode";
+import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
 
 export async function readFileContent(fileUri: string): Promise<string> {
-  const uri = Uri.parse(fileUri);
-  const openFile = workspace.textDocuments.find(
+  const uri = vscode.Uri.parse(fileUri);
+  const openFile = vscode.workspace.textDocuments.find(
     (doc) => doc.uri.toString() === fileUri,
   );
   if (openFile) {
     return openFile.getText();
   }
-  const data = await workspace.fs.readFile(uri);
+  const data = await vscode.workspace.fs.readFile(uri);
   const content = new TextDecoder().decode(data);
   return content;
+}
+
+export async function resolveCopybookURI(
+  documentURI: string,
+  copybookName: string,
+  dialectType: string,
+): Promise<string | undefined> {
+  const uri = vscode.Uri.parse(documentURI);
+
+  const pgLibs = await loadProcessorGroupCopybooksLibs(uri, dialectType);
+  for (const pgLib of pgLibs) {
+    const result = await pgLib.resolveCopybookUri(copybookName, uri);
+    if (result) {
+      if (typeof result === "function") {
+        const resultUri = await result();
+        return resultUri?.toString();
+      }
+      return result.toString();
+    }
+  }
 }
