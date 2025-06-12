@@ -1424,7 +1424,7 @@
   "GREATER": {
     "prefix": "GREATER",
     "body": [
-      "IF ${1:VAR1} GREATER THEN ${2:VAR2} THEN",
+      "IF ${1:VAR1} GREATER THAN ${2:VAR2} THEN",
       "\t${3:ifTrue}",
       "END-IF.",
       "$0"
@@ -2070,7 +2070,7 @@
   "SET ADDRESS OF": {
     "prefix": "OF",
     "body": ["SET ADDRESS OF ${1:VAR-POINTER-1} TO ${2:VAR-POINTER-2}."],
-    "description": "ADDRESS OF is a COBOL special register that can be used to reference the address of a data item in the LINKAGE SECTION, LOCAL-STORAGE SECTION, or WORKING-STORAGE SECTION."
+    "description": "ADDRESS OF is a COBOL special register to reference the address of a data item in the LINKAGE SECTION, LOCAL-STORAGE SECTION, or WORKING-STORAGE SECTION."
   },
   "INLINE OFF": {
     "prefix": "OFF",
@@ -2568,7 +2568,7 @@
   "RETURN-CODE": {
     "prefix": "RETURN-CODE",
     "body": ["IF ${1:WS-SWITCH-NO-ERRORS} = \"Y\"", "\tMOVE 0 to RETURN-CODE."],
-    "description": "RETURN-CODE is a COBOL special register that can be used to pass a return code to the calling program or to z/OS when the program ends."
+    "description": "RETURN-CODE is a COBOL special register to pass a return code to the calling program or to z/OS when the program ends."
   },
   "RETURNING": {
     "prefix": "RETURNING",
@@ -2614,10 +2614,10 @@
     ],
     "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5."
   },
-  "SAME AREA": {
+  "SAME": {
     "prefix": "SAME",
     "body": ["SAME ${1|AREA,SORT,SORT-MERGE|} FOR ${2:filename}."],
-    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - The SAME AREA clause is syntax checked but not executable."
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - The SAME clause is syntax checked but not executable."
   },
   "SAME RECORD AREA": {
     "prefix": "SAME RECORD AREA",
@@ -2676,7 +2676,7 @@
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tFILE STATUS IS ${5:PAT-TRAN-STATUS}."
     ],
-    "description": "SELECT MODE defines the internal COBOL FD (DATA DIVISION FILE DESCRIPTOR) that is assigned to (associated with) an external QSAM, VSAM or Line Sequential file."
+    "description": "DATA DIVISION / FILE DESCRIPTOR - SELECT MODE defines the internal COBOL FD that is assigned to and associated with an external QSAM, VSAM or Line Sequential file."
   },
   "SEPARATE": {
     "prefix": "SEPARATE",
@@ -2716,6 +2716,26 @@
     "body": ["01 ${1:VAR-1} PIC ${2:S9(4)} SIGN ${3|LEADING,TRAILING|}."],
     "description": "The SIGN clause specifies the position and character of the operational sign for signed numeric variables."
   },
+  "SIZE ERROR": {
+    "prefix": "SIZE ERROR",
+    "body": [
+      "DIVIDE ${1:TOT-COST} BY ${2:PURCHASED-NBR}",
+      "\tGIVING ${3:ANSWER-TOT-COST}",
+      "\t\tON SIZE ERROR",
+      "\t\tGO TO ${4:MATH-ERR-PARA}",
+      "END-DIVIDE"
+    ],
+    "description": "When arithmetic overflow occurs in a receiving field, the SIZE ERROR clause invokes statements that follow. "
+  },
+  "DELIMITED BY SIZE": {
+    "prefix": "SIZE",
+    "body": [
+      "STRING",
+      "\t${1:LINE-NUMBER SPACE CUSTOMER-INFORMATION}",
+      "\tDELIMITED BY SIZE ${2:...}"
+    ],
+    "description": "DELIMITED BY SIZE moves each field in its entirety to a receiving fields."
+  },
   "SKIP1/SKIP2/SKIP3": {
     "prefix": "SKIP",
     "body": ["SKIP${1|1,2,3|}.", "$0"],
@@ -2741,13 +2761,13 @@
     ],
     "description": "The register SORT-CONTROL contains the JCL ddname of the data set that holds control statements used to improve the performance of a sort or merge operation."
   },
-  "SORT-CORE SIZE": {
-    "prefix": "SORT-CORE SIZE",
+  "SORT-CORESIZE": {
+    "prefix": "SORT-CORESIZE",
     "body": [
       "01 SORT-CORE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY",
       "\tVALUE ZERO."
     ],
-    "description": "SORT-CORE-SIZE is the name of a COMP (binary) variable that you can use to declare the number of storage bytes available to the sort utility."
+    "description": "SORT-CORE-SIZE is the name of a COMP (binary) variable to declare the number of storage bytes available to the sort utility."
   },
   "SORT-FILE-SIZE": {
     "prefix": "SORT-FILE-SIZE",
@@ -2755,7 +2775,7 @@
       "01 SORT-FILE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY",
       "\tVALUE ZERO."
     ],
-    "description": "SORT-FILE-SIZE is the name of a COMP (binary) variable that you can use to declare the number of input records to a SORT."
+    "description": "SORT-FILE-SIZE is the name of a COMP (binary) variable to declare the number of input records to a SORT."
   },
   "SORT-MESSAGE": {
     "prefix": "SORT-MESSAGE",
@@ -2771,7 +2791,7 @@
       "01 SORT-MODE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY",
       "\tVALUE ZERO."
     ],
-    "description": "SORT-MODE-SIZE is the name of a COMP (binary) variable that you can use to declare the length of variable-length records that occur most frequently."
+    "description": "SORT-MODE-SIZE is the name of a COMP (binary) variable to declare the length of variable-length records that occur most frequently."
   },
   "SORT-RETURN": {
     "prefix": "SORT-RETURN",
@@ -2779,7 +2799,7 @@
       "01 SORT-RETURN GLOBAL PICTURE S9(8) USAGE BINARY",
       "\tVALUE ZERO."
     ],
-    "description": "SORT-RETURN is the name of a COMP (binary) variable that you can declare that will contain a return-code from the sort function."
+    "description": "SORT-RETURN is the name of a COMP (binary) variable that will contain a return-code from the sort function."
   },
   "SOURCE-COMPUTER": {
     "prefix": "SOURCE-COMPUTER",
@@ -2846,18 +2866,21 @@
   },
   "START": {
     "prefix": "START",
-    "body": ["START ${1:fileName} ${2:key-var}", "END-START."],
+    "body": ["START ${1:INPAT-FILE} ${2:KEY IS > `AAAAA`}", "END-START."],
     "description": "START positions record retrieval within an indexed or relative file for subsequent sequential retrieval. Note that START does not READ a record."
+  },
+  "STATUS": {
+    "prefix": "STATUS",
+    "body": [
+      "SELECT ${1:INPAT} ASSIGN TO ${2:UT-S-INPAT}",
+      "FILE STATUS IS ${3:WS-INPAT-STATUS}."
+    ],
+    "description": "FILE STATUS monitors the execution of each input-output operation for a file, and sets the operation's return-code into the specified variable."
   },
   "STOP": {
     "prefix": "STOP",
     "body": ["STOP RUN."],
     "description": "STOP RUN terminates all COBOL routines. Control is returned immediately to Z/OS. Note that GOBACK is a safer or better approach to ending a program."
-  },
-  "SIZE ERROR": {
-    "prefix": "SIZE ERROR",
-    "body": ["SIZE ERROR ${1:impStat}"],
-    "description": "SIZE ERROR"
   },
   "SHELL": {
     "prefix": "SHELL",
@@ -2969,6 +2992,25 @@
       "END-UNSTRING."
     ],
     "description": "TALLYING counts the occurrences of a specific character or special character in the INSPECT, STRING or UNSTRING data item."
+  },
+  "THAN (PERFORM)": {
+    "prefix": "THAN",
+    "body": [
+      "PERFORM ${1:010-PROCESS-ONE-MONTH}",
+      "\tUNTIL MONTH GREATER THAN 12",
+      "\t${2:COMPUTE MONTH-TOT = ...}",
+      "END PERFORM."
+    ],
+    "description": "THAN is a relational operater used within GREATER THAN or LESS THAN."
+  },
+  "THAN (IF)": {
+    "prefix": "THAN",
+    "body": [
+      "IF ${1:I} IS ${2|GREATER,LESS|} THAN ${3:TBL-MAX} THEN",
+      "\t${4:ADD WS-DAILY-CHARGES TO WS-WEEKLY-CHARGES}",
+      "END-IF."
+    ],
+    "description": "THAN is a relational operater used within GREATER THAN or LESS THAN."
   },
   "If x THEN": {
     "prefix": "THEN",
@@ -3117,7 +3159,7 @@
   "USAGE": {
     "prefix": "USAGE",
     "body": ["01 ${1:VAR1} ${2:PIC X(8)} USAGE IS DISPLAY"],
-    "description": "USAGE"
+    "description": "USAGE provides details about the intention of a given variable."
   },
   "CALL x USING y": {
     "prefix": "USING",
@@ -3234,7 +3276,7 @@
     "description": "CLOSE x WITH LOCK specifies that the file cannot be opened again while the program is running."
   },
   "DISPLAY x WITH NO ADVANCING": {
-    "prefix": "DISPLAY WITH NO ADVANCING",
+    "prefix": "WITH NO ADVANCING",
     "body": ["DISPLAY \"${1:CICS ABEND ERROR}\" WITH NO ADVANCING."],
     "description": "DISPLAY x WITH NO ADVANCING which is going to a ddname places a + sign in byte one of the output."
   },
@@ -3311,7 +3353,7 @@
   "XML-INFORMATION": {
     "prefix": "XML-INFORMATION",
     "body": ["01 ${1:XML-INFORMATION} PIC S9(9) USAGE BINARY VALUE 0."],
-    "description": "The XML-INFORMATION special register is used to provide additional information to an XML PARSE processing procedure about the status of the executing code. parse.https://publibfp.dhe.ibm.com/epubs/pdf/igy6pg40.pdfs"
+    "description": "The XML-INFORMATION special register is used to provide additional information to an XML PARSE processing procedure about the status of the executing code. parse."
   },
   "XML-NAMESPACE": {
     "prefix": "XML-NAMESPACE",
@@ -3331,7 +3373,7 @@
   "XML-SCHEMA": {
     "prefix": "XML-SCHEMA",
     "body": ["01 ${1:XML-SCHEMA} PIC S9(9) USAGE BINARY VALUE 0."],
-    "description": "XML-SCHEMA relates <xml-schema-name-1> to an external file identifier such as a  ddname or environment variable which identifies the actual external file that contains the optimized XML schema."
+    "description": "XML-SCHEMA relates <xml-schema-name-1> to an external file identifier such as a ddname or environment variable which identifies the actual external file that contains the optimized XML schema."
   },
   "XML-TEXT": {
     "prefix": "XML-TEXT",
