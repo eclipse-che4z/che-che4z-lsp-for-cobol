@@ -355,11 +355,11 @@ Each element contains the following parameters:
 
 Using the example `pgm_conf.json` file above, the following `proc_grps.json` example enables the following:
 
-- Copybooks from libraries LIB1 and LIB2, with the extensions ".cpy" and ".copy", and from Endevor location PRD/2/SYS3/SUB4/COBCPY, are used with PROGRAM1. The Explorer for Endevor inventory location "inv1" is used to retrieve the dependencies from Endevor.
+- Copybooks from local folders LIB1 and LIB2, with the extensions ".cpy" and ".copy", and from Endevor location PRD/2/SYS3/SUB4/COBCPY, are used with PROGRAM1. The Explorer for Endevor inventory location "inv1" is used to retrieve the dependencies from Endevor.
 - The QUALIFY(EXTEND) and XMLPARSE(COMPAT) compiler options are enabled for PROGRAM1.
-- The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from LIB3 and LIB4 are used with PROGRAM2.
+- The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from local folders LIB3 and LIB4 are used with PROGRAM2.
 - The DB2 SQL server is enabled for PROGRAM2. 
-- Non-IDMS copybooks from libraries LIB5 and LIB6, USS path /remote/uss/folder, and mainframe data set HLQ.DSN.COBCOPY, are used with PROGRAM2. The Zowe profile "prof1" is used to download the remote dependencies.
+- Non-IDMS copybooks from USS path /remote/uss/folder, and mainframe data set HLQ.DSN.COBCOPY, are used with PROGRAM2. The Zowe profile "prof1" is used to download the remote dependencies.
 
 ```
 {
@@ -399,7 +399,6 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                 }
             ],
             "libs": [
-                "LIB5", "LIB6",
                         {
                             "uss": "/remote/uss/folder"
                         },
