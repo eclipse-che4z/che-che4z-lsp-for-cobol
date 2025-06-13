@@ -317,11 +317,13 @@ A dialect preprocessor can be used to enable a COBOL dialect for a particular pr
 - (Optional) **"libs":** (array)
     - Specify local folders, mainframe data sets, USS files, and Endevor locations that contain copybooks written in the specified dialect as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
     - Specify local folders as a string.
-    - Specify remote locations as JSON elements containing one of the following parameters. Use one JSON element per remote location.
+    - Specify remote locations as JSON elements. Use one JSON element per remote location. Specify either the **"dataset"** or **"uss"** parameter, and optionally a **"profile"**. Use one JSON element per remote location.
         - **"dataset":** (string)
             - Specify the full DSN of a PDS that contains copybooks.
         - **"uss":** (string)
             - Specify a full USS path that contains copybooks.
+        - (Optional) **"profile":** (string)
+            - Specify the name of a Zowe profile. If you do not include this parameter, the Zowe profile specified in the extension settings is used. 
     - Specify Endevor locations as JSON elements containing the following parameters. Use one JSON element per Endevor location.
         - (Optional) **"profile":** (string)
             - If you use more than one Endevor connection or inventory location, specify the name of a connection or inventory location or profile in this parameter. If you only use one Endevor connection and inventory location, you can omit this parameter.
