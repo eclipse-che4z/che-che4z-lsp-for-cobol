@@ -2667,11 +2667,6 @@
     "body": ["SEARCH ${1:item} WHEN ${2:condition} ${3:item}"],
     "description": "SEARCH WHEN condition item"
   },
-  "SEGMENT-LIMIT IS": {
-    "prefix": "SEGMENT-LIMIT IS",
-    "body": ["SEGMENT-LIMIT IS ${1:...}"],
-    "description": "A reserved word used in early IBM compilers. SEGMENT-LIMIT is syntax checked, but not operational."
-  },
   "SELECT": {
     "prefix": "SELECT",
     "body": [
@@ -2837,7 +2832,7 @@
   },
   "EXEC SQLIMS": {
     "prefix": "EXEC SQLIMS",
-    "body": ["EXEC SQLIMS INCLUDE ${1:SQLSTATEMENT.CPY} END-EXEC."],
+    "body": ["EXEC SQLIMS", "\t${1:SQL statement}", "END-EXEC."],
     "description": "The EXEC SQLIMS statements invoke a Compiler option, which allows you to access IMS Databases through SQL relational statements. There is a wide variety of SQLIMS options and the setup for this functionality must be installed and configured. "
   },
   "STANDARD": {
