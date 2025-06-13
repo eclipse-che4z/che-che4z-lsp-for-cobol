@@ -396,10 +396,8 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
           break;
         case "APOST":
           cicsCheckUtilityParameters.quoteEnabled = false;
-          cicsCheckUtilityParameters.apostEnabled = true;
           break;
         case "QUOTE":
-          cicsCheckUtilityParameters.apostEnabled = false;
           cicsCheckUtilityParameters.quoteEnabled = true;
           break;
         default:

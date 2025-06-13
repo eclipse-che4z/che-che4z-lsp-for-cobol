@@ -374,7 +374,7 @@ public class CICSOptionsCheckUtility {
         utility = optionsMap.entrySet().iterator().next().getValue();
         if (utilityParameters.quoteEnabled && context.getText().endsWith("\'"))
           utility.throwWrongApostQuoteTranslatorOption(context, "QUOTE");
-        else if (utilityParameters.apostEnabled && context.getText().endsWith("\""))
+        else if (!utilityParameters.quoteEnabled && context.getText().endsWith("\""))
           utility.throwWrongApostQuoteTranslatorOption(context, "APOST");
       }
     }
