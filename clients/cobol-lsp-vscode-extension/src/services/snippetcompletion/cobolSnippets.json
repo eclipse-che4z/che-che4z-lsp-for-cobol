@@ -2628,10 +2628,10 @@
     "prefix": "SD",
     "body": [
       "SD ${1:SORT-FILE}",
-      "\t\tLABEL RECORDS ARE STANDARD",
-      "\t\tBLOCK CONTAINS 0",
-      "\t\tDATA RECORD IS ${2:SORT-RECORD}.",
-      "01 ${3:SORT-RECORD} ${4:PIC X(1324)}."
+      "\tLABEL RECORDS ARE STANDARD",
+      "\tBLOCK CONTAINS ${2:number}",
+      "\tDATA RECORD IS ${3:SORT-RECORD}.",
+      "01 ${4:SORT-RECORD} ${5:PIC X(1324)}."
     ],
     "description": "DATA DIVISION - The SD (SORT DESCRIPTION) defines files that are to be sorted and that are referred to in your PROCEDURE DIVISION's SORT statement."
   },
