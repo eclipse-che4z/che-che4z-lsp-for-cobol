@@ -284,7 +284,7 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
 - (Optional) **"compiler-options":** (array)  
     - Specify compiler directives that you want to apply to the programs linked with this processor group. Currently the following directives are supported:
         - QUALIFY(*EXTEND|COMPAT*)
-	- XMLPARSE(*XMLSS|COMPAT*)
+        - XMLPARSE(*XMLSS|COMPAT*)
 	- For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
 - (Optional) **"preprocessor":** (array)
     - Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
