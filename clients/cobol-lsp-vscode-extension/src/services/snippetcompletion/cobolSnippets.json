@@ -3,7 +3,7 @@
     "prefix": "ACCESS MODE",
     "body": [
       "SELECT ${1:customerFile} ASSIGN TO ${2:custFile}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
@@ -142,9 +142,9 @@
   "ASSIGN": {
     "prefix": "ASSIGN",
     "body": [
-      "SELECT ${2:rptfile}",
-      "\tASSIGN TO ${1:rptfile-DD}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "SELECT ${1:rptfile}",
+      "\tASSIGN TO ${2:rptfile-DD}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
@@ -922,7 +922,7 @@
     "body": [
       "SELECT ${2:rptfile}",
       "\tASSIGN TO ${1:PATVSAM}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tRECORD KEY IS ${5:PATIENT-REC-KEY}",
       "\tFILE STATUS IS ${1:PATVSAM}-FS."
@@ -938,7 +938,7 @@
     "prefix": "FILE CONTROL",
     "body": [
       "SELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
-      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "ACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "FILE STATUS IS ${5:WS-FILE-STATUS-VAR}."
     ],
@@ -947,10 +947,10 @@
   "FILLER": {
     "prefix": "FILLER",
     "body": [
-      "01 ${2:GROUP-ITEM}.",
-      "\t05 ${3:ELEMENTARY-LINE}",
-      "\t\t10 ${4:FIELD-1} PIC S9(${5:5}) COMP-3.",
-      "\t\t10 FILLER PIC X(${1:20}) VALUE SPACE.",
+      "01 ${1:GROUP-ITEM}.",
+      "\t05 ${2:ELEMENTARY-LINE}",
+      "\t\t10 ${3:FIELD-1} PIC S9(${4:5}) COMP-3.",
+      "\t\t10 FILLER PIC X(${5:20}) VALUE SPACE.",
       "\t\t$0"
     ],
     "description": "A placeholder variable that is not explicitly referred to in a program. FILLER is used to line up variable names with byte-offsets in the physical data record."
@@ -963,16 +963,16 @@
   "FIRST #2": {
     "prefix": "FIRST",
     "body": [
-      "INSPECT ${4:VAR-1}",
-      "TALLYING ${5:VAR-CTR} FOR LEADING \"${6:A}\"",
-      "REPLACING FIRST \"${1:A1}\" BY \"${2:2}\" AFTER INITIAL \"${3:T}\""
+      "INSPECT ${1:VAR-1}",
+      "TALLYING ${2:VAR-CTR} FOR LEADING \"${3:A}\"",
+      "REPLACING FIRST \"${4:A1}\" BY \"${5:2}\" AFTER INITIAL \"${6:T}\""
     ],
     "description": "REPLACING FIRST changes the first (leftmost) occurrence of the inspected field (VAR-1 in this example)."
   },
   "FOOTING": {
     "prefix": "FOOTING",
     "body": ["WITH FOOTING AT ${1:literal}"],
-    "description": "Part of the FD LINAGE (logical page size) clause. Available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
+    "description": "Part of the FD LINAGE (logical page size) clause. Available for QSAM and LINE SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
   },
   "FOR": {
     "prefix": "FOR",
@@ -982,8 +982,8 @@
   "FOR CHARACTERS AFTER": {
     "prefix": "FOR CHARACTERS AFTER",
     "body": [
-      "INSPECT ${2:variable-field} TALLYING ${3:num-field}",
-      "FOR CHARACTERS AFTER ${1:X\"40\"}"
+      "INSPECT ${1:variable-field} TALLYING ${2:num-field}",
+      "FOR CHARACTERS AFTER ${3:X\"40\"}"
     ],
     "description": "Counts the number of characters after the first occurrence of a specified string. Part of the TALLYING keyword in the INSPECT statement."
   },
@@ -991,8 +991,8 @@
     "prefix": "USE FOR DEBUGGING",
     "body": [
       "DECLARATIVES.",
-      "${2:Debug-Declaratives} SECTION.",
-      "\tUSE FOR DEBUGGING ON ${1:paragraph-section-name}."
+      "${1:Debug-Declaratives} SECTION.",
+      "\tUSE FOR DEBUGGING ON ${2:paragraph-section-name}."
     ],
     "description": "PRODECURE DIVISION - Specifies debugging to begin on (specified) routine."
   },
@@ -1475,9 +1475,9 @@
   "INSPECT CONVERTING": {
     "prefix": "INSPECT ID CONVERTING",
     "body": [
-      "INPUT ${1:id}",
+      "INSPECT ${1:id}",
       "\tCONVERTING '${2:abcdefg}' TO '${3:ABCDEFG}",
-      "\tAFTER INITIAL '${4:|}' BEFORE INITIAL '${5:*}'."
+      "\tAFTER INITIAL '${4:|}' BEFORE INITIAL '${5:/}'."
     ],
     "description": "INSPECT is a string parsing verb for alphanumeric fields."
   },
@@ -1490,8 +1490,10 @@
   },
   "INSPECT TALLYING": {
     "prefix": "INSPECT",
-    "body": ["INSPECT ${1:id} "],
-    "description": "Specifies search characters, in INSPECT verb."
+    "body": ["INSPECT ${1:id}",
+      "TALLYING ${2:VAR-CTR} FOR LEADING \"${3:A}\"",
+      "REPLACING FIRST \"${4:A1}\" BY \"${5:2}\" AFTER INITIAL \"${6:T}\""],
+    "description": "When FIRST is specified and not BEFORE or AFTER, The replacement field changes the left/first occurrence of the inspected field."
   },
   "IDENTIFICATION DIVISION": {
     "prefix": "IDENTIFICATION-DIVISION",
@@ -1573,7 +1575,7 @@
     "prefix": "INPUT",
     "body": [
       "SELECT ${1:CARPOOL} ASSIGN TO ${2:CARFILE}",
-      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "ACCESS MODE IS INPUT."
     ],
     "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - File I/O mode that denotes if input is to be read from a file."
@@ -1763,8 +1765,8 @@
   "LEFT": {
     "prefix": "LEFT",
     "body": [
-      "01 ${2:GROUP-VAR}.",
-      "\t05 ${1:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."
+      "01 ${1:GROUP-VAR}.",
+      "\t05 ${2:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."
     ],
     "description": "LEFT Specifies that an elementary COBOL variable is to be positioned in main storage so that byte one begins at the left word boundary. Note that this is an efficiency coding specification."
   },
@@ -1786,13 +1788,13 @@
   },
   "LINEAGE": {
     "prefix": "LINEAGE",
-    "body": ["FD ${2:FILENAME}", "\tLINEAGE ${1:50}", "\t$0"],
+    "body": ["FD ${1:FILENAME}", "\tLINEAGE ${2:50}", "\t$0"],
     "description": "DATA DIVISION - The LINEAGE clause of a FD entry controls the size and number of lines of a printed page."
   },
   "WRITE LINE": {
     "prefix": "LINES",
     "body": [
-      "WRITE ${1:PRINT-REC} ${2|BEFORE,AFTER|} ADVANCING ${3:numLiteral} ${4|LINE,LINES|}."
+      "WRITE ${1:PRINT-REC} ${2|BEFORE,AFTER|} ADVANCING ${3:numLiteral} LINES."
     ],
     "description": "Use LINE to control the number of blank lines output for a report file."
   },
@@ -1800,9 +1802,9 @@
     "prefix": "LINE SEQUENTIAL",
     "body": [
       "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
-      "\tORGANIZATION IS LINE-SEQUENTIAL"
+      "\tORGANIZATION IS LINE SEQUENTIAL"
     ],
-    "description": "ENVIRONMENT DIVISION - LINE-SEQUENTIAL defines an input/output file as a line-sequential file, typically Unix or PC."
+    "description": "ENVIRONMENT DIVISION - LINE SEQUENTIAL defines an input/output file as a LINE SEQUENTIAL file, typically Unix or PC."
   },
   "LOC": {
     "prefix": "LOC",
@@ -1871,7 +1873,7 @@
       "FD ${1:FILENAME}",
       "LABEL RECORDS ARE STANDARD",
       "BLOCK CONTAINS ${2:0}",
-      "ACCESS MODE IS ${3|SEQUENTIAL,INDEXED,RELATIVE,LINE-SEQUENTIAL|}",
+      "ACCESS MODE IS ${3|SEQUENTIAL,INDEXED,RELATIVE,LINE SEQUENTIAL|}",
       "\tRECORD CONTAINS ${4:numLiteral} CHARACTERS"
     ],
     "description": "ACCESS MODE defines how records are made available for processing. If ACCESS MODE is not defined, the default is SEQUENTIAL."
@@ -1986,7 +1988,7 @@
   "NO REWIND": {
     "prefix": "NO REWIND",
     "body": ["${1|OPEN INPUT,CLOSE|} ${2:filename} WITH NO REWIND."],
-    "description": "NO REWIND applies only to LINE-SEQUENTIAL and QSAM tape files.  Specifically, with NO REWIND, OPEN filename must be positioned at its beginning record."
+    "description": "NO REWIND applies only to LINE SEQUENTIAL and QSAM tape files.  Specifically, with NO REWIND, OPEN filename must be positioned at its beginning record."
   },
   "IF var NOT x": {
     "prefix": "NOT",
@@ -2694,7 +2696,7 @@
     "prefix": "SEQUENTIAL",
     "body": [
       "SELECT ${1:COMMUTER-FILE} ASSIGN TO ${2:COMMUTR}",
-      "ORGANIZATION IS ${3|SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ORGANIZATION IS ${3|SEQUENTIAL,LINE SEQUENTIAL|}",
       "ACCESS MODE IS SEQUENTIAL."
     ],
     "description": "FILE CONTROL - SEQUENTIAL determines the previous/next relationship among the records in the file as established by file creation."
