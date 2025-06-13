@@ -263,19 +263,35 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
 - **"name":** (string)  
     - Specify a name for the processor group.
 - (Optional) **"libs":** (array)  
-    - Specify local folders, mainframe data sets and USS files that contain copybooks. Specify local folders as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the copybook libraries that you specify in the extension settings.
+    - Specify local folders, mainframe data sets, USS files, and Endevor locations that contain copybooks. Specify local folders as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the copybook libraries that you specify in the extension settings.
+    - Specify local folders as a string.
+    - Specify remote locations as JSON elements containing one of the following parameters. Use one JSON element per remote location.
+        - **"dataset":** (string)
+            - Specify the full DSN of a PDS that contains copybooks.
+        - **"uss":** (string)
+            - Specify a full USS path that contains copybooks.
+    - Specify Endevor locations as JSON elements containing the following parameters. Use one JSON element per Endevor location.
+        - (Optional) **"profile":** (string)
+            - If you use more than one Endevor connection or inventory location, specify the name of a connection or inventory location or profile in this parameter. If you only use one Endevor connection and inventory location, you can omit this parameter.
+        - **"environment":** (string)
+        - **"stage":** (string)
+        - **"system":** (string)
+        - **"subsystem":** (string)
+        - **"type":** (string)
     - To retrieve copybooks from mainframe data sets and USS files, ensure that you also specify the **"zoweProfile"** parameter.
 - (Optional) **"copybook-extensions":** (array)  
     - Specify copybook extensions that you use for the programs linked with this processor groups. These copybook extensions take priority over extensions that you specify in the extension settings.
 - (Optional) **"compiler-options":** (array)  
     - Specify compiler directives that you want to apply to the programs linked with this processor group. Currently the following directives are supported:
         - QUALIFY(*EXTEND|COMPAT*)
-		- XMLPARSE(*XMLSS|COMPAT*)
+	- XMLPARSE(*XMLSS|COMPAT*)
 	- For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
 - (Optional) **"preprocessor":** (array)
     - Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
 - (Optional) **"zoweProfile":** (string)
     - Specify the name of a Zowe profile. Specify this parameter if you want to use a processor group to retrieve copybooks from mainframe data sets and USS files. 
+
+### Example `libs` Array
 
 ### Preprocessors
 
@@ -299,7 +315,21 @@ A dialect preprocessor can be used to enable a COBOL dialect for a particular pr
 - **"name":** (string)
     - Specify the name of a dialect.
 - (Optional) **"libs":** (array)
-    - Specify libraries that contain copybooks written in the specified dialect as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+    - Specify local folders, mainframe data sets, USS files, and Endevor locations that contain copybooks written in the specified dialect as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the local copybook libraries that you specify in the extension settings.
+    - Specify local folders as a string.
+    - Specify remote locations as JSON elements containing one of the following parameters. Use one JSON element per remote location.
+        - **"dataset":** (string)
+            - Specify the full DSN of a PDS that contains copybooks.
+        - **"uss":** (string)
+            - Specify a full USS path that contains copybooks.
+    - Specify Endevor locations as JSON elements containing the following parameters. Use one JSON element per Endevor location.
+        - (Optional) **"profile":** (string)
+            - If you use more than one Endevor connection or inventory location, specify the name of a connection or inventory location or profile in this parameter. If you only use one Endevor connection and inventory location, you can omit this parameter.
+        - **"environment":** (string)
+        - **"stage":** (string)
+        - **"system":** (string)
+        - **"subsystem":** (string)
+        - **"type":** (string)
  
 ### Program configuration file
 
@@ -321,15 +351,15 @@ Each element contains the following parameters:
 - **"pgroup":** (string)
     - Specify the name of a procecssor group that is defined in `proc_grps.json`.
    
-### Example
+### Example Processor Group Configuration
 
 Using the example `pgm_conf.json` file above, the following `proc_grps.json` example enables the following:
 
-- Copybooks from libraries LIB1 and LIB2, with the extensions ".cpy" and ".copy", are used with PROGRAM1.
+- Copybooks from libraries LIB1 and LIB2, with the extensions ".cpy" and ".copy", and from Endevor location PRD/2/SYS3/SUB4/COBCPY, are used with PROGRAM1. The Explorer for Endevor inventory location "inv1" is used to retrieve the dependencies from Endevor.
 - The QUALIFY(EXTEND) and XMLPARSE(COMPAT) compiler options are enabled for PROGRAM1.
 - The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from LIB3 and LIB4 are used with PROGRAM2.
 - The DB2 SQL server is enabled for PROGRAM2. 
-- Non-IDMS copybooks from libraries LIB5 and LIB6 are used with PROGRAM2. 
+- Non-IDMS copybooks from libraries LIB5 and LIB6, USS path /remote/uss/folder, and mainframe data set HLQ.DSN.COBCOPY, are used with PROGRAM2. The Zowe profile "prof1" is used to download the remote dependencies.
 
 ```
 {
@@ -337,7 +367,15 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
         {
             "name": "GROUP1",
             "libs": [
-                "LIB1", "LIB2"
+                "LIB1", "LIB2",
+                       {
+                            "profile": "inv1",
+                            "environment": "PRD",
+                            "stage": "2",
+                            "system": "SYS3",
+                            "subsystem": "SUB4",
+                            "type": "COBCPY"
+                        }
             ],
             "copybook-extensions": [
                 ".cpy", ".copy"
@@ -361,8 +399,15 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                 }
             ],
             "libs": [
-                "LIB5", "LIB6"
-                ]
+                "LIB5", "LIB6",
+                        {
+                            "uss": "/remote/uss/folder"
+                        },
+                        {
+                            "dataset": "HLQ.DSN.COBCOPY"
+                        }
+                ],
+           "zoweProfile": "prof1"
         }
     ]
 }
