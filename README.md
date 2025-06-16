@@ -280,7 +280,6 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
         - **"system":** (string)
         - **"subsystem":** (string)
         - **"type":** (string)
-    - To retrieve copybooks from mainframe data sets and USS files, ensure that you also specify the **"zoweProfile"** parameter.
 - (Optional) **"copybook-extensions":** (array)  
     - Specify copybook extensions that you use for the programs linked with this processor groups. These copybook extensions take priority over extensions that you specify in the extension settings.
 - (Optional) **"compiler-options":** (array)  
