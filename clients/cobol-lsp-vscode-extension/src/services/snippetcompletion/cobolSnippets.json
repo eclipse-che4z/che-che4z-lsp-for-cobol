@@ -2339,7 +2339,7 @@
       "DATA DIVISION.",
       "LINKAGE SECTION.",
       "01 ${1:EXTERNAL-DATA} ${2:PIC X(872)}.",
-      "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}/"
+      "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}."
     ],
     "description": "PROCEDURE DIVISION USING allows you reference data being passed from a calling module to your program through the LINKAGE SECTION."
   },
@@ -2401,6 +2401,14 @@
     "body": ["01 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
     "description": "QUOTE/QUOTES is a figurative constant. It can also be used in a comparison or MOVE statement."
   },
+  "ACCESS MODE IS RANDOM": {
+    "prefix": "RANDOM",
+    "body": [
+      "SELECT ${1:RRDS-FILE} ASSIGN TO ${2:VSMRRDS}",
+      "ACCESS MODE IS RANDOM."
+    ],
+    "description": "The RANDOM intrinsic function generates a random number between 0 and 1"
+  },
   "READ (QSAM)": {
     "prefix": "READ",
     "body": [
@@ -2418,7 +2426,7 @@
     ],
     "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier, which moves the record from the I/O buffer into program WORKING-STORAGE, and the INVALID KEY modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field."
   },
-  "RECORD": {
+  "RECORD CONTAINS": {
     "prefix": "RECORD",
     "body": [
       "FD ${1:CARPOOL}",
@@ -2426,6 +2434,16 @@
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
     "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause, which defines the size (in bytes) of each logical record in the file."
+  },
+  "RECORD KEY IS": {
+    "prefix": "RECORD",
+    "body": [
+      "SELECT ${1:VSAM-PATIENT-FILE} ASSIGN TO ${2:PATIENTS}",
+      "\tORGANIZATION IS INDEXED ACCESS IS RANDOM",
+      "\tRECORD KEY IS ${3:COMMUTER-KEY}",
+      "\tFILE STATUS IS ${4:PAT-FILESTATUS}."
+    ],
+    "description": "As part of a VSAM SELECT/ASSIGN, RECORD (singular) is used in a RECORD KEY IS clause to describe the indexed access of a specific record in the given file."
   },
   "RECORDING": {
     "prefix": "RECORDING",
@@ -2506,7 +2524,7 @@
   },
   "REMAINDER": {
     "prefix": "REMAINDER",
-    "body": ["DIVIDE ${1:A} INTO ${2:B} GIVING ${3:C} REMAINER ${4:D}."],
+    "body": ["DIVIDE ${1:A} INTO ${2:B} GIVING ${3:C} REMAINDER ${4:D}."],
     "description": "DIVIDE with REMAINDER allows you to specify a numeric data item that you can process as a remainder from the math. REMAINDER is available from all formats of the COBOL DIVIDE statement."
   },
   "REMOVAL": {
