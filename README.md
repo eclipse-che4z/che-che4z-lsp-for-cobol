@@ -57,14 +57,12 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 
 The autocomplete feature is only available in the main COBOL file, not in copybooks.
 
-![Autocomplete](/docs/images/CLSAutocorrect.gif)
+![Autocomplete](/docs/images/autocomplete3.gif)
 
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, and the semantic analysis highlights incorrect names of variables, copybooks and paragraphs.
 
 This feature is also enabled for Datacom, CICS, and DB2 SQL keywords and variables.
-
-![Syntax check](/docs/images/CLSErrorHighlighting.gif)
 
 ### Syntax Highlighting
 The extension enables syntax highlighting for COBOL code.
@@ -289,8 +287,6 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
 	- For more information on COBOL compiler options, see the [IBM Enterprise COBOL documentation](https://www.ibm.com/docs/en/cobol-zos/6.3?topic=guide-enterprise-cobol-compiler-options).
 - (Optional) **"preprocessor":** (array)
     - Specify dialect and SQL preprocessors that you want to apply to the programs linked with this processor group. See the [Preprocessors](#preprocessors) section below for further information.
-
-### Example `libs` Array
 
 ### Preprocessors
 
