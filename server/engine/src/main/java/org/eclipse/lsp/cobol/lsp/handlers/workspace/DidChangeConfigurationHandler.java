@@ -18,12 +18,16 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.*;
 
 import com.google.inject.Inject;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -47,6 +51,7 @@ public class DidChangeConfigurationHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final CodeLayoutStore codeLayoutStore;
   private final CopybookService copybookService;
+  private final DialectService dialectService;
   private final ErrorFinalizerService errorFinalizerService;
 
   @Inject
@@ -61,6 +66,7 @@ public class DidChangeConfigurationHandler {
       AsyncAnalysisService asyncAnalysisService,
       CodeLayoutStore codeLayoutStore,
       CopybookService copybookService,
+      DialectService dialectService,
       ErrorFinalizerService errorFinalizerService) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.settingsService = settingsService;
@@ -72,6 +78,7 @@ public class DidChangeConfigurationHandler {
     this.asyncAnalysisService = asyncAnalysisService;
     this.codeLayoutStore = codeLayoutStore;
     this.copybookService = copybookService;
+    this.dialectService = dialectService;
     this.errorFinalizerService = errorFinalizerService;
   }
 
@@ -86,18 +93,6 @@ public class DidChangeConfigurationHandler {
     }
     copybookService.invalidateCache(false);
     messageService.reloadMessages();
-    copybookNameService
-        .copybookLocalFolders(null)
-        .thenAccept(
-            localFolders -> {
-              try {
-                acceptSettingsChange(localFolders);
-              } catch (InterruptedException e) {
-                LOG.error("InterruptedException while accepting settings changes");
-                Thread.currentThread().interrupt();
-              }
-            });
-
     settingsService.fetchConfiguration(LOCALE.label).thenAccept(localeStore.notifyLocaleStore());
     settingsService
         .fetchConfiguration(LOGGING_LEVEL.label)
@@ -110,13 +105,59 @@ public class DidChangeConfigurationHandler {
         .thenAccept(errorFinalizerService::updateDiagnosticsLevel);
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
+    reanalyseIfRequired();
+  }
+
+  private void reanalyseIfRequired() {
+    AtomicBoolean shouldReAnalyse = new AtomicBoolean(false);
+    CompletableFuture<Void> copybookFolderFuture =
+        copybookNameService
+            .copybookLocalFolders(null)
+            .thenAccept(
+                localFolders -> {
+                  try {
+                    List<String> watchingFolders = watchingService.getWatchingFolders();
+                    if (!new HashSet<>(watchingFolders).equals(new HashSet<>(localFolders))) {
+                      shouldReAnalyse.set(true);
+                      acceptSettingsChange(localFolders);
+                    }
+                  } catch (InterruptedException e) {
+                    LOG.error("Interrupted while processing local folders", e);
+                    Thread.currentThread().interrupt();
+                  }
+                });
+    CompletableFuture<Void> dialectsFuture =
+        settingsService
+            .fetchTextConfiguration(DIALECTS.label)
+            .thenAccept(
+                dialects -> {
+                  if (dialects.stream()
+                      .anyMatch(n -> !dialectService.getDialectByName(n).isPresent())) {
+                    shouldReAnalyse.set(true);
+                  }
+                });
+    CompletableFuture.allOf(copybookFolderFuture, dialectsFuture)
+        .thenRun(
+            () -> {
+              if (shouldReAnalyse.get()) {
+                try {
+                  asyncAnalysisService.reanalyseOpenedPrograms();
+                } catch (InterruptedException e) {
+                  LOG.error("Interrupted while reanalysing programs", e);
+                  Thread.currentThread().interrupt();
+                }
+              }
+            })
+        .exceptionally(
+            e -> {
+              LOG.error("Error during configuration change processing", e);
+              return null;
+            });
   }
 
   private void acceptSettingsChange(List<String> localFolders) throws InterruptedException {
     List<String> watchingFolders = watchingService.getWatchingFolders();
-
     updateWatchers(localFolders, watchingFolders);
-    asyncAnalysisService.reanalyseOpenedPrograms();
   }
 
   private void updateWatchers(List<String> newPaths, List<String> existingPaths) {

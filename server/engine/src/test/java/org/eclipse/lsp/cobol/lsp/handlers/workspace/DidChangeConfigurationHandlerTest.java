@@ -32,6 +32,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -61,6 +62,7 @@ class DidChangeConfigurationHandlerTest {
     MessageService messageService = mock(MessageService.class);
     AsyncAnalysisService asyncAnalysisService = mock(AsyncAnalysisService.class);
     ErrorFinalizerService errorFinalizerService = mock(ErrorFinalizerService.class);
+    DialectService dialectService = mock(DialectService.class);
 
     DidChangeConfigurationHandler didChangeConfigurationHandler =
         new DidChangeConfigurationHandler(
@@ -74,9 +76,11 @@ class DidChangeConfigurationHandlerTest {
             asyncAnalysisService,
             getMockLayoutStore(),
             copybookService,
+            dialectService,
             errorFinalizerService);
 
-    when(copybookNameService.copybookLocalFolders(null)).thenReturn(completedFuture(emptyList()));
+    when(copybookNameService.copybookLocalFolders(null))
+        .thenReturn(completedFuture(ImmutableList.of("some-path")));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
@@ -85,12 +89,14 @@ class DidChangeConfigurationHandlerTest {
         .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
 
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(new Object()));
-    verify(watchingService).addWatchers(emptyList());
+    verify(watchingService).addWatchers(ImmutableList.of("some-path"));
     verify(watchingService).removeWatchers(emptyList());
     verify(asyncAnalysisService).reanalyseOpenedPrograms();
   }
@@ -120,6 +126,7 @@ class DidChangeConfigurationHandlerTest {
             asyncAnalysisService,
             getMockLayoutStore(),
             copybookService,
+            mock(DialectService.class),
             mock(ErrorFinalizerService.class));
 
     String path = "foo/bar";
@@ -136,12 +143,13 @@ class DidChangeConfigurationHandlerTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
-
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(new Object()));
-    verify(watchingService).addWatchers(emptyList());
-    verify(watchingService).removeWatchers(emptyList());
-    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+    verify(watchingService, never()).addWatchers(emptyList());
+    verify(watchingService, never()).removeWatchers(emptyList());
+    verify(asyncAnalysisService, never()).reanalyseOpenedPrograms();
     verify(localeStore).notifyLocaleStore();
   }
 
@@ -170,6 +178,7 @@ class DidChangeConfigurationHandlerTest {
             asyncAnalysisService,
             getMockLayoutStore(),
             copybookService,
+            mock(DialectService.class),
             mock(ErrorFinalizerService.class));
 
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
@@ -187,7 +196,8 @@ class DidChangeConfigurationHandlerTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
-
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(new Object()));
 
@@ -224,6 +234,7 @@ class DidChangeConfigurationHandlerTest {
             asyncAnalysisService,
             getMockLayoutStore(),
             copybookService,
+            mock(DialectService.class),
             mock(ErrorFinalizerService.class));
     ArgumentCaptor<List<String>> watcherCaptor = forClass(List.class);
     JsonArray arr = new JsonArray();
@@ -242,7 +253,8 @@ class DidChangeConfigurationHandlerTest {
         .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
-
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(localeStore));
     verify(watchingService).addWatchers(emptyList());
