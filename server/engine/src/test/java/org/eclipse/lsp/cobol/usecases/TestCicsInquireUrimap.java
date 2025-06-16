@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 public class TestCicsInquireUrimap {
   /** below program is a generated code from the grammar. Do not showcase the actual code */
   public static final String TEXT =
-      "       CBL CICS(\"SP\")\n"
+      "       CBL CICS(\"SP,QUOTE\")\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ABCDEF.\n"
           + "       DATA DIVISION.\n"
