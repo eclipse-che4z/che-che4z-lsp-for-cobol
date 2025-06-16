@@ -73,14 +73,33 @@ public class Db2SqlDialect implements CobolDialect {
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
+    if (getSqlBackend(context).equalsIgnoreCase(SQLBackend.SKIP_SQL.toString())) {
+      return processSkipSql(context, db2SqlVisitor);
+    }
+    return processDB2(context, db2SqlVisitor);
+  }
+
+  private ResultWithErrors<DialectOutcome> processSkipSql(DialectProcessingContext context, Db2SqlVisitor db2SqlVisitor) {
+    List<SyntaxError> parseError = new ArrayList<>();
+
+    Db2SqlParser.StartSkipRuleContext skipRuleContext = parseSkipSql(
+            context.getExtendedDocument().toString(),
+            context.getExtendedDocument().getUri(),
+            parseError);
+
+    List<Node> nodes = db2SqlVisitor.visitStartSkipRule(skipRuleContext);
+    return new ResultWithErrors<>(new DialectOutcome(nodes, context), parseError);
+  }
+
+  private ResultWithErrors<DialectOutcome> processDB2(DialectProcessingContext context, Db2SqlVisitor db2SqlVisitor) {
     List<SyntaxError> parseError = new ArrayList<>();
 
     // parse the document text to get parseTree
     Db2SqlParser.StartRuleContext startRuleContext =
-        parseDB2(
-            context.getExtendedDocument().toString(),
-            context.getExtendedDocument().getUri(),
-            parseError);
+            parseDB2(
+                    context.getExtendedDocument().toString(),
+                    context.getExtendedDocument().getUri(),
+                    parseError);
 
     // Traverse the parse tree to generate dialect specific nodes
     List<Node> nodes = db2SqlVisitor.visitStartRule(startRuleContext);
@@ -131,6 +150,12 @@ public class Db2SqlDialect implements CobolDialect {
             new Db2WorkingAndLinkageSectionProcessor(messageService)));
   }
 
+  private String getSqlBackend(DialectProcessingContext context) {
+    JsonElement jsonElement = context.getConfig().getDialectsSettings().get(SQL_BACKEND_SETTING);
+    if (Objects.isNull(jsonElement)) return SQLBackend.DB2_SERVER.toString();
+    return jsonElement.getAsString();
+  }
+
   @Override
   public List<String> getSettingsSections() {
     return ImmutableList.of(SQL_BACKEND_SETTING);
@@ -151,6 +176,20 @@ public class Db2SqlDialect implements CobolDialect {
     Db2SqlParser.StartRuleContext result = parser.startRule();
     errors.addAll(listener.getErrors());
     return result;
+  }
+
+  private Db2SqlParser.StartSkipRuleContext parseSkipSql(String text, String programDocumentUri, List<SyntaxError> errors) {
+    Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(text));
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    Db2SqlParser parser = new Db2SqlParser(tokens);
+    Db2ErrorListener listener = new Db2ErrorListener(programDocumentUri);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(listener);
+    parser.removeErrorListeners();
+    parser.addErrorListener(listener);
+    parser.setErrorHandler(new Db2ErrorStrategy(messageService));
+
+    return parser.startSkipRule();
   }
 
   /**

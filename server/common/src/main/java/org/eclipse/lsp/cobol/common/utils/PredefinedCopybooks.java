@@ -51,7 +51,16 @@ public class PredefinedCopybooks {
     SQLCA {
       @Override
       public String nameForBackend(SQLBackend backend) {
-        return backend == SQLBackend.DATACOM_SERVER ? "SQLCA_DATACOM" : "SQLCA_DB2";
+        switch (backend) {
+          case DB2_SERVER:
+            return "SQLCA_DB2";
+          case DATACOM_SERVER:
+            return "SQLCA_DATACOM";
+          case SKIP_SQL:
+            return "SKIP_SQL";
+          default:
+            return "SQLCA_DB2";
+        }
       }
     },
     SQLDA {

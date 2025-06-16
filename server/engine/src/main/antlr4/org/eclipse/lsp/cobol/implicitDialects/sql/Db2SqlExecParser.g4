@@ -17,6 +17,8 @@ options {tokenVocab = Db2SqlExecLexer; superClass = MessageServiceParser;}
 
 startSqlRule : (dataDivisionRules | procedureDivisionRules | rulesAllowedInDataDivisionAndProcedureDivision)+ EOF;
 
+startSkipSqlRule : EOF;
+
 /*Allowable SQL statements for COBOL program specific dvisions or sections*/
 dataDivisionRules: dbs_declare_variable+ | rulesAllowedInWorkingStorageAndLinkageSection;
 
@@ -1651,4 +1653,9 @@ kmg_blob_parameter: INTEGERLITERAL dbs_k_m_g_identifier? | dbs_sql_identifier;
 dbs_dsize_parameter: INTEGERLITERAL dbs_sql_identifier | dbs_sql_identifier;
 dbs_maxPartition: INTEGERLITERAL;
 dbs_minus_one: MINUSCHAR INTEGERLITERAL;
+/////
+
+
+///// Skip SQL Rules /////
+
 /////

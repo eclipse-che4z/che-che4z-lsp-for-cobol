@@ -23,6 +23,8 @@ startRule: (
 //startRule: .*? ((execRule | nonExecRule) .*?) * EOF;
 //startIncludeRule: .*? (includeStatement .*?)* EOF;
 
+startSkipRule: execRule;
+
 execRule: (EXEC_SQL | EXEC_SQLIMS) sqlCode END_EXEC;
 
 nonExecRule: sql_host_variables | binary_host_variable | binary_host_variable_array;
