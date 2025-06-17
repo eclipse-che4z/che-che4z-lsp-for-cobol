@@ -57,7 +57,7 @@ Autocomplete speeds up the coding process by intuitively suggesting the most lik
 
 The autocomplete feature is only available in the main COBOL file, not in copybooks.
 
-![Autocomplete](/docs/images/autocomplete3.gif)
+![Autocomplete](/docs/images/autocomplete3.1.gif)
 
 ### Syntax and Semantic Check for Code
 This feature checks for mistakes and errors in COBOL code. The syntax check feature reviews the whole content of the code and suggests fixes, and the semantic analysis highlights incorrect names of variables, copybooks and paragraphs.
