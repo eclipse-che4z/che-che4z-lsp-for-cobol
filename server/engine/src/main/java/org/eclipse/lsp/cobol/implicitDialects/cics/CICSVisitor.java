@@ -418,12 +418,12 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
       if (cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\'"))
         throwException(
             getTokenLocality(ctx.start),
-            MessageTemplate.of("Enabled translator option: QUOTE"),
+            MessageTemplate.of("cics.invalidLiteralDelimeter", "APOST", "QUOTE"),
             ErrorSeverity.ERROR);
       else if (!cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\""))
         throwException(
             getTokenLocality(ctx.start),
-            MessageTemplate.of("Enabled translator option: APOST"),
+            MessageTemplate.of("cics.invalidLiteralDelimeter", "QUOTE", "APOST"),
             ErrorSeverity.ERROR);
     }
     return visitChildren(ctx);

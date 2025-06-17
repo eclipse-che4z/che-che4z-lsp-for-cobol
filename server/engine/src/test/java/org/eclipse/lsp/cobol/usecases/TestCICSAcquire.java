@@ -86,7 +86,7 @@ public class TestCICSAcquire {
             "error",
             new Diagnostic(
                 new Range(),
-                "Enabled translator option: QUOTE",
+                "Invalid literal delimeter: APOST, QUOTE expected.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
 
@@ -100,7 +100,7 @@ public class TestCICSAcquire {
             "error",
             new Diagnostic(
                 new Range(),
-                "Enabled translator option: QUOTE",
+                "Invalid literal delimeter: APOST, QUOTE expected.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
 
