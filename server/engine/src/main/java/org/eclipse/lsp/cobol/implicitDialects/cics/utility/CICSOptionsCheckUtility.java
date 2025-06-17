@@ -27,6 +27,7 @@ public class CICSOptionsCheckUtility {
   private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
 
   private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
+
   private CICSCheckUtilityParameters utilityParameters;
 
   public CICSOptionsCheckUtility(
