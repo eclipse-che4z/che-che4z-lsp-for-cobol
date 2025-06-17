@@ -390,6 +390,16 @@ export class CopybookDownloaderForE4E {
     return resolvedProfile;
   }
 
+  public async getProfileForUri(uri: vscode.Uri) {
+    const profile = await this.e4e.getProfileInfo(uri.toString());
+
+    if (profile instanceof Error) {
+      vscode.window.showErrorMessage(profile.message);
+      return;
+    }
+    return profile;
+  }
+
   public async hasElement(
     profile: ResolvedProfile,
     endevorType: EndevorType,
