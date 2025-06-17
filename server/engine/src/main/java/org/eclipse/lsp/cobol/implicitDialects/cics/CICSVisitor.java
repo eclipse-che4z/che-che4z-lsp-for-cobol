@@ -75,11 +75,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private final DialectProcessingContext context;
   private final MessageService messageService;
   private final CICSOptionsCheckUtility cicsOptionsCheckUtility;
+  private final CICSCheckUtilityParameters cicsOptionsCheckUtilityParams;
 
   CICSVisitor(DialectProcessingContext context, MessageService messageService) {
     this.context = context;
     this.messageService = messageService;
-    this.cicsOptionsCheckUtility = new CICSOptionsCheckUtility(context, errors, getCheckParams());
+    this.cicsOptionsCheckUtilityParams = getCheckParams();
+    this.cicsOptionsCheckUtility =
+        new CICSOptionsCheckUtility(context, errors, cicsOptionsCheckUtilityParams);
   }
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
@@ -325,7 +328,8 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
                     locality ->
                         throwException(
                             locality,
-                            MessageTemplate.of("CobolVisitor.AreaBWarningMsg", token.getText()))));
+                            MessageTemplate.of("CobolVisitor.AreaBWarningMsg", token.getText()),
+                            ErrorSeverity.WARNING)));
   }
 
   private Locality getTokenLocality(Token token) {
@@ -349,13 +353,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     };
   }
 
-  private void throwException(@NonNull Locality locality, MessageTemplate messageTemplate) {
+  private void throwException(
+      @NonNull Locality locality, MessageTemplate messageTemplate, ErrorSeverity severity) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(locality.toOriginalLocation())
             .messageTemplate(messageTemplate)
-            .severity(ErrorSeverity.WARNING)
+            .severity(severity)
             .build();
 
     LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
@@ -409,19 +414,16 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitVariableNameUsage(CICSParser.VariableNameUsageContext ctx) {
-    CICSCheckUtilityParameters options = cicsOptionsCheckUtility.getUtilityParameters();
     if ((ctx.NONNUMERICLITERAL() != null || ctx.NUMERICLITERAL() != null)) {
-      if (options.quoteEnabled && ctx.getText().endsWith("\'"))
+      if (cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\'"))
         throwException(
-            "QUOTE",
             getTokenLocality(ctx.start),
-            "Enabled translator option: ",
+            MessageTemplate.of("Enabled translator option: QUOTE"),
             ErrorSeverity.ERROR);
-      else if (!options.quoteEnabled && ctx.getText().endsWith("\""))
+      else if (!cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\""))
         throwException(
-            "APOST",
             getTokenLocality(ctx.start),
-            "Enabled translator option: ",
+            MessageTemplate.of("Enabled translator option: APOST"),
             ErrorSeverity.ERROR);
     }
     return visitChildren(ctx);

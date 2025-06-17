@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -29,7 +28,7 @@ public class CICSOptionsCheckUtility {
   private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
 
   private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
-  @Getter private CICSCheckUtilityParameters utilityParameters;
+  private CICSCheckUtilityParameters utilityParameters;
 
   public CICSOptionsCheckUtility(
       DialectProcessingContext context,
