@@ -15,7 +15,6 @@
 import * as vscode from "vscode";
 import {
   DATASET,
-  DEFAULT_DIALECT,
   E4E_INCOMPATIBLE,
   ENDEVOR_PROCESSOR,
   ENVIRONMENT,
@@ -25,7 +24,7 @@ import {
 } from "../../constants";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { DownloadUtil } from "./downloader/DownloadUtil";
-import { E4E, EndevorElement } from "../../type/e4eApi";
+import { E4E } from "../../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./downloader/CopybookDownloaderForUss";
 import { ZoweDSNService as ZoweDSNService } from "./downloader/CopybookDownloaderForDsn";
@@ -40,9 +39,6 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "../ProcessorGroupsLoader";
-import { localCopybooks } from "./LocalCopybooksService";
-// import { searchLocalCopybooks } from "./LocalCopybooksService";
-import { getErrorMessage } from "../util/ErrorsUtils";
 import { getE4EAPI } from "./E4ECopybookService";
 import { Utils } from "../util/Utils";
 import { clearDiagnostics, showDiagnostics } from "../DiagnosticsService";
@@ -224,224 +220,6 @@ class ExternalAPIsService {
     }
   }
 
-  public async listRemoteCopybooks(
-    documentUri: vscode.Uri,
-    dialect: string,
-  ): Promise<string[]> {
-    // is document is endevor element - return list of copybooks from endevor
-    if (this.handleAsEndevorElement(documentUri.toString())) {
-      return (
-        this.e4eDownloader?.listRemoteCopybooksE4E(documentUri.toString()) ?? []
-      );
-    }
-
-    if (
-      !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [dialect]))
-    ) {
-      return [];
-    }
-
-    const profile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      this.explorerApi,
-    );
-    if (!profile) {
-      return [];
-    }
-
-    const copybooks: string[] = [];
-    const dsnPaths: string[] = SettingsService.getDsnPath(documentUri, dialect);
-    const ussPaths: string[] = SettingsService.getUssPath(documentUri, dialect);
-
-    const results = await Promise.allSettled([
-      ...dsnPaths.map(async (dsn) => {
-        const dsnMembers = await this.dsnService?.getAllMembers(profile, dsn);
-        return dsnMembers ?? [];
-      }),
-      ...ussPaths.map(async (uss) => {
-        const ussFiles = await this.ussService?.getAllMembers(profile, uss);
-        return ussFiles ?? [];
-      }),
-    ]);
-
-    results.forEach((result) => {
-      if (result.status === "fulfilled") {
-        result.value.forEach((c) => copybooks.push(c.name));
-      } else {
-        this.outputChannel?.appendLine(
-          `Unable to load copybooks completions. ${result.reason}`,
-        );
-      }
-    });
-
-    return copybooks;
-  }
-
-  // async searchRemoteCopybooks(
-  //   documentURI: string,
-  //   copybookName: string,
-  //   dialectType: string,
-  // ): Promise<vscode.Uri | undefined> {
-  //   if (
-  //     !(await this.isPrerequisiteForDownloadSatisfied(documentURI, [
-  //       dialectType,
-  //     ]))
-  //   ) {
-  //     return;
-  //   }
-
-  //   const profile = ProfileUtils.getProfileNameForCopybook(
-  //     documentURI,
-  //     this.explorerApi,
-  //   );
-  //   if (!profile) {
-  //     return;
-  //   }
-
-  //   const dsnPaths: string[] = SettingsService.getDsnPath(
-  //     documentURI,
-  //     dialectType,
-  //   );
-  //   const ussPaths: string[] = SettingsService.getUssPath(
-  //     documentURI,
-  //     dialectType,
-  //   );
-  //   const results = await Promise.allSettled([
-  //     ...dsnPaths.map((dsn) =>
-  //       this.dsnDownloader?.resolveCopybookUri(profile, dsn, copybookName),
-  //     ),
-  //     ...ussPaths.map((uss) =>
-  //       this.ussDownloader?.resolveCopybookUri(profile, uss, copybookName),
-  //     ),
-  //   ]);
-
-  //   for (const result of results) {
-  //     if (result.status === "fulfilled" && result.value) {
-  //       return result.value;
-  //     }
-  //   }
-  // }
-
-  async resolveCopybookUriInProcessorGroups(
-    copybookName: string,
-    defaultProfile: string,
-    documentUri: vscode.Uri,
-    pgConfigs: ProcessorGroupCopybookPathConfig[],
-  ): Promise<vscode.Uri | undefined> {
-    const allowedExtensions =
-      await SettingsService.getCopybookExtension(documentUri);
-
-    const promises = pgConfigs.map(async (config) => {
-      if (config instanceof vscode.Uri) {
-        const localResult = await localCopybooks.searchDirectory(
-          config,
-          copybookName,
-          allowedExtensions ?? [],
-        );
-        if (localResult) {
-          return localResult;
-        }
-      } else {
-        const profile =
-          config.profile ??
-          ProfileUtils.getProfileNameForCopybook(
-            copybookName,
-            this.explorerApi,
-          );
-        if (!profile) {
-          this.processDownloadError(PROVIDE_PROFILE_MSG);
-          return;
-        }
-        if (
-          !(await this.isPrerequisiteForDownloadSatisfied(documentUri, [
-            DEFAULT_DIALECT,
-          ]))
-        ) {
-          return;
-        }
-        if (DATASET in config && this.dsnService) {
-          const dsResult = await this.dsnService.resolveCopybookUri(
-            profile,
-            config.dataset,
-            copybookName,
-          );
-          if (dsResult) {
-            return dsResult;
-          }
-        } else if (USS in config && this.ussService) {
-          const ussResult = await this.ussService.resolveCopybookUri(
-            profile,
-            config.uss,
-            copybookName,
-          );
-          if (ussResult) {
-            return ussResult;
-          }
-        } else if (ENVIRONMENT in config && this.e4eDownloader) {
-          const resolvedProfile = await this.e4eDownloader.getProfileInfo(
-            config.profile,
-          );
-          const element: EndevorElement = {
-            use_map: config.use_map === false ? false : true,
-            environment: config.environment,
-            stage: config.stage,
-            system: config.system,
-            subsystem: config.subsystem,
-            type: config.type,
-            element: copybookName.toUpperCase(),
-            fingerprint: "",
-          };
-          if (
-            resolvedProfile &&
-            (await this.e4eDownloader.hasElement(
-              resolvedProfile,
-              element,
-              copybookName,
-            ))
-          ) {
-            return {
-              endevorElement: {
-                resolvedProfile,
-                element,
-              },
-            };
-          }
-        }
-      }
-    });
-
-    const results = await Promise.allSettled(promises);
-    for (const result of results) {
-      if (result.status === "fulfilled" && result.value) {
-        if (result.value instanceof vscode.Uri) {
-          return result.value;
-        } else {
-          try {
-            const e4eResult = await this.e4eDownloader?.downloadElementE4E(
-              result.value.endevorElement.resolvedProfile,
-              result.value.endevorElement.element,
-            );
-
-            if (e4eResult) {
-              return e4eResult;
-            }
-          } catch (err) {
-            this.outputChannel?.appendLine(
-              `Error while downloading copybook from Endevor - ${copybookName} - ${getErrorMessage(err)}`,
-            );
-          }
-        }
-      } else if (result.status === "rejected") {
-        this.outputChannel?.appendLine(
-          `Error while resolving copybook ${copybookName} - ${JSON.stringify(result.reason)}`,
-        );
-      }
-    }
-    this.outputChannel?.appendLine(
-      `Unable to resolve copybook ${copybookName} using processor groups.`,
-    );
-  }
-
   private async isPrerequisiteForDownloadSatisfied(
     documentUri: vscode.Uri,
     dialects: string[],
@@ -515,18 +293,6 @@ class ExternalAPIsService {
       ))
     );
   }
-  // private missingExtension(documentUri: vscode.Uri, message: string) {
-  //   this.diagnosticsService?.showDiagnostics(documentUri, [
-  //     {
-  //       range: new vscode.Range(
-  //         new vscode.Position(0, 0),
-  //         new vscode.Position(1, 0),
-  //       ),
-  //       message: message,
-  //       severity: vscode.DiagnosticSeverity.Warning,
-  //     },
-  //   ]);
-  // }
 
   private processDownloadError(title: string): void {
     const actionSettings = "Change settings";
@@ -565,14 +331,11 @@ class ExternalAPIsService {
     if (configs.length == 0) return false;
 
     if (endevorConfigs.length > 0 && !this.e4eApi) {
-      this.missingExtension(
-        documentUri,
-        "Explorer for Endevor is not installed",
-      );
+      missingExtension(documentUri, "Explorer for Endevor is not installed");
       return false;
     }
     if (!this.explorerApi && procGroupZoweConfigs.length > 0) {
-      this.missingExtension(documentUri, "Zowe Explorer is not installed");
+      missingExtension(documentUri, "Zowe Explorer is not installed");
       return false;
     }
     if (!this.explorerApi) return endevorConfigs.length > 0;

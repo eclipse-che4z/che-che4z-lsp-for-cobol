@@ -50,7 +50,7 @@ export abstract class ZoweLib {
 
     if (
       await DownloadUtil.checkForInvalidCredProfile(
-        this.getProfile(documentUri),
+        profile,
         this.credentialsTestLocation(),
       )
     ) {

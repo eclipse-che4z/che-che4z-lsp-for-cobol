@@ -24,6 +24,10 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
   }
 
   async resolveCopybookUri(copybookName: string, documentUri: Uri) {
+    if (!(await this.configCheck(documentUri))) {
+      return;
+    }
+
     const profile = await this.getProfile(documentUri);
 
     if (profile) {
@@ -45,8 +49,15 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
     documentUri: Uri,
     _outputChannel?: OutputChannel,
   ): Promise<string[]> {
+    if (!(await this.configCheck(documentUri))) {
+      return [];
+    }
     const profile = await this.getProfile(documentUri);
     if (profile) {
+      if (!this.configCheck(documentUri)) {
+        return [];
+      }
+
       const list = await externalApis.e4eDownloader?.getMembers(
         profile,
         this.config.endevorDataset,

@@ -1,13 +1,9 @@
 import { Uri, OutputChannel } from "vscode";
 import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
-import { DATASET, ENVIRONMENT } from "../../constants";
+import { ENVIRONMENT } from "../../constants";
 import { CopybookLibs, EndevorConfigModel } from "../ProcessorGroupsLoader";
-import {
-  EndevorElement,
-  EndevorMember,
-  ResolvedProfile,
-} from "../../type/e4eApi";
+import { EndevorElement } from "../../type/e4eApi";
 import { externalApis } from "../copybook/CopybookDownloadService";
 import { EndevorLib } from "./EndevorLib";
 
@@ -28,6 +24,10 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
 
   async resolveCopybookUri(copybookName: string, documentUri: Uri) {
     const profile = await this.getProfile(documentUri);
+
+    if (!(await this.configCheck(documentUri))) {
+      return;
+    }
 
     if (profile) {
       const element: EndevorElement = {
@@ -58,7 +58,12 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
     documentUri: Uri,
     _outputChannel?: OutputChannel,
   ): Promise<string[]> {
+    if (!(await this.configCheck(documentUri))) {
+      return [];
+    }
+
     const profile = await this.getProfile(documentUri);
+
     if (profile) {
       const list = await externalApis.e4eDownloader?.getElements(profile, {
         use_map: this.config.use_map === false ? false : true,
