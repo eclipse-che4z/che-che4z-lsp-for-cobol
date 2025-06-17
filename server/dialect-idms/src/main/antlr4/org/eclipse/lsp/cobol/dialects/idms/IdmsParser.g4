@@ -32,7 +32,7 @@ copyIdmsOptions
     : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?) |
     (FILE copyIdmsSource versionClause?) |
     ((MAP | MAP_CONTROL) copyIdmsSource) |
-    (MODULE? copyIdmsSource versionClause?)
+    ((MODULE | LR)? copyIdmsSource versionClause?)
     ;
 
 copyIdmsSource
@@ -1176,6 +1176,7 @@ idmsKeywords
 cobolCompilerDirectivesKeywords
     :  ANY
     | DATA | DUMP
+    | LR
     | MAP
     | NAME
     | NODUMP

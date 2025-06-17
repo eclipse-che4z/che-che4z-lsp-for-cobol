@@ -23,6 +23,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 
@@ -164,9 +165,8 @@ public class GroupContext {
                         locality ->
                             SyntaxError.syntaxError()
                                 .errorSource(ErrorSource.PARSING)
-                                .suggestion(
-                                    messageService.getMessage(
-                                        "CobolVisitor.paragraphNotDefined", name))
+                                .messageTemplate(
+                                    MessageTemplate.of("CobolVisitor.paragraphNotDefined", name))
                                 .severity(ErrorSeverity.ERROR)
                                 .location(locality.toOriginalLocation())
                                 .build()))

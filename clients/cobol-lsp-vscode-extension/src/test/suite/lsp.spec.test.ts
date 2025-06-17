@@ -684,4 +684,14 @@ suite("Integration Test Suite", function () {
       (d) => d.message === "BOOK3: Copybook not found",
     );
   });
+
+  test("No info message for missing copybooks if diagnostics analysis mode is BASIC", async () => {
+    await helper.updateConfig("low_severity_settings.json");
+    const editor = await helper.showDocument(path.join("USERC1F.cbl"));
+    await helper.waitFor(
+      () => vscode.languages.getDiagnostics(editor.document.uri).length === 0,
+    );
+    const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+    assert.strictEqual(diagnostics.length, 0);
+  });
 });

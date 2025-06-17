@@ -20,6 +20,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.DivisionNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -54,7 +55,7 @@ public class Db2DeclareVariableProcessor implements Processor<Db2DeclareVariable
                 .location(node.getLocality().toOriginalLocation())
                 .severity(ErrorSeverity.ERROR)
                 .errorSource(ErrorSource.DIALECT)
-                .suggestion(messageService.getMessage("db2Parser.validation.declareVar"))
+                .messageTemplate(MessageTemplate.of("db2Parser.validation.declareVar"))
                 .build());
   }
 }

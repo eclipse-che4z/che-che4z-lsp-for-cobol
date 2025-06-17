@@ -39,6 +39,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Position;
@@ -107,8 +108,7 @@ public class ReplacingServiceImpl implements ReplacingService {
                 .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
                 .location(locality.toOriginalLocation())
-                .suggestion(
-                    messageService.getMessage("ReplacingServiceImpl.pseudoTxtInvalidLength"))
+                .messageTemplate(MessageTemplate.of("ReplacingServiceImpl.pseudoTxtInvalidLength"))
                 .build())
         : Optional.empty();
   }
@@ -121,7 +121,7 @@ public class ReplacingServiceImpl implements ReplacingService {
             SyntaxError.syntaxError()
                 .errorSource(ErrorSource.EXTENDED_DOCUMENT)
                 .severity(ErrorSeverity.ERROR)
-                .suggestion(messageService.getMessage("ReplacingServiceImpl.invalidWord"))
+                .messageTemplate(MessageTemplate.of("ReplacingServiceImpl.invalidWord"))
                 .location(locality.toOriginalLocation())
                 .build())
         : Optional.empty();

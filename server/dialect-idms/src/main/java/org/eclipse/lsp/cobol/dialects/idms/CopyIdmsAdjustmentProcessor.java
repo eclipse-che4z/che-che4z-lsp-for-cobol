@@ -27,6 +27,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp4j.DiagnosticRelatedInformation;
@@ -84,7 +85,7 @@ public class CopyIdmsAdjustmentProcessor {
       return getWarningAtARange(
           rangeIntegerPair.getLeft(),
           uri,
-          messageService.getMessage(
+          MessageTemplate.of(
               IDMS_DIALECT_MAX_ADJUSTMENT_EXCEED_MSG,
               delta + rangeIntegerPair.getRight(),
               delta,
@@ -101,11 +102,11 @@ public class CopyIdmsAdjustmentProcessor {
   }
 
   private List<SyntaxError> getWarningAtARange(
-      Range rangeForError, String uri, String message, Locality sourceLocality) {
+      Range rangeForError, String uri, MessageTemplate messageTemplate, Locality sourceLocality) {
     return Collections.singletonList(
         SyntaxError.syntaxError()
             .location(Locality.builder().uri(uri).range(rangeForError).build().toOriginalLocation())
-            .suggestion(messageService.getMessage(message))
+            .messageTemplate(messageTemplate)
             .severity(WARNING)
             .errorSource(ErrorSource.DIALECT)
             .relatedInformation(

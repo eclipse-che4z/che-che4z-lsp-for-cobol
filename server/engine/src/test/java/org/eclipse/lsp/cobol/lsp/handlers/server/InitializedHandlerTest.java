@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
@@ -62,6 +63,8 @@ class InitializedHandlerTest {
         .thenReturn(Optional.of(CobolLanguageId.COBOL.getLayout()));
     when(codeLayoutStore.updateCodeLayout()).thenReturn(mock -> {});
 
+    ErrorFinalizerService mockErrorFinalizerService = mock(ErrorFinalizerService.class);
+
     InitializedHandler initializedHandler =
         new InitializedHandler(
             watchingService,
@@ -71,12 +74,14 @@ class InitializedHandlerTest {
             localeStore,
             mock(AnalysisService.class),
             messageService,
-            codeLayoutStore);
+            codeLayoutStore,
+            mockErrorFinalizerService);
     initializedHandler.initialized(new InitializedParams());
     verify(watchingService).watchConfigurationChange();
     verify(settingsService).fetchConfiguration(LOCALE.label);
     verify(settingsService).fetchConfiguration(LOGGING_LEVEL.label);
     verify(settingsService).fetchConfiguration(CPY_EXTENSIONS.label);
+    verify(settingsService).fetchConfiguration(ANALYSIS_MODE.label);
     verify(localeStore).notifyLocaleStore();
   }
 
@@ -101,5 +106,7 @@ class InitializedHandlerTest {
     when(settingsService.fetchConfiguration(COBOL_PROGRAM_LAYOUT.label))
         .thenReturn(
             completedFuture(ImmutableList.of(Optional.of(CobolLanguageId.COBOL.getLayout()))));
+    when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
+        .thenReturn(completedFuture(ImmutableList.of(Optional.of(false))));
   }
 }

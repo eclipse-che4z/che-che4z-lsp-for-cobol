@@ -50,10 +50,8 @@ import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 
 /**
  * This class applies syntax and semantic analysis for COBOL texts using the actual Language Engine.
@@ -596,14 +594,44 @@ public class UseCaseEngine {
   private void assertDiagnostics(
       Map<String, List<Diagnostic>> expected, Map<String, List<Diagnostic>> actual) {
     assertEquals(expected.keySet(), actual.keySet(), "Diagnostic documents are not the same");
+
+    // Below code provides flexible validation, as a strict assertion would lead to update of most
+    // of the TestCases. Strict assertion is done when the expectedDiagnostics includes an
+    // ErrorCode.
     for (String documentUri : expected.keySet()) {
-      List<Diagnostic> expectedDiagnostic =
+      List<Diagnostic> expectedDiagnostics =
           expected.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
-      List<Diagnostic> actualDiagnostic =
+      List<Diagnostic> actualDiagnostics =
           actual.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
       assertEquals(
-          expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
+          expectedDiagnostics.size(), actualDiagnostics.size(), "Different diagnostics size");
+      for (int i = 0; i < expectedDiagnostics.size(); i++) {
+        Diagnostic expectedDiagnostic = expectedDiagnostics.get(i);
+        Diagnostic actualDiagnostic = actualDiagnostics.get(i);
+        if (expectedDiagnostic.getCode() == null && actualDiagnostic.getCode() != null) {
+          assertDiagnosticEqualsIgnoringCode(expectedDiagnostic, actualDiagnostic);
+        } else {
+          assertEquals(
+              expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
+        }
+      }
     }
+  }
+
+  private static void assertDiagnosticEqualsIgnoringCode(
+      @NonNull Diagnostic expected, @NonNull Diagnostic actual) {
+    assertEquals(expected.getRange(), actual.getRange(), "Diagnostic range mismatch");
+    assertEquals(expected.getSeverity(), actual.getSeverity(), "Diagnostic severity mismatch");
+    assertEquals(expected.getSource(), actual.getSource(), "Diagnostic source mismatch");
+    assertEquals(expected.getMessage(), actual.getMessage(), "Diagnostic message mismatch");
+    assertEquals(
+        expected.getCodeDescription(), actual.getCodeDescription(), " Code Description mismatch");
+    assertEquals(expected.getTags(), actual.getTags(), " Tags mismatch");
+    assertEquals(
+        expected.getRelatedInformation(),
+        actual.getRelatedInformation(),
+        "RelatedInformation mismatch");
+    assertEquals(expected.getData(), actual.getData(), "Data mismatch");
   }
 
   private <T> void assertResult(

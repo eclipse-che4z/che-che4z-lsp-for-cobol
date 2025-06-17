@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.error;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
@@ -30,12 +31,42 @@ import org.eclipse.lsp4j.DiagnosticRelatedInformation;
 // https://github.com/rzwitserloot/lombok/issues/2044
 @Builder(builderMethodName = "syntaxError", toBuilder = true)
 @Value
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SyntaxError {
-  OriginalLocation location;
-  MessageTemplate messageTemplate;
-  String suggestion;
-  ErrorSeverity severity;
+  @EqualsAndHashCode.Include OriginalLocation location;
+  @EqualsAndHashCode.Include MessageTemplate messageTemplate;
+  @EqualsAndHashCode.Include String suggestion;
+  @EqualsAndHashCode.Include ErrorSeverity severity;
   ErrorCode errorCode;
-  ErrorSource errorSource;
-  DiagnosticRelatedInformation relatedInformation;
+  @EqualsAndHashCode.Include ErrorSource errorSource;
+  @EqualsAndHashCode.Include DiagnosticRelatedInformation relatedInformation;
+
+  @EqualsAndHashCode.Include
+  private String matchErrorCode() {
+    return errorCode != null
+        ? errorCode.getLabel()
+        : messageTemplate != null ? messageTemplate.getTemplate() : null;
+  }
+
+  public static class SyntaxErrorBuilder {
+    private ErrorCode errorCode;
+
+    public SyntaxError build() {
+      return getSyntaxError();
+    }
+
+    private SyntaxError getSyntaxError() {
+      if (errorCode == null && messageTemplate != null) {
+        errorCode = messageTemplate::getTemplate;
+      }
+      return new SyntaxError(
+          location,
+          messageTemplate,
+          suggestion,
+          severity,
+          errorCode,
+          errorSource,
+          relatedInformation);
+    }
+  }
 }

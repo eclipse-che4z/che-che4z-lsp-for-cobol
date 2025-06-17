@@ -330,12 +330,13 @@ public abstract class CICSOptionsCheckBaseUtility {
   }
 
   protected void throwException(
-      ErrorSeverity errorSeverity, @NonNull Locality locality, String message, String wrongToken) {
+      ErrorSeverity errorSeverity, @NonNull Locality locality, String msg, String wrongToken) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(locality.toOriginalLocation())
-            .suggestion(message + wrongToken)
+            .suggestion(msg + wrongToken)
+            .errorCode(() -> "cics.invalid.options")
             .severity(errorSeverity)
             .build();
 

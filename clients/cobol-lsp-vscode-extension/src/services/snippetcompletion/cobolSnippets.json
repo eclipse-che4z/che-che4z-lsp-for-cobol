@@ -830,7 +830,7 @@
   },
   "ARITH EXTEND": {
     "prefix": "EXTEND",
-    "body": ["ARITH(EXTEND}"],
+    "body": ["ARITH(EXTEND)"],
     "description": "A compiler directive that provides extended-precision function results that can accurately represent the value of the argument being returned."
   },
   "EXEC SQL": {
@@ -931,13 +931,8 @@
   },
   "MULTIPLE FILE TAPE": {
     "prefix": "MULTIPLE FILE TAPE",
-    "body": [
-      "FD ${1:QSAM-FILE}",
-      "\tLABEL RECORDS ARE STANDARD",
-      "\tMULTIPLE FILE TAPE.",
-      "\t${3:RPT-OUT-REC} PIC X(${4:132})."
-    ],
-    "description": "DATA DIVISION - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files share the same physical volume serial of tape."
+    "body": ["MULTIPLE FILE TAPE ${1:file1}, ${2:file2}"],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - The MULTIPLE FILE TAPE clause specifies that 2 or mote data files, separated by commas, share the same physical volume serial of tape."
   },
   "FILE CONTROL": {
     "prefix": "FILE CONTROL",
@@ -1392,10 +1387,20 @@
     "prefix": "GENERATE",
     "body": [
       "JSON GENERATE ${1:JSON-STMT} FROM ${2:IN-FILE-TEXT} IN ${3:JSON-CHAR-CTR}",
-      "\tON EXCEPTION ${4:DISPLAY 'JSON GENERATE ERROR: ' WS-JS-CODE",
+      "\tON EXCEPTION ${4:DISPLAY 'JSON GENERATE ERROR: ' WS-JS-CODE}",
       "END-JSON"
     ],
     "description": "Manipulate COBOL data items as JSON text by using the JSON GENERATE statement."
+  },
+  "XML GENERATE": {
+    "prefix": "XML GENERATE",
+    "body": [
+      "XML GENERATE ${1:XML-DATA} FROM ${2:IN-FILE-TEXT} IN ${3:XML-CHAR-CTR}",
+      "\tON EXCEPTION ${4:DISPLAY 'XML TRANSLATE ERROR: ' WS-XML-CODE}",
+      "\tGO TO ${5:XML-ERROR-PARAGRAPH}",
+      "END-XML."
+    ],
+    "description": "Use an XML GENERATE statement to transform COBOL data to XML."
   },
   "GIVING": {
     "prefix": "GIVING",
@@ -1469,20 +1474,25 @@
   },
   "INSPECT CONVERTING": {
     "prefix": "INSPECT ID CONVERTING",
-    "body": ["INPUT PROCEDURE ${1:procName}"],
-    "description": "INSPECT CONVERTING"
-  },
-  "INSPECT": {
-    "prefix": "INSPECT",
-    "body": ["INSPECT ${1:id}"],
-    "description": "INSPECT id"
+    "body": [
+      "INPUT ${1:id}",
+      "\tCONVERTING '${2:abcdefg}' TO '${3:ABCDEFG}`",
+      "\tAFTER INITIAL '${4:|}' BEFORE INITIAL '${5:*}'."
+    ],
+    "description": "INSPECT is a string parsing verb for alphanumeric fields."
   },
   "INSPECT REPLACING": {
     "prefix": "INSPECT REPLACING",
-    "body": ["INSPECT ${1:id} REPLACING ${2:SNIP}"],
-    "description": "INSPECT REPLACING"
+    "body": [
+      "INSPECT ${1:id} ${2|REPLACING,REPLACING ALL LOW-VALUES BY|} ${3:SNIP}"
+    ],
+    "description": "INSPECT is a string parsing verb for alphanumeric fields."
   },
-
+  "INSPECT TALLYING": {
+    "prefix": "INSPECT",
+    "body": ["INSPECT ${1:id} "],
+    "description": "description"
+  },
   "IDENTIFICATION DIVISION": {
     "prefix": "IDENTIFICATION-DIVISION",
     "body": ["IDENTIFICATION DIVISION.", "$0"],
@@ -1559,6 +1569,15 @@
     ],
     "description": "IS INDEXED defines a file entry as a VSAM KSDS (Indexed) Data Set in the ENVIRONMENT DIVISION'S SELECT/ASSIGN paragraph."
   },
+  "ACCESS MODE IS INPUT": {
+    "prefix": "INPUT",
+    "body": [
+      "SELECT ${1:CARPOOL} ASSIGN TO ${2:CARFILE}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ACCESS MODE IS INPUT."
+    ],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - File I/O mode that denotes if input is to be read from a file."
+  },
   "INITIALIZE": {
     "prefix": "INITIALIZE",
     "body": ["INITIALIZE ${1:INSURED-NAME-ADDR}"],
@@ -1591,11 +1610,11 @@
     ],
     "description": "RETURN INTO accesses a sorted file record and copies it into a WORKING-STORAGE data item."
   },
-  "INSPECT TALLYING": {
+  "INSPECT TALLYING (COUNTER)": {
     "prefix": "INSPECT",
     "body": [
       "MOVE 0 TO ${1:COUNTER}",
-      "INSPECT ${2:SOURCE} TALLYING ${1:COUNTER} FOR ${3|ALL SPACES,ALL $4,CHARACTERS|}"
+      "INSPECT ${2:SOURCE} TALLYING ${1:COUNTER} FOR ${3|ALL SPACES,ALL ,CHARACTERS|}"
     ],
     "description": "INSPECT A TALLYING COUNTER FOR ..."
   },
@@ -1824,36 +1843,6 @@
     "body": ["LINKAGE SECTION.", "$0"],
     "description": "LINKAGE SECTION."
   },
-  "LOCAL-STORAGE SECTION": {
-    "prefix": "LOCAL-STORAGE",
-    "body": ["LOCAL-STORAGE SECTION.", "$0"],
-    "description": "LOCAL-STORAGE SECTION"
-  },
-  "MAIN METHOD-ID": {
-    "prefix": "MAIN",
-    "body": [
-      "*>> <SUMMARY>METHOD MAIN</SUMMARY>",
-      "METHOD-ID MAIN PUBLIC STATIC.",
-      "PROCEDURE DIVISION USING",
-      "           BY VALUE ARGS AS STRING OCCURS ANY.",
-      "    $0",
-      "END METHOD.",
-      ""
-    ],
-    "description": "METHOD-ID (MAIN)"
-  },
-  "METHOD-ID": {
-    "prefix": "METHOD-ID",
-    "body": [
-      "*>> <SUMMARY>METHOD $1</SUMMARY>",
-      "METHOD-ID $1.",
-      "PROCEDURE DIVISION.",
-      "    $0",
-      "END METHOD.",
-      ""
-    ],
-    "description": "METHOD-ID"
-  },
   "MERGE": {
     "prefix": "MERGE",
     "body": ["MERGE ${1:fileName} ${2:snipasc|DESC} ${3:dataname}"],
@@ -1925,18 +1914,18 @@
   },
   "MULTIPLY BY": {
     "prefix": "MULTIPLY BY",
-    "body": ["MULTIPLY ${1:id} BY ${2:id}"],
+    "body": ["MULTIPLY ${1:id} BY ${2:id} ROUNDED"],
     "description": "MULTIPLY"
   },
   "MULTIPLY a BY b GIVING c": {
     "prefix": "MULTIPLY",
-    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}"],
+    "body": ["MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C} ROUNDED"],
     "description": "MULTIPLY a BY b GIVING c"
   },
   "MULTIPLY a BY b GIVING c ON SIZE ERROR": {
     "prefix": "MULTIPLY",
     "body": [
-      "MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C}",
+      "MULTIPLY ${1:A} BY ${2:B} GIVING ${3:C} ROUNDED",
       "ON SIZE ERROR ${4:imperative_statement}",
       "END-MULTIPLY."
     ],
@@ -2025,7 +2014,7 @@
     "prefix": "NULL",
     "body": [
       "IF ${1:PTR-VAR} IS NULL",
-      "\tSET ${1:PTR-VAR} TO ${2|identified,ADDRESS OF identified|}",
+      "\tSET ${1:PTR-VAR} TO ${2|identifier,ADDRESS OF identifier,NULL|}",
       "END-IF."
     ],
     "description": "NULL which has the value of zero, is a data type used with datatypes of: POINTER, PROCEDURE-POINTER, FUNCTION-POINTER, OBJECT REFERENCE, or the ADDRESS OF a special register."
@@ -2096,6 +2085,11 @@
     ],
     "description": "Used for Tape files without z/OS data set LABELS."
   },
+  "NAME IS OMITTED": {
+    "prefix": "OMITTED",
+    "body": ["JSON PARSE ${1:VAR-1} INTO ${2:VAR-2} NAME IS OMITTED."],
+    "description": "Can use the NAME IS OMITTED phrase to parse an anonymous JSON array in addition to an anonymous JSON object."
+  },
   "DEPENDING ON": {
     "prefix": "ON",
     "body": [
@@ -2117,7 +2111,7 @@
     "prefix": "ON SIZE ERROR",
     "body": [
       "MULTIPLY ${1:VAR-1} BY ${2:VAR-2} GIVING ${3:VAR-3}",
-      "\tONE SIZE ERROR GO TO ${4:ARITH-PROBLEM}",
+      "\tON SIZE ERROR GO TO ${4:ARITH-PROBLEM}",
       "END-MULTIPLY."
     ],
     "description": "ON is used to code: ON SIZE ERROR, ON OVERFLOW and ON EXCEPTION error and exception trapping phrases."
@@ -2207,7 +2201,7 @@
   },
   "OUTPUT": {
     "prefix": "OUTPUT",
-    "body": ["OPEN OUTPUT ${1:fileName}", "${2| ,WITH NO REWIND|}"],
+    "body": ["OPEN OUTPUT ${1:fileName}${2|., WITH NO REWIND.|}"],
     "description": "OUTPUT FILENAME"
   },
   "OUTPUT PROCEDURE": {
@@ -2229,7 +2223,7 @@
       "\tON OVERFLOW GO TO ${4:UNSTRING-OVERFLOW}",
       "END-UNSTRING."
     ],
-    "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with UNSTRING allows you to trap text-parsing errors during runtime. After ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (String Statement)": {
     "prefix": "OVERFLOW",
@@ -2240,7 +2234,7 @@
       "\tON OVERFLOW GO TO ${4:STRING-OVERFLOW}",
       "END-STRING."
     ],
-    "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime. Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with STRING allows you to trap text-parsing errors during runtime. After ON OVERFLOW you can code any imperative statement."
   },
   "ON OVERFLOW GO TO (Call Statement)": {
     "prefix": "OVERFLOW",
@@ -2249,7 +2243,21 @@
       "\tON OVERFLOW GO TO ${1:CALL-PGM-OVERFLOW}",
       "END-CALL."
     ],
-    "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND. Note that after ON OVERFLOW you can code any imperative statement."
+    "description": "ON OVERFLOW with CALL statements allows you to trap runtime called program name errors. Without ON OVERFLOW the program will ABEND. After ON OVERFLOW you can code any imperative statement."
+  },
+  "PACKED-DECIMAL": {
+    "prefix": "PACKED-DECIMAL",
+    "body": ["77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
+    "description": "PACKED-DECIMAL variables (internally) are stored with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. PACKED-DECIMAL is identical to COMP-3/COMPUTATIONAL-3."
+  },
+  "PADDING CHARACTER IS": {
+    "prefix": "PADDING CHARACTER IS",
+    "body": [
+      "SELECT ${1:INTERNAL-FILENAME} ASSIGN ${2:EXTFILE}",
+      "BLOCK CONTAINS ${3:170}",
+      "PADDING CHARACTER IS \"${4:B}\"."
+    ],
+    "description": "PADDING CHARACTER specifies a character, or variable defined in WORKING-STORAGE, to be used for record-blocking-factor padding on sequential files. (That is, filling out a BLOCK of records. BLOCK is the unit of file I/O between DFSMS and your program's DATA DIVISION.)"
   },
   "PARSE": {
     "prefix": "PARSE",
@@ -2257,14 +2265,29 @@
     "description": "PARSE ITEM"
   },
   "PERFORM": {
-    "prefix": "PERFORM",
-    "body": ["PERFORM ${1:PARAGRAPH-NAME} ${2:VALUE-1} TIMES"],
+    "prefix": "PERFORM UNTIL",
+    "body": [
+      "MOVE ${1:1} TO SUB.",
+      "PERFORM UNTIL SUB > ${2:100}",
+      "\t${3:codeHere}",
+      "ADD +1 TO SUB",
+      "END-PERFORM."
+    ],
     "description": "PERFORM PARAGRAPH X TIMES"
   },
   "PERFORM TIMES": {
     "prefix": "PERFORM TIMES",
     "body": ["PERFORM ${1:procName} ${2:id|int} TIMES"],
     "description": "PERFORM TIMES PROCEDURE NAME X TIMES"
+  },
+  "PERFORM THRU": {
+    "prefix": "PERFORM THRU",
+    "body": [
+      "PERFORM ${1:100-OPEN-FILES}",
+      "\tTHRU ${2:100-FILES-EXIT}",
+      "END-PERFORM."
+    ],
+    "description": "PERFORM THRU transfers control to one or more paragraphs or SECTIONS and returns control to the next sequential executable statement after the THRU paragraph or SECTION finishes."
   },
   "PERFORM-END-PERFORM": {
     "prefix": "PERFORM",
@@ -2281,66 +2304,315 @@
     ],
     "description": "INLINE PERFORM VARYING"
   },
+  "PICTURE": {
+    "prefix": "PICTURE",
+    "body": ["01 ${1:VAR-NAME} PIC ${2:X(111) VALUE SPACE}."],
+    "description": "The reserved word PICTURE or PIC describes a data variable to the COBOL compiler (and program)."
+  },
   "POINTER": {
     "prefix": "POINTER",
-    "body": ["POINTER ${1:item}"],
-    "description": "POINTER item"
+    "body": ["01 ${1:WS-JAVA-NI-VAR} USAGE POINTER"],
+    "description": "POINTER defines a variable as a 4 or 8 byte field. This is dependent on the LP(nn) Compiler directive, which contains the address of a variable, instead of its contents."
+  },
+  "POINTER-32": {
+    "prefix": "POINTER-32",
+    "body": ["01 ${1:WS-JAVA-NI-VAR} USAGE POINTER-32"],
+    "description": "POINTER-32 defines a variable as a 4 byte field. This is independent of the LP(nn) Compiler directive, which contains the address of a variable, instead of its contents."
+  },
+  "POSITIVE": {
+    "prefix": "POSITIVE",
+    "body": ["IF ${1:CONDITION} IS POSITIVE", "\t$0", "END-IF."],
+    "description": "POSITIVE is a \"sign condition\" used to determine whether the algebraic value of a numeric variable is greater than zero."
   },
   "PROCEDURE DIVISION": {
     "prefix": "PROCEDURE-DIVISION",
     "body": ["PROCEDURE DIVISION.", "$0"],
     "description": "PROCEDURE DIVISION"
   },
+  "PROCEDURE DIVISION USING": {
+    "prefix": "PROCEDURE DIVISION USING",
+    "body": [
+      "DATA DIVISION.",
+      "LINKAGE SECTION.",
+      "01 ${1:EXTERNAL-DATA} ${2:PIC X(872)}.",
+      "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}/"
+    ],
+    "description": "PROCEDURE DIVISION USING allows you reference data being passed from a calling module to your program through the LINKAGE SECTION."
+  },
+  "PROCEDURE IS": {
+    "prefix": "PROCEDURE IS",
+    "body": [
+      "SORT ${1:fileName}",
+      "${2|INPUT,OUTPUT|} PROCEDURE IS ${3:100-RECORD-SEL} SECTION"
+    ],
+    "description": "PROCEDURE DIVISION - The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT - and process records returned from a SORT."
+  },
+  "PROCEDURE-POINTER": {
+    "prefix": "PROCEDURE-POINTER",
+    "body": ["77 ${1:LE-UTILITY} USAGE IS PROCEDURE-POINTER."],
+    "description": "A PROCEDURE-POINTER is a variable which contains the address of a procedure \"entry point\". PROCEDURE-POINTER variables are often used to CALL z/OS LE (Language Environment) utilities."
+  },
+  "USE FOR DEBUGGING ON ALL PROCEDURES": {
+    "prefix": "PROCEDURES",
+    "body": ["USE FOR DEBUGGING ON ALL PROCEDURES"],
+    "description": "A USE FOR DEBUGGING keyword, which you can specify as ALL PROCEDURES once in a program."
+  },
+  "PROCESSING": {
+    "prefix": "PROCESSING",
+    "body": [
+      "XML PARSE ${1:intentifier-1} RETURNING NATIONAL",
+      "VALIDATING WITH ${2:indentifier-2} FILE ${3:xml-schema-name-1}",
+      "PROCESSING PROCEDURE IS ${4:procedure-name-1}."
+    ],
+    "description": "XML PARSE translates an XML document into individual pieces, then passes each piece to a user-written COBOL paragraph."
+  },
+  "END PROGRAM": {
+    "prefix": "END PROGRAM",
+    "body": ["END PROGRAM ${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}."],
+    "description": "END PROGRAM designates the end of a called module and returns control to the calling module. The program name must be identical to its PROGRAM-ID."
+  },
   "PROGRAM-ID": {
     "prefix": "PROGRAM-ID.",
     "body": ["PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}}.", "$0"],
-    "description": "PROGRAM-ID"
+    "description": "IDENTIFICATION DIVISION - PROGRAM-ID provides a unique name for a COBOL program."
   },
   "PROPERTY": {
     "prefix": "PROPERTY",
     "body": [
-      "01 ${2:_PROP} ${3:BINARY-LONG} PRIVATE.",
-      "METHOD-ID. GET PROPERTY #${1:PROP}.",
-      "PROCEDURE DIVISION RETURNING RET AS ${3:BINARY-LONG}.",
-      "    SET RET TO ${2:_PROP}",
+      "01 ${1:_PROP} ${2:BINARY-LONG} PRIVATE.",
+      "METHOD-ID. GET PROPERTY #${3:PROP}.",
+      "PROCEDURE DIVISION RETURNING RET AS ${2:BINARY-LONG}.",
+      "\tSET RET TO ${1:_PROP}",
       "END METHOD.",
-      "METHOD-ID. SET PROPERTY #${1:PROP}.",
-      "PROCEDURE DIVISION USING BY VALUE VAL AS ${3:BINARY-LONG}.",
-      "    SET ${2:_PROP} TO 0",
+      "METHOD-ID. SET PROPERTY #${3:PROP}.",
+      "PROCEDURE DIVISION USING BY VALUE VAL AS ${2:BINARY-LONG}.",
+      "\tSET ${1:_PROP} TO 0",
       "END METHOD.",
       ""
     ],
     "description": "SET/GET PROPERTY"
   },
-  "READ": {
+  "QUOTE": {
+    "prefix": "QUOTE",
+    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
+    "description": "QUOTE/QUOTES is a figurative constant. It can also be used in a comparison or MOVE statement."
+  },
+  "READ (QSAM)": {
     "prefix": "READ",
-    "body": ["READ ${1:fileName}"],
-    "description": "READ FILENAME"
+    "body": [
+      "READ ${1:QSAM-File} INTO ${2:WS-Record-Layout}",
+      "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-Switch}"
+    ],
+    "description": "For QSAM file access, the READ statement makes the next record from a sequential file available to the program. In the given example, READ includes the INTO modifier, which moves the record from the I-O buffer into program WORKING-STORAGE, and the AT END modifier which forces z/OS to signal the program that the last record in the file has been read."
+  },
+  "READ (VSAM)": {
+    "prefix": "READ",
+    "body": [
+      "READ ${1:VSAM-File} INTO ${2:WS-Record-Layout}",
+      "KEY IS ${3:Key-field}",
+      "INVALID KEY ${4:imperative-statement}"
+    ],
+    "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier, which moves the record from the I-O buffer into program WORKING-STORAGE, and the INVALID KEY modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field."
+  },
+  "RECORD": {
+    "prefix": "RECORD",
+    "body": [
+      "FD ${1:CARPOOL}",
+      "\tLABEL RECORDS STANDARD",
+      "\tRECORD CONTAINS ${2:80} CHARACTERS."
+    ],
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause - which defines the size (in bytes) of each logical record in the file."
+  },
+  "RECORDING": {
+    "prefix": "RECORDING",
+    "body": [
+      "FD ${1:CARPOOL}",
+      "\tLABEL RECORDS STANDARD",
+      "\tRECORDING MODE IS ${2|F,FB,V,U,S|}",
+      "\tRECORD CONTAINS ${3:80} CHARACTERS."
+    ],
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDING MODE is used with QSAM files to describe the file/record data: F-Fixed (one record per/block), FB-Fixed/Blocked, V-Variable, U-Undefined (use for Load Modules) and S-Spanned records (extremely long records, that are larger than a block)."
+  },
+  "RECORDS": {
+    "prefix": "RECORDS",
+    "body": [
+      "FD ${1:CARPOOL}",
+      "\tLABEL RECORDS STANDARD",
+      "\tRECORD CONTAINS ${2:80} CHARACTERS."
+    ],
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. This is typically used with QSAM files."
+  },
+  "RECURSIVE": {
+    "prefix": "RECURSIVE",
+    "body": [
+      "PROGRAM-ID. ${1:${TM_FILENAME/(.*)\\..+$/${1:/UPCASE}/}} RECURSIVE."
+    ],
+    "description": "IDENTIFICATION DIVISION - An optional language element that allows programs to be reentered recursively."
+  },
+  "REDEFINES": {
+    "prefix": "REDEFINES",
+    "body": [
+      "01 ${1:LAB-REC}.",
+      "\t05 ${2:M-UNITS} PIC 9(6).",
+      "\t05 ${3:SERUM} PIC 9(6).",
+      "\t05 ${4:SERUM-PRICE} REDEFINES FIELD-A PIC 9999V99.",
+      "\t05 ${5:SERUM-CLASS} PIC X(3)."
+    ],
+    "description": "WORKING-STORAGE SECTION - REDEFINES allows one variable to share the same storage as another. It is a way to declare multiple fields for a single storage area in files and WORKING-STORAGE."
+  },
+  "USING BY REFERENCE": {
+    "prefix": "REFERENCE",
+    "body": ["PROCEDURE DIVISION USING BY REFERENCE ${1:COMMAREA}"],
+    "description": "BY REFERENCE receives an argument/address that was passed by reference (the default). You must define \"COMMAREA\" in the LINKAGE SECTION."
+  },
+  "RELATIVE": {
+    "prefix": "RELATIVE",
+    "body": [
+      "SELECT ${1:rptfil} ASSIGN TO ${2:rptfilDD}",
+      "\tORGANIZATION IS RELATIVE.",
+      "\tACCESS MODE IS ${3|SEQUENTIAL,RANDOM,DYNAMIC|}",
+      "\tRELATIVE KEY IS ${4:key1}",
+      "\tFILE STATUS IS ${5:WS-FILE-STATUS-VAR}.",
+      "$0"
+    ],
+    "description": "Identify VSAM RRDS files in your program by using ORGANIZATION IS RELATIVE. RELATIVE KEY IS associates a logical record with its relative record number."
   },
   "RELEASE": {
     "prefix": "RELEASE",
-    "body": ["RELEASE ${1:recordName}"],
-    "description": "RELEASE recordName"
+    "body": [
+      "MOVE ${1:SORT-EXT-RECORD} TO ${2:SORT-RECORD}",
+      "PERFORM ${3:RELEASE-SORT-RECORD}",
+      "RELEASE ${2:SORT-RECORD}"
+    ],
+    "description": "RELEASE transfers records from an input/output area to the initial phase of a SORT. NOTE: RELEASE can only be used in an INPUT PROCEDURE SECTION."
+  },
+  "RELEASE FROM": {
+    "prefix": "RELEASE FROM",
+    "body": [
+      "MOVE ${1:SORT-EXT-RECORD} TO ${2:SORT-RECORD}",
+      "PERFORM ${3:RELEASE-SORT-RECORD}",
+      "RELEASE ${2:SORT-RECORD} FROM ${4:SORT-FILE-IN}"
+    ],
+    "description": "RELEASE FROM moves data from one group field to the SORT field, then transfers records from an input/output area to the initial phase of a SORT. RELEASE FROM can only be used in an INPUT PROCEDURE SECTION."
+  },
+  "SERVICE RELOAD": {
+    "prefix": "RELOAD",
+    "body": ["SERVICE RELOAD ${1:data-name}."],
+    "description": "SERVICE RELOAD, a compiler directive. It is syntax checked, but has no effect on the execution of the program."
+  },
+  "REMAINDER": {
+    "prefix": "REMAINDER",
+    "body": ["DIVIDE ${1:A} INTO ${2:B} GIVING ${3:C} REMAINER ${4:D}."],
+    "description": "DIVIDE with REMAINDER allows you to specify a numeric data item that you can process as a remainder from the math. REMAINDER is available from all formats of the COBOL DIVIDE statement."
+  },
+  "REMOVAL": {
+    "prefix": "REMOVAL",
+    "body": ["CLOSE ${1:fileName} FOR REMOVAL."],
+    "description": "FOR REMOVAL applies only to QSAM tape files."
+  },
+  "RENAMES": {
+    "prefix": "RENAMES",
+    "body": ["66 ${1:DATA-ITEM5} RENAMES ${2:DATA-ITEM1}."],
+    "description": "RENAMES allows you to rename a data-item. The only level-number allowed for RENAMES is 66."
+  },
+  "RENAMES THRU": {
+    "prefix": "RENAMES THRU",
+    "body": ["66 ${1:DATA-ITEMX} RENAMES ${2:DATA-ITEM5} THRU ${3:DATA-ITEM1}"],
+    "description": "RENAMES THRU allows you to rename multiple consecutively defined data items with the same name. The only level-number allowed for RENAMES is 66."
+  },
+  "REPLACE": {
+    "prefix": "REPLACE",
+    "body": [
+      "REPLACE ==${1::TAG:}== BY ==${2:EMP-PAY}==.",
+      "\t01 ${1::TAG:}.",
+      "\t\t02 ${1::TAG:}-WEEK PIC S99.",
+      "\t\t02 ${1::TAG:}-GROSS-PAY PIC S9(5)V99.",
+      "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES",
+      "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."
+    ],
+    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement that is similar to REPLACING except that it replaces text across an entire file - not simply a copybook."
   },
   "REPLACING": {
     "prefix": "REPLACING",
-    "body": ["RELEASE ${1:item}"],
-    "description": "REPLACING item "
+    "body": ["COPY ${1:PAYLIB} REPLACING ==${2::TAG:}== BY ==${3:EMP-PAY}==."],
+    "description": "REPLACING allows you to rename source text within a COBOL Copybook. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement."
+  },
+  "RERUN": {
+    "prefix": "RERUN",
+    "body": ["RERUN ON ${1:ddName} EVERY ${2:20000} RECORDS OF ${3:filename}."],
+    "description": "RERUN specifies what checkpoints (for rerunning a program) are to be taken at specified intervals."
+  },
+  "RESERVE": {
+    "prefix": "RESERVE",
+    "body": [
+      "SELECT ${1:TESTDATA}",
+      "ASSIGN TO ${2:UT-S-TESTDATA}",
+      "\tRESERVE ${3:4} AREAS."
+    ],
+    "description": "RESERVE allows you to specify the number of I/O buffers to be allocated at run time for QSAM and VSAM files."
+  },
+  "RESET TRACE": {
+    "prefix": "RESET TRACE",
+    "body": ["RESET TRACE."],
+    "description": "Deprecated but could still be syntax checked depending on your compiler release."
   },
   "RETURN": {
     "prefix": "RETURN",
-    "body": ["RETURN ${1:fileName}"],
-    "description": "REPLACING fileName"
+    "body": [
+      "RETURN ${1:SORT-FILE-NAME}",
+      "\tAT END MOVE \"${2:YES}\" TO ${3:WS-EOF-SRT-OUTPUT-SW}",
+      "\tGO TO ${4:RETURN-SRTD-REC-EXIT}."
+    ],
+    "description": "The RETURN statement in the OUTPUT PROCEDURE of a COBOL SORT program is a request for the next sorted record."
+  },
+  "RETURN-CODE": {
+    "prefix": "RETURN-CODE",
+    "body": ["IF ${1:WS-SWITCH-NO-ERRORS} = \"Y\"", "\tMOVE 0 to RETURN-CODE."],
+    "description": "RETURN-CODE is a COBOL special register that can be used to pass a return code to the calling program or to z/OS when the program ends."
   },
   "RETURNING": {
     "prefix": "RETURNING",
-    "body": ["RETURNING ${1:dataname}"],
-    "description": "RETURNING dataName"
+    "body": [
+      "INVOKE ${1:OO-CLASS-NAME} USING ${2:SENDING-FLD}",
+      "\tRETURNING ${3:RECEIVING-FLD}."
+    ],
+    "description": "The RETURNING phrase specifies a data item that will contain the value returned from the invoked method."
+  },
+  "REVERSED": {
+    "prefix": "REVERSED",
+    "body": ["OPEN ${1:QSAM-FILE} REVERSED."],
+    "description": "REVERSED positions a QSAM file at its end. Successive READ statements make the file records available in reversed order, starting with the last record."
+  },
+  "WITH NO REWIND": {
+    "prefix": "REWIND",
+    "body": ["CLOSE ${1:QSAM-FILE} WITH NO REWIND"],
+    "description": "REWIND is typically used after WITH NO - an option that positions a QSAM file at its end."
   },
   "REWRITE": {
     "prefix": "REWRITE",
-    "body": ["REWRITE ${1:recordName}"],
-    "description": "REWRITE recordName"
+    "body": ["REWRITE ${1:recordName}."],
+    "description": "REWRITE Can be used with any DASD (non-Tape) file. It replaces the contents of the current record with the program's FILE SECTION values for that record."
+  },
+  "REWRITE FROM": {
+    "prefix": "REWRITE FROM",
+    "body": ["REWRITE ${1:recordName} FROM ${2:WS-RECORD}."],
+    "description": "REWRITE FROM can be used with any DASD (non-Tape) file. It moves data from (in the above example) WS-RECORD to the program's FILE SECTION declaration and replaces the record."
+  },
+  "RIGHT": {
+    "prefix": "RIGHT",
+    "body": [
+      "01 ${1:GROUP-FLD}.",
+      "\t05 ${2:ACCTG-CODE} ${3:PIC X(999)} JUSTIFIED RIGHT."
+    ],
+    "description": "JUSTIFIED overrides COBOL's standard byte-movement rules for receiving data of type: PIC A, PIC X, DBCS, NATIONAL."
+  },
+  "ROUNDED": {
+    "prefix": "ROUNDED",
+    "body": [
+      "77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.",
+      "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."
+    ],
+    "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5."
   },
   "SEARCH ALL WHEN": {
     "prefix": "SEARCH ALL WHEN",
@@ -2517,11 +2789,6 @@
     "prefix": "WRITE item",
     "body": ["WRITE ${1:item}"],
     "description": "WRITE item"
-  },
-  "XML GENERATE": {
-    "prefix": "XML GENERATE",
-    "body": ["XML GENERATE ${1:item}"],
-    "description": "XML GENERATE item"
   },
   "XML PARSE": {
     "prefix": "XML PARSE",

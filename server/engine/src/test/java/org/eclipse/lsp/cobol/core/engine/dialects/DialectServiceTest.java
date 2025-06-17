@@ -27,6 +27,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -44,9 +45,12 @@ class DialectServiceTest {
     ddService = mock(DialectDiscoveryService.class);
     copybookService = mock(CopybookService.class);
     messageService = mock(MessageService.class);
+    ErrorFinalizerService errorFinalizerService = mock(ErrorFinalizerService.class);
+
     when(ddService.loadDialects(copybookService, messageService)).thenReturn(ImmutableList.of());
 
-    dialectService = new DialectService(ddService, copybookService, messageService);
+    dialectService =
+        new DialectService(ddService, copybookService, messageService, errorFinalizerService);
   }
 
   private CobolDialect configureDialect(DialectProcessingContext context, String name) {
