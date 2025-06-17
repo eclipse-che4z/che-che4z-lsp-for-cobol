@@ -18,18 +18,18 @@ package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 
 /** Manages traffic for CICS parser options checking */
 public class CICSOptionsCheckUtility {
   private final Map<Integer, CICSOptionsCheckBaseUtility> optionsMap = new HashMap<>();
 
   private final Map<Integer, CICSOptionsCheckBaseUtility> spOptionsMap = new HashMap<>();
-
-  private CICSCheckUtilityParameters utilityParameters;
+  @Getter private CICSCheckUtilityParameters utilityParameters;
 
   public CICSOptionsCheckUtility(
       DialectProcessingContext context,
@@ -367,16 +367,6 @@ public class CICSOptionsCheckUtility {
     else if (spOptions != null) {
       if (utilityParameters.spEnabled) spOptions.checkOptions(ctx);
       else spOptions.throwIfMissingTranslatorOption(ctx, "\"SP\"");
-    }
-    if (ctx.getRuleIndex() == CICSParser.RULE_variableNameUsage) {
-      CICSParser.VariableNameUsageContext context = (CICSParser.VariableNameUsageContext) ctx;
-      if ((context.NONNUMERICLITERAL() != null || context.NUMERICLITERAL() != null)) {
-        utility = optionsMap.entrySet().iterator().next().getValue();
-        if (utilityParameters.quoteEnabled && context.getText().endsWith("\'"))
-          utility.throwWrongApostQuoteTranslatorOption(context, "QUOTE");
-        else if (!utilityParameters.quoteEnabled && context.getText().endsWith("\""))
-          utility.throwWrongApostQuoteTranslatorOption(context, "APOST");
-      }
     }
   }
 }

@@ -325,7 +325,8 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
                         throwException(
                             token.getText(),
                             locality,
-                            messageService.getMessage("CobolVisitor.AreaBWarningMsg"))));
+                            messageService.getMessage("CobolVisitor.AreaBWarningMsg"),
+                            ErrorSeverity.WARNING)));
   }
 
   private Locality getTokenLocality(Token token) {
@@ -349,13 +350,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     };
   }
 
-  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+  private void throwException(
+      String wrongToken, @NonNull Locality locality, String message, ErrorSeverity severity) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(locality.toOriginalLocation())
             .suggestion(message + wrongToken)
-            .severity(ErrorSeverity.WARNING)
+            .severity(severity)
             .build();
 
     LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
@@ -405,5 +407,25 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
       }
     }
     return cicsCheckUtilityParameters;
+  }
+
+  @Override
+  public List<Node> visitVariableNameUsage(CICSParser.VariableNameUsageContext ctx) {
+    CICSCheckUtilityParameters options = cicsOptionsCheckUtility.getUtilityParameters();
+    if ((ctx.NONNUMERICLITERAL() != null || ctx.NUMERICLITERAL() != null)) {
+      if (options.quoteEnabled && ctx.getText().endsWith("\'"))
+        throwException(
+            "QUOTE",
+            getTokenLocality(ctx.start),
+            "Enabled translator option: ",
+            ErrorSeverity.ERROR);
+      else if (!options.quoteEnabled && ctx.getText().endsWith("\""))
+        throwException(
+            "APOST",
+            getTokenLocality(ctx.start),
+            "Enabled translator option: ",
+            ErrorSeverity.ERROR);
+    }
+    return visitChildren(ctx);
   }
 }

@@ -717,16 +717,4 @@ public abstract class CICSOptionsCheckBaseUtility {
           optionalFieldName);
     }
   }
-
-  /**
-   * Helper method to produce diagnostics that violates enabled directive option
-   *
-   * @param rule TerminalNode to check.
-   * @param directiveOption Violated translator option
-   * @param <E> Generic type to allow cross-rule context collection.
-   */
-  public <E> void throwWrongApostQuoteTranslatorOption(E rule, String directiveOption) {
-    throwException(
-        ErrorSeverity.ERROR, getLocality(rule), "Enabled translator option: ", directiveOption);
-  }
 }
