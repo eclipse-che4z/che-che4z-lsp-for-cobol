@@ -25,8 +25,8 @@ export class ZoweDSNService extends ZoweExplorerDownloader {
   protected schema = "zowe-ds";
   protected separator = "/";
 
-  constructor(explorerAPI: IApiRegisterClient) {
-    super(explorerAPI);
+  constructor(protected readonly explorerAPI: IApiRegisterClient) {
+    super();
   }
 
   public async getAllMembers(

@@ -157,7 +157,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-      new CopybooksCompletionProvider(externalApis, outputChannel),
+      new CopybooksCompletionProvider(),
     ),
   );
 
@@ -177,7 +177,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.workspace.onDidCloseTextDocument((document) => {
       void analysisService.invalidate(document.uri.toString(), true);
-      copyBooksDownloader.clearE4EConfig(document.uri.toString());
+      externalApis.clearE4EConfig(document.uri.toString());
     }),
   );
 

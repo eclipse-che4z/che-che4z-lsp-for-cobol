@@ -9,9 +9,12 @@ import {
   ResolvedProfile,
 } from "../../type/e4eApi";
 import { externalApis } from "../copybook/CopybookDownloadService";
+import { EndevorLib } from "./EndevorLib";
 
-export class EndevorElementLib implements CopybookLib {
-  constructor(private config: EndevorConfigModel) {}
+export class EndevorElementLib extends EndevorLib implements CopybookLib {
+  constructor(private config: EndevorConfigModel) {
+    super(config.profile);
+  }
 
   static create(configs: CopybookLibs) {
     const libs = [];
@@ -23,10 +26,8 @@ export class EndevorElementLib implements CopybookLib {
     return libs;
   }
 
-  async resolveCopybookUri(copybookName: string, _documentUri: Uri) {
-    const profile = await externalApis.e4eDownloader?.getProfileInfo(
-      this.config.profile,
-    );
+  async resolveCopybookUri(copybookName: string, documentUri: Uri) {
+    const profile = await this.getProfile(documentUri);
 
     if (profile) {
       const element: EndevorElement = {
@@ -46,42 +47,31 @@ export class EndevorElementLib implements CopybookLib {
       );
 
       if (foundElement) {
-        return () => this.downloadCopybook(profile, foundElement);
+        return async () =>
+          externalApis.e4eDownloader?.downloadElementE4E(profile, foundElement);
       }
     }
     return;
   }
 
-  async downloadCopybook(
-    profile: ResolvedProfile,
-    element: EndevorElement | EndevorMember,
-  ) {
-    // try {
-    if (DATASET in element) {
-      return await externalApis.e4eDownloader?.downloadDatasetE4E(
-        profile,
-        element,
-      );
-    } else if (ENVIRONMENT in element) {
-      return await externalApis.e4eDownloader?.downloadElementE4E(
-        profile,
-        element,
-      );
-    }
-
-    throw new Error("Invalid endevor element");
-    // } catch (err) {
-    // throw err;
-    // this.outputChannel?.appendLine(
-    //   `Error while downloading element from Endevor ${JSON.stringify(element)} - ${getErrorMessage(err)}`,
-    // );
-    // }
-  }
-
-  listCopybooks(
+  async listCopybooks(
     documentUri: Uri,
-    outputChannel?: OutputChannel,
+    _outputChannel?: OutputChannel,
   ): Promise<string[]> {
-    throw new Error("Method not implemented.");
+    const profile = await this.getProfile(documentUri);
+    if (profile) {
+      const list = await externalApis.e4eDownloader?.getElements(profile, {
+        use_map: this.config.use_map === false ? false : true,
+        environment: this.config.environment,
+        stage: this.config.stage,
+        system: this.config.system,
+        subsystem: this.config.subsystem,
+        type: this.config.type,
+      });
+      // TODO? handle error in better way?
+      if (list instanceof Error) return [];
+      return list?.map((m) => m.element) ?? [];
+    }
+    return [];
   }
 }

@@ -162,22 +162,43 @@ export class CopybookDownloaderForE4E {
     });
   }
 
-  private async getMembers(
+  public async getMembers(
     profile: ResolvedProfile,
     dataset: string,
   ): Promise<EndevorMember[] | Error> {
-    const list = await this.e4e.listMembers(profile, { dataset });
-    if (list instanceof Error) return list;
+    const id = this.createProfileDatasetId(profile, dataset);
+    if (this.E4EMembers.has(id)) {
+      return this.E4EMembers.get(id)!;
+    }
 
-    return list.map((str) => ({
+    const list = await this.e4e.listMembers(profile, { dataset });
+    if (list instanceof Error) {
+      this.E4EMembers.set(id, undefined);
+      return list;
+    }
+
+    const members = list.map((str) => ({
       dataset: dataset,
       member: str,
     }));
+
+    this.E4EMembers.set(id, members);
+    return members;
   }
-  private async getElements(
+  public async getElements(
     profile: ResolvedProfile,
     lib: EndevorType,
   ): Promise<EndevorElement[] | Error> {
+    const id = this.createProfileEndevorTypeId(profile, lib);
+
+    const cachedElements = this.E4EElements.get(id);
+    if (cachedElements) {
+      return cachedElements;
+    }
+    if (this.E4EElements.has(id)) {
+      return this.E4EElements.get(id) ?? [];
+    }
+
     const list = await this.e4e.listElements(profile, lib);
     if (list instanceof Error) return list;
 
@@ -405,19 +426,11 @@ export class CopybookDownloaderForE4E {
     endevorType: EndevorType,
     elementName: string,
   ) {
-    const id = this.createProfileEndevorTypeId(profile, endevorType);
-    elementName = elementName.toUpperCase();
-    if (this.E4EElements.has(id)) {
-      return this.E4EElements.get(id)?.find(
-        (x) => x.element.toUpperCase() == elementName,
-      );
-    }
     const members = await this.getElements(profile, endevorType);
     if (members instanceof Error) {
-      this.E4EElements.set(id, undefined);
       return;
     }
-    this.E4EElements.set(id, members);
+
     return members.find((x) => x.element.toUpperCase() == elementName);
   }
 
@@ -426,20 +439,10 @@ export class CopybookDownloaderForE4E {
     dataset: string,
     memberName: string,
   ) {
-    const id = this.createProfileDatasetId(profile, dataset);
-
-    if (this.E4EMembers.has(id)) {
-      return this.E4EMembers.get(id)?.find(
-        (member) => member.member.toUpperCase() === memberName,
-      );
-    }
-
     const members = await this.getMembers(profile, dataset);
     if (members instanceof Error) {
-      this.E4EMembers.set(id, undefined);
       return;
     }
-    this.E4EMembers.set(id, members);
     return members.find((member) => member.member.toUpperCase() === memberName);
   }
 

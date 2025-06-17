@@ -28,8 +28,6 @@ export abstract class ZoweExplorerDownloader {
   protected abstract schema: string;
   protected abstract separator: string;
 
-  constructor(protected readonly explorerAPI: IApiRegisterClient) {}
-
   protected createId(profileName: string, path: string) {
     return `${profileName}-${path}`;
   }

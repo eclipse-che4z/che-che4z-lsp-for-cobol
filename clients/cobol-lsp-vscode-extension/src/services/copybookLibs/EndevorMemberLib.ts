@@ -5,12 +5,13 @@ import {
   CopybookLibs,
   EndevorDatasetConfigModel,
 } from "../ProcessorGroupsLoader";
-
 import { externalApis } from "../copybook/CopybookDownloadService";
-import { ResolvedProfile } from "../../type/e4eApi";
+import { EndevorLib } from "./EndevorLib";
 
-export class EndevorMemberLib implements CopybookLib {
-  constructor(private config: EndevorDatasetConfigModel) {}
+export class EndevorMemberLib extends EndevorLib implements CopybookLib {
+  constructor(private config: EndevorDatasetConfigModel) {
+    super(config.profile);
+  }
 
   static create(configs: CopybookLibs) {
     const libs = [];
@@ -23,14 +24,7 @@ export class EndevorMemberLib implements CopybookLib {
   }
 
   async resolveCopybookUri(copybookName: string, documentUri: Uri) {
-    let profile: ResolvedProfile | undefined;
-    if (this.config.profile) {
-      profile = await externalApis.e4eDownloader?.getProfileInfo(
-        this.config.profile,
-      );
-    } else {
-      profile = await externalApis.e4eDownloader?.getProfileForUri(documentUri);
-    }
+    const profile = await this.getProfile(documentUri);
 
     if (profile) {
       const foundMember = await externalApis.e4eDownloader?.hasMember(
@@ -47,26 +41,20 @@ export class EndevorMemberLib implements CopybookLib {
     return;
   }
 
-  // async downloadCopybook(profile: ResolvedProfile, element: EndevorMember) {
-  //   // try {
-  //   return await externalApis.e4eDownloader?.downloadDatasetE4E(
-  //     profile,
-  //     element,
-  //   );
-
-  //   throw new Error("Invalid endevor member");
-  //   // } catch (err) {
-  //   // throw err;
-  //   // this.outputChannel?.appendLine(
-  //   //   `Error while downloading element from Endevor ${JSON.stringify(element)} - ${getErrorMessage(err)}`,
-  //   // );
-  //   // }
-  // }
-
-  listCopybooks(
+  async listCopybooks(
     documentUri: Uri,
-    outputChannel?: OutputChannel,
+    _outputChannel?: OutputChannel,
   ): Promise<string[]> {
-    throw new Error("Method not implemented.");
+    const profile = await this.getProfile(documentUri);
+    if (profile) {
+      const list = await externalApis.e4eDownloader?.getMembers(
+        profile,
+        this.config.endevorDataset,
+      );
+      // TODO? handle error in better way?
+      if (list instanceof Error) return [];
+      return list?.map((m) => m.member) ?? [];
+    }
+    return [];
   }
 }

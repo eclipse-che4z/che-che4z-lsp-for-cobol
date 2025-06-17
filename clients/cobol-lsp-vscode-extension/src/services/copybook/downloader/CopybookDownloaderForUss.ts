@@ -26,8 +26,8 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
   protected schema = "zowe-uss";
   protected separator = "";
 
-  constructor(explorerAPI: IApiRegisterClient) {
-    super(explorerAPI);
+  constructor(protected readonly explorerAPI: IApiRegisterClient) {
+    super();
   }
 
   public async getAllMembers(
