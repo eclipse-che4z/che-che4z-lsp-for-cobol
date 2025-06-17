@@ -73,7 +73,7 @@ public class TestCICSAbend {
             "error",
             new Diagnostic(
                 new Range(),
-                "Invalid literal delimeter: QUOTE, APOST expected.",
+                "Invalid literal delimeter: \' expected.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ABEND_ABCODE_APOST_INVALID, expectedDiagnostic);
@@ -86,7 +86,7 @@ public class TestCICSAbend {
             "error",
             new Diagnostic(
                 new Range(),
-                "Invalid literal delimeter: QUOTE, APOST expected.",
+                "Invalid literal delimeter: \' expected.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ABEND_ABCODE_APOST_HEX_INVALID, expectedDiagnostic);
