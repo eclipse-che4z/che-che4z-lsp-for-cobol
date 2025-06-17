@@ -423,7 +423,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
       else if (!cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\""))
         throwException(
             getTokenLocality(ctx.start),
-            MessageTemplate.of("cics.invalidLiteralDelimeter", "QUOTE", "APOST"),
+            MessageTemplate.of("cics.invalidLiteralDelimeter", "'"),
             ErrorSeverity.ERROR);
     }
     return visitChildren(ctx);
