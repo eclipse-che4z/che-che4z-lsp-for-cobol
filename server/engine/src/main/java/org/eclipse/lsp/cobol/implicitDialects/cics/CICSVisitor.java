@@ -45,6 +45,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -96,6 +97,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   public List<Node> visitCicsExecBlock(CICSParser.CicsExecBlockContext ctx) {
     areaBWarning(ctx);
     changeContextToDialectStatement(ctx);
+    checkNoCicsEnabled(ctx);
     if (ctx.stop.getType() != CICSLexer.END_EXEC) {
       SyntaxError error =
           SyntaxError.syntaxError()
@@ -154,6 +156,27 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
       return addTreeNode(ctx, (location) -> new ExecCicsHandleNode(location, type));
     }
     return addTreeNode(ctx, ExecCicsNode::new);
+  }
+
+  private void checkNoCicsEnabled(CICSParser.CicsExecBlockContext ctx) {
+    if (cicsOptionsCheckUtilityParams.noCicsEnabled) {
+      OriginalLocation locality =
+          Locality.builder()
+              .range(
+                  new Range(
+                      getTokenLocality(ctx.start).getRange().getStart(),
+                      getTokenLocality(ctx.stop).getRange().getEnd()))
+              .build()
+              .toOriginalLocation();
+      SyntaxError error =
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .location(locality)
+              .suggestion(messageService.getMessage("cics.noCicsWarning"))
+              .severity(ErrorSeverity.WARNING)
+              .build();
+      errors.add(error);
+    }
   }
 
   @Override
@@ -404,6 +427,12 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
           break;
         case "QUOTE":
           cicsCheckUtilityParameters.quoteEnabled = true;
+          break;
+        case "NOCICS":
+          cicsCheckUtilityParameters.noCicsEnabled = true;
+          break;
+        case "CICS":
+          cicsCheckUtilityParameters.noCicsEnabled = false;
           break;
         default:
           break;

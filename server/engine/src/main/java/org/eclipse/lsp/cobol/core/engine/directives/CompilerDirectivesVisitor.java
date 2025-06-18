@@ -162,4 +162,17 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     }
     return super.visitCicsTranslatorDirectives(ctx);
   }
+  @Override
+  public Object visitCobolCompilerOption(CompilerDirectivesParser.CobolCompilerOptionContext ctx) {
+    List<String> cicsDirectives =
+        analysisContext
+            .getPreprocessorsDirectives()
+            .computeIfAbsent("CICS", e -> new ArrayList<>());
+    if (ctx.NOCICS() != null) {
+      cicsDirectives.add(ctx.NOCICS().getText());
+    } else if (ctx.CICS() != null) {
+      cicsDirectives.add(ctx.CICS().getText());
+    }
+    return super.visitCobolCompilerOption(ctx);
+  }
 }

@@ -20,4 +20,5 @@ public class CICSCheckUtilityParameters {
   public boolean spEnabled = false;
   public boolean exciEnabled = false;
   public boolean quoteEnabled = false;
+  public boolean noCicsEnabled = false;
 }
