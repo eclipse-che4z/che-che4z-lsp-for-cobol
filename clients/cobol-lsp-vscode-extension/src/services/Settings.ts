@@ -158,13 +158,7 @@ export async function lspConfigHandler(
           );
           break;
         case DIALECT_LIBS:
-          if (item.dialect && item.scopeUri) {
-            const dialectLibs = await SettingsService.getCopybookLocalPath(
-              vscode.Uri.parse(item.scopeUri),
-              item.dialect,
-            );
-            result.push(dialectLibs);
-          }
+          // server should not need to know local paths to dialect libs
           break;
         default:
           result.push(vscode.workspace.getConfiguration().get(item.section));
@@ -200,42 +194,6 @@ export class SettingsService {
     return vscode.workspace
       .getConfiguration()
       .get(SETTINGS_SUBROUTINE_LOCAL_KEY);
-  }
-
-  /**
-   * Get copybook local path based on program file name
-   * @param documentUri is a program file URI
-   * @param dialectType name of the cobol dialect type
-   * @returns a list of local path
-   */
-  public static async getCopybookLocalPath(
-    documentUri: vscode.Uri,
-    dialectType: string,
-    convertToAbsolutePaths = true,
-  ): Promise<string[]> {
-    const pgPaths = await loadProcessorGroupCopybookPaths(
-      documentUri,
-      dialectType,
-    );
-
-    const vars = getVariablesFromUri(documentUri);
-    const paths: string[] = [
-      ...SettingsService.evaluateVariables(pgPaths, vars),
-      ...SettingsService.getCopybookConfigValues(
-        PATHS_LOCAL_KEY,
-        documentUri,
-        dialectType,
-      ),
-    ];
-
-    if (convertToAbsolutePaths) {
-      const uris = SettingsService.prepareLocalSearchUris(
-        paths,
-        vscode.workspace.workspaceFolders ?? [],
-      );
-      return uris.map((u) => u.fsPath);
-    }
-    return paths;
   }
 
   public static async getCopybookExtension(

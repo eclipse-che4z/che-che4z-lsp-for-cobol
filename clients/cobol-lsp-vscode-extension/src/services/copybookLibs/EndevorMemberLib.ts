@@ -16,7 +16,7 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
   static create(configs: CopybookLibs) {
     const libs = [];
     for (const config of configs) {
-      if (hasMember(config, "endevorDataset")) {
+      if (hasMember(config, "dataset")) {
         libs.push(new EndevorMemberLib(config));
       }
     }
@@ -33,7 +33,7 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
     if (profile) {
       const foundMember = await externalApis.e4eDownloader?.hasMember(
         profile,
-        this.config.endevorDataset,
+        this.config.dataset,
         copybookName,
       );
 
@@ -54,13 +54,13 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
     }
     const profile = await this.getProfile(documentUri);
     if (profile) {
-      if (!this.configCheck(documentUri)) {
+      if (!(await this.configCheck(documentUri))) {
         return [];
       }
 
       const list = await externalApis.e4eDownloader?.getMembers(
         profile,
-        this.config.endevorDataset,
+        this.config.dataset,
       );
       // TODO? handle error in better way?
       if (list instanceof Error) return [];

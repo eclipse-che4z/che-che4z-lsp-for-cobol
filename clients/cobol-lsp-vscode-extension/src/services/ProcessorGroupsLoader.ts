@@ -23,6 +23,7 @@ import { DatasetLib } from "./copybookLibs/DatasetLib";
 import { externalApis } from "./ExternalAPIsService";
 import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
 import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
+import CopybookLib from "./copybookLibs/CopybookLib";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -48,8 +49,9 @@ export async function readEndevorConfig(
     return;
   }
 
-  const workspaceKey = documentUri.toString();
-  let workspaceConfig = workspaceConfigs[workspaceKey];
+  const programPath = workspace.asRelativePath(documentUri);
+
+  let workspaceConfig = workspaceConfigs[programPath];
   if (workspaceConfig) {
     return workspaceConfig;
   }
@@ -64,61 +66,38 @@ export async function readEndevorConfig(
       documentUri,
     );
   if (endevorData) {
-    // const decodedGroups = ProcessorGroupsModel.decode(
-    //   endevorData.pgroups.map((p) => ({ name: p.name, libs: p.libs })),
-    // );
-    // if (isLeft(decodedGroups)) {
-    //   const msg = `Could not validate data: ${PathReporter.report(decodedGroups).join("\n")}`;
-    //   throw Error(msg);
-    // }
-    const decodedGroups = endevorData.pgroups.map((p) => ({
-      name: p.name,
-      libs: p.libs.map((l) => {
-        if (hasMember(l, "dataset")) {
-          const el: EndevorDatasetConfigModel = {
-            endevorDataset: l.dataset,
-          };
-          if (hasMember(l, "profile") && typeof l.profile === "string") {
-            el.profile = l.profile;
-          }
-          return el;
-        } else return l;
-      }),
-    }));
-
-    const processorGroups = decodedGroups.map(transformProcessorGroup);
+    const processorGroups = endevorData.pgroups.map(
+      transformProcessorGroup([EndevorElementLib, EndevorMemberLib]),
+    );
     processorGroups.forEach((pg) => {
       workspaceConfig.processorGroups[pg.name] = pg;
     });
 
-    const decodedPrograms = ProgramsConfigModel.decode({
-      pgms: endevorData.pgms.map((pgm) => ({
-        ...pgm,
-        program: `**/${pgm.program.split("/").reverse().join(".")}`,
-      })),
-    });
+    const decodedPrograms = ProgramsConfigModel.decode(endevorData);
     if (isLeft(decodedPrograms)) {
       throw Error(
         `Could not validate data: ${PathReporter.report(decodedPrograms).join("\n")}`,
       );
     }
-    decodedPrograms.right.pgms.forEach((program) => {
-      let processorGroup = processorGroups.find(
-        (p) => p.name === program.pgroup,
-      );
-      if (!processorGroup) {
-        //throw Error(`Processor group ${program.pgroup} definition missing.`);
-        // TODO: report missing pg configuration
-        processorGroup = { name: program.pgroup };
-      }
-      workspaceConfig.programs.push({
-        program: program.program,
-        processorGroup: processorGroup,
-      });
-    });
+
+    const processorGroupName = decodedPrograms.right.pgms[0].pgroup;
+    const processorGroup = processorGroups.find(
+      (pg) => pg.name === processorGroupName,
+    );
+    if (processorGroup) {
+      const programs: ProgramConfig[] = [
+        {
+          program: programPath,
+          processorGroup,
+        },
+      ];
+      workspaceConfig.programs = programs;
+    } else {
+      // TODO: report missing pg configuration
+    }
   }
 
-  workspaceConfigs[workspaceKey] = workspaceConfig;
+  workspaceConfigs[programPath] = workspaceConfig;
 
   return workspaceConfig;
 }
@@ -184,7 +163,7 @@ export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
 
 const EndevorDatasetModel = t.intersection([
   t.type({
-    endevorDataset: t.string,
+    dataset: t.string,
   }),
   t.partial({
     profile: t.string,
@@ -302,7 +281,7 @@ async function readProcessorGroupsFile(
       );
     }
 
-    return decoded.right.pgroups.map(transformProcessorGroup);
+    return decoded.right.pgroups.map(transformProcessorGroup());
   } catch (e) {
     if (hasMember(e, "code") && e.code !== "FileNotFound") {
       // TODO: better error handling
@@ -312,32 +291,41 @@ async function readProcessorGroupsFile(
   }
 }
 
-function transformProcessorGroup(
-  input: ProcessorGroup,
-): TransformedProcessorGroup {
-  const result: TransformedProcessorGroup = {
-    name: input.name,
-    libs: transformLibs(input.libs),
-    preprocessors: transformPreprocessor(input.preprocessor),
+const transformProcessorGroup =
+  (
+    libTypes = [
+      LocalPathLib,
+      DatasetLib,
+      UssPathLib,
+      EndevorElementLib,
+      EndevorMemberLib,
+    ],
+  ) =>
+  (input: ProcessorGroup): TransformedProcessorGroup => {
+    const result: TransformedProcessorGroup = {
+      name: input.name,
+      libs: transformLibs(input.libs, libTypes),
+      preprocessors: transformPreprocessor(input.preprocessor),
+    };
+
+    return result;
   };
 
-  return result;
-}
-
-export function transformLibs(libs?: CopybookLibs) {
-  if (!libs) {
-    return [];
-  }
-
-  const processorGroupLibTypes = [
+export function transformLibs(
+  libs?: CopybookLibs,
+  libTypes = [
     LocalPathLib,
     DatasetLib,
     UssPathLib,
     EndevorElementLib,
     EndevorMemberLib,
-  ];
+  ],
+) {
+  if (!libs) {
+    return [];
+  }
 
-  const results = processorGroupLibTypes.map((pg) => pg.create(libs)).flat();
+  const results = libTypes.map((pg) => pg.create(libs)).flat();
 
   return results;
 }
