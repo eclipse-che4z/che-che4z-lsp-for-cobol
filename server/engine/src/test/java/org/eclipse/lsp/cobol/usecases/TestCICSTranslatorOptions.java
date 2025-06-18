@@ -34,7 +34,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests CICS translator options. Refer <a
@@ -158,5 +160,164 @@ public class TestCICSTranslatorOptions {
     Assertions.assertEquals(1, diagnostics.get(UseCaseUtils.DOCUMENT_URI).size());
     Assertions.assertEquals(
         "Syntax error on 'XOPTS'", diagnostics.get(UseCaseUtils.DOCUMENT_URI).get(0).getMessage());
+  }
+
+  @ParameterizedTest
+  @MethodSource("conflictingOptionsProvider")
+  void testConflictingOptionsGenerateWarning(String firstOption, String secondOption) {
+    String text =
+        String.format(
+            "       CBL CICS(%s {%s|1})\n       CBL CICS({%s|2} %s)\n%s",
+            firstOption, secondOption, secondOption, firstOption, TEXT);
+
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                String.format("Conflicting options detected. %s assumed.", firstOption),
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                String.format("Conflicting options detected. %s assumed.", firstOption),
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
+  }
+
+  private static Stream<Arguments> conflictingOptionsProvider() {
+    return Stream.of(
+        Arguments.of("QUOTE", "APOST"),
+        Arguments.of("APOST", "QUOTE"),
+        Arguments.of("CBLCARD", "NOCBLCARD"),
+        Arguments.of("NOCBLCARD", "CBLCARD"),
+        Arguments.of("COBOL2", "COBOL3"),
+        Arguments.of("COBOL2", "CO3"),
+        Arguments.of("CO2", "COBOL3"),
+        Arguments.of("CO2", "CO3"),
+        Arguments.of("COBOL3", "COBOL2"),
+        Arguments.of("COBOL3", "CO2"),
+        Arguments.of("CO3", "COBOL2"),
+        Arguments.of("CO3", "CO2"),
+        Arguments.of("CPSM", "NOCPSM"),
+        Arguments.of("NOCPSM", "CPSM"),
+        Arguments.of("DEBUG", "NODEBUG"),
+        Arguments.of("NODEBUG", "DEBUG"),
+        Arguments.of("EDF", "NOEDF"),
+        Arguments.of("NOEDF", "EDF"),
+        Arguments.of("FEPI", "NOFEPI"),
+        Arguments.of("NOFEPI", "FEPI"),
+        Arguments.of("LENGTH", "NOLENGTH"),
+        Arguments.of("NOLENGTH", "LENGTH"),
+        Arguments.of("LINKAGE", "NOLINKAGE"),
+        Arguments.of("NOLINKAGE", "LINKAGE"),
+        Arguments.of("NUM", "NONUM"),
+        Arguments.of("NONUM", "NUM"),
+        Arguments.of("OPTIONS", "NOOPTIONS"),
+        Arguments.of("NOOPTIONS", "OPTIONS"),
+        Arguments.of("SEQ", "NOSEQ"),
+        Arguments.of("NOSEQ", "SEQ"),
+        Arguments.of("SPIE", "NOSPIE"),
+        Arguments.of("NOSPIE", "SPIE"),
+        Arguments.of("VBREF", "NOVBREF"),
+        Arguments.of("NOVBREF", "VBREF"));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "QUOTE",
+        "APOST",
+        "CBLCARD",
+        "NOCBLCARD",
+        "COBOL2",
+        "CO2",
+        "COBOL3",
+        "CO3",
+        "CPSM",
+        "NOCPSM",
+        "DEBUG",
+        "NODEBUG",
+        "EDF",
+        "NOEDF",
+        "FEPI",
+        "NOFEPI",
+        "LENGTH",
+        "NOLENGTH",
+        "LINKAGE",
+        "NOLINKAGE",
+        "NUM",
+        "NONUM",
+        "OPTIONS",
+        "NOOPTIONS",
+        "SEQ",
+        "NOSEQ",
+        "SPIE",
+        "NOSPIE",
+        "VBREF",
+        "NOVBREF"
+      })
+  void testSingleOptionDoesNotGenerateWarning(String option) {
+    String text = String.format("       CBL CICS(%s)\n%s", option, TEXT);
+    UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testMultipleConflictingOptionsGenerateWarning1() {
+    String text =
+        String.format(
+            "       CBL CICS(\"{APOST|1}\")\n"
+                + "       CBL CICS({APOST|2})\n"
+                + "       CBL CICS(QUOTE {APOST|3} QUOTE)\n%s",
+            TEXT);
+
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Conflicting options detected. QUOTE assumed.",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Conflicting options detected. QUOTE assumed.",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Conflicting options detected. QUOTE assumed.",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testMultipleConflictingOptionsGenerateWarning2() {
+    String text =
+        String.format("       CBL CICS(EDF {NOEDF|1})\n       CBL CICS({NOEDF|2} EDF)\n%s", TEXT);
+
+    UseCaseEngine.runTest(
+        text,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Conflicting options detected. EDF assumed.",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Conflicting options detected. EDF assumed.",
+                DiagnosticSeverity.Warning,
+                ErrorSource.PARSING.getText())));
   }
 }
