@@ -72,6 +72,7 @@ public class Db2SqlDialect implements CobolDialect {
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     List<Node> nodes;
+    List<SyntaxError> parseError = new ArrayList<>();
 
     Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
@@ -92,9 +93,8 @@ public class Db2SqlDialect implements CobolDialect {
       // parse the document text to get parseTree
       Db2SqlParser.StartRuleContext startRuleContext = parser.startRule();
       nodes = db2SqlVisitor.visitStartRule(startRuleContext);
+      parseError.addAll(listener.getErrors());
     }
-
-    List<SyntaxError> parseError = new ArrayList<>(listener.getErrors());
 
     // Add nodes returned by extend method. Not needed here.
     nodes.addAll(context.getDialectNodes());
