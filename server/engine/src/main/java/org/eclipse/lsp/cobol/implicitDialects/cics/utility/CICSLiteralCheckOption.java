@@ -14,10 +14,9 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics.utility;
 
-/** CICS check utility parameters */
-public class CICSCheckUtilityParameters {
-  public boolean noLengthEnabled = false;
-  public boolean spEnabled = false;
-  public boolean exciEnabled = false;
-  public CICSLiteralCheckOption literalChecks = CICSLiteralCheckOption.APOST;
+/** CICS Literal checking option APOST/QUOTE */
+public enum CICSLiteralCheckOption {
+  IGNORE,
+  APOST,
+  QUOTE,
 }

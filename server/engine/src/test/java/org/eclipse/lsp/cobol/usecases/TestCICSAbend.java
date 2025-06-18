@@ -76,7 +76,7 @@ public class TestCICSAbend {
                 "Invalid literal delimeter: \' expected.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(ABEND_ABCODE_APOST_INVALID, expectedDiagnostic);
+    CICSTestUtils.errorTest(ABEND_ABCODE_APOST_INVALID, expectedDiagnostic, "APOST");
   }
 
   @Test
@@ -89,6 +89,6 @@ public class TestCICSAbend {
                 "Invalid literal delimeter: \' expected.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
-    CICSTestUtils.errorTest(ABEND_ABCODE_APOST_HEX_INVALID, expectedDiagnostic);
+    CICSTestUtils.errorTest(ABEND_ABCODE_APOST_HEX_INVALID, expectedDiagnostic, "APOST");
   }
 }

@@ -60,6 +60,7 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSCheckUtilityParameters;
+import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSLiteralCheckOption;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -383,6 +384,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     if (opts == null || opts.isEmpty()) {
       // This is a special case to reduce false positives until we have CICS configuration
       cicsCheckUtilityParameters.spEnabled = true;
+      cicsCheckUtilityParameters.literalChecks = CICSLiteralCheckOption.IGNORE;
       return cicsCheckUtilityParameters;
     }
     for (String opt : opts) {
@@ -400,10 +402,10 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
           cicsCheckUtilityParameters.exciEnabled = true;
           break;
         case "APOST":
-          cicsCheckUtilityParameters.quoteEnabled = false;
+          cicsCheckUtilityParameters.literalChecks = CICSLiteralCheckOption.APOST;
           break;
         case "QUOTE":
-          cicsCheckUtilityParameters.quoteEnabled = true;
+          cicsCheckUtilityParameters.literalChecks = CICSLiteralCheckOption.QUOTE;
           break;
         default:
           break;
@@ -415,12 +417,13 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitVariableNameUsage(CICSParser.VariableNameUsageContext ctx) {
     if ((ctx.NONNUMERICLITERAL() != null || ctx.NUMERICLITERAL() != null)) {
-      if (cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\'"))
+      final CICSLiteralCheckOption opt = cicsOptionsCheckUtilityParams.literalChecks;
+      if (opt == CICSLiteralCheckOption.QUOTE && ctx.getText().endsWith("\'"))
         throwException(
             getTokenLocality(ctx.start),
             MessageTemplate.of("cics.invalidLiteralDelimeter", "\""),
             ErrorSeverity.ERROR);
-      else if (!cicsOptionsCheckUtilityParams.quoteEnabled && ctx.getText().endsWith("\""))
+      else if (opt == CICSLiteralCheckOption.APOST && ctx.getText().endsWith("\""))
         throwException(
             getTokenLocality(ctx.start),
             MessageTemplate.of("cics.invalidLiteralDelimeter", "'"),
