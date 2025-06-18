@@ -38,7 +38,7 @@ describe("LocalSubroutinesService tests", () => {
     jest.restoreAllMocks();
   });
 
-  describe("listLocalCopybooks", () => {
+  describe("listLocalSubroutines", () => {
     describe("returns array of names of copybooks stored in local directories", () => {
       beforeAll(() => {
         configurationValues = {

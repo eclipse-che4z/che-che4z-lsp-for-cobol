@@ -371,9 +371,9 @@ export class SettingsService {
     );
   }
 
-  private static getCopybookConfigValues(
+  public static getCopybookConfigValues(
     section: string,
-    documentUri: string,
+    documentUri: vscode.Uri,
     dialectType: string,
   ) {
     const vars = getVariablesFromUri(documentUri);

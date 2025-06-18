@@ -25,7 +25,6 @@ import { registerEvent } from "../services/reporter";
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/OpenSettingsCommand");
 jest.mock("../services/LanguageClientService");
-jest.mock("../services/copybook/CopybookDownloadService");
 jest.mock("../commands/ClearCopybookCacheCommand");
 
 jest.mock("../services/Settings", () => ({
