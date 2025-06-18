@@ -5,7 +5,7 @@ import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { USS } from "../../constants";
 import * as vscode from "vscode";
-import { externalApis } from "../copybook/CopybookDownloadService";
+import { externalApis } from "../ExternalAPIsService";
 
 export class UssPathLib implements CopybookLib {
   constructor(

@@ -39,7 +39,7 @@ import {
   setUpProcessorGroupConfigWatcher,
   setUpProgramConfigWatcher,
 } from "./ProcessorGroups";
-import { localCopybooks } from "./copybook/LocalCopybooksService";
+import { localCopybooks } from "./copybookLibs/LocalPathLib";
 
 const extensionId = "BroadcomMFD.cobol-language-support";
 

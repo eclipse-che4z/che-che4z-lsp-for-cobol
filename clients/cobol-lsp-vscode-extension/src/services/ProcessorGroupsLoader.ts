@@ -20,7 +20,7 @@ import { asArray, hasMember } from "./util/Utils";
 import LocalPathLib from "./copybookLibs/LocalPathLib";
 import { UssPathLib } from "./copybookLibs/UssPathConfig";
 import { DatasetLib } from "./copybookLibs/DatasetLib";
-import { externalApis } from "./copybook/CopybookDownloadService";
+import { externalApis } from "./ExternalAPIsService";
 import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
 import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 

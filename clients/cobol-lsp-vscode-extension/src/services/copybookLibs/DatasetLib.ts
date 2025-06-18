@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import CopybookLib from "./CopybookLib";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { ProfileUtils } from "../util/ProfileUtils";
-import { externalApis } from "../copybook/CopybookDownloadService";
+import { externalApis } from "../ExternalAPIsService";
 import { ZoweLib } from "./ZoweLib";
 import { MainframeRemoteLocation } from "../copybook/downloader/DownloadUtil";
 

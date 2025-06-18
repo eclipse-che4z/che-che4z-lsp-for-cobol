@@ -5,7 +5,7 @@ import {
   CopybookLibs,
   EndevorDatasetConfigModel,
 } from "../ProcessorGroupsLoader";
-import { externalApis } from "../copybook/CopybookDownloadService";
+import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
 
 export class EndevorMemberLib extends EndevorLib implements CopybookLib {

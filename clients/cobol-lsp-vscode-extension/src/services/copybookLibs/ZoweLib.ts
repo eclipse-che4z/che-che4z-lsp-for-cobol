@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 import { ProfileUtils } from "../util/ProfileUtils";
-import {
-  externalApis,
-  missingExtension,
-} from "../copybook/CopybookDownloadService";
+import { externalApis, missingExtension } from "../ExternalAPIsService";
 import {
   DownloadUtil,
   MainframeRemoteLocation,
@@ -32,16 +29,13 @@ export abstract class ZoweLib {
       return false;
     }
 
-    // isProfileLocked
     if (await DownloadUtil.isProfileLocked(profile)) {
       return false;
     }
 
-    // isProfileValid
     const availableProfiles = ProfileUtils.getAvailableProfiles(
       externalApis.explorerApi,
     );
-
     if (!availableProfiles.includes(profile)) {
       const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
       vscode.window.showErrorMessage(msg);

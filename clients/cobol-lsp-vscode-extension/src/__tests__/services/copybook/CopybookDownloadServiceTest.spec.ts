@@ -22,7 +22,7 @@ import {
   PROVIDE_PROFILE_MSG,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
 } from "../../../constants";
-import { ExternalAPIsService } from "../../../services/copybook/CopybookDownloadService";
+import { ExternalAPIsService } from "../../../services/ExternalAPIsService";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { Utils } from "../../../services/util/Utils";
 import * as vscode from "vscode";

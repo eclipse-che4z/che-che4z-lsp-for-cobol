@@ -20,7 +20,7 @@ import {
   TextLine,
   Uri,
 } from "vscode";
-import { ExternalAPIsService } from "../../../services/copybook/CopybookDownloadService";
+import { ExternalAPIsService } from "../../../services/ExternalAPIsService";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
 import {
   DialectInfo,

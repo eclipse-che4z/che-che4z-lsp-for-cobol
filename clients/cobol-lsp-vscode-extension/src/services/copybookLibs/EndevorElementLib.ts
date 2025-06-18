@@ -4,7 +4,7 @@ import { hasMember } from "../util/Utils";
 import { ENVIRONMENT } from "../../constants";
 import { CopybookLibs, EndevorConfigModel } from "../ProcessorGroupsLoader";
 import { EndevorElement } from "../../type/e4eApi";
-import { externalApis } from "../copybook/CopybookDownloadService";
+import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
 
 export class EndevorElementLib extends EndevorLib implements CopybookLib {

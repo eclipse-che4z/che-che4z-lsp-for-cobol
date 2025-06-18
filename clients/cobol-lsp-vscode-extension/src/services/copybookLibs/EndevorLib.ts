@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 import { ResolvedProfile } from "../../type/e4eApi";
-import {
-  externalApis,
-  missingExtension,
-} from "../copybook/CopybookDownloadService";
+import { externalApis, missingExtension } from "../ExternalAPIsService";
 
 export abstract class EndevorLib {
   constructor(protected profile?: string) {}

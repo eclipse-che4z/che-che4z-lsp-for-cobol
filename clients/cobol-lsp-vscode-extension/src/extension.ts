@@ -28,7 +28,7 @@ import {
 import {
   externalApis,
   initializeExternalAPIs,
-} from "./services/copybook/CopybookDownloadService";
+} from "./services/ExternalAPIsService";
 import { CopybooksCodeActionProvider } from "./services/copybook/CopybooksCodeActionProvider";
 
 import { RunAnalysis } from "./commands/RunAnalysisCLI";
