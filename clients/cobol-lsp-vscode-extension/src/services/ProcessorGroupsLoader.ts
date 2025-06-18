@@ -245,19 +245,19 @@ export type TransformedProcessorGroup = {
   // "target-sql-backend"?: string;
 } & Partial<ProcessorGroupProperties>;
 
-export type TransformedLibs =
-  | LocalPathLib
-  | DatasetLib
-  | UssPathLib
-  | EndevorElementLib
-  | EndevorMemberLib;
+export type TransformedLibTypes =
+  | typeof LocalPathLib
+  | typeof DatasetLib
+  | typeof UssPathLib
+  | typeof EndevorElementLib
+  | typeof EndevorMemberLib;
 
 export type TransformedPreprocessor = {
   name: string;
 } & Partial<ProcessorGroupProperties>;
 
 export interface ProcessorGroupProperties {
-  libs: TransformedLibs[];
+  libs: CopybookLib[];
   "copybook-extensions": string[];
   "compiler-options": string[];
   "copybook-file-encoding": string;
@@ -293,12 +293,11 @@ async function readProcessorGroupsFile(
 
 const transformProcessorGroup =
   (
-    libTypes = [
+    libTypes: TransformedLibTypes[] = [
       LocalPathLib,
       DatasetLib,
       UssPathLib,
       EndevorElementLib,
-      EndevorMemberLib,
     ],
   ) =>
   (input: ProcessorGroup): TransformedProcessorGroup => {
@@ -313,13 +312,7 @@ const transformProcessorGroup =
 
 export function transformLibs(
   libs?: CopybookLibs,
-  libTypes = [
-    LocalPathLib,
-    DatasetLib,
-    UssPathLib,
-    EndevorElementLib,
-    EndevorMemberLib,
-  ],
+  libTypes: TransformedLibTypes[] = [],
 ) {
   if (!libs) {
     return [];
