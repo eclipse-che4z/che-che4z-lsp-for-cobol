@@ -23,7 +23,7 @@ startRule: (
 //startRule: .*? ((execRule | nonExecRule) .*?) * EOF;
 //startIncludeRule: .*? (includeStatement .*?)* EOF;
 
-startSkipRule: execRule;
+startSkipRule: (execRule | ~( EXEC_SQL | EXEC_SQLIMS | SINGLEDIGIT_1 | DOUBLEDIGIT_1 | INTEGERLITERAL | SINGLEDIGITLITERAL))* EOF;
 
 execRule: (EXEC_SQL | EXEC_SQLIMS) sqlCode END_EXEC;
 

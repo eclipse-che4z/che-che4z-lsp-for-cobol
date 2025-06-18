@@ -71,38 +71,28 @@ public class Db2SqlDialect implements CobolDialect {
 
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
+    List<SyntaxError> parseError = new ArrayList<>();
+    List<Node> nodes;
+
     Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
     if (getSqlBackend(context).equalsIgnoreCase(SQLBackend.SKIP_SQL.toString())) {
-      return processSkipSql(context, db2SqlVisitor);
+      Db2SqlParser.StartSkipRuleContext skipRuleContext = parseSkipSql(
+              context.getExtendedDocument().toString(),
+              context.getExtendedDocument().getUri(),
+              parseError);
+
+      nodes = db2SqlVisitor.visitStartSkipRule(skipRuleContext);
+    } else {
+      // parse the document text to get parseTree
+      Db2SqlParser.StartRuleContext startRuleContext =
+              parseDB2(
+                      context.getExtendedDocument().toString(),
+                      context.getExtendedDocument().getUri(),
+                      parseError);
+
+      nodes = db2SqlVisitor.visitStartRule(startRuleContext);
     }
-    return processDB2(context, db2SqlVisitor);
-  }
-
-  private ResultWithErrors<DialectOutcome> processSkipSql(DialectProcessingContext context, Db2SqlVisitor db2SqlVisitor) {
-    List<SyntaxError> parseError = new ArrayList<>();
-
-    Db2SqlParser.StartSkipRuleContext skipRuleContext = parseSkipSql(
-            context.getExtendedDocument().toString(),
-            context.getExtendedDocument().getUri(),
-            parseError);
-
-    List<Node> nodes = db2SqlVisitor.visitStartSkipRule(skipRuleContext);
-    return new ResultWithErrors<>(new DialectOutcome(nodes, context), parseError);
-  }
-
-  private ResultWithErrors<DialectOutcome> processDB2(DialectProcessingContext context, Db2SqlVisitor db2SqlVisitor) {
-    List<SyntaxError> parseError = new ArrayList<>();
-
-    // parse the document text to get parseTree
-    Db2SqlParser.StartRuleContext startRuleContext =
-            parseDB2(
-                    context.getExtendedDocument().toString(),
-                    context.getExtendedDocument().getUri(),
-                    parseError);
-
-    // Traverse the parse tree to generate dialect specific nodes
-    List<Node> nodes = db2SqlVisitor.visitStartRule(startRuleContext);
 
     // Add nodes returned by extend method. Not needed here.
     nodes.addAll(context.getDialectNodes());

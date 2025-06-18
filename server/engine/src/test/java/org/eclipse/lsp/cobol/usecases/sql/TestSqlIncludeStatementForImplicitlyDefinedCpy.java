@@ -94,6 +94,18 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           DISPLAY  {$SQLN}.\n"
           + "           DISPLAY  {$SQLD}.\n";
 
+  private static final String TEXT_BACKEND_SKIP_SQL =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           EXEC SQL\n"
+                  + "           UPDATE DSN8C10.DEPT\n"
+                  + "           SET MGRNO = MGR-NUM\n"
+                  + "           WHERE DEPTNO = INT-DEPT\n"
+                  + "           END-EXEC.\n";
+
   private static final String TEXT_ERR_PRG =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-DB2.\n"
@@ -223,5 +235,24 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         ImmutableMap.of(),
         ImmutableList.of(),
         analysisConfig);
+  }
+
+  @Test
+  void testSkipSql() {
+    AnalysisConfig analysisConfig = new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("SKIP_SQL")));
+
+    UseCaseEngine.runTest(
+            TEXT_BACKEND_SKIP_SQL,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            analysisConfig);
+
   }
 }
