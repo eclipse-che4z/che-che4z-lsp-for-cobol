@@ -274,12 +274,3 @@ describe("Processor groups configuration provides lib path in Windows", () => {
     // expect(result).toStrictEqual([vscode.Uri.file("/copy")]);
   });
 });
-describe("Processor groups configurations prepared for download services", () => {
-  it("getCopybookLocalPath returns local paths only when remote locations provided in processor group definitions", async () => {
-    const paths = await SettingsService.getCopybookLocalPath(
-      vscode.Uri.parse(WORKSPACE_URI + "/abs/TEST.cob"),
-      "COBOL",
-    );
-    expect(paths).toStrictEqual([vscode.Uri.file("/abs").fsPath]);
-  });
-});

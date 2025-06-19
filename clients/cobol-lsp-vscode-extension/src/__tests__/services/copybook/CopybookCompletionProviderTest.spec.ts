@@ -19,16 +19,26 @@ import {
   TextDocument,
   TextLine,
   Uri,
+  window,
 } from "vscode";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
 import {
   DialectInfo,
   DialectRegistry,
 } from "../../../services/DialectRegistry";
-
+import { initializeExternalAPIs } from "../../../services/ExternalAPIsService";
+import * as ProcessorGroups from "../../../services/ProcessorGroups";
+import { MockLib } from "./libs/MockLib";
 describe("CopybooksCompletionProvider", () => {
-  const remoteCopybooks = ["AAA", "ABC", "BBB", "CCC"];
-  const localCopybooks = ["LOCAL"];
+  const remoteCopybooks = {
+    AAA: Uri.parse("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA"),
+    ABC: Uri.parse("zowe-ds:/zosmf/COBOL.COPYBOOK/ABC"),
+    BBB: Uri.parse("zowe-ds:/zosmf/COBOL.COPYBOOK/BBB"),
+    CCC: Uri.parse("zowe-ds:/zosmf/COBOL.COPYBOOK/CCC"),
+  };
+  const localCopybooks = {
+    LOCAL: Uri.file("/copybooks/LOCAL.cpy"),
+  };
   let documentMock: TextDocument;
   let lineText = "";
   let positionMock: Position;
@@ -36,7 +46,7 @@ describe("CopybooksCompletionProvider", () => {
   let cancellationTokenMock: CancellationToken;
   let completionContextMock: CompletionContext;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     documentMock = {
       uri: Uri.file("/PROGRAM.cbl"),
       lineAt: () => ({ text: lineText }) as unknown as TextLine,
@@ -50,6 +60,16 @@ describe("CopybooksCompletionProvider", () => {
       onCancellationRequested: jest.fn(),
     };
     completionContextMock = {} as unknown as CompletionContext;
+    await initializeExternalAPIs(
+      Uri.file("/storage"),
+      window.createOutputChannel("test"),
+    );
+    jest
+      .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
+      .mockResolvedValue([
+        new MockLib(remoteCopybooks),
+        new MockLib(localCopybooks),
+      ]);
   });
 
   describe("completions are provided only after the COPY statement", () => {
@@ -69,7 +89,7 @@ describe("CopybooksCompletionProvider", () => {
         );
 
         expect(completions.map((c) => c.label)).toEqual(
-          remoteCopybooks.concat(localCopybooks),
+          Object.keys(remoteCopybooks).concat(Object.keys(localCopybooks)),
         );
       });
     });
@@ -185,7 +205,7 @@ describe("CopybooksCompletionProvider", () => {
         );
 
         expect(completions.map((c) => c.label)).toEqual(
-          remoteCopybooks.concat(localCopybooks),
+          Object.keys(remoteCopybooks).concat(Object.keys(localCopybooks)),
         );
       });
     });
