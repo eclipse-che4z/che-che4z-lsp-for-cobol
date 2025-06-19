@@ -162,6 +162,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
     }
     return super.visitCicsTranslatorDirectives(ctx);
   }
+
   @Override
   public Object visitCobolCompilerOption(CompilerDirectivesParser.CobolCompilerOptionContext ctx) {
     List<String> cicsDirectives =
