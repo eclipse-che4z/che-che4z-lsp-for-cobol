@@ -23,6 +23,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -379,6 +382,10 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
+    if (getSqlBackend(context).equalsIgnoreCase(SQLBackend.SKIP_SQL.toString())) {
+      return ImmutableList.of();
+    }
+
     String sqlCode = preProcessSqlComment(ctx);
 
     List<Node> nodes =
@@ -393,6 +400,12 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     Node sqlNode = new ExecSqlNode(locality);
     nodes.forEach(sqlNode::addChild);
     return Collections.singletonList(sqlNode);
+  }
+
+  private String getSqlBackend(DialectProcessingContext context) {
+    JsonElement jsonElement = context.getConfig().getDialectsSettings().get(Db2SqlDialect.SQL_BACKEND_SETTING);
+    if (Objects.isNull(jsonElement)) return SQLBackend.DB2_SERVER.toString();
+    return jsonElement.getAsString();
   }
 
   private String preProcessSqlComment(Db2SqlParser.SqlCodeContext ctx) {

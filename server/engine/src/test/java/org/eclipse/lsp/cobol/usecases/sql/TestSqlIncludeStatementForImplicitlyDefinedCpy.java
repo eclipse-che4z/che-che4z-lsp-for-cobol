@@ -106,6 +106,16 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
                   + "           WHERE DEPTNO = INT-DEPT\n"
                   + "           END-EXEC.\n";
 
+  private static final String TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           EXEC SQL\n"
+                  + "           THIS IS INVALID CODE\n"
+                  + "           END-EXEC.\n";
+
   private static final String TEXT_ERR_PRG =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-DB2.\n"
@@ -238,7 +248,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
   }
 
   @Test
-  void testSkipSql() {
+  void testSkipSql1() {
     AnalysisConfig analysisConfig = new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
@@ -249,6 +259,26 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
 
     UseCaseEngine.runTest(
             TEXT_BACKEND_SKIP_SQL,
+            ImmutableList.of(),
+            ImmutableMap.of(),
+            ImmutableList.of(),
+            analysisConfig);
+
+  }
+
+  // Test of purposefully invalid code to ascertain that SKIP_SQL truly skips everything within the EXEC block.
+  @Test
+  void testSkipSql2() {
+    AnalysisConfig analysisConfig = new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("SKIP_SQL")));
+
+    UseCaseEngine.runTest(
+            TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED,
             ImmutableList.of(),
             ImmutableMap.of(),
             ImmutableList.of(),
