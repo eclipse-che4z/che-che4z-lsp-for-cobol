@@ -32,6 +32,7 @@ public class TestDataTypeLength {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*VALID-NUMERIC} PIC 9(18).\n"
+          + "       01 {$*VALID-NUMERIC} PIC S9(18).\n"
           + "       01 {$*INVALID-NUMERIC|2} PIC 9(19).\n"
           + "       PROCEDURE DIVISION.";
 
@@ -55,6 +56,17 @@ public class TestDataTypeLength {
           + "       01 {$*VALID-ALPHANUM} PIC X(255).\n"
           + "       01 {$*INVALID-ALPHANUM|1} PIC X(1000000000).\n"
           + "       01 {$*INVALID1-ALPHANUM|2} PIC X(9999999999).\n"
+          + "       PROCEDURE DIVISION.";
+
+  private static final String TEXT_NUMERIC1 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-NUM} PIC S9(18).\n"
+          + "       01 {$*INVALID-NUM|1} PIC 99999999999999999999.\n"
+          + "       01 {$*INVALID-NUM1|2} PIC S9999999999999999999.\n"
           + "       PROCEDURE DIVISION.";
 
   @Test
@@ -112,6 +124,28 @@ public class TestDataTypeLength {
                 new Range(),
                 "Alphanumeric field 'INVALID1-ALPHANUM' with length 9999999999 exceeds maximum"
                     + " allowed length of 999999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testNumeric1() {
+    UseCaseEngine.runTest(
+        TEXT_NUMERIC1,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-NUM' with length 20 exceeds maximum allowed length of 18"
+                    + " digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-NUM1' with length 19 exceeds maximum allowed length of 18"
+                    + " digits",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

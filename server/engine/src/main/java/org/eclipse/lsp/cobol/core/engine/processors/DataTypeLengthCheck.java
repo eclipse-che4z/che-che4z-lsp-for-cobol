@@ -48,72 +48,83 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
   private void checkDataTypeLength(
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
 
-    Matcher numericMatcher = NUMERIC_PATTERN.matcher(pictureClause);
-    if (numericMatcher.find()) {
-      try {
-        int length = Integer.parseInt(numericMatcher.group(1));
-        if (length > MAX_NUMERIC_LENGTH) {
-          showError(
-              context,
-              node,
-              "dataTypeLengthCheck.maxNumericLengthExceeded",
-              String.valueOf(length),
-              MAX_NUMERIC_LENGTH);
-        }
-      } catch (NumberFormatException e) {
-        showError(
-            context,
-            node,
-            "dataTypeLengthCheck.maxNumericLengthExceeded",
-            String.valueOf(numericMatcher.group(1)),
-            MAX_NUMERIC_LENGTH);
-      }
+    if (checkSimpleNumericPattern(node, pictureClause, context)) {
       return;
     }
 
-    Matcher alphabeticMatcher = ALPHABETIC_PATTERN.matcher(pictureClause);
-    if (alphabeticMatcher.find()) {
-      try {
-        int length = Integer.parseInt(alphabeticMatcher.group(1));
-        if (length > MAX_ALPHABETIC_ALPHANUMERIC_LENGTH) {
-          showError(
-              context,
-              node,
-              "dataTypeLengthCheck.maxAlphabeticLengthExceeded",
-              String.valueOf(length),
-              MAX_ALPHABETIC_ALPHANUMERIC_LENGTH);
-        }
-      } catch (NumberFormatException e) {
-        showError(
-            context,
-            node,
-            "dataTypeLengthCheck.maxAlphabeticLengthExceeded",
-            String.valueOf(alphabeticMatcher.group(1)),
-            MAX_ALPHABETIC_ALPHANUMERIC_LENGTH);
-      }
+    checkPatternBasedClause(
+        node,
+        pictureClause,
+        context,
+        NUMERIC_PATTERN,
+        MAX_NUMERIC_LENGTH,
+        "dataTypeLengthCheck.maxNumericLengthExceeded");
+
+    checkPatternBasedClause(
+        node,
+        pictureClause,
+        context,
+        ALPHABETIC_PATTERN,
+        MAX_ALPHABETIC_ALPHANUMERIC_LENGTH,
+        "dataTypeLengthCheck.maxAlphabeticLengthExceeded");
+
+    checkPatternBasedClause(
+        node,
+        pictureClause,
+        context,
+        ALPHANUMERIC_PATTERN,
+        MAX_ALPHABETIC_ALPHANUMERIC_LENGTH,
+        "dataTypeLengthCheck.maxAlphanumericLengthExceeded");
+  }
+
+  private boolean checkSimpleNumericPattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+
+    if (!pictureClause.matches("(?i)S?9+")) {
+      return false;
+    }
+
+    String numericPart =
+        pictureClause.toUpperCase().startsWith("S") ? pictureClause.substring(1) : pictureClause;
+
+    if (numericPart.length() > MAX_NUMERIC_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxNumericLengthExceeded",
+          String.valueOf(numericPart.length()),
+          MAX_NUMERIC_LENGTH);
+    }
+
+    return true;
+  }
+
+  private void checkPatternBasedClause(
+      VariableWithLevelNode node,
+      String pictureClause,
+      ProcessingContext context,
+      Pattern pattern,
+      int maxLength,
+      String errorMessageKey) {
+
+    Matcher matcher = pattern.matcher(pictureClause);
+    if (!matcher.find()) {
       return;
     }
 
-    Matcher alphanumericMatcher = ALPHANUMERIC_PATTERN.matcher(pictureClause);
-    if (alphanumericMatcher.find()) {
-      try {
-        int length = Integer.parseInt(alphanumericMatcher.group(1));
-        if (length > MAX_ALPHABETIC_ALPHANUMERIC_LENGTH) {
-          showError(
-              context,
-              node,
-              "dataTypeLengthCheck.maxAlphanumericLengthExceeded",
-              String.valueOf(length),
-              MAX_ALPHABETIC_ALPHANUMERIC_LENGTH);
-        }
-      } catch (NumberFormatException e) {
-        showError(
-            context,
-            node,
-            "dataTypeLengthCheck.maxAlphanumericLengthExceeded",
-            alphanumericMatcher.group(1),
-            MAX_ALPHABETIC_ALPHANUMERIC_LENGTH);
-      }
+    String lengthString = matcher.group(1);
+    int length = parseLength(lengthString);
+
+    if (length > maxLength) {
+      showError(context, node, errorMessageKey, lengthString, maxLength);
+    }
+  }
+
+  private int parseLength(String lengthString) {
+    try {
+      return Integer.parseInt(lengthString);
+    } catch (NumberFormatException e) {
+      return Integer.MAX_VALUE;
     }
   }
 
