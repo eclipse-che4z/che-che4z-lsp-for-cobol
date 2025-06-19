@@ -22,18 +22,18 @@ import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
+import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 
 /** Stage to process dialect nodes */
 @RequiredArgsConstructor
-public class DialectCompilerDirectiveStage
-    implements Stage<AnalysisContext, List<CompilerDirectiveNode>, Void> {
+public class DialectCompilerDirectiveStage implements Stage<AnalysisContext, Void, Void> {
   private final DialectService dialectService;
 
   @Override
-  public StageResult<List<CompilerDirectiveNode>> run(
-      AnalysisContext context, StageResult<Void> prevStageResult) {
+  public StageResult<Void> run(AnalysisContext context, StageResult<Void> prevStageResult) {
     List<CompilerDirectiveNode> dialectCompilerDirectiveNodes = new ArrayList<>();
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
     DialectProcessingContext dialectProcessingContext =
@@ -52,7 +52,16 @@ public class DialectCompilerDirectiveStage
         dialect ->
             dialectCompilerDirectiveNodes.addAll(
                 dialect.getCompilerDirectives(dialectProcessingContext)));
-    return new StageResult<>(dialectCompilerDirectiveNodes);
+    context.getDialectNodes().addAll(dialectCompilerDirectiveNodes);
+    List<String> opts =
+        context
+            .getPreprocessorsDirectives()
+            .computeIfAbsent(CICSDialect.DIALECT_NAME, k -> new ArrayList<>());
+    dialectCompilerDirectiveNodes.stream()
+        .map(CompilerDirectiveNode::getDirectiveText)
+        .map(StringUtils::trimQuotes)
+        .forEach(opts::add);
+    return (StageResult<Void>) StageResult.empty();
   }
 
   @Override

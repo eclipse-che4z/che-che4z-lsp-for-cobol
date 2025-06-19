@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases.cics;
 
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
@@ -41,7 +41,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * href="https://www.ibm.com/docs/en/cics-ts/6.1?topic=compilation-using-cics-translator">CICS
  * translator</a> for more details.
  */
-public class TestCICSTranslatorOptions {
+public class TestCicsTranslatorOptions {
   public static final String PREFIX = "       CBL XOPTS (";
   public static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"

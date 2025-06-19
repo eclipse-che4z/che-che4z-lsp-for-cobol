@@ -15,7 +15,6 @@ parser grammar CICSParser;
 options {tokenVocab = CICSLexer; superClass = MessageServiceParser;}
 
 startRule: (cicsExecBlock | cicsDfhValue | cicsDfhResp | ~(EXEC_CICS|DFHRESP|DFHVALUE))* EOF;
-compilerDirective: (.*? compilerOpts)* .*? EOF;
 cicsExecBlock: EXEC_CICS (allCicsRule)* END_EXEC ;
 
 allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate | cics_asktime | cics_assign | cics_bif |
@@ -39,53 +38,6 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
               cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
 allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics | cics_csd;
-
-// compiler options
-compilerOpts
-   : (XOPTS LPARENCHAR compilerXOptsOption (commaClause? compilerXOptsOption)* RPARENCHAR) | cicsOptions;
-
-cicsOptions:  CICS LPARENCHAR (cicsTranslatorCompileDirectivedKeywords | NONNUMERICLITERAL)  RPARENCHAR;
-
-compilerXOptsOption
-    : APOST |
-      CBLCARD |
-      CICS |
-      COBOL2 |
-      COBOL3 |
-      CPSM |
-      DBCS |
-      DEBUG |
-      DLI |
-      EDF |
-      EXCI |
-      FEPI |
-      ((FLAG | F_CHAR) LPARENCHAR (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR) (commaClause (E_CHAR | I_CHAR | S_CHAR | U_CHAR | W_CHAR))? RPARENCHAR) |
-      LENGTH |
-      ((LINECOUNT | LC) LPARENCHAR integerLiteral RPARENCHAR) |
-      LINKAGE |
-      NATLANG |
-      NOCBLCARD |
-      NOCPSM |
-      NODEBUG |
-      NOEDF |
-      NOFEPI |
-      NOLENGTH |
-      NOLINKAGE |
-      NONUM |
-      NOOPTIONS |
-      NOSEQ |
-      NOSPIE |
-      NOVBREF |
-      NUM |
-      OPTIONS |
-      QUOTE |
-      SEQ |
-      SP |
-      SPACE LPARENCHAR integerLiteral RPARENCHAR |
-      SPIE |
-      SYSEIB |
-      VBREF
-    ;
 
 cicsTranslatorCompileDirectivedKeywords
    : CBLCARD | COBOL2 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF

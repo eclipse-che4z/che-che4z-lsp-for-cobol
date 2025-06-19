@@ -31,6 +31,7 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -138,7 +139,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
       List<String> cicsDirectives =
           analysisContext
               .getPreprocessorsDirectives()
-              .computeIfAbsent("CICS", e -> new ArrayList<>());
+              .computeIfAbsent(CICSDialect.DIALECT_NAME, e -> new ArrayList<>());
       cicsDirectives.add(t.getText());
     }
     return super.visitCicsTranslatorOptions(ctx);
@@ -155,7 +156,7 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
       List<String> cicsDirectives =
           analysisContext
               .getPreprocessorsDirectives()
-              .computeIfAbsent("CICS", e -> new ArrayList<>());
+              .computeIfAbsent(CICSDialect.DIALECT_NAME, e -> new ArrayList<>());
       Matcher m = CICS_DIRECTIVES_IN_LITERAL.matcher(literal.getText());
       while (m.find()) {
         cicsDirectives.add(m.group());
