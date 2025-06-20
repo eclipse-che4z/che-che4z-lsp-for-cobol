@@ -191,18 +191,17 @@ export class CopybookDownloaderForE4E {
   ): Promise<EndevorElement[] | Error> {
     const id = this.createProfileEndevorTypeId(profile, lib);
 
-    const cachedElements = this.E4EElements.get(id);
-    if (cachedElements) {
-      return cachedElements;
-    }
     if (this.E4EElements.has(id)) {
-      return this.E4EElements.get(id) ?? [];
+      return this.E4EElements.get(id)!;
     }
 
     const list = await this.e4e.listElements(profile, lib);
-    if (list instanceof Error) return list;
+    if (list instanceof Error) {
+      this.E4EElements.set(id, undefined);
+      return list;
+    }
 
-    return list.map(([filename, fingerprint]) => ({
+    const elements = list.map(([filename, fingerprint]) => ({
       environment: lib.environment,
       element: filename,
       use_map: lib.use_map ? true : false,
@@ -212,6 +211,9 @@ export class CopybookDownloaderForE4E {
       type: lib.type,
       fingerprint: fingerprint,
     }));
+
+    this.E4EElements.set(id, elements);
+    return elements;
   }
 
   public async downloadElement(
@@ -430,7 +432,7 @@ export class CopybookDownloaderForE4E {
     if (members instanceof Error) {
       return;
     }
-
+    elementName = elementName.toUpperCase();
     return members.find((x) => x.element.toUpperCase() == elementName);
   }
 
@@ -443,6 +445,7 @@ export class CopybookDownloaderForE4E {
     if (members instanceof Error) {
       return;
     }
+    memberName = memberName.toUpperCase();
     return members.find((member) => member.member.toUpperCase() === memberName);
   }
 

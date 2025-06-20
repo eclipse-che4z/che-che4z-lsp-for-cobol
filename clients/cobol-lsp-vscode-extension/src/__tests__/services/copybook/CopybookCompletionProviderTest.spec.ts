@@ -28,7 +28,7 @@ import {
 } from "../../../services/DialectRegistry";
 import { initializeExternalAPIs } from "../../../services/ExternalAPIsService";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
-import { MockLib } from "./libs/MockLib";
+import { MockLib } from "./libs/MockLib.utility";
 describe("CopybooksCompletionProvider", () => {
   const remoteCopybooks = {
     AAA: Uri.parse("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA"),

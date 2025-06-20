@@ -187,9 +187,7 @@ describe("e4e copybook downloader tests", () => {
     expect(getMember).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
     expect(outputChannel.appendLine).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "Error while downloading copybook from Endevor copybook",
-      ),
+      expect.stringContaining("Error while downloading element from Endevor"),
     );
   });
 
@@ -209,7 +207,7 @@ describe("e4e copybook downloader tests", () => {
     expect(getElement).toHaveBeenCalled();
     expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
     expect(outputChannel.appendLine).toHaveBeenCalledWith(
-      expect.stringContaining("Error while downloading copybook from Endevor"),
+      expect.stringContaining("Error while downloading element from Endevor"),
     );
   });
 
