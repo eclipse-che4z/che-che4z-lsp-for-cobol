@@ -76,7 +76,8 @@ public class Db2SqlDialect implements CobolDialect {
 
     Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
-    Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
+    Db2SqlLexer lexer =
+        new Db2SqlLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlParser parser = new Db2SqlParser(tokens);
     Db2ErrorListener listener = new Db2ErrorListener(context.getExtendedDocument().getUri());

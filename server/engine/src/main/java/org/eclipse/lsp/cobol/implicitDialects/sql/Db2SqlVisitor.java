@@ -18,13 +18,12 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonElement;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -403,7 +402,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   }
 
   private String getSqlBackend(DialectProcessingContext context) {
-    JsonElement jsonElement = context.getConfig().getDialectsSettings().get(Db2SqlDialect.SQL_BACKEND_SETTING);
+    JsonElement jsonElement =
+        context.getConfig().getDialectsSettings().get(Db2SqlDialect.SQL_BACKEND_SETTING);
     if (Objects.isNull(jsonElement)) return SQLBackend.DB2_SERVER.toString();
     return jsonElement.getAsString();
   }
