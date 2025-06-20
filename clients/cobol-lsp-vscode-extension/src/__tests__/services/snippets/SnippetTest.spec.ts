@@ -17,6 +17,8 @@ import { SnippetCompletionProvider } from "../../../services/snippetcompletion/S
 import { DialectRegistry } from "../../../services/DialectRegistry";
 import path = require("path");
 import { createExtensionContextMock } from "../../../__mocks__/ExtensionContext.utility";
+import { readFileResult } from "../../../__mocks__/vscode";
+import { readFile } from "fs/promises";
 
 describe("Test CompletionProvider", () => {
   const context = {
@@ -28,21 +30,29 @@ describe("Test CompletionProvider", () => {
     createExtensionContextMock(),
   );
   const SNIPPET_CBL = "SNIPPET.cbl";
-  beforeAll(() => {
+  const dacoSnippetPath = path.resolve(
+    __dirname,
+    "../../../../../daco-dialect-support/snippets.json",
+  );
+  const idmsSnippetPath = path.resolve(
+    __dirname,
+    "../../../../../idms-dialect-support/snippets.json",
+  );
+  beforeAll(async () => {
+    readFileResult[dacoSnippetPath] = (
+      await readFile(dacoSnippetPath)
+    ).toString();
+    readFileResult[idmsSnippetPath] = (
+      await readFile(idmsSnippetPath)
+    ).toString();
     DialectRegistry.getDialects = jest.fn().mockReturnValue([
       {
         name: "DaCo",
-        snippetPath: path.resolve(
-          __dirname,
-          "../../../../../daco-dialect-support/snippets.json",
-        ),
+        snippetPath: dacoSnippetPath,
       },
       {
         name: "IDMS",
-        snippetPath: path.resolve(
-          __dirname,
-          "../../../../../idms-dialect-support/snippets.json",
-        ),
+        snippetPath: idmsSnippetPath,
       },
     ]);
   });
