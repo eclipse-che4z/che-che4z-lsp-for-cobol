@@ -500,7 +500,7 @@
           "enumDescriptions": [
             "DB2_SERVER  - IBM DB2 SQL Server",
             "DATACOM_SERVER - CA DATACOM Server",
-            "SKIP_SQL - Allows anything within EXEC SQL blocks with minimal processing",
+            "SKIP_SQL - Allows anything within EXEC SQL blocks without further processing",
             "NONE"
           ],
           "description": "The target SQL backend server which is used on the mainframe"
