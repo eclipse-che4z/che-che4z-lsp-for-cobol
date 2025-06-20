@@ -12,114 +12,52 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import {
+  getWorkspaceFolderResult,
+  readFileResult,
+  Uri,
+} from "../../__mocks__/vscode";
+import { initializeExternalAPIs } from "../../services/ExternalAPIsService";
+import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,
-  loadProcessorGroupCopybookPaths,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "../../services/ProcessorGroups";
-import { SettingsService } from "../../services/Settings";
 import * as vscode from "vscode";
 
-const WORKSPACE_URI = "file:///my/workspace";
+const WORKSPACE_PATH = "/tests/processor-groups";
+const WORKSPACE_URI = Uri.file(WORKSPACE_PATH);
 
 jest.mock("fs", () => ({
   existsSync: jest.fn().mockReturnValue(true),
   readFileSync: jest.fn().mockImplementation(() => {}),
 }));
 
-jest.mock("vscode", () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const vscode = jest.requireActual("../../__mocks__/vscode");
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace") as vscode.Uri;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file(
-    "c:/my/workspace",
-  ) as vscode.Uri;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return {
-    ...vscode,
-    workspace: {
-      fs: {
-        readFile: jest.fn().mockImplementation((uri: vscode.Uri) => {
-          if (uri.toString().endsWith("proc_grps.json")) {
-            return Buffer.from(`{
-                      "pgroups": [
-                          {
-                              "name": "DAF",
-                              "copybook-extensions": [".copy"],
-                              "copybook-file-encoding": "UTF-8",
-                              "compiler-options": ["QUALIFY(EXTEND)","XMLPARSE(COMPAT)"],
-                              "preprocessor": [
-                                  "IDMS",
-                                  {
-                                      "name": "DaCo",
-                                      "libs": ["/daco",
-                                      {
-                                  "environment": "ENV",
-                                  "stage": "1",
-                                  "system": "SYSTEM",
-                                  "subsystem": "SUBSYTEM",
-                                  "type": "COPY",
-                                  "profile": "instance.internal.connection"
-                                }
-                                  ]
-                                  },
-                                  {
-                                      "name": "SQL",
-                                      "target-sql-backend": "DATACOM_SERVER"
-                                  }
-                              ],
-                              "libs": ["/copy"]
-                          },
-                          {
-                              "name": "IDMSPG",
-                              "preprocessor": [ "IDMS" ]
-                          },
-                         {
-                              "name": "ABS",
-                              "libs": [
-                                "/abs",
-                                { "dataset": "remote.dataset.location" },
-                                { "uss": "remote.uss.location" },
-                                {
-                                  "environment": "ENV",
-                                  "stage": "1",
-                                  "system": "SYSTEM",
-                                  "subsystem": "SUBSYTEM",
-                                  "type": "COPY",
-                                  "profile": "instance.internal.connection"
-                                }
-                              ]
-                          }
-                      ]
-                  }`);
-          }
-          if (uri.toString().endsWith("pgm_conf.json")) {
-            return Buffer.from(`{
-                      "pgms": [
-                          { "program": "c:\\\\my\\\\workspace\\\\TEST.cob", "pgroup": "DAF" },
-                          { "program": "/my/workspace/abs/TEST.cob", "pgroup": "ABS" },
-                          { "program": "TEST.cob", "pgroup": "DAF" },
-                          { "program": "*DAF.cob", "pgroup": "DAF" },
-                          { "program": "IDMS/TEST.cob", "pgroup": "IDMSPG" }
-                      ]
-                  }`);
-          }
-        }),
-      },
-      getWorkspaceFolder: (uri: vscode.Uri) =>
-        uri.path.startsWith("/c:")
-          ? { uri: WORKSPACE_URI_OBJ_WIN32 }
-          : { uri: WORKSPACE_URI_OBJ },
-      workspaceFolders: [{ uri: WORKSPACE_URI_OBJ }],
-      getConfiguration: jest.fn().mockReturnValue({
-        get: jest.fn().mockReturnValue(undefined),
-      }),
-    },
-  };
-});
+// jest.mock("vscode", () => {
+//   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+//   const vscode = jest.requireActual("../../__mocks__/vscode");
+//   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+//   const WORKSPACE_URI_OBJ = vscode.Uri.file("/my/workspace") as vscode.Uri;
+//   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+//   const WORKSPACE_URI_OBJ_WIN32 = vscode.Uri.file(
+//     "c:/my/workspace",
+//   ) as vscode.Uri;
+//   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+//   return {
+//     ...vscode,
+//     workspace: {
+//       fs: {
+//       getWorkspaceFolder: (uri: vscode.Uri) =>
+//         uri.path.startsWith("/c:")
+//           ? { uri: WORKSPACE_URI_OBJ_WIN32 }
+//           : { uri: WORKSPACE_URI_OBJ },
+//       workspaceFolders: [{ uri: WORKSPACE_URI_OBJ }],
+//       getConfiguration: jest.fn().mockReturnValue({
+//         get: jest.fn().mockReturnValue(undefined),
+//       }),
+//     },
+//   };
+// });
 
 jest.mock("path", (): unknown => {
   return {
@@ -131,6 +69,79 @@ jest.mock("path", (): unknown => {
       return strs[0].startsWith("/") || strs[0].startsWith("c:\\");
     },
   };
+});
+
+beforeEach(async () => {
+  getWorkspaceFolderResult.uri = WORKSPACE_URI;
+  readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] = `{
+      "pgroups": [
+          {
+              "name": "DAF",
+              "copybook-extensions": [".copy"],
+              "copybook-file-encoding": "UTF-8",
+              "compiler-options": ["QUALIFY(EXTEND)","XMLPARSE(COMPAT)"],
+              "preprocessor": [
+                  "IDMS",
+                  {
+                      "name": "DaCo",
+                      "libs": ["/daco",
+                      {
+                  "environment": "ENV",
+                  "stage": "1",
+                  "system": "SYSTEM",
+                  "subsystem": "SUBSYTEM",
+                  "type": "COPY",
+                  "profile": "instance.internal.connection"
+                }
+                  ]
+                  },
+                  {
+                      "name": "SQL",
+                      "target-sql-backend": "DATACOM_SERVER"
+                  }
+              ],
+              "libs": ["/copy"]
+          },
+          {
+              "name": "IDMSPG",
+              "preprocessor": [ "IDMS" ]
+          },
+          {
+              "name": "ABS",
+              "libs": [
+                "/abs",
+                { "dataset": "remote.dataset.location" },
+                { "uss": "remote.uss.location" },
+                {
+                  "environment": "ENV",
+                  "stage": "1",
+                  "system": "SYSTEM",
+                  "subsystem": "SUBSYTEM",
+                  "type": "COPY",
+                  "profile": "instance.internal.connection"
+                }
+              ]
+          }
+      ]
+  }`;
+  readFileResult[`${WORKSPACE_PATH}/.cobolplugin/pgm_conf.json`] = `{
+    "pgms": [
+        { "program": "c:\\\\my\\\\workspace\\\\TEST.cob", "pgroup": "DAF" },
+        { "program": "/my/workspace/abs/TEST.cob", "pgroup": "ABS" },
+        { "program": "TEST.cob", "pgroup": "DAF" },
+        { "program": "*DAF.cob", "pgroup": "DAF" },
+        { "program": "IDMS/TEST.cob", "pgroup": "IDMSPG" }
+    ]
+  }`;
+
+  jest
+    .spyOn(vscode.workspace, "getWorkspaceFolder")
+    .mockReturnValue({ name: "ws", index: 0, uri: WORKSPACE_URI });
+
+  await initializeExternalAPIs(
+    Uri.file("/storage"),
+    vscode.window.createOutputChannel("test"),
+  );
 });
 
 describe("Processor groups configuration provides lib path", () => {
@@ -169,7 +180,7 @@ describe("Processor groups configuration understand absolute paths", () => {
 
 it("Processor groups configuration provides copybook-extensions", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/TEST.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob"),
     section: "cobol-lsp.cpy-manager.copybook-extensions",
   };
   const result = await loadProcessorGroupCopybookExtensionsConfig(
@@ -181,24 +192,16 @@ it("Processor groups configuration provides copybook-extensions", async () => {
 
 it("Processor groups configuration provides cobol-lsp.target-sql-backend", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/TEST.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob"),
     section: "cobol-lsp.target-sql-backend",
   };
   const result = await loadProcessorGroupSqlBackendConfig(item, "");
   expect(result).toStrictEqual("DATACOM_SERVER");
 });
 
-it("Processor groups configuration provides dialect lib path", async () => {
-  const result = await loadProcessorGroupCopybookPaths(
-    vscode.Uri.parse(WORKSPACE_URI + "/TEST.cob"),
-    "DaCo",
-  );
-  expect(result).toStrictEqual(["/daco"]);
-});
-
 it("Processor groups configuration matches program", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/TEST.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob"),
     section: "cobol-lsp.dialects",
   };
   const result = await loadProcessorGroupDialectConfig(item, []);
@@ -207,7 +210,7 @@ it("Processor groups configuration matches program", async () => {
 
 it("Processor groups configuration matches program relative to workspace", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/TEST.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "IDMS/TEST.cob"),
     section: "cobol-lsp.dialects",
   };
   const result = await loadProcessorGroupDialectConfig(item, []);
@@ -239,7 +242,7 @@ it("Checks library configurations in preprocessor definitions overrides processo
 
 it("Processor groups configuration matches program with *", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/progDaF.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "progDaF.cob"),
     section: "cobol-lsp.dialects",
   };
   const result = await loadProcessorGroupDialectConfig(item, []);
@@ -248,7 +251,7 @@ it("Processor groups configuration matches program with *", async () => {
 
 it("Processor groups configuration mismatches program with *", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/progDA.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "progDA.cob"),
     section: "cobol-lsp.dialects",
   };
   const result = await loadProcessorGroupDialectConfig(item, []);
@@ -257,7 +260,7 @@ it("Processor groups configuration mismatches program with *", async () => {
 
 it("Processor groups configuration provides compiler-options", async () => {
   const item = {
-    scopeUri: vscode.Uri.parse(WORKSPACE_URI + "/TEST.cob"),
+    scopeUri: vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob"),
     section: "cobol-lsp.compiler.options",
   };
   const result = await loadProcessorGroupCompileOptionsConfig(item, "");

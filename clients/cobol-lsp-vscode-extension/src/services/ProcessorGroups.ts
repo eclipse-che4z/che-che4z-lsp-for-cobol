@@ -32,15 +32,6 @@ import {
 } from "./ProcessorGroupsLoader";
 import { DEFAULT_DIALECT, PATHS_LOCAL_KEY } from "../constants";
 
-export async function loadProcessorGroupCopybookPaths(
-  documentUri: Uri,
-  dialectType: string,
-): Promise<string[]> {
-  return (
-    await loadProcessorGroupSettings(documentUri, "libs", [], dialectType)
-  ).filter((element) => typeof element == "string");
-}
-
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
   dialectType: string,

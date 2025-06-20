@@ -16,7 +16,6 @@ import * as path from "node:path";
 import * as vscode from "vscode";
 import {
   COPYBOOK_EXTENSIONS,
-  PATHS_LOCAL_KEY,
   PATHS_USS,
   PATHS_DSN,
   SERVER_PORT,
@@ -40,7 +39,6 @@ import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,
-  loadProcessorGroupCopybookPaths,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";

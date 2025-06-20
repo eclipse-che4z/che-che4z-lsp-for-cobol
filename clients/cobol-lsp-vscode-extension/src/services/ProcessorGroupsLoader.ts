@@ -304,7 +304,11 @@ const transformProcessorGroup =
     const result: TransformedProcessorGroup = {
       name: input.name,
       libs: transformLibs(input.libs, libTypes),
-      preprocessors: transformPreprocessor(input.preprocessor),
+      preprocessors: transformPreprocessor(input.preprocessor, libTypes),
+      "compiler-options": input["compiler-options"],
+      "copybook-extensions": input["copybook-extensions"],
+      "copybook-file-encoding": input["copybook-file-encoding"],
+      "target-sql-backend": input["target-sql-backend"],
     };
 
     return result;
@@ -325,6 +329,7 @@ export function transformLibs(
 
 function transformPreprocessor(
   input?: Preprocessor,
+  libTypes: TransformedLibTypes[] = [],
 ): TransformedPreprocessor[] {
   if (!input) return [];
   const preprocessors = asArray(input);
@@ -333,8 +338,12 @@ function transformPreprocessor(
       return { name: preprocessor, libs: [] };
     } else {
       return {
-        name: preprocessor?.name ?? "",
-        libs: transformLibs(preprocessor?.libs),
+        name: preprocessor.name ?? "",
+        libs: transformLibs(preprocessor.libs, libTypes),
+        "compiler-options": preprocessor["compiler-options"],
+        "copybook-extensions": preprocessor["copybook-extensions"],
+        "copybook-file-encoding": preprocessor["copybook-file-encoding"],
+        "target-sql-backend": preprocessor["target-sql-backend"],
       };
     }
   });

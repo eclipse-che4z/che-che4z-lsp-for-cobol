@@ -20,30 +20,36 @@ import type {
 } from "vscode";
 import { URI, Utils } from "vscode-uri";
 
-import { readFile } from "fs/promises";
-
 export const readDirectoryResult: {
   [path: string]:
     | (string | { name: string; mode?: string } | [string, FileType])[]
     | Error;
 } = {};
 
+export const readFileResult: {
+  [path: string]: string | Error;
+} = {};
+
+export const workspaceFoldersMock = [
+  {
+    name: "workspace",
+    uri: URI.parse("/workspace"),
+    index: 0,
+  },
+];
+export const getWorkspaceFolderResult = workspaceFoldersMock[0];
+
+export const getConfigurationResult: { [key: string]: unknown } = {
+  "cobol-lsp.smart-tab": undefined,
+};
+
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
-  export const workspaceFolders = [
-    {
-      name: "workspace",
-      uri: URI.parse("/workspace"),
-      index: 0,
-    },
-  ];
+  export const workspaceFolders = workspaceFoldersMock;
   export function getConfiguration() {
     return {
       get: (key: string) => {
-        if ("cobol-lsp.smart-tab" === key) {
-          return undefined;
-        }
-        return jest.fn();
+        return getConfigurationResult[key];
       },
     };
   }
@@ -56,14 +62,28 @@ export namespace workspace {
     };
   }
   export const fs = {
-    readFile: async (uri: UriType): Promise<Uint8Array | undefined> => {
-      const path = uri.fsPath;
-      try {
-        return await readFile(path);
-      } catch (_err) {
-        // ignore
+    readFile: jest.fn().mockImplementation((uri: UriType) => {
+      const resultKey = Object.keys(readFileResult).find(
+        (key: string) => uri.path === key,
+      );
+      if (!resultKey) {
+        return Promise.reject(new FileNotFound());
       }
-    },
+      const result = readFileResult[resultKey];
+      if (result instanceof Error) {
+        throw result;
+      } else {
+        return Promise.resolve(Buffer.from(result));
+      }
+    }),
+    // readFileOrig: async (uri: UriType): Promise<Uint8Array | undefined> => {
+    //   const path = uri.fsPath;
+    //   try {
+    //     return await readFile(path);
+    //   } catch (_err) {
+    //     // ignore
+    //   }
+    // },
     writeFile: jest.fn(),
     delete: jest.fn().mockReturnValue(true),
     readDirectory: jest.fn().mockImplementation((uri: UriType) => {
@@ -101,12 +121,20 @@ export namespace workspace {
     .fn()
     .mockReturnValue("onDidChangeConfiguration");
   export const textDocuments = [];
-  export function getWorkspaceFolder() {}
+  export function getWorkspaceFolder() {
+    return workspaceFolders[0];
+  }
   export async function findFiles() {
     return Promise.resolve([]);
   }
   export const onDidChangeTextDocument = jest.fn();
   export const onDidCloseTextDocument = jest.fn();
+  export const asRelativePath = jest
+    .fn()
+    .mockImplementation((documentUri: UriType) => {
+      const wsPath = getWorkspaceFolder().uri.fsPath;
+      return path.relative(wsPath, documentUri.fsPath);
+    });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
