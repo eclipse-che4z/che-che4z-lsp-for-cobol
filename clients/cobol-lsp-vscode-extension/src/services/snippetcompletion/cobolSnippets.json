@@ -2667,7 +2667,7 @@
       "\tDISPLAY \"FOUND IN TABLE\"",
       "END-SEARCH."
     ],
-    "description": "SEARCH searches a table SEQUENTIALLY (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
+    "description": "SEARCH searches a table sequentially (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
   },
   "SEARCH ALL": {
     "prefix": "SEARCH ALL",
@@ -2678,7 +2678,7 @@
       "\tDISPLAY \"FOUND IN TABLE\"",
       "END-SEARCH."
     ],
-    "description": "SEARCH searches a table SEQUENTIALLY (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
+    "description": "SEARCH searches a table sequentially (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
   },
   "SEARCH WHEN": {
     "prefix": "SEARCH WHEN",
@@ -2700,7 +2700,7 @@
     "body": [
       "01 ${1:VAR-1} PIC S9999 DISPLAY SIGN ${2|LEADING,TRAILING|} SEPARATE."
     ],
-    "description": "If SIGN LEADING (or TRAILING) and SEPARATE is specified, the internal representation of the sign is a full byte, not 1/2-byte as would be for COMP-3 field declarations."
+    "description": "If both SIGN LEADING (or TRAILING) and SEPARATE are specified, the internal representation of the sign is a full byte, not a half byte as is normal for COMP-3 field declarations."
   },
   "SEQUENCE": {
     "prefix": "SEQUENCE",
@@ -2714,12 +2714,12 @@
       "ORGANIZATION IS ${3|SEQUENTIAL,LINE SEQUENTIAL|}",
       "ACCESS MODE IS SEQUENTIAL."
     ],
-    "description": "FILE CONTROL - SEQUENTIAL determines the previous/next relationship among the records in the file as established by file creation."
+    "description": "FILE CONTROL - SEQUENTIAL specifies that the records in the file are written and read in the order they are entered."
   },
   "SET": {
     "prefix": "SET",
     "body": ["SET ${1:item} TO ${2:value}."],
-    "description": "Use the SET statement to assign a value to a: COBOL Table index, POINTER, PROCEDURE POINTER, FUNCTION POINTER and OBJECT REFERENCE."
+    "description": "Use the SET statement to assign a value to a: COBOL Table index, POINTER, PROCEDURE POINTER, FUNCTION POINTER or OBJECT REFERENCE."
   },
   "SHIFT": {
     "prefix": "SHIFT",
@@ -2892,12 +2892,12 @@
       "SELECT ${1:INPAT} ASSIGN TO ${2:UT-S-INPAT}",
       "FILE STATUS IS ${3:WS-INPAT-STATUS}."
     ],
-    "description": "FILE STATUS monitors the execution of each input-output operation for a file, and sets the operation's return-code into the specified variable."
+    "description": "FILE STATUS monitors the execution of each input-output operation for a file, and moves the operation's return code into the specified variable."
   },
   "STOP": {
     "prefix": "STOP",
     "body": ["STOP RUN."],
-    "description": "STOP RUN terminates all COBOL routines. Control is returned immediately to Z/OS. Note that GOBACK is a safer or better approach to ending a program."
+    "description": "STOP RUN terminates all COBOL routines. Control is returned immediately to z/OS. Note that GOBACK is a safer or better approach to ending a program."
   },
   "SHELL": {
     "prefix": "SHELL",
@@ -2940,7 +2940,7 @@
   "SUBTRACT CORRESPONDING": {
     "prefix": "SUBTRACT CORRESPONDING",
     "body": ["SUBTRACT CORRESPONDING ${1:A} FROM ${2:B} GIVING ${3:C}"],
-    "description": "SUBTRACT CORRESPONDING subtracts variables of the same name between two Group variable and stores the result."
+    "description": "SUBTRACT CORRESPONDING subtracts variables of the same name between two group variables and stores the result."
   },
   "COMPUTE SUM (Values)": {
     "prefix": "SUM",
@@ -2968,12 +2968,12 @@
       "\t\tEVERY NUMERIC ELEMENT WHEN ZERO",
       "END-XML."
     ],
-    "description": "SUPPRESS specifies whether individual data items are generated during an XML GENERATE."
+    "description": "SUPPRES excludes individual data items from an XML GENERATE."
   },
   "SUPPRESS (Copy)": {
     "prefix": "SUPPRESS",
     "body": ["COPY ${1:ABC-COPY-BOOK} SUPPRESS."],
-    "description": "SUPPRESS specifies whether individual data items are generated during into the Compiler Listing. "
+    "description": "SUPPRESS specifies that the library text is not to be printed on the source listing."
   },
   "SYMBOLIC CHARACTERS": {
     "prefix": "SYMBOLIC CHARACTERS",
@@ -2983,7 +2983,7 @@
   "SYNCHRONIZED": {
     "prefix": "SYNCHRONIZED",
     "body": ["01 ${1:GROUP-VAR}", "\t05 ${2:IDX-VAR} PIC S9(4) COMP SYNC."],
-    "description": "The SYNC/SYNCHRONIZED clause specifies the alignment of an elementary item on a natural boundary in Z/OS main storage."
+    "description": "The SYNC/SYNCHRONIZED clause specifies the alignment of an elementary item on a natural boundary in z/OS main storage."
   },
   "TALLY": {
     "prefix": "TALLY",
@@ -3009,25 +3009,6 @@
       "END-UNSTRING."
     ],
     "description": "TALLYING counts the occurrences of a specific character or special character in the INSPECT, STRING or UNSTRING data item."
-  },
-  "THAN (PERFORM)": {
-    "prefix": "THAN",
-    "body": [
-      "PERFORM ${1:010-PROCESS-ONE-MONTH}",
-      "\tUNTIL MONTH GREATER THAN 12",
-      "\t${2:COMPUTE MONTH-TOT = ...}",
-      "END PERFORM."
-    ],
-    "description": "THAN is a relational operater used within GREATER THAN or LESS THAN."
-  },
-  "THAN (IF)": {
-    "prefix": "THAN",
-    "body": [
-      "IF ${1:I} IS ${2|GREATER,LESS|} THAN ${3:TBL-MAX} THEN",
-      "\t${4:ADD WS-DAILY-CHARGES TO WS-WEEKLY-CHARGES}",
-      "END-IF."
-    ],
-    "description": "THAN is a relational operater used within GREATER THAN or LESS THAN."
   },
   "If x THEN": {
     "prefix": "THEN",
@@ -3077,7 +3058,7 @@
     "body": [
       "PERFORM ${1:PROCESS-PAT-EDIT} THRU ${2:PAT-EDIT-EXT} ${3:99} TIMES."
     ],
-    "description": "TIMES when used in a COBOL loop construct declares the number of iterations the logic should be looped through."
+    "description": "TIMES when used in a COBOL loop construct declares the number of iterations the logic is looped through."
   },
   "SELECT x ASSIGN TO y": {
     "prefix": "TO",
@@ -3085,7 +3066,7 @@
       "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
       "ORGANIZATION IS INDEXED"
     ],
-    "description": "FILE CONTROL - TO as part of a SELECT/ASSIGN statement associates the internal COBOL filename (after SELECT) to an external (JCL) DDNAME."
+    "description": "FILE CONTROL - TO as part of a SELECT/ASSIGN statement associates the internal COBOL filename (after SELECT) to an external data set name."
   },
   "IF x GREATER/LESS THAN OR EQUAL TO y": {
     "prefix": "TO",
@@ -3233,7 +3214,7 @@
       "\tVARYING ${3:TBL-IDX} FROM 1 BY 1 ",
       "\tUNTIL ${3:TBL-IDX} >= ${4:WS-TBL-MAX}."
     ],
-    "description": "PROCEDURE DIVISION - VARYING increases or decreases the value of one or more variable subscripts or table indexes. Note that the PERFORM statement could be an inline PERFORM that varies a variable from low-to-high."
+    "description": "PROCEDURE DIVISION - VARYING increases or decreases the value of one or more variable subscripts or table indexes. Note that the PERFORM statement can be an inline PERFORM that varies a variable from low-to-high."
   },
   "VOLATILE": {
     "prefix": "VOLATILE",
@@ -3246,7 +3227,7 @@
       "\t\t05 ${6:SCREEN-B1} PIC S9(9).",
       "\t\t05 ${7:SCREEN-B2} PIC S9(9) VOLATILE."
     ],
-    "description": "VOLATILE indicates that a variable's value can be modified or referenced in ways that the COBOL compiler cannot detect; I.E. a Language Environment (LE) condition handler, etc."
+    "description": "VOLATILE indicates that a variable's value can be modified or referenced in ways that the COBOL compiler cannot detect, e.g. a Language Environment (LE) condition handler."
   },
   "WHEN (EVALUATE)": {
     "prefix": "WHEN",
@@ -3258,7 +3239,7 @@
       "\t\t${5:doThisWhenTrue}",
       "END-EVALUATE."
     ],
-    "description": "The WHEN clause, when used with EVALUATE is a succinct way specifying IF conditionals."
+    "description": "The WHEN clause, when used with EVALUATE is a succinct way of specifying IF conditionals."
   },
   "WHEN (Search)": {
     "prefix": "WHEN",
@@ -3295,7 +3276,7 @@
   "DISPLAY x WITH NO ADVANCING": {
     "prefix": "WITH NO ADVANCING",
     "body": ["DISPLAY \"${1:CICS ABEND ERROR}\" WITH NO ADVANCING."],
-    "description": "DISPLAY x WITH NO ADVANCING which is going to a ddname places a + sign in byte one of the output."
+    "description": "DISPLAY x WITH NO ADVANCING places a + sign in byte one of the output sent to a DDNAME."
   },
   "PERFORM WITH": {
     "prefix": "WITH",
@@ -3315,7 +3296,7 @@
       "\t${4:I/O-Error-Logic}",
       "END-IF."
     ],
-    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed; I.E. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
+    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed. i.e. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
   },
   "WRITE x FROM y BEFORE ADVANDING z lines": {
     "prefix": "WRITE",
@@ -3327,7 +3308,7 @@
       "\t${5:I/O-Error-Logic}",
       "END-IF."
     ],
-    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed; I.E. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
+    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed. i.e. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
   },
   "WRITE x FROM y INVALID KEY PERFORM z": {
     "prefix": "WRITE",
@@ -3336,7 +3317,7 @@
       "\tINVALID KEY PERFORM ${3:z}",
       "END-WRITE."
     ],
-    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed; I.E. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
+    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed. i.e. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
   },
   "WRITE item": {
     "prefix": "WRITE item",
@@ -3346,7 +3327,7 @@
   "APPLY WRITE ONLY": {
     "prefix": "WRITE-ONLY",
     "body": ["AWO."],
-    "description": "ENVIRONMENT DIVISION / FILE-CONTROL / I-O-CONTROL - Use the comiler option AWO (APPLY WRITE-ONLY) to make optimum use of buffering on the I/O device. Note that Enterprise COBOL v6 describes I/O efficiency savings as being upwards of 90%."
+    "description": "ENVIRONMENT DIVISION / FILE-CONTROL / I-O-CONTROL - Use the compiler option AWO (APPLY WRITE-ONLY) to make optimal use of buffering on the I/O device. Note that Enterprise COBOL v6 describes I/O efficiency savings as being upwards of 90%."
   },
   "XML PARSE": {
     "prefix": "XML PARSE",
@@ -3370,7 +3351,7 @@
   "XML-INFORMATION": {
     "prefix": "XML-INFORMATION",
     "body": ["01 ${1:XML-INFORMATION} PIC S9(9) USAGE BINARY VALUE 0."],
-    "description": "The XML-INFORMATION special register is used to provide additional information to an XML PARSE processing procedure about the status of the executing code. parse."
+    "description": "The XML-INFORMATION special register is used to provide additional information to an XML PARSE processing procedure about the status of the executing code."
   },
   "XML-NAMESPACE": {
     "prefix": "XML-NAMESPACE",
