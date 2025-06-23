@@ -1,17 +1,20 @@
 import CopybookLib from "./CopybookLib";
 import { getVariablesFromUri } from "../util/FSUtils";
 import { SettingsService } from "../Settings";
-import { ProfileUtils } from "../util/ProfileUtils";
 import { CopybookLibs } from "../ProcessorGroupsLoader";
 import { USS } from "../../constants";
 import * as vscode from "vscode";
 import { externalApis } from "../ExternalAPIsService";
+import { ZoweLib } from "./ZoweLib";
+import { MainframeRemoteLocation } from "../copybook/downloader/DownloadUtil";
 
-export class UssPathLib implements CopybookLib {
+export class UssPathLib extends ZoweLib implements CopybookLib {
   constructor(
     private uss: string,
-    private profile?: string,
-  ) {}
+    profile?: string,
+  ) {
+    super(profile);
+  }
 
   static create(configs: CopybookLibs) {
     const libs = [];
@@ -33,36 +36,44 @@ export class UssPathLib implements CopybookLib {
       variables,
     )[0];
 
-    if (!this.profile) {
-      this.profile = ProfileUtils.getProfileNameForCopybook(
-        documentUri,
-        externalApis.explorerApi,
-      );
+    const profile = this.getProfile(documentUri);
+
+    if (!(await this.configCheck(documentUri))) {
+      return;
     }
 
-    return await externalApis.ussService?.resolveCopybookUri(
-      this.profile ?? "profile",
+    const member = await externalApis.ussService?.hasMember(
+      profile,
       evaluatedUri,
       copybookName,
     );
+
+    if (member) {
+      return vscode.Uri.parse(
+        `zowe-uss:/${profile}${this.uss}/${member.name}${member.extension ? member.extension : ""}`,
+      );
+    }
   }
 
   async listCopybooks(
     documentUri: vscode.Uri,
     _outputChannel?: vscode.OutputChannel,
   ): Promise<string[]> {
-    if (!this.profile) {
-      this.profile = ProfileUtils.getProfileNameForCopybook(
-        documentUri,
-        externalApis.explorerApi,
-      );
+    const profile = this.getProfile(documentUri);
+
+    if (!(await this.configCheck(documentUri))) {
+      return [];
     }
 
     const members = await externalApis.ussService?.getAllMembers(
-      this.profile ?? "profile",
+      profile,
       this.uss,
     );
 
     return members?.map((m) => m.name) ?? [];
+  }
+
+  credentialsTestLocation(): MainframeRemoteLocation {
+    return { uss: this.uss };
   }
 }

@@ -21,10 +21,7 @@ import * as vscode from "vscode";
 /**
  * Copybook downloader from MVS using Zowe Explorer
  */
-export class ZoweDSNService extends ZoweExplorerDownloader {
-  protected schema = "zowe-ds";
-  protected separator = "/";
-
+export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
   constructor(protected readonly explorerAPI: IApiRegisterClient) {
     super();
   }
@@ -44,7 +41,7 @@ export class ZoweDSNService extends ZoweExplorerDownloader {
       `list dataset members ${profileName}/${dataset}`,
       async () => {
         const response = await vscode.workspace.fs.readDirectory(
-          vscode.Uri.parse(`${this.schema}:/${profileName}/${dataset}`),
+          vscode.Uri.parse(`zowe-ds:/${profileName}/${dataset}`),
         );
         members = response.map((item) => {
           const [name, extension] = splitFilename(item[0]);

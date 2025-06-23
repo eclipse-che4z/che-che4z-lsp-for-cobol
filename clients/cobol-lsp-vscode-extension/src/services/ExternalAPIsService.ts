@@ -17,7 +17,7 @@ import { E4E_INCOMPATIBLE, ENDEVOR_PROCESSOR } from "../constants";
 import { E4E } from "../type/e4eApi";
 import { CopybookDownloaderForE4E } from "./copybook/downloader/CopybookDownloaderForE4E";
 import { CopybookDownloaderForUss } from "./copybook/downloader/CopybookDownloaderForUss";
-import { ZoweDSNService as ZoweDSNService } from "./copybook/downloader/CopybookDownloaderForDsn";
+import { CopybookDownloaderForDsn as CopybookDownloaderForDsn } from "./copybook/downloader/CopybookDownloaderForDsn";
 import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
@@ -78,7 +78,7 @@ export function missingExtension(documentUri: vscode.Uri, message: string) {
 class ExternalAPIsService {
   explorerApi: IApiRegisterClient | undefined;
   e4eApi: E4E | undefined;
-  dsnService?: ZoweDSNService;
+  dsnService?: CopybookDownloaderForDsn;
   ussService?: CopybookDownloaderForUss;
   e4eDownloader?: CopybookDownloaderForE4E;
 
@@ -130,7 +130,7 @@ class ExternalAPIsService {
   public explorerAppeared(api: IApiRegisterClient) {
     this.explorerApi = api;
     this.ussService = new CopybookDownloaderForUss(this.explorerApi);
-    this.dsnService = new ZoweDSNService(this.explorerApi);
+    this.dsnService = new CopybookDownloaderForDsn(this.explorerApi);
     clearDiagnostics();
     if (this.explorerApi.onProfileUpdated) {
       this.explorerApi.onProfileUpdated((profile: IProfileLoaded) => {

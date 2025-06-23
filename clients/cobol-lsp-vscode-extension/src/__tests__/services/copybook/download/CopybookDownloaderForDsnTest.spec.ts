@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ZoweDSNService } from "../../../../services/copybook/downloader/CopybookDownloaderForDsn";
+import { CopybookDownloaderForDsn } from "../../../../services/copybook/downloader/CopybookDownloaderForDsn";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import * as vscode from "vscode";
 import { readDirectoryResult } from "../../../../__mocks__/vscode";
@@ -24,7 +24,7 @@ describe("Tests Copybook download from DNS", () => {
   });
 
   describe("checks the copybook download using ZE DSN API's", () => {
-    const downloader = new ZoweDSNService(createZoweExplorerMock());
+    const downloader = new CopybookDownloaderForDsn(createZoweExplorerMock());
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {
       it("checks hasMember adds fetched list to cache when cache doesn't have the member and hasMember uses cache when have member is cached", async () => {

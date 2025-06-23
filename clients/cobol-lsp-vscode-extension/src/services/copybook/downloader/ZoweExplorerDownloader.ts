@@ -25,8 +25,6 @@ export abstract class ZoweExplorerDownloader {
     new Map();
   protected memberListCache: Map<string, MemberCacheItem[]> = new Map();
   protected failedRequests: Map<string, number> = new Map();
-  protected abstract schema: string;
-  protected abstract separator: string;
 
   protected createId(profileName: string, path: string) {
     return `${profileName}-${path}`;
@@ -89,18 +87,4 @@ export abstract class ZoweExplorerDownloader {
     profileName: string,
     dataset: string,
   ): Promise<MemberCacheItem[]>;
-
-  public async resolveCopybookUri(
-    profileName: string,
-    dataset: string,
-    copybookName: string,
-  ) {
-    const member = await this.hasMember(profileName, dataset, copybookName);
-
-    if (member) {
-      return vscode.Uri.parse(
-        `${this.schema}:/${profileName}${this.separator}${dataset}/${member.name}${member.extension ? member.extension : ""}`,
-      );
-    }
-  }
 }

@@ -18,7 +18,7 @@ import { isLeft } from "fp-ts/Either";
 import { TextDecoder } from "util";
 import { asArray, hasMember } from "./util/Utils";
 import LocalPathLib from "./copybookLibs/LocalPathLib";
-import { UssPathLib } from "./copybookLibs/UssPathConfig";
+import { UssPathLib } from "./copybookLibs/UssPathLib";
 import { DatasetLib } from "./copybookLibs/DatasetLib";
 import { externalApis } from "./ExternalAPIsService";
 import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";

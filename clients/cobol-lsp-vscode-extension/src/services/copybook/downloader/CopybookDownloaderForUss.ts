@@ -23,9 +23,6 @@ import * as vscode from "vscode";
  * Copybook downloader from USS using Zowe Explorer
  */
 export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
-  protected schema = "zowe-uss";
-  protected separator = "";
-
   constructor(protected readonly explorerAPI: IApiRegisterClient) {
     super();
   }
@@ -53,7 +50,7 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
       `list USS directory ${profileName}/${dataset}`,
       async () => {
         const response = await vscode.workspace.fs.readDirectory(
-          vscode.Uri.parse(`${this.schema}:/${profileName}${dataset}`),
+          vscode.Uri.parse(`zowe-uss:/${profileName}${dataset}`),
         );
 
         for (const file of response) {
