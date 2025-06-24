@@ -30,11 +30,20 @@ export const readFileResult: {
   [path: string]: string | Error;
 } = {};
 
-export const workspaceFoldersMock = [
+export const findFilesResult: {
+  [path: string]: URI[];
+} = {};
+
+const workspaceFoldersMock = [
   {
     name: "workspace",
-    uri: URI.parse("/workspace"),
+    uri: URI.file("/workspace"),
     index: 0,
+  },
+  {
+    name: "other",
+    uri: URI.file("/other"),
+    index: 1,
   },
 ];
 export const getWorkspaceFolderResult = workspaceFoldersMock[0];
@@ -124,9 +133,11 @@ export namespace workspace {
   export function getWorkspaceFolder() {
     return workspaceFolders[0];
   }
-  export async function findFiles() {
-    return Promise.resolve([]);
-  }
+  export const findFiles = jest
+    .fn()
+    .mockImplementation((pattern: { baseUri: URI }) => {
+      return Promise.resolve(findFilesResult[pattern.baseUri.path] ?? []);
+    });
   export const onDidChangeTextDocument = jest.fn();
   export const onDidCloseTextDocument = jest.fn();
   export const asRelativePath = jest
