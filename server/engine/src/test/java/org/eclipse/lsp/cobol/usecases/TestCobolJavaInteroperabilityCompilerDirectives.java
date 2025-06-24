@@ -174,7 +174,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_NOJAVA64_JAVA64_VALID =
-      "       CBL JAVAIOP(NOJAVA64 JAVA64)\n"
+      "       CBL JAVAIOP(NOJAVA64, JAVA64)\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -185,7 +185,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_JVMI_VALID =
-      "       CBL JAVAIOP(JVMI('-Djava.library.path=.') NOJVMI)\n"
+      "       CBL JAVAIOP(JVMI('-Djava.library.path=.'), NOJVMI)\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -196,7 +196,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_OUTPATH_JVMI_VALID =
-      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir') JVMI('-Xms512m'))\n"
+      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir'), JVMI('-Xms512m'))\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
