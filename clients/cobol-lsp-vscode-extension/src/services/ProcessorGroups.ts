@@ -30,7 +30,11 @@ import {
   ZoweDatasetConfigModel,
   ZoweUssConfigModel,
 } from "./ProcessorGroupsLoader";
-import { DEFAULT_DIALECT, PATHS_LOCAL_KEY } from "../constants";
+import {
+  DEFAULT_DIALECT,
+  PATHS_LOCAL_KEY,
+  SETTINGS_CPY_SECTION,
+} from "../constants";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,

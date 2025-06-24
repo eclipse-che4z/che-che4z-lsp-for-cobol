@@ -34,6 +34,7 @@ import {
   SETTINGS_LSPCONFIG_SECTION,
   SETTINGS_UNREACHABLE_CODE_SEVERITY,
   SETTINGS_MAXIMUM_VM_COUNT,
+  PATHS_LOCAL_KEY,
 } from "../constants";
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
@@ -249,6 +250,17 @@ export class SettingsService {
     );
   }
 
+  public static getLocalPath(
+    documentUri: vscode.Uri,
+    dialectType: string,
+  ): string[] {
+    return SettingsService.getCopybookConfigValues(
+      PATHS_LOCAL_KEY,
+      documentUri,
+      dialectType,
+    );
+  }
+
   /**
    * Get profile name
    * @returns a profile name
@@ -302,29 +314,23 @@ export class SettingsService {
   }
 
   public static evaluateVariables(
-    dataList: string[] | undefined,
+    path: string,
     vars: SupportedVariables,
-  ): string[] {
-    if (!dataList) return [];
-    return dataList.map((d) =>
-      d
-        .replace(/\${fileBasenameNoExtension}/g, vars.filename)
-        .replace(/\${fileDirname}/g, vars.dirName)
-        .replace(/\${fileDirnameBasename}/g, vars.dirBasename)
-        .replace(
-          /\${workspaceFolder(:[^}]+)?}/g,
-          (_, ws: string | undefined) => {
-            if (ws === undefined) {
-              return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
-            }
-            ws = ws.substring(1);
-            return (
-              vscode.workspace.workspaceFolders?.find((x) => x.name === ws)?.uri
-                .fsPath ?? ""
-            );
-          },
-        ),
-    );
+  ): string {
+    return path
+      .replace(/\${fileBasenameNoExtension}/g, vars.filename)
+      .replace(/\${fileDirname}/g, vars.dirName)
+      .replace(/\${fileDirnameBasename}/g, vars.dirBasename)
+      .replace(/\${workspaceFolder(:[^}]+)?}/g, (_, ws: string | undefined) => {
+        if (ws === undefined) {
+          return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
+        }
+        ws = ws.substring(1);
+        return (
+          vscode.workspace.workspaceFolders?.find((x) => x.name === ws)?.uri
+            .fsPath ?? ""
+        );
+      });
   }
 
   public static getCopybookConfigValues(
@@ -332,17 +338,16 @@ export class SettingsService {
     documentUri: vscode.Uri,
     dialectType: string,
   ) {
-    const vars = getVariablesFromUri(documentUri);
     if (dialectType !== SettingsService.DEFAULT_DIALECT) {
       const pathList: string[] | undefined = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)
         .get(`${dialectType.toLowerCase()}.${section}`);
-      return SettingsService.evaluateVariables(pathList, vars);
+      return pathList ?? [];
     }
     const pathList: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(section);
-    return SettingsService.evaluateVariables(pathList, vars);
+    return pathList ?? [];
   }
 
   /**

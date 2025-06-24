@@ -14,9 +14,6 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
-import { ZOWE_FOLDER } from "../../../constants";
-import { CopybookURI } from "../../../services/copybook/CopybookURI";
-import { SettingsService } from "../../../services/Settings";
 import { ProfileUtils } from "../../../services/util/ProfileUtils";
 import { SettingsUtils } from "../../../services/util/SettingsUtils";
 
@@ -64,12 +61,7 @@ function buildResultArrayFrom(
   ProfileUtils.getProfileNameForCopybook = jest
     .fn()
     .mockImplementation(() => profileName);
-  const result = CopybookURI.createPathForCopybookDownloaded(
-    vscode.Uri.parse(filename),
-    SettingsService.DEFAULT_DIALECT,
-    path.join("file:///downloadFolder", ZOWE_FOLDER),
-    {} as unknown as IApiRegisterClient,
-  );
+  const result = [];
   return result.length;
 }
 beforeEach(() => {

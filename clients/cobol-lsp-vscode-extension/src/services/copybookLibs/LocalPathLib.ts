@@ -22,13 +22,13 @@ export default class LocalPathLib implements CopybookLib {
 
   private getUris(documentUri: vscode.Uri) {
     const variables = getVariablesFromUri(documentUri, false);
-    const evaluatedPaths = SettingsService.evaluateVariables(
-      [this.path],
+    const evaluatedPath = SettingsService.evaluateVariables(
+      this.path,
       variables,
     );
 
     return SettingsService.prepareLocalSearchUris(
-      evaluatedPaths,
+      [evaluatedPath],
       vscode.workspace.workspaceFolders ?? [],
     );
   }

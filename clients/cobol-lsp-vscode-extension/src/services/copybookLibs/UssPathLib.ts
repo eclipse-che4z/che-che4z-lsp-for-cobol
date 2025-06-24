@@ -31,10 +31,10 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
     documentUri: vscode.Uri,
   ): Promise<vscode.Uri | undefined> {
     const variables = getVariablesFromUri(documentUri, false);
-    const evaluatedUri = SettingsService.evaluateVariables(
-      [this.uss],
+    const evaluatedPath = SettingsService.evaluateVariables(
+      this.uss,
       variables,
-    )[0];
+    );
 
     const profile = this.getProfile(documentUri);
 
@@ -44,13 +44,13 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
 
     const member = await externalApis.ussService?.hasMember(
       profile,
-      evaluatedUri,
+      evaluatedPath,
       copybookName,
     );
 
     if (member) {
       return vscode.Uri.parse(
-        `zowe-uss:/${profile}${this.uss}/${member.name}${member.extension ? member.extension : ""}`,
+        `zowe-uss:/${profile}${evaluatedPath}/${member.name}${member.extension ? member.extension : ""}`,
       );
     }
   }

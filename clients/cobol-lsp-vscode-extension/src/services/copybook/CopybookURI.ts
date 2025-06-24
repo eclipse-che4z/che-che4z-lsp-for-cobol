@@ -12,8 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { COPYBOOKS_FOLDER, E4E_FOLDER, ZOWE_FOLDER } from "../../constants";
-import { SettingsService } from "../Settings";
-import { ProfileUtils } from "../util/ProfileUtils";
 import { EndevorType, ResolvedProfile } from "../../type/e4eApi.d";
 import { Utils } from "../util/Utils";
 import * as vscode from "vscode";
@@ -47,38 +45,6 @@ export class CopybookURI {
     dataset: string,
   ): string[] {
     return [source, COPYBOOKS_FOLDER, ...profileName, dataset];
-  }
-  /**
-   * This method produce an array with element that following the schema
-   * "file://[EXTENSION_FOLDER]/zowe/copybooks/PROFILE/DATASET" or
-   * "file://[EXTENSION_FOLDER]/zowe/copybooks/PROFILE/USS"
-   * @param profile represent a name of a folder within the copybooks folder that have the same name as the
-   * connection name needed to download copybooks from mainframe.
-   */
-  public static createPathForCopybookDownloaded(
-    documentUri: vscode.Uri,
-    dialectType: string,
-    downloadFolder: string,
-    zoweExplorerApi: IApiRegisterClient | undefined,
-  ): string[] {
-    const profile = ProfileUtils.getProfileNameForCopybook(
-      documentUri,
-      zoweExplorerApi,
-    );
-    if (!profile) {
-      return [];
-    }
-
-    const remotePaths = [
-      ...SettingsService.getDsnPath(documentUri, dialectType),
-      ...SettingsService.getUssPath(documentUri, dialectType),
-    ];
-
-    return remotePaths.map(
-      (remote) =>
-        vscode.Uri.joinPath(vscode.Uri.file(downloadFolder), profile, remote)
-          .fsPath,
-    );
   }
 
   public static getEnviromentPath(

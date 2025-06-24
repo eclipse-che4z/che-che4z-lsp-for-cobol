@@ -68,10 +68,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
             }
           }
         }
+        this.memberListCache.set(id, members);
       },
     );
 
-    this.memberListCache.set(id, members);
     return members;
   }
 }

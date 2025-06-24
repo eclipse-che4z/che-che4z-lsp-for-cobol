@@ -120,35 +120,6 @@ export class DownloadUtil {
     return shouldUnlock;
   }
 
-  /**
-   * checks if copybook download configurations are present
-   * @param documentUri
-   * @param dialects
-   * @returns first configured remote location if if copybook download
-   * configurations are present, null otherwise
-   */
-  public static areCopybookDownloadConfigurationsPresent(
-    documentUri: vscode.Uri,
-    dialects: string[],
-  ): MainframeRemoteLocation | null {
-    const uniqueDialects = new Set(
-      dialects.map((dialect) => dialect?.toUpperCase()).filter(Boolean),
-    );
-
-    for (const dialect of uniqueDialects) {
-      const dsnPath = SettingsService.getDsnPath(documentUri, dialect);
-      const ussPath = SettingsService.getUssPath(documentUri, dialect);
-
-      if ((dsnPath?.length ?? 0) > 0) {
-        return { dsn: dsnPath[0] };
-      }
-      if ((ussPath?.length ?? 0) > 0) {
-        return { uss: ussPath[0] };
-      }
-    }
-    return null;
-  }
-
   private static async showQueueLockedDialog(
     profileName: string,
   ): Promise<boolean> {

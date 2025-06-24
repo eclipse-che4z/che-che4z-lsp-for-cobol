@@ -293,6 +293,7 @@ export const languages = {
   registerCodeActionsProvider: jest.fn(),
   registerCompletionItemProvider: jest.fn(),
   createDiagnosticCollection: jest.fn().mockReturnValue({
+    set: jest.fn(),
     clear: jest.fn(),
     delete: jest.fn(),
   }),
