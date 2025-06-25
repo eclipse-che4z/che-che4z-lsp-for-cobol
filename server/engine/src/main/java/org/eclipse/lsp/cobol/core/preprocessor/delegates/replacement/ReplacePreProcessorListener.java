@@ -23,6 +23,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
@@ -84,6 +85,7 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
       currentTextReplaceData =
           new ReplaceData(new ArrayList<>(), extendedDocument.getUri(), new Range());
     }
+    extendedDocument.fillArea(AntlrRangeUtils.constructRange(ctx), ' ');
   }
 
   @Override
@@ -129,8 +131,10 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     }
     if (hierarchy.getLastTextReplacing() != null) {
       Range range = hierarchy.getLastTextReplacing().getRange(extendedDocument.getUri());
-      range.setEnd(
-          new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
+      if (range.getEnd() == null) {
+        range.setEnd(
+            new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
+      }
     }
     applyReplacing();
   }

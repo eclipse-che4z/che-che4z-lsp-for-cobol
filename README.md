@@ -426,4 +426,5 @@ To view troubleshooting logs, open the output panel and select **COBOL Language 
 
 ## Known Issues
 
-If you do not have Java on your workstation, COBOL Language Support uses the native binary (engine.exe) to execute. If your environment does not allow engine.exe to execute, contact your system administrator to add an exception for engine.exe.
+- If you do not have Java on your workstation, COBOL Language Support uses the native binary (engine.exe) to execute. If your environment does not allow engine.exe to execute, contact your system administrator to add an exception for engine.exe.
+- Double-byte character sets and the DBCS compiler option are not supported.

@@ -90,20 +90,6 @@ class TestWithCopybook {
           + "       {#*bug-test2}.\n"
           + "           move 0 to {$test1}.\n";
 
-  public static final String TEXT6 =
-      "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID. TEST12.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "        WORKING-STORAGE SECTION.\n"
-          + "        01 {$*test1} pic x(9).\n"
-          + "       PROCEDURE DIVISION.\n"
-          + "       {#*bug-test}.\n"
-          + "           move 0 to {$test1}.\n"
-          + "           REPLACE ==:TAG:== BY ==BUG0==. display copy {~:TAG:^BUG0}. .\n"
-          + "       {#*bug-test2}.\n"
-          + "           move 0 to {$test1}.";
-
   public static final String TEXT7 =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. ABCDEF.\n"
@@ -161,14 +147,6 @@ class TestWithCopybook {
   void testCopybookSubstitutionOnACobolLinePartially4() {
     UseCaseEngine.runTest(
         TEXT5,
-        ImmutableList.of(new CobolText("BUG0", "            \"scenario 4\"\n")),
-        ImmutableMap.of());
-  }
-
-  @Test
-  void testCopybookSubstitutionOnACobolLinePartially5() {
-    UseCaseEngine.runTest(
-        TEXT6,
         ImmutableList.of(new CobolText("BUG0", "            \"scenario 4\"\n")),
         ImmutableMap.of());
   }

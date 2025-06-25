@@ -3,7 +3,7 @@
     "prefix": "ACCESS MODE",
     "body": [
       "SELECT ${1:customerFile} ASSIGN TO ${2:custFile}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
@@ -122,7 +122,7 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "AND is used to connect two or more conditional expressions. When using AND - all expressions connected by AND must test true for the program to take that path."
+    "description": "AND is used to connect two or more conditional expressions. When using AND all expressions connected by AND must test true for the program to take that path."
   },
   "AREA": {
     "prefix": "AREA",
@@ -142,9 +142,9 @@
   "ASSIGN": {
     "prefix": "ASSIGN",
     "body": [
-      "SELECT ${2:rptfile}",
-      "\tASSIGN TO ${1:rptfile-DD}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "SELECT ${1:rptfile}",
+      "\tASSIGN TO ${2:rptfile-DD}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tFILE STATUS IS ${5:statusVariable}.",
       "$0"
@@ -169,7 +169,7 @@
   "BIT TO CHAR": {
     "prefix": "BIT-TO-CHAR",
     "body": [
-      "77 ${1:BIT-FLD} PIC X(16).",
+      "01 ${1:BIT-FLD} PIC X(16).",
       "\tMOVE '${2:0000000000000000}' TO ${1:BIT-FLD}.",
       "\tFUNCTION BIT-TO-CHAR(${1:BIT-FLD})."
     ],
@@ -177,13 +177,13 @@
   },
   "BLANK WHEN ZERO": {
     "prefix": "BLANK",
-    "body": ["77 ${1:variableName} PIC S9(5)V99 BLANK WHEN ZERO."],
+    "body": ["01 ${1:variableName} PIC S9(5)V99 BLANK WHEN ZERO."],
     "description": "BLANK WHEN ZERO specifies that an elementary field contains spaces when its value is zero."
   },
   "BLOCK": {
     "prefix": "BLOCK",
     "body": ["BLOCK CONTAINS 0 RECORDS"],
-    "description": "The BLOCK CONTAINS clause in the FD entry in the DATA DIVISION dictates the size of the physical (I/O) records. If you specify BLOCK CONTAINS 0, z/OS chooses the optimal \"blocking factor\" for most efficient file I/O - taking into account channels and DASD along with the file specifics."
+    "description": "The BLOCK CONTAINS clause in the FD entry in the DATA DIVISION dictates the size of the physical (I/O) records. If you specify BLOCK CONTAINS 0, z/OS chooses the optimal \"blocking factor\" for most efficient file I/O, taking into account channels and DASD along with the file specifics."
   },
   "BOOLEAN": {
     "prefix": "JSON GENERATE FROM then CONVERT TO BOOLEAN",
@@ -215,7 +215,7 @@
   "SET x UP BY": {
     "prefix": "BY",
     "body": ["SET ${1:X-IND} UP BY ${2:1}"],
-    "description": "Adds +1 an internal COBOL table's index - assuming INDEXED BY."
+    "description": "Adds +1 an internal COBOL table's index, assuming INDEXED BY."
   },
   "STRING x DELIMITED BY y": {
     "prefix": "BY",
@@ -279,38 +279,38 @@
   },
   "COMP": {
     "prefix": "COMP",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}."],
     "description": "BINARY, and its synonyms COMP and COMP-4, are used next to numeric fields in the DATA DIVISION to specify that the data is represented in two's complement hex (EBCDIC) format."
   },
   "COMP-1": {
     "prefix": "COMP-1",
     "body": [
-      "77 ${1:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-1."
+      "01 ${1:VAR-FLOAT-SINGLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-1."
     ],
     "description": "A four-byte single-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-2": {
     "prefix": "COMP-2",
     "body": [
-      "77 ${1:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-2."
+      "01 ${1:VAR-FLOAT-DOUBLE-PREC} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-2."
     ],
     "description": "A four-byte double-precision floating-point number declared in the DATA DIVISION."
   },
   "COMP-3": {
     "prefix": "COMP-3",
     "body": [
-      "77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-3."
+      "01 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-3."
     ],
     "description": "Internally-packed (efficient) number declared in the DATA DIVISION."
   },
   "COMP-4": {
     "prefix": "COMP-4",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-4."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-4."],
     "description": "BINARY, and its synonyms COMP and COMP-4, are used next to numeric fields in the DATA DIVISION to specify that the data is represented in two's complement hex (EBCDIC) format."
   },
   "COMP-5": {
     "prefix": "COMP-5",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-5."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) ${2|COMP,COMPUTATIONAL|}-5."],
     "description": "Typically used to communicate data between Java/C/C++/Python/etc. and COBOL. When numeric data is moved into a COMP-5 item, truncation occurs at the binary field size rather than at the COBOL picture clause declaration."
   },
   "COMPUTE": {
@@ -353,7 +353,7 @@
       "\tBLOCK CONTAINS 0 RECORDS",
       "\tDATA RECORD IS ${3:inputFileRec}."
     ],
-    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS - and is the preferred way to specify most QSAM file FDs."
+    "description": "A fixed-block file. Note that BLOCK CONTAINS 0 leaves the blocking-optimization up to z/OS and is the preferred way to specify most QSAM file FDs."
   },
   "CONTENT": {
     "prefix": "CONTENT",
@@ -393,7 +393,7 @@
       "END-INSPECT",
       "$0"
     ],
-    "description": "CONVERTING is a parameter of the INSPECT keyword - used to replace character values."
+    "description": "CONVERTING is a parameter of the INSPECT keyword. Used to replace character values."
   },
   "COPY": {
     "prefix": "COPY",
@@ -489,12 +489,12 @@
   "DAY": {
     "prefix": "DAY",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable - YY NNN) - from z/OS."
+    "description": "This is an example of utilizing a Julian Date receiving field (PIC 9(5) variable in the format YY NNN) from z/OS."
   },
   "DAY OF WEEK": {
     "prefix": "DAY OF WEEK",
     "body": ["ACCEPT ${1:DATE-VAR-RECV} FROM DAY-OF-WEEK (${2:DATE-VAR-SEND})"],
-    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable - (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc."
+    "description": "This is an example of utilizing a one-byte (ie. PIC 9(1)) receiving variable (1-7) from z/OS. Note that 1 = Monday, 2 = Tuesday, 3 = Wednesday, etc."
   },
   "DBCS": {
     "prefix": "DBCS",
@@ -609,7 +609,7 @@
   },
   "DISPLAY-1": {
     "prefix": "DISPLAY-1",
-    "body": ["77 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
+    "body": ["01 ${1:DBCS-FLD} PIC N(10) USAGE DISPLAY-1."],
     "description": "The DISPLAY-1 phrase defines an item as DBCS. The data item is stored in character form, with each character occupying 2 bytes of storage."
   },
   "DIVIDE": {
@@ -922,7 +922,7 @@
     "body": [
       "SELECT ${2:rptfile}",
       "\tASSIGN TO ${1:PATVSAM}",
-      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "\tRECORD KEY IS ${5:PATIENT-REC-KEY}",
       "\tFILE STATUS IS ${1:PATVSAM}-FS."
@@ -938,7 +938,7 @@
     "prefix": "FILE CONTROL",
     "body": [
       "SELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
-      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "ACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
       "FILE STATUS IS ${5:WS-FILE-STATUS-VAR}."
     ],
@@ -947,10 +947,10 @@
   "FILLER": {
     "prefix": "FILLER",
     "body": [
-      "01 ${2:GROUP-ITEM}.",
-      "\t05 ${3:ELEMENTARY-LINE}",
-      "\t\t10 ${4:FIELD-1} PIC S9(${5:5}) COMP-3.",
-      "\t\t10 FILLER PIC X(${1:20}) VALUE SPACE.",
+      "01 ${1:GROUP-ITEM}.",
+      "\t05 ${2:ELEMENTARY-LINE}",
+      "\t\t10 ${3:FIELD-1} PIC S9(${4:5}) COMP-3.",
+      "\t\t10 FILLER PIC X(${5:20}) VALUE SPACE.",
       "\t\t$0"
     ],
     "description": "A placeholder variable that is not explicitly referred to in a program. FILLER is used to line up variable names with byte-offsets in the physical data record."
@@ -963,16 +963,16 @@
   "FIRST #2": {
     "prefix": "FIRST",
     "body": [
-      "INSPECT ${4:VAR-1}",
-      "TALLYING ${5:VAR-CTR} FOR LEADING \"${6:A}\"",
-      "REPLACING FIRST \"${1:A1}\" BY \"${2:2}\" AFTER INITIAL \"${3:T}\""
+      "INSPECT ${1:VAR-1}",
+      "TALLYING ${2:VAR-CTR} FOR LEADING \"${3:A}\"",
+      "REPLACING FIRST \"${4:A1}\" BY \"${5:2}\" AFTER INITIAL \"${6:T}\""
     ],
     "description": "REPLACING FIRST changes the first (leftmost) occurrence of the inspected field (VAR-1 in this example)."
   },
   "FOOTING": {
     "prefix": "FOOTING",
     "body": ["WITH FOOTING AT ${1:literal}"],
-    "description": "Part of the FD LINAGE (logical page size) clause - available for QSAM and LINE-SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
+    "description": "Part of the FD LINAGE (logical page size) clause. Available for QSAM and LINE SEQUENTIAL files only. WITH FOOTING specifies a line number in an output file or printer."
   },
   "FOR": {
     "prefix": "FOR",
@@ -982,8 +982,8 @@
   "FOR CHARACTERS AFTER": {
     "prefix": "FOR CHARACTERS AFTER",
     "body": [
-      "INSPECT ${2:variable-field} TALLYING ${3:num-field}",
-      "FOR CHARACTERS AFTER ${1:X\"40\"}"
+      "INSPECT ${1:variable-field} TALLYING ${2:num-field}",
+      "FOR CHARACTERS AFTER ${3:X\"40\"}"
     ],
     "description": "Counts the number of characters after the first occurrence of a specified string. Part of the TALLYING keyword in the INSPECT statement."
   },
@@ -991,8 +991,8 @@
     "prefix": "USE FOR DEBUGGING",
     "body": [
       "DECLARATIVES.",
-      "${2:Debug-Declaratives} SECTION.",
-      "\tUSE FOR DEBUGGING ON ${1:paragraph-section-name}."
+      "${1:Debug-Declaratives} SECTION.",
+      "\tUSE FOR DEBUGGING ON ${2:paragraph-section-name}."
     ],
     "description": "PRODECURE DIVISION - Specifies debugging to begin on (specified) routine."
   },
@@ -1380,7 +1380,7 @@
   },
   "FUNCTION-POINTER": {
     "prefix": "FUNCTION-POINTER",
-    "body": ["77 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
+    "body": ["01 ${1:DATA-FUNCTION-PTR} USAGE FUNCTION-POINTER."],
     "description": "A FUNCTION-POINTER is a 4-byte elementary item which can contain the address of a procedure (typically a program) entry point."
   },
   "JSON GENERATE": {
@@ -1424,12 +1424,12 @@
   "GREATER": {
     "prefix": "GREATER",
     "body": [
-      "IF ${1:VAR1} GREATER THEN ${2:VAR2} THEN",
+      "IF ${1:VAR1} GREATER THAN ${2:VAR2} THEN",
       "\t${3:ifTrue}",
       "END-IF.",
       "$0"
     ],
-    "description": "GREATER is a general comparison operator - treated like the algebraic \">\" operator."
+    "description": "GREATER is a general comparison operator. Treated like the algebraic \">\" operator."
   },
   "GROUP-USAGE": {
     "prefix": "GROUP-USAGE",
@@ -1445,7 +1445,7 @@
     "body": [
       "READ ${1:IN-FILE} AT ${2|END,BEGINNING|} MOVE HIGH-VALUES TO ${3:INPUT-REC}."
     ],
-    "description": "HIGH-VALUE equates to binary (Hex) FF - the highest EBCDIC collating sequence value."
+    "description": "HIGH-VALUE equates to binary (Hex) FF. The highest EBCDIC collating sequence value."
   },
   "I-O": {
     "prefix": "I-O",
@@ -1475,9 +1475,9 @@
   "INSPECT CONVERTING": {
     "prefix": "INSPECT ID CONVERTING",
     "body": [
-      "INPUT ${1:id}",
-      "\tCONVERTING '${2:abcdefg}' TO '${3:ABCDEFG}`",
-      "\tAFTER INITIAL '${4:|}' BEFORE INITIAL '${5:*}'."
+      "INSPECT ${1:id}",
+      "\tCONVERTING '${2:abcdefg}' TO '${3:ABCDEFG}",
+      "\tAFTER INITIAL '${4:|}' BEFORE INITIAL '${5:/}'."
     ],
     "description": "INSPECT is a string parsing verb for alphanumeric fields."
   },
@@ -1490,8 +1490,12 @@
   },
   "INSPECT TALLYING": {
     "prefix": "INSPECT",
-    "body": ["INSPECT ${1:id} "],
-    "description": "description"
+    "body": [
+      "INSPECT ${1:id}",
+      "TALLYING ${2:VAR-CTR} FOR LEADING \"${3:A}\"",
+      "REPLACING FIRST \"${4:A1}\" BY \"${5:2}\" AFTER INITIAL \"${6:T}\""
+    ],
+    "description": "When FIRST is specified and not BEFORE or AFTER, The replacement field changes the left/first occurrence of the inspected field."
   },
   "IDENTIFICATION DIVISION": {
     "prefix": "IDENTIFICATION-DIVISION",
@@ -1547,7 +1551,7 @@
   },
   "INDEX": {
     "prefix": "INDEX",
-    "body": ["77 ${1:TBL-IDX} USAGE IS INDEX."],
+    "body": ["01 ${1:TBL-IDX} USAGE IS INDEX."],
     "description": "USAGE IS INDEX creates an index data item, which can used as an index variable into any COBOL internal table (OCCURS clause)."
   },
   "OCCURS x INDEXED BY": {
@@ -1573,7 +1577,7 @@
     "prefix": "INPUT",
     "body": [
       "SELECT ${1:CARPOOL} ASSIGN TO ${2:CARFILE}",
-      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE-SEQUENTIAL|}",
+      "ORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL,LINE SEQUENTIAL|}",
       "ACCESS MODE IS INPUT."
     ],
     "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL - File I/O mode that denotes if input is to be read from a file."
@@ -1659,7 +1663,7 @@
   "USAGE IS": {
     "prefix": "USAGE IS",
     "body": [
-      "77 ${1:VAR1} PIC ${2:X} USAGE IS ${3|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
+      "01 ${1:VAR1} PIC ${2:X} USAGE IS ${3|DISPLAY,ALPHANUMERIC,SEPARATE,INDEX|}"
     ],
     "description": "Variable declarations with IS. (IS is optional)"
   },
@@ -1748,7 +1752,7 @@
   "LABEL RECORDS": {
     "prefix": "LABEL RECORDS",
     "body": ["FD ${1:inputFile}", "LABEL RECORDS ARE STANDARD"],
-    "description": "DATA DIVISION / FILE SECTION - For QSAM files, LABEL RECORDS declares the presence or absence of labels used to identify DASD volumes - for uncataloged files. For VSAM files LABEL RECORDS is syntax checked but ignored."
+    "description": "DATA DIVISION / FILE SECTION - For QSAM files, LABEL RECORDS declares the presence or absence of labels used to identify DASD volumes for uncataloged files. For VSAM files LABEL RECORDS is syntax checked but ignored."
   },
   "LEADING BY": {
     "prefix": "LEADING BY",
@@ -1757,14 +1761,14 @@
   },
   "LEADING": {
     "prefix": "LEADING",
-    "body": ["77 ${1:VAR-NUM} ${2:PIC S9999} DISPLAY SIGN LEADING"],
+    "body": ["01 ${1:VAR-NUM} ${2:PIC S9999} DISPLAY SIGN LEADING"],
     "description": "SIGN LEADING/TRAILING declares the position of the operational sign for a numeric variable."
   },
   "LEFT": {
     "prefix": "LEFT",
     "body": [
-      "01 ${2:GROUP-VAR}.",
-      "\t05 ${1:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."
+      "01 ${1:GROUP-VAR}.",
+      "\t05 ${2:NUM-BINARY-VAR} PIC S9(4) COMP SYNC LEFT."
     ],
     "description": "LEFT Specifies that an elementary COBOL variable is to be positioned in main storage so that byte one begins at the left word boundary. Note that this is an efficiency coding specification."
   },
@@ -1782,17 +1786,17 @@
       "\t${3:ifTrue}",
       "END-IF."
     ],
-    "description": "LESS is a general comparison operator - treated like the algebraic \"<\" operator."
+    "description": "LESS is a general comparison operator. Treated like the algebraic \"<\" operator."
   },
   "LINEAGE": {
     "prefix": "LINEAGE",
-    "body": ["FD ${2:FILENAME}", "\tLINEAGE ${1:50}", "\t$0"],
+    "body": ["FD ${1:FILENAME}", "\tLINEAGE ${2:50}", "\t$0"],
     "description": "DATA DIVISION - The LINEAGE clause of a FD entry controls the size and number of lines of a printed page."
   },
   "WRITE LINE": {
     "prefix": "LINES",
     "body": [
-      "WRITE ${1:PRINT-REC} ${2|BEFORE,AFTER|} ADVANCING ${3:numLiteral} ${4|LINE,LINES|}."
+      "WRITE ${1:PRINT-REC} ${2|BEFORE,AFTER|} ADVANCING ${3:numLiteral} LINES."
     ],
     "description": "Use LINE to control the number of blank lines output for a report file."
   },
@@ -1800,9 +1804,9 @@
     "prefix": "LINE SEQUENTIAL",
     "body": [
       "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
-      "\tORGANIZATION IS LINE-SEQUENTIAL"
+      "\tORGANIZATION IS LINE SEQUENTIAL"
     ],
-    "description": "ENVIRONMENT DIVISION - LINE-SEQUENTIAL defines an input/output file as a line-sequential file - typically Unix or PC."
+    "description": "ENVIRONMENT DIVISION - LINE SEQUENTIAL defines an input/output file as a LINE SEQUENTIAL file, typically Unix or PC."
   },
   "LOC": {
     "prefix": "LOC",
@@ -1822,12 +1826,12 @@
   "READ LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": ["READ ${1:IN-FILE} AT END MOVE LOW-VALUES TO ${2:INPUT-REC}."],
-    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00, the lowest EBCDIC collating sequence value."
   },
   "MOVE LOW-VALUE": {
     "prefix": "LOW-VALUE",
     "body": ["MOVE LOW-VALUES TO ${1:VAR1}."],
-    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00, the lowest EBCDIC collating sequence value."
   },
   "IF LOW-VALUE": {
     "prefix": "LOW-VALUE",
@@ -1836,7 +1840,7 @@
       "\t${2:MOVE SPACES TO ${1:VAR}}",
       "END-IF."
     ],
-    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00 - the lowest EBCDIC collating sequence value."
+    "description": "For Alphanumeric fields - LOW-VALUE/LOW-VALUES equates to binary (Hex) 00, the lowest EBCDIC collating sequence value."
   },
   "LINKAGE SECTION ": {
     "prefix": "LINKAGE SECTION",
@@ -1871,7 +1875,7 @@
       "FD ${1:FILENAME}",
       "LABEL RECORDS ARE STANDARD",
       "BLOCK CONTAINS ${2:0}",
-      "ACCESS MODE IS ${3|SEQUENTIAL,INDEXED,RELATIVE,LINE-SEQUENTIAL|}",
+      "ACCESS MODE IS ${3|SEQUENTIAL,INDEXED,RELATIVE,LINE SEQUENTIAL|}",
       "\tRECORD CONTAINS ${4:numLiteral} CHARACTERS"
     ],
     "description": "ACCESS MODE defines how records are made available for processing. If ACCESS MODE is not defined, the default is SEQUENTIAL."
@@ -1961,7 +1965,7 @@
   },
   "NATIVE": {
     "prefix": "NATIVE",
-    "body": ["77 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."],
+    "body": ["01 ${1:VAR-BIN} PIC S9(4) COMPUTATIONAL USAGE NATIVE."],
     "description": "NATIVE is syntax checked, but has no effect on program execution."
   },
   "NEXT SENTENCE": {
@@ -1986,7 +1990,7 @@
   "NO REWIND": {
     "prefix": "NO REWIND",
     "body": ["${1|OPEN INPUT,CLOSE|} ${2:filename} WITH NO REWIND."],
-    "description": "NO REWIND applies only to LINE-SEQUENTIAL and QSAM tape files.  Specifically, with NO REWIND, OPEN filename must be positioned at its beginning record."
+    "description": "NO REWIND applies only to LINE SEQUENTIAL and QSAM tape files.  Specifically, with NO REWIND, OPEN filename must be positioned at its beginning record."
   },
   "IF var NOT x": {
     "prefix": "NOT",
@@ -1995,7 +1999,7 @@
       "\t$0",
       "END-IF."
     ],
-    "description": "NOT is a true/false test - testing true if the comparison fails."
+    "description": "NOT is a true/false test. Testing true if the comparison fails."
   },
   "NOT ON SIZE ERROR": {
     "prefix": "NOT ON SIZE ERROR",
@@ -2003,7 +2007,7 @@
       "SUBTRACT ${1:VAR-2} FROM ${2:VAR-1} GIVING ${3:VAR-3}",
       "NOT ON SIZE ERROR ${4:MOVE ZEROS TO VAR-4}"
     ],
-    "description": "NOT is a true/false test - testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4."
+    "description": "NOT is a true/false test. Testing true if the comparison fails. In the snippet, if there is no numeric exception in the subtract, zeros are moved to VAR-4."
   },
   "NOT INVALID": {
     "prefix": "NAMESPACE-prefix",
@@ -2039,7 +2043,7 @@
   },
   "OBJECT-REFERENCE": {
     "prefix": "OBJECT-REFERENCE",
-    "body": ["77 ${1:VAR-OBJ-REF} PIC X(36) USAGE OBJECT-REFERENCE."],
+    "body": ["01 ${1:VAR-OBJ-REF} PIC X(36) USAGE OBJECT-REFERENCE."],
     "description": "An OBJECT-REFERENCE data item is a 4 or 8 byte (depending on your z/OS system) that references valid objects."
   },
   "OCCURS": {
@@ -2070,7 +2074,7 @@
   "SET ADDRESS OF": {
     "prefix": "OF",
     "body": ["SET ADDRESS OF ${1:VAR-POINTER-1} TO ${2:VAR-POINTER-2}."],
-    "description": "ADDRESS OF is a COBOL special register that can be used to reference the address of a data item in the LINKAGE SECTION, LOCAL-STORAGE SECTION, or WORKING-STORAGE SECTION."
+    "description": "ADDRESS OF is a COBOL special register to reference the address of a data item in the LINKAGE SECTION, LOCAL-STORAGE SECTION, or WORKING-STORAGE SECTION."
   },
   "INLINE OFF": {
     "prefix": "OFF",
@@ -2124,7 +2128,7 @@
   "OPEN I-O": {
     "prefix": "OPEN I-O",
     "body": ["OPEN I-O ${1:fileName}"],
-    "description": "OPEN I-O FILENAME."
+    "description": "OPEN I/O FILENAME."
   },
   "OPEN INPUT": {
     "prefix": "OPEN INPUT",
@@ -2247,7 +2251,7 @@
   },
   "PACKED-DECIMAL": {
     "prefix": "PACKED-DECIMAL",
-    "body": ["77 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
+    "body": ["01 ${1:VAR-PACKED-NUM-DATA} PIC S9(4) PACKED-DECIMAL."],
     "description": "PACKED-DECIMAL variables (internally) are stored with two digits for each character position, except for the trailing character position, which is occupied by the low-order digit and the variable's sign. PACKED-DECIMAL is identical to COMP-3/COMPUTATIONAL-3."
   },
   "PADDING CHARACTER IS": {
@@ -2335,7 +2339,7 @@
       "DATA DIVISION.",
       "LINKAGE SECTION.",
       "01 ${1:EXTERNAL-DATA} ${2:PIC X(872)}.",
-      "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}/"
+      "PROCEDURE DIVISION USING ${1:EXTERNAL-DATA}."
     ],
     "description": "PROCEDURE DIVISION USING allows you reference data being passed from a calling module to your program through the LINKAGE SECTION."
   },
@@ -2345,11 +2349,11 @@
       "SORT ${1:fileName}",
       "${2|INPUT,OUTPUT|} PROCEDURE IS ${3:100-RECORD-SEL} SECTION"
     ],
-    "description": "PROCEDURE DIVISION - The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT - and process records returned from a SORT."
+    "description": "PROCEDURE DIVISION - The INPUT and OUTPUT PROCEDUREs are used to select specific records that will be released to a SORT and process records returned from a SORT."
   },
   "PROCEDURE-POINTER": {
     "prefix": "PROCEDURE-POINTER",
-    "body": ["77 ${1:LE-UTILITY} USAGE IS PROCEDURE-POINTER."],
+    "body": ["01 ${1:LE-UTILITY} USAGE IS PROCEDURE-POINTER."],
     "description": "A PROCEDURE-POINTER is a variable which contains the address of a procedure \"entry point\". PROCEDURE-POINTER variables are often used to CALL z/OS LE (Language Environment) utilities."
   },
   "USE FOR DEBUGGING ON ALL PROCEDURES": {
@@ -2394,8 +2398,16 @@
   },
   "QUOTE": {
     "prefix": "QUOTE",
-    "body": ["77 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
+    "body": ["01 ${1:WS-QUOTE-FIELD} PIC ${2:X(01)} VALUE QUOTES."],
     "description": "QUOTE/QUOTES is a figurative constant. It can also be used in a comparison or MOVE statement."
+  },
+  "ACCESS MODE IS RANDOM": {
+    "prefix": "RANDOM",
+    "body": [
+      "SELECT ${1:RRDS-FILE} ASSIGN TO ${2:VSMRRDS}",
+      "ACCESS MODE IS RANDOM."
+    ],
+    "description": "The RANDOM intrinsic function generates a random number between 0 and 1"
   },
   "READ (QSAM)": {
     "prefix": "READ",
@@ -2403,7 +2415,7 @@
       "READ ${1:QSAM-File} INTO ${2:WS-Record-Layout}",
       "AT END MOVE \"${3:Y}\" TO ${4:WS-EOF-Switch}"
     ],
-    "description": "For QSAM file access, the READ statement makes the next record from a sequential file available to the program. In the given example, READ includes the INTO modifier, which moves the record from the I-O buffer into program WORKING-STORAGE, and the AT END modifier which forces z/OS to signal the program that the last record in the file has been read."
+    "description": "For QSAM file access, the READ statement makes the next record from a sequential file available to the program. In the given example, READ includes the INTO modifier, which moves the record from the I/O buffer into program WORKING-STORAGE, and the AT END modifier which forces z/OS to signal the program that the last record in the file has been read."
   },
   "READ (VSAM)": {
     "prefix": "READ",
@@ -2412,16 +2424,26 @@
       "KEY IS ${3:Key-field}",
       "INVALID KEY ${4:imperative-statement}"
     ],
-    "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier, which moves the record from the I-O buffer into program WORKING-STORAGE, and the INVALID KEY modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field."
+    "description": "For VSAM (keyed) file access, the READ statement makes a specific record from an indexed file available to the program. In the above example, READ includes the INTO modifier, which moves the record from the I/O buffer into program WORKING-STORAGE, and the INVALID KEY modifier which forces z/OS to signal the program that no record was found in the VSAM file that matches the data in the key field."
   },
-  "RECORD": {
+  "RECORD CONTAINS": {
     "prefix": "RECORD",
     "body": [
       "FD ${1:CARPOOL}",
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause - which defines the size (in bytes) of each logical record in the file."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORD (singular) is used with the RECORD CONTAINS clause, which defines the size (in bytes) of each logical record in the file."
+  },
+  "RECORD KEY IS": {
+    "prefix": "RECORD",
+    "body": [
+      "SELECT ${1:VSAM-PATIENT-FILE} ASSIGN TO ${2:PATIENTS}",
+      "\tORGANIZATION IS INDEXED ACCESS IS RANDOM",
+      "\tRECORD KEY IS ${3:COMMUTER-KEY}",
+      "\tFILE STATUS IS ${4:PAT-FILESTATUS}."
+    ],
+    "description": "As part of a VSAM SELECT/ASSIGN, RECORD (singular) is used in a RECORD KEY IS clause to describe the indexed access of a specific record in the given file."
   },
   "RECORDING": {
     "prefix": "RECORDING",
@@ -2440,7 +2462,7 @@
       "\tLABEL RECORDS STANDARD",
       "\tRECORD CONTAINS ${2:80} CHARACTERS."
     ],
-    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause - which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. This is typically used with QSAM files."
+    "description": "DATA DIVISION / FILE SECTION - As part of a COBOL FD, RECORDS (plural) is used with the LABEL RECORDS clause, which describes the I/O access mode (Sequential/Standard, Varying, etc.) for this file. This is typically used with QSAM files."
   },
   "RECURSIVE": {
     "prefix": "RECURSIVE",
@@ -2502,7 +2524,7 @@
   },
   "REMAINDER": {
     "prefix": "REMAINDER",
-    "body": ["DIVIDE ${1:A} INTO ${2:B} GIVING ${3:C} REMAINER ${4:D}."],
+    "body": ["DIVIDE ${1:A} INTO ${2:B} GIVING ${3:C} REMAINDER ${4:D}."],
     "description": "DIVIDE with REMAINDER allows you to specify a numeric data item that you can process as a remainder from the math. REMAINDER is available from all formats of the COBOL DIVIDE statement."
   },
   "REMOVAL": {
@@ -2530,7 +2552,7 @@
       "\t\t02 ${1::TAG:}-HOURS PIC S999 OCCURS 1 TO 52 TIMES",
       "DEPENDING ON ${1::TAG:}-WEEK OF ${1::TAG:}."
     ],
-    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement that is similar to REPLACING except that it replaces text across an entire file - not simply a copybook."
+    "description": "REPLACE allows you to rename a source text within a program file. This is typically used when the same physical record layout can assume multiple logical business terms within a program. This is a Compilation (not run-time) level statement that is similar to REPLACING except that it replaces text across an entire file, not simply a copybook."
   },
   "REPLACING": {
     "prefix": "REPLACING",
@@ -2568,7 +2590,7 @@
   "RETURN-CODE": {
     "prefix": "RETURN-CODE",
     "body": ["IF ${1:WS-SWITCH-NO-ERRORS} = \"Y\"", "\tMOVE 0 to RETURN-CODE."],
-    "description": "RETURN-CODE is a COBOL special register that can be used to pass a return code to the calling program or to z/OS when the program ends."
+    "description": "RETURN-CODE is a COBOL special register to pass a return code to the calling program or to z/OS when the program ends."
   },
   "RETURNING": {
     "prefix": "RETURNING",
@@ -2586,7 +2608,7 @@
   "WITH NO REWIND": {
     "prefix": "REWIND",
     "body": ["CLOSE ${1:QSAM-FILE} WITH NO REWIND"],
-    "description": "REWIND is typically used after WITH NO - an option that positions a QSAM file at its end."
+    "description": "REWIND is typically used after WITH NO. An option that positions a QSAM file at its end."
   },
   "REWRITE": {
     "prefix": "REWRITE",
@@ -2609,58 +2631,273 @@
   "ROUNDED": {
     "prefix": "ROUNDED",
     "body": [
-      "77 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.",
+      "01 ${1:TEMP-RESULT} PIC 9(5)V99 VALUE ZERO.",
       "COMPUTE ${1:TEMP-RESULT} ROUNDED = ${2:mathExpression}."
     ],
     "description": "After decimal point alignment, the number of places in the fraction result of an math statement is compared with the number of places provided for the fraction in the PIC clause. When the size of the fractional result is greater than fraction provided in the PIC clause, truncation occurs unless ROUNDED is specified. The right-most digit of the resultant is increased by 1 whenever the most significant digit of the excess is >= 5."
   },
-  "SEARCH ALL WHEN": {
-    "prefix": "SEARCH ALL WHEN",
+  "SAME": {
+    "prefix": "SAME",
+    "body": ["SAME ${1|AREA,SORT,SORT-MERGE|} FOR ${2:filename}."],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - The SAME clause is syntax checked but not executable."
+  },
+  "SAME RECORD AREA": {
+    "prefix": "SAME RECORD AREA",
+    "body": ["SAME RECORD AREA FOR ${1:filename}."],
+    "description": "ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / I-O-CONTROL - The SAME RECORD AREA clause specifies that the same main storage be used for two or more files."
+  },
+  "SD": {
+    "prefix": "SD",
     "body": [
-      "SEARCH ALL ${1:item} WHEN ${2:item1} EQUAL ${3:item3} ${4:item4}"
+      "SD ${1:SORT-FILE}",
+      "\tLABEL RECORDS ARE STANDARD",
+      "\tBLOCK CONTAINS ${2:number}",
+      "\tDATA RECORD IS ${3:SORT-RECORD}.",
+      "01 ${4:SORT-RECORD} ${5:PIC X(1324)}."
     ],
-    "description": "SEARCH ALL item1 WHEN item2 EQUAL item3 item4 "
+    "description": "DATA DIVISION - The SD (SORT DESCRIPTION) defines files that are to be sorted and that are referred to in your PROCEDURE DIVISION's SORT statement."
+  },
+  "SEARCH": {
+    "prefix": "SEARCH",
+    "body": [
+      "SET SUB TO 1.",
+      "\tSEARCH ${1:WS-TABLE}",
+      "\tAT END DISPLAY \"${2:ELEMENT NOT FOUND IN TABLE}\"",
+      "\tWHEN ${1:WS-TABLE}(SUB) = ${3:WS-SRCH-ELEMENT}",
+      "\tDISPLAY \"FOUND IN TABLE\"",
+      "END-SEARCH."
+    ],
+    "description": "SEARCH searches a table sequentially (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
+  },
+  "SEARCH ALL": {
+    "prefix": "SEARCH ALL",
+    "body": [
+      "SEARCH ALL ${1:WS-TABLE}",
+      "\tAT END DISPLAY \"${2:ELEMENT NOT FOUND IN TABLE}\"",
+      "\tWHEN ${1:WS-TABLE}(IDX) = ${3:WS-SRCH-ELEMENT}",
+      "\tDISPLAY \"FOUND IN TABLE\"",
+      "END-SEARCH."
+    ],
+    "description": "SEARCH searches a table sequentially (top to bottom) for an element that satisfies a condition. The SEARCH statement automatically increments the table subscript."
   },
   "SEARCH WHEN": {
     "prefix": "SEARCH WHEN",
     "body": ["SEARCH ${1:item} WHEN ${2:condition} ${3:item}"],
     "description": "SEARCH WHEN condition item"
   },
+  "SELECT": {
+    "prefix": "SELECT",
+    "body": [
+      "SELECT ${1:PATIENT-TRAN-FILE} ASSIGN TO ${2:PATTRAN}",
+      "\tORGANIZATION IS ${3|INDEXED,RELATIVE,SEQUENTIAL|}.",
+      "\tACCESS MODE IS ${4|SEQUENTIAL,RANDOM,DYNAMIC|}",
+      "\tFILE STATUS IS ${5:PAT-TRAN-STATUS}."
+    ],
+    "description": "DATA DIVISION / FILE DESCRIPTOR - SELECT MODE defines the internal COBOL FD that is assigned to and associated with an external QSAM, VSAM or Line Sequential file."
+  },
+  "SEPARATE": {
+    "prefix": "SEPARATE",
+    "body": [
+      "01 ${1:VAR-1} PIC S9999 DISPLAY SIGN ${2|LEADING,TRAILING|} SEPARATE."
+    ],
+    "description": "If both SIGN LEADING (or TRAILING) and SEPARATE are specified, the internal representation of the sign is a full byte, not a half byte as is normal for COMP-3 field declarations."
+  },
   "SEQUENCE": {
     "prefix": "SEQUENCE",
     "body": ["SEQUENCE ${1:item}"],
     "description": "SEQUENCE"
   },
+  "SEQUENTIAL": {
+    "prefix": "SEQUENTIAL",
+    "body": [
+      "SELECT ${1:COMMUTER-FILE} ASSIGN TO ${2:COMMUTR}",
+      "ORGANIZATION IS ${3|SEQUENTIAL,LINE SEQUENTIAL|}",
+      "ACCESS MODE IS SEQUENTIAL."
+    ],
+    "description": "FILE CONTROL - SEQUENTIAL specifies that the records in the file are written and read in the order they are entered."
+  },
   "SET": {
     "prefix": "SET",
-    "body": ["SET ${1:item}"],
-    "description": "SET"
+    "body": ["SET ${1:item} TO ${2:value}."],
+    "description": "Use the SET statement to assign a value to a: COBOL Table index, POINTER, PROCEDURE POINTER, FUNCTION POINTER or OBJECT REFERENCE."
   },
-  "SORT": {
-    "prefix": "SORT",
-    "body": ["SORT ${1:fileName} ${2:snipordering} ${3:snip} ${4:snip}"],
-    "description": "SORT"
+  "SHIFT": {
+    "prefix": "SHIFT",
+    "body": [
+      "01 ${1|SHIFT-IN,SHIFT-OUT|} GLOBAL PICTURE X(1) USAGE DISPLAY VALUE X\"0F\"."
+    ],
+    "description": "SHIFT-IN/SHIFT-OUT is a special register that represents EBCDIC shift-in/shift-out control characters. Note that these control characters are unprintable."
   },
-  "START": {
-    "prefix": "START",
-    "body": ["START ${1:fileName}"],
-    "description": "START"
-  },
-  "SUPPRESS": {
-    "prefix": "SUPPRESS",
-    "body": ["SUPPRESS ${1:id}"],
-    "description": "SUPPRESS"
-  },
-
-  "STOP": {
-    "prefix": "STOP",
-    "body": ["STOP ${1:RUN}"],
-    "description": "STOP"
+  "SIGN": {
+    "prefix": "SIGN",
+    "body": ["01 ${1:VAR-1} PIC ${2:S9(4)} SIGN ${3|LEADING,TRAILING|}."],
+    "description": "The SIGN clause specifies the position and character of the operational sign for signed numeric variables."
   },
   "SIZE ERROR": {
     "prefix": "SIZE ERROR",
-    "body": ["SIZE ERROR ${1:impStat}"],
-    "description": "SIZE ERROR"
+    "body": [
+      "DIVIDE ${1:TOT-COST} BY ${2:PURCHASED-NBR}",
+      "\tGIVING ${3:ANSWER-TOT-COST}",
+      "\t\tON SIZE ERROR",
+      "\t\tGO TO ${4:MATH-ERR-PARA}",
+      "END-DIVIDE"
+    ],
+    "description": "When arithmetic overflow occurs in a receiving field, the SIZE ERROR clause invokes statements that follow. "
+  },
+  "DELIMITED BY SIZE": {
+    "prefix": "SIZE",
+    "body": [
+      "STRING",
+      "\t${1:LINE-NUMBER SPACE CUSTOMER-INFORMATION}",
+      "\tDELIMITED BY SIZE ${2:...}"
+    ],
+    "description": "DELIMITED BY SIZE moves each field in its entirety to a receiving fields."
+  },
+  "SKIP1/SKIP2/SKIP3": {
+    "prefix": "SKIP",
+    "body": ["SKIP${1|1,2,3|}.", "$0"],
+    "description": "SKIP n number of lines in a source listing."
+  },
+  "SORT x on y": {
+    "prefix": "SORT",
+    "body": ["SORT ${1:fileName} ON ${2:VAR1}${3|., DESCENDING VAR2.|}"],
+    "description": "SORT causes a set of records in an external sequential file to be arranged in a user-specified sequence."
+  },
+  "SORT TABLE": {
+    "prefix": "SORT",
+    "body": [
+      "SORT ${1:varOrTable} ON ${2|ASCENDING,DESCENDING|} ${3:sort-var-key}."
+    ],
+    "description": "SORT sorts internal COBOL table rows according to the specified COBOL table key fields. It is especially useful for tables used with SEARCH ALL, which is more efficient than default SEARCH."
+  },
+  "SORT-CONTROL": {
+    "prefix": "SORT-CONTROL",
+    "body": [
+      "01 SORT-CONTROL GLOBAL PICTURE X(8) USAGE DISPLAY",
+      "\tVALUE \"IGZSRTCD\"."
+    ],
+    "description": "The register SORT-CONTROL contains the JCL ddname of the data set that holds control statements used to improve the performance of a sort or merge operation."
+  },
+  "SORT-CORESIZE": {
+    "prefix": "SORT-CORESIZE",
+    "body": [
+      "01 SORT-CORE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY",
+      "\tVALUE ZERO."
+    ],
+    "description": "SORT-CORE-SIZE is the name of a COMP (binary) variable to declare the number of storage bytes available to the sort utility."
+  },
+  "SORT-FILE-SIZE": {
+    "prefix": "SORT-FILE-SIZE",
+    "body": [
+      "01 SORT-FILE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY",
+      "\tVALUE ZERO."
+    ],
+    "description": "SORT-FILE-SIZE is the name of a COMP (binary) variable to declare the number of input records to a SORT."
+  },
+  "SORT-MESSAGE": {
+    "prefix": "SORT-MESSAGE",
+    "body": [
+      "01 SORT-MESSAGE GLOBAL PICTURE X(8) USAGE DISPLAY",
+      "\tVALUE \"SYSOUT\"."
+    ],
+    "description": "The register SORT-MESSAGE contains the JCL ddname of the data set that holds output messages of a sort operation at run-time, in place of the MSGDDN= sort control statement."
+  },
+  "SORT-MODE-SIZE": {
+    "prefix": "SORT-MODE-SIZE",
+    "body": [
+      "01 SORT-MODE-SIZE GLOBAL PICTURE S9(8) USAGE BINARY",
+      "\tVALUE ZERO."
+    ],
+    "description": "SORT-MODE-SIZE is the name of a COMP (binary) variable to declare the length of variable-length records that occur most frequently."
+  },
+  "SORT-RETURN": {
+    "prefix": "SORT-RETURN",
+    "body": [
+      "01 SORT-RETURN GLOBAL PICTURE S9(8) USAGE BINARY",
+      "\tVALUE ZERO."
+    ],
+    "description": "SORT-RETURN is the name of a COMP (binary) variable that will contain a return-code from the sort function."
+  },
+  "SOURCE-COMPUTER": {
+    "prefix": "SOURCE-COMPUTER",
+    "body": [
+      "SOURCE-COMPUTER. ${1:COMPUTER-NAME}${2|., WITH DEBUGGING MODE.|}"
+    ],
+    "description": "The SOURCE-COMPUTER paragraph is syntax checked unless it contains a WITH DEBUGGING clause which then sets a compile-time switch for debugging."
+  },
+  "SPACE": {
+    "prefix": "SPACE",
+    "body": [
+      "01 DEBUG-ITEM.",
+      "\t02 DEBUG-FIELD PICTURE IS X(6).",
+      "\t02 FILLER PICTURE IS X VALUE SPACE"
+    ],
+    "description": "The figurative constant SPACE or SPACES identify a character field the (EBCDIC) Hex value of \"40\"."
+  },
+  "SPECIAL-NAMES": {
+    "prefix": "SPECIAL-NAMES",
+    "body": [
+      "ENVIRONMENT DIVISION.",
+      "CONFIGURATION SECTION.",
+      "SOURCE-COMPUTER. ${1:COMPUTER-NAME}. OBJECT-COMPUTER. ${1:COMPUTER-NAME}",
+      "SPECIAL-NAMES.",
+      "\tALPHABET SPECIAL-SEQUENCE IS",
+      "\t\t\"A\" Also \"a\"",
+      "\t\t\"B\" Also \"b\"",
+      "\t\t${2:...}"
+    ],
+    "description": "The SPECIAL-NAMES paragraph is the name of an ENVIRONMENT DIVISION, CONFIGURTION SECTION paragraph in which user-specified mnemonic-names are releated to environment-names."
+  },
+  "EXEC SQLIMS": {
+    "prefix": "EXEC SQLIMS",
+    "body": ["EXEC SQLIMS", "\t${1:SQL statement}", "END-EXEC."],
+    "description": "The EXEC SQLIMS statements invoke a Compiler option, which allows you to access IMS Databases through SQL relational statements. There is a wide variety of SQLIMS options and the setup for this functionality must be installed and configured. "
+  },
+  "STANDARD": {
+    "prefix": "STANDARD",
+    "body": [
+      "FD ${1:INPATIENT-REC}",
+      "\tLABEL RECORD STANDARD",
+      "\tBLOCK CONTAINS ${2:0} CHARACTERS",
+      "\tRECORD CONTAINS ${3:80} CHARACTERS."
+    ],
+    "description": "DATA DIVISION / FILE SECTION - LABEL RECORDS documents the presence or absence of labels. STANDARD LABELS conform to system specifications."
+  },
+  "STANDARD-1": {
+    "prefix": "STANDARD-1",
+    "body": [
+      "OBJECT-COMPUTER. ${1:COMPUTER-NAME}.",
+      "\tPROGRAM COLLATING SEQUENCE IS ASCII-SEQUENCE.",
+      "\tSPECIAL-NAMES. ALPHABET ASCII-SEQUENCE IS STANDARD-1."
+    ],
+    "description": "STANDARD-1 specifies that the ASCII collating sequence is used for all alphanumeric comparisons."
+  },
+  "STANDARD-2": {
+    "prefix": "STANDARD-2",
+    "body": [
+      "OBJECT-COMPUTER. ${1:COMPUTER-NAME}.",
+      "\tPROGRAM COLLATING SEQUENCE IS ASCII-SEQUENCE.",
+      "\tSPECIAL-NAMES. ALPHABET ASCII-SEQUENCE IS STANDARD-2."
+    ],
+    "description": "STANDARD-2 specifies that the ISO/IEC 646, 7-bit coded character set collating sequence is used for all alphanumeric comparisons."
+  },
+  "START": {
+    "prefix": "START",
+    "body": ["START ${1:INPAT-FILE} ${2:KEY IS > `AAAAA`}", "END-START."],
+    "description": "START positions record retrieval within an indexed or relative file for subsequent sequential retrieval. Note that START does not READ a record."
+  },
+  "STATUS": {
+    "prefix": "STATUS",
+    "body": [
+      "SELECT ${1:INPAT} ASSIGN TO ${2:UT-S-INPAT}",
+      "FILE STATUS IS ${3:WS-INPAT-STATUS}."
+    ],
+    "description": "FILE STATUS monitors the execution of each input-output operation for a file, and moves the operation's return code into the specified variable."
+  },
+  "STOP": {
+    "prefix": "STOP",
+    "body": ["STOP RUN."],
+    "description": "STOP RUN terminates all COBOL routines. Control is returned immediately to z/OS. Note that GOBACK is a safer or better approach to ending a program."
   },
   "SHELL": {
     "prefix": "SHELL",
@@ -2684,36 +2921,163 @@
     ],
     "description": "TEMPLATE PROGRAM"
   },
-  "SUBTRACT": {
-    "prefix": "SUBTRACT",
-    "body": ["SUBTRACT ${1:A} FROM ${2:B} GIVING ${3:C}"],
-    "description": "SUBTRACT A FROM B GIVING C"
-  },
   "STRING": {
     "prefix": "STRING",
     "body": [
       "STRING ${1:item1} DELIMITED BY SIZE",
-      "       ${2:item2} DELIMITED BY SIZE",
-      "       INTO ${3:RESULT}",
+      "\t${2:item2} DELIMITED BY SIZE",
+      "\tINTO ${3:RESULT}",
       "END-STRING",
       "$0"
     ],
-    "description": "STRING DELIMITED BY SIZE"
+    "description": "STRING selects and formats information from data source(s) into a receiving field."
   },
-  "TALLYING": {
+  "SUBTRACT": {
+    "prefix": "SUBTRACT",
+    "body": ["SUBTRACT ${1:A} FROM ${2:B} GIVING ${3:C}"],
+    "description": "SUBTRACT subtracts one numeric variable, or the sum of two or more numeric variables, from one or more numeric variables, and stores the result."
+  },
+  "SUBTRACT CORRESPONDING": {
+    "prefix": "SUBTRACT CORRESPONDING",
+    "body": ["SUBTRACT CORRESPONDING ${1:A} FROM ${2:B} GIVING ${3:C}"],
+    "description": "SUBTRACT CORRESPONDING subtracts variables of the same name between two group variables and stores the result."
+  },
+  "COMPUTE SUM (Values)": {
+    "prefix": "SUM",
+    "body": [
+      "COMPUTE ${1:resultNum} = FUNCTION SUM(${2:arg-1}),${3:arg-2},${4:arg-3})"
+    ],
+    "description": "The SUM function returns a value that is the sum of the arguments."
+  },
+  "COMPUTE SUM (Table)": {
+    "prefix": "SUM",
+    "body": [
+      "01 ${1:EMP-TAB-WS}.",
+      "\t05 ${2:EMPLOYEE-REC} OCCURS ${3:1000} TIMES",
+      "\t\t10 ${4:EMPLOYEE-SAL} PIC S9(7)V99 COMP-3.",
+      "COMPUTE ${5:TOT-EMPLOYEE-PAYROLL} = FUNCTION SUM(${4:EMPLYOYEE-SAL}(ALL))"
+    ],
+    "description": "The SUM function returns a value that is the sum of all rows in an internal COBOL table."
+  },
+  "SUPPRESS (XML)": {
+    "prefix": "SUPPRESS",
+    "body": [
+      "XML GENERATE ${1:DOC} FROM ${2:GOOD-DOC}",
+      "\tSUPPRESS ${2:PATIENT-INFO}",
+      "\t\tEVERY NONNUMERIC ELEMENT WHEN SPACE",
+      "\t\tEVERY NUMERIC ELEMENT WHEN ZERO",
+      "END-XML."
+    ],
+    "description": "SUPPRES excludes individual data items from an XML GENERATE."
+  },
+  "SUPPRESS (Copy)": {
+    "prefix": "SUPPRESS",
+    "body": ["COPY ${1:ABC-COPY-BOOK} SUPPRESS."],
+    "description": "SUPPRESS specifies that the library text is not to be printed on the source listing."
+  },
+  "SYMBOLIC CHARACTERS": {
+    "prefix": "SYMBOLIC CHARACTERS",
+    "body": ["SYMBOLIC CHARACTERS ${1:BACKSPACE IS 23}"],
+    "description": "The SYMBOLIC CHARACTERS clause provides a means of specifying one or more single-byte, symbolic characters assigned to an EBCIDIC/ASCII hex value."
+  },
+  "SYNCHRONIZED": {
+    "prefix": "SYNCHRONIZED",
+    "body": ["01 ${1:GROUP-VAR}", "\t05 ${2:IDX-VAR} PIC S9(4) COMP SYNC."],
+    "description": "The SYNC/SYNCHRONIZED clause specifies the alignment of an elementary item on a natural boundary in z/OS main storage."
+  },
+  "TALLY": {
+    "prefix": "TALLY",
+    "body": ["01 TALLY GLOBAL PICTURE 9(5) COMP VALUE ZERO."],
+    "description": "TALLY is a special register named as a binary (COMP) data item. When used in nested programs, this special register is implicitly declared with this global variable in the outermost program. You can refer to or modify the contents of TALLY throughout the nested program."
+  },
+  "TALLYING (Inspect)": {
     "prefix": "TALLYING",
-    "body": ["TALLYING ${1:item}"],
-    "description": "TALLYING item"
+    "body": [
+      "INSPECT ${1:INPAT-ADDRESS}",
+      "\tTALLYING ${2:INPAT-COUNTR} FOR LEADING \" \"",
+      "\tREPLACING FIRST \" \" BY \"|\"."
+    ],
+    "description": "TALLYING counts the occurrences of a specific character or special character in the INSPECT, STRING or UNSTRING data item."
   },
-  "THROUGH": {
-    "prefix": "THROUGH",
-    "body": ["THROUGH ${1:item}"],
-    "description": "THROUGH item"
+  "TALLYING (UNSTRING)": {
+    "prefix": "TALLYING",
+    "body": [
+      "UNSTRING ${1:INPAT-FLDS}",
+      "\tDELIMITED BY SPACES ",
+      "\tINTO ${2:WS-INPAT}",
+      "\tTALLYING IN ${3:INPAT-FLDS-FILLED}",
+      "END-UNSTRING."
+    ],
+    "description": "TALLYING counts the occurrences of a specific character or special character in the INSPECT, STRING or UNSTRING data item."
   },
-  "THRU": {
-    "prefix": "THRU",
-    "body": ["THRU ${1:item}"],
-    "description": "THRU item"
+  "If x THEN": {
+    "prefix": "THEN",
+    "body": [
+      "IF ${1:statement-1} THEN",
+      "\t${2:ifTrue}",
+      "ELSE",
+      "\t${3:ifNotTrue}",
+      "END-IF."
+    ],
+    "description": "Use THEN in an IF ... ELSE statement to code a formal (English-language) choice between processing actions. Note that the word THEN is optional."
+  },
+  "PERFORM x THRU y": {
+    "prefix": "PERFORM THRU",
+    "body": ["PERFORM ${1:PROCESS-PATIENT} THRU ${2:PROCESS-PATIENT-EXIT}"],
+    "description": "THROUGH (or THRU) in a PERFORM statement tells the runtime to execute all paragraphs and statements from the named-paragraph THRU the EXIT paragraph."
+  },
+  "VALUE x THRU y": {
+    "prefix": "VALUE THRU",
+    "body": [
+      "01 WS-YEAR-VALUES.",
+      "\t05 WS-INIT-YEAR PIC 9(4).",
+      "\t\t88 VALID-YEAR   VALUE 1960 THRU 2022.",
+      "\t\t88 INVALID-YEAR VALUE 0001 THRU 1959",
+      "\t\t                      2023 THRU 9999."
+    ],
+    "description": "THROUGH (or THRU) in an 88-declaration tells the compiler that all sequential values after VALUE to the THRU value are assigned to the 88."
+  },
+  "TIME": {
+    "prefix": "TIME",
+    "body": [
+      "ACCEPT ${1:WS-TIME-ITEM} FROM TIME.",
+      "DISPLAY \"CURRENT TIME IS: \"${1:WS-TIME-ITEM}."
+    ],
+    "description": "The reserved word TIME is a special register that returns the current time in your system-format."
+  },
+  "OCCURS x TIMES": {
+    "prefix": "TIMES",
+    "body": [
+      "01 ${1:WS-PATIENT-TBL}.",
+      "\t05 ${2:WS-PATIENT-DATA} OCCURS ${3:99} TIMES."
+    ],
+    "description": "TIMES when used in a table declaration defines the number of instances a variable occurs within a table."
+  },
+  "PERFORM x THRU y num TIMES": {
+    "prefix": "TIMES",
+    "body": [
+      "PERFORM ${1:PROCESS-PAT-EDIT} THRU ${2:PAT-EDIT-EXT} ${3:99} TIMES."
+    ],
+    "description": "TIMES when used in a COBOL loop construct declares the number of iterations the logic is looped through."
+  },
+  "SELECT x ASSIGN TO y": {
+    "prefix": "TO",
+    "body": [
+      "\tSELECT ${1:FILE-1} ASSIGN TO ${2:EXTFILE1}",
+      "ORGANIZATION IS INDEXED"
+    ],
+    "description": "FILE CONTROL - TO as part of a SELECT/ASSIGN statement associates the internal COBOL filename (after SELECT) to an external data set name."
+  },
+  "IF x GREATER/LESS THAN OR EQUAL TO y": {
+    "prefix": "TO",
+    "body": [
+      "IF ${1:statement-1} ${2|GREATER,LESS|} THAN OR EQUAL TO ${3:statement-2} THEN",
+      "\t${4:ifTrue}",
+      "ELSE",
+      "\t${5:ifNotTrue}",
+      "END-IF."
+    ],
+    "description": "TO as part of an IF statement directs the runtime to evaluate the value after the word IF to the value after TO and take appropriate action."
   },
   "TO": {
     "prefix": "TO",
@@ -2725,40 +3089,98 @@
     "body": ["TO ${1:item} ${2:item}"],
     "description": "TO item1 item2"
   },
-  "TYPE": {
-    "prefix": "TYPE ITEM1 ITEM2",
-    "body": ["TYPE ${1:item} ${2:SNIP}"],
-    "description": "TYPE item1 item2"
+  "TRAILING": {
+    "prefix": "TRAILING",
+    "body": ["01 ${1:VAR-1} PIC ${2:S9(4)} SIGN TRAILING."],
+    "description": "SIGN TRAILING declares the position of the operational sign (plus or minus) for a numeric variable."
+  },
+  "EVALUATE TRUE": {
+    "prefix": "EVALUATE TRUE",
+    "body": [
+      "EVALUATE TRUE",
+      "\tWHEN ${1:VAR-A} = ${2:VAR-B}",
+      "\t\tMOVE \"${1:VAR-A} - ${2:VAR-B} EQUAL\" TO DISP-OUT.",
+      "\tWHEN ${3:VAR-C} = ${4:VAR-D}",
+      "\t\tMOVE \"${3:VAR-C} - ${4:VAR-D} EQUAL\" TO DISP-OUT.",
+      "END-EVALUATE."
+    ],
+    "description": "Use EVALUATE TRUE instead of a series of nested IF statements to test multiple conditions and specify distinct actions for each."
+  },
+  "SET x TRUE": {
+    "prefix": "SET TRUE",
+    "body": ["IF NO-MORE-RECORDS", "\tSET EOF-CONDITION TRUE"],
+    "description": "When a SET statement is executed, the value associated with a condition-name is placed in its 88-Level according to the rules of the VALUE clause."
+  },
+  "JSON GENERATE TYPE": {
+    "prefix": "TYPE",
+    "body": [
+      "JSON GENERATE ${1:JASON-STMT} FROM ${2:IN-FILE-TEXT} COUNT IN ${3:JSON-CHAR-CTR}",
+      "\tTYPE OF ${4:VAR-MSG} IS ${5:attribute}",
+      "\tON EXCEPTION DISPLAY \"JSON GENERATE ERROR: \" ${6:WS-JS-CODE}",
+      "END-JSON"
+    ],
+    "description": "The TYPE phrase allows you to control attribute and element generation."
   },
   "UNSTRING": {
-    "prefix": "UNSTRING ITEM",
-    "body": ["UNSTRING ${1:item}"],
-    "description": "UNSTRING item"
+    "prefix": "UNSTRING",
+    "body": [
+      "UNSTRING ${1:PAT-DETAILS-IN-REC}",
+      "\t${2:LNAME, FNAME, MID-INIT, DETAILS} DELIMITED BY SIZE",
+      "END-UNSTRING."
+    ],
+    "description": "UNSTRING selects and formats information from data source(s) into a receiving field."
   },
-  "UNTIL": {
+  "PERFORM UNTIL": {
     "prefix": "UNTIL",
-    "body": ["UNTIL ${1:item}"],
-    "description": "UNTIL item"
+    "body": [
+      "PERFORM ${1:PAT-IN-REC-EDITS} THRU ${2:PAT-IN-REC-EDITS-EXIT}",
+      "\tUNTIL ${3:NO-MORE-PAT-IN-RECS}",
+      "END-PERFORM."
+    ],
+    "description": "UNTIL tells the runtime to execute procedures referred to until a specified condition tests true, or if an UNTIL EXIT is reached."
   },
   "UP BY": {
     "prefix": "UP BY",
-    "body": ["UP BY ${1:item}"],
-    "description": "UP BY item1"
+    "body": ["SET ${1:indexName} UP BY ${2:numVarLiteral}"],
+    "description": "SET x UP is equivalent to a ADD statement, except referring to a COBOL table index or a COBOL pointer variable."
   },
   "UPON": {
     "prefix": "UPON",
     "body": ["UPON ${1:mnemName|envName}"],
     "description": "UPON mnemName|envName"
   },
-  "USING": {
+  "UPON CONSOLE": {
+    "prefix": "UPON CONSOLE",
+    "body": ["DISPLAY \"SERIOUS DB2 ERROR\"", "\tUPON CONSOLE."],
+    "description": "UPON CONSOLE (or environment-name) or the environment name associated with an output device copies what is to be displayed to an output device defined in the ENVIRONMENT DIVISION."
+  },
+  "USAGE": {
+    "prefix": "USAGE",
+    "body": ["01 ${1:VAR1} ${2:PIC X(8)} USAGE IS DISPLAY"],
+    "description": "USAGE provides details about the intention of a given variable."
+  },
+  "CALL x USING y": {
     "prefix": "USING",
-    "body": ["USING ${1:fileName} ${2:fileName}"],
-    "description": "USING fileName"
+    "body": ["CALL \"${1:PATEDITS}\" USING ${2:WS-PAT-DETAILS, WS-PAT-RETC}."],
+    "description": "The WORKING-STORAGE SECTION parameters referenced by the USING phrase are made available to the called subprogram at the time the CALL is executed."
+  },
+  "JSON PARSE USING": {
+    "prefix": "USING",
+    "body": [
+      "JSON PARSE ${1:id} INTO ${2:id}",
+      "\tCONVERTING ${3:id} FROM BOOLEAN USING ${4:data-flag-b}"
+    ],
+    "description": "USING provides various methods of specifying the values that are moved after the JSON PARSE conversion."
   },
   "USING VALUE": {
     "prefix": "USING",
     "body": ["USING VALUE ${1:id}"],
     "description": "USING VALUE"
+  },
+  "UTF-8": {
+    "prefix": "UTF-8",
+    "body": ["01 ${1:UTF-8-VAR} PIC X(8) USAGE UTF-8."],
+    "description": "Literals identified by the opening delimiter U\" or U' are UTF-8 literals. They can contain any single-byte or double-byte characters."
   },
   "VALIDATING": {
     "prefix": "VALIDATING",
@@ -2767,37 +3189,203 @@
   },
   "VALUE": {
     "prefix": "VALUE",
-    "body": ["VALUE ${1:id}"],
-    "description": "VALUE ID"
+    "body": [
+      "01 ${1:WS-VAR} PIC X(20) VALUE \"${2:textHere}\".",
+      "\t88 ${3:WS-SUBVAR} VALUE \"${4:textHere}\". "
+    ],
+    "description": "WORKING-STORAGE SECTION - VALUE/VALUES specifies the initial contents of a variable or the value(s) associated with an 88-level condition name."
   },
-  "VARYING FROM": {
-    "prefix": "VARYING FROM",
-    "body": ["VARYING ${1:item} FROM ${2:item} ${3:snipByUntil}"],
-    "description": "VARYING FROM"
+  "VALUE OF": {
+    "prefix": "VALUE OF",
+    "body": [
+      "FD ${1:QSAM-FILE}",
+      "\t\tLABEL RECORDS ARE STANDARD",
+      "\t\tRECORDING MODE IS FBA",
+      "\t\tBLOCK CONTAINS 0",
+      "\t\tVALUE OF ${2:system-name} IS ${3:working-storage-field}",
+      "\t\tDATA RECORD IS ${4:RPT-OUT-REC}."
+    ],
+    "description": "The VALUE OF clause describes a WORKING-STORAGE item in the label records associated with the file."
   },
-  "WHEN": {
+  "VARYING": {
+    "prefix": "VARYING",
+    "body": [
+      "PERFORM ${1:TBL-EDIT-RTN} THRU ${2:TBL-EDIT-EXIT}",
+      "\tVARYING ${3:TBL-IDX} FROM 1 BY 1 ",
+      "\tUNTIL ${3:TBL-IDX} >= ${4:WS-TBL-MAX}."
+    ],
+    "description": "PROCEDURE DIVISION - VARYING increases or decreases the value of one or more variable subscripts or table indexes. Note that the PERFORM statement can be an inline PERFORM that varies a variable from low-to-high."
+  },
+  "VOLATILE": {
+    "prefix": "VOLATILE",
+    "body": [
+      "01 ${1:ONLINE-DATA-COLLECTION-VARS}.",
+      "\t03 ${2:SCREEN-ITEMS-A-SECTION} VOLATILE.",
+      "\t\t05 ${3:SCREEN-A1} PIC S9(3)V99 COMP SYNC.",
+      "\t\t05 ${4:SCREEN-A2} PIC S9(5)V99 COMP SYNC.",
+      "\t03 ${5:SCREEN-ITEMS-B-SECTION}.",
+      "\t\t05 ${6:SCREEN-B1} PIC S9(9).",
+      "\t\t05 ${7:SCREEN-B2} PIC S9(9) VOLATILE."
+    ],
+    "description": "VOLATILE indicates that a variable's value can be modified or referenced in ways that the COBOL compiler cannot detect, e.g. a Language Environment (LE) condition handler."
+  },
+  "WHEN (EVALUATE)": {
     "prefix": "WHEN",
-    "body": ["WHEN ${1:snipPhrase} ${2:impStat}"],
-    "description": "WHEN item"
+    "body": [
+      "EVALUATE ${1:VAR-TO-EVALUATE}",
+      "\tWHEN ${2:statement-1}",
+      "\t\t${3:doThisWhenTrue}",
+      "\tWHEN ${4:statement-2}",
+      "\t\t${5:doThisWhenTrue}",
+      "END-EVALUATE."
+    ],
+    "description": "The WHEN clause, when used with EVALUATE is a succinct way of specifying IF conditionals."
+  },
+  "WHEN (Search)": {
+    "prefix": "WHEN",
+    "body": [
+      "SEARCH ${1:tableToSearch}",
+      "\tAT END",
+      "\t\tMOVE ${2:-1} TO RETURN-CODE",
+      "\tWHEN ${3:conditionalStatement}",
+      "\t\t${4:doThisWhen}",
+      "END-SEARCH."
+    ],
+    "description": "In a COBOL SEARCH operation WHEN is used as the conditional test keyword."
   },
   "WHEN OTHER": {
     "prefix": "WHEN OTHER",
-    "body": ["WHEN OTHER ${1:impStat}"],
+    "body": ["WHEN OTHER", "\t${1:impStat}"],
     "description": "WHEN OTHER"
+  },
+  "WHEN-COMPILED #1": {
+    "prefix": "WHEN-COMPILED",
+    "body": ["MOVE FUNCTION WHEN-COMPILED WS-PIC-X-21-BYTE-FLD."],
+    "description": "Use the COBOL instrinsic function WHEN-COMPILED to determine when a program was compiled. The resultant alphanumeric format is: YYYYMMDDHHMMSSHH from Greenwich Mean Time."
+  },
+  "WHEN-COMPILED #2": {
+    "prefix": "WHEN-COMPILED",
+    "body": ["01 WHEN-COMPILED GLOBAL PICTURE X(16)."],
+    "description": "Use the COBOL instrinsic function WHEN-COMPILED to determine when a program was compiled. The resultant alphanumeric format is: YYYYMMDDHHMMSSHH from Greenwich Mean Time."
+  },
+  "CLOSE WITH": {
+    "prefix": "WITH",
+    "body": ["CLOSE ${1:filename} WITH LOCK."],
+    "description": "CLOSE x WITH LOCK specifies that the file cannot be opened again while the program is running."
+  },
+  "DISPLAY x WITH NO ADVANCING": {
+    "prefix": "WITH NO ADVANCING",
+    "body": ["DISPLAY \"${1:CICS ABEND ERROR}\" WITH NO ADVANCING."],
+    "description": "DISPLAY x WITH NO ADVANCING places a + sign in byte one of the output sent to a DDNAME."
+  },
+  "PERFORM WITH": {
+    "prefix": "WITH",
+    "body": [
+      "PERFORM ${1:INPAT-EDITS} WITH TEST AFTER VARYING ${2:WS-INPAT-IDX}",
+      "FROM 1 BY 1 UNTIL ${2:WS-INPAT-IDX} >= ${3:99}",
+      "END-PERFORM."
+    ],
+    "description": "As part of a PERFORM (loop) construct, WITH TEST AFTER (or WITH TEST BEFORE) allows you to control whether or not at least a single loop occurs."
+  },
+  "WRITE x FROM y": {
+    "prefix": "WRITE",
+    "body": [
+      "WRITE ${1:x} FROM ${2:y}",
+      "END-WRITE.",
+      "IF ${3:WS-OUTPUT-STATUS-CODE} NOT EQUAL 0",
+      "\t${4:I/O-Error-Logic}",
+      "END-IF."
+    ],
+    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed. i.e. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
+  },
+  "WRITE x FROM y BEFORE ADVANDING z lines": {
+    "prefix": "WRITE",
+    "body": [
+      "WRITE ${1:x} FROM ${2:y}",
+      "\tBEFORE ADVANCING ${3:2} LINES",
+      "END-WRITE.",
+      "IF ${4:WS-OUTPUT-STATUS-CODE} NOT EQUAL 0",
+      "\t${5:I/O-Error-Logic}",
+      "END-IF."
+    ],
+    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed. i.e. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
+  },
+  "WRITE x FROM y INVALID KEY PERFORM z": {
+    "prefix": "WRITE",
+    "body": [
+      "WRITE ${1:x} FROM ${2:y}",
+      "\tINVALID KEY PERFORM ${3:z}",
+      "END-WRITE."
+    ],
+    "description": "The format of the WRITE phrase in the PROCEDURE DIVISION is dependent on the file-type being processed. i.e. VSAM, QSAM, etc. It also has several optional subordinate clauses for specific I/O error trapping."
   },
   "WRITE item": {
     "prefix": "WRITE item",
     "body": ["WRITE ${1:item}"],
     "description": "WRITE item"
   },
+  "APPLY WRITE ONLY": {
+    "prefix": "WRITE-ONLY",
+    "body": ["AWO."],
+    "description": "ENVIRONMENT DIVISION / FILE-CONTROL / I-O-CONTROL - Use the compiler option AWO (APPLY WRITE-ONLY) to make optimal use of buffering on the I/O device. Note that Enterprise COBOL v6 describes I/O efficiency savings as being upwards of 90%."
+  },
   "XML PARSE": {
     "prefix": "XML PARSE",
-    "body": ["XML PARSE ${1:item}"],
-    "description": "XML PARSE item"
+    "body": [
+      "XML PARSE ${1:LS-XML-INPAT-DOC} ",
+      "\tPROCESSING PROCEDURE COUNTELEMENTS",
+      "\tMOVE LENGTH OF ${2:XML-DOCUMENT} TO ${3:WS-DOC-SIZE}."
+    ],
+    "description": "PROCEDURE DIVISION - The XML reserved word which invokes IBM's XML parser is followed by a number of options for parsing or generating XML documents. Note that the detailed IBM documentation contains complete generating information."
   },
-  "WORKING-STORAGE SECTION": {
-    "prefix": "WORKING-STORAGE SECTION",
-    "body": ["WORKING-STORAGE SECTION.", "$0"],
-    "description": "WORKING-STORAGE SECTION"
+  "XML-CODE": {
+    "prefix": "XML-CODE",
+    "body": ["01 ${1:XML-CODE} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "The special register XML-CODE communicates the status between the IBM XML parser and the XML  procedure invoked in an XML PARSE statement. It indicates either that an XML GENERATE was successful or not."
+  },
+  "XML-EVENT": {
+    "prefix": "XML-EVENT",
+    "body": ["01 ${1:XML-EVENT} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "XML-EVENT is a special register that passes run-time event information from the XML parser to the processing procedure identified in the XML PARSE statement."
+  },
+  "XML-INFORMATION": {
+    "prefix": "XML-INFORMATION",
+    "body": ["01 ${1:XML-INFORMATION} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "The XML-INFORMATION special register is used to provide additional information to an XML PARSE processing procedure about the status of the executing code."
+  },
+  "XML-NAMESPACE": {
+    "prefix": "XML-NAMESPACE",
+    "body": ["01 ${1:XML-NAMESPACE} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "XML-NAMESPACE special register passes event information from the XML parser to the processing procedure identified in the XML PARSE statement."
+  },
+  "XML-NAMESPACE-PREFIX": {
+    "prefix": "XML-NAMESPACE-PREFIX",
+    "body": ["01 ${1:XML-NAMESPACE-PREFIX} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "XML-NAMESPACE-PREFIX contains the identifier of the namespace, if any, associated with the name in XML-TEXT for XML events."
+  },
+  "XML-NTEXT": {
+    "prefix": "XML-NTEXT",
+    "body": ["01 ${1:XML-NTEXT} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "XML-NTEXT contains document fragments that are represented in usage NATIONAL."
+  },
+  "XML-SCHEMA": {
+    "prefix": "XML-SCHEMA",
+    "body": ["01 ${1:XML-SCHEMA} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "XML-SCHEMA relates <xml-schema-name-1> to an external file identifier such as a ddname or environment variable which identifies the actual external file that contains the optimized XML schema."
+  },
+  "XML-TEXT": {
+    "prefix": "XML-TEXT",
+    "body": ["01 ${1:XML-TEXT} PIC S9(9) USAGE BINARY VALUE 0."],
+    "description": "XML-TEXT contains document fragments that are represented in usage DISPLAY (PIC A, or PIC X)."
+  },
+  "MOVE ZERO": {
+    "prefix": "ZERO",
+    "body": ["MOVE ZERO TO ${1:WS-NUM-ITEM1}."],
+    "description": "ZERO and its synonyms represent the numeric value zero (0) or one or more occurrences of the character zero (in EBCDIC: xF0)."
+  },
+  "VALUE ZERO": {
+    "prefix": "ZERO",
+    "body": ["01 ${1:VAR-BIN} PIC S9(4)V99 COMP-3 VALUE ZERO."],
+    "description": "VALUE ZERO when used in a variable declaration initiaizes the field to the numeric value zero (0)."
   }
 }
