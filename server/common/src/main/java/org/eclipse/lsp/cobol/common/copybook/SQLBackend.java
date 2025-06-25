@@ -21,6 +21,5 @@ package org.eclipse.lsp.cobol.common.copybook;
 public enum SQLBackend {
   DB2_SERVER,
   DATACOM_SERVER,
-  SKIP_SQL,
   NONE
 }

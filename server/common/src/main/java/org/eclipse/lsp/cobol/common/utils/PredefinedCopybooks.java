@@ -56,8 +56,6 @@ public class PredefinedCopybooks {
             return "SQLCA_DB2";
           case DATACOM_SERVER:
             return "SQLCA_DATACOM";
-          case SKIP_SQL:
-            return "SKIP_SQL";
           default:
             return "SQLCA_DB2";
         }
