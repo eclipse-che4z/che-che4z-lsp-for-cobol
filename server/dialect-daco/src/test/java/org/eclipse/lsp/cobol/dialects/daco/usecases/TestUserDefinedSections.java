@@ -84,6 +84,7 @@ class TestUserDefinedSections {
             ImmutableList.of("DaCo", "IDMS"),
             true,
             false,
+            true,
             ImmutableList.of(),
             dialectConfig);
     UseCaseEngine.runTestForDiagnostics(

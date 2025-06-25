@@ -74,6 +74,7 @@ public class TestCICSGeneratedRegisters {
             ImmutableList.of(),
             false,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of());
 

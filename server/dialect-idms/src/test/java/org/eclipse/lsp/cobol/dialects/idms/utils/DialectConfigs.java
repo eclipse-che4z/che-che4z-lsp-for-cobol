@@ -30,6 +30,7 @@ public class DialectConfigs {
         ImmutableList.of(IdmsDialect.NAME),
         true,
         false,
+        true,
         ImmutableList.of(),
         ImmutableMap.of());
   }

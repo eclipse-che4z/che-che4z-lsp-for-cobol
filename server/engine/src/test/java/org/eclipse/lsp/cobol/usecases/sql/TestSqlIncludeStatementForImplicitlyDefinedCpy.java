@@ -116,6 +116,16 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           THIS IS INVALID CODE\n"
           + "           END-EXEC.\n";
 
+  private static final String TEXT_BACKEND_SKIP_SQL_VARIABLE_DEFINITION =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-DB2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*A} SQL TYPE IS BINARY(10).\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           MOVE 'AAAA' TO {$A}.\n"
+          + "           STOP RUN.\n";
+
   private static final String TEXT_ERR_PRG =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-DB2.\n"
@@ -175,6 +185,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -203,6 +214,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -235,6 +247,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");
@@ -255,8 +268,9 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            false,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("SKIP_SQL")));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL,
@@ -276,11 +290,32 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            false,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("SKIP_SQL")));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
+  }
+
+  @Test
+  void testSkipSql3() {
+    AnalysisConfig analysisConfig =
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            false,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+
+    UseCaseEngine.runTest(
+        TEXT_BACKEND_SKIP_SQL_VARIABLE_DEFINITION,
         ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),

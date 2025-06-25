@@ -74,6 +74,7 @@ public class TestDaCoCopyMixture {
             ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

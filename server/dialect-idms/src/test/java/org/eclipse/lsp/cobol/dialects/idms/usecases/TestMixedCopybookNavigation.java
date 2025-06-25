@@ -59,6 +59,7 @@ public class TestMixedCopybookNavigation {
             ImmutableList.of(IdmsDialect.NAME),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

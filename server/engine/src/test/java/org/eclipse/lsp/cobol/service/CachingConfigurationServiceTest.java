@@ -55,6 +55,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of(),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
@@ -102,6 +103,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
@@ -147,6 +149,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             false,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));

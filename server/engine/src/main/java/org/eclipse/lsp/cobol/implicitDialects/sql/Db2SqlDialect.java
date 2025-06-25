@@ -49,6 +49,7 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.processor.*;
 public class Db2SqlDialect implements CobolDialect {
   public static final String DIALECT_NAME = "db2";
   public static final String SQL_BACKEND_SETTING = "target-sql-backend";
+  public static final String SQL_PROCESSING_ENABLED_SETTING = "enable-sql-processing";
 
   private final CopybookService copybookService;
   private final MessageService messageService;
@@ -71,37 +72,27 @@ public class Db2SqlDialect implements CobolDialect {
 
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
-    List<Node> nodes;
-    List<SyntaxError> parseError = new ArrayList<>();
-
+    boolean isSqlProcessingEnabled = getSqlProcessingEnabled(context);
     Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
 
-    Db2SqlLexer lexer =
-        new Db2SqlLexer(CharStreams.fromString(context.getExtendedDocument().toString()));
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    Db2SqlParser parser = new Db2SqlParser(tokens);
-    Db2ErrorListener listener = new Db2ErrorListener(context.getExtendedDocument().getUri());
-    lexer.removeErrorListeners();
-    lexer.addErrorListener(listener);
-    parser.removeErrorListeners();
-    parser.addErrorListener(listener);
-    parser.setErrorHandler(new Db2ErrorStrategy(messageService));
+    List<SyntaxError> parseError = new ArrayList<>();
 
-    if (getSqlBackend(context).equalsIgnoreCase(SQLBackend.SKIP_SQL.toString())) {
-      Db2SqlParser.StartSkipRuleContext skipRuleContext = parser.startSkipRule();
-      nodes = db2SqlVisitor.visitStartSkipRule(skipRuleContext);
-    } else {
-      // parse the document text to get parseTree
-      Db2SqlParser.StartRuleContext startRuleContext = parser.startRule();
-      nodes = db2SqlVisitor.visitStartRule(startRuleContext);
-      parseError.addAll(listener.getErrors());
-    }
+    // parse the document text to get parseTree
+    Db2SqlParser.StartRuleContext startRuleContext =
+        parseDB2(
+            context.getExtendedDocument().toString(),
+            context.getExtendedDocument().getUri(),
+            parseError,
+            isSqlProcessingEnabled);
+
+    // Traverse the parse tree to generate dialect specific nodes
+    List<Node> nodes = db2SqlVisitor.visitStartRule(startRuleContext);
 
     // Add nodes returned by extend method. Not needed here.
     nodes.addAll(context.getDialectNodes());
 
     // Add error encountered while visiting the parser. To be reported to COBOL LS engine.
-    parseError.addAll(db2SqlVisitor.getErrors());
+    if (isSqlProcessingEnabled) parseError.addAll(db2SqlVisitor.getErrors());
 
     return new ResultWithErrors<>(new DialectOutcome(nodes, context), parseError);
   }
@@ -143,10 +134,28 @@ public class Db2SqlDialect implements CobolDialect {
             new Db2WorkingAndLinkageSectionProcessor(messageService)));
   }
 
-  private String getSqlBackend(DialectProcessingContext context) {
-    JsonElement jsonElement = context.getConfig().getDialectsSettings().get(SQL_BACKEND_SETTING);
-    if (Objects.isNull(jsonElement)) return SQLBackend.DB2_SERVER.toString();
-    return jsonElement.getAsString();
+  private Db2SqlParser.StartRuleContext parseDB2(
+      String text,
+      String programDocumentUri,
+      List<SyntaxError> errors,
+      boolean isSqlProcessingEnabled) {
+    Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(text));
+    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    Db2SqlParser parser = new Db2SqlParser(tokens);
+    Db2ErrorListener listener = new Db2ErrorListener(programDocumentUri);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(listener);
+    parser.removeErrorListeners();
+    parser.addErrorListener(listener);
+    parser.setErrorHandler(new Db2ErrorStrategy(messageService));
+
+    Db2SqlParser.StartRuleContext result = parser.startRule();
+    if (isSqlProcessingEnabled) errors.addAll(listener.getErrors());
+    return result;
+  }
+
+  private boolean getSqlProcessingEnabled(DialectProcessingContext context) {
+    return context.getConfig().isSqlProcessingEnabled();
   }
 
   @Override

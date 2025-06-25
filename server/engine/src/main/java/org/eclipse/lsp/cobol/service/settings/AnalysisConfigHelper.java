@@ -38,6 +38,7 @@ class AnalysisConfigHelper {
             entity.getDialects(),
             entity.isCicsTranslatorEnabled(),
             false,
+            true,
             entity.getDialectRegistry(),
             entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());

@@ -68,6 +68,7 @@ class TestMapDefinition {
                 ImmutableList.of(IdmsDialect.NAME),
                 true,
                 false,
+                true,
                 ImmutableList.of(),
                 ImmutableMap.of()));
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);

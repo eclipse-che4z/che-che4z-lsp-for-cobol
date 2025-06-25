@@ -53,6 +53,7 @@ class TestMissedDialect {
             ImmutableList.of("TESTDIALECT"),
             false,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

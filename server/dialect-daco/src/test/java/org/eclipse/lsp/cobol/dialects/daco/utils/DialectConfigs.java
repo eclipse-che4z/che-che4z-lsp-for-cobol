@@ -41,6 +41,7 @@ public class DialectConfigs {
         ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
         true,
         false,
+        true,
         ImmutableList.of(),
         createPredefinedSectionsConfig(
             ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")));
@@ -60,6 +61,7 @@ public class DialectConfigs {
         ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
         true,
         false,
+        true,
         ImmutableList.of(),
         createPredefinedSectionsConfig(predefinedSections));
   }

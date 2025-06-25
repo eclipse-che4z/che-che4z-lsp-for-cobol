@@ -60,6 +60,7 @@ public class TestCopyIdmsNested4 {
             ImmutableList.of(IdmsDialect.NAME),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

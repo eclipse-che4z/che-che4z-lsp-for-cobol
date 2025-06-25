@@ -32,6 +32,7 @@ public class DialectConfigs {
         ImmutableList.of("IDMS"),
         true,
         false,
+        true,
         ImmutableList.of(),
         ImmutableMap.of());
   }
@@ -49,6 +50,7 @@ public class DialectConfigs {
         ImmutableList.of("DaCo", "IDMS"),
         true,
         false,
+        true,
         ImmutableList.of(),
         ImmutableMap.of(
             "daco.predefined-sections",

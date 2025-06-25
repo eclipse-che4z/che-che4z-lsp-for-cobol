@@ -494,16 +494,19 @@
           "enum": [
             "DB2_SERVER",
             "DATACOM_SERVER",
-            "SKIP_SQL",
             "NONE"
           ],
           "enumDescriptions": [
             "DB2_SERVER  - IBM DB2 SQL Server",
             "DATACOM_SERVER - CA DATACOM Server",
-            "SKIP_SQL - Allows anything within EXEC SQL blocks without further processing",
             "NONE"
           ],
           "description": "The target SQL backend server which is used on the mainframe"
+        },
+        "cobol-lsp.enable-sql-processing": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enable SQL Processing"
         },
         "cobol-lsp.dialects": {
           "type": "array",

@@ -66,6 +66,7 @@ public class TestDaCoCopyFrom5 {
             ImmutableList.of(DaCoDialect.NAME),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

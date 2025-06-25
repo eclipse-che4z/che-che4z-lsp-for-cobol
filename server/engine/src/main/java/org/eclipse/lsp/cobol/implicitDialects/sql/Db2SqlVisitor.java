@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.AntlrRangeUtils.constructRange;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonElement;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -36,7 +35,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
-import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -381,7 +379,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
-    if (getSqlBackend(context).equalsIgnoreCase(SQLBackend.SKIP_SQL.toString())) {
+    if (!getSqlProcessingEnabled(context)) {
       return ImmutableList.of();
     }
 
@@ -401,11 +399,8 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     return Collections.singletonList(sqlNode);
   }
 
-  private String getSqlBackend(DialectProcessingContext context) {
-    JsonElement jsonElement =
-        context.getConfig().getDialectsSettings().get(Db2SqlDialect.SQL_BACKEND_SETTING);
-    if (Objects.isNull(jsonElement)) return SQLBackend.DB2_SERVER.toString();
-    return jsonElement.getAsString();
+  private boolean getSqlProcessingEnabled(DialectProcessingContext context) {
+    return context.getConfig().isSqlProcessingEnabled();
   }
 
   private String preProcessSqlComment(Db2SqlParser.SqlCodeContext ctx) {

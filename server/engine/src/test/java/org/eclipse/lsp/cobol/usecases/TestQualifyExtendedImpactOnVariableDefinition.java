@@ -136,6 +136,7 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
             ImmutableList.of(),
             true,
             false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of());
     analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");
