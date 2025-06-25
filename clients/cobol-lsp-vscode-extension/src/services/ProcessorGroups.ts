@@ -15,26 +15,18 @@
 import * as path from "path";
 import { Minimatch } from "minimatch";
 import { Uri, workspace } from "vscode";
-import { DialectsConfiguration, SettingsService } from "./Settings";
+import { DialectsConfiguration } from "./Settings";
 import { loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
   clearWorkspaceConfigCache,
-  CopybookLibs,
-  EndevorConfigModel,
   ProcessorGroupProperties,
   readEndevorConfig,
   readWorkspaceConfig,
-  TransformedProcessorGroup,
-  transformLibs,
+  ProcessorGroup,
   WorkspaceConfig,
-  ZoweDatasetConfigModel,
-  ZoweUssConfigModel,
+  readSettingConfig as readSettingConfig,
 } from "./ProcessorGroupsLoader";
-import {
-  DEFAULT_DIALECT,
-  PATHS_LOCAL_KEY,
-  SETTINGS_CPY_SECTION,
-} from "../constants";
+import { DEFAULT_DIALECT } from "../constants";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -49,52 +41,6 @@ export async function loadProcessorGroupCopybooksLibs(
 
   return libs;
 }
-
-export type ProcessorGroupCopybookPathConfig =
-  | Uri
-  | ZoweDatasetConfigModel
-  | ZoweUssConfigModel
-  | EndevorConfigModel;
-
-// export async function loadProcessorGroupCopybookPathsConfig(
-//   documentUri: Uri,
-//   dialect?: string,
-// ): Promise<ProcessorGroupCopybookPathConfig[]> {
-//   const allConfigs = await loadProcessorGroupSettings(
-//     documentUri,
-//     "libs",
-//     [],
-//     dialect,
-//   );
-
-//   const configs: ProcessorGroupCopybookPathConfig[] = [];
-//   const variables = getVariablesFromUri(documentUri, false);
-
-//   for (const config of allConfigs) {
-//     if (typeof config === "string") {
-//       const evaluatedPaths = SettingsService.evaluateVariables(
-//         [config],
-//         variables,
-//       );
-
-//       const searchUris = SettingsService.prepareLocalSearchUris(
-//         evaluatedPaths,
-//         workspace.workspaceFolders ?? [],
-//       );
-
-//       configs.push(...searchUris);
-//     } else {
-//       if (USS in config) {
-//         config.uss = SettingsService.evaluateVariables(
-//           [config.uss],
-//           variables,
-//         )[0];
-//       }
-//       configs.push(config);
-//     }
-//   }
-//   return configs;
-// }
 
 export async function loadProcessorGroupCopybookExtensionsConfig(
   documentUri: Uri,
@@ -152,7 +98,7 @@ export async function loadProcessorGroupDialectConfig(
 function matchProcessorGroup(wsCfg: WorkspaceConfig, documentUri: Uri) {
   const relativeDocPath = workspace.asRelativePath(documentUri, false);
 
-  const candidates: TransformedProcessorGroup[] = [];
+  const candidates: ProcessorGroup[] = [];
   for (const programConfig of wsCfg.programs) {
     // exact match
     if (path.isAbsolute(programConfig.program)) {
@@ -249,6 +195,21 @@ async function loadProcessorGroup(documentUri: Uri) {
 
     workspaceConfig = await readWorkspaceConfig(workspaceUri);
   }
+
+  const b4gPGName = await getB4GProcessorGroupName(documentUri);
+  if (b4gPGName) {
+    return workspaceConfig.processorGroups[b4gPGName];
+  }
+
+  const matchedGroup = matchProcessorGroup(workspaceConfig, documentUri);
+  if (matchedGroup) {
+    return matchedGroup;
+  } else {
+    return readSettingConfig(documentUri, DEFAULT_DIALECT);
+  }
+}
+
+async function getB4GProcessorGroupName(documentUri: Uri) {
   const b4gConfig = await loadBridgeJsonContent(documentUri);
   if (b4gConfig) {
     const selectedElement = b4gConfig.fileExtension
@@ -258,18 +219,8 @@ async function loadProcessorGroup(documentUri: Uri) {
       b4gConfig.elements[selectedElement] === undefined
         ? b4gConfig.defaultProcessorGroup
         : b4gConfig.elements[selectedElement].processorGroup;
-    return workspaceConfig.processorGroups[processorGroupName];
+    return processorGroupName;
   }
-
-  const matchedGroup = matchProcessorGroup(workspaceConfig, documentUri);
-  if (matchedGroup) {
-    return matchedGroup;
-  } else {
-    return settingsProcessorGroup(documentUri, DEFAULT_DIALECT);
-  }
-  // const processorGroup = selectProcessorGroup(documentUri, workspaceConfig);
-
-  // const workspaceProcessorGroups = await readWorkspaceProcessorGroups(wsUri)
 }
 
 async function loadProcessorGroupSettings<

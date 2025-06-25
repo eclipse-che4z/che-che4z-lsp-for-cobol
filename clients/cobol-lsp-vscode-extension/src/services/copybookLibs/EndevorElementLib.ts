@@ -2,7 +2,7 @@ import { Uri, OutputChannel } from "vscode";
 import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
 import { ENVIRONMENT } from "../../constants";
-import { CopybookLibs, EndevorConfigModel } from "../ProcessorGroupsLoader";
+import { LibsDefinitions, EndevorConfigModel } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
 
@@ -11,7 +11,7 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
     super(config.profile);
   }
 
-  static create(configs: CopybookLibs) {
+  static create(configs: LibsDefinitions) {
     const libs = [];
     for (const config of configs) {
       if (hasMember(config, ENVIRONMENT)) {

@@ -1,7 +1,7 @@
 import CopybookLib from "./CopybookLib";
 import { getVariablesFromUri } from "../util/FSUtils";
 import { SettingsService } from "../Settings";
-import { CopybookLibs } from "../ProcessorGroupsLoader";
+import { LibsDefinitions } from "../ProcessorGroupsLoader";
 import { USS } from "../../constants";
 import * as vscode from "vscode";
 import { externalApis } from "../ExternalAPIsService";
@@ -16,7 +16,7 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
     super(profile);
   }
 
-  static create(configs: CopybookLibs) {
+  static create(configs: LibsDefinitions) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "object" && USS in config) {

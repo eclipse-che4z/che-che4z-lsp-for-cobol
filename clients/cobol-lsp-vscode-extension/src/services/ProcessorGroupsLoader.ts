@@ -24,6 +24,7 @@ import { externalApis } from "./ExternalAPIsService";
 import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
 import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 import CopybookLib from "./copybookLibs/CopybookLib";
+import { SettingsService } from "./Settings";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -32,13 +33,134 @@ const EMPTY_PROGRAM_CONFIG = { pgms: [] };
 
 type ProgramConfig = {
   program: string;
-  processorGroup: TransformedProcessorGroup;
+  processorGroup: ProcessorGroup;
 };
 
 export interface WorkspaceConfig {
   programs: ProgramConfig[];
-  processorGroups: { [key: string]: TransformedProcessorGroup };
+  processorGroups: { [key: string]: ProcessorGroup };
 }
+
+export type ProcessorGroup = {
+  name: string;
+  preprocessors?: Preprocessor[];
+} & Partial<ProcessorGroupProperties>;
+
+export type Preprocessor = {
+  name: string;
+} & Partial<ProcessorGroupProperties>;
+
+export interface ProcessorGroupProperties {
+  libs: CopybookLib[];
+  "copybook-extensions": string[];
+  "compiler-options": string[];
+  "copybook-file-encoding": string;
+  "target-sql-backend": string;
+}
+
+const ProgramsConfigModel = t.type({
+  pgms: t.array(
+    t.type({
+      program: t.string,
+      pgroup: t.string,
+    }),
+  ),
+});
+export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
+
+const EndevorConfigModel = t.intersection([
+  t.type({
+    environment: t.string,
+    stage: t.string,
+    system: t.string,
+    subsystem: t.string,
+    type: t.string,
+  }),
+  t.partial({ use_map: t.boolean }),
+  t.partial({ profile: t.string }),
+]);
+export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
+
+const EndevorDatasetModel = t.intersection([
+  t.type({
+    dataset: t.string,
+  }),
+  t.partial({
+    profile: t.string,
+  }),
+]);
+export type EndevorDatasetConfigModel = t.TypeOf<typeof EndevorDatasetModel>;
+
+const ZoweDatasetConfigModel = t.intersection([
+  t.type({ dataset: t.string }),
+  t.partial({ profile: t.string }),
+]);
+export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
+
+const ZoweUssConfigModel = t.intersection([
+  t.type({ uss: t.string }),
+  t.partial({ profile: t.string }),
+]);
+export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
+
+const LibsModel = t.array(
+  t.union([
+    t.string,
+    EndevorConfigModel,
+    EndevorDatasetModel,
+    ZoweDatasetConfigModel,
+    ZoweUssConfigModel,
+  ]),
+);
+export type LibsDefinitions = t.TypeOf<typeof LibsModel>;
+
+const PreprocessorItemModel = t.union([
+  t.string,
+  t.intersection([
+    t.type({ name: t.string }),
+    t.partial({
+      libs: LibsModel,
+      "copybook-extensions": t.array(t.string),
+      "compiler-options": t.array(t.string),
+      "copybook-file-encoding": t.string,
+      "target-sql-backend": t.string,
+    }),
+  ]),
+]);
+
+const PreprocessorModel = t.union([
+  PreprocessorItemModel,
+  t.array(PreprocessorItemModel),
+]);
+
+type PreprocessorDefinition = t.TypeOf<typeof PreprocessorModel>;
+
+const ProcessorGroupModel = t.intersection([
+  t.type({
+    name: t.string,
+  }),
+  t.partial({
+    preprocessor: PreprocessorModel,
+    libs: LibsModel,
+    "copybook-extensions": t.array(t.string),
+    "compiler-options": t.array(t.string),
+    "copybook-file-encoding": t.string,
+    "target-sql-backend": t.string,
+  }),
+]);
+
+const ProcessorGroupsModel = t.type({
+  pgroups: t.array(ProcessorGroupModel),
+});
+
+type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
+
+export type CopybookLibTypes =
+  | typeof LocalPathLib
+  | typeof DatasetLib
+  | typeof UssPathLib
+  | typeof EndevorElementLib
+  | typeof EndevorMemberLib;
 
 let workspaceConfigs: { [key: string]: WorkspaceConfig } = {};
 
@@ -138,135 +260,33 @@ export async function readWorkspaceConfig(
   return workspaceConfig;
 }
 
-const ProgramsConfigModel = t.type({
-  pgms: t.array(
-    t.type({
-      program: t.string,
-      pgroup: t.string,
-    }),
-  ),
-});
-export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
+export function readSettingConfig(
+  documentUri: Uri,
+  dialectType: string,
+): ProcessorGroup {
+  // local paths
+  const directoryPaths = SettingsService.getLocalPath(documentUri, dialectType);
 
-const EndevorConfigModel = t.intersection([
-  t.type({
-    environment: t.string,
-    stage: t.string,
-    system: t.string,
-    subsystem: t.string,
-    type: t.string,
-  }),
-  t.partial({ use_map: t.boolean }),
-  t.partial({ profile: t.string }),
-]);
-export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
+  // dsn
+  const dsns: LibsDefinitions = SettingsService.getDsnPath(
+    documentUri,
+    dialectType,
+  ).map((dsn) => ({ dataset: dsn }));
 
-const EndevorDatasetModel = t.intersection([
-  t.type({
-    dataset: t.string,
-  }),
-  t.partial({
-    profile: t.string,
-  }),
-]);
-export type EndevorDatasetConfigModel = t.TypeOf<typeof EndevorDatasetModel>;
-
-const ZoweDatasetConfigModel = t.intersection([
-  t.type({ dataset: t.string }),
-  t.partial({ profile: t.string }),
-]);
-export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
-
-const ZoweUssConfigModel = t.intersection([
-  t.type({ uss: t.string }),
-  t.partial({ profile: t.string }),
-]);
-export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
-
-const LibsModel = t.array(
-  t.union([
-    t.string,
-    EndevorConfigModel,
-    EndevorDatasetModel,
-    ZoweDatasetConfigModel,
-    ZoweUssConfigModel,
-  ]),
-);
-export type CopybookLibs = t.TypeOf<typeof LibsModel>;
-
-const PreprocessorItemModel = t.union([
-  t.string,
-  t.intersection([
-    t.type({ name: t.string }),
-    t.partial({
-      libs: LibsModel,
-      "copybook-extensions": t.array(t.string),
-      "compiler-options": t.array(t.string),
-      "copybook-file-encoding": t.string,
-      "target-sql-backend": t.string,
-    }),
-  ]),
-]);
-
-const PreprocessorModel = t.union([
-  PreprocessorItemModel,
-  t.array(PreprocessorItemModel),
-]);
-
-type Preprocessor = t.TypeOf<typeof PreprocessorModel>;
-
-const ProcessorGroupModel = t.intersection([
-  t.type({
-    name: t.string,
-  }),
-  t.partial({
-    preprocessor: PreprocessorModel,
-    libs: LibsModel,
-    "copybook-extensions": t.array(t.string),
-    "compiler-options": t.array(t.string),
-    "copybook-file-encoding": t.string,
-    "target-sql-backend": t.string,
-  }),
-]);
-
-const ProcessorGroupsModel = t.type({
-  pgroups: t.array(ProcessorGroupModel),
-});
-
-type ProcessorGroup = t.TypeOf<typeof ProcessorGroupModel>;
-
-export type TransformedProcessorGroup = {
-  name: string;
-  preprocessors?: TransformedPreprocessor[];
-  // libs: TransformedLibs[];
-  // "copybook-extensions"?: string[];
-  // "compiler-options"?: string[];
-  // "copybook-file-encoding"?: string;
-  // "target-sql-backend"?: string;
-} & Partial<ProcessorGroupProperties>;
-
-export type TransformedLibTypes =
-  | typeof LocalPathLib
-  | typeof DatasetLib
-  | typeof UssPathLib
-  | typeof EndevorElementLib
-  | typeof EndevorMemberLib;
-
-export type TransformedPreprocessor = {
-  name: string;
-} & Partial<ProcessorGroupProperties>;
-
-export interface ProcessorGroupProperties {
-  libs: CopybookLib[];
-  "copybook-extensions": string[];
-  "compiler-options": string[];
-  "copybook-file-encoding": string;
-  "target-sql-backend": string;
+  // uss
+  const usss: LibsDefinitions = SettingsService.getUssPath(
+    documentUri,
+    dialectType,
+  ).map((uss) => ({ uss }));
+  return {
+    name: "VSCodeSettingProcessorGroup",
+    libs: transformLibs([...directoryPaths, ...dsns, ...usss]),
+  };
 }
 
 async function readProcessorGroupsFile(
   workspaceUri: Uri,
-): Promise<TransformedProcessorGroup[]> {
+): Promise<ProcessorGroup[]> {
   const procCfgPath = Uri.joinPath(workspaceUri, PG_FOLDER, PG_PROC_FILE);
   try {
     const fileContent = new TextDecoder().decode(
@@ -293,15 +313,15 @@ async function readProcessorGroupsFile(
 
 const transformProcessorGroup =
   (
-    libTypes: TransformedLibTypes[] = [
+    libTypes: CopybookLibTypes[] = [
       LocalPathLib,
       DatasetLib,
       UssPathLib,
       EndevorElementLib,
     ],
   ) =>
-  (input: ProcessorGroup): TransformedProcessorGroup => {
-    const result: TransformedProcessorGroup = {
+  (input: ProcessorGroupDefinition): ProcessorGroup => {
+    const result: ProcessorGroup = {
       name: input.name,
       libs: transformLibs(input.libs, libTypes),
       preprocessors: transformPreprocessor(input.preprocessor, libTypes),
@@ -315,8 +335,8 @@ const transformProcessorGroup =
   };
 
 export function transformLibs(
-  libs?: CopybookLibs,
-  libTypes: TransformedLibTypes[] = [],
+  libs?: LibsDefinitions,
+  libTypes: CopybookLibTypes[] = [],
 ) {
   if (!libs) {
     return [];
@@ -328,9 +348,9 @@ export function transformLibs(
 }
 
 function transformPreprocessor(
-  input?: Preprocessor,
-  libTypes: TransformedLibTypes[] = [],
-): TransformedPreprocessor[] {
+  input?: PreprocessorDefinition,
+  libTypes: CopybookLibTypes[] = [],
+): Preprocessor[] {
   if (!input) return [];
   const preprocessors = asArray(input);
   const transformed = preprocessors.map((preprocessor) => {

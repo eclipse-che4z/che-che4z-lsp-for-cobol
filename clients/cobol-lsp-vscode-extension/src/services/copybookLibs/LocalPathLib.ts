@@ -1,5 +1,5 @@
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { CopybookLibs } from "../ProcessorGroupsLoader";
+import { LibsDefinitions } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
 import CopybookLib from "./CopybookLib";
@@ -10,7 +10,7 @@ export const localCopybooks = new LocalFilesystemResourceService();
 export default class LocalPathLib implements CopybookLib {
   constructor(private path: string) {}
 
-  static create(configs: CopybookLibs) {
+  static create(configs: LibsDefinitions) {
     const libs = [];
     for (const config of configs) {
       if (typeof config === "string") {

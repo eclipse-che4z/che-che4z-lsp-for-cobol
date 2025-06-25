@@ -2,7 +2,7 @@ import { Uri, OutputChannel } from "vscode";
 import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
 import {
-  CopybookLibs,
+  LibsDefinitions,
   EndevorDatasetConfigModel,
 } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
@@ -13,7 +13,7 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
     super(config.profile);
   }
 
-  static create(configs: CopybookLibs) {
+  static create(configs: LibsDefinitions) {
     const libs = [];
     for (const config of configs) {
       if (hasMember(config, "dataset")) {
