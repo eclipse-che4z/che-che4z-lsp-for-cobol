@@ -36,14 +36,18 @@ export async function resolveCopybookURI(
   const uri = vscode.Uri.parse(documentURI);
 
   const pgLibs = await loadProcessorGroupCopybooksLibs(uri, dialectType);
-  for (const pgLib of pgLibs) {
-    const result = await pgLib.resolveCopybookUri(copybookName, uri);
-    if (result) {
-      if (typeof result === "function") {
-        const resultUri = await result();
+
+  const promises = pgLibs.map((lib) =>
+    lib.resolveCopybookUri(copybookName, uri),
+  );
+  const results = await Promise.allSettled(promises);
+  for (const result of results) {
+    if (result.status === "fulfilled" && result.value) {
+      if (typeof result.value === "function") {
+        const resultUri = await result.value();
         return resultUri?.toString();
       }
-      return result.toString();
+      return result.value.toString();
     }
   }
 }

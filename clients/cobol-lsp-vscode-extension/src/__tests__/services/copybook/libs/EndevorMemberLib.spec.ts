@@ -17,7 +17,9 @@ describe("Endevor Member Lib", () => {
       }),
       listElements: jest.fn().mockResolvedValue([]),
       getElement: jest.fn(),
-      listMembers: jest.fn().mockResolvedValue(["COPYBOOK", "ANOTHER"]),
+      listMembers: jest
+        .fn()
+        .mockResolvedValue(["COPYBOOK", "ANOTHER", "CaSeTeSt"]),
       getMember: jest.fn().mockResolvedValue([]),
       getConfiguration: jest.fn().mockResolvedValue({
         pgms: [{ pgroup: "pgroup" }],
@@ -74,6 +76,22 @@ describe("Endevor Member Lib", () => {
       );
     });
 
+    it("copybook resolution is case insensitive", async () => {
+      const lib = new EndevorMemberLib({
+        dataset,
+      });
+      const document = vscode.Uri.file("/program.cbl");
+      const result = await lib.resolveCopybookUri("CASEtest", document);
+      expect(typeof result).toEqual("function");
+
+      const downloadResult = await result!();
+      expect(downloadResult).toEqual(
+        vscode.Uri.file(
+          "/storage/e4e/copybooks/instance.profile/ENDEVOR.DATASET.COPYBOOK/CaSeTeSt",
+        ),
+      );
+    });
+
     it("returns undefined if copybook is not present in the dataset", async () => {
       const lib = new EndevorMemberLib({
         dataset,
@@ -105,7 +123,7 @@ describe("Endevor Member Lib", () => {
       const lib = new EndevorMemberLib({ dataset });
       const document = vscode.Uri.file("/program.cbl");
       const copybooks = await lib.listCopybooks(document);
-      expect(copybooks).toEqual(["COPYBOOK", "ANOTHER"]);
+      expect(copybooks).toEqual(["COPYBOOK", "ANOTHER", "CaSeTeSt"]);
     });
   });
 });

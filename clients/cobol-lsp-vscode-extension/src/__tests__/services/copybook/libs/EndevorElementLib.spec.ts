@@ -17,6 +17,7 @@ describe("Endevor Element Lib", () => {
       listElements: jest.fn().mockResolvedValue([
         ["COPYBOOK", "12345"],
         ["ANOTHER", "98765"],
+        ["CaSeTeSt", "98765"],
       ]),
       getElement: jest.fn().mockResolvedValue(["Content", "12345"]),
       listMembers: jest.fn().mockResolvedValue([]),
@@ -56,7 +57,7 @@ describe("Endevor Element Lib", () => {
       );
     });
 
-    it("reads profile configuration from opened document", async () => {
+    it("copybook resolution is case insensitive", async () => {
       const lib = new EndevorElementLib({
         use_map: false,
         environment: "environment",
@@ -66,13 +67,13 @@ describe("Endevor Element Lib", () => {
         type: "type",
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("COPYBOOK", document);
+      const result = await lib.resolveCopybookUri("CASEtest", document);
       expect(typeof result).toEqual("function");
 
       const downloadResult = await result!();
       expect(downloadResult).toEqual(
         vscode.Uri.file(
-          "/storage/e4e/copybooks/instance.profile/environment/stage/system/subsystem/type/COPYBOOK",
+          "/storage/e4e/copybooks/instance.profile/environment/stage/system/subsystem/type/CaSeTeSt",
         ),
       );
     });

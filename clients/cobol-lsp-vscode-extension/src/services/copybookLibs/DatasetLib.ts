@@ -46,7 +46,7 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
 
     if (member) {
       return vscode.Uri.parse(
-        `zowe-dsn:/${profile}/${this.dsn}/${member.name}${member.extension ? member.extension : ""}`,
+        `zowe-ds:/${profile}/${this.dsn}/${member.name}${member.extension ? member.extension : ""}`,
       );
     }
   }

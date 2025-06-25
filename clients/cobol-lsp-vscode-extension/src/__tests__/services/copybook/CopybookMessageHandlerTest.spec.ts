@@ -1,0 +1,3 @@
+describe("CopybookMessageHandler", () => {
+  describe("resolveCopybookURI", () => {});
+});
