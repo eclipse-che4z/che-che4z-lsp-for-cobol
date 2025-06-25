@@ -63,6 +63,7 @@ public class ImplicitDialectProcessingStage
             .config(ctx.getConfig())
             .programDocumentUri(ctx.getExtendedDocument().getUri())
             .extendedDocument(ctx.getExtendedDocument())
+            .preprocessorsDirectives(ctx.getPreprocessorsDirectives())
             .build();
     dialectProcessingContext.getExtendedDocument().commitTransformations();
 

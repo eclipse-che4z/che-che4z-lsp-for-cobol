@@ -138,8 +138,11 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSWebOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSWebOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -206,7 +209,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.CONVERSE(), ctx, "CONVERSE");
     checkHasMandatoryOptions(ctx.SESSTOKEN(), ctx, "SESSTOKEN");
     checkMutuallyExclusiveOptions("PATH or URIMAP", ctx.PATH(), ctx.URIMAP());
-    checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
     checkHasExactlyOneOption(
         "GET, HEAD, PATCH, POST, PUT, TRACE, OPTIONS, DELETE or METHOD",
         ctx,
@@ -245,14 +247,11 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.NONE().isEmpty() || !ctx.BASICAUTH().isEmpty() || !ctx.AUTHENTICATE().isEmpty()) {
       checkAllOptionsArePresentOrAbsent(
           "USERNAME and PASSWORD", ctx, ctx.USERNAME(), ctx.PASSWORD());
-      checkPrerequisiteIsMet(
-          ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAMELEN without USERNAME");
     } else {
       checkHasIllegalOptions(ctx.USERNAME(), "USERNAME without NONE, BASICAUTH or AUTHENTICATE");
       checkHasIllegalOptions(
           ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
     }
-    checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORDLEN without PASSWORD");
 
     checkMutuallyExclusiveOptions(
         "INTO, SET or TOCONTAINER", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
@@ -278,6 +277,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.NOOUTCONVERT(),
         ctx.NOCLICONVERT(),
         ctx.CLIENTCONV());
+    checkOptionalWithLength(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH", "PATHLENGTH");
+    checkOptionalWithLength(ctx.INTO(), ctx.MAXLENGTH(), ctx, "INTO", "MAXLENGTH");
+    checkOptionalWithLength(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD", "PASSWORDLEN");
+    checkOptionalWithLength(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME", "USERNAMELEN");
   }
 
   private void checkEndbrowse(CICSParser.Cics_web_endbrowseContext ctx) {
@@ -354,13 +357,12 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.PARSE(), ctx, "PARSE");
     checkHasMandatoryOptions(ctx.URL(), ctx, "URL");
     checkPrerequisiteIsMet(ctx.URL(), ctx.URLLENGTH(), ctx, "URLLENGTH without URL");
-
-    checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOSTLENGTH without HOST");
     checkPrerequisiteIsMet(ctx.HOST(), ctx.HOSTTYPE(), ctx, "HOSTTYPE without HOST");
 
-    checkPrerequisiteIsMet(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATHLENGTH without PATH");
-    checkPrerequisiteIsMet(
-        ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRLEN without QUERYSTRING");
+    checkOptionalWithLength(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH", "PATHLENGTH");
+    checkOptionalWithLength(ctx.HOST(), ctx.HOSTLENGTH(), ctx, "HOST", "HOSTLENGTH");
+    checkOptionalWithLength(
+        ctx.QUERYSTRING(), ctx.QUERYSTRLEN(), ctx, "QUERYSTRING", "QUERYSTRLEN");
   }
 
   private void checkRead(CICSParser.Cics_web_readContext ctx) {
@@ -397,6 +399,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     checkPrerequisiteIsMet(
         ctx.FORMFIELD(), ctx.CHARACTERSET(), ctx, "CHARACTERSET without FORMFIELD");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
+    }
   }
 
   private void checkReadNext(CICSParser.Cics_web_readnextContext ctx) {
@@ -498,6 +503,11 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           ctx.LENGTH(),
           ctx.TOCONTAINER());
     }
+    if (noLengthOptionsEnabled()) {
+      if (!ctx.SESSTOKEN().isEmpty() && !ctx.STATUSCODE().isEmpty())
+        checkHasMandatoryOptions(ctx.STATUSLEN(), ctx, "STATUSLEN");
+      if (!ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
+    }
   }
 
   private void checkRetrieve(CICSParser.Cics_web_retrieveContext ctx) {
@@ -561,10 +571,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
       checkAllOptionsArePresentOrAbsent(
           "USERNAME and PASSWORD", ctx, ctx.USERNAME(), ctx.PASSWORD());
-      checkPrerequisiteIsMet(
-          ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAMELEN without USERNAME");
-      checkPrerequisiteIsMet(
-          ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORDLEN without PASSWORD");
 
       checkPrerequisiteIsMet(ctx.CONTAINER(), ctx.CHANNEL(), ctx, "CHANNEL without CONTAINER");
 
@@ -573,6 +579,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           ctx.CLICONVERT(),
           ctx.NOCLICONVERT(),
           ctx.CLIENTCONV());
+      checkOptionalWithLength(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME", "USERNAMELEN");
+      checkOptionalWithLength(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD", "PASSWORDLEN");
+
     } else {
       // Server
       checkMutuallyExclusiveOptions(
@@ -657,5 +666,9 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.WRITE(), ctx, "WRITE");
     checkHasMandatoryOptions(ctx.HTTPHEADER(), ctx, "HTTPHEADER");
     checkHasMandatoryOptions(ctx.VALUE(), ctx, "VALUE");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.NAMELENGTH(), ctx, "NAMELENGTH");
+      checkHasMandatoryOptions(ctx.VALUELENGTH(), ctx, "VALUELENGTH");
+    }
   }
 }

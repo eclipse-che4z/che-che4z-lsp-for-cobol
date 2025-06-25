@@ -111,6 +111,20 @@ public class TestCicsConverseStatement {
 
   private static final String T2660_VALID =
       CONVERSE_FROM_INTO_TO + "MAXLENGTH(123) CTLCHAR(123) LINEADDR(123) LEAVEKB";
+  private static final String ALTER_NOLENGTH_INVALID =
+      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT"
+          + " ATTRIBUTES({$varFour})|error_}";
+  private static final String GETNEXTRSRCE_NOLENGTH_INVALID =
+      "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
+          + "ATTRIBUTES({$varFour})|error_}";
+  private static final String INQUIRERSRCE_NOLENGTH_INVALID =
+      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour})|error_}";
+  private static final String USERDEFINE_NOLENGTH_INVALID =
+      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour}) NOHANDLE PIPELINE|error_}";
+  private static final String CONVERSE_TRANS_FROMLENGTH_INVALID =
+      "CONVERSE {NOTRUNCATE|error|error2}";
 
   private Map<String, Diagnostic> getErrorDiagnostic(String errorMessage) {
     return ImmutableMap.of(
@@ -226,5 +240,24 @@ public class TestCicsConverseStatement {
   @Test
   void testFromMaxflength() {
     CICSTestUtils.noErrorTest(FROM_MAXFLENGTH);
+  }
+
+  @Test
+  void testConverseTransNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROMLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TOLENGTH OR TOFLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(CONVERSE_TRANS_FROMLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }

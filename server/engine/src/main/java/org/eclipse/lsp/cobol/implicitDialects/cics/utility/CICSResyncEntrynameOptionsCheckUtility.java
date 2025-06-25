@@ -43,8 +43,10 @@ public class CICSResyncEntrynameOptionsCheckUtility extends CICSOptionsCheckBase
       };
 
   public CICSResyncEntrynameOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -62,6 +64,6 @@ public class CICSResyncEntrynameOptionsCheckUtility extends CICSOptionsCheckBase
   @SuppressWarnings("unchecked")
   private void checkOpts(CICSParser.Cics_resync_entryname_optsContext ctx) {
     checkHasMandatoryOptions(ctx.ENTRYNAME(), ctx, "ENTRYNAME");
-    checkPrerequisiteIsMet(ctx.IDLIST(), ctx.IDLISTLENGTH(), ctx, "IDLISTLENGTH without IDLIST");
+    checkOptionalWithLength(ctx.IDLIST(), ctx.IDLISTLENGTH(), ctx, "IDLIST", "IDLISTLENGTH");
   }
 }

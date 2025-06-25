@@ -53,8 +53,11 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSInvokeOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSInvokeOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -89,9 +92,7 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     if (!ctx.EXACTMATCH().isEmpty() || !ctx.MINIMUM().isEmpty()) {
       checkHasMandatoryOptions(ctx.MINORVERSION(), ctx, "MINORVERSION");
     }
-    if (!ctx.LENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.COMMAREA(), ctx, "COMMAREA");
-    }
+    checkOptionalWithLength(ctx.COMMAREA(), ctx.LENGTH(), ctx, "COMMAREA", "LENGTH");
   }
 
   @SuppressWarnings("unchecked")
@@ -100,8 +101,6 @@ public class CICSInvokeOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.CHANNEL(), ctx, "CHANNEL");
     checkHasMandatoryOptions(ctx.OPERATION(), ctx, "OPERATION");
     checkHasMutuallyExclusiveOptions("URI or URIMAP", ctx.URI(), ctx.URIMAP());
-    if (!ctx.SCOPELEN().isEmpty()) {
-      checkHasMandatoryOptions(ctx.SCOPE(), ctx, "SCOPE");
-    }
+    checkOptionalWithLength(ctx.SCOPE(), ctx.SCOPELEN(), ctx, "SCOPE", "SCOPELEN");
   }
 }

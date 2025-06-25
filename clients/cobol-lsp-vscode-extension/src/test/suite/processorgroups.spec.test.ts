@@ -24,13 +24,15 @@ suite("Integration Test Suite: Processor Groups", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => {
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
     await helper.closeAllEditors();
   });
 
-  this.afterAll(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   // cobol-dialect-api (development) npm ci && npm run compile
   // daco-dialect-support (development) npm ci && npm run package

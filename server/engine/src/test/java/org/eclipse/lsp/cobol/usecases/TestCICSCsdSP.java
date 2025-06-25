@@ -175,6 +175,18 @@ public class TestCICSCsdSP {
   private static final String REMOVE_PRIOR_INVALID = "CSD {_REMOVE GROUP({$varFour})|error_}";
   private static final String DELETE_LIST_INVALID =
       "CSD INSTALL LIST({$varFour}) {RESID|error}({$varFour}) {ATOMSERVICE|error2}";
+  private static final String ALTER_NOLENGTH_INVALID =
+      "CSD {_PROGRAM ALTER RESID({$varFour}) GROUP({$varFour}) NOCOMPAT"
+          + " ATTRIBUTES({$varFour})|error_}";
+  private static final String GETNEXTRSRCE_NOLENGTH_INVALID =
+      "CSD {_GETNEXTRSRCE RESTYPE({$varOne}) RESID({$varFour}) GROUP({$varFour})"
+          + "ATTRIBUTES({$varFour})|error_}";
+  private static final String INQUIRERSRCE_NOLENGTH_INVALID =
+      "CSD {_INQUIRERSRCE DUMPCODE RESID({$varFour}) GROUP({$varFour})"
+          + " ATTRIBUTES({$varFour})|error_}";
+  private static final String USERDEFINE_NOLENGTH_INVALID =
+      "CSD {_COMPAT USERDEFINE RESID({$varFour}) GROUP({$varFour}) ATTRIBUTES({$varFour}) NOHANDLE"
+          + " PIPELINE|error_}";
 
   @ParameterizedTest
   @MethodSource("getValidOptions")
@@ -760,5 +772,57 @@ public class TestCICSCsdSP {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(DELETE_LIST_INVALID, expectedDiagnostic, "SP");
+  }
+
+  @Test
+  void testCdsAlterNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ALTER_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
+  }
+
+  @Test
+  void testCdsGetNextRsrceNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(GETNEXTRSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
+  }
+
+  @Test
+  void testInquireRsrceNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(INQUIRERSRCE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
+  }
+
+  @Test
+  void testUserDefineNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ATTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(USERDEFINE_NOLENGTH_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 }

@@ -50,8 +50,10 @@ public class CICSConnectProcessOptionsCheckUtility extends CICSOptionsCheckBaseU
       };
 
   public CICSConnectProcessOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -77,13 +79,8 @@ public class CICSConnectProcessOptionsCheckUtility extends CICSOptionsCheckBaseU
       checkHasIllegalOptions(ctx.PARTNER(), "PARTNER");
       checkHasMandatoryOptions(ctx.PROCNAME(), ctx, "PROCNAME");
     }
-    if (!ctx.PROCLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.PROCNAME(), ctx, "PROCNAME");
-    }
-    if (!ctx.PIPLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.PIPLIST(), ctx, "PIPLIST");
-    }
-
     checkHasMandatoryOptions(ctx.SYNCLEVEL(), ctx, "SYNCLEVEL");
+    checkOptionalWithLength(ctx.PROCNAME(), ctx.PROCLENGTH(), ctx, "PROCNAME", "PROCLENGTH");
+    checkOptionalWithLength(ctx.PIPLIST(), ctx.PIPLENGTH(), ctx, "PIPLIST", "PIPLENGTH");
   }
 }

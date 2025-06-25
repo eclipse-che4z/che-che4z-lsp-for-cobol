@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -55,6 +56,20 @@ public class TestCICSSoapfaultStatement {
   private static final String SOAPFAULT_CREATE_INVALID =
       "SOAPFAULT CREATE {CLIENT|errorOne} {FAULTCODESTR|errorTwo}({$varOne})"
           + " FAULTSTRING({$varOne})";
+  private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID =
+      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne})|error_}";
+  private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_2 =
+      "SOAPFAULT {_CREATE  FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " FAULTCODESTR({$varFour})|error_}";
+  private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_3 =
+      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " FAULTACTOR({$varFour})|error_}";
+  private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_4 =
+      "SOAPFAULT {_CREATE CLIENT  FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " DETAIL({$varFour})|error_}";
+  private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_5 =
+      "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
+          + " ROLE({$varFour})|error_}";
 
   // Valid Test Cases
   @Test
@@ -143,5 +158,75 @@ public class TestCICSSoapfaultStatement {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(SOAPFAULT_CREATE_INVALID, expectedDiagnostics);
+  }
+
+  @Test
+  void testSoapFaultCreateNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FAULTSTRLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testSoapFaultCreateNoLengthInvalid2() {
+    CICSTestUtils.errorTest(
+        SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_2,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FAULTCODELEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testSoapFaultCreateNoLengthInvalid3() {
+    CICSTestUtils.errorTest(
+        SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_3,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FAULTACTLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testSoapFaultCreateNoLengthInvalid4() {
+    CICSTestUtils.errorTest(
+        SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_4,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: DETAILLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testSoapFaultCreateNoLengthInvalid5() {
+    CICSTestUtils.errorTest(
+        SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_5,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: ROLELENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

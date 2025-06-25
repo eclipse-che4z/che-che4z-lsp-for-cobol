@@ -42,8 +42,10 @@ public class CICSSpoolWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtili
       };
 
   public CICSSpoolWriteOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -64,5 +66,6 @@ public class CICSSpoolWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMutuallyExclusiveOptions("LINE or PAGE", ctx.LINE(), ctx.PAGE());
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
   }
 }

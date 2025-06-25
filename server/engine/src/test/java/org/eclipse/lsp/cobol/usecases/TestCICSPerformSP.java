@@ -134,6 +134,8 @@ public class TestCICSPerformSP {
       "PERFORM {_STATISTICS ALL RECORD DB2|error_}";
   private static final String PERFORM_STATISTICS_ALL_WITH_OTHERS2_INVALID =
       "PERFORM {_STATISTICS ALL RECORD DB2 CONNECTION FILE FEPI|error_}";
+  private static final String PERFORM_JVMSERVER_NOLENGTH_INVALID =
+      "PERFORM {_JVMSERVER({$varFour}) APPID({$varFour}) JVMTYPE({$varFour})|error_}";
 
   @ParameterizedTest
   @MethodSource("getValidOptions")
@@ -355,7 +357,7 @@ public class TestCICSPerformSP {
             "error",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: APPIDLEN without APPID",
+                "Missing required option: APPIDLEN without APPID",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(
@@ -575,5 +577,20 @@ public class TestCICSPerformSP {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(PERFORM_STATISTICS_ALL_WITH_OTHERS2_INVALID, expectedDiagnostic, "SP");
+  }
+
+  @Test
+  void testPerformJvmServerNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        PERFORM_JVMSERVER_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: APPIDLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP",
+        "NOLENGTH");
   }
 }

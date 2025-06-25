@@ -37,6 +37,10 @@ public class TestCICSAcquire {
       "ACQUIRE ACTIVITYID (100) {PROCESS | error}";
   private static final String ACQUIRE_PROCESS_INVALID =
       "ACQUIRE PROCESS(100) PROCESSTYPE(100) {ACTIVITYID | error }";
+  private static final String ACQUIRE_ACTIVITYID_QUOTE_INVALID =
+      "ACQUIRE ACTIVITYID({_'100'|error_})";
+  private static final String ACQUIRE_ACTIVITYID_HEX_QUOTE_INVALID =
+      "ACQUIRE ACTIVITYID({_X'100'|error_})";
 
   @Test
   void testAcquireActivityIdValid() {
@@ -73,5 +77,33 @@ public class TestCICSAcquire {
                 ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(ACQUIRE_PROCESS_INVALID, expectedDiagnostic);
+  }
+
+  @Test
+  void testAcquireProcessQuoteInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Invalid literal delimeter: \" expected.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+
+    CICSTestUtils.errorTest(ACQUIRE_ACTIVITYID_QUOTE_INVALID, expectedDiagnostic, "QUOTE");
+  }
+
+  @Test
+  void testAcquireProcessHexQuoteInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Invalid literal delimeter: \" expected.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+
+    CICSTestUtils.errorTest(ACQUIRE_ACTIVITYID_HEX_QUOTE_INVALID, expectedDiagnostic, "QUOTE");
   }
 }

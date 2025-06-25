@@ -62,8 +62,10 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       };
 
   public CICSReceiveOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -98,6 +100,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.LENGTH(), ctx.FLENGTH());
     else checkHasMutuallyExclusiveOptions("LENGTH or FLENGTH", ctx.LENGTH(), ctx.FLENGTH());
     checkHasMutuallyExclusiveOptions("MAXLENGTH or MAXFLENGTH", ctx.MAXLENGTH(), ctx.MAXFLENGTH());
+    if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
+      checkHasExactlyOneOption("LENGTH or FLENGTH", ctx, ctx.LENGTH(), ctx.FLENGTH());
   }
 
   private void checkPartn(CICSParser.Cics_receive_partnContext ctx) {
@@ -108,6 +112,9 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
 
   private void checkMap(CICSParser.Cics_receive_mapContext ctx) {
     if (ctx.FROM().isEmpty()) checkHasIllegalOptions(ctx.LENGTH(), "LENGTH without FROM");
+    else if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
     if (!checkMapHasLiteral(ctx)) {
       checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
     }
@@ -120,6 +127,7 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     if (!checkMapHasLiteral(ctx)) {
       checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
     }
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private boolean checkMapHasLiteral(ParserRuleContext ctx) {

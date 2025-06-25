@@ -99,8 +99,11 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSIssueOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSIssueOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -195,6 +198,10 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
 
     if (ctx.RIDFLD().isEmpty()) checkHasIllegalOptions(ctx.RRN(), "RRN without RIDFLD");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
+    }
   }
 
   private void checkConfirmation(CICSParser.Cics_issue_confirmationContext ctx) {
@@ -224,13 +231,13 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
-
     checkHasExactlyOneOption("RRN or KEYLENGTH", ctx, ctx.RRN(), ctx.KEYLENGTH());
-
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
     if (ctx.KEYLENGTH().isEmpty()) {
       checkHasIllegalOptions(ctx.KEYNUMBER(), "KEYNUMBER without KEYLENGTH");
+    }
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
     }
   }
 
@@ -248,9 +255,8 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
     checkHasMandatoryOptions(ctx.RIDFLD(), ctx, "RIDFLD");
     checkHasMandatoryOptions(ctx.RRN(), ctx, "RRN");
-
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
   }
 
   void checkPass(CICSParser.Cics_issue_passContext ctx) {
@@ -275,15 +281,16 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.QUERY(), ctx, "QUERY");
     checkHasMandatoryOptions(ctx.DESTID(), ctx, "DESTID");
 
-    if (ctx.DESTID().isEmpty())
-      checkHasIllegalOptions(ctx.DESTIDLENG(), "DESTIDLENG without DESTID");
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    checkOptionalWithLength(ctx.DESTID(), ctx.DESTIDLENG(), ctx, "DESTID", "DESTIDLENG");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
   }
 
   void checkReceive(CICSParser.Cics_issue_receiveContext ctx) {
     checkHasMandatoryOptions(ctx.RECEIVE(), ctx, "RECEIVE");
     if (ctx.INTO().isEmpty()) checkHasMandatoryOptions(ctx.SET(), ctx, "INTO or SET");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   void checkReplace(CICSParser.Cics_issue_replaceContext ctx) {
@@ -297,8 +304,11 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.RRN(), ctx, "RRN");
     } else checkHasIllegalOptions(ctx.RRN(), "RRN with KEYLENGTH");
 
-    if (ctx.VOLUME().isEmpty())
-      checkHasIllegalOptions(ctx.VOLUMELENG(), "VOLUMELENG without VOLUME");
+    checkOptionalWithLength(ctx.VOLUME(), ctx.VOLUMELENG(), ctx, "VOLUME", "VOLUMELENG");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.DESTIDLENG(), ctx, "DESTIDLENG");
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   void checkSend(CICSParser.Cics_issue_sendContext ctx) {
@@ -306,6 +316,9 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     if (ctx.cics_issue_common().isEmpty())
       checkHasMandatoryOptions(ctx.cics_issue_common(), ctx, "DESTID or SUBADDR branches");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
     checkIssueCommon(ctx.cics_issue_common());
   }
 
@@ -364,6 +377,12 @@ public class CICSIssueOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           }
 
           if (!hasVolume) checkHasIllegalOptions(context.VOLUMELENG(), "VOLUMELENG without VOLUME");
+          if (noLengthOptionsEnabled()) {
+            if (!context.DESTID().isEmpty())
+              checkHasMandatoryOptions(context.DESTIDLENG(), context, "DESTIDLENG");
+            if (!context.VOLUME().isEmpty())
+              checkHasMandatoryOptions(context.VOLUMELENG(), context, "VOLUMELENG");
+          }
         });
   }
 }

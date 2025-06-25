@@ -15,7 +15,9 @@
 package org.eclipse.lsp.cobol.common.dialects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
@@ -33,4 +35,5 @@ public class DialectProcessingContext {
   CleanerPreprocessor preprocessor;
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();
   @Builder.Default String languageId = "cobol";
+  @Builder.Default Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
 }

@@ -82,6 +82,12 @@ public class TestCICSWrite {
   private static final String WRITE_OPERATOR_INVALID_FIVE =
       "WRITE {_OPERATOR TEXT({$varOne}) {EVENTUAL|errorTwo} {REPLY|errorThree}({$varTwo})"
           + " TIMEOUT(123)|errorOne_}";
+  private static final String WRITE_JOURNALNAME_TRANS_NOLENGTH_INVALID =
+      "WRITE {_JOURNALNAME({$varOne}) JTYPEID({$varTwo}) FROM({$varThree})"
+          + " PREFIX({$varFour})|error|errorTwo_}";
+  private static final String WRITE_OPERATOR_TRANS_NOLENGTH_INVALID =
+      "WRITE {_OPERATOR TEXT({$varOne}) ROUTECODES({$varThree})"
+          + " NUMROUTES({$varThree})|error_}";
 
   @Test
   void testWriteFileValidOne() {
@@ -274,5 +280,39 @@ public class TestCICSWrite {
                     + " CRITICAL or IMMEDIATE or REPLY",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testWriteJournalNameNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        WRITE_JOURNALNAME_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: PFXLENG",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testOperatorNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        WRITE_OPERATOR_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: TEXTLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

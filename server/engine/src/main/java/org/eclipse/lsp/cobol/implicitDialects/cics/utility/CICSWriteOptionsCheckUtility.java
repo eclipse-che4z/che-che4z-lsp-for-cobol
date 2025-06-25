@@ -71,8 +71,11 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSWriteOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSWriteOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -113,8 +116,9 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.JOURNALNAME(), ctx, "JOURNALNAME");
     checkHasMandatoryOptions(ctx.JTYPEID(), ctx, "JTYPEID");
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    if (!ctx.PFXLENG().isEmpty()) {
-      checkHasMandatoryOptions(ctx.PREFIX(), ctx, "PREFIX");
+    checkOptionalWithLength(ctx.PREFIX(), ctx.PFXLENG(), ctx, "PREFIX", "PFXLENG");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
     }
   }
 
@@ -146,6 +150,9 @@ public class CICSWriteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (!ctx.MAXLENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.REPLY(), ctx, "REPLY");
+    }
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.TEXTLENGTH(), ctx, "TEXTLENGTH");
     }
   }
 }

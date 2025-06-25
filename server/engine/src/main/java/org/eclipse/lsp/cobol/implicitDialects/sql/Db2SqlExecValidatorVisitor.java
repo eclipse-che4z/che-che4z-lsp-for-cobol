@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Position;
@@ -198,7 +199,7 @@ public class Db2SqlExecValidatorVisitor extends Db2SqlExecParserBaseVisitor<List
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(getTokenEndLocality(ctx.stop).toOriginalLocation())
-            .suggestion(messageService.getMessage(messageKey, messageArgs))
+            .messageTemplate(MessageTemplate.of(messageKey, messageArgs))
             .severity(ErrorSeverity.ERROR)
             .build();
     errors.add(error);

@@ -18,6 +18,7 @@ import { isV1RuntimeDialectDetail } from "./dialect/utils";
 import { fetchCopybookCommand } from "./commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import {
+  ANALYSIS_MODE,
   E4E_INCOMPATIBLE,
   EXP_LANGUAGE_ID,
   FAIL_CREATE_COPYBOOK_FOLDER_MSG,
@@ -152,6 +153,11 @@ export async function activate(
     ["bootstrap", "experiment-tag"],
     "Extension activation event was triggered",
   );
+  registerEvent(
+    "analysis-mode",
+    ["bootstrap", "analysis-mode"],
+    `COBOL LS is being used in ${vscode.workspace.getConfiguration().get(ANALYSIS_MODE) as string} mode`,
+  );
 
   // Register Commands
   registerCommands(context, copyBooksDownloader);
@@ -186,9 +192,10 @@ export async function activate(
   );
 
   context.subscriptions.push(
-    vscode.workspace.onDidCloseTextDocument((document) =>
-      analysisService.invalidate(document.uri.toString(), true),
-    ),
+    vscode.workspace.onDidCloseTextDocument((document) => {
+      void analysisService.invalidate(document.uri.toString(), true);
+      copyBooksDownloader.clearE4EConfig(document.uri.toString());
+    }),
   );
 
   configurationWatcher.watchConfigurationChanges();

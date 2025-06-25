@@ -49,8 +49,10 @@ public class CICSRetrieveOptionsCheckUtility extends CICSOptionsCheckBaseUtility
       };
 
   public CICSRetrieveOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -78,7 +80,8 @@ public class CICSRetrieveOptionsCheckUtility extends CICSOptionsCheckBaseUtility
 
   private void checkRetrieveStandard(CICSParser.Cics_retrieve_standardContext ctx) {
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
-    if (!ctx.SET().isEmpty()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    if (noLengthOptionsEnabled() || !ctx.SET().isEmpty())
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private void checkRetrieveReattach(CICSParser.Cics_retrieve_reattachContext ctx) {

@@ -47,8 +47,11 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSBifOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSBifOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -69,6 +72,9 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkDeedit(CICSParser.Cics_bif_deeditContext ctx) {
     checkHasMandatoryOptions(ctx.DEEDIT(), ctx, "DEEDIT");
     checkHasMandatoryOptions(ctx.FIELD(), ctx, "FIELD");
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 
   private void checkDigest(CICSParser.Cics_bif_digestContext ctx) {
@@ -81,5 +87,8 @@ public class CICSBifOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.BINARY(),
         ctx.BASE64(),
         ctx.DIGESTTYPE());
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.RECORDLEN(), ctx, "RECORDLEN");
+    }
   }
 }

@@ -71,8 +71,10 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
       };
 
   public CICSConverseOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULES_CHECK);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULES_CHECK, params);
   }
 
   /**
@@ -107,7 +109,10 @@ public class CICSConverseOptionsCheckUtility extends CICSOptionsCheckBaseUtility
     if (!ctx.STRFIELD().isEmpty()) {
       checkHasIllegalOptions(ctx.cics_converse_erase(), "ERASE");
     }
-
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.cics_converse_fromlength(), ctx, "FROMLENGTH");
+      checkHasMandatoryOptions(ctx.cics_converse_tolength(), ctx, "TOLENGTH OR TOFLENGTH");
+    }
     checkDuplicates(ctx);
   }
 }

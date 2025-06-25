@@ -47,8 +47,11 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSReadqOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSReadqOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -89,6 +92,7 @@ public class CICSReadqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasExactlyOneOption("INTO or SET", ctx, ctx.cics_into_set());
     checkHasMutuallyExclusiveOptions("NEXT or ITEM", ctx.NEXT(), ctx.ITEM());
     checkHasIllegalOptions(ctx.NOSUSPEND(), "NOSUSPEND");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }
 
   private void checkSetTs(CICSParser.Cics_into_setContext ctx) {

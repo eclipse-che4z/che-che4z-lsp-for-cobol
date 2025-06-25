@@ -47,9 +47,11 @@ public class TestCicsXctl {
       "XCTL PROGRAM({$varOne}) {COMMAREA|error1}({$varTwo}) {CHANNEL|error1}({$varThree})"
           + " LENGTH({$varFour}) INPUTMSG({$varFive}) INPUTMSGLEN({$varSix})";
   private static final String INVALID_TWO =
-      "XCTL PROGRAM({$varOne}) CHANNEL({$varThree}) {INPUTMSGLEN|error1}({$varSix})";
+      "XCTL {_PROGRAM({$varOne}) CHANNEL({$varThree}) INPUTMSGLEN({$varSix})|error1_}";
   private static final String INVALID_THREE =
-      "XCTL PROGRAM({$varOne}) {LENGTH|error1}({$varThree})";
+      "XCTL {_PROGRAM({$varOne}) LENGTH({$varThree})|error1_}";
+  private static final String XCTL_NOLENGTH_INVALID =
+      "XCTL {_PROGRAM({$varOne}) COMMAREA({$varTwo})  INPUTMSG({$varFive})|error|errorTwo_}";
 
   @Test
   void testAllOptionsValidOne() {
@@ -96,7 +98,7 @@ public class TestCicsXctl {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: INPUTMSGLEN without INPUTMSG",
+                "Missing required option: INPUTMSGLEN without INPUTMSG",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(INVALID_TWO, expectedDiagnostic);
@@ -109,9 +111,28 @@ public class TestCicsXctl {
             "error1",
             new Diagnostic(
                 new Range(),
-                "Invalid option provided: LENGTH without COMMAREA",
+                "Missing required option: LENGTH without COMMAREA",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(INVALID_THREE, expectedDiagnostic);
+  }
+
+  @Test
+  void testNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INPUTMSGLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(XCTL_NOLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }

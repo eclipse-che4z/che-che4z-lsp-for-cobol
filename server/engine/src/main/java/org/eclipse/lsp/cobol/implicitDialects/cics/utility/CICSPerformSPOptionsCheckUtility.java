@@ -144,8 +144,10 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       };
 
   public CICSPerformSPOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -247,7 +249,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
           ctx.SERVERDUMP());
       if (!ctx.REFRESH().isEmpty()) {
         checkPrerequisiteIsMet(ctx.APPLICATION(), ctx.APPID(), ctx, "APPID without APPLICATION");
-        checkPrerequisiteIsMet(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPIDLEN without APPID");
+        checkOptionalWithLength(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPID", "APPIDLEN");
         checkHasMutuallyExclusiveOptions(
             "RESOURCETYPE or APPLICATION or CONFIG",
             ctx.RESOURCETYPE(),
@@ -259,7 +261,7 @@ public class CICSPerformSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       checkOptsLibertyPresent(ctx);
       checkHasMutuallyExclusiveOptions(
           "OSGIACTION or REFRESHPKGS", ctx.OSGIACTION(), ctx.REFRESHPKGS());
-    }
+    } else checkOptionalWithLength(ctx.APPID(), ctx.APPIDLEN(), ctx, "APPID", "APPIDLEN");
   }
 
   private void checkOptsLibertyPresent(CICSParser.Cics_perform_jvmserverContext ctx) {

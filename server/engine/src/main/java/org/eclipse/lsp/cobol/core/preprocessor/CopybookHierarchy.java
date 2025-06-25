@@ -172,7 +172,6 @@ public class CopybookHierarchy {
   public void replaceText(
       ExtendedDocument extendedDocument, BiConsumer<ExtendedDocument, ReplaceData> accumulator) {
     textReplacing.forEach(tr -> accumulator.accept(extendedDocument, tr));
-    textReplacing.clear();
   }
 
   /**

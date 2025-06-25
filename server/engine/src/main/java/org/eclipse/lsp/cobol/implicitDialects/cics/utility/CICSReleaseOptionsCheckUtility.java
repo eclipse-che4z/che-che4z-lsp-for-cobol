@@ -38,8 +38,10 @@ public class CICSReleaseOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       };
 
   public CICSReleaseOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

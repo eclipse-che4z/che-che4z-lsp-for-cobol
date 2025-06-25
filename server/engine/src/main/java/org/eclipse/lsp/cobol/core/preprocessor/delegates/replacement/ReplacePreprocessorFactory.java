@@ -16,6 +16,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import lombok.NonNull;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 
@@ -27,8 +28,11 @@ public interface ReplacePreprocessorFactory {
    *
    * @param extendedDocument an extended document
    * @param hierarchy the hierarchy of the copybooks
+   * @param languageId
    * @return a new listener
    */
   ReplacePreProcessorListener create(
-      @NonNull ExtendedDocument extendedDocument, @NonNull CopybookHierarchy hierarchy);
+      @NonNull ExtendedDocument extendedDocument,
+      @NonNull CopybookHierarchy hierarchy,
+      @NonNull CobolLanguageId languageId);
 }

@@ -33,4 +33,11 @@ public class StringUtils {
   public String trimQuotes(@NonNull String line) {
     return QUOTE_PATTERN.matcher(line).replaceAll("");
   }
+
+  public boolean isEnclosedInSingleQuotes(String str) {
+    if (str == null || str.length() < 2) return false;
+    char first = str.charAt(0);
+    char last = str.charAt(str.length() - 1);
+    return (first == '\'' && last == '\'');
+  }
 }

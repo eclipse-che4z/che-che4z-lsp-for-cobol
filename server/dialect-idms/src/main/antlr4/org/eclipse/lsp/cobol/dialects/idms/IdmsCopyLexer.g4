@@ -167,6 +167,7 @@ LAX : L A X;
 LAXPERF : L A X P E R F;
 LAXREDEF : L A X R E D E F;
 LC : L C;
+LR: L R;
 LIBEXIT : L I B E X I T;
 LIBX : L I B X;
 LILIAN : L I L I A N;

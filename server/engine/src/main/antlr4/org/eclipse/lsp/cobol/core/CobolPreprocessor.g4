@@ -88,11 +88,15 @@ replacePseudoText
    ;
 
 pseudoReplaceable
-   : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter)
+   : (openingPseudoTextDelimiter pseudoTextContent closingPseudoTextDelimiter)
    ;
 
 pseudoReplacement
-   : (openingPseudoTextDelimiter ~DOUBLEEQUALCHAR*? closingPseudoTextDelimiter) | EMPTYPSEUDOTEXT
+   : openingPseudoTextDelimiter pseudoTextContent closingPseudoTextDelimiter
+   ;
+
+pseudoTextContent
+   : ~(DOUBLEEQUALCHAR2)*
    ;
 
 openingPseudoTextDelimiter
@@ -100,7 +104,7 @@ openingPseudoTextDelimiter
    ;
 
 closingPseudoTextDelimiter
-   : DOUBLEEQUALCHAR (COMMACHAR | SEMICOLON_FS)?
+   : DOUBLEEQUALCHAR2 (COMMACHAR | SEMICOLON_FS)?
    ;
 
 replaceable
@@ -133,9 +137,5 @@ cobolWord
 
 literal
    : NONNUMERICLITERAL | NUMERICLITERAL | INTEGERLITERAL | LEVEL_NUMBER |LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
-   ;
-
-integerLiteral
-   : INTEGERLITERAL | LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
    ;
 

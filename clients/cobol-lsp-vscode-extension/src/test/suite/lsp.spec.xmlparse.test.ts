@@ -17,7 +17,6 @@ import * as helper from "./testHelper";
 import * as vscode from "vscode";
 
 suite("TF48416: XML PARSE", function () {
-  let editor: vscode.TextEditor;
   suiteSetup(async function () {
     this.timeout(0);
     this.slow(2000);
@@ -25,17 +24,18 @@ suite("TF48416: XML PARSE", function () {
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
-  this.afterAll(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("TC369336: RETURNING NATIONAL phrase with compiler", async () => {
-    await helper.showDocument("XML1.cbl");
-    editor = helper.getEditor("XML1.cbl");
+    const editor = await helper.showDocument("XML1.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -55,8 +55,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test.skip("TC369337: RETURNING NATIONAL phrase without compiler", async () => {
-    await helper.showDocument("XML2.cbl");
-    editor = helper.getEditor("XML2.cbl");
+    const editor = await helper.showDocument("XML2.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -67,8 +66,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369338: VALIDATING phrase with FILE keyword", async () => {
-    await helper.showDocument("validck.cbl");
-    editor = helper.getEditor("validck.cbl");
+    const editor = await helper.showDocument("validck.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -87,8 +85,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369338: VALIDATING phrase with FILE keyword - special schema", async () => {
-    await helper.showDocument("special_schema.cbl");
-    editor = helper.getEditor("special_schema.cbl");
+    const editor = await helper.showDocument("special_schema.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -99,8 +96,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369339: VALIDATING phrase without FILE keyword", async () => {
-    await helper.showDocument("xmls.cbl");
-    editor = helper.getEditor("xmls.cbl");
+    const editor = await helper.showDocument("xmls.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -119,8 +115,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369341: VALIDATING phrase with compiler", async () => {
-    await helper.showDocument("xmls.cbl");
-    editor = helper.getEditor("xmls.cbl");
+    const editor = await helper.showDocument("xmls.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -139,8 +134,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test.skip("TC369344: VALIDATING phrase without compiler", async () => {
-    await helper.showDocument("xmls1.cbl");
-    editor = helper.getEditor("xmls1.cbl");
+    const editor = await helper.showDocument("xmls1.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -151,8 +145,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369345: ENCODING phrase with compiler", async () => {
-    await helper.showDocument("xmls.cbl");
-    editor = helper.getEditor("xmls.cbl");
+    const editor = await helper.showDocument("xmls.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -171,8 +164,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test.skip("TC369346: ENCODING phrase without compiler", async () => {
-    await helper.showDocument("xmls.cbl");
-    editor = helper.getEditor("xmls.cbl");
+    const editor = await helper.showDocument("xmls.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -183,8 +175,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369347: ENCODING phrase with codepage", async () => {
-    await helper.showDocument("xmls2.cbl");
-    editor = helper.getEditor("xmls2.cbl");
+    const editor = await helper.showDocument("xmls2.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -203,8 +194,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369348: ENCODING phrase without codepage", async () => {
-    await helper.showDocument("xmls3.cbl");
-    editor = helper.getEditor("xmls3.cbl");
+    const editor = await helper.showDocument("xmls3.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -216,8 +206,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369349: PROCESSING PROCEDURE phrase", async () => {
-    await helper.showDocument("xmlup.cbl");
-    editor = helper.getEditor("xmlup.cbl");
+    const editor = await helper.showDocument("xmlup.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");
@@ -236,8 +225,7 @@ suite("TF48416: XML PARSE", function () {
   });
 
   test("TC369350: identifier1", async () => {
-    await helper.showDocument("XML3.cbl");
-    editor = helper.getEditor("XML3.cbl");
+    const editor = await helper.showDocument("XML3.cbl");
     await helper.waitFor(() => editor.document.languageId === "cobol");
     if (vscode.window.activeTextEditor === undefined) {
       assert.fail("activeTextEditor in undefined");

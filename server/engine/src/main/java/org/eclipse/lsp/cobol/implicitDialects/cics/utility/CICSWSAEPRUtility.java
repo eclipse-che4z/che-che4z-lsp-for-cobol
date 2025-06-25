@@ -51,8 +51,11 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSWSAEPRUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSWSAEPRUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -78,11 +81,10 @@ public class CICSWSAEPRUtility extends CICSOptionsCheckBaseUtility {
             .flatMap(List::stream)
             .collect(Collectors.toList());
     checkHasMandatoryOptions(options, ctx, "ADDRESS or REFPARMS or METADATA");
-    if (ctx.REFPARMS().isEmpty())
-      checkHasIllegalOptions(ctx.REFPARMSLEN(), "REFPARMSLEN without REFPARMS");
-    if (ctx.METADATA().isEmpty())
-      checkHasIllegalOptions(ctx.METADATALEN(), "METADATALEN without METADATA");
+
     checkHasMutuallyExclusiveOptions(
         "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
+    checkOptionalWithLength(ctx.REFPARMS(), ctx.REFPARMSLEN(), ctx, "REFPARMS", "REFPARMSLEN");
+    checkOptionalWithLength(ctx.METADATA(), ctx.METADATALEN(), ctx, "METADATA", "METADATALEN");
   }
 }

@@ -145,4 +145,13 @@ public interface CobolDialect {
   default List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context) {
     return ImmutableList.of();
   }
+
+  /**
+   * Returns a list of Fatal Error codes that should never be suppressed.
+   *
+   * @return Set of Error codes String
+   */
+  default Set<String> getFatalErrorCodes() {
+    return ImmutableSet.of();
+  }
 }

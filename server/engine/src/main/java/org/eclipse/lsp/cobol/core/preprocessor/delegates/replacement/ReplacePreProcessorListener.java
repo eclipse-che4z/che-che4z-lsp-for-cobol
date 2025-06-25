@@ -22,6 +22,9 @@ import com.google.inject.assistedinject.Assisted;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -39,6 +42,7 @@ import org.eclipse.lsp4j.Range;
 @Slf4j
 public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   private final List<SyntaxError> errors = new ArrayList<>();
+  private final CobolLanguageId languageId;
   private final ReplacingService replacingService;
   private final ExtendedDocument extendedDocument;
   private final CopybookHierarchy hierarchy;
@@ -49,7 +53,9 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
   public ReplacePreProcessorListener(
       @Assisted ExtendedDocument extendedDocument,
       @Assisted CopybookHierarchy hierarchy,
+      @Assisted CobolLanguageId languageId,
       ReplacingService replacingService) {
+    this.languageId = languageId;
     this.replacingService = replacingService;
     this.extendedDocument = extendedDocument;
     this.hierarchy = hierarchy;
@@ -68,12 +74,18 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
 
   @Override
   public void enterReplaceAreaStartOrOffStatement(ReplaceAreaStartOrOffStatementContext ctx) {
+    if (ctx.OFF() != null && currentTextReplaceData != null) {
+      currentTextReplaceData
+          .getRange(extendedDocument.getUri())
+          .setEnd(new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
+    }
     restartReplace(ctx.getStart());
     if (!ctx.replacePseudoText().isEmpty()) {
       applyReplacing();
       currentTextReplaceData =
           new ReplaceData(new ArrayList<>(), extendedDocument.getUri(), new Range());
     }
+    extendedDocument.fillArea(AntlrRangeUtils.constructRange(ctx), ' ');
   }
 
   @Override
@@ -85,7 +97,12 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
               new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
       replacingService
           .retrievePseudoTextReplacingPattern(
-              ReplacementHelper.createClause(ctx), retrieveLocality(ctx))
+              new ImmutablePair<>(
+                  ReplacementHelper.getPseudoText(ctx.pseudoReplaceable()),
+                  ReplacementHelper.getPseudoText(ctx.pseudoReplacement())),
+              retrieveLocality(ctx),
+              languageId,
+              ReplacementHelper.getSearchPattern(ctx))
           .processIfNoErrorsFound(
               pattern -> currentTextReplaceData.getReplacePatterns().add(pattern), errors::addAll);
     }
@@ -114,7 +131,10 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     }
     if (hierarchy.getLastTextReplacing() != null) {
       Range range = hierarchy.getLastTextReplacing().getRange(extendedDocument.getUri());
-      range.setEnd(new Position(ctx.getStop().getLine(), ctx.getStop().getCharPositionInLine()));
+      if (range.getEnd() == null) {
+        range.setEnd(
+            new Position(ctx.getStop().getLine() - 1, ctx.getStop().getCharPositionInLine()));
+      }
     }
     applyReplacing();
   }
@@ -133,7 +153,9 @@ public class ReplacePreProcessorListener extends CobolPreprocessorBaseListener {
     }
     if (hierarchy.getLastTextReplacing() != null) {
       Range range = hierarchy.getLastTextReplacing().getRange(extendedDocument.getUri());
-      range.setEnd(new Position(start.getLine(), start.getCharPositionInLine()));
+      if (range.getEnd() == null) {
+        range.setEnd(new Position(start.getLine() - 1, start.getCharPositionInLine()));
+      }
     }
   }
 }

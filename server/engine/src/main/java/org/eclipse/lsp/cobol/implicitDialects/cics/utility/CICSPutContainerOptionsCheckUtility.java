@@ -52,8 +52,10 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
       };
 
   public CICSPutContainerOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -91,6 +93,7 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
         ctx.ACQPROCESS());
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
   }
 
   private void checkChannel(CICSParser.Cics_put_container_channelContext ctx) {
@@ -101,5 +104,6 @@ public class CICSPutContainerOptionsCheckUtility extends CICSOptionsCheckBaseUti
 
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.FLENGTH(), ctx, "FLENGTH");
   }
 }

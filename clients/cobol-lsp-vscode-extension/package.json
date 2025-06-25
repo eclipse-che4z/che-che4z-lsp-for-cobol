@@ -551,6 +551,19 @@
           },
           "description": "List of preprocessors used by the LSPConfig",
           "uniqueItems": true
+        },
+        "cobol-lsp.analysis-mode": {
+          "type": "string",
+          "enum": [
+            "BASIC",
+            "ADVANCED"
+          ],
+          "enumDescriptions": [
+            "Enables basic syntax checks",
+            "Enables advanced analysis including syntax and semantic checks"
+          ],
+          "description": "Analysis mode",
+          "default": "ADVANCED"
         }
       }
     },

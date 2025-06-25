@@ -46,6 +46,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
@@ -58,6 +59,8 @@ import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsReturnNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSCheckUtilityParameters;
+import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSLiteralCheckOption;
 import org.eclipse.lsp.cobol.implicitDialects.cics.utility.CICSOptionsCheckUtility;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -73,11 +76,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   private final DialectProcessingContext context;
   private final MessageService messageService;
   private final CICSOptionsCheckUtility cicsOptionsCheckUtility;
+  private final CICSCheckUtilityParameters cicsOptionsCheckUtilityParams;
 
   CICSVisitor(DialectProcessingContext context, MessageService messageService) {
     this.context = context;
     this.messageService = messageService;
-    this.cicsOptionsCheckUtility = new CICSOptionsCheckUtility(context, errors);
+    this.cicsOptionsCheckUtilityParams = getCheckParams();
+    this.cicsOptionsCheckUtility =
+        new CICSOptionsCheckUtility(context, errors, cicsOptionsCheckUtilityParams);
   }
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
@@ -154,23 +160,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   @Override
   public List<Node> visitCicsDfhRespLiteral(CICSParser.CicsDfhRespLiteralContext ctx) {
     addReplacementContext(ctx);
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public List<Node> visitCompilerDirective(CICSParser.CompilerDirectiveContext ctx) {
-    cicsOptionsCheckUtility.setExciOptionsEnabled(false);
-    cicsOptionsCheckUtility.setSpOptionsEnabled(false);
-
-    for (CICSParser.CompilerOptsContext options : ctx.compilerOpts()) {
-      if (options.cicsOptions() != null) {
-        if (options.cicsOptions().getText().contains("SP"))
-          cicsOptionsCheckUtility.setSpOptionsEnabled(true);
-        if (options.cicsOptions().getText().contains("EXCI"))
-          cicsOptionsCheckUtility.setExciOptionsEnabled(true);
-      }
-    }
-
     return visitChildren(ctx);
   }
 
@@ -339,9 +328,9 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
                 .ifPresent(
                     locality ->
                         throwException(
-                            token.getText(),
                             locality,
-                            messageService.getMessage("CobolVisitor.AreaBWarningMsg"))));
+                            MessageTemplate.of("CobolVisitor.AreaBWarningMsg", token.getText()),
+                            ErrorSeverity.WARNING)));
   }
 
   private Locality getTokenLocality(Token token) {
@@ -365,13 +354,14 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
     };
   }
 
-  private void throwException(String wrongToken, @NonNull Locality locality, String message) {
+  private void throwException(
+      @NonNull Locality locality, MessageTemplate messageTemplate, ErrorSeverity severity) {
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .location(locality.toOriginalLocation())
-            .suggestion(message + wrongToken)
-            .severity(ErrorSeverity.WARNING)
+            .messageTemplate(messageTemplate)
+            .severity(severity)
             .build();
 
     LOG.debug("Syntax error by CobolVisitor#throwException: {}", error);
@@ -386,5 +376,59 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
             token.getLine() - 1,
             token.getCharPositionInLine() + token.getStopIndex() - token.getStartIndex() + 1);
     return new Range(p, p);
+  }
+
+  private CICSCheckUtilityParameters getCheckParams() {
+    CICSCheckUtilityParameters cicsCheckUtilityParameters = new CICSCheckUtilityParameters();
+    final List<String> opts = context.getPreprocessorsDirectives().get("CICS");
+    if (opts == null || opts.isEmpty()) {
+      // This is a special case to reduce false positives until we have CICS configuration
+      cicsCheckUtilityParameters.spEnabled = true;
+      cicsCheckUtilityParameters.literalChecks = CICSLiteralCheckOption.IGNORE;
+      return cicsCheckUtilityParameters;
+    }
+    for (String opt : opts) {
+      switch (opt.toUpperCase()) {
+        case "LENGTH":
+          cicsCheckUtilityParameters.noLengthEnabled = false;
+          break;
+        case "NOLENGTH":
+          cicsCheckUtilityParameters.noLengthEnabled = true;
+          break;
+        case "SP":
+          cicsCheckUtilityParameters.spEnabled = true;
+          break;
+        case "EXCI":
+          cicsCheckUtilityParameters.exciEnabled = true;
+          break;
+        case "APOST":
+          cicsCheckUtilityParameters.literalChecks = CICSLiteralCheckOption.APOST;
+          break;
+        case "QUOTE":
+          cicsCheckUtilityParameters.literalChecks = CICSLiteralCheckOption.QUOTE;
+          break;
+        default:
+          break;
+      }
+    }
+    return cicsCheckUtilityParameters;
+  }
+
+  @Override
+  public List<Node> visitVariableNameUsage(CICSParser.VariableNameUsageContext ctx) {
+    if ((ctx.NONNUMERICLITERAL() != null || ctx.NUMERICLITERAL() != null)) {
+      final CICSLiteralCheckOption opt = cicsOptionsCheckUtilityParams.literalChecks;
+      if (opt == CICSLiteralCheckOption.QUOTE && ctx.getText().endsWith("\'"))
+        throwException(
+            getTokenLocality(ctx.start),
+            MessageTemplate.of("cics.invalidLiteralDelimeter", "\""),
+            ErrorSeverity.ERROR);
+      else if (opt == CICSLiteralCheckOption.APOST && ctx.getText().endsWith("\""))
+        throwException(
+            getTokenLocality(ctx.start),
+            MessageTemplate.of("cics.invalidLiteralDelimeter", "'"),
+            ErrorSeverity.ERROR);
+    }
+    return visitChildren(ctx);
   }
 }

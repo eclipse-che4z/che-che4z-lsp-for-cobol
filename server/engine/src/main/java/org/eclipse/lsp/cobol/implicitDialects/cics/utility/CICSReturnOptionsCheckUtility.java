@@ -43,8 +43,11 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSReturnOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSReturnOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -68,8 +71,7 @@ public class CICSReturnOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
     checkMutuallyExclusiveOptions("TRANSID or ENDACTIVITY", ctx.TRANSID(), ctx.ENDACTIVITY());
 
-    checkPrerequisiteIsMet(ctx.COMMAREA(), ctx.LENGTH(), ctx, "LENGTH without COMMAREA");
-
-    checkPrerequisiteIsMet(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSGLEN without INPUTMSG");
+    checkOptionalWithLength(ctx.COMMAREA(), ctx.LENGTH(), ctx, "COMMAREA", "LENGTH");
+    checkOptionalWithLength(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSG", "INPUTMSGLEN");
   }
 }

@@ -42,8 +42,11 @@ public class CICSLoadOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSLoadOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSLoadOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**

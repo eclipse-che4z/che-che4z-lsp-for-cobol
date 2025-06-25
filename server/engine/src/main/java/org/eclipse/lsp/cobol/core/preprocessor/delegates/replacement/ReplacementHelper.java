@@ -16,15 +16,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
-import org.eclipse.lsp4j.Range;
 
 /** Helper for replacement functionality */
 @UtilityClass
@@ -52,30 +47,43 @@ public class ReplacementHelper {
   }
 
   /**
-   * Creates a string for replacement parsing from a given list of clauses
+   * Returns a searchPattern strategy based on the passed antlr context
    *
-   * @param children - list of clauses
-   * @return a string
+   * @param replacePseudoTextContext Antlr replacePseudoText context
+   * @return SearchPattern
    */
-  public List<Pair<String, Range>> createClause(List<ParseTree> children) {
-    List<Pair<String, Range>> clauses = new LinkedList<>();
-    for (ParseTree parseTree : children) {
-      if (parseTree instanceof CobolPreprocessor.ReplacingPhraseContext) {
-        for (ParseTree clause : ((CobolPreprocessor.ReplacingPhraseContext) parseTree).children) {
-          if (clause instanceof CobolPreprocessor.ReplaceClauseContext) {
-            CobolPreprocessor.ReplacePseudoTextContext pseudoTextContext =
-                ((CobolPreprocessor.ReplaceClauseContext) clause).replacePseudoText();
-            CobolPreprocessor.ReplaceLiteralContext literalContext =
-                ((CobolPreprocessor.ReplaceClauseContext) clause).replaceLiteral();
-            ParserRuleContext context =
-                Optional.ofNullable((ParserRuleContext) pseudoTextContext).orElse(literalContext);
+  public static SearchPattern getSearchPattern(
+      CobolPreprocessor.ReplacePseudoTextContext replacePseudoTextContext) {
+    if (replacePseudoTextContext.LEADING() != null) return SearchPattern.STARTS_WITH;
+    if (replacePseudoTextContext.TRAILING() != null) return SearchPattern.ENDS_WITH;
+    return SearchPattern.EXACT;
+  }
 
-            String clauseString = createClause(context).replace(" : ", ":").replace(" .", ".");
-            clauses.add(ImmutablePair.of(clauseString, AntlrRangeUtils.constructRange(context)));
-          }
-        }
-      }
+  /**
+   * Gives replaceable pseudo text used in `{replaceable} BY {replacement}` replac(e/ing) context of
+   * COBOL source.
+   *
+   * @param pseudoReplaceableContext
+   * @return a pseudo text String.
+   */
+  public String getPseudoText(CobolPreprocessor.PseudoReplaceableContext pseudoReplaceableContext) {
+    if (pseudoReplaceableContext == null || pseudoReplaceableContext.pseudoTextContent() == null) {
+      return "";
     }
-    return clauses;
+    return pseudoReplaceableContext.pseudoTextContent().getText();
+  }
+
+  /**
+   * Gives replacement pseudo text used in `{replaceable} BY {replacement}` replac(e/ing) context of
+   * COBOL source.
+   *
+   * @param pseudoReplacementContext
+   * @return a pseudo text String.
+   */
+  public String getPseudoText(CobolPreprocessor.PseudoReplacementContext pseudoReplacementContext) {
+    if (pseudoReplacementContext == null || pseudoReplacementContext.pseudoTextContent() == null) {
+      return "";
+    }
+    return pseudoReplacementContext.pseudoTextContent().getText();
   }
 }

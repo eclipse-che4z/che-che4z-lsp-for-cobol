@@ -37,6 +37,8 @@ public class AnalysisConfig {
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();
+  // Map preprocessors name to list of directives
+  Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
 
   /**
    * Create the default language features config, containing all features and the given copybook

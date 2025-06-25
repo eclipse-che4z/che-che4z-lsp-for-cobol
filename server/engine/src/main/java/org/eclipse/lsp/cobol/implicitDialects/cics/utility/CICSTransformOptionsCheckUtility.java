@@ -53,8 +53,10 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       };
 
   public CICSTransformOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -103,9 +105,10 @@ public class CICSTransformOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
 
     checkHasExactlyOneOption("DATATOXML or XMLTODATA", ctx, ctx.DATATOXML(), ctx.XMLTODATA());
-    checkPrerequisiteIsMet(ctx.ELEMNAME(), ctx.ELEMNAMELEN(), ctx, "ELEMNAMELEN without ELEMNAME");
-    checkPrerequisiteIsMet(ctx.ELEMNS(), ctx.ELEMNSLEN(), ctx, "ELEMNSLEN without ELEMNS");
-    checkPrerequisiteIsMet(ctx.TYPENAME(), ctx.TYPENAMELEN(), ctx, "TYPENAMELEN without TYPENAME");
-    checkPrerequisiteIsMet(ctx.TYPENS(), ctx.TYPENSLEN(), ctx, "TYPENSLEN without TYPENS");
+
+    checkOptionalWithLength(ctx.ELEMNAME(), ctx.ELEMNAMELEN(), ctx, "ELEMNAME", "ELEMNAMELEN");
+    checkOptionalWithLength(ctx.ELEMNS(), ctx.ELEMNSLEN(), ctx, "ELEMNS", "ELEMNSLEN");
+    checkOptionalWithLength(ctx.TYPENAME(), ctx.TYPENAMELEN(), ctx, "TYPENAME", "TYPENAMELEN");
+    checkOptionalWithLength(ctx.TYPENS(), ctx.TYPENSLEN(), ctx, "TYPENS", "TYPENSLEN");
   }
 }

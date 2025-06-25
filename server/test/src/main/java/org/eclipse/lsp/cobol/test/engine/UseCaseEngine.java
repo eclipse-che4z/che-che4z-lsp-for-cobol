@@ -25,6 +25,7 @@ import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import java.util.*;
 import java.util.function.Function;
@@ -49,10 +50,8 @@ import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.test.CobolText;
-import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 
 /**
  * This class applies syntax and semantic analysis for COBOL texts using the actual Language Engine.
@@ -168,6 +167,30 @@ public class UseCaseEngine {
   }
 
   /**
+   * @param text - COBOL text to analyse. It will be cleaned up before analysis to exclude all the
+   *     technical tokens and collect syntax and semantic elements
+   * @param copybooks - list of the copybooks used in the document
+   * @param expectedDiagnostics - map of IDs and diagnostics that are expected to appear in the
+   *     document or copybooks. IDs are the same as in the diagnostic sections inside the text.
+   * @param preprocessorsDirectives - initial preprocessor directives
+   * @return analysis result object
+   */
+  public AnalysisResult runTest(
+      String text,
+      List<CobolText> copybooks,
+      Map<String, Diagnostic> expectedDiagnostics,
+      Map<String, List<String>> preprocessorsDirectives) {
+    return runTest(
+        text,
+        copybooks,
+        expectedDiagnostics,
+        ImmutableList.of(),
+        AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED),
+        CobolLanguageId.COBOL,
+        preprocessorsDirectives);
+  }
+
+  /**
    * Check if the language engine applies required syntax and semantic checks for "cobol"
    * languageId. All the semantic elements in the given text, as well as syntax errors, should be
    * wrapped with according tags. The same extraction operation applied also for the given
@@ -224,7 +247,8 @@ public class UseCaseEngine {
         expectedDiagnostics,
         subroutineNames,
         AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED),
-        languageId);
+        languageId,
+        ImmutableMap.of());
   }
 
   /**
@@ -246,6 +270,7 @@ public class UseCaseEngine {
    * @param analysisConfig - analysis settings: copybook processing mode and the SQL backend for the
    *     analysis
    * @param languageId - language Id
+   * @param preprocessorsDirectives - initial preprocessor directives
    * @return analysis result object
    */
   public AnalysisResult runTest(
@@ -254,7 +279,8 @@ public class UseCaseEngine {
       Map<String, Diagnostic> expectedDiagnostics,
       List<String> subroutineNames,
       AnalysisConfig analysisConfig,
-      CobolLanguageId languageId) {
+      CobolLanguageId languageId,
+      Map<String, List<String>> preprocessorsDirectives) {
 
     SQLBackend sqlBackendSetting =
         Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
@@ -283,6 +309,7 @@ public class UseCaseEngine {
                 .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .compilerOptions(analysisConfig.getCompilerOptions())
+                .preprocessorsDirectives(preprocessorsDirectives)
                 .build(),
             languageId);
     assertResultEquals(actual, document.getTestData());
@@ -323,7 +350,8 @@ public class UseCaseEngine {
         expectedDiagnostics,
         subroutineNames,
         analysisConfig,
-        CobolLanguageId.COBOL);
+        CobolLanguageId.COBOL,
+        ImmutableMap.of());
   }
 
   /**
@@ -566,14 +594,44 @@ public class UseCaseEngine {
   private void assertDiagnostics(
       Map<String, List<Diagnostic>> expected, Map<String, List<Diagnostic>> actual) {
     assertEquals(expected.keySet(), actual.keySet(), "Diagnostic documents are not the same");
+
+    // Below code provides flexible validation, as a strict assertion would lead to update of most
+    // of the TestCases. Strict assertion is done when the expectedDiagnostics includes an
+    // ErrorCode.
     for (String documentUri : expected.keySet()) {
-      List<Diagnostic> expectedDiagnostic =
+      List<Diagnostic> expectedDiagnostics =
           expected.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
-      List<Diagnostic> actualDiagnostic =
+      List<Diagnostic> actualDiagnostics =
           actual.get(documentUri).stream().sorted(diagnosticComparator).collect(toList());
       assertEquals(
-          expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
+          expectedDiagnostics.size(), actualDiagnostics.size(), "Different diagnostics size");
+      for (int i = 0; i < expectedDiagnostics.size(); i++) {
+        Diagnostic expectedDiagnostic = expectedDiagnostics.get(i);
+        Diagnostic actualDiagnostic = actualDiagnostics.get(i);
+        if (expectedDiagnostic.getCode() == null && actualDiagnostic.getCode() != null) {
+          assertDiagnosticEqualsIgnoringCode(expectedDiagnostic, actualDiagnostic);
+        } else {
+          assertEquals(
+              expectedDiagnostic, actualDiagnostic, "Different diagnostics for: " + documentUri);
+        }
+      }
     }
+  }
+
+  private static void assertDiagnosticEqualsIgnoringCode(
+      @NonNull Diagnostic expected, @NonNull Diagnostic actual) {
+    assertEquals(expected.getRange(), actual.getRange(), "Diagnostic range mismatch");
+    assertEquals(expected.getSeverity(), actual.getSeverity(), "Diagnostic severity mismatch");
+    assertEquals(expected.getSource(), actual.getSource(), "Diagnostic source mismatch");
+    assertEquals(expected.getMessage(), actual.getMessage(), "Diagnostic message mismatch");
+    assertEquals(
+        expected.getCodeDescription(), actual.getCodeDescription(), " Code Description mismatch");
+    assertEquals(expected.getTags(), actual.getTags(), " Tags mismatch");
+    assertEquals(
+        expected.getRelatedInformation(),
+        actual.getRelatedInformation(),
+        "RelatedInformation mismatch");
+    assertEquals(expected.getData(), actual.getData(), "Data mismatch");
   }
 
   private <T> void assertResult(

@@ -35,6 +35,8 @@ public class TestCICSAbend {
   private static final String ABEND_VALID_ABCODE_CANCEL_NODUMP =
       "ABEND ABCODE({$varFour}) CANCEL NODUMP";
   private static final String ABEND_INVALID_ABCODE = "ABEND ABCODE {END-EXEC | error}(100)";
+  private static final String ABEND_ABCODE_APOST_INVALID = "ABEND ABCODE({_\"CODE\"|error_})";
+  private static final String ABEND_ABCODE_APOST_HEX_INVALID = "ABEND ABCODE({_X\"A0DE2\"|error_})";
 
   @Test
   void testAbendValid() {
@@ -62,5 +64,31 @@ public class TestCICSAbend {
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(ABEND_INVALID_ABCODE, expectedDiagnostic);
+  }
+
+  @Test
+  void testAbendInvalidAbcodeApostHex() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Invalid literal delimeter: \' expected.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ABEND_ABCODE_APOST_INVALID, expectedDiagnostic, "APOST");
+  }
+
+  @Test
+  void testAbendInvalidAbcodeApost() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Invalid literal delimeter: \' expected.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(ABEND_ABCODE_APOST_HEX_INVALID, expectedDiagnostic, "APOST");
   }
 }

@@ -45,6 +45,8 @@ public class TestCICSSignalEvent {
 
   private static final String SIGNAL_EVENT_INVALID_FROMLENGTH_WITHOUT_FROM =
       "SIGNAL {_EVENT({$varOne}) FROMLENGTH(123)|errorOne_}";
+  private static final String SIGNAL_EVENT_TRANS_NOLENGTH_INVALID =
+      "SIGNAL {_FROM({$varOne})EVENT({$varOne})|error_}";
 
   @Test
   void testSignalEventValidMinimal() {
@@ -101,8 +103,22 @@ public class TestCICSSignalEvent {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: FROM",
+                "Missing required option: FROMLENGTH without FROM",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSignalNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        SIGNAL_EVENT_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FROMLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

@@ -31,7 +31,6 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   public static final int RULE_INDEX = CICSParser.RULE_cics_extract_system_programming;
-
   private static final Map<Integer, ErrorSeverity> DUPLICATE_CHECK_OPTIONS =
       new HashMap<Integer, ErrorSeverity>() {
         {
@@ -109,8 +108,10 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       };
 
   public CICSExtractSPOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -158,6 +159,11 @@ public class CICSExtractSPOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
     }
     checkSubResidOptions(ctx);
     checkLastTimeOptions(ctx);
+    if (noLengthOptionsEnabled()) {
+      if (!ctx.RESID().isEmpty()) checkHasMandatoryOptions(ctx.RESIDLEN(), ctx, "RESIDLEN");
+      if (!ctx.SUBRESID().isEmpty())
+        checkHasMandatoryOptions(ctx.SUBRESIDLEN(), ctx, "SUBRESIDLEN");
+    }
   }
 
   /**

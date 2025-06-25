@@ -50,8 +50,11 @@ public class CICSWriteqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSWriteqOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSWriteqOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -89,5 +92,8 @@ public class CICSWriteqOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasMandatoryOptions(ctx.ITEM(), ctx, "ITEM");
     }
     checkHasMutuallyExclusiveOptions("AUXILIARY or MAIN", ctx.AUXILIARY(), ctx.MAIN());
+    if (noLengthOptionsEnabled()) {
+      checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
+    }
   }
 }

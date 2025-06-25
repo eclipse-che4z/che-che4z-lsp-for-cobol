@@ -1258,7 +1258,7 @@ evaluateStatement
    (
       END_EVALUATE
       |
-      {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==EOF}?
+      {_input.LA(1)==DOT_FS || _input.LA(1)==ELSE || _input.LA(1)==END_IF || _input.LA(1)==EOF}?
    )
    ;
 

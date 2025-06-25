@@ -58,8 +58,10 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
       };
 
   public CICSWSAContextOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -91,11 +93,9 @@ public class CICSWSAContextOptionsCheckUtility extends CICSOptionsCheckBaseUtili
     checkPrerequisiteIsMet(ctx.RELATESURI(), ctx.RELATESTYPE(), ctx, "RELATESTYPE");
     checkAllOptionsArePresentOrAbsent(
         "EPRTYPE, EPRFIELD and EPRFROM", ctx, ctx.EPRTYPE(), ctx.EPRFIELD(), ctx.EPRFROM());
-    if (!ctx.EPRLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.EPRTYPE(), ctx, "EPRTYPE");
-    }
     checkHasMutuallyExclusiveOptions(
         "FROMCCSID or FROMCODEPAGE", ctx.FROMCCSID(), ctx.FROMCODEPAGE());
+    checkOptionalWithLength(ctx.EPRTYPE(), ctx.EPRLENGTH(), ctx, "EPRTYPE", "EPRLENGTH");
   }
 
   private void checkWSAContextDelete(CICSParser.Cics_wsacontext_deleteContext ctx) {

@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.usecases;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.*;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -43,6 +44,9 @@ public class TestCicsReturnStatement {
   private static final String RETURN_INVALID_3 =
       "RETURN TRANSID({$varOne}) COMMAREA({$varOne}) LENGTH({$varOne}) IMMEDIATE"
           + " INPUTMSG({$varOne}) INPUTMSGLEN({$varOne}) {ENDACTIVITY|errorOne}";
+  private static final String RETURN_TRANS_NOLENGTH_INVALID =
+      "RETURN {_TRANSID({$varOne}) COMMAREA({$varOne}) IMMEDIATE"
+          + " INPUTMSG({$varOne})|error|errorTwo_}";
 
   // Test Functions
   @Test
@@ -89,5 +93,24 @@ public class TestCicsReturnStatement {
             DiagnosticSeverity.Error,
             ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(RETURN_INVALID_3, expectedDiagnostics);
+  }
+
+  @Test
+  void testCicsReturnNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: INPUTMSGLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RETURN_TRANS_NOLENGTH_INVALID, expectedDiagnostic, "NOLENGTH");
   }
 }

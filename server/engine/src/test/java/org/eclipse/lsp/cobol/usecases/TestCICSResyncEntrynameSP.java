@@ -37,6 +37,8 @@ public class TestCICSResyncEntrynameSP {
 
   private static final String RESYNC_INVALID =
       "RESYNC {_ENTRYNAME({$varFour}) QUALIFIER({$varFour}) IDLISTLENGTH({$varFour})|error_}";
+  private static final String RESYNC_NOLENGHT_INVALID =
+      "RESYNC {_ENTRYNAME({$varFour}) QUALIFIER({$varFour}) IDLIST({$varFour}) PARTIAL|error_}";
 
   @Test
   void testResyncValid() {
@@ -50,9 +52,22 @@ public class TestCICSResyncEntrynameSP {
             "error",
             new Diagnostic(
                 new Range(),
-                "Missing required option for: IDLISTLENGTH without IDLIST",
+                "Missing required option: IDLISTLENGTH without IDLIST",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()));
     CICSTestUtils.errorTest(RESYNC_INVALID, expectedDiagnostic, "SP");
+  }
+
+  @Test
+  void testResyncNoLengthInvalid() {
+    Map<String, Diagnostic> expectedDiagnostic =
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: IDLISTLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(RESYNC_NOLENGHT_INVALID, expectedDiagnostic, "SP", "NOLENGTH");
   }
 }

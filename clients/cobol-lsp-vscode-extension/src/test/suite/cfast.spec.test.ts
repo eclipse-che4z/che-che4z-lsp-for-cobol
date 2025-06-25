@@ -23,19 +23,19 @@ interface Extension {
 }
 
 suite("Integration Test Suite: CFAST generation", function () {
+  this.timeout(helper.TEST_TIMEOUT);
   suiteSetup(async function () {
-    this.timeout(0);
     await helper.updateConfig("basic.json");
     await helper.activate();
   });
 
-  this.afterEach(async () => await helper.closeAllEditors()).timeout(
-    helper.TEST_TIMEOUT,
-  );
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
 
   test("CFAST generation call", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );
@@ -61,8 +61,7 @@ suite("Integration Test Suite: CFAST generation", function () {
   });
 
   test("CFAST generation call for nested program", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );
@@ -87,8 +86,7 @@ suite("Integration Test Suite: CFAST generation", function () {
   });
 
   test("CFAST generation call for MAIN2 program", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );
@@ -113,8 +111,7 @@ suite("Integration Test Suite: CFAST generation", function () {
   });
 
   test("CFAST generation: MAIN program after nested click", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );
@@ -139,8 +136,7 @@ suite("Integration Test Suite: CFAST generation", function () {
   });
 
   test("CFAST generation: before MAIN program click", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );
@@ -165,8 +161,7 @@ suite("Integration Test Suite: CFAST generation", function () {
   });
 
   test("CFAST generation: before MAIN2 after MAIN programs click", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );
@@ -191,8 +186,7 @@ suite("Integration Test Suite: CFAST generation", function () {
   });
 
   test("CFAST generation: after MAIN2 programs click", async () => {
-    await helper.showDocument("CFAST.cbl");
-    const editor = helper.getEditor("CFAST.cbl");
+    const editor = await helper.showDocument("CFAST.cbl");
     const cobolExtension = vscode.extensions.getExtension<Extension>(
       "broadcommfd.cobol-language-support",
     );

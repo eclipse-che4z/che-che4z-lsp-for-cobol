@@ -113,6 +113,9 @@ public class TestCicsExtractSP {
           + " {SUBRESTYPE|error}({$varFive}) {CAPTURESPEC|error} STATISTICS";
   private static final String STATISTICS_WARNING_DUPLICATE_RESTYPE =
       "EXTRACT SET({$varFour}) STATISTICS ASYNCSERVICE {ASYNCSERVICE|warning}";
+  private static final String STATISTICS_NOLENGTH_INVALID =
+      "EXTRACT {_STATISTICS SET({$varFour}) BUNDLE RESID({$varTwo})"
+          + " SUBRESID({$varSix}) POLICYRULE|error|errorTwo_}";
 
   @Test
   void testAllExitOptions() {
@@ -498,5 +501,26 @@ public class TestCicsExtractSP {
                 DiagnosticSeverity.Warning,
                 ErrorSource.PARSING.getText())),
         "SP");
+  }
+
+  @Test
+  void testExtractNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        STATISTICS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: RESIDLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "errorTwo",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: SUBRESIDLEN",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "SP",
+        "NOLENGTH");
   }
 }

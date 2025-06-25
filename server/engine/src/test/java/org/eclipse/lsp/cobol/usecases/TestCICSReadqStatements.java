@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.usecases;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
@@ -74,6 +75,10 @@ public class TestCICSReadqStatements {
       "READQ TD QUEUE({$varFour}) INTO({$varFour}) {_ITEM|errorItemIllegal_}({$varFour})"
           + "{_NEXT|errorNextIllegal_} {_NUMITEMS|errorNumItemIllegal_}({$varFour})"
           + "{_QNAME|errorQnameIllegal_}({$varFour})";
+  private static final String READQ_TS_TRANS_NOLENGTH_INVALID =
+      "READQ {_TS QUEUE({$varFour}) NOHANDLE INTO({$varFour})\n "
+          + "NUMITEMS({$varFour})\n "
+          + "NEXT SYSID({$varFour})|error_}";
 
   @Test
   void testReadqTdValid() {
@@ -243,5 +248,18 @@ public class TestCICSReadqStatements {
                 ErrorSource.PARSING.getText()));
 
     CICSTestUtils.errorTest(READQ_TD_ILLEGAL_OPTS_INVALID, expectedDiagnostic);
+  }
+
+  @Test
+  void testReadqTsNoLengthInvalid() {
+    HashMap<String, Diagnostic> expectedDiagnostics = new HashMap<>();
+    expectedDiagnostics.put(
+        "error",
+        new Diagnostic(
+            new Range(),
+            "Missing required option: LENGTH",
+            DiagnosticSeverity.Error,
+            ErrorSource.PARSING.getText()));
+    CICSTestUtils.errorTest(READQ_TS_TRANS_NOLENGTH_INVALID, expectedDiagnostics, "NOLENGTH");
   }
 }

@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 
 /** Provides creating errors for copybooks */
@@ -57,7 +58,7 @@ class CopybookErrorService {
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.COPYBOOK)
             .severity(info)
-            .suggestion(messageService.getMessage(messageID, copybookName.getDisplayName()))
+            .messageTemplate(MessageTemplate.of(messageID, copybookName.getDisplayName()))
             .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());
@@ -69,8 +70,8 @@ class CopybookErrorService {
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.COPYBOOK)
             .severity(ERROR)
-            .suggestion(
-                messageService.getMessage("GrammarPreprocessorListener.recursionDetected", name))
+            .messageTemplate(
+                MessageTemplate.of("GrammarPreprocessorListener.recursionDetected", name))
             .location(locality.toOriginalLocation())
             .build();
     LOG.debug("Syntax error by CopybookErrorService: {}", error.toString());
@@ -115,7 +116,7 @@ class CopybookErrorService {
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.COPYBOOK)
             .severity(info)
-            .suggestion(messageService.getMessage(messageID, maxNameLength, copybookName))
+            .messageTemplate(MessageTemplate.of(messageID, maxNameLength, copybookName))
             .location(locality.toOriginalLocation())
             .build();
     LOG.debug(logMessage, error.toString());
@@ -142,8 +143,8 @@ class CopybookErrorService {
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PREPROCESSING)
             .severity(ERROR)
-            .suggestion(
-                messageService.getMessage(
+            .messageTemplate(
+                MessageTemplate.of(
                     "GrammarPreprocessorListener.controlDirectiveWrongArgs", argument))
             .location(locality.toOriginalLocation())
             .build();

@@ -50,12 +50,16 @@ export class CopybookDownloaderForE4E {
     private outputChannel?: vscode.OutputChannel,
   ) {}
 
-  private E4EConfigs = new Map<string, Promise<e4eResponse | undefined>>();
+  private E4EConfigs = new Map<string, E4EConfig>();
   private E4EProfiles = new Map<string, ResolvedProfile | undefined>();
   private E4EElements = new Map<string, EndevorElement[] | undefined>();
 
   public clearConfigs() {
     this.E4EConfigs.clear();
+  }
+  public clearInvalidConfig(uri: string) {
+    const config = this.E4EConfigs.get(uri);
+    if (config) config.closed = true;
   }
 
   private async getE4EConfigImpl(
@@ -115,17 +119,21 @@ export class CopybookDownloaderForE4E {
   }
 
   public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
-    const config = this.E4EConfigs.get(uri);
-    if (config) {
-      return config;
+    const e4eConfig = this.E4EConfigs.get(uri);
+    if (e4eConfig) {
+      if (!e4eConfig.closed) return e4eConfig.config;
+      const result = await e4eConfig.config;
+      if (result) return result;
     }
     if (!this.e4e.isEndevorElement(uri)) return undefined;
-
-    const response = this.getE4EConfigImpl(uri).catch((err) => {
-      this.E4EConfigs.delete(uri);
-      throw err;
-    });
-    this.E4EConfigs.set(uri, response);
+    const response = this.getE4EConfigImpl(uri).catch(
+      (err: Error): undefined => {
+        vscode.window.showErrorMessage(
+          `An error occurred while retrieving Endevor configuration: ${err.message}.`,
+        );
+      },
+    );
+    this.E4EConfigs.set(uri, { config: response, closed: false });
     return response;
   }
 
@@ -399,4 +407,8 @@ export class CopybookDownloaderForE4E {
   ) {
     return `${profile.instance}-${profile.profile}-${endevorType.environment}-${endevorType.stage}-${endevorType.system}-${endevorType.subsystem}-${endevorType.type}-${endevorType.use_map}`;
   }
+}
+interface E4EConfig {
+  config: Promise<e4eResponse | undefined>;
+  closed: boolean;
 }

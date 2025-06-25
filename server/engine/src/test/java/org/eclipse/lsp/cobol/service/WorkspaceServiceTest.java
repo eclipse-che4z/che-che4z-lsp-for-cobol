@@ -80,7 +80,8 @@ class WorkspaceServiceTest {
             messageService,
             asyncAnalysisService,
             getMockLayoutStore(),
-            copybookService);
+            copybookService,
+            null);
     ExecuteCommandHandler executeCommandHandler =
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
     DidChangeWatchedFilesHandler didChangeWatchedFilesHandler =
@@ -131,7 +132,8 @@ class WorkspaceServiceTest {
             null,
             asyncAnalysisService,
             getMockLayoutStore(),
-            copybookService);
+            copybookService,
+            null);
     ExecuteCommandHandler executeCommandHandler =
         new ExecuteCommandHandler(stateService, asyncAnalysisService);
     DidChangeWatchedFilesHandler didChangeWatchedFilesHandler =
@@ -249,7 +251,8 @@ class WorkspaceServiceTest {
             null,
             asyncAnalysisService,
             getMockLayoutStore(),
-            copybookService);
+            copybookService,
+            null);
 
     ExecuteCommandHandler executeCommandHandler =
         new ExecuteCommandHandler(stateService, asyncAnalysisService);

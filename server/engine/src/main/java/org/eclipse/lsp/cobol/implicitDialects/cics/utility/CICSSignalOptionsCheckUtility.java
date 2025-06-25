@@ -40,8 +40,11 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSSignalOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSSignalOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -61,8 +64,6 @@ public class CICSSignalOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkSignalEvent(CICSParser.Cics_signal_optionsContext ctx) {
     checkHasMandatoryOptions(ctx.EVENT(), ctx, "EVENT");
     checkHasMutuallyExclusiveOptions("FROMCHANNEL or FROM", ctx.FROMCHANNEL(), ctx.FROM());
-    if (!ctx.FROMLENGTH().isEmpty()) {
-      checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    }
+    checkOptionalWithLength(ctx.FROM(), ctx.FROMLENGTH(), ctx, "FROM", "FROMLENGTH");
   }
 }

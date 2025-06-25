@@ -14,11 +14,18 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
@@ -87,8 +94,8 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                           .errorSource(ErrorSource.PARSING)
                           .errorCode(() -> "IGYOS4013-I")
                           .location(new OriginalLocation(location, null))
-                          .suggestion(
-                              messageService.getMessage(
+                          .messageTemplate(
+                              MessageTemplate.of(
                                   "compilerDirective.info.deprecatedDirectiveUse", ctx.getText()))
                           .severity(ErrorSeverity.INFO)
                           .build());
@@ -120,5 +127,39 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                           .build());
             });
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
+  }
+
+  @Override
+  public Object visitCicsTranslatorOptions(
+      CompilerDirectivesParser.CicsTranslatorOptionsContext ctx) {
+    final Token t = ctx.getStart();
+    if (t != null) {
+      List<String> cicsDirectives =
+          analysisContext
+              .getPreprocessorsDirectives()
+              .computeIfAbsent("CICS", e -> new ArrayList<>());
+      cicsDirectives.add(t.getText());
+    }
+    return super.visitCicsTranslatorOptions(ctx);
+  }
+
+  private static final Pattern CICS_DIRECTIVES_IN_LITERAL =
+      Pattern.compile("\\b(SP|LENGTH|NOLENGTH|EXCI|APOST|QUOTE)\\b", Pattern.CASE_INSENSITIVE);
+
+  @Override
+  public Object visitCicsTranslatorDirectives(
+      CompilerDirectivesParser.CicsTranslatorDirectivesContext ctx) {
+    final TerminalNode literal = ctx.LITERAL();
+    if (literal != null) {
+      List<String> cicsDirectives =
+          analysisContext
+              .getPreprocessorsDirectives()
+              .computeIfAbsent("CICS", e -> new ArrayList<>());
+      Matcher m = CICS_DIRECTIVES_IN_LITERAL.matcher(literal.getText());
+      while (m.find()) {
+        cicsDirectives.add(m.group());
+      }
+    }
+    return super.visitCicsTranslatorDirectives(ctx);
   }
 }

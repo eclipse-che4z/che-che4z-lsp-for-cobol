@@ -43,6 +43,8 @@ public class TestCICSSpoolWrite {
 
   private static final String SPOOLWRITE_INVALID_BOTH_LINE_PAGE =
       "SPOOLWRITE TOKEN({$varOne}) FROM({$varTwo}) {LINE|errorOne} {PAGE|errorTwo}";
+  private static final String SPOOLWRITE_TRANS_NOLENGTH_INVALID =
+      "SPOOLWRITE {_TOKEN({$varOne}) FROM({$varTwo})|error_}";
 
   @Test
   void testSpoolwriteValidMinimal() {
@@ -97,5 +99,19 @@ public class TestCICSSpoolWrite {
                 "Exactly one option required, options are mutually exclusive: LINE or PAGE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSpoolWriteNoLength() {
+    CICSTestUtils.errorTest(
+        SPOOLWRITE_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

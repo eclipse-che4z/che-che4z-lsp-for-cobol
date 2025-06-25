@@ -66,6 +66,9 @@ public class UseCase {
 
   @Builder.Default boolean cicsTranslator = true;
 
+  /** preprocessor directives mapped with preprocessor name */
+  Map<String, List<String>> preprocessorsDirectives;
+
   /**
    * Get the {@link AnalysisConfig} using the specified processing mode and the {@link SQLBackend}
    * see {@link CopybookProcessingMode}
@@ -82,6 +85,8 @@ public class UseCase {
             ImmutableList.of(),
             dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
+    if (preprocessorsDirectives != null)
+      analysisConfig.getPreprocessorsDirectives().putAll(preprocessorsDirectives);
     return analysisConfig;
   }
 }

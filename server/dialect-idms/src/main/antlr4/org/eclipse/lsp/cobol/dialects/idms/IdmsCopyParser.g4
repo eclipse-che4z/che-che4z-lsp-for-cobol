@@ -56,7 +56,7 @@ copyIdmsOptions
     : (RECORD copyIdmsSource versionClause? (REDEFINES cobolWord)?) |
     (FILE copyIdmsSource versionClause?) |
     ((MAP | MAP_CONTROL) copyIdmsSource) |
-    (MODULE? copyIdmsSource versionClause?)
+    ((MODULE | LR)? copyIdmsSource versionClause?)
     ;
 
 copyIdmsSource
@@ -128,7 +128,7 @@ cobolCompilerDirectivesKeywords
     | INEXIT | INITCHECK | INITIAL | INL | INLINE | INTDATE | INVD | INVDATA | INX
     | JA | JAPANESE | JP
     | LANG | LANGUAGE | LAX | LAXPERF | LAXREDEF | LC | LIBEXIT | LIBX | LILIAN | LINECOUNT | LIST | LM | LONGMIXED
-    | LONGUPPER | LP | LU | LXPRF | LXRDF
+    | LONGUPPER | LP | LR | LU | LXPRF | LXRDF
     | M_CHAR | MAP | MAXPCF | MD | MDECK | MIG | MIXED | MSG | MSGEXIT | MSGX
     | N_CHAR | NAME | NAT | NATIONAL | NC | ND | NOADATA | NOADEXIT | NOADV | NOADX | NOALIAS | NOALPHNUM | NOAWO | NOBIN
     | NOBLOCK0 | NOC | NOCICS | NOCLEANSIGN | NOCOMPILE | NOCOPYLOC | NOCOPYRIGHT | NOCPLC | NOCPYR | NOCS | NOCURR

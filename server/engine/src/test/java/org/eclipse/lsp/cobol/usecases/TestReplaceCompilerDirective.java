@@ -20,8 +20,13 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Range;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /** Test the REPLACE compiler directive. */
@@ -170,4 +175,271 @@ class TestReplaceCompilerDirective {
         Collections.emptyList(),
         AnalysisConfig.defaultConfig(CopybookProcessingMode.ENABLED));
   }
+
+  public static final String TEXT6 =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.                                    \n"
+          + "               REPLACE ==     '000 000'      == BY ====. \n"
+          + "       PROCEDURE              {'000 000'^''} DIVISION.        \n"
+          + "               EXIT PROGRAM. ";
+
+  @Test
+  void testReplace_1() {
+    UseCaseEngine.runTest(TEXT6, ImmutableList.of(), ImmutableMap.of(), Collections.emptyList());
+  }
+
+  public static final String TEXT_MULTI_REPLACE_ON_OFF =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.        \n"
+          + "       WORKING-STORAGE SECTION.                            \n"
+          + "       01  {$*TEST-VAR-1}.\n"
+          + "       REPLACE ==:PFX:==  BY ==BLQ1==.\n"
+          + "           COPY {~CPY1}.\n"
+          + "           REPLACE OFF.\n"
+          + "       01  {$*TEST-VAR-2}.\n"
+          + "           REPLACE ==:PFX:== BY ==BPP1==.\n"
+          + "           COPY {~CPY1}.\n"
+          + "           REPLACE OFF.\n"
+          + "       REPLACE OFF.           \n"
+          + "       PROCEDURE DIVISION.       \n"
+          + "           DISPLAY {$BLQ1-PARM-AREA}.  \n"
+          + "           DISPLAY {$BPP1-PARM-AREA}.  \n"
+          + "               EXIT PROGRAM.            ";
+
+  public static final String CPY1_CONTENT =
+      "           05  {$*:PFX:-PARM-AREA`->BLQ1-PARM-AREA`->BPP1-PARM-AREA}.\n"
+          + "            07 "
+          + " {$*:PFX:-COMMON-LINKAGE`->BLQ1-COMMON-LINKAGE`->BPP1-COMMON-LINKAGE}.\n"
+          + "               10 "
+          + " {$*:PFX:-CALLING-PROGRAM`->BLQ1-CALLING-PROGRAM`->BPP1-CALLING-PROGRAM}          PIC "
+          + " X(08).";
+
+  @Test
+  void test_whenMultiCopybookUsedWithReplacePattern_thenResolutionWorksOnReplaceRange() {
+    UseCaseEngine.runTest(
+        TEXT_MULTI_REPLACE_ON_OFF,
+        ImmutableList.of(new CobolText("CPY1", CPY1_CONTENT)),
+        ImmutableMap.of(),
+        Collections.emptyList());
+  }
+
+  public static final String TEXT_PSEUDO_TEXT_ENDS_WITH_EQUAL_CHAR =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. PGMNAME.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "          replace ==abcd== by ==abcd==   ==asdf=== by ==abcd==.\n"
+          + "          01 {$*ASDF=^abcd}.\n"
+          + "                05 {$*abcd1} pic x.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$abcd}.\n"
+          + "               EXIT PROGRAM.\n";
+
+  @Test
+  void testReplace_whenPseudoTextEndsWithEqualChars() {
+    UseCaseEngine.runTest(
+        TEXT_PSEUDO_TEXT_ENDS_WITH_EQUAL_CHAR,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        Collections.emptyList());
+  }
+
+  public static final String TEXT11 =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.        \n"
+          + "       WORKING-STORAGE SECTION.                            \n"
+          + "       01  {$*TEST-VAR-1}.\n"
+          + "       REPLACE ==:PFX:==  BY ==BL==.\n"
+          + "           COPY {~CPY1}.\n"
+          + "           COPY {~SOME1}.\n"
+          + "           REPLACE OFF.\n"
+          + "       01  {$*TEST-VAR-2}.\n"
+          + "           REPLACE ==:PFX:== BY ==BP==.\n"
+          + "           COPY {~CPY1}.\n"
+          + "           COPY {~SOME1}.\n"
+          + "           REPLACE OFF.\n"
+          + "       REPLACE OFF.           \n"
+          + "       PROCEDURE DIVISION.       \n"
+          + "           display  {$BP-PARAMETERS} of {$TEST-VAR-2} .\n"
+          + "           display {$BL-PARM-AREA} of {$BL-PARAMETERS}.\n"
+          + "               EXIT PROGRAM.   ";
+  public static final String CPY1_TEXT =
+      "           05  {$*:PFX:-PARM-AREA`->BL-PARM-AREA`->BP-PARM-AREA}.\n"
+          + "            07  {$*:PFX:-COMMON-LINKAGE`->BL-COMMON-LINKAGE`->BP-COMMON-LINKAGE}.\n"
+          + "               10  {$*:PFX:-CALLING-PROGRAM`->BL-CALLING-PROGRAM`->BP-CALLING-PROGRAM}"
+          + "          PIC  X(08).";
+
+  public static final String SOME1_TEXT =
+      "         05  {$*:PFX:-PARAMETERS`->BL-PARAMETERS`->BP-PARAMETERS}.\n"
+          + "           10 "
+          + " {$*:PFX:-INPUT-PARAMETERS`->BL-INPUT-PARAMETERS`->BP-INPUT-PARAMETERS}.\n"
+          + "              15  {$*:PFX:-REQUEST-CODE`->BL-REQUEST-CODE`->BP-REQUEST-CODE}         "
+          + " PIC X(01).\n"
+          + "                  88 {$*:PFX:-RET-BY-SEC`->BL-RET-BY-SEC`->BP-RET-BY-SEC}        "
+          + " VALUE 'S'.\n"
+          + "              15  {$*:PFX:-SEC-DETAIL`->BL-SEC-DETAIL`->BP-SEC-DETAIL}.\n"
+          + "                 20 {$*:PFX:-SEC-CATEGORY`->BL-SEC-CATEGORY`->BP-SEC-CATEGORY}       "
+          + " PIC X(02).\n"
+          + "                     COPY {~CCPY2}.\n"
+          + "                 20 {$*:PFX:-SEC-LOC-STREET`->BL-SEC-LOC-STREET`->BP-SEC-LOC-STREET}  "
+          + "    PIC X(40).";
+
+  public static final String CCPY2_TEXT =
+      "           20  {$*:PFX:-PARM-AREA`->BL-PARM-AREA`->BP-PARM-AREA} pic x.\n";
+
+  @Test
+  void testReplaceIsPropagatedToTheCopybooks() {
+    UseCaseEngine.runTest(
+        TEXT11,
+        ImmutableList.of(
+            new CobolText("CPY1", CPY1_TEXT),
+            new CobolText("SOME1", SOME1_TEXT),
+            new CobolText("CCPY2", CCPY2_TEXT)),
+        ImmutableMap.of());
+  }
+
+  public static final String TEXT12 =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.        \n"
+          + "       WORKING-STORAGE SECTION.                            \n"
+          + "       01  {$*TEST-VAR-1}.\n"
+          + "       REPLACE ==:PF:==  BY ==BL==.\n"
+          + "           COPY {~CPY1} REPLACING ==:PFX:== BY ==:PF:==.\n"
+          + "           REPLACE OFF.\n"
+          + "       REPLACE OFF.           \n"
+          + "       PROCEDURE DIVISION.       \n"
+          + "                  display {$BL-PARM-AREA} of {$TEST-VAR-1}.\n"
+          + "               EXIT PROGRAM.   ";
+
+  public static final String CPY1_TEXT12 =
+      "           05  {$*:PFX:-PARM-AREA`->BL-PARM-AREA}.\n"
+          + "            07  {$*:PFX:-COMMON-LINKAGE`->BL-COMMON-LINKAGE}.\n"
+          + "               10  {$*:PFX:-CALLING-PROGRAM`->BL-CALLING-PROGRAM}"
+          + "          PIC  X(08).";
+
+  @Test
+  void testReplaceClauseChangesReplacingClauseOfCopyDirective() {
+    UseCaseEngine.runTest(
+        TEXT12, ImmutableList.of(new CobolText("CPY1", CPY1_TEXT12)), ImmutableMap.of());
+  }
+
+  public static final String TEXT13 =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.        \n"
+          + "       WORKING-STORAGE SECTION.                            \n"
+          + "       01  {$*TEST-VAR-1}.\n"
+          + "       REPLACE ==:PFX:==  BY ==BL==.\n"
+          + "           COPY {~CPY1} REPLACING ==:PFX:== BY ==JARA==.\n"
+          + "           REPLACE OFF.\n"
+          + "       REPLACE OFF.           \n"
+          + "       PROCEDURE DIVISION.       \n"
+          + "                  display {$JARA-PARM-AREA} of {$TEST-VAR-1}.\n"
+          + "               EXIT PROGRAM.   ";
+
+  public static final String CPY1_TEXT13 =
+      "           05  {$*:PFX:-PARM-AREA`->JARA-PARM-AREA}.\n"
+          + "            07  {$*:PFX:-COMMON-LINKAGE`->JARA-COMMON-LINKAGE}.\n"
+          + "               10  {$*:PFX:-CALLING-PROGRAM`->JARA-CALLING-PROGRAM}"
+          + "          PIC  X(08).";
+
+  @Test
+  void testCopyDirectiveReplacingHasHigherPriorityThenReplaceClause() {
+    UseCaseEngine.runTest(
+        TEXT13, ImmutableList.of(new CobolText("CPY1", CPY1_TEXT13)), ImmutableMap.of());
+  }
+
+  public static final String TEXT14 =
+      "       IDENTIFICATION DIVISION.    \n"
+          + "       PROGRAM-ID. PGMNAME.        \n"
+          + "       DATA DIVISION.              \n"
+          + "       WORKING-STORAGE SECTION.    \n"
+          + "       COPY {~CPY1}.                 \n"
+          + "       PROCEDURE DIVISION.         \n"
+          + "               DISPLAY {$PREFIX-TEXT}.\n"
+          + "               EXIT PROGRAM. ";
+
+  public static final String CPY1_TEXT14 =
+      "       COPY {~COPY2} REPLACING ==:PFX2:== BY ==:PFX1:==. ";
+  public static final String COPY2_TEXT14 =
+      "       REPLACE ==:PFX1:== BY ==PREFIX==.              \n"
+          + "       01 {$*:PFX2:-TEXT^PREFIX-TEXT} PIC X. ";
+
+  @Test
+  void testReplaceWithReplacingScenario1() {
+    UseCaseEngine.runTest(
+        TEXT14,
+        ImmutableList.of(new CobolText("CPY1", CPY1_TEXT14), new CobolText("COPY2", COPY2_TEXT14)),
+        ImmutableMap.of());
+  }
+
+  // TODO: Add use case test scenario
+  // 1. Add support in usecase test engine
+  // 2. Diagnostics - IGYDS1082-E A period was required. is wrong and should be fixed.
+  public static final String TEXT7_ERROR =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.                                    \n"
+          + "               REPLACE ==     '000  000'      == BY ====.\n"
+          + "       PROCEDURE              '000 000' DIVISION.        \n"
+          + "               EXIT PROGRAM. ";
+
+  public static final String TEXT8_ERROR =
+      "       IDENTIFICATION DIVISION.                          \n"
+          + "       PROGRAM-ID. PGMNAME.                              \n"
+          + "       ENVIRONMENT DIVISION.                             \n"
+          + "       DATA DIVISION.                                    \n"
+          + "               REPLACE ==     '000 000'      == BY ====. \n"
+          + "       PROCEDURE              '000                       \n"
+          + "                                   000' DIVISION.        \n"
+          + "               EXIT PROGRAM.  ";
+
+  public static final String TEXT9 =
+      "       IDENTIFICATION DIVISION.                         \n"
+          + "       PROGRAM-ID. PGMNAME.                             \n"
+          + "       ENVIRONMENT DIVISION.                            \n"
+          + "       DATA DIVISION.                                   \n"
+          + "               REPLACE ==     {'|1}000                      \n"
+          + "                                   000{'|2}      == BY ====.\n"
+          + "       PROCEDURE              {_{'|3}000                      \n"
+          + "                                   000{'|4}^''_} DIVISION.       \n"
+          + "               EXIT PROGRAM. ";
+
+  @Disabled(
+      "2 reason. i.) fix diagnostics as these are unexpected. ii.) Add support for usecase tests")
+  @Test
+  void testReplace_2() {
+    Diagnostic diagnostic =
+        new Diagnostic(
+            new Range(),
+            "IGYDS1082-E A period was required.",
+            DiagnosticSeverity.Error,
+            ErrorSource.PREPROCESSING.getText());
+    UseCaseEngine.runTest(
+        TEXT9,
+        ImmutableList.of(),
+        ImmutableMap.of("1", diagnostic, "2", diagnostic, "3", diagnostic, "4", diagnostic));
+  }
+
+  public static final String TEXT10 =
+      "       IDENTIFICATION DIVISION.                              \n"
+          + "       PROGRAM-ID. PGMNAME.                                  \n"
+          + "       ENVIRONMENT DIVISION.                                 \n"
+          + "       DATA DIVISION.                                        \n"
+          + "               REPLACE ==     '000                           \n"
+          + "                       000'      == BY ====.                 \n"
+          + "       PROCEDURE              '000                           \n"
+          + "                                               000' DIVISION.\n"
+          + "               EXIT PROGRAM.      ";
 }

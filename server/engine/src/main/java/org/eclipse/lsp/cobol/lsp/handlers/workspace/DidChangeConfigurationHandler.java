@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.utils.LogLevelUtils;
+import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.service.WatcherService;
@@ -46,6 +47,7 @@ public class DidChangeConfigurationHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final CodeLayoutStore codeLayoutStore;
   private final CopybookService copybookService;
+  private final ErrorFinalizerService errorFinalizerService;
 
   @Inject
   public DidChangeConfigurationHandler(
@@ -58,7 +60,8 @@ public class DidChangeConfigurationHandler {
       MessageService messageService,
       AsyncAnalysisService asyncAnalysisService,
       CodeLayoutStore codeLayoutStore,
-      CopybookService copybookService) {
+      CopybookService copybookService,
+      ErrorFinalizerService errorFinalizerService) {
     this.disposableLSPStateService = disposableLSPStateService;
     this.settingsService = settingsService;
     this.copybookNameService = copybookNameService;
@@ -69,6 +72,7 @@ public class DidChangeConfigurationHandler {
     this.asyncAnalysisService = asyncAnalysisService;
     this.codeLayoutStore = codeLayoutStore;
     this.copybookService = copybookService;
+    this.errorFinalizerService = errorFinalizerService;
   }
 
   /**
@@ -101,6 +105,9 @@ public class DidChangeConfigurationHandler {
     settingsService
         .fetchConfiguration(COBOL_PROGRAM_LAYOUT.label)
         .thenAccept(codeLayoutStore.updateCodeLayout());
+    settingsService
+        .fetchConfiguration(ANALYSIS_MODE.label)
+        .thenAccept(errorFinalizerService::updateDiagnosticsLevel);
     copybookNameService.collectLocalCopybookNames();
     keywords.updateStorage();
   }

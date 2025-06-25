@@ -20,7 +20,6 @@ import static org.eclipse.lsp.cobol.core.CobolPreprocessor.*;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -31,13 +30,11 @@ import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
-import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.GrammarPreprocessor;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.PreprocessorContext;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacementContext;
-import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacementHelper;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
 import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 
@@ -54,11 +51,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   private final List<SyntaxError> errors = new ArrayList<>();
 
   private final CopybookProcessingMode copybookConfig;
-  private final MessageService messageService;
   private final CopybookPreprocessorService preprocessorService;
-  private final ReplacingService replacingService;
-
-  private List<ReplacementContext> replacementContext;
 
   @Inject
   GrammarPreprocessorListenerImpl(
@@ -69,7 +62,6 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
       MessageService messageService,
       ReplacingService replacingService) {
     this.copybookConfig = context.getCopybookProcessingMode();
-    this.messageService = messageService;
     this.preprocessorService =
         new CopybookPreprocessorService(
             context.getProgramDocumentUri(),
@@ -81,8 +73,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
             context.getHierarchy(),
             messageService,
             replacingService,
-            preprocessor);
-    this.replacingService = replacingService;
+            preprocessor,
+            context.getLanguageId());
   }
 
   /**
@@ -122,9 +114,8 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
               .errorSource(ErrorSource.EXTENDED_DOCUMENT)
               .location(preprocessorService.retrieveLocality(ctx).toOriginalLocation())
               .severity(ERROR)
-              .suggestion(
-                  messageService.getMessage(
-                      "GrammarPreprocessorListener.langMissingEnterDirective"))
+              .messageTemplate(
+                  MessageTemplate.of("GrammarPreprocessorListener.langMissingEnterDirective"))
               .build();
       LOG.debug("Syntax error by exitEnterDirective: {}", error);
       errors.add(error);
@@ -144,8 +135,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    preprocessorService.addCopybook(
-        ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_10, replacementContext);
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_10);
   }
 
   @Override
@@ -154,8 +144,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    preprocessorService.addCopybook(
-        ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8);
   }
 
   @Override
@@ -164,8 +153,7 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   @Override
   public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
     if (requiresEarlyReturn(ctx)) return;
-    preprocessorService.addCopybook(
-        ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8, replacementContext);
+    preprocessorService.addCopybook(ctx, ctx.copySource(), MAX_COPYBOOK_NAME_LENGTH_8);
   }
 
   private boolean requiresEarlyReturn(ParserRuleContext ctx) {
@@ -180,25 +168,5 @@ public class GrammarPreprocessorListenerImpl extends CobolPreprocessorBaseListen
   public void enterEveryRule(ParserRuleContext ctx) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     super.enterEveryRule(ctx);
-  }
-
-  @Override
-  public void enterReplaceAreaStartOrOffStatement(ReplaceAreaStartOrOffStatementContext ctx) {
-    Locality locality = preprocessorService.retrieveLocality(ctx);
-    if (!ctx.replacePseudoText().isEmpty()) {
-      replacementContext =
-          ctx.replacePseudoText().stream()
-              .map(ReplacementHelper::createClause)
-              .map(c -> replacingService.retrievePseudoTextReplacingPattern(c, locality))
-              .map(r -> r.unwrap(errors::addAll))
-              .map(r -> new ReplacementContext(r, locality))
-              .collect(Collectors.toList());
-    }
-
-    if (ctx.OFF() != null) {
-      replacementContext = null;
-    }
-
-    preprocessorService.replaceWithSpaces(ctx);
   }
 }

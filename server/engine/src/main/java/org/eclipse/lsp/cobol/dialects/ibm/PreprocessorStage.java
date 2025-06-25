@@ -79,7 +79,8 @@ public class PreprocessorStage
             extendedDocument,
             ctx.getConfig().getCopybookProcessingMode(),
             new CopybookHierarchy(),
-            new CopybooksRepository());
+            new CopybooksRepository(),
+            ctx.getLanguageId());
 
     CopybooksRepository copybooks =
         grammarPreprocessor.preprocess(context, preprocessor).unwrap(preprocessorErrors::addAll);

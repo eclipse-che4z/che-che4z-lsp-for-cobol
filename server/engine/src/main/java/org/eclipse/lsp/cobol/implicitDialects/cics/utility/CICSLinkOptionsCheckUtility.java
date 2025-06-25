@@ -51,8 +51,11 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSLinkOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSLinkOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -82,16 +85,16 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
   private void checkLinkProgram(CICSParser.Cics_link_programContext ctx) {
     checkHasMandatoryOptions(ctx.PROGRAM(), ctx, "PROGRAM");
     checkHasMutuallyExclusiveOptions("COMMAREA or CHANNEL", ctx.COMMAREA(), ctx.CHANNEL());
-    if (!ctx.LENGTH().isEmpty() || !ctx.DATALENGTH().isEmpty()) {
+    if (!ctx.DATALENGTH().isEmpty()) {
       checkHasMandatoryOptions(ctx.COMMAREA(), ctx, "COMMAREA");
     }
-    if (!ctx.INPUTMSGLEN().isEmpty()) {
-      checkHasMandatoryOptions(ctx.INPUTMSG(), ctx, "INPUTMSG");
-    }
+
     checkHasMutuallyExclusiveOptions("INPUTMSG or SYSID", ctx.INPUTMSG(), ctx.SYSID());
     checkHasMutuallyExclusiveOptions(
         "INPUTMSG or SYNCONRETURN", ctx.INPUTMSG(), ctx.SYNCONRETURN());
     checkHasMutuallyExclusiveOptions("INPUTMSG or TRANSID", ctx.INPUTMSG(), ctx.TRANSID());
+    checkOptionalWithLength(ctx.INPUTMSG(), ctx.INPUTMSGLEN(), ctx, "INPUTMSG", "INPUTMSGLEN");
+    checkOptionalWithLength(ctx.COMMAREA(), ctx.LENGTH(), ctx, "COMMAREA", "LENGTH");
   }
 
   private void checkLinkAcqprocess(CICSParser.Cics_link_acqprocessContext ctx) {

@@ -189,6 +189,7 @@ public class TestCicsSendStatement {
   private static final String SEND_TEXT_NOEDIT_TERMINAL_PAGING_WAIT_LAST_REQID_L80_INVALID =
       "SEND {_TEXT NOEDIT {TERMINAL|error2} {PAGING|error3} WAIT LAST REQID({$varOne})"
           + " L80|error1_}";
+  private static final String SEND_FROM_TRANS_NOLENGTH_INVALID = "SEND {_FROM({$varOne})|error_}";
 
   @Test
   void testSendFromLengthValid() {
@@ -896,5 +897,19 @@ public class TestCicsSendStatement {
                 "Exactly one option required, options are mutually exclusive: TERMINAL or PAGING",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSendNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        SEND_FROM_TRANS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: LENGTH or FLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

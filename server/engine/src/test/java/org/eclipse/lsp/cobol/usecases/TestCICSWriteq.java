@@ -51,6 +51,8 @@ public class TestCICSWriteq {
 
   private static final String WRITEQ_TS_INVALID_TWO =
       "WRITEQ TS QUEUE({$varOne}) FROM({$varTwo}) {AUXILIARY|errorOne} {MAIN|errorTwo}";
+  private static final String WRITEQ_TS_NOLENGTH_INVALID =
+      "WRITEQ {_TS QUEUE({$varOne}) FROM({$varTwo})|error_}";
 
   @Test
   void testWriteqTdValidOne() {
@@ -134,5 +136,19 @@ public class TestCICSWriteq {
                 "Exactly one option required, options are mutually exclusive: AUXILIARY or MAIN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testOperatorNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        WRITEQ_TS_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: LENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
   }
 }

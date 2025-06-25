@@ -41,8 +41,10 @@ public class CICSSpoolreadOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
       };
 
   public CICSSpoolreadOptionsCheckUtility(
-      DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -61,5 +63,6 @@ public class CICSSpoolreadOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private void checkSpoolread(CICSParser.Cics_spoolread_optionsContext ctx) {
     checkHasMandatoryOptions(ctx.TOKEN(), ctx, "TOKEN");
     checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO");
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.MAXFLENGTH(), ctx, "MAXFLENGTH");
   }
 }

@@ -64,8 +64,11 @@ public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSSignonOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS);
+  public CICSSignonOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, params);
   }
 
   /**
@@ -95,10 +98,10 @@ public class CICSSignonOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkMutuallyExclusiveOptions("PASSWORD or PHRASE", ctx.PASSWORD(), ctx.PHRASE());
 
     checkPrerequisiteIsMet(ctx.PASSWORD(), ctx.NEWPASSWORD(), ctx, "NEWPASSWORD without PASSWORD");
-    checkPrerequisiteIsMet(ctx.PHRASE(), ctx.PHRASELEN(), ctx, "PHRASELEN without PHRASE");
     checkPrerequisiteIsMet(ctx.PHRASE(), ctx.NEWPHRASE(), ctx, "NEWPHRASE without PHRASE");
     checkPrerequisiteIsMet(
         ctx.NEWPHRASE(), ctx.NEWPHRASELEN(), ctx, "NEWPHRASELEN without NEWPHRASE");
+    checkOptionalWithLength(ctx.PHRASE(), ctx.PHRASELEN(), ctx, "PHRASE", "PHRASELEN");
   }
 
   private void checkToken(CICSParser.Cics_signon_token_bodyContext ctx) {

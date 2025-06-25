@@ -29,9 +29,9 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSParser;
 /** Checks CICS CSD System Command rules for required and invalid options */
 public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
+  public static final int RULE_INDEX = RULE_cics_csd;
   private static final String MISSING_ATTRBUTES_OR_SET =
       "Missing required option for ATTRLEN: ATTRIBUTES or SET";
-  public static final int RULE_INDEX = RULE_cics_csd;
   private static final String CVDA_OPTS =
       "RESTYPE or ATOMSERVICE or BUNDLE or CONNECTION or CORBASERVER or DB2CONN or DB2ENTRY or"
           + " DB2TRAN or DJAR or DOCTEMPLATE or DUMPCODE or ENQMODEL or FILE or IPCONN or"
@@ -140,8 +140,11 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         }
       };
 
-  public CICSCsdSpOptionsCheckUtility(DialectProcessingContext context, List<SyntaxError> errors) {
-    super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS);
+  public CICSCsdSpOptionsCheckUtility(
+      DialectProcessingContext context,
+      List<SyntaxError> errors,
+      CICSCheckUtilityParameters params) {
+    super(context, errors, DUPLICATE_CHECK_OPTIONS, DUPLICATE_RULE_OPTIONS, params);
   }
 
   /**
@@ -231,6 +234,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMutuallyExclusiveOptions(
         "NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
     checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+    if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
   private void checkAppend(CICSParser.Cics_csd_appendContext ctx) {
@@ -296,6 +300,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
+    else if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
   private void checkInquireGroup(CICSParser.Cics_csd_inquiregroupContext ctx) {
@@ -319,6 +324,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     }
     if (ctx.ATTRIBUTES().isEmpty())
       checkAllOptionsArePresentOrAbsent("SET, ATTRLEN", ctx, ctx.SET(), ctx.ATTRLEN());
+    else if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.ATTRLEN(), ctx, "ATTRLEN");
   }
 
   private void checkInstall(CICSParser.Cics_csd_installContext ctx) {
@@ -368,7 +374,7 @@ public class CICSCsdSpOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkHasMandatoryOptions(ctx.RESID(), ctx, "RESID");
     checkHasMutuallyExclusiveOptions(
         "NOCOMPAT or COMPATMODE or COMPAT", ctx.NOCOMPAT(), ctx.COMPATMODE(), ctx.COMPAT());
-    checkPrerequisiteIsMet(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRLEN without ATTRIBUTES");
     checkHasMandatoryOptions(ctx.cics_csd_cvda(), ctx, CVDA_OPTS);
+    checkOptionalWithLength(ctx.ATTRIBUTES(), ctx.ATTRLEN(), ctx, "ATTRIBUTES", "ATTRLEN");
   }
 }
