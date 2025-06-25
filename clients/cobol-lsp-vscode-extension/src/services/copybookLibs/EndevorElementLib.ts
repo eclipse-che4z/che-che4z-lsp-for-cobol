@@ -3,7 +3,6 @@ import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
 import { ENVIRONMENT } from "../../constants";
 import { CopybookLibs, EndevorConfigModel } from "../ProcessorGroupsLoader";
-import { EndevorElement } from "../../type/e4eApi";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
 
@@ -25,25 +24,27 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
   async resolveCopybookUri(copybookName: string, documentUri: Uri) {
     const profile = await this.getProfile(documentUri);
 
-    if (!(await this.configCheck(documentUri))) {
+    if (!this.configCheck(documentUri)) {
       return;
     }
 
     if (profile) {
-      const element: EndevorElement = {
+      const elements = await externalApis.e4eDownloader?.getElements(profile, {
         use_map: this.config.use_map === false ? false : true,
         environment: this.config.environment,
         stage: this.config.stage,
         system: this.config.system,
         subsystem: this.config.subsystem,
         type: this.config.type,
-        element: copybookName.toUpperCase(),
-        fingerprint: "",
-      };
-      const foundElement = await externalApis.e4eDownloader?.hasElement(
-        profile,
-        element,
-        copybookName,
+      });
+
+      if (elements instanceof Error) {
+        return;
+      }
+
+      copybookName = copybookName.toUpperCase();
+      const foundElement = elements?.find(
+        (x) => x.element.toUpperCase() == copybookName,
       );
 
       if (foundElement) {
@@ -51,14 +52,13 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
           externalApis.e4eDownloader?.downloadElementE4E(profile, foundElement);
       }
     }
-    return;
   }
 
   async listCopybooks(
     documentUri: Uri,
     _outputChannel?: OutputChannel,
   ): Promise<string[]> {
-    if (!(await this.configCheck(documentUri))) {
+    if (!this.configCheck(documentUri)) {
       return [];
     }
 

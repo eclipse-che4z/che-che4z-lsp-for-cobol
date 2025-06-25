@@ -5,15 +5,13 @@ import { externalApis, missingExtension } from "../ExternalAPIsService";
 export abstract class EndevorLib {
   constructor(protected profile?: string) {}
 
-  protected async configCheck(documentUri: vscode.Uri) {
+  protected configCheck(documentUri: vscode.Uri) {
     if (!externalApis.e4eDownloader) {
       missingExtension(documentUri, "Explorer for Endevor is not installed");
       return false;
     }
 
-    return !!(await externalApis.e4eDownloader.getE4EConfig(
-      documentUri.toString(),
-    ));
+    return true;
   }
 
   protected async getProfile(

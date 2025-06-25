@@ -24,17 +24,25 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
   }
 
   async resolveCopybookUri(copybookName: string, documentUri: Uri) {
-    if (!(await this.configCheck(documentUri))) {
+    if (!this.configCheck(documentUri)) {
       return;
     }
 
     const profile = await this.getProfile(documentUri);
 
     if (profile) {
-      const foundMember = await externalApis.e4eDownloader?.hasMember(
+      const members = await externalApis.e4eDownloader?.getMembers(
         profile,
         this.config.dataset,
-        copybookName,
+      );
+
+      if (members instanceof Error) {
+        return;
+      }
+
+      copybookName = copybookName.toUpperCase();
+      const foundMember = members?.find(
+        (member) => member.member.toUpperCase() === copybookName,
       );
 
       if (foundMember) {
@@ -42,22 +50,17 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
           externalApis.e4eDownloader?.downloadDatasetE4E(profile, foundMember);
       }
     }
-    return;
   }
 
   async listCopybooks(
     documentUri: Uri,
     _outputChannel?: OutputChannel,
   ): Promise<string[]> {
-    if (!(await this.configCheck(documentUri))) {
+    if (!this.configCheck(documentUri)) {
       return [];
     }
     const profile = await this.getProfile(documentUri);
     if (profile) {
-      if (!(await this.configCheck(documentUri))) {
-        return [];
-      }
-
       const list = await externalApis.e4eDownloader?.getMembers(
         profile,
         this.config.dataset,

@@ -423,32 +423,6 @@ export class CopybookDownloaderForE4E {
     return profile;
   }
 
-  public async hasElement(
-    profile: ResolvedProfile,
-    endevorType: EndevorType,
-    elementName: string,
-  ) {
-    const members = await this.getElements(profile, endevorType);
-    if (members instanceof Error) {
-      return;
-    }
-    elementName = elementName.toUpperCase();
-    return members.find((x) => x.element.toUpperCase() == elementName);
-  }
-
-  public async hasMember(
-    profile: ResolvedProfile,
-    dataset: string,
-    memberName: string,
-  ) {
-    const members = await this.getMembers(profile, dataset);
-    if (members instanceof Error) {
-      return;
-    }
-    memberName = memberName.toUpperCase();
-    return members.find((member) => member.member.toUpperCase() === memberName);
-  }
-
   public clearProfiles() {
     this.E4EProfiles.clear();
   }
