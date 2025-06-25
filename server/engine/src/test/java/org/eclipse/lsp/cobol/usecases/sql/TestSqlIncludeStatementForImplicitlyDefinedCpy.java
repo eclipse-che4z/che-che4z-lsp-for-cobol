@@ -280,7 +280,8 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         analysisConfig);
   }
 
-  // Test of purposefully invalid code to ascertain that disabling SQL processing truly skips everything within the
+  // Test of purposefully invalid code to ascertain that disabling SQL processing truly skips
+  // everything within the
   // EXEC block.
   @Test
   void testSkipSql2() {

@@ -73,7 +73,8 @@ public class Db2SqlDialect implements CobolDialect {
   @Override
   public ResultWithErrors<DialectOutcome> processText(DialectProcessingContext context) {
     boolean isSqlProcessingEnabled = getSqlProcessingEnabled(context);
-    Db2SqlVisitor db2SqlVisitor = new Db2SqlVisitor(context, messageService, copybookService);
+    Db2SqlVisitor db2SqlVisitor =
+        new Db2SqlVisitor(context, messageService, copybookService, isSqlProcessingEnabled);
 
     List<SyntaxError> parseError = new ArrayList<>();
 
@@ -92,7 +93,7 @@ public class Db2SqlDialect implements CobolDialect {
     nodes.addAll(context.getDialectNodes());
 
     // Add error encountered while visiting the parser. To be reported to COBOL LS engine.
-    if (isSqlProcessingEnabled) parseError.addAll(db2SqlVisitor.getErrors());
+    parseError.addAll(db2SqlVisitor.getErrors());
 
     return new ResultWithErrors<>(new DialectOutcome(nodes, context), parseError);
   }
