@@ -22,6 +22,7 @@ import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
@@ -174,7 +175,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_NOJAVA64_JAVA64_VALID =
-      "       CBL JAVAIOP(NOJAVA64, JAVA64)\n"
+      "       CBL JAVAIOP(NOJAVA64,JAVA64)\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -185,7 +186,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_JVMI_VALID =
-      "       CBL JAVAIOP(JVMI('-Djava.library.path=.'), NOJVMI)\n"
+      "       CBL JAVAIOP(JVMI('-Djava.library.path=.'),NOJVMI)\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -196,7 +197,18 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_OUTPATH_JVMI_VALID =
-      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir'), JVMI('-Xms512m'))\n"
+      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir'),JVMI('-Xms512m'))\n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       >>JAVA-SHAREABLE ON\n"
+          + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           GOBACK.\n";
+
+  private static final String TEXT_SETTING_OUTPATH_JVMI_INVALID =
+      "       CBL JAVAIOP(OUTPATH('/a/folder/compdir'),{|error1} JVMI('-Xms512m'))\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -513,6 +525,21 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   @Test
   void testSettingOutPathJvmiValid() {
     UseCaseEngine.runTest(TEXT_SETTING_OUTPATH_JVMI_VALID, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testSettingOutPathJvmiInvalid() {
+    UseCaseEngine.runTest(
+        TEXT_SETTING_OUTPATH_JVMI_INVALID,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(new Position(0, 48), new Position(0, 49)),
+                "No space allowed.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
   }
 
   @Test
