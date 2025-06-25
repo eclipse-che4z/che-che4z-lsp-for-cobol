@@ -130,7 +130,7 @@ COBOL Language Support processes dialects in the order you list them in the **Co
 
 ### SQL Backend Server
 
-Set the SQL backend server as either DB2 or Datacom to ensure you use the correct version of the implicit `SQLCA` and `SQLDA` copybooks. To set the SQL backend server, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: Target-sql-backend**. The default setting is DB2.
+Set the SQL backend server as either DB2 or Datacom to ensure you use the correct version of the implicit `SQLCA` and `SQLDA` copybooks. To set the SQL backend server, go to **VS Code Settings** > **User** > **Extensions** > **COBOL Language Support** > **Cobol-lsp: SQL.Target-backend**. The default setting is DB2.
 
 ## Subroutine Support
 
@@ -300,7 +300,7 @@ The SQL backend preprocessor is used to override the SQL server that you specify
 
 - **"name":** (string)
     - Specify **SQL**
-- **"target-sql-backend":** (string)
+- **"sql.target-backend":** (string)
     - Specify either **DB2_SERVER** or **DATACOM_SERVER**
 	
 #### Dialect Preprocessor
@@ -392,7 +392,7 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                 }, 
                 {
                     "name": "SQL",
-                    "target-sql-backend": "DB2_SERVER"
+                    "sql.target-backend": "DB2_SERVER"
                 }
             ],
             "libs": [

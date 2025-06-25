@@ -56,7 +56,7 @@ public class AnalysisConfig {
         false,
         true,
         ImmutableList.of(),
-        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        ImmutableMap.of("sql.target-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 
   public static AnalysisConfig defaultConfig(
@@ -68,6 +68,6 @@ public class AnalysisConfig {
         collectAstChanges,
         true,
         ImmutableList.of(),
-        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        ImmutableMap.of("sql.target-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

@@ -488,7 +488,7 @@
           ],
           "description": "The logging level for COBOL LS backend"
         },
-        "cobol-lsp.target-sql-backend": {
+        "cobol-lsp.sql.target-backend": {
           "type": "string",
           "default": "DB2_SERVER",
           "enum": [
@@ -503,7 +503,7 @@
           ],
           "description": "The target SQL backend server which is used on the mainframe"
         },
-        "cobol-lsp.enable-sql-processing": {
+        "cobol-lsp.sql.enable-processing": {
           "type": "boolean",
           "default": "true",
           "description": "Enable SQL Processing"

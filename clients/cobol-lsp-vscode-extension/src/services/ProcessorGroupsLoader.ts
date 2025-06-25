@@ -82,7 +82,7 @@ const PreprocessorModel = t.union([
       "copybook-extensions": t.array(t.string),
       "compiler-options": t.array(t.string),
       "copybook-file-encoding": t.string,
-      "target-sql-backend": t.string,
+      "sql.target-backend": t.string,
     }),
   ]),
 ]);
@@ -106,7 +106,7 @@ const ProcessorGroupModel = t.intersection([
     "copybook-extensions": t.array(t.string),
     "compiler-options": t.array(t.string),
     "copybook-file-encoding": t.string,
-    "target-sql-backend": t.string,
+    "sql.target-backend": t.string,
   }),
 ]);
 

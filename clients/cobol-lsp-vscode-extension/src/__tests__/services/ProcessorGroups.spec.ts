@@ -71,7 +71,7 @@ jest.mock("vscode", () => {
                                   },
                                   {
                                       "name": "SQL",
-                                      "target-sql-backend": "DATACOM_SERVER"
+                                      "sql.target-backend": "DATACOM_SERVER"
                                   }
                               ],
                               "libs": ["/copy"]
@@ -214,10 +214,10 @@ it("Processor groups configuration provides copybook-file-encoding", async () =>
   expect(result).toStrictEqual("UTF-8");
 });
 
-it("Processor groups configuration provides cobol-lsp.target-sql-backend", async () => {
+it("Processor groups configuration provides cobol-lsp.sql.target-backend", async () => {
   const item = {
     scopeUri: WORKSPACE_URI + "/TEST.cob",
-    section: "cobol-lsp.target-sql-backend",
+    section: "cobol-lsp.sql.target-backend",
   };
   const result = await loadProcessorGroupSqlBackendConfig(item, "");
   expect(result).toStrictEqual("DATACOM_SERVER");

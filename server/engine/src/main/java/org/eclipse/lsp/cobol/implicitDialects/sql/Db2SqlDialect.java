@@ -43,13 +43,13 @@ import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2DeclareVariableNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2ProcedureDivisionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.node.Db2WorkingAndLinkageSectionNode;
 import org.eclipse.lsp.cobol.implicitDialects.sql.processor.*;
+import org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum;
 
 /** Db2 SQL dialect */
 @Slf4j
 public class Db2SqlDialect implements CobolDialect {
   public static final String DIALECT_NAME = "db2";
-  public static final String SQL_BACKEND_SETTING = "target-sql-backend";
-  public static final String SQL_PROCESSING_ENABLED_SETTING = "enable-sql-processing";
+  public static final String SQL_BACKEND_SETTING = SettingsParametersEnum.SQL_BACKEND_SETTING.label;
 
   private final CopybookService copybookService;
   private final MessageService messageService;
@@ -175,7 +175,7 @@ public class Db2SqlDialect implements CobolDialect {
   private Optional<CopybookModel> tryResolvePredefinedCopybook(
       CopybookName copybookName, Map<String, JsonElement> dialectsSettings) {
     SQLBackend sqlBackend =
-        Optional.ofNullable(dialectsSettings.get("target-sql-backend"))
+        Optional.ofNullable(dialectsSettings.get(SQL_BACKEND_SETTING))
             .map(JsonElement::getAsString)
             .map(SQLBackend::valueOf)
             .orElse(SQLBackend.DB2_SERVER);

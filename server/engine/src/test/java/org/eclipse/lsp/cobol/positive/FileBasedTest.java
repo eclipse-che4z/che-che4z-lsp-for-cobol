@@ -210,7 +210,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
           false,
           true,
           ImmutableList.of(),
-          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+          ImmutableMap.of("sql.target-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

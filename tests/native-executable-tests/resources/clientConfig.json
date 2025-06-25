@@ -1,5 +1,5 @@
 {
-  "cobol-lsp.target-sql-backend": "DB2_SERVER",
+  "cobol-lsp.sql.target-backend": "DB2_SERVER",
   "cobol-lsp.analysis.features": [],
   "cobol-lsp.dialects": [],
   "cobol-lsp.dialect.registry": [],

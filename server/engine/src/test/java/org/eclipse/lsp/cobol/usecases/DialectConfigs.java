@@ -55,7 +55,7 @@ public class DialectConfigs {
         ImmutableMap.of(
             "daco.predefined-sections",
             new Gson().toJsonTree(list),
-            "target-sql-backend",
+            "sql.target-backend",
             new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

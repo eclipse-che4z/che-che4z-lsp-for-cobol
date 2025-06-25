@@ -150,7 +150,7 @@ export async function loadProcessorGroupSqlBackendConfig(
 ): Promise<string> {
   return loadProcessorGroupSettings(
     item.scopeUri,
-    "target-sql-backend",
+    "sql.target-backend",
     configObject,
     "SQL",
   );
@@ -287,7 +287,7 @@ type AttributeTypes = {
     | EndevorConfigModel
   )[];
   name: string;
-  "target-sql-backend": string;
+  "sql.target-backend": string;
   "compiler-options": string;
   "copybook-file-encoding": string;
   "copybook-extensions": string[];

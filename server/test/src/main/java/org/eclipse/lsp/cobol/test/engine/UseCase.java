@@ -59,7 +59,7 @@ public class UseCase {
   @Builder.Default
   Map<String, JsonElement> dialectsSettings =
       ImmutableMap.of(
-          "target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER.toString()));
+          "sql.target-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER.toString()));
 
   /** Compile options config */
   @Builder.Default List<String> compilerOptions = Collections.emptyList();
