@@ -514,9 +514,8 @@ public class TransformTreeStage
     List<ProgramNode> programs = rootNode.findPrograms();
 
     Position tokenPosition = new Position(token.getLine() - 1, token.getCharPositionInLine());
-    for (int i = 1; i < programs.size(); i++) {
-      ProgramNode nestedProgram = programs.get(i);
-      if (isPositionWithinNode(tokenPosition, nestedProgram)) {
+    for (ProgramNode program : programs) {
+      if (isNestedProgram(program) && isPositionWithinNode(tokenPosition, program)) {
         createError(
             analysisContext,
             token,
@@ -527,6 +526,17 @@ public class TransformTreeStage
       }
     }
     return true;
+  }
+
+  private boolean isNestedProgram(ProgramNode program) {
+    Node parent = program.getParent();
+    while (parent != null) {
+      if (parent instanceof ProgramNode) {
+        return true;
+      }
+      parent = parent.getParent();
+    }
+    return false;
   }
 
   private boolean isPositionWithinNode(Position position, Node node) {

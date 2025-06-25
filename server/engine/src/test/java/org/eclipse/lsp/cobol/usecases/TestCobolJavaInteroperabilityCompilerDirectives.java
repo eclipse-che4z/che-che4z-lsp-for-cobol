@@ -275,6 +275,28 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       >>JAVA-SHAREABLE ON {fdgfd|error2}\n"
           + "       01 {$*varTwo}   PIC S9 VALUE +100.";
 
+  private static final String TEXT_WITH_COPYBOOK_PGM1 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. PGM1.\n"
+          + "       DATA DIVISION.\n"
+          + "       >> JAVA-CALLABLE\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       >> JAVA-SHAREABLE ON\n"
+          + "       >> JAVA-SHAREABLE OFF\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "               EXIT PROGRAM.\n"
+          + "       END PROGRAM PGM1.\n"
+          + "       copy {~abc}.";
+
+  private static final String COPYBOOK_TEXT_PGM2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. PGM2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "               EXIT PROGRAM.\n"
+          + "       END PROGRAM PGM2.";
+
   private static final String TEXT_SHAREABLE_ON_VALID =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
@@ -559,6 +581,14 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
                 "An invalid option was found: fdgfd",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testWithCopybookError1() {
+    UseCaseEngine.runTest(
+        TEXT_WITH_COPYBOOK_PGM1,
+        ImmutableList.of(new CobolText("ABC", COPYBOOK_TEXT_PGM2)),
+        ImmutableMap.of());
   }
 
   @Test
