@@ -78,7 +78,6 @@ export async function loadProcessorGroupDialectConfig(
   item: { scopeUri: Uri },
   dialectConfig: DialectsConfiguration,
 ) {
-  // try {
   const pgCfg = await loadProcessorGroup(item.scopeUri);
   if (pgCfg === undefined || pgCfg.preprocessors == undefined) {
     return dialectConfig;
@@ -89,10 +88,6 @@ export async function loadProcessorGroupDialectConfig(
   // "SQL" is not a real dialect, we will use it only to set up sql backend for now
   const result = dialects.filter((name) => name != "SQL");
   return result.length > 0 ? result : dialectConfig;
-  // } catch (e) {
-  //   console.error(JSON.stringify(e));
-  //   return dialectConfig;
-  // }
 }
 
 function matchProcessorGroup(wsCfg: WorkspaceConfig, documentUri: Uri) {
@@ -132,59 +127,7 @@ function pathMatches(program: string, documentPath: string) {
   );
 }
 
-// export const loadProcessorsConfigForDocument = (
-//   documentUriString: string,
-//   pgroups: ProcessorGroup[],
-//   pgmCfg: ProgramsConfig,
-//   b4g: B4GTypeMetadata | undefined,
-// ): ProcessorGroup | undefined => {
-//   if (pgroups.length === 0) {
-//     return undefined;
-//   }
-//   const documentUri = Uri.parse(documentUriString);
-//   const wsUri = workspace.getWorkspaceFolder(documentUri)?.uri;
-//   if (wsUri === undefined) {
-//     return undefined;
-//   }
-//   const pgroup = selectProcessorGroup(pgmCfg, documentUri, wsUri, b4g);
-//   let result;
-//   pgroups.forEach((p) => {
-//     if (pgroup === p.name) {
-//       result = p;
-//       return;
-//     }
-//   });
-//   return result;
-// };
-
-// function selectProcessorGroup(
-//   wsCfg: WorkspaceConfig,
-//   documentUri: Uri,
-//   b4g: B4GTypeMetadata | undefined,
-// ): TransformedProcessorGroup | undefined {
-//   if (b4g === undefined) {
-//     return matchProcessorGroup(wsCfg, documentUri);
-//   }
-//   const selectedElement = b4g.fileExtension
-//     ? path.basename(documentUri.fsPath, "." + b4g.fileExtension)
-//     : path.basename(documentUri.fsPath);
-//   const processorGroupName =
-//     b4g.elements[selectedElement] === undefined
-//       ? b4g.defaultProcessorGroup
-//       : b4g.elements[selectedElement].processorGroup;
-//   return wsCfg.processorGroups[processorGroupName];
-// }
-
-// type AttributeTypes = {
-//   libs: TransformedLibs[];
-//   name: string;
-//   "target-sql-backend": string;
-//   "compiler-options": string;
-//   "copybook-file-encoding": string;
-//   "copybook-extensions": string[];
-// };
-
-async function loadProcessorGroup(documentUri: Uri) {
+export async function loadProcessorGroup(documentUri: Uri) {
   let workspaceConfig = await readEndevorConfig(documentUri);
 
   if (!workspaceConfig) {

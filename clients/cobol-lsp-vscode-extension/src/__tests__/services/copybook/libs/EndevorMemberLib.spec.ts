@@ -21,15 +21,7 @@ describe("Endevor Member Lib", () => {
         .fn()
         .mockResolvedValue(["COPYBOOK", "ANOTHER", "CaSeTeSt"]),
       getMember: jest.fn().mockResolvedValue([]),
-      getConfiguration: jest.fn().mockResolvedValue({
-        pgms: [{ pgroup: "pgroup" }],
-        pgroups: [
-          {
-            name: "pgroup",
-            libs: [{ dataset }],
-          },
-        ],
-      }),
+      getConfiguration: jest.fn(),
       onDidChangeElement: jest.fn(),
     };
 

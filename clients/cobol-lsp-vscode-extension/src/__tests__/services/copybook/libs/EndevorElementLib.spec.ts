@@ -126,7 +126,7 @@ describe("Endevor Element Lib", () => {
       });
       const document = vscode.Uri.file("/program.cbl");
       const copybooks = await lib.listCopybooks(document);
-      expect(copybooks).toEqual(["COPYBOOK", "ANOTHER"]);
+      expect(copybooks).toEqual(["COPYBOOK", "ANOTHER", "CaSeTeSt"]);
     });
   });
 });

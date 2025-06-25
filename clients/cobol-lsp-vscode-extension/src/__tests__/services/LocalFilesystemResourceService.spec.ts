@@ -32,7 +32,7 @@ describe("LocalFilesystemResourceService test", () => {
       });
   });
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   describe("listDirectory", () => {

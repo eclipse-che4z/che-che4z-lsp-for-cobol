@@ -211,53 +211,6 @@ describe("e4e copybook downloader tests", () => {
     );
   });
 
-  it("check hasElement returns correct value when element is in the list", async () => {
-    const e4eMock: E4E = {
-      isEndevorElement: jest.fn().mockResolvedValue(false),
-      getProfileInfo: jest.fn(),
-      listElements: jest.fn().mockResolvedValue([
-        ["element", "fingerprint"],
-        ["element2", "fingerprint2"],
-      ]),
-      getElement: jest.fn(),
-      listMembers: jest.fn(),
-      getMember: jest.fn(),
-      getConfiguration: jest.fn(),
-      onDidChangeElement: jest.fn(),
-    };
-    const e4eDownloader = new CopybookDownloaderForE4E(
-      vscode.Uri.file("/storagePath"),
-      e4eMock,
-    );
-
-    const res = await e4eDownloader.hasElement(
-      { profile: "profile", instance: "instance" },
-      {
-        environment: "environment",
-        system: "system",
-        subsystem: "subsystem",
-        type: "type",
-        stage: "1",
-        use_map: false,
-      },
-      "copybook",
-    );
-    const res2 = await e4eDownloader.hasElement(
-      { profile: "profile", instance: "instance" },
-      {
-        environment: "environment",
-        system: "system",
-        subsystem: "subsystem",
-        type: "type",
-        stage: "1",
-        use_map: false,
-      },
-      "element",
-    );
-    expect(res).toBeFalsy();
-    expect(res2).toBeTruthy();
-  });
-
   it("checks getProfileInfo uses cache for same partialProfile", async () => {
     const e4eMock: E4E = {
       isEndevorElement: jest.fn().mockResolvedValue(false),

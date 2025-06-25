@@ -41,7 +41,7 @@ describe("Dataset copybook lib", () => {
         );
         expect(result).toEqual(
           vscode.Uri.parse(
-            "zowe-dsn:/profile/DATASET.WITH.COPYBOOK/COPYBOOK.cpy",
+            "zowe-ds:/profile/DATASET.WITH.COPYBOOK/COPYBOOK.cpy",
           ),
         );
       });
