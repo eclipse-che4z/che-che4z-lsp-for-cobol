@@ -1271,7 +1271,8 @@ ABORT
  | YEAR
  | YYYYDDD
  | YYYYMMDD
- | cicsTranslatorCompileDirectivedKeywords;
+ | cicsTranslatorCompileDirectivedKeywords
+ | cicsLexerDefinedVariableUsageTokens;
 
 cicsLexerDefinedVariableUsageTokens:
 ABCODE
@@ -4121,7 +4122,7 @@ cics_document_set_symbollist: variableNameUsage+;
 hhmmss: variableNameUsage+;
 
 paragraphNameUsage
-   : cicsWord | integerLiteral | cvda_opts
+   : cicsWord | integerLiteral
    ;
 
 variableNameUsage
