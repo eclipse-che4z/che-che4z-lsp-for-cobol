@@ -8,6 +8,7 @@ import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService
 import { Utils } from "../../../../services/util/Utils";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
+import { ZoweExplorerDownloader } from "../../../../services/copybook/downloader/ZoweExplorerDownloader";
 
 describe("Dataset copybook lib", () => {
   let zoweExplorerApiMock: IApiRegisterClient;
@@ -77,10 +78,42 @@ describe("Dataset copybook lib", () => {
         expect(result).toBeUndefined();
       });
     });
+
+    describe("unauthorized error from ZE", () => {
+      let statSpy: jest.SpyInstance;
+
+      beforeEach(() => {
+        ZoweExplorerDownloader.profileStore.clear();
+        jest.clearAllMocks();
+        statSpy = jest
+          .spyOn(vscode.workspace.fs, "stat")
+          .mockRejectedValue(
+            new Error(
+              "Rest API failure with HTTP(S) status 401\nThis operation requires authentication.",
+            ),
+          );
+      });
+
+      afterEach(() => {
+        statSpy.mockRestore();
+      });
+
+      it("resolves to undefined if invalid credentials are used", async () => {
+        const lib = new DatasetLib("DATASET.WITH.COPYBOOK", "profile");
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+        );
+        expect(result).toBeUndefined();
+        expect(statSpy).toHaveBeenCalledTimes(2); // credentials check and retry
+        expect(vscode.workspace.fs.readDirectory).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe("listCopybooks", () => {
     beforeEach(() => {
+      ZoweExplorerDownloader.profileStore.clear();
       readDirectoryResult["/profile/DATASET.WITH.COPYBOOK"] = [
         "COPYA",
         "COPYB",
