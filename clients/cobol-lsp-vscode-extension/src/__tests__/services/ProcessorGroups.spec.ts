@@ -37,6 +37,7 @@ import {
 } from "../../services/ProcessorGroups";
 import * as vscode from "vscode";
 import * as E4ECopybookService from "../../services/copybook/E4ECopybookService";
+import { E4E, E4EExternalConfigurationResponse } from "../../type/e4eApi";
 
 const WORKSPACE_PATH = "/tests/processor-groups";
 const WORKSPACE_URI = Uri.file(WORKSPACE_PATH);
@@ -54,6 +55,8 @@ jest.mock("path", (): unknown => {
 });
 
 let isEndevorElementResult = false;
+let e4eConfigurationResult: E4EExternalConfigurationResponse | Error;
+let e4eMock: E4E;
 
 beforeEach(async () => {
   getWorkspaceFolderResult.uri = WORKSPACE_URI;
@@ -118,11 +121,21 @@ beforeEach(async () => {
     ]
   }`;
 
+  e4eConfigurationResult = {
+    pgms: [{ program: "COBOL/PROGRAM", pgroup: "endevor_pgroup" }],
+    pgroups: [
+      {
+        name: "endevor_pgroup",
+        libs: [{ dataset: "ENDEVOR.DATASET" }],
+      },
+    ],
+  };
+
   jest
     .spyOn(vscode.workspace, "getWorkspaceFolder")
     .mockReturnValue({ name: "ws", index: 0, uri: WORKSPACE_URI });
 
-  const e4eMock = {
+  e4eMock = {
     isEndevorElement: jest
       .fn()
       .mockImplementation(() => isEndevorElementResult),
@@ -136,14 +149,8 @@ beforeEach(async () => {
       .fn()
       .mockResolvedValue(["COPYBOOK", "ANOTHER", "CaSeTeSt"]),
     getMember: jest.fn().mockResolvedValue([]),
-    getConfiguration: jest.fn().mockResolvedValue({
-      pgms: [{ program: "COBOL/PROGRAM", pgroup: "endevor_pgroup" }],
-      pgroups: [
-        {
-          name: "endevor_pgroup",
-          libs: [{ dataset: "ENDEVOR.DATASET" }],
-        },
-      ],
+    getConfiguration: jest.fn().mockImplementation(() => {
+      return e4eConfigurationResult;
     }),
 
     onDidChangeElement: jest.fn(),
@@ -180,6 +187,25 @@ describe("Processor groups", () => {
         const document = vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob");
         const pg = await loadProcessorGroup(document);
         expect(pg?.name).toEqual("endevor_pgroup");
+      });
+
+      describe("Endevor returns error", () => {
+        beforeEach(() => {
+          e4eConfigurationResult = new Error("Error from E4E");
+        });
+
+        it("returns vscode setting configuration and show error to user", async () => {
+          const document = vscode.Uri.joinPath(WORKSPACE_URI, "ERROR.cob");
+          const pg = await loadProcessorGroup(document);
+          expect(pg?.name).toEqual("VSCodeSettingProcessorGroup");
+          expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+            "An error occurred while retrieving Endevor configuration: Error from E4E.",
+          );
+
+          // failed requests are not repeated
+          await loadProcessorGroup(document);
+          expect(e4eMock.getConfiguration).toHaveBeenCalledTimes(1);
+        });
       });
     });
 

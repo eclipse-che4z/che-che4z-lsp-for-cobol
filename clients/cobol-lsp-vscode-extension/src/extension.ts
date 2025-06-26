@@ -177,7 +177,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.workspace.onDidCloseTextDocument((document) => {
       void analysisService.invalidate(document.uri.toString(), true);
-      externalApis.clearE4EConfig(document.uri.toString());
+      // externalApis.clearE4EConfig(document.uri.toString());
     }),
   );
 

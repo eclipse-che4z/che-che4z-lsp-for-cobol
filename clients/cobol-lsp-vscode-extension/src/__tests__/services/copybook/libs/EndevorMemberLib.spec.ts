@@ -44,11 +44,22 @@ describe("Endevor Member Lib", () => {
       const result = await lib.resolveCopybookUri("COPYBOOK", document);
       expect(typeof result).toEqual("function");
 
+      // copybook is resolved, but hasn't been downloaded yet
+      expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
+
       const downloadResult = await result!();
       expect(downloadResult).toEqual(
         vscode.Uri.file(
           "/storage/e4e/copybooks/instance.profile/ENDEVOR.DATASET.COPYBOOK/COPYBOOK",
         ),
+      );
+
+      // content of the copybook was written into the cache directory
+      expect(vscode.workspace.fs.writeFile).toHaveBeenCalledWith(
+        vscode.Uri.file(
+          "/storage/e4e/copybooks/instance.profile/ENDEVOR.DATASET.COPYBOOK/COPYBOOK",
+        ),
+        expect.any(Buffer),
       );
     });
 

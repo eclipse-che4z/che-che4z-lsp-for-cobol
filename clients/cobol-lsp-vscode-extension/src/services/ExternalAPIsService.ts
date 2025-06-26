@@ -88,15 +88,10 @@ class ExternalAPIsService {
   clearCache() {
     this.dsnService?.clearMemberListCache();
     this.ussService?.clearMemberListCache();
-    this.e4eDownloader?.clearConfigs();
     this.e4eDownloader?.clearProfiles();
   }
   clearProfiles() {
     this.e4eDownloader?.clearProfiles();
-  }
-
-  clearE4EConfig(uri: string) {
-    this.e4eDownloader?.clearInvalidConfig(uri);
   }
 
   public handleAsEndevorElement(documentUri: string) {

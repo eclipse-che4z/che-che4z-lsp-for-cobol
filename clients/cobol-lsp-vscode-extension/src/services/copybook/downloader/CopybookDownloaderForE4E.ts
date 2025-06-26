@@ -15,24 +15,15 @@ import * as vscode from "vscode";
 import {
   EndevorElement,
   EndevorMember,
-  e4eResponse,
   E4E,
-  E4EExternalConfigurationResponse,
   ResolvedProfile,
   EndevorType,
   ExternalConfigurationOptions,
   ProcessorConfigurationType,
 } from "../../../type/e4eApi.d";
 import { CopybookURI } from "../CopybookURI";
-import {
-  DATASET,
-  E4E_FOLDER,
-  ENVIRONMENT,
-  OUTPUT_MSG_SEARCH_LOCATION,
-  USE_MAP,
-} from "../../../constants";
+import { E4E_FOLDER, USE_MAP } from "../../../constants";
 import { asPartialProfile, hasMember, Utils } from "../../util/Utils";
-import { getErrorMessage } from "../../util/ErrorsUtils";
 import { SettingsService } from "../../Settings";
 
 const defaultConfigs: ExternalConfigurationOptions = {
@@ -48,18 +39,9 @@ export class CopybookDownloaderForE4E {
     private outputChannel?: vscode.OutputChannel,
   ) {}
 
-  private E4EConfigs = new Map<string, E4EConfig>();
   private E4EProfiles = new Map<string, ResolvedProfile | undefined>();
   private E4EElements = new Map<string, EndevorElement[] | undefined>();
   private E4EMembers = new Map<string, EndevorMember[] | undefined>();
-
-  public clearConfigs() {
-    this.E4EConfigs.clear();
-  }
-  public clearInvalidConfig(uri: string) {
-    const config = this.E4EConfigs.get(uri);
-    if (config) config.closed = true;
-  }
 
   public async getEndevorProcessorGroupConfig(uri: vscode.Uri) {
     const profile = await this.e4e.getProfileInfo(uri.toString());
@@ -68,98 +50,19 @@ export class CopybookDownloaderForE4E {
     const compiler = SettingsService.getLspConfigCompiler();
     const preprocessor = SettingsService.getLspConfigPreprocessors();
 
-    const promise: E4EExternalConfigurationResponse | Error =
-      await this.e4e.getConfiguration(uri.toString(), {
-        compiler: compiler ?? defaultConfigs.compiler,
-        preprocessor: preprocessor ?? defaultConfigs.preprocessor,
-        type: defaultConfigs.type,
-      });
-    if (promise instanceof Error) throw promise;
-
-    return promise;
-  }
-
-  private async getE4EConfigImpl(
-    uri: string,
-  ): Promise<e4eResponse | undefined> {
-    const profile = await this.e4e.getProfileInfo(uri);
-    if (profile instanceof Error) throw profile;
-
-    const compiler = SettingsService.getLspConfigCompiler();
-    const preprocessor = SettingsService.getLspConfigPreprocessors();
-
-    const promise: E4EExternalConfigurationResponse | Error =
-      await this.e4e.getConfiguration(uri, {
-        compiler: compiler ?? defaultConfigs.compiler,
-        preprocessor: preprocessor ?? defaultConfigs.preprocessor,
-        type: defaultConfigs.type,
-      });
-    if (promise instanceof Error) throw promise;
-
-    const candidate = promise.pgroups.find(
-      (x) => x.name === promise.pgms[0].pgroup,
-    );
-    if (!candidate) throw Error("Invalid configuration");
-
-    const elements: { [key: string]: EndevorElement | EndevorMember } = {};
-    const promises: Promise<EndevorMember[] | EndevorElement[] | Error>[] = [];
-
-    for (const lib of candidate.libs) {
-      if (DATASET in lib) {
-        promises.push(this.getMembers(profile, lib.dataset));
-      }
-      if (ENVIRONMENT in lib) {
-        promises.push(this.getElements(profile, lib));
-      }
-    }
-
-    for (const promise of await Promise.all(promises)) {
-      if (promise instanceof Error) {
-        this.outputChannel?.appendLine(promise.message);
-      } else {
-        for (const pro of promise) {
-          if (DATASET in pro && !elements[pro.member]) {
-            elements[pro.member] = pro;
-          } else if (ENVIRONMENT in pro && !elements[pro.element])
-            elements[pro.element] = pro;
-        }
-      }
-    }
-
-    this.writeLocationLogs(candidate?.libs);
-
-    return {
-      profile: profile,
-      uri: uri,
-      elements: elements,
-    };
-  }
-
-  public async getE4EConfig(uri: string): Promise<e4eResponse | undefined> {
-    const e4eConfig = this.E4EConfigs.get(uri);
-    if (e4eConfig) {
-      if (!e4eConfig.closed) return e4eConfig.config;
-      const result = await e4eConfig.config;
-      if (result) return result;
-    }
-    if (!this.e4e.isEndevorElement(uri)) return undefined;
-    const response = this.getE4EConfigImpl(uri).catch(
-      (err: Error): undefined => {
-        vscode.window.showErrorMessage(
-          `An error occurred while retrieving Endevor configuration: ${err.message}.`,
-        );
-      },
-    );
-    this.E4EConfigs.set(uri, { config: response, closed: false });
-    return response;
-  }
-
-  private writeLocationLogs(entries: unknown[]) {
-    const ch = this.outputChannel;
-    if (!ch) return;
-    entries.forEach((libEntry) => {
-      ch.appendLine(OUTPUT_MSG_SEARCH_LOCATION + JSON.stringify(libEntry));
+    const e4eConfiguration = await this.e4e.getConfiguration(uri.toString(), {
+      compiler: compiler ?? defaultConfigs.compiler,
+      preprocessor: preprocessor ?? defaultConfigs.preprocessor,
+      type: defaultConfigs.type,
     });
+    if (e4eConfiguration instanceof Error) {
+      vscode.window.showErrorMessage(
+        `An error occurred while retrieving Endevor configuration: ${e4eConfiguration.message}.`,
+      );
+      return;
+    }
+
+    return e4eConfiguration;
   }
 
   public async getMembers(
@@ -185,6 +88,7 @@ export class CopybookDownloaderForE4E {
     this.E4EMembers.set(id, members);
     return members;
   }
+
   public async getElements(
     profile: ResolvedProfile,
     lib: EndevorType,
@@ -214,49 +118,6 @@ export class CopybookDownloaderForE4E {
 
     this.E4EElements.set(id, elements);
     return elements;
-  }
-
-  public async downloadElement(
-    profile: ResolvedProfile,
-    element: EndevorElement | EndevorMember,
-  ) {
-    try {
-      if (DATASET in element)
-        return await this.downloadDatasetE4E(profile, element);
-      else if (ENVIRONMENT in element)
-        return await this.downloadElementE4E(profile, element);
-    } catch (err) {
-      this.outputChannel?.appendLine(
-        `Error while downloading element from Endevor ${JSON.stringify(element)} - ${getErrorMessage(err)}`,
-      );
-    }
-  }
-
-  public async downloadCopybookE4E(
-    documentUri: string,
-    copybookName: string,
-    _dialectType: string,
-  ): Promise<vscode.Uri | undefined> {
-    const response = await this.getE4EConfig(documentUri);
-    if (!response) return;
-
-    const element = response.elements[copybookName];
-    if (!element) {
-      this.outputChannel?.appendLine(
-        `Failed to find ${copybookName} in Endevor`,
-      );
-    }
-
-    return this.downloadElement(response.profile, element);
-  }
-
-  public async listRemoteCopybooksE4E(documentUri: string) {
-    const response = await this.getE4EConfig(documentUri);
-    if (!response) {
-      return [];
-    }
-
-    return Object.keys(response.elements);
   }
 
   public async downloadElementE4E(
@@ -290,7 +151,10 @@ export class CopybookDownloaderForE4E {
     const resultElement = await this.e4e.getElement(profile, element);
 
     if (resultElement instanceof Error) {
-      throw resultElement;
+      vscode.window.showErrorMessage(
+        `Unable to download E4E element - ${JSON.stringify(element)} - ${resultElement.message}`,
+      );
+      return;
     } else {
       await vscode.workspace.fs.writeFile(
         filePath,
@@ -333,7 +197,10 @@ export class CopybookDownloaderForE4E {
     });
 
     if (memberContent instanceof Error) {
-      throw memberContent;
+      vscode.window.showErrorMessage(
+        `Unable to download E4E member - ${member.dataset}/${member.member} - ${memberContent.message}`,
+      );
+      return;
     } else {
       await vscode.workspace.fs.writeFile(filePath, Buffer.from(memberContent));
       return filePath;
@@ -426,6 +293,7 @@ export class CopybookDownloaderForE4E {
   public clearProfiles() {
     this.E4EProfiles.clear();
   }
+
   private createProfileEndevorTypeId(
     profile: ResolvedProfile,
     endevorType: EndevorType,
@@ -436,8 +304,4 @@ export class CopybookDownloaderForE4E {
   private createProfileDatasetId(profile: ResolvedProfile, dataset: string) {
     return `${profile.instance}-${profile.profile}-${dataset}`;
   }
-}
-interface E4EConfig {
-  config: Promise<e4eResponse | undefined>;
-  closed: boolean;
 }

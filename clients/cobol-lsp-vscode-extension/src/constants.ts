@@ -82,7 +82,6 @@ export const ZOWE_FOLDER = "zowe";
 export const FAIL_CREATE_COPYBOOK_FOLDER_MSG = `Failed to create copybook internal folder`;
 export const FAIL_CREATE_GLOBAL_STORAGE_MSG = `Failed to create extension global storage folder`;
 export const E4E_SCHEME: string = "ndvr";
-export const OUTPUT_MSG_SEARCH_LOCATION = "Looking for location => ";
 export const E4E_FOLDER = "e4e";
 export const DATASET = "dataset";
 export const ENVIRONMENT = "environment";
