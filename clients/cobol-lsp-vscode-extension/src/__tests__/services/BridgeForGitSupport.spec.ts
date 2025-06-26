@@ -12,20 +12,22 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { B4GTypeMetadata } from "../../services/BridgeForGitLoader";
+import {
+  FileNotFound,
+  getWorkspaceFolderResult,
+  readFileResult,
+} from "../../__mocks__/vscode";
+import {
+  B4GTypeMetadata,
+  watcherChangeEventHandler,
+} from "../../services/BridgeForGitLoader";
+// import * as b4gLoader from "../../services/BridgeForGitLoader";
+import * as vscode from "vscode";
+import { loadProcessorGroup } from "../../services/ProcessorGroups";
+import { initializeExternalAPIs } from "../../services/ExternalAPIsService";
 
-jest.mock("vscode", () => {
-  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
-  const vscode = jest.requireActual("../../__mocks__/vscode");
-  const WS_URI = vscode.Uri.file("c:/my/workspace");
-  return {
-    ...vscode,
-    workspace: {
-      getWorkspaceFolder: () => ({ uri: WS_URI }),
-      workspaceFolders: [{ uri: WS_URI }],
-    },
-  };
-});
+const WS_PATH = "/my/b4g/workspace";
+const WS_URI = vscode.Uri.file(WS_PATH);
 
 const b4gJson: B4GTypeMetadata = {
   elements: {
@@ -47,49 +49,72 @@ const b4gJson: B4GTypeMetadata = {
   fileExtension: "cob",
 };
 
-const b4gJsonNoExt = {
-  elements: {
-    main: {
-      processorGroup: "pg2",
-    },
-  },
-  defaultProcessorGroup: "DEFGRP",
-  definedProcessorGroups: [
-    {
-      name: "pg2",
-      description: "A GROUP",
-    },
-    {
-      name: "DEFGRP",
-      description: "DEFAULT GROUP",
-    },
-  ],
-  fileExtension: "",
+const pgJson = {
+  pgroups: [{ name: "pg1" }, { name: "pg2" }, { name: "DEFGRP" }],
 };
-
-const pgJson = [{ name: "pg1" }, { name: "pg2" }];
 const pgMapJson = { pgms: [{ program: "main.cob", pgroup: "pg1" }] };
 
 describe("Bridge for Git group tests", () => {
-  test("Map file into processor group", () => {
-    // const scopeUri = "file:///home/main.cob";
-    // const cfg = loadProcessorsConfigForDocument(
-    //   scopeUri,
-    //   pgJson,
-    //   pgMapJson,
-    //   b4gJson,
-    // );
-    // expect(cfg?.name).toBe("pg2");
+  beforeEach(async () => {
+    await initializeExternalAPIs(
+      vscode.Uri.file("/storage"),
+      vscode.window.createOutputChannel("test"),
+    );
+    getWorkspaceFolderResult.uri = WS_URI;
+    readFileResult[`${WS_PATH}/.cobolplugin/proc_grps.json`] =
+      JSON.stringify(pgJson);
+    readFileResult[`${WS_PATH}/.cobolplugin/pgm_conf.json`] =
+      JSON.stringify(pgMapJson);
+    watcherChangeEventHandler(vscode.Uri.joinPath(WS_URI, ".bridge.json"));
   });
 
-  test("No extension case", () => {
-    // const scopeUri = "file:///home/main";
-    // const cfg = loadProcessorsConfigForDocument(
-    //   scopeUri,
-    //   pgJson,
-    //   pgMapJson,
-    //   b4gJsonNoExt,
-    // );
-    // expect(cfg?.name).toBe("pg2");
+  describe("b4g config is present", () => {
+    describe("fileExtension specified", () => {
+      beforeEach(() => {
+        b4gJson.fileExtension = "cob";
+        readFileResult[`${WS_PATH}/.bridge.json`] = JSON.stringify(b4gJson);
+      });
+      test("Map file into processor group", async () => {
+        const document = vscode.Uri.joinPath(WS_URI, "main.cob");
+        const cfg = await loadProcessorGroup(document);
+        expect(cfg?.name).toBe("pg2");
+      });
+    });
+
+    describe("fileExtension setting is empty", () => {
+      beforeEach(() => {
+        b4gJson.fileExtension = "";
+        readFileResult[`${WS_PATH}/.bridge.json`] = JSON.stringify(b4gJson);
+      });
+      test("No extension case", async () => {
+        const document = vscode.Uri.joinPath(WS_URI, "main");
+        const cfg = await loadProcessorGroup(document);
+        expect(cfg?.name).toBe("pg2");
+      });
+    });
+
+    describe("default group", () => {
+      beforeEach(() => {
+        readFileResult[`${WS_PATH}/.bridge.json`] = JSON.stringify(b4gJson);
+      });
+
+      test("default b4g group is used for elements not matching configuration", async () => {
+        const document = vscode.Uri.joinPath(WS_URI, "other-element.cob");
+        const cfg = await loadProcessorGroup(document);
+        expect(cfg?.name).toBe("DEFGRP");
+      });
+    });
+  });
+
+  describe("b4g configuration is not present", () => {
+    beforeEach(() => {
+      readFileResult[`${WS_PATH}/.bridge.json`] = new FileNotFound();
+    });
+
+    test("If no b4g config is present, use pgm_conf to select pg", async () => {
+      const document = vscode.Uri.joinPath(WS_URI, "main.cob");
+      const cfg = await loadProcessorGroup(document);
+      expect(cfg?.name).toBe("pg1");
+    });
   });
 });

@@ -27,6 +27,7 @@ import {
   readSettingConfig as readSettingConfig,
 } from "./ProcessorGroupsLoader";
 import { DEFAULT_DIALECT } from "../constants";
+import { getVariablesFromUri } from "./util/FSUtils";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -155,14 +156,17 @@ export async function loadProcessorGroup(documentUri: Uri) {
 async function getB4GProcessorGroupName(documentUri: Uri) {
   const b4gConfig = await loadBridgeJsonContent(documentUri);
   if (b4gConfig) {
-    const selectedElement = b4gConfig.fileExtension
-      ? path.basename(documentUri.fsPath, "." + b4gConfig.fileExtension)
-      : path.basename(documentUri.fsPath);
-    const processorGroupName =
-      b4gConfig.elements[selectedElement] === undefined
-        ? b4gConfig.defaultProcessorGroup
-        : b4gConfig.elements[selectedElement].processorGroup;
-    return processorGroupName;
+    const { filename, extension } = getVariablesFromUri(documentUri, false);
+    if (
+      !b4gConfig.fileExtension ||
+      `.${b4gConfig.fileExtension}` === extension
+    ) {
+      const b4gElement = b4gConfig.elements[filename];
+      if (b4gElement) {
+        return b4gElement.processorGroup;
+      }
+    }
+    return b4gConfig.defaultProcessorGroup;
   }
 }
 
