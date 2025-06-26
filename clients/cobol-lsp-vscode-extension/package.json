@@ -506,7 +506,7 @@
         "cobol-lsp.sql.enable-processing": {
           "type": "boolean",
           "default": "true",
-          "description": "Enable SQL Processing"
+          "description": "Enable SQL Processing - If disabled, will still use the target SQL backend to determine implicit copybooks to avoid errors."
         },
         "cobol-lsp.dialects": {
           "type": "array",
