@@ -36,6 +36,7 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
   private static final Pattern NATIONAL_PATTERN = Pattern.compile("(?i)N\\((\\d+)\\)");
   private static final Pattern UTF8_PATTERN = Pattern.compile("(?i)U\\((\\d+)\\)");
   private static final Pattern DBCS_PATTERN = Pattern.compile("(?i)G\\((\\d+)\\)");
+  private static final Pattern NUMERIC_WITH_DECIMAL_PATTERN = Pattern.compile("(?i)S?9\\((\\d+)\\)V9\\((\\d+)\\)");
 
   @Override
   public void accept(
@@ -52,6 +53,14 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
 
   private void checkDataTypeLength(
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+
+    if (checkNumericWithDecimalPattern(node, pictureClause, context)) {
+      return;
+    }
+
+    if (checkSimpleNumericWithDecimal(node, pictureClause, context)) {
+      return;
+    }
 
     if (checkSimpleNumericPattern(node, pictureClause, context)) {
       return;
@@ -120,6 +129,60 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
     if (pictureClause.toUpperCase().contains("G")) {
       checkDbcsUsageDisplay1(node, context);
     }
+  }
+
+  private boolean checkNumericWithDecimalPattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+    
+    Matcher matcher = NUMERIC_WITH_DECIMAL_PATTERN.matcher(pictureClause);
+    if (!matcher.find()) {
+      return false;
+    }
+
+    String integerPart = matcher.group(1);
+    String decimalPart = matcher.group(2);
+    int totalLength = parseLength(integerPart) + parseLength(decimalPart);
+
+    if (totalLength > MAX_NUMERIC_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxNumericLengthExceeded",
+          String.valueOf(totalLength),
+          MAX_NUMERIC_LENGTH);
+    }
+
+    return true;
+  }
+
+  private boolean checkSimpleNumericWithDecimal(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+    
+    if (!pictureClause.matches("(?i)S?9+V9+")) {
+      return false;
+    }
+
+    String numericPart = pictureClause.toUpperCase().startsWith("S")
+        ? pictureClause.substring(1) 
+        : pictureClause;
+
+    String[] parts = numericPart.split("V");
+    if (parts.length != 2) {
+      return false;
+    }
+
+    int totalLength = parts[0].length() + parts[1].length();
+
+    if (totalLength > MAX_NUMERIC_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxNumericLengthExceeded",
+          String.valueOf(totalLength),
+          MAX_NUMERIC_LENGTH);
+    }
+
+    return true;
   }
 
   private boolean checkSimpleNumericPattern(
