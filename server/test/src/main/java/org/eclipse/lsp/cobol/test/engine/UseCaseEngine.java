@@ -283,7 +283,7 @@ public class UseCaseEngine {
       Map<String, List<String>> preprocessorsDirectives) {
 
     SQLBackend sqlBackendSetting =
-        Optional.ofNullable(analysisConfig.getDialectsSettings().get("sql.target-backend"))
+        Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
             .map(JsonElement::getAsString)
             .map(SQLBackend::valueOf)
             .orElse(SQLBackend.DB2_SERVER);
@@ -375,7 +375,7 @@ public class UseCaseEngine {
       List<String> subroutineNames,
       AnalysisConfig analysisConfig) {
     SQLBackend sqlBackendSetting =
-        Optional.ofNullable(analysisConfig.getDialectsSettings().get("sql.target-backend"))
+        Optional.ofNullable(analysisConfig.getDialectsSettings().get("target-sql-backend"))
             .map(JsonElement::getAsString)
             .map(SQLBackend::valueOf)
             .orElse(SQLBackend.DB2_SERVER);

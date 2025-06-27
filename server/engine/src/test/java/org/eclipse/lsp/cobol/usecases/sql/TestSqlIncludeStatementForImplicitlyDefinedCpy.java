@@ -187,7 +187,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             true,
             ImmutableList.of(),
-            ImmutableMap.of("sql.target-backend", new JsonPrimitive("DATACOM_SERVER"))));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
 
   @Test
@@ -216,7 +216,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             true,
             ImmutableList.of(),
-            ImmutableMap.of("sql.target-backend", new JsonPrimitive("DATACOM_SERVER"))));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
 
   @Test
@@ -249,7 +249,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             true,
             ImmutableList.of(),
-            ImmutableMap.of("sql.target-backend", new JsonPrimitive("DB2_SERVER")));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");
 
     UseCaseEngine.runTest(
@@ -270,7 +270,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             false,
             ImmutableList.of(),
-            ImmutableMap.of("sql.target-backend", new JsonPrimitive("DB2_SERVER")));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL,
@@ -293,7 +293,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             false,
             ImmutableList.of(),
-            ImmutableMap.of("sql.target-backend", new JsonPrimitive("DB2_SERVER")));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED,
@@ -313,7 +313,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             false,
             ImmutableList.of(),
-            ImmutableMap.of("sql.target-backend", new JsonPrimitive("DB2_SERVER")));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL_VARIABLE_DEFINITION,
