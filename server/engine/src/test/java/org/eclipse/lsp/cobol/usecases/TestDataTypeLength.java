@@ -124,6 +124,29 @@ public class TestDataTypeLength {
           + "       01 {$*DBCS-SIMPLE-NO-USAGE|1} PIC GGG.\n"
           + "       PROCEDURE DIVISION.";
 
+  private static final String TEXT_NUMERIC_WITH_DECIMAL =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-DECIMAL1} PIC 9(10)V9(8).\n"
+          + "       01 {$*VALID-DECIMAL2} PIC S9(16)V9(2).\n"
+          + "       01 {$*INVALID-DECIMAL1|1} PIC 9(10)V9(9).\n"
+          + "       01 {$*INVALID-DECIMAL2|2} PIC S9(15)V9(5).\n"
+          + "       PROCEDURE DIVISION.";
+
+  private static final String TEXT_SIMPLE_NUMERIC_WITH_DECIMAL =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-SIMPLE-DEC1} PIC 999V99.\n"
+          + "       01 {$*VALID-SIMPLE-DEC2} PIC S9999V999.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC|1} PIC 9999999999V999999999.\n"
+          + "       PROCEDURE DIVISION.";
+
   @Test
   void testNumeric() {
     UseCaseEngine.runTest(
@@ -294,6 +317,43 @@ public class TestDataTypeLength {
             new Diagnostic(
                 new Range(),
                 "USAGE DISPLAY-1 was not specified for DBCS item 'DBCS-SIMPLE-NO-USAGE'.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testNumericWithDecimal() {
+    UseCaseEngine.runTest(
+        TEXT_NUMERIC_WITH_DECIMAL,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-DECIMAL1' with length 19 exceeds maximum allowed length of"
+                    + " 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-DECIMAL2' with length 20 exceeds maximum allowed length of"
+                    + " 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSimpleNumericWithDecimal() {
+    UseCaseEngine.runTest(
+        TEXT_SIMPLE_NUMERIC_WITH_DECIMAL,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC' with length 19 exceeds maximum allowed length of"
+                    + " 18 digits",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
