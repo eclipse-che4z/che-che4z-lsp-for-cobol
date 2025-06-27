@@ -4,7 +4,10 @@ import {
 } from "../../../../__mocks__/vscode";
 import { DatasetLib } from "../../../../services/copybookLibs/DatasetLib";
 import * as vscode from "vscode";
-import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService";
+import {
+  externalApis,
+  initializeExternalAPIs,
+} from "../../../../services/ExternalAPIsService";
 import { Utils } from "../../../../services/util/Utils";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
@@ -107,6 +110,43 @@ describe("Dataset copybook lib", () => {
         expect(result).toBeUndefined();
         expect(statSpy).toHaveBeenCalledTimes(2); // credentials check and retry
         expect(vscode.workspace.fs.readDirectory).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("error limiting", () => {
+      it("library is disabled from resolving after 3 failed requests", async () => {
+        const lib = new DatasetLib("DOESNT.EXIST.DATASET", "profile");
+
+        for (let attempts = 0; attempts < 3; attempts++) {
+          await expect(
+            lib.resolveCopybookUri("COPYBOOK", vscode.Uri.file("/program.cbl")),
+          ).rejects.toEqual(new FileNotFound());
+        }
+        expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(3);
+        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+          expect.stringContaining(
+            `Request to list dataset members profile/DOESNT.EXIST.DATASET keeps failing repeatedly.`,
+          ),
+          "Keep disabled",
+          "Reenable",
+        );
+
+        // next request do not call Zowe any more
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+        );
+        expect(result).toBeUndefined();
+        expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(3);
+
+        // after reenabling the lib, the requests are sent again.
+        externalApis.dsnService?.reenableFailedRequests();
+
+        await expect(
+          lib.resolveCopybookUri("COPYBOOK", vscode.Uri.file("/program.cbl")),
+        ).rejects.toEqual(new FileNotFound());
+
+        expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(4);
       });
     });
   });

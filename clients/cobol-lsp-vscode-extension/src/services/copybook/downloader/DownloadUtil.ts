@@ -18,7 +18,6 @@ import {
   UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../../constants";
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
-import { SettingsService } from "../../Settings";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
 import { EndevorType } from "../../../type/e4eApi";
@@ -169,16 +168,6 @@ export class DownloadUtil {
    */
   private static isNotFoundError(e: unknown) {
     return hasMember(e, "code") && e.code === "FileNotFound";
-  }
-  public static endevorConfigToType(config: EndevorConfigModel): EndevorType {
-    return {
-      use_map: config.use_map === false ? false : true,
-      environment: config.environment,
-      stage: config.stage,
-      system: config.system,
-      subsystem: config.subsystem,
-      type: config.type,
-    };
   }
 }
 

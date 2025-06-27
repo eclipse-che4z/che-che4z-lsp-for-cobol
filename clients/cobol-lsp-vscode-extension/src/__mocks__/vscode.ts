@@ -17,6 +17,7 @@ import type {
   OutputChannel as OutputChannelType,
   Position as PositionType,
   Uri as UriType,
+  TextDocument,
 } from "vscode";
 import { URI, Utils } from "vscode-uri";
 
@@ -129,7 +130,12 @@ export namespace workspace {
   export const onDidChangeConfiguration = jest
     .fn()
     .mockReturnValue("onDidChangeConfiguration");
-  export const textDocuments = [];
+  export const textDocuments: TextDocument[] = [
+    {
+      uri: URI.file("/workspace/edited"),
+      getText: jest.fn().mockReturnValue("EDITED"),
+    } as unknown as TextDocument,
+  ];
   export function getWorkspaceFolder() {
     return workspaceFolders[0];
   }
