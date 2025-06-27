@@ -69,6 +69,61 @@ public class TestDataTypeLength {
           + "       01 {$*INVALID-NUM1|2} PIC S9999999999999999999.\n"
           + "       PROCEDURE DIVISION.";
 
+  private static final String TEXT_NATIONAL =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-NATIONAL} PIC N(99999999).\n"
+          + "       01 {$*INVALID-NATIONAL|1} PIC N(100000000).\n"
+          + "       01 {$*INVALID1-NATIONAL|2} PIC N(9999999999).\n"
+          + "       PROCEDURE DIVISION.";
+
+  private static final String TEXT_UTF8 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-UTF8} PIC U(99999999).\n"
+          + "       01 {$*INVALID-UTF8|1} PIC U(100000000).\n"
+          + "       01 {$*INVALID1-UTF8|2} PIC U(9999999999).\n"
+          + "       PROCEDURE DIVISION.";
+
+  private static final String TEXT_DBCS =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-DBCS} PIC G(99999999) USAGE DISPLAY-1.\n"
+          + "       01 {$*INVALID-DBCS|1} PIC G(100000000) USAGE DISPLAY-1.\n"
+          + "       01 {$*INVALID1-DBCS|2} PIC G(9999999999) DISPLAY-1.\n"
+          + "       PROCEDURE DIVISION.";
+
+  private static final String TEXT_DBCS_ERROR =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*DBCS-NO-USAGE|1} PIC G(100).\n"
+          + "       01 {$*DBCS-WITH-USAGE} PIC G(100) USAGE DISPLAY-1.\n"
+          + "       PROCEDURE DIVISION.";
+
+  private static final String TEXT_SIMPLE_PATTERNS =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-NATIONAL-SIMPLE} PIC NNNN.\n"
+          + "       01 {$*VALID-UTF8-SIMPLE} PIC UUUU.\n"
+          + "       01 {$*VALID-DBCS-SIMPLE} PIC GGGG USAGE DISPLAY-1.\n"
+          + "       01 {$*DBCS-SIMPLE-NO-USAGE|1} PIC GGG.\n"
+          + "       PROCEDURE DIVISION.";
+
   @Test
   void testNumeric() {
     UseCaseEngine.runTest(
@@ -146,6 +201,99 @@ public class TestDataTypeLength {
                 new Range(),
                 "Numeric field 'INVALID-NUM1' with length 19 exceeds maximum allowed length of 18"
                     + " digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testNational() {
+    UseCaseEngine.runTest(
+        TEXT_NATIONAL,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "National field 'INVALID-NATIONAL' with length 100000000 exceeds maximum allowed"
+                    + " length of 99999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "National field 'INVALID1-NATIONAL' with length 9999999999 exceeds maximum allowed"
+                    + " length of 99999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testUtf8() {
+    UseCaseEngine.runTest(
+        TEXT_UTF8,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "UTF-8 field 'INVALID-UTF8' with length 100000000 exceeds maximum allowed"
+                    + " length of 99999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "UTF-8 field 'INVALID1-UTF8' with length 9999999999 exceeds maximum allowed"
+                    + " length of 99999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testDbcs() {
+    UseCaseEngine.runTest(
+        TEXT_DBCS,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "DBCS field 'INVALID-DBCS' with length 100000000 exceeds maximum allowed"
+                    + " length of 99999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "DBCS field 'INVALID1-DBCS' with length 9999999999 exceeds maximum allowed"
+                    + " length of 99999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testDbcsUsageError() {
+    UseCaseEngine.runTest(TEXT_DBCS_ERROR,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "USAGE DISPLAY-1 was not specified for DBCS item 'DBCS-NO-USAGE'.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSimplePatterns() {
+    UseCaseEngine.runTest(
+        TEXT_SIMPLE_PATTERNS,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "USAGE DISPLAY-1 was not specified for DBCS item 'DBCS-SIMPLE-NO-USAGE'.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

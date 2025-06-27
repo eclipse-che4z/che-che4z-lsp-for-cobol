@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.UsageFormat;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableWithLevelNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
@@ -27,10 +28,14 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
 
   private static final int MAX_NUMERIC_LENGTH = 18;
   private static final int MAX_ALPHABETIC_ALPHANUMERIC_LENGTH = 999999999;
+  private static final int MAX_NATIONAL_UTF8_DBCS_LENGTH = 99999999;
 
   private static final Pattern NUMERIC_PATTERN = Pattern.compile("(?i)9\\((\\d+)\\)");
   private static final Pattern ALPHABETIC_PATTERN = Pattern.compile("(?i)A\\((\\d+)\\)");
   private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("(?i)X\\((\\d+)\\)");
+  private static final Pattern NATIONAL_PATTERN = Pattern.compile("(?i)N\\((\\d+)\\)");
+  private static final Pattern UTF8_PATTERN = Pattern.compile("(?i)U\\((\\d+)\\)");
+  private static final Pattern DBCS_PATTERN = Pattern.compile("(?i)G\\((\\d+)\\)");
 
   @Override
   public void accept(
@@ -49,6 +54,18 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
 
     if (checkSimpleNumericPattern(node, pictureClause, context)) {
+      return;
+    }
+
+    if (checkSimpleNationalPattern(node, pictureClause, context)) {
+      return;
+    }
+
+    if (checkSimpleUtf8Pattern(node, pictureClause, context)) {
+      return;
+    }
+
+    if (checkSimpleDbcsPattern(node, pictureClause, context)) {
       return;
     }
 
@@ -75,6 +92,34 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
         ALPHANUMERIC_PATTERN,
         MAX_ALPHABETIC_ALPHANUMERIC_LENGTH,
         "dataTypeLengthCheck.maxAlphanumericLengthExceeded");
+
+    checkPatternBasedClause(
+        node,
+        pictureClause,
+        context,
+        NATIONAL_PATTERN,
+        MAX_NATIONAL_UTF8_DBCS_LENGTH,
+        "dataTypeLengthCheck.maxNationalLengthExceeded");
+
+    checkPatternBasedClause(
+        node,
+        pictureClause,
+        context,
+        UTF8_PATTERN,
+        MAX_NATIONAL_UTF8_DBCS_LENGTH,
+        "dataTypeLengthCheck.maxUtf8LengthExceeded");
+
+    checkPatternBasedClause(
+        node,
+        pictureClause,
+        context,
+        DBCS_PATTERN,
+        MAX_NATIONAL_UTF8_DBCS_LENGTH,
+        "dataTypeLengthCheck.maxDbcsLengthExceeded");
+
+    if (pictureClause.toUpperCase().contains("G")) {
+      checkDbcsUsageDisplay1(node, context);
+    }
   }
 
   private boolean checkSimpleNumericPattern(
@@ -125,6 +170,76 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
       return Integer.parseInt(lengthString);
     } catch (NumberFormatException e) {
       return Integer.MAX_VALUE;
+    }
+  }
+
+  private boolean checkSimpleNationalPattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+    if (!pictureClause.matches("(?i)N+")) {
+      return false;
+    }
+
+    if (pictureClause.length() > MAX_NATIONAL_UTF8_DBCS_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxNationalLengthExceeded",
+          String.valueOf(pictureClause.length()),
+          MAX_NATIONAL_UTF8_DBCS_LENGTH);
+    }
+
+    return true;
+  }
+
+  private boolean checkSimpleUtf8Pattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+    if (!pictureClause.matches("(?i)U+")) {
+      return false;
+    }
+
+    if (pictureClause.length() > MAX_NATIONAL_UTF8_DBCS_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxUtf8LengthExceeded",
+          String.valueOf(pictureClause.length()),
+          MAX_NATIONAL_UTF8_DBCS_LENGTH);
+    }
+
+    return true;
+  }
+
+  private boolean checkSimpleDbcsPattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+    if (!pictureClause.matches("(?i)G+")) {
+      return false;
+    }
+
+    if (pictureClause.length() > MAX_NATIONAL_UTF8_DBCS_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxDbcsLengthExceeded",
+          String.valueOf(pictureClause.length()),
+          MAX_NATIONAL_UTF8_DBCS_LENGTH);
+    }
+    if (pictureClause.toUpperCase().contains("G")) {
+      checkDbcsUsageDisplay1(node, context);
+    }
+    return true;
+  }
+
+  private void checkDbcsUsageDisplay1(VariableWithLevelNode node, ProcessingContext context) {
+    if (node instanceof ElementaryItemNode) {
+      ElementaryItemNode elementaryNode = (ElementaryItemNode) node;
+      if (elementaryNode.getUsageFormat() != UsageFormat.DISPLAY_1) {
+        context
+            .getErrors()
+            .add(
+                node.getError(
+                    MessageTemplate.of(
+                        "dataTypeLengthCheck.dbcsMissingUsageDisplay1", node.getName())));
+      }
     }
   }
 
