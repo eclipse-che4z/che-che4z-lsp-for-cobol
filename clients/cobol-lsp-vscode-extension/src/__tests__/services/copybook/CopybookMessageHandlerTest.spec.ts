@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { MockLib } from "./libs/MockLib.utility";
 import { DEFAULT_DIALECT } from "../../../constants";
+import { ErrorLib } from "./libs/ErrorLib.utility";
 
 export type Writable<T> = {
   -readonly [P in keyof T]: T[P];
@@ -51,29 +52,62 @@ describe("CopybookMessageHandler", () => {
       AAA: vscode.Uri.file("/copybooks/AAA.cpy"),
     };
 
-    beforeEach(() => {
-      jest
-        .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
-        .mockResolvedValue([
-          new MockLib(remoteCopybooks),
-          new MockLib(localCopybooks),
-        ]);
+    describe("sucessful resolving", () => {
+      beforeEach(() => {
+        jest
+          .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
+          .mockResolvedValue([
+            new MockLib(remoteCopybooks),
+            new MockLib(localCopybooks),
+          ]);
+      });
+
+      it("resolves copybook name to URI", async () => {
+        const document = "/program.cob";
+        const result = await resolveCopybookURI(
+          document,
+          "AAA",
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
+      });
+
+      it("respects order of processor groups - first resolved result is returned", async () => {
+        const document = "/program.cob";
+        const resultAAA = await resolveCopybookURI(
+          document,
+          "AAA",
+          DEFAULT_DIALECT,
+        );
+        expect(resultAAA).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
+      });
     });
 
-    it("resolves copybook name to URI", async () => {
-      const document = "/program.cob";
-      const result = await resolveCopybookURI(document, "AAA", DEFAULT_DIALECT);
-      expect(result).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
-    });
+    describe("error handling", () => {
+      beforeEach(() => {
+        jest
+          .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
+          .mockResolvedValue([new ErrorLib(), new MockLib(remoteCopybooks)]);
+      });
+      it("resolves copybook from other libraries even if one library errors", async () => {
+        const document = "/program.cob";
+        const resultAAA = await resolveCopybookURI(
+          document,
+          "AAA",
+          DEFAULT_DIALECT,
+        );
+        expect(resultAAA).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
+      });
 
-    it("respects order of processor groups - first resolved result is returned", async () => {
-      const document = "/program.cob";
-      const resultAAA = await resolveCopybookURI(
-        document,
-        "AAA",
-        DEFAULT_DIALECT,
-      );
-      expect(resultAAA).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
+      it("returns undefined if copybook is not resolved", async () => {
+        const document = "/program.cob";
+        const resultAAA = await resolveCopybookURI(
+          document,
+          "NotFound",
+          DEFAULT_DIALECT,
+        );
+        expect(resultAAA).toBeUndefined();
+      });
     });
   });
 });
