@@ -147,6 +147,23 @@ public class TestDataTypeLength {
           + "       01 {$*INVALID-SIMPLE-DEC|1} PIC 9999999999V999999999.\n"
           + "       PROCEDURE DIVISION.";
 
+  private static final String TEXT_FLOATING_POINT =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-FLOAT1} PIC -9V9(15)E-99.\n"
+          + "       01 {$*VALID-FLOAT2} PIC +99V999(12)E+99.\n"
+          + "       01 {$*VALID-FLOAT3} PIC +99.999E+99.\n"
+          + "       01 {$*VALID-FLOAT4} PIC +99.99(13)E+99.\n"
+          + "       01 {$*INVALID-FLOAT-MANTISSA|1} PIC -99V999(13)E+99.\n"
+          + "       01 {$*INVALID-FLOAT-NO-SIGN|2} PIC 9V9(15)E-99.\n"
+          + "       01 {$*INVALID-FLOAT-NO-DECIMAL|3} PIC +9(16)E-99.\n"
+          + "       01 {$*INVALID-FLOAT-EXP-SIGN|4} PIC +9V9(15)E99.\n"
+          + "       01 {$*INVALID-FLOAT-EXP-DIGITS|5} PIC +9V9(15)E+999.\n"
+          + "       PROCEDURE DIVISION.";
+
   @Test
   void testNumeric() {
     UseCaseEngine.runTest(
@@ -354,6 +371,45 @@ public class TestDataTypeLength {
                 new Range(),
                 "Numeric field 'INVALID-SIMPLE-DEC' with length 19 exceeds maximum allowed length of"
                     + " 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testFloatingPoint() {
+    UseCaseEngine.runTest(
+        TEXT_FLOATING_POINT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Floating-point field 'INVALID-FLOAT-MANTISSA' mantissa with length 17 exceeds"
+                    + " maximum allowed length of 16 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Floating-point field 'INVALID-FLOAT-NO-SIGN' mantissa must start with + or - sign",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Floating-point field 'INVALID-FLOAT-NO-DECIMAL' must include a decimal point (. or V)",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "4",
+            new Diagnostic(
+                new Range(),
+                "Floating-point field 'INVALID-FLOAT-EXP-SIGN' exponent must have + or - sign",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "5",
+            new Diagnostic(
+                new Range(),
+                "Floating-point field 'INVALID-FLOAT-EXP-DIGITS' exponent must be exactly 99",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
