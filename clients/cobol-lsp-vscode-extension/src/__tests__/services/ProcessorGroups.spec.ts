@@ -71,16 +71,17 @@ beforeEach(async () => {
                   "IDMS",
                   {
                       "name": "DaCo",
-                      "libs": ["/daco",
-                      {
-                  "environment": "ENV",
-                  "stage": "1",
-                  "system": "SYSTEM",
-                  "subsystem": "SUBSYTEM",
-                  "type": "COPY",
-                  "profile": "instance.internal.connection"
-                }
-                  ]
+                      "libs": [
+                        "/daco",
+                        {
+                          "environment": "ENV",
+                          "stage": "1",
+                          "system": "SYSTEM",
+                          "subsystem": "SUBSYTEM",
+                          "type": "COPY",
+                          "profile": "instance.internal.connection"
+                        }
+                      ]
                   },
                   {
                       "name": "SQL",
