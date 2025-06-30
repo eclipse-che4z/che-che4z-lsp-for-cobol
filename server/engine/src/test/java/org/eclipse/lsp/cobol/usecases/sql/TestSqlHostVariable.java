@@ -761,13 +761,13 @@ public class TestSqlHostVariable {
             "2",
             new Diagnostic(
                 new Range(),
-                "'CHAR LARGE OBJECT' type variable exceeds maximum length of 2147483647 bytes",
+                "'CLOB' type variable exceeds maximum length of 2147483647 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-                "'CHARACTER LARGE OBJECT' type variable exceeds maximum length of 2147483647 bytes",
+                "'CLOB' type variable exceeds maximum length of 2147483647 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }
@@ -787,7 +787,7 @@ public class TestSqlHostVariable {
             "2",
             new Diagnostic(
                 new Range(),
-                "'BINARY LARGE OBJECT' type variable exceeds maximum length of 2147483647 bytes",
+                "'BLOB' type variable exceeds maximum length of 2147483647 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText()),
             "3",
