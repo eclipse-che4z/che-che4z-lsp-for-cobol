@@ -31,7 +31,7 @@ import org.eclipse.lsp.cobol.core.CobolParser;
  */
 public abstract class MessageServiceParser extends Parser {
 
-  private static final Pattern PATTERN = Pattern.compile("(?i)^(.*?)\\s*\\((\\d+)\\s*([GMK])?\\)$");
+  private static final Pattern PATTERN = Pattern.compile("(?i)(\\d+)\\s*([GMK])?");
 
   /**
    * @param input {@link TokenStream}
