@@ -71,7 +71,6 @@ lobWithSize
   | (CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB) LPARENCHAR lobSize RPARENCHAR { validateLobSize("CLOB", $lobSize.ctx, 2147483647);}
   | DBCLOB LPARENCHAR lobSize RPARENCHAR { validateLobSize("DBCLOB", $lobSize.ctx, 1073741823);}
   ;
-    ;
 
 lobSize: (dbs_integer k_m_g?| T=IDENTIFIER {validateTokenWithRegex($T.text, "\\d+[kKmMgG]", "unexpected token");} );
 
