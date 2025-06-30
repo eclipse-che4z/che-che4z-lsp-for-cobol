@@ -151,17 +151,7 @@ public class Db2SqlDialect implements CobolDialect {
     parser.setErrorHandler(new Db2ErrorStrategy(messageService));
 
     Db2SqlParser.StartRuleContext result = parser.startRule();
-    if (isSqlProcessingEnabled) {
-      errors.addAll(listener.getErrors());
-    } else {
-      String endExecMessage = messageService.getMessage("db2Parser.missingEndExec");
-      List<SyntaxError> currentErrors = listener.getErrors();
-      Optional<SyntaxError> missingEndExecErr =
-          currentErrors.stream()
-              .filter(err -> endExecMessage.equalsIgnoreCase(err.getSuggestion()))
-              .findFirst();
-      missingEndExecErr.ifPresent(errors::add);
-    }
+    errors.addAll(listener.getErrors());
     return result;
   }
 
