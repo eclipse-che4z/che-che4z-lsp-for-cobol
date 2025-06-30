@@ -78,11 +78,13 @@ describe("Local copybook library", () => {
     });
 
     describe("Path variables are evaluated during resolution", () => {
-      findFilesResult["/workspace/ABCPROG/copybooks"] = [
+      findFilesResult["/workspace/copybooks"] = [
         vscode.Uri.file("/workspace/ABCPROG/copybooks/ABCCOPY.cpy"),
       ];
       it("replace variable a value", async () => {
-        const lib = new LocalPathLib("${fileBasenameNoExtension}/copybooks");
+        const lib = new LocalPathLib(
+          "${workspaceFolder}/${fileBasenameNoExtension}/copybooks",
+        );
         const document = vscode.Uri.file("/ABCPROG.cbl");
         const result = await lib.resolveCopybookUri("ABCCOPY", document);
         expect(result).toEqual(

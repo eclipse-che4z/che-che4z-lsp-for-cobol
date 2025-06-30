@@ -43,7 +43,7 @@ import {
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
-import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
+import { SupportedVariables } from "./util/FSUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
 
@@ -222,15 +222,8 @@ export class SettingsService {
    * @param dialectType name of the cobol dialect type
    * @returns a list of dsn path
    */
-  public static getDsnPath(
-    documentUri: vscode.Uri,
-    dialectType: string,
-  ): string[] {
-    return SettingsService.getCopybookConfigValues(
-      PATHS_DSN,
-      documentUri,
-      dialectType,
-    );
+  public static getDsnPath(dialectType: string): string[] {
+    return SettingsService.getCopybookConfigValues(PATHS_DSN, dialectType);
   }
 
   /**
@@ -239,24 +232,13 @@ export class SettingsService {
    * @param dialectType name of the cobol dialect type
    * @returns a list of uss path
    */
-  public static getUssPath(
-    documentUri: vscode.Uri,
-    dialectType: string,
-  ): string[] {
-    return SettingsService.getCopybookConfigValues(
-      PATHS_USS,
-      documentUri,
-      dialectType,
-    );
+  public static getUssPath(dialectType: string): string[] {
+    return SettingsService.getCopybookConfigValues(PATHS_USS, dialectType);
   }
 
-  public static getLocalPath(
-    documentUri: vscode.Uri,
-    dialectType: string,
-  ): string[] {
+  public static getLocalPath(dialectType: string): string[] {
     return SettingsService.getCopybookConfigValues(
       PATHS_LOCAL_KEY,
-      documentUri,
       dialectType,
     );
   }
@@ -333,11 +315,7 @@ export class SettingsService {
       });
   }
 
-  public static getCopybookConfigValues(
-    section: string,
-    documentUri: vscode.Uri,
-    dialectType: string,
-  ) {
+  public static getCopybookConfigValues(section: string, dialectType: string) {
     if (dialectType !== SettingsService.DEFAULT_DIALECT) {
       const pathList: string[] | undefined = vscode.workspace
         .getConfiguration(SETTINGS_CPY_SECTION)

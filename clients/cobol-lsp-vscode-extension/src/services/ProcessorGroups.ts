@@ -24,7 +24,7 @@ import {
   readWorkspaceConfig,
   ProcessorGroup,
   WorkspaceConfig,
-  readSettingConfig as readSettingConfig,
+  readSettingConfig,
 } from "./ProcessorGroupsLoader";
 import { DEFAULT_DIALECT } from "../constants";
 import { getVariablesFromUri } from "./util/FSUtils";
@@ -149,7 +149,7 @@ export async function loadProcessorGroup(documentUri: Uri) {
   if (matchedGroup) {
     return matchedGroup;
   } else {
-    return readSettingConfig(documentUri, DEFAULT_DIALECT);
+    return readSettingConfig(DEFAULT_DIALECT);
   }
 }
 

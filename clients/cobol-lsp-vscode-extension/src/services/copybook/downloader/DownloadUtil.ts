@@ -20,8 +20,6 @@ import {
 import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
-import { EndevorType } from "../../../type/e4eApi";
-import { EndevorConfigModel } from "../../ProcessorGroupsLoader";
 
 /**
  * Utility class for downloading copybooks

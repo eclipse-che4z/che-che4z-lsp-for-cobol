@@ -260,24 +260,19 @@ export async function readWorkspaceConfig(
   return workspaceConfig;
 }
 
-export function readSettingConfig(
-  documentUri: Uri,
-  dialectType: string,
-): ProcessorGroup {
+export function readSettingConfig(dialectType: string): ProcessorGroup {
   // local paths
-  const directoryPaths = SettingsService.getLocalPath(documentUri, dialectType);
+  const directoryPaths = SettingsService.getLocalPath(dialectType);
 
   // dsn
-  const dsns: LibsDefinitions = SettingsService.getDsnPath(
-    documentUri,
-    dialectType,
-  ).map((dsn) => ({ dataset: dsn }));
+  const dsns: LibsDefinitions = SettingsService.getDsnPath(dialectType).map(
+    (dsn) => ({ dataset: dsn }),
+  );
 
   // uss
-  const usss: LibsDefinitions = SettingsService.getUssPath(
-    documentUri,
-    dialectType,
-  ).map((uss) => ({ uss }));
+  const usss: LibsDefinitions = SettingsService.getUssPath(dialectType).map(
+    (uss) => ({ uss }),
+  );
   return {
     name: "VSCodeSettingProcessorGroup",
     libs: transformLibs([...directoryPaths, ...dsns, ...usss]),

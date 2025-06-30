@@ -32,9 +32,6 @@ import {
 function makefsPath(p: string): string {
   return path.join(process.platform == "win32" ? "a:" : "", p);
 }
-function makePath(p: string): string {
-  return (process.platform == "win32" ? "/a:" : "") + p;
-}
 
 describe("SettingsService evaluate variables", () => {
   beforeAll(() => {
@@ -127,12 +124,7 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "dialect.paths-uss",
       undefined,
     );
-    expect(
-      SettingsService.getUssPath(
-        vscode.Uri.parse("file:///doc-uri"),
-        "dialect",
-      ),
-    ).toHaveLength(0);
+    expect(SettingsService.getUssPath("dialect")).toHaveLength(0);
   });
 
   test("returns configured array when dialect configuration is provided", () => {
@@ -140,10 +132,7 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "dialect.paths-uss",
       ["configured-dialect-settings"],
     );
-    const configuredValue = SettingsService.getUssPath(
-      vscode.Uri.parse("file:///doc-uri"),
-      "dialect",
-    );
+    const configuredValue = SettingsService.getUssPath("dialect");
     expect(configuredValue).toHaveLength(1);
     expect(configuredValue[0]).toBe("configured-dialect-settings");
   });
@@ -153,7 +142,6 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "configured-cobol-settings",
     ]);
     const configuredValue = SettingsService.getUssPath(
-      vscode.Uri.parse("file:///doc-uri"),
       SettingsService.DEFAULT_DIALECT,
     );
     expect(configuredValue).toHaveLength(1);
