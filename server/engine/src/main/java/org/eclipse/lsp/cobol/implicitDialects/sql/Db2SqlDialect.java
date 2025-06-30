@@ -135,9 +135,7 @@ public class Db2SqlDialect implements CobolDialect {
   }
 
   private Db2SqlParser.StartRuleContext parseDB2(
-      String text,
-      String programDocumentUri,
-      List<SyntaxError> errors) {
+      String text, String programDocumentUri, List<SyntaxError> errors) {
     Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlParser parser = new Db2SqlParser(tokens);
