@@ -154,7 +154,6 @@ public class Db2SqlDialect implements CobolDialect {
     if (isSqlProcessingEnabled) {
       errors.addAll(listener.getErrors());
     } else {
-      // Provide missing END-EXEC error if present.
       String endExecMessage = messageService.getMessage("db2Parser.missingEndExec");
       List<SyntaxError> currentErrors = listener.getErrors();
       Optional<SyntaxError> missingEndExecErr =
