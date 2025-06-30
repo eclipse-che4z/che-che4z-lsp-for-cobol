@@ -126,6 +126,14 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           MOVE 'AAAA' TO {$A}.\n"
           + "           STOP RUN.\n";
 
+  private static final String TEXT_BACKEND_SKIP_SQL_MISSING_END_EXEC =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID. HELLO-DB2.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       PROCEDURE DIVISION.\n"
+                  + "           {|err1}EXEC SQL\n";
+
   private static final String TEXT_ERR_PRG =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-DB2.\n"
@@ -162,6 +170,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n";
 
   private static final String ERR_MESSAGE = "Variable %s is not defined";
+  private static final String REPORT_MISSING_END_EXEC = "Missing token END-EXEC for the EXEC block";
 
   @Test
   void test1() {
@@ -321,5 +330,32 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         ImmutableMap.of(),
         ImmutableList.of(),
         analysisConfig);
+  }
+
+  @Test
+  void testSkipSql4() {
+    AnalysisConfig analysisConfig =
+            new AnalysisConfig(
+                    CopybookProcessingMode.ENABLED,
+                    ImmutableList.of(),
+                    true,
+                    false,
+                    false,
+                    ImmutableList.of(),
+                    ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+
+    UseCaseEngine.runTest(
+            TEXT_BACKEND_SKIP_SQL_MISSING_END_EXEC,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "err1",
+                    new Diagnostic(
+                            new Range(),
+                            REPORT_MISSING_END_EXEC,
+                            Error,
+                            ErrorSource.PREPROCESSING.getText())
+            ),
+            ImmutableList.of(),
+            analysisConfig);
   }
 }
