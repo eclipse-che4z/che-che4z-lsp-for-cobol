@@ -154,8 +154,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   }
 
   public async invalidate(documentUri: string, rejectPromise: boolean) {
-    this.logChannel?.debug(`Invalidate document: ${documentUri}`);
-
     this.invalidatePromise(documentUri, rejectPromise);
     if (rejectPromise) {
       this.diagnosticService.clearDiagnostics(documentUri);
