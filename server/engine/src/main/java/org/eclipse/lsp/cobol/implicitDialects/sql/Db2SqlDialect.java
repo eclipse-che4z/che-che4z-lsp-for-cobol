@@ -83,8 +83,7 @@ public class Db2SqlDialect implements CobolDialect {
         parseDB2(
             context.getExtendedDocument().toString(),
             context.getExtendedDocument().getUri(),
-            parseError,
-            isSqlProcessingEnabled);
+            parseError);
 
     // Traverse the parse tree to generate dialect specific nodes
     List<Node> nodes = db2SqlVisitor.visitStartRule(startRuleContext);
@@ -138,8 +137,7 @@ public class Db2SqlDialect implements CobolDialect {
   private Db2SqlParser.StartRuleContext parseDB2(
       String text,
       String programDocumentUri,
-      List<SyntaxError> errors,
-      boolean isSqlProcessingEnabled) {
+      List<SyntaxError> errors) {
     Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(text));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlParser parser = new Db2SqlParser(tokens);
