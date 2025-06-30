@@ -313,7 +313,8 @@ public class TestDataTypeLength {
 
   @Test
   void testDbcsUsageError() {
-    UseCaseEngine.runTest(TEXT_DBCS_ERROR,
+    UseCaseEngine.runTest(
+        TEXT_DBCS_ERROR,
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
@@ -369,8 +370,8 @@ public class TestDataTypeLength {
             "1",
             new Diagnostic(
                 new Range(),
-                "Numeric field 'INVALID-SIMPLE-DEC' with length 19 exceeds maximum allowed length of"
-                    + " 18 digits",
+                "Numeric field 'INVALID-SIMPLE-DEC' with length 19 exceeds maximum allowed length"
+                    + " of 18 digits",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -397,7 +398,8 @@ public class TestDataTypeLength {
             "3",
             new Diagnostic(
                 new Range(),
-                "Floating-point field 'INVALID-FLOAT-NO-DECIMAL' must include a decimal point (. or V)",
+                "Floating-point field 'INVALID-FLOAT-NO-DECIMAL' must include a decimal point (. or"
+                    + " V)",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "4",
