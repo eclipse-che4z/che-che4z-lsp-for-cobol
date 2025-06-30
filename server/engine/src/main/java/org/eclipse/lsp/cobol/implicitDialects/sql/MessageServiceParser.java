@@ -133,77 +133,43 @@ public abstract class MessageServiceParser extends Parser {
    * @param ctx context
    * @param maxValue max allowed value
    */
-  protected void validateLobSize(String input, ParserRuleContext ctx, Integer maxValue) {
-    if (input != null) {
-      Matcher matcher = PATTERN.matcher(input);
+  protected void validateLobSize(
+      String dataType, Db2SqlParser.LobSizeContext lobSize, Integer maxValue) {
+    Matcher matcher = PATTERN.matcher(lobSize.getText());
+    if (!matcher.matches()) return;
 
-      if (matcher.matches()) {
-        String dataType = matcher.group(1);
-        String numericValue = matcher.group(2);
-        String unit = matcher.group(3);
+    String numericValue = matcher.group(1);
+    String unit = matcher.group(2);
 
-        Db2SqlParser.LobSizeContext lobSize =
-            ctx.children.stream()
-                .filter(child -> child instanceof Db2SqlParser.LobSizeContext)
-                .map(child -> (Db2SqlParser.LobSizeContext) child)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("LobSizeContext not found"));
+    long size;
+    long scale = 1;
 
-        try {
-          long size = Long.parseLong(numericValue);
-          if (unit != null) {
-            switch (unit.toUpperCase()) {
-              case "K":
-                if (size > Long.MAX_VALUE / 1024) {
-                  notifyError(
-                      lobSize.getStart(),
-                      "db2Parser.maxDb2HostVarLengthExceeded",
-                      dataType,
-                      maxValue.toString());
-                  return;
-                }
-                size *= 1024;
-                break;
-              case "M":
-                if (size > Long.MAX_VALUE / (1024 * 1024)) {
-                  notifyError(
-                      lobSize.getStart(),
-                      "db2Parser.maxDb2HostVarLengthExceeded",
-                      dataType,
-                      maxValue.toString());
-                  return;
-                }
-                size *= 1024 * 1024;
-                break;
-              case "G":
-                if (size > Long.MAX_VALUE / (1024L * 1024L * 1024L)) {
-                  notifyError(
-                      lobSize.getStart(),
-                      "db2Parser.maxDb2HostVarLengthExceeded",
-                      dataType,
-                      maxValue.toString());
-                  return;
-                }
-                size *= 1024L * 1024L * 1024L;
-                break;
-              default:
-            }
-          }
-          if (size > maxValue) {
-            notifyError(
-                lobSize.getStart(),
-                "db2Parser.maxDb2HostVarLengthExceeded",
-                dataType,
-                maxValue.toString());
-          }
-        } catch (NumberFormatException e) {
-          notifyError(
-              lobSize.getStart(),
-              "db2Parser.maxDb2HostVarLengthExceeded",
-              dataType,
-              maxValue.toString());
-        }
+    if (unit != null) {
+      switch (unit.toUpperCase()) {
+        case "K":
+          scale = 1024;
+          break;
+        case "M":
+          scale = 1024 * 1024;
+          break;
+        case "G":
+          scale = 1024 * 1024 * 1024;
+          break;
+        default:
       }
+    }
+
+    try {
+      size = Integer.parseInt(numericValue);
+    } catch (NumberFormatException e) {
+      size = -1;
+    }
+    if (size < 0 || size * scale > maxValue) {
+      notifyError(
+          lobSize.getStart(),
+          "db2Parser.maxDb2HostVarLengthExceeded",
+          dataType,
+          maxValue.toString());
     }
   }
 
