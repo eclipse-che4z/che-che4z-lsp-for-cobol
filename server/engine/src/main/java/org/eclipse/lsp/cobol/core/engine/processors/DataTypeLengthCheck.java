@@ -134,7 +134,7 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
         MAX_NATIONAL_UTF8_DBCS_LENGTH,
         "dataTypeLengthCheck.maxDbcsLengthExceeded");
 
-    if (pictureClause.toUpperCase().contains("G")) {
+    if (pictureClause.toUpperCase().startsWith("G")) {
       checkDbcsUsageDisplay1(node, context);
     }
   }
