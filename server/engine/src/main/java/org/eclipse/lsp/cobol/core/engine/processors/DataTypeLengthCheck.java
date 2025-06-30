@@ -29,6 +29,7 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
   private static final int MAX_NUMERIC_LENGTH = 18;
   private static final int MAX_ALPHABETIC_ALPHANUMERIC_LENGTH = 999999999;
   private static final int MAX_NATIONAL_UTF8_DBCS_LENGTH = 99999999;
+  private static final int MAX_FLOATING_POINT_MANTISSA = 16;
 
   private static final Pattern NUMERIC_PATTERN = Pattern.compile("(?i)9\\((\\d+)\\)");
   private static final Pattern ALPHABETIC_PATTERN = Pattern.compile("(?i)A\\((\\d+)\\)");
@@ -36,7 +37,10 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
   private static final Pattern NATIONAL_PATTERN = Pattern.compile("(?i)N\\((\\d+)\\)");
   private static final Pattern UTF8_PATTERN = Pattern.compile("(?i)U\\((\\d+)\\)");
   private static final Pattern DBCS_PATTERN = Pattern.compile("(?i)G\\((\\d+)\\)");
-  private static final Pattern NUMERIC_WITH_DECIMAL_PATTERN = Pattern.compile("(?i)S?9\\((\\d+)\\)V9\\((\\d+)\\)");
+  private static final Pattern NUMERIC_WITH_DECIMAL_PATTERN =
+      Pattern.compile("(?i)S?9\\((\\d+)\\)V9\\((\\d+)\\)");
+  private static final Pattern FLOATING_POINT_PATTERN =
+      Pattern.compile("(?i)^([+-]?)(.*?)E([+-]?)(9+)$");
 
   @Override
   public void accept(
@@ -53,6 +57,10 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
 
   private void checkDataTypeLength(
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+
+    if (checkFloatingPointPattern(node, pictureClause, context)) {
+      return;
+    }
 
     if (checkNumericWithDecimalPattern(node, pictureClause, context)) {
       return;
@@ -131,9 +139,98 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
     }
   }
 
+  private boolean checkFloatingPointPattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+
+    if (!pictureClause.toUpperCase().contains("E")) {
+      return false;
+    }
+
+    Matcher matcher = FLOATING_POINT_PATTERN.matcher(pictureClause);
+    if (!matcher.matches()) {
+      return false;
+    }
+
+    String mantissaSign = matcher.group(1);
+    String mantissaPart = matcher.group(2);
+    String exponentSign = matcher.group(3);
+    String exponentPart = matcher.group(4);
+
+    if (mantissaSign.isEmpty()) {
+      context
+          .getErrors()
+          .add(
+              node.getError(
+                  MessageTemplate.of(
+                      "dataTypeLengthCheck.floatingPointMantissaMissingSign", node.getName())));
+    }
+
+    if (!mantissaPart.contains(".") && !mantissaPart.toUpperCase().contains("V")) {
+      context
+          .getErrors()
+          .add(
+              node.getError(
+                  MessageTemplate.of(
+                      "dataTypeLengthCheck.floatingPointMissingDecimal", node.getName())));
+    }
+
+    int digitCount = countDigitsInPictureString(mantissaPart);
+    int mantissaLength = digitCount > 0 ? digitCount - 1 : 0;
+
+    if (mantissaLength > MAX_FLOATING_POINT_MANTISSA) {
+      context
+          .getErrors()
+          .add(
+              node.getError(
+                  MessageTemplate.of(
+                      "dataTypeLengthCheck.floatingPointMantissaTooLong",
+                      node.getName(),
+                      String.valueOf(mantissaLength),
+                      String.valueOf(MAX_FLOATING_POINT_MANTISSA))));
+    }
+
+    if (exponentSign.isEmpty()) {
+      context
+          .getErrors()
+          .add(
+              node.getError(
+                  MessageTemplate.of(
+                      "dataTypeLengthCheck.floatingPointExponentMissingSign", node.getName())));
+    }
+
+    if (!exponentPart.equals("99")) {
+      context
+          .getErrors()
+          .add(
+              node.getError(
+                  MessageTemplate.of(
+                      "dataTypeLengthCheck.floatingPointExponentNotTwoDigits", node.getName())));
+    }
+
+    return true;
+  }
+
+  private int countDigitsInPictureString(String pictureString) {
+    int parenIndex = pictureString.indexOf('(');
+    if (parenIndex == -1) {
+      return 0;
+    }
+    String beforeParen = pictureString.substring(0, parenIndex);
+    String digitsBeforeParen = beforeParen.replaceAll("[v.]", "");
+    int lengthDigitsBeforeParen = digitsBeforeParen.length();
+    int closeParen = pictureString.indexOf(')', parenIndex);
+    if (closeParen == -1) {
+      return 0;
+    }
+    String numberInParen = pictureString.substring(parenIndex + 1, closeParen);
+    int size = Integer.parseInt(numberInParen);
+
+    return lengthDigitsBeforeParen + size - 1;
+  }
+
   private boolean checkNumericWithDecimalPattern(
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
-    
+
     Matcher matcher = NUMERIC_WITH_DECIMAL_PATTERN.matcher(pictureClause);
     if (!matcher.find()) {
       return false;
@@ -157,14 +254,13 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
 
   private boolean checkSimpleNumericWithDecimal(
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
-    
+
     if (!pictureClause.matches("(?i)S?9+V9+")) {
       return false;
     }
 
-    String numericPart = pictureClause.toUpperCase().startsWith("S")
-        ? pictureClause.substring(1) 
-        : pictureClause;
+    String numericPart =
+        pictureClause.toUpperCase().startsWith("S") ? pictureClause.substring(1) : pictureClause;
 
     String[] parts = numericPart.split("V");
     if (parts.length != 2) {
