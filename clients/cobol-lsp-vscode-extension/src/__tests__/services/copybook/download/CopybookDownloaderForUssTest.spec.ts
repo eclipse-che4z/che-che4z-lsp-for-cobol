@@ -64,17 +64,18 @@ describe("Tests Copybook download from USS", () => {
         jest
           .spyOn(SettingsService, "getCopybookFileEncoding")
           .mockReturnValue("utf8");
-        jest
-          .spyOn(SettingsService, "getCopybookExtension")
-          .mockResolvedValue([".cpy", ""]);
       });
 
       it("checks hasMember adds fetched list to cache when cache doesn't have the member and checks hasMember uses cache when have member is cached", async () => {
-        await downloader.hasMember("profile", "/ussFile", "uss_copybook");
+        await downloader.hasMember("profile", "/ussFile", "uss_copybook", [
+          ".cpy",
+          "",
+        ]);
         const res = await downloader.hasMember(
           "profile",
           "/ussFile",
           "uss_copybook",
+          [".cpy", ""],
         );
         expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(1);
         expect(res).toStrictEqual({ extension: ".cpy", name: "uss_copybook" });

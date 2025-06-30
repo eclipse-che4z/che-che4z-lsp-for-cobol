@@ -21,7 +21,11 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
     return libs;
   }
 
-  async resolveCopybookUri(copybookName: string, documentUri: Uri) {
+  async resolveCopybookUri(
+    copybookName: string,
+    documentUri: Uri,
+    _dialect: string,
+  ) {
     const profile = await this.getProfile(documentUri);
 
     if (!this.configCheck(documentUri)) {
@@ -56,6 +60,7 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
 
   async listCopybooks(
     documentUri: Uri,
+    _dialect: string,
     _outputChannel?: OutputChannel,
   ): Promise<string[]> {
     if (!this.configCheck(documentUri)) {

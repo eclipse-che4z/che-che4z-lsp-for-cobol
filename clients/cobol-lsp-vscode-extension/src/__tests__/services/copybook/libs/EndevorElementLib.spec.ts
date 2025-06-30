@@ -3,6 +3,7 @@ import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService
 import * as E4ECopybookService from "../../../../services/copybook/E4ECopybookService";
 import { E4E } from "../../../../type/e4eApi";
 import { EndevorElementLib } from "../../../../services/copybookLibs/EndevorElementLib";
+import { DEFAULT_DIALECT } from "../../../../constants";
 
 describe("Endevor Element Lib", () => {
   let e4eMock: E4E;
@@ -46,7 +47,11 @@ describe("Endevor Element Lib", () => {
         type: "type",
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("COPYBOOK", document);
+      const result = await lib.resolveCopybookUri(
+        "COPYBOOK",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(typeof result).toEqual("function");
 
       const downloadResult = await result!();
@@ -67,7 +72,11 @@ describe("Endevor Element Lib", () => {
         type: "type",
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("CASEtest", document);
+      const result = await lib.resolveCopybookUri(
+        "CASEtest",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(typeof result).toEqual("function");
 
       const downloadResult = await result!();
@@ -88,7 +97,11 @@ describe("Endevor Element Lib", () => {
         type: "type",
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("NOTFOUND", document);
+      const result = await lib.resolveCopybookUri(
+        "NOTFOUND",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(result).toBeUndefined();
     });
 
@@ -108,7 +121,11 @@ describe("Endevor Element Lib", () => {
           profile: "invalid",
         });
         const document = vscode.Uri.file("/program.cbl");
-        const result = await lib.resolveCopybookUri("COPYBOOK", document);
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          document,
+          DEFAULT_DIALECT,
+        );
         expect(result).toBeUndefined();
       });
     });
@@ -125,7 +142,7 @@ describe("Endevor Element Lib", () => {
         type: "type",
       });
       const document = vscode.Uri.file("/program.cbl");
-      const copybooks = await lib.listCopybooks(document);
+      const copybooks = await lib.listCopybooks(document, DEFAULT_DIALECT);
       expect(copybooks).toEqual(["COPYBOOK", "ANOTHER", "CaSeTeSt"]);
     });
   });

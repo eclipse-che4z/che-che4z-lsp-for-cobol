@@ -26,8 +26,8 @@ export abstract class ZoweExplorerDownloader {
   protected memberListCache: Map<string, MemberCacheItem[]> = new Map();
   protected failedRequests: Map<string, number> = new Map();
 
-  protected createId(profileName: string, path: string) {
-    return `${profileName}-${path}`;
+  protected createId(profileName: string, path: string, extensions: string[]) {
+    return `${profileName}|${path}|${extensions.join("|")}`;
   }
 
   /**
@@ -77,8 +77,13 @@ export abstract class ZoweExplorerDownloader {
     profileName: string,
     uss: string,
     copybookName: string,
+    allowedExtensions: string[],
   ): Promise<MemberCacheItem | undefined> {
-    const members = await this.getAllMembers(profileName, uss);
+    const members = await this.getAllMembers(
+      profileName,
+      uss,
+      allowedExtensions,
+    );
     copybookName = copybookName.toUpperCase();
     return members.find((member) => member.name.toUpperCase() === copybookName);
   }
@@ -86,5 +91,6 @@ export abstract class ZoweExplorerDownloader {
   public abstract getAllMembers(
     profileName: string,
     dataset: string,
+    extensions: string[],
   ): Promise<MemberCacheItem[]>;
 }

@@ -45,12 +45,14 @@ export async function loadProcessorGroupCopybooksLibs(
 
 export async function loadProcessorGroupCopybookExtensionsConfig(
   documentUri: Uri,
+  dialect: string,
   configObject: string[],
 ): Promise<string[]> {
   return loadProcessorGroupSettings(
     documentUri,
     "copybook-extensions",
     configObject,
+    dialect,
   );
 }
 

@@ -28,11 +28,12 @@ describe("Tests Copybook download from DNS", () => {
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {
       it("checks hasMember adds fetched list to cache when cache doesn't have the member and hasMember uses cache when have member is cached", async () => {
-        await downloader.hasMember("profile", "dataset", "copybook");
+        await downloader.hasMember("profile", "dataset", "copybook", []);
         const res = await downloader.hasMember(
           "profile",
           "dataset",
           "copybook",
+          [],
         );
         expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(1);
         expect(res).toStrictEqual({ extension: ".cpy", name: "copybook" });

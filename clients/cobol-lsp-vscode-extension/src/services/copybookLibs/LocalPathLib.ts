@@ -33,11 +33,17 @@ export default class LocalPathLib implements CopybookLib {
     );
   }
 
-  async resolveCopybookUri(copybookName: string, documentUri: vscode.Uri) {
+  async resolveCopybookUri(
+    copybookName: string,
+    documentUri: vscode.Uri,
+    dialect: string,
+  ) {
     const uris = this.getUris(documentUri);
 
-    const allowedExtensions =
-      await SettingsService.getCopybookExtension(documentUri);
+    const allowedExtensions = await SettingsService.getCopybookExtension(
+      documentUri,
+      dialect,
+    );
     const promises = uris.map(async (uri) => {
       return await localCopybooks.searchDirectory(
         uri,
@@ -56,12 +62,15 @@ export default class LocalPathLib implements CopybookLib {
 
   async listCopybooks(
     documentUri: vscode.Uri,
+    dialect: string,
     outputChannel?: vscode.OutputChannel,
   ): Promise<string[]> {
     const uris = this.getUris(documentUri);
 
-    const allowedExtensions =
-      await SettingsService.getCopybookExtension(documentUri);
+    const allowedExtensions = await SettingsService.getCopybookExtension(
+      documentUri,
+      dialect,
+    );
 
     const results = await Promise.allSettled(
       uris.map(async (directoryUri) =>

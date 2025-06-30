@@ -279,6 +279,7 @@ it("Processor groups configuration provides copybook-extensions", async () => {
   };
   const result = await loadProcessorGroupCopybookExtensionsConfig(
     item.scopeUri,
+    DEFAULT_DIALECT,
     [],
   );
   expect(result).toStrictEqual([".copy"]);

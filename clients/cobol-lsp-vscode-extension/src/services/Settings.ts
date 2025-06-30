@@ -196,14 +196,17 @@ export class SettingsService {
   }
 
   public static async getCopybookExtension(
-    documentUri?: vscode.Uri,
-  ): Promise<string[] | undefined> {
+    documentUri: vscode.Uri,
+    dialect: string,
+  ): Promise<string[]> {
     const global: string[] | undefined = vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(COPYBOOK_EXTENSIONS);
-    return documentUri === undefined
-      ? global
-      : loadProcessorGroupCopybookExtensionsConfig(documentUri, global!);
+    return loadProcessorGroupCopybookExtensionsConfig(
+      documentUri,
+      dialect,
+      global ?? [],
+    );
   }
 
   /**

@@ -7,12 +7,14 @@ export class MockLib implements CopybookLib {
   resolveCopybookUri(
     copybookName: string,
     _documentUri: Uri,
+    _dialect: string,
   ): Promise<Uri | (() => Promise<Uri | undefined>) | undefined> {
     return Promise.resolve(this.directory[copybookName]);
   }
 
   listCopybooks(
     _documentUri: Uri,
+    _dialect: string,
     _outputChannel?: OutputChannel,
   ): Promise<string[]> {
     return Promise.resolve(Object.keys(this.directory));

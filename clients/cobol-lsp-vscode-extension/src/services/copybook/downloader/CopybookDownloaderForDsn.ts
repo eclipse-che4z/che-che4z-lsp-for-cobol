@@ -30,7 +30,7 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
     profileName: string,
     dataset: string,
   ): Promise<MemberCacheItem[]> {
-    const id = this.createId(profileName, dataset);
+    const id = this.createId(profileName, dataset, []);
 
     if (this.memberListCache.has(id)) {
       return this.memberListCache.get(id)!;

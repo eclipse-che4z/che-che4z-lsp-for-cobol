@@ -9,6 +9,7 @@ import { Utils } from "../../../../services/util/Utils";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { UssPathLib } from "../../../../services/copybookLibs/UssPathLib";
+import { DEFAULT_DIALECT } from "../../../../constants";
 
 describe("USS copybook lib", () => {
   let zoweExplorerApiMock: IApiRegisterClient;
@@ -48,6 +49,7 @@ describe("USS copybook lib", () => {
         const result = await lib.resolveCopybookUri(
           "COPYBOOK",
           vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
         );
         expect(result).toEqual(
           vscode.Uri.parse(
@@ -66,6 +68,7 @@ describe("USS copybook lib", () => {
         const result = await lib.resolveCopybookUri(
           "COPYBOOK",
           vscode.Uri.file("/ABCPROG.cbl"),
+          DEFAULT_DIALECT,
         );
         expect(result).toEqual(
           vscode.Uri.parse(
@@ -81,6 +84,7 @@ describe("USS copybook lib", () => {
         const result = await lib.resolveCopybookUri(
           "NONEXIST",
           vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
         );
         expect(result).toBeUndefined();
       });
@@ -90,7 +94,11 @@ describe("USS copybook lib", () => {
       it("throws File Not Found error", async () => {
         const lib = new UssPathLib("/remote/uss/not-exists", "profile");
         await expect(
-          lib.resolveCopybookUri("COPYBOOK", vscode.Uri.file("/program.cbl")),
+          lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          ),
         ).rejects.toEqual(new FileNotFound());
       });
     });
@@ -101,6 +109,7 @@ describe("USS copybook lib", () => {
         const result = await lib.resolveCopybookUri(
           "COPYBOOK",
           vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
         );
         expect(result).toBeUndefined();
       });
@@ -121,7 +130,10 @@ describe("USS copybook lib", () => {
     describe("list copybook from dataset", () => {
       it("returns array of names of copybooks present in the dataset", async () => {
         const lib = new UssPathLib("/remote/uss/copybooks", "profile");
-        const result = await lib.listCopybooks(vscode.Uri.file("/program.cbl"));
+        const result = await lib.listCopybooks(
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
         expect(result).toEqual(["COPYBOOK", "CaSEsEnSiTiVe"]);
       });
     });
@@ -130,7 +142,11 @@ describe("USS copybook lib", () => {
       it("throws File Not Found error", async () => {
         const lib = new UssPathLib("/remote/uss/not-exists", "profile");
         await expect(
-          lib.resolveCopybookUri("COPYBOOK", vscode.Uri.file("/program.cbl")),
+          lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          ),
         ).rejects.toEqual(new FileNotFound());
       });
     });
@@ -138,7 +154,10 @@ describe("USS copybook lib", () => {
     describe("invalid configuration check", () => {
       it("resolves to empty array if configuration check fails - i.e. profile is not configured", async () => {
         const lib = new UssPathLib("/remote/uss/copybooks", "invalid-profile");
-        const result = await lib.listCopybooks(vscode.Uri.file("/program.cbl"));
+        const result = await lib.listCopybooks(
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
         expect(result).toEqual([]);
       });
     });

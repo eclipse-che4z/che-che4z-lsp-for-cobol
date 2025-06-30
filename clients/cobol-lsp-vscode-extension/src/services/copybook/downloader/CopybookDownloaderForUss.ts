@@ -11,7 +11,6 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { SettingsService } from "../../Settings";
 import { splitFilename } from "../../util/FSUtils";
 import {
   MemberCacheItem,
@@ -30,15 +29,14 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
   public async getAllMembers(
     profileName: string,
     dataset: string,
+    allowedCopybooksExtensions: string[],
   ): Promise<MemberCacheItem[]> {
-    const id = this.createId(profileName, dataset);
+    const id = this.createId(profileName, dataset, allowedCopybooksExtensions);
 
     if (this.memberListCache.has(id)) {
       return this.memberListCache.get(id)!;
     }
 
-    let allowedCopybooksExtensions =
-      await SettingsService.getCopybookExtension();
     allowedCopybooksExtensions = allowedCopybooksExtensions?.map((ext) =>
       ext.toLowerCase(),
     );

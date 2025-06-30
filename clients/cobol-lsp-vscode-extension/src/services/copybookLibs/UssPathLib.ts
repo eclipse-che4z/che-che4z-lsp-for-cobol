@@ -29,6 +29,7 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
   async resolveCopybookUri(
     copybookName: string,
     documentUri: vscode.Uri,
+    dialect: string,
   ): Promise<vscode.Uri | undefined> {
     const variables = getVariablesFromUri(documentUri, false);
     const evaluatedPath = SettingsService.evaluateVariables(
@@ -42,10 +43,16 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
       return;
     }
 
+    const allowedExtensions = await SettingsService.getCopybookExtension(
+      documentUri,
+      dialect,
+    );
+
     const member = await externalApis.ussService?.hasMember(
       profile,
       evaluatedPath,
       copybookName,
+      allowedExtensions,
     );
 
     if (member) {
@@ -57,6 +64,7 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
 
   async listCopybooks(
     documentUri: vscode.Uri,
+    dialect: string,
     _outputChannel?: vscode.OutputChannel,
   ): Promise<string[]> {
     const profile = this.getProfile(documentUri);
@@ -65,9 +73,15 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
       return [];
     }
 
+    const allowedExtensions = await SettingsService.getCopybookExtension(
+      documentUri,
+      dialect,
+    );
+
     const members = await externalApis.ussService?.getAllMembers(
       profile,
       this.uss,
+      allowedExtensions,
     );
 
     return members?.map((m) => m.name) ?? [];

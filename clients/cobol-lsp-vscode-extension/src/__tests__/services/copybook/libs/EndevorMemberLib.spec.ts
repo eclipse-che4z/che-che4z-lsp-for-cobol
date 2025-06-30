@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService";
 import * as E4ECopybookService from "../../../../services/copybook/E4ECopybookService";
 import { E4E } from "../../../../type/e4eApi";
+import { DEFAULT_DIALECT } from "../../../../constants";
 
 describe("Endevor Member Lib", () => {
   let e4eMock: E4E;
@@ -41,7 +42,11 @@ describe("Endevor Member Lib", () => {
         profile: "profile",
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("COPYBOOK", document);
+      const result = await lib.resolveCopybookUri(
+        "COPYBOOK",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(typeof result).toEqual("function");
 
       // copybook is resolved, but hasn't been downloaded yet
@@ -68,7 +73,11 @@ describe("Endevor Member Lib", () => {
         dataset,
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("COPYBOOK", document);
+      const result = await lib.resolveCopybookUri(
+        "COPYBOOK",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(typeof result).toEqual("function");
 
       const downloadResult = await result!();
@@ -84,7 +93,11 @@ describe("Endevor Member Lib", () => {
         dataset,
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("CASEtest", document);
+      const result = await lib.resolveCopybookUri(
+        "CASEtest",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(typeof result).toEqual("function");
 
       const downloadResult = await result!();
@@ -100,7 +113,11 @@ describe("Endevor Member Lib", () => {
         dataset,
       });
       const document = vscode.Uri.file("/program.cbl");
-      const result = await lib.resolveCopybookUri("NOTFOUND", document);
+      const result = await lib.resolveCopybookUri(
+        "NOTFOUND",
+        document,
+        DEFAULT_DIALECT,
+      );
       expect(result).toBeUndefined();
     });
 
@@ -115,7 +132,11 @@ describe("Endevor Member Lib", () => {
           profile: "invalid",
         });
         const document = vscode.Uri.file("/program.cbl");
-        const result = await lib.resolveCopybookUri("COPYBOOK", document);
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          document,
+          DEFAULT_DIALECT,
+        );
         expect(result).toBeUndefined();
       });
     });
@@ -125,7 +146,7 @@ describe("Endevor Member Lib", () => {
     it("return list of members from endevor api", async () => {
       const lib = new EndevorMemberLib({ dataset });
       const document = vscode.Uri.file("/program.cbl");
-      const copybooks = await lib.listCopybooks(document);
+      const copybooks = await lib.listCopybooks(document, DEFAULT_DIALECT);
       expect(copybooks).toEqual(["COPYBOOK", "ANOTHER", "CaSeTeSt"]);
     });
   });
