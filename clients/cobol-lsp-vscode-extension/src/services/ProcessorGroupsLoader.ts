@@ -275,7 +275,10 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
   );
   return {
     name: "VSCodeSettingProcessorGroup",
-    libs: transformLibs([...directoryPaths, ...dsns, ...usss]),
+    libs: transformLibs(
+      [...directoryPaths, ...dsns, ...usss],
+      [LocalPathLib, DatasetLib, UssPathLib],
+    ),
   };
 }
 

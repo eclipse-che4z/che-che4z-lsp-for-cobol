@@ -6,8 +6,11 @@ import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService
 import {
   findFilesResult,
   getConfigurationResult,
+  getWorkspaceFolderResult,
+  readFileResult,
 } from "../../../../__mocks__/vscode";
 import { DEFAULT_DIALECT } from "../../../../constants";
+import { loadProcessorGroupCopybooksLibs } from "../../../../services/ProcessorGroups";
 
 describe("Local copybook library", () => {
   beforeEach(async () => {
@@ -125,6 +128,95 @@ describe("Local copybook library", () => {
         });
       });
     });
+
+    describe("copybook files extension filter configuration is respected", () => {
+      const WORKSPACE_PATH = "/tests/local-libs-ext";
+      const WORKSPACE_URI = vscode.Uri.file(WORKSPACE_PATH);
+
+      beforeEach(() => {
+        getConfigurationResult["copybook-extensions"] = [".cpa"];
+        getConfigurationResult["paths-local"] = ["a"];
+        getWorkspaceFolderResult.uri = WORKSPACE_URI;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] = `{
+          "pgroups": [
+            {
+              "name": "test",
+              "copybook-extensions": ["cpb"],
+              "libs": ["b"],
+              "preprocessor": [
+                {
+                  "name": "preproc",
+                  "copybook-extensions": ["cpc"],
+                  "libs": ["c"]
+                }
+              ]
+            }
+          ]
+        }`;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/pgm_conf.json`] = `{
+            "pgms": [
+                { "program": "/TEST.cob", "pgroup": "test" }
+            ]
+          }`;
+
+        const extensions = ["cpa", "cpb", "cpc"];
+        const testFile = (path: string, ext: string) =>
+          vscode.Uri.file(`${path}/COPY.${ext}`);
+        const testFiles = (path: string) =>
+          extensions.map((ext) => testFile(path, ext));
+
+        findFilesResult[`${WORKSPACE_PATH}/a`] = testFiles(
+          `${WORKSPACE_PATH}/a`,
+        );
+        findFilesResult[`${WORKSPACE_PATH}/b`] = testFiles(
+          `${WORKSPACE_PATH}/b`,
+        );
+        findFilesResult[`${WORKSPACE_PATH}/c`] = testFiles(
+          `${WORKSPACE_PATH}/c`,
+        );
+      });
+
+      it("uses vscode settings extension configuration", async () => {
+        const document = vscode.Uri.file("/NOPG.cob");
+        const libs = await loadProcessorGroupCopybooksLibs(
+          document,
+          DEFAULT_DIALECT,
+        );
+        const result = await libs[0].resolveCopybookUri(
+          "COPY",
+          document,
+          DEFAULT_DIALECT,
+        );
+
+        expect(result).toEqual(vscode.Uri.file(`${WORKSPACE_PATH}/a/COPY.cpa`));
+      });
+
+      it("uses processor group extension configuration", async () => {
+        const document = vscode.Uri.file("/TEST.cob");
+        const libs = await loadProcessorGroupCopybooksLibs(
+          document,
+          DEFAULT_DIALECT,
+        );
+        const result = await libs[0].resolveCopybookUri(
+          "COPY",
+          document,
+          DEFAULT_DIALECT,
+        );
+
+        expect(result).toEqual(vscode.Uri.file(`${WORKSPACE_PATH}/b/COPY.cpb`));
+      });
+
+      it("uses process group preprocessor extension configuration", async () => {
+        const document = vscode.Uri.file("/TEST.cob");
+        const libs = await loadProcessorGroupCopybooksLibs(document, "preproc");
+        const result = await libs[0].resolveCopybookUri(
+          "COPY",
+          document,
+          "preproc",
+        );
+        expect(result).toEqual(vscode.Uri.file(`${WORKSPACE_PATH}/c/COPY.cpc`));
+      });
+    });
   });
 
   describe("listCopybooks", () => {
@@ -155,6 +247,7 @@ describe("Local copybook library", () => {
           vscode.Uri.file("/other/copybooks/COPYBOOK.cpy"),
           vscode.Uri.file("/other/copybooks/OTHER.cpy"),
         ];
+        getWorkspaceFolderResult.uri = vscode.Uri.file("/workspace");
       });
 
       it("resolves copybook uri in all workspace folders", async () => {
