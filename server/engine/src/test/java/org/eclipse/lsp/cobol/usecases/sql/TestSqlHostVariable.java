@@ -781,19 +781,19 @@ public class TestSqlHostVariable {
             "1",
             new Diagnostic(
                 new Range(),
-                "'BLOB' type variable exceeds maximum length of 2147483647 bytes",
+                "'BLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "'BLOB' type variable exceeds maximum length of 2147483647 bytes",
+                "'BLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-                "'BLOB' type variable exceeds maximum length of 2147483647 bytes",
+                "'BLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }
@@ -807,7 +807,7 @@ public class TestSqlHostVariable {
             "1",
             new Diagnostic(
                 new Range(),
-                "'DBCLOB' type variable exceeds maximum length of 1073741823 bytes",
+                "'DBCLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }
