@@ -164,44 +164,26 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
   }
 
   @Override
-  public Object visitCobolCompilerOption(CompilerDirectivesParser.CobolCompilerOptionContext ctx) {
-    if (ctx.cobolJavaInteroperabilityOptions() != null) {
-      CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext cobolJavaIopCtx =
-          ctx.cobolJavaInteroperabilityOptions();
+  public Object visitCobolJavaInteroperabilityOptions(
+      CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
+    for (TerminalNode commaToken : ctx.COMMACHAR()) {
+      if (commaToken.getText().length() <= 1) continue;
+      Range range =
+          CompilerDirectivesUtils.shiftRange(
+              AntlrRangeUtils.constructRange(commaToken), startPosition);
 
-      cobolJavaIopCtx
-          .COMMACHAR()
-          .forEach(
-              commaToken -> {
-                if (commaToken.getText().length() > 1) {
-                  Range range =
-                      CompilerDirectivesUtils.shiftRange(
-                          new Range(
-                              new Position(
-                                  commaToken.getSymbol().getLine() - 1,
-                                  commaToken.getSymbol().getCharPositionInLine() + 1),
-                              new Position(
-                                  commaToken.getSymbol().getLine() - 1,
-                                  commaToken.getSymbol().getCharPositionInLine()
-                                      + commaToken.getText().length())),
-                          startPosition);
-
-                  Location location =
-                      new Location(analysisContext.getExtendedDocument().getUri(), range);
-                  analysisContext
-                      .getAccumulatedErrors()
-                      .add(
-                          SyntaxError.syntaxError()
-                              .errorSource(ErrorSource.PARSING)
-                              .location(new OriginalLocation(location, null))
-                              .suggestion(
-                                  messageService.getMessage(
-                                      "compilerDirective.javaiop.spaceAfterComma"))
-                              .severity(ErrorSeverity.ERROR)
-                              .build());
-                }
-              });
+      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      analysisContext
+          .getAccumulatedErrors()
+          .add(
+              SyntaxError.syntaxError()
+                  .errorSource(ErrorSource.PARSING)
+                  .location(new OriginalLocation(location, null))
+                  .suggestion(
+                      messageService.getMessage("compilerDirective.javaiop.spaceAfterComma"))
+                  .severity(ErrorSeverity.ERROR)
+                  .build());
     }
-    return super.visitCobolCompilerOption(ctx);
+    return super.visitCobolJavaInteroperabilityOptions(ctx);
   }
 }
