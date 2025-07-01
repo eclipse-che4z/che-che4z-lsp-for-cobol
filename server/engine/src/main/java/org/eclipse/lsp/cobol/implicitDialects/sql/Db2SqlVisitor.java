@@ -114,9 +114,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
       if (ctx.lobWithSize() != null) {
         addLobWithSizeNodes(
             variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize().lobSize()));
-      } else {
-        addLobWithSizeNodes(
-            variableDefinitionNode, generatedVariableLevel, lobSize(ctx.lobWithSize().lobSize()));
       }
     }
 
@@ -200,12 +197,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
             lobSize(ctx.lobWithSize().lobSize()),
             ctx);
-
-      } else {
-        generateVarbinVariables(
-            (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-            lobSize(ctx.lobWithSize().lobSize()),
-            ctx);
       }
     }
     return hostVariableDefinitionNode;
@@ -218,11 +209,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
         createHostVariableDefinitionNode(ctx, ctx.dbs_host_var_levels_arrays(), ctx.entry_name());
     if (ctx.lobWithSize() != null) {
       if (ctx.lobWithSize() != null) {
-        generateVarbinVariables(
-            (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
-            lobSize(ctx.lobWithSize().lobSize()),
-            ctx);
-      } else {
         generateVarbinVariables(
             (VariableDefinitionNode) hostVariableDefinitionNode.get(0),
             lobSize(ctx.lobWithSize().lobSize()),
