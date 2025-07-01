@@ -68,7 +68,7 @@ tableLocators: TABLE LIKE entry_name AS LOCATOR;
 
 lobWithSize
   : (BINARY LARGE OBJECT | BLOB) LPARENCHAR lobSize RPARENCHAR { validateLobSize("BLOB", $lobSize.ctx, 2147483647);}
-  | (CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB) LPARENCHAR lobSize RPARENCHAR { validateLobSize("CLOB", $lobSize.ctx, 2147483647);}
+  | (CHARACTER LARGE OBJECT | CHAR LARGE OBJECT | CLOB) LPARENCHAR lobSize RPARENCHAR { validateLobSize("CLOB", $lobSize.ctx, 999999999);}
   | DBCLOB LPARENCHAR lobSize RPARENCHAR { validateLobSize("DBCLOB", $lobSize.ctx, 1073741823);}
   ;
 

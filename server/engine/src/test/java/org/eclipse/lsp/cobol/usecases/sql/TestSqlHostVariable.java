@@ -150,7 +150,7 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR3`->VAR3`->VAR3-LENGTH`->VAR3-DATA} USAGE IS SQL TYPE IS CHARACTER"
           + " LARGE OBJECT (10 M).\n"
           + "       01 {$*VAR4`->VAR4`->VAR4-LENGTH`->VAR4-DATA} USAGE IS SQL TYPE IS CHAR LARGE"
-          + " OBJECT (1 G).\n"
+          + " OBJECT (1000 K).\n"
           + "       01 {$*VAR5`->VAR5`->VAR5-LENGTH`->VAR5-DATA} USAGE IS SQL TYPE IS CLOB (20).\n"
           + "       01 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS DBCLOB (30"
           + " K).\n"
@@ -199,7 +199,7 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR3`->VAR3`->VAR3-LENGTH`->VAR3-DATA} USAGE IS SQL TYPE IS XML AS"
           + " CHARACTER LARGE OBJECT (10 M).\n"
           + "       01 {$*VAR4`->VAR4`->VAR4-LENGTH`->VAR4-DATA} USAGE IS SQL TYPE IS XML AS CHAR"
-          + " LARGE OBJECT (1 G).\n"
+          + " LARGE OBJECT (999999999).\n"
           + "       01 {$*VAR5`->VAR5`->VAR5-LENGTH`->VAR5-DATA} USAGE IS SQL TYPE IS XML AS CLOB"
           + " (20).\n"
           + "       01 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS XML AS DBCLOB"
@@ -755,19 +755,19 @@ public class TestSqlHostVariable {
             "1",
             new Diagnostic(
                 new Range(),
-                "'CLOB' type variable exceeds maximum length of 2147483647 bytes",
+                "'CLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText()),
             "2",
             new Diagnostic(
                 new Range(),
-                "'CLOB' type variable exceeds maximum length of 2147483647 bytes",
+                "'CLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText()),
             "3",
             new Diagnostic(
                 new Range(),
-                "'CLOB' type variable exceeds maximum length of 2147483647 bytes",
+                "'CLOB' type variable exceeds maximum length of 999999999 bytes",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }
