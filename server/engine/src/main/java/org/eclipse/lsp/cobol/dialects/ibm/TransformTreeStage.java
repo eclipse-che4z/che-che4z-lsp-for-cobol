@@ -15,21 +15,13 @@
 package org.eclipse.lsp.cobol.dialects.ibm;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
-import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
-import org.eclipse.lsp.cobol.common.error.ErrorSource;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -44,7 +36,6 @@ import org.eclipse.lsp.cobol.common.pipeline.StageResult;
 import org.eclipse.lsp.cobol.common.processor.*;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.RangeUtils;
-import org.eclipse.lsp.cobol.core.CobolLexer;
 import org.eclipse.lsp.cobol.core.CobolParser;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
@@ -59,7 +50,6 @@ import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutStore;
 import org.eclipse.lsp.cobol.service.settings.layout.CodeLayoutUtil;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 /** Transform Tree Stage */
@@ -74,12 +64,6 @@ public class TransformTreeStage
   protected final DialectService dialectService;
   protected final AstProcessor astProcessor;
   protected final CodeLayoutStore layoutStore;
-  private static final Pattern JAVA_CALLABLE_PATTERN =
-      Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-CALLABLE)(?:\\s+(.+))?\\s*$");
-  private static final Pattern JAVA_SHAREABLE_ON_PATTERN =
-      Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-SHAREABLE\\s+ON)(?:\\s+(.+))?\\s*$");
-  private static final Pattern JAVA_SHAREABLE_OFF_PATTERN =
-      Pattern.compile("(?i)\\s*(>>)(\\s*)(JAVA-SHAREABLE\\s+OFF)(?:\\s+(.+))?\\s*$");
 
   @Override
   public StageResult<ProcessingResult> run(
@@ -94,8 +78,7 @@ public class TransformTreeStage
                     prevStageResult.getData().getTokens(),
                     prevStageResult.getData().getTree())
                 .get(0);
-    processCobolJavaInteroperabilityDirectives(
-        context, prevStageResult.getData().getTokens(), rootNode);
+
     SymbolAccumulator symbolAccumulator = new SymbolAccumulator();
     processSyntaxTree(context.getConfig(), symbolAccumulator, context, rootNode);
 
@@ -163,7 +146,12 @@ public class TransformTreeStage
           context.getCopybooksRepository().getDefinitions().get(name).stream()
               .findFirst()
               .orElse(null);
-      rootNode.addChild(new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
+      Optional<Node> nodeByPosition =
+          RangeUtils.findNodeByPosition(
+              rootNode, statementLocality.getUri(), statementLocality.getRange().getStart());
+      nodeByPosition
+          .orElse(rootNode)
+          .addChild(new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
     }
   }
 
@@ -400,236 +388,5 @@ public class TransformTreeStage
     // Dialects
     List<ProcessorDescription> pds = dialectService.getProcessors(analysisConfig.getDialects());
     pds.forEach(ctx::register);
-  }
-
-  private void processCobolJavaInteroperabilityDirectives(
-      AnalysisContext context, CommonTokenStream tokenStream, RootNode rootNode) {
-    List<Token> compilerLineTokens =
-        tokenStream.getTokens().stream()
-            .filter(
-                token ->
-                    token.getType() == CobolLexer.COMPILERLINE
-                        || token.getType() == CobolLexer.IDENTIFICATION
-                        || token.getType() == CobolLexer.DATA
-                        || token.getType() == CobolLexer.WORKING_STORAGE
-                        || token.getType() == CobolLexer.PROCEDURE)
-            .collect(Collectors.toList());
-
-    validateJavaInteroperabilityDirectives(context, compilerLineTokens, rootNode);
-  }
-
-  private void validateJavaInteroperabilityDirectives(
-      AnalysisContext analysisContext, List<Token> compilerLineTokens, RootNode rootNode) {
-    DirectiveValidationState state = new DirectiveValidationState();
-
-    for (Token token : compilerLineTokens) {
-      updateStateForToken(state, token);
-
-      if (token.getType() == CobolLexer.COMPILERLINE) {
-        validateCompilerDirective(analysisContext, token, state, rootNode);
-      }
-    }
-  }
-
-  private void updateStateForToken(DirectiveValidationState state, Token token) {
-    switch (token.getType()) {
-      case CobolLexer.IDENTIFICATION:
-        state.currentSection = "IDENTIFICATION";
-        break;
-      case CobolLexer.DATA:
-        state.currentSection = "DATA";
-        break;
-      case CobolLexer.WORKING_STORAGE:
-        state.currentSection = "WORKING-STORAGE";
-        break;
-      case CobolLexer.PROCEDURE:
-        state.currentSection = "PROCEDURE";
-        break;
-      default:
-    }
-  }
-
-  private void validateCompilerDirective(
-      AnalysisContext analysisContext,
-      Token token,
-      DirectiveValidationState state,
-      RootNode rootNode) {
-    String tokenText = token.getText();
-
-    Matcher callableMatcher = JAVA_CALLABLE_PATTERN.matcher(tokenText);
-    if (callableMatcher.matches()) {
-      if (validateNestedProgramRestriction(analysisContext, token, tokenText, rootNode)) {
-        validateDirective(
-            analysisContext,
-            token,
-            callableMatcher,
-            state.currentSection.equals("DATA") || state.currentSection.equals("WORKING-STORAGE"),
-            "compilerDirective.validation.dataSection");
-      }
-      return;
-    }
-
-    Matcher shareableOnMatcher = JAVA_SHAREABLE_ON_PATTERN.matcher(tokenText);
-    if (shareableOnMatcher.matches()) {
-      if (validateNestedProgramRestriction(analysisContext, token, tokenText, rootNode)) {
-        state.isJavaShareableOn = true;
-        validateDirective(
-            analysisContext,
-            token,
-            shareableOnMatcher,
-            state.currentSection.equals("WORKING-STORAGE"),
-            "compilerDirective.validation.workingSection");
-      }
-      return;
-    }
-
-    Matcher shareableOffMatcher = JAVA_SHAREABLE_OFF_PATTERN.matcher(tokenText);
-    if (shareableOffMatcher.matches()) {
-      if (validateNestedProgramRestriction(analysisContext, token, tokenText, rootNode)) {
-        if (!state.isJavaShareableOn) {
-          createError(
-              analysisContext,
-              token,
-              callOffsetForToken(tokenText),
-              messageService.getMessage(
-                  "compilerDirective.validation.javaShareableOff",
-                  tokenText.replaceAll(">>\\s?", "")));
-        } else {
-          state.isJavaShareableOn = false;
-        }
-
-        validateDirective(
-            analysisContext,
-            token,
-            shareableOffMatcher,
-            state.currentSection.equals("WORKING-STORAGE"),
-            "compilerDirective.validation.workingSection");
-      }
-    }
-  }
-
-  private boolean validateNestedProgramRestriction(
-      AnalysisContext analysisContext, Token token, String tokenText, RootNode rootNode) {
-
-    List<ProgramNode> programs = rootNode.findPrograms();
-
-    Position tokenPosition = new Position(token.getLine() - 1, token.getCharPositionInLine());
-    for (ProgramNode program : programs) {
-      if (isNestedProgram(program) && isPositionWithinNode(tokenPosition, program)) {
-        createError(
-            analysisContext,
-            token,
-            callOffsetForToken(tokenText),
-            messageService.getMessage(
-                "compilerDirective.validation.nestedProgram", tokenText.replaceAll(">>\\s?", "")));
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private boolean isNestedProgram(ProgramNode program) {
-    Node parent = program.getParent();
-    while (parent != null) {
-      if (parent instanceof ProgramNode) {
-        return true;
-      }
-      parent = parent.getParent();
-    }
-    return false;
-  }
-
-  private boolean isPositionWithinNode(Position position, Node node) {
-    if (node.getLocality() == null || node.getLocality().getRange() == null) {
-      return false;
-    }
-    Range nodeRange = node.getLocality().getRange();
-    Range positionRange = new Range(position, position);
-    return RangeUtils.isInside(positionRange, nodeRange);
-  }
-
-  private static class DirectiveValidationState {
-    boolean isJavaShareableOn = false;
-    String currentSection = "";
-  }
-
-  private void validateDirective(
-      AnalysisContext analysisContext,
-      Token token,
-      Matcher matcher,
-      boolean isValidPosition,
-      String positionErrorKey) {
-    String spaces = matcher.group(2);
-    String extraText =
-        matcher.groupCount() >= 4 && matcher.group(4) != null ? matcher.group(4).trim() : "";
-
-    if (spaces.length() > 1) {
-      int offset = token.getText().indexOf(">>") + 2 + spaces.length();
-      createError(
-          analysisContext,
-          token,
-          offset,
-          messageService.getMessage("compilerDirective.invalid", matcher.group(3).trim()));
-      return;
-    }
-
-    if (!isValidPosition) {
-      createError(
-          analysisContext,
-          token,
-          callOffsetForToken(token.getText()),
-          messageService.getMessage(positionErrorKey, token.getText().replaceAll(">>\\s?", "")));
-    }
-
-    if (!extraText.isEmpty()) {
-      String tokenText = token.getText();
-      int extraTextStartPos = tokenText.lastIndexOf(extraText);
-      createError(
-          analysisContext,
-          token,
-          extraTextStartPos,
-          messageService.getMessage("compilerOption.invalid", extraText));
-    }
-  }
-
-  private int callOffsetForToken(String tokenText) {
-    return tokenText.startsWith(">> ") ? 3 : 2;
-  }
-
-  private void createError(
-      AnalysisContext analysisContext, Token token, int startOffset, String message) {
-    Range range =
-        new Range(
-            new Position(token.getLine() - 1, token.getCharPositionInLine() + startOffset),
-            new Position(
-                token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
-    Location location = analysisContext.getExtendedDocument().mapLocation(range);
-
-    throwException(analysisContext, locationToLocality(analysisContext, location), message);
-  }
-
-  private Locality locationToLocality(AnalysisContext analysisContext, Location location) {
-    Locality.LocalityBuilder builder =
-        Locality.builder().range(location.getRange()).uri(location.getUri());
-    if (analysisContext.getCopybooksRepository() != null) {
-      builder.copybookId(
-          analysisContext.getCopybooksRepository().getCopybookIdByUri(location.getUri()));
-    }
-    return builder.build();
-  }
-
-  private void throwException(
-      AnalysisContext analysisContext, @NonNull Locality locality, String message) {
-    SyntaxError error =
-        SyntaxError.syntaxError()
-            .errorSource(ErrorSource.PARSING)
-            .location(locality.toOriginalLocation())
-            .suggestion(message)
-            .severity(ErrorSeverity.ERROR)
-            .build();
-
-    if (!analysisContext.getAccumulatedErrors().contains(error)) {
-      analysisContext.getAccumulatedErrors().add(error);
-    }
   }
 }
