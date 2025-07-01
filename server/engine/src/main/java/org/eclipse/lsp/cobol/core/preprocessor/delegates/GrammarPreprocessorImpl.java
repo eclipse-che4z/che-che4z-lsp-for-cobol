@@ -60,18 +60,19 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
       @NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor) {
     List<SyntaxError> errors = new ArrayList<>();
 
-    String replacedCode =
-        replace(context.getCurrentDocument(), context.getHierarchy(), context.getLanguageId())
-            .unwrap(errors::addAll);
+    CopybooksRepository copybooksRepository =
+        preprocessDirectives(context, preprocessor).unwrap(errors::addAll);
+    replace(context.getCurrentDocument(), context.getHierarchy(), context.getLanguageId())
+        .unwrap(errors::addAll);
 
-    return preprocess(context, preprocessor, replacedCode).accumulateErrors(errors);
+    return new ResultWithErrors<>(copybooksRepository, errors);
   }
 
   private ResultWithErrors<String> replace(
       ExtendedDocument extendedDocument, CopybookHierarchy hierarchy, CobolLanguageId languageId) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     CobolPreprocessor preprocessorParser =
-        new CobolPreprocessor(makeTokens(extendedDocument.toString()));
+        new CobolPreprocessor(makeTokens(extendedDocument.getCurrentText().toString()));
     preprocessorParser.removeErrorListeners();
 
     ReplacePreProcessorListener listener =
@@ -81,10 +82,11 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     return new ResultWithErrors<>(extendedDocument.toString(), listener.getErrors());
   }
 
-  private ResultWithErrors<CopybooksRepository> preprocess(
-      PreprocessorContext context, CleanerPreprocessor preprocessor, String code) {
+  private ResultWithErrors<CopybooksRepository> preprocessDirectives(
+      PreprocessorContext context, CleanerPreprocessor preprocessor) {
     ThreadInterruptionUtil.checkThreadInterrupted();
-    BufferedTokenStream tokens = makeTokens(code);
+    BufferedTokenStream tokens =
+        makeTokens(context.getCurrentDocument().getCurrentText().toString());
 
     GrammarPreprocessorListener<CopybooksRepository> listener =
         listenerFactory.create(context, preprocessor);
@@ -95,6 +97,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
 
     ParseTreeWalker walker = new ParseTreeWalker();
     walker.walk(listener, parser.startRule());
+    context.getCurrentDocument().commitTransformations();
     return listener.getResult();
   }
 

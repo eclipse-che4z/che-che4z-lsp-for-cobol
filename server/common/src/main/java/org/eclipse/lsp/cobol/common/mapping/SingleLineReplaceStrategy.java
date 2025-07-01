@@ -36,21 +36,16 @@ class SingleLineReplaceStrategy implements ReplaceStrategy {
   private void addLines(
       ExtendedText extendedText, Position position, String[] newLines, Location instantLocation) {
     if (newLines.length == 1) {
-      extendedText.insert(
-          position, new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
+      extendedText.insert(position, new ExtendedTextLine(newLines[0], instantLocation));
     } else if (newLines.length > 1) {
       extendedText.addLineBreak(position);
-      extendedText.append(
-          position.getLine(),
-          new ExtendedTextLine(newLines[0], instantLocation, extendedText.getUri()));
+      extendedText.append(position.getLine(), new ExtendedTextLine(newLines[0], instantLocation));
       extendedText.insert(
           new Position(position.getLine() + 1, 0),
-          new ExtendedTextLine(
-              newLines[newLines.length - 1], instantLocation, extendedText.getUri()));
+          new ExtendedTextLine(newLines[newLines.length - 1], instantLocation));
       for (int i = 1; i < newLines.length - 2; i++) {
         extendedText.insert(
-            position.getLine() + i,
-            new ExtendedTextLine(newLines[i], instantLocation, extendedText.getUri()));
+            position.getLine() + i, new ExtendedTextLine(newLines[i], instantLocation));
       }
     }
   }

@@ -104,8 +104,10 @@ async function getTelemetryKey(
   // telemetry is disabled by default, to enable provide "telemetry.key" with a base64 encoded telemetry key
   const KEY_URI = vscode.Uri.joinPath(context.extensionUri, "telemetry.key");
   try {
-    const content = (await vscode.workspace.fs.readFile(KEY_URI)).toString();
-    const key = Buffer.from(content, "base64").toString();
+    const content = await vscode.workspace.fs.readFile(KEY_URI);
+    const key64 = new TextDecoder().decode(content);
+    const keyBytes = Uint8Array.from(atob(key64), (c) => c.charCodeAt(0));
+    const key = new TextDecoder().decode(keyBytes);
     if (key.length === 0) {
       return undefined;
     }

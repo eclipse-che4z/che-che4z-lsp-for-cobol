@@ -96,10 +96,7 @@ class CopybookPreprocessorService {
   }
 
   void addCopybook(
-      ParserRuleContext ctx,
-      CobolPreprocessor.CopySourceContext copySource,
-      int maxCopybookLen,
-      List<ReplacementContext> replacementContext) {
+      ParserRuleContext ctx, CobolPreprocessor.CopySourceContext copySource, int maxCopybookLen) {
     CopybookName name = getCopybookName(copySource);
     String copybookName = name.getQualifiedName();
 
@@ -128,8 +125,7 @@ class CopybookPreprocessorService {
       copybooks.addStatement(copybookName, null, statementLocality);
 
       prepareReplacements(ctx);
-      ExtendedDocument copybookDocument =
-          processCopybookWithReplacement(replacementContext, copybook, nameLocality);
+      ExtendedDocument copybookDocument = processCopybookWithReplacement(copybook, nameLocality);
 
       Range range = AntlrRangeUtils.constructRange(ctx);
       if (firstInstruction(currentDocument, range.getStart())) {
@@ -218,19 +214,13 @@ class CopybookPreprocessorService {
   }
 
   private ExtendedDocument processCopybookWithReplacement(
-      List<ReplacementContext> replacementContext, CopybookModel copybook, Locality nameLocality) {
+      CopybookModel copybook, Locality nameLocality) {
     hierarchy.push(
         new CopybookUsage(
             copybook.getCopybookName(),
             CopybooksRepository.toId(
                 copybook.getCopybookName().getQualifiedName(), null, nameLocality.getUri()),
             nameLocality));
-    if (replacementContext != null) {
-      replacementContext.forEach(
-          h ->
-              hierarchy.addTextReplacing(
-                  h.getReplacement(), h.getLocality().getUri(), h.getLocality().getRange()));
-    }
 
     ExtendedDocument copybookDocument =
         new ExtendedDocument(copybook.getContent(), copybook.getUri());

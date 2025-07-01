@@ -34,6 +34,16 @@ public class ExtendedTextLine {
     }
   }
 
+  ExtendedTextLine(String line, Location instantLocation) {
+    for (int i = 0; i < line.length(); i++) {
+      char character = line.charAt(i);
+      checkCharacter(character);
+      characters.add(
+          new MappedCharacter(
+              character, null, instantLocation.getUri(), this, instantLocation, null));
+    }
+  }
+
   ExtendedTextLine(String line, int lineNumber, String uri) {
     this(line, new Position(lineNumber, 0), uri);
   }
