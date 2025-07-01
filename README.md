@@ -64,6 +64,8 @@ This feature checks for mistakes and errors in COBOL code. The syntax check feat
 
 This feature is also enabled for Datacom, CICS, and DB2 SQL keywords and variables.
 
+To disable the semantic check feature, open the COBOL Language Support extension settings and change **Analysis mode** to **BASIC**.
+
 ### Syntax Highlighting
 The extension enables syntax highlighting for COBOL code.
 

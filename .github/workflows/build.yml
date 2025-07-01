@@ -180,21 +180,21 @@ jobs:
         run: |
           npm ci
           cp ../../server/engine/target/server.jar ./server/jar
-          npm run package
+          npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Package IDMS vsix
         working-directory: clients/idms-dialect-support
         run: |
           npm ci
           cp ../../server/dialect-idms/target/dialect-idms.jar ./server/jar
-          npm run package
+          npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Package DaCo vsix
         working-directory: clients/daco-dialect-support
         run: |
           npm ci
           cp ../../server/dialect-daco/target/dialect-daco.jar ./server/jar
-          npm run package
+          npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Upload IDMS vsix
         uses: actions/upload-artifact@v4
@@ -246,7 +246,7 @@ jobs:
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
           npm ci
-          npm run package:web
+          npm run package:web -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Upload Web vsix
         uses: actions/upload-artifact@v4
@@ -444,7 +444,7 @@ jobs:
       - name: Package COBOL LS vsix for ${{ env.target }}
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
-          npm run package  -- --target ${{ env.target }}
+          npm run package  -- --target ${{ env.target }} --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - uses: actions/upload-artifact@v4
         with:
