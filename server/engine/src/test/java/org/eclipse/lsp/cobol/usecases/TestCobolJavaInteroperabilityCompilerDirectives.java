@@ -535,7 +535,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
         ImmutableMap.of(
             "error1",
             new Diagnostic(
-                new Range(new Position(0, 48), new Position(0, 49)),
+                new Range(new Position(0, 47), new Position(0, 49)),
                 "No space allowed.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
