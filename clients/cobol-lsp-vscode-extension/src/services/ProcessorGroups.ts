@@ -28,6 +28,7 @@ import {
 } from "./ProcessorGroupsLoader";
 import { DEFAULT_DIALECT } from "../constants";
 import { getVariablesFromUri } from "./util/FSUtils";
+import { debug } from "./copybook/CopybooksCompletionProvider";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -136,23 +137,24 @@ export async function loadProcessorGroup(documentUri: Uri) {
   if (!workspaceConfig) {
     const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
     if (workspaceUri === undefined) {
-      return undefined;
+      return readSettingConfig(DEFAULT_DIALECT);
     }
 
     workspaceConfig = await readWorkspaceConfig(workspaceUri);
   }
 
-  const b4gPGName = await getB4GProcessorGroupName(documentUri);
-  if (b4gPGName) {
-    return workspaceConfig.processorGroups[b4gPGName];
-  }
+  if (workspaceConfig) {
+    const b4gPGName = await getB4GProcessorGroupName(documentUri);
+    if (b4gPGName) {
+      return workspaceConfig.processorGroups[b4gPGName];
+    }
 
-  const matchedGroup = matchProcessorGroup(workspaceConfig, documentUri);
-  if (matchedGroup) {
-    return matchedGroup;
-  } else {
-    return readSettingConfig(DEFAULT_DIALECT);
+    const matchedGroup = matchProcessorGroup(workspaceConfig, documentUri);
+    if (matchedGroup) {
+      return matchedGroup;
+    }
   }
+  return readSettingConfig(DEFAULT_DIALECT);
 }
 
 async function getB4GProcessorGroupName(documentUri: Uri) {
@@ -203,18 +205,28 @@ async function loadProcessorGroupSettings<
   return defaultValue;
 }
 
-export function setUpProgramConfigWatcher() {
+export function setUpProgramConfigWatcher(fn: () => void) {
+  const callback = () => {
+    debug("pgm_conf.json changed");
+    clearWorkspaceConfigCache();
+    fn();
+  };
   const watcher = workspace.createFileSystemWatcher("**/pgm_conf.json");
-  watcher.onDidChange((_uri) => clearWorkspaceConfigCache());
-  watcher.onDidDelete((_uri) => clearWorkspaceConfigCache());
-  watcher.onDidCreate((_uri) => clearWorkspaceConfigCache());
+  watcher.onDidChange((_uri) => callback());
+  watcher.onDidDelete((_uri) => callback());
+  watcher.onDidCreate((_uri) => callback());
   return watcher;
 }
 
-export function setUpProcessorGroupConfigWatcher() {
+export function setUpProcessorGroupConfigWatcher(fn: () => void) {
+  const callback = () => {
+    debug("proc_grps.json changed");
+    clearWorkspaceConfigCache();
+    fn();
+  };
   const watcher = workspace.createFileSystemWatcher("**/proc_grps.json");
-  watcher.onDidChange((_uri) => clearWorkspaceConfigCache());
-  watcher.onDidDelete((_uri) => clearWorkspaceConfigCache());
-  watcher.onDidCreate((_uri) => clearWorkspaceConfigCache());
+  watcher.onDidChange((_uri) => callback());
+  watcher.onDidDelete((_uri) => callback());
+  watcher.onDidCreate((_uri) => callback());
   return watcher;
 }

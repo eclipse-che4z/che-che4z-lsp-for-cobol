@@ -66,6 +66,10 @@ import {
   readFileContent,
   resolveCopybookURI,
 } from "./services/copybook/CopybookMessageHandler";
+import {
+  invalidateConfig,
+  invalidateEndevorConfig,
+} from "./services/ProcessorGroupsLoader";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -177,7 +181,7 @@ export async function activate(
   context.subscriptions.push(
     vscode.workspace.onDidCloseTextDocument((document) => {
       void analysisService.invalidate(document.uri.toString(), true);
-      // externalApis.clearE4EConfig(document.uri.toString());
+      invalidateConfig(document.uri);
     }),
   );
 

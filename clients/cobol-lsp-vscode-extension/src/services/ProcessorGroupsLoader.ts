@@ -25,6 +25,8 @@ import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
 import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 import CopybookLib from "./copybookLibs/CopybookLib";
 import { SettingsService } from "./Settings";
+import { Memoize } from "./util/Memoize";
+import { debug } from "./copybook/CopybooksCompletionProvider";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -162,103 +164,92 @@ export type CopybookLibTypes =
   | typeof EndevorElementLib
   | typeof EndevorMemberLib;
 
-let workspaceConfigs: { [key: string]: WorkspaceConfig } = {};
+const readEndevorConfigCached = new Memoize(
+  async function (documentUri: Uri): Promise<WorkspaceConfig | undefined> {
+    if (!externalApis.handleAsEndevorElement(documentUri.toString())) {
+      return;
+    }
 
-export async function readEndevorConfig(
-  documentUri: Uri,
-): Promise<WorkspaceConfig | undefined> {
-  if (!externalApis.handleAsEndevorElement(documentUri.toString())) {
-    return;
-  }
+    const workspaceConfig: WorkspaceConfig = {
+      processorGroups: {},
+      programs: [],
+    };
 
-  const programPath = workspace.asRelativePath(documentUri);
+    const endevorData =
+      await externalApis.e4eDownloader?.getEndevorProcessorGroupConfig(
+        documentUri,
+      );
+    if (endevorData) {
+      const processorGroups = endevorData.pgroups.map(
+        transformProcessorGroup([EndevorElementLib, EndevorMemberLib]),
+      );
+      processorGroups.forEach((pg) => {
+        workspaceConfig.processorGroups[pg.name] = pg;
+      });
 
-  let workspaceConfig = workspaceConfigs[programPath];
-  if (workspaceConfig) {
+      const decodedPrograms = ProgramsConfigModel.decode(endevorData);
+      if (isLeft(decodedPrograms)) {
+        throw Error(
+          `Could not validate data: ${PathReporter.report(decodedPrograms).join("\n")}`,
+        );
+      }
+
+      const processorGroupName = decodedPrograms.right.pgms[0].pgroup;
+      const processorGroup = processorGroups.find(
+        (pg) => pg.name === processorGroupName,
+      );
+      if (processorGroup) {
+        const programs: ProgramConfig[] = [
+          {
+            program: workspace.asRelativePath(documentUri),
+            processorGroup,
+          },
+        ];
+        workspaceConfig.programs = programs;
+      }
+    }
+
     return workspaceConfig;
-  }
+  },
+  undefined,
+  workspace.asRelativePath,
+);
+export const readEndevorConfig = readEndevorConfigCached.execute;
+export const invalidateEndevorConfig = readEndevorConfigCached.invalidateCache;
 
-  workspaceConfig = {
-    processorGroups: {},
-    programs: [],
-  };
+const readWorkspaceConfigCached = new Memoize(
+  async function (workspaceUri: Uri): Promise<WorkspaceConfig> {
+    const workspaceConfig: WorkspaceConfig = {
+      processorGroups: {},
+      programs: [],
+    };
 
-  const endevorData =
-    await externalApis.e4eDownloader?.getEndevorProcessorGroupConfig(
-      documentUri,
-    );
-  if (endevorData) {
-    const processorGroups = endevorData.pgroups.map(
-      transformProcessorGroup([EndevorElementLib, EndevorMemberLib]),
-    );
+    const processorGroups = await readProcessorGroupsFile(workspaceUri);
     processorGroups.forEach((pg) => {
       workspaceConfig.processorGroups[pg.name] = pg;
     });
 
-    const decodedPrograms = ProgramsConfigModel.decode(endevorData);
-    if (isLeft(decodedPrograms)) {
-      throw Error(
-        `Could not validate data: ${PathReporter.report(decodedPrograms).join("\n")}`,
+    const programs = await readProgramConfig(workspaceUri);
+
+    programs.pgms.forEach((program) => {
+      let processorGroup = processorGroups.find(
+        (p) => p.name === program.pgroup,
       );
-    }
-
-    const processorGroupName = decodedPrograms.right.pgms[0].pgroup;
-    const processorGroup = processorGroups.find(
-      (pg) => pg.name === processorGroupName,
-    );
-    if (processorGroup) {
-      const programs: ProgramConfig[] = [
-        {
-          program: programPath,
-          processorGroup,
-        },
-      ];
-      workspaceConfig.programs = programs;
-    } else {
-      // TODO: report missing pg configuration
-    }
-  }
-
-  workspaceConfigs[programPath] = workspaceConfig;
-
-  return workspaceConfig;
-}
-
-export async function readWorkspaceConfig(
-  workspaceUri: Uri,
-): Promise<WorkspaceConfig> {
-  const workspaceKey = workspaceUri.toString();
-  let workspaceConfig = workspaceConfigs[workspaceKey];
-  if (workspaceConfig) {
-    return workspaceConfig;
-  }
-
-  workspaceConfig = { processorGroups: {}, programs: [] };
-
-  const processorGroups = await readProcessorGroupsFile(workspaceUri);
-  processorGroups.forEach((pg) => {
-    workspaceConfig.processorGroups[pg.name] = pg;
-  });
-
-  const programs = await readProgramConfig(workspaceUri);
-
-  programs.pgms.forEach((program) => {
-    let processorGroup = processorGroups.find((p) => p.name === program.pgroup);
-    if (!processorGroup) {
-      //throw Error(`Processor group ${program.pgroup} definition missing.`);
-      // TODO: report missing pg configuration
-      processorGroup = { name: program.pgroup };
-    }
-    workspaceConfig.programs.push({
-      program: program.program,
-      processorGroup: processorGroup,
+      if (!processorGroup) {
+        processorGroup = { name: program.pgroup };
+      }
+      workspaceConfig.programs.push({
+        program: program.program,
+        processorGroup: processorGroup,
+      });
     });
-  });
 
-  workspaceConfigs[workspaceKey] = workspaceConfig;
-
-  return workspaceConfig;
-}
+    return workspaceConfig;
+  },
+  undefined,
+  (uri) => uri.toString(),
+);
+export const readWorkspaceConfig = readWorkspaceConfigCached.execute;
 
 export function readSettingConfig(dialectType: string): ProcessorGroup {
   // local paths
@@ -273,6 +264,9 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
   const usss: LibsDefinitions = SettingsService.getUssPath(dialectType).map(
     (uss) => ({ uss }),
   );
+
+  debug(`pg set: ${JSON.stringify(directoryPaths)}`);
+
   return {
     name: "VSCodeSettingProcessorGroup",
     libs: transformLibs(
@@ -280,6 +274,11 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
       [LocalPathLib, DatasetLib, UssPathLib],
     ),
   };
+}
+
+export function invalidateConfig(documentUri: Uri) {
+  readWorkspaceConfigCached.invalidateCache(documentUri);
+  readEndevorConfigCached.invalidateCache(documentUri);
 }
 
 async function readProcessorGroupsFile(
@@ -395,5 +394,6 @@ async function readProgramConfig(workspaceUri: Uri): Promise<ProgramsConfig> {
 }
 
 export function clearWorkspaceConfigCache() {
-  workspaceConfigs = {};
+  readWorkspaceConfigCached.clearCache();
+  readEndevorConfigCached.clearCache();
 }

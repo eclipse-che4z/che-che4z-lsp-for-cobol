@@ -189,8 +189,8 @@ export class LanguageClientService {
       outputChannel: this.outputChannel,
       synchronize: {
         fileEvents: [
-          setUpProgramConfigWatcher(),
-          setUpProcessorGroupConfigWatcher(),
+          setUpProgramConfigWatcher(this.invalidateConfiguration),
+          setUpProcessorGroupConfigWatcher(this.invalidateConfiguration),
           vscode.workspace.createFileSystemWatcher(
             new vscode.RelativePattern(this.storagePath, "**/*"),
           ),

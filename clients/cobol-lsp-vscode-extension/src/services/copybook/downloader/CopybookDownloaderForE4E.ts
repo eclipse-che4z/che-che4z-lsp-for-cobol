@@ -45,7 +45,12 @@ export class CopybookDownloaderForE4E {
 
   public async getEndevorProcessorGroupConfig(uri: vscode.Uri) {
     const profile = await this.e4e.getProfileInfo(uri.toString());
-    if (profile instanceof Error) throw profile;
+    if (profile instanceof Error) {
+      vscode.window.showErrorMessage(
+        `An error occurred while retrieving Endevor configuration: ${profile.message}.`,
+      );
+      return;
+    }
 
     const compiler = SettingsService.getLspConfigCompiler();
     const preprocessor = SettingsService.getLspConfigPreprocessors();
