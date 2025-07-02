@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.lsp.analysis.AnalysisStateListener;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** Workspace document graph object */
 @Singleton
@@ -379,15 +380,17 @@ public class SourceUnitGraph implements AnalysisStateListener {
   }
 
   private static boolean isContainedInside(Position usage, NodeV nodeV) {
-    boolean isContained;
-    Set<Location> referencedLocations = nodeV.referencedLocation;
-    for (Location referencedLocation : referencedLocations) {
-      Position start = referencedLocation.getRange().getStart();
-      Position end = referencedLocation.getRange().getEnd();
-      isContained =
-          (RangeUtils.isAfter(usage, start) || usage.equals(start))
-              && (RangeUtils.isBefore(usage, end) || usage.equals(end));
-      if (isContained) return true;
+    for (Location location : nodeV.referencedLocation) {
+      Range range = location.getRange();
+      if (range == null || range.getStart() == null || range.getEnd() == null) {
+        continue;
+      }
+      Position start = range.getStart();
+      Position end = range.getEnd();
+      if ((RangeUtils.isAfter(usage, start) || usage.equals(start))
+          && (RangeUtils.isBefore(usage, end) || usage.equals(end))) {
+        return true;
+      }
     }
     return false;
   }
