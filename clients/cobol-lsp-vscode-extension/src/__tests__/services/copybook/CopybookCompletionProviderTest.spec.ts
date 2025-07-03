@@ -29,6 +29,7 @@ import {
 import { initializeExternalAPIs } from "../../../services/ExternalAPIsService";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { MockLib } from "./libs/MockLib.utility";
+import { DEFAULT_DIALECT } from "../../../constants";
 describe("CopybooksCompletionProvider", () => {
   const remoteCopybooks = {
     AAA: Uri.parse("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA"),
@@ -45,6 +46,7 @@ describe("CopybooksCompletionProvider", () => {
   let positionChar = 0;
   let cancellationTokenMock: CancellationToken;
   let completionContextMock: CompletionContext;
+  let loadPGLibsSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     documentMock = {
@@ -64,12 +66,13 @@ describe("CopybooksCompletionProvider", () => {
       Uri.file("/storage"),
       window.createOutputChannel("test"),
     );
-    jest
+    loadPGLibsSpy = jest
       .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
       .mockResolvedValue([
         new MockLib(remoteCopybooks),
         new MockLib(localCopybooks),
       ]);
+    jest.clearAllMocks();
   });
 
   describe("completions are provided only after the COPY statement", () => {
@@ -79,7 +82,7 @@ describe("CopybooksCompletionProvider", () => {
         positionChar = lineText.length;
       });
 
-      test("returns all remote completions", async () => {
+      test("returns all local and remote completions", async () => {
         const provider = new CopybooksCompletionProvider();
         const completions = await provider.provideCompletionItems(
           documentMock,
@@ -100,7 +103,7 @@ describe("CopybooksCompletionProvider", () => {
         positionChar = lineText.length - 3;
       });
 
-      test("no remote copybooks completions returned", async () => {
+      test("no copybooks completions returned", async () => {
         const provider = new CopybooksCompletionProvider();
         const completions = await provider.provideCompletionItems(
           documentMock,
@@ -119,7 +122,7 @@ describe("CopybooksCompletionProvider", () => {
         positionChar = lineText.length - 3;
       });
 
-      test("no remote copybooks completions returned", async () => {
+      test("no copybooks completions returned", async () => {
         const provider = new CopybooksCompletionProvider();
         const completions = await provider.provideCompletionItems(
           documentMock,
@@ -231,7 +234,7 @@ describe("CopybooksCompletionProvider", () => {
           .mockReturnValue([dialectInfo]);
       });
 
-      describe("Selected dialect is passed to copybook download service", () => {
+      describe("Selected dialect is passed to copybook library loader", () => {
         beforeAll(() => {
           lineText = '           COPY MAID "AB"';
           positionChar = lineText.length - 1;
@@ -246,16 +249,16 @@ describe("CopybooksCompletionProvider", () => {
             completionContextMock,
           );
 
-          // expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
-          //   "file:///PROGRAM.cbl",
-          //   "DACO",
-          // );
+          expect(loadPGLibsSpy).toHaveBeenCalledWith(
+            Uri.file("/PROGRAM.cbl"),
+            "DACO",
+          );
 
           expect(completions.map((c) => c.label)).toEqual(["ABC"]);
         });
       });
 
-      describe("Default dialect is passed to copybook download service", () => {
+      describe("Default dialect is passed to copybook library loader", () => {
         beforeAll(() => {
           lineText = '           COPY "AB"';
           positionChar = lineText.length - 1;
@@ -270,10 +273,10 @@ describe("CopybooksCompletionProvider", () => {
             completionContextMock,
           );
 
-          // expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
-          //   "file:///PROGRAM.cbl",
-          //   DEFAULT_DIALECT,
-          // );
+          expect(loadPGLibsSpy).toHaveBeenCalledWith(
+            Uri.file("/PROGRAM.cbl"),
+            DEFAULT_DIALECT,
+          );
 
           expect(completions.map((c) => c.label)).toEqual(["ABC"]);
         });
@@ -296,10 +299,10 @@ describe("CopybooksCompletionProvider", () => {
         completionContextMock,
       );
 
-      // expect(cdsMock.listRemoteCopybooks).toHaveBeenCalledWith(
-      //   "file:///PROGRAM.cbl",
-      //   "COBOL",
-      // );
+      expect(loadPGLibsSpy).toHaveBeenCalledWith(
+        Uri.file("/PROGRAM.cbl"),
+        "COBOL",
+      );
     });
   });
 });

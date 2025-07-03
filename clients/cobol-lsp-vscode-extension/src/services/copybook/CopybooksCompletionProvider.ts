@@ -100,8 +100,8 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
           );
 
           copybooksLoadingPromises.push(
-            ...pgLibs.map(async (pg) => {
-              const list = await pg.listCopybooks(document.uri, dialect.name);
+            ...pgLibs.map(async (lib) => {
+              const list = await lib.listCopybooks(document.uri, dialect.name);
               list?.forEach((copybook) => {
                 if (!prefix || copybook.startsWith(prefix)) {
                   copybooks.add(copybook);
