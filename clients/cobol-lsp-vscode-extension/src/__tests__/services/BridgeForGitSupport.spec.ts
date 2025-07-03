@@ -103,7 +103,7 @@ describe("Bridge for Git group tests", () => {
         expect(cfg?.name).toBe("pg2");
       });
 
-      test("File with extension case - extension is ignored, document is still matched with b4g definition", async () => {
+      test("File with extension - extension is ignored, document is still matched with b4g definition", async () => {
         const document = vscode.Uri.joinPath(WS_URI, "main.cob");
         const cfg = await loadProcessorGroup(document);
         expect(cfg?.name).toBe("pg2");

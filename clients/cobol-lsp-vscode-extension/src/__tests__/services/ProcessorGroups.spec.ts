@@ -230,7 +230,7 @@ describe("Processor groups", () => {
           getConfigurationResult[SETTINGS_CPY_NDVR_DEPENDENCIES] = "";
         });
 
-        it("reads processor group configuration from E4E", async () => {
+        it("reads processor group configuration from VSCode settings", async () => {
           const document = vscode.Uri.joinPath(WORKSPACE_URI, "ENDEVOR.cob");
           const pg = await loadProcessorGroup(document);
           expect(pg?.name).toEqual("VSCodeSettingProcessorGroup");
@@ -241,7 +241,7 @@ describe("Processor groups", () => {
 });
 
 describe("Processor groups configuration provides lib path", () => {
-  it("Processor groups configuration provides lib path", async () => {
+  it("returns instance of LocalPathLib pointing to the directory from configuration", async () => {
     const document = vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob");
     const result = await loadProcessorGroupCopybooksLibs(
       document,
@@ -253,7 +253,7 @@ describe("Processor groups configuration provides lib path", () => {
 
 describe("Processor groups configuration understand absolute paths", () => {
   it("Processor groups configuration understand absolute paths", async () => {
-    const document = vscode.Uri.joinPath(WORKSPACE_URI, "/abs/TEST.cob");
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "abs/TEST.cob");
     const result = await loadProcessorGroupCopybooksLibs(
       document,
       DEFAULT_DIALECT,
@@ -366,11 +366,12 @@ it("Processor groups configuration provides compiler-options", async () => {
 
 describe("Processor groups configuration provides lib path in Windows", () => {
   it("Processor groups configuration provides lib path in Windows", async () => {
-    // const item = {
-    //   scopeUri: "file:///c:/my/workspace/TEST.cob",
-    //   section: "cobol-lsp.cpy-manager.paths-local",
-    // };
-    // const result = await loadProcessorGroupCopybookPathsConfig(item, []);
-    // expect(result).toStrictEqual([vscode.Uri.file("/copy")]);
+    const document = vscode.Uri.parse("file:///c:/my/workspace/TEST.cob");
+
+    const result = await loadProcessorGroupCopybooksLibs(
+      document,
+      DEFAULT_DIALECT,
+    );
+    expect(result).toStrictEqual([new LocalPathLib("/copy")]);
   });
 });

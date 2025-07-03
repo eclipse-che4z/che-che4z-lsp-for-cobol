@@ -93,11 +93,17 @@ describe("Local copybook library", () => {
       });
     });
 
-    describe("Path variables are evaluated during resolution", () => {
+    describe("Path variables are evaluated during copybook resolution", () => {
       findFilesResult["/workspace/copybooks"] = [
         vscode.Uri.file("/workspace/ABCPROG/copybooks/ABCCOPY.cpy"),
       ];
-      it("replace variable a value", async () => {
+      findFilesResult["/path/to/program/copybooks"] = [
+        vscode.Uri.file("/path/to/program/copybooks/ABCCOPY.cpy"),
+      ];
+      findFilesResult["/other/copybooks"] = [
+        vscode.Uri.file("/other/copybooks/ABCCOPY.cpy"),
+      ];
+      it("replaces ${workspaceFolder} and ${fileBasenameNoExtension} variables with values", async () => {
         const lib = new LocalPathLib(
           "${workspaceFolder}/${fileBasenameNoExtension}/copybooks",
         );
@@ -109,6 +115,43 @@ describe("Local copybook library", () => {
         );
         expect(result).toEqual(
           vscode.Uri.file("/workspace/ABCPROG/copybooks/ABCCOPY.cpy"),
+        );
+      });
+
+      it("replaces ${fileDirname} variable with a value", async () => {
+        const lib = new LocalPathLib("${fileDirname}/copybooks");
+        const document = vscode.Uri.file("/path/to/program/ABCPROG.cbl");
+        const result = await lib.resolveCopybookUri(
+          "ABCCOPY",
+          document,
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(
+          vscode.Uri.file("/path/to/program/copybooks/ABCCOPY.cpy"),
+        );
+      });
+
+      it("replaces ${workspaceFolder:other} variable with a value", async () => {
+        const lib = new LocalPathLib("${workspaceFolder:other}/copybooks");
+        const document = vscode.Uri.file("/path/to/program/ABCPROG.cbl");
+        const result = await lib.resolveCopybookUri(
+          "ABCCOPY",
+          document,
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(vscode.Uri.file("/other/copybooks/ABCCOPY.cpy"));
+      });
+
+      it("replaces ${fileDirnameBasename} variable with a value", async () => {
+        const lib = new LocalPathLib("${fileDirnameBasename}/copybooks");
+        const document = vscode.Uri.file("/path/to/program/ABCPROG.cbl");
+        const result = await lib.resolveCopybookUri(
+          "ABCCOPY",
+          document,
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(
+          vscode.Uri.file("/path/to/program/copybooks/ABCCOPY.cpy"),
         );
       });
     });
