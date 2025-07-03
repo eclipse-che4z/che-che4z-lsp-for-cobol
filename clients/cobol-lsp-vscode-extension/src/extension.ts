@@ -66,10 +66,7 @@ import {
   readFileContent,
   resolveCopybookURI,
 } from "./services/copybook/CopybookMessageHandler";
-import {
-  invalidateConfig,
-  invalidateEndevorConfig,
-} from "./services/ProcessorGroupsLoader";
+import { invalidateConfig } from "./services/ProcessorGroupsLoader";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;

@@ -30,16 +30,6 @@ import {
 } from "../../constants";
 import { CopyStatementParser, DialectRegistry } from "../DialectRegistry";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
-import * as vscode from "vscode";
-
-let debugChannel: vscode.OutputChannel;
-
-export function debug(message: string, id = "DebugChannel") {
-  if (!debugChannel) {
-    debugChannel = vscode.window.createOutputChannel(id);
-  }
-  debugChannel.appendLine(message);
-}
 
 const isDefaultCopyStatement: CopyStatementParser = (statement: string) => {
   const regex = /^.*\bCOPY(?:\s+"?'?)([\S]+)?$/i;
@@ -69,8 +59,6 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
     const line = document
       .lineAt(position.line)
       .text.slice(0, position.character);
-
-    debug("listing completions");
 
     const dialects: {
       name: string;
@@ -110,7 +98,6 @@ export class CopybooksCompletionProvider implements CompletionItemProvider {
             document.uri,
             dialect.name,
           );
-          debug(`libs: ${JSON.stringify(pgLibs)}`);
 
           copybooksLoadingPromises.push(
             ...pgLibs.map(async (pg) => {

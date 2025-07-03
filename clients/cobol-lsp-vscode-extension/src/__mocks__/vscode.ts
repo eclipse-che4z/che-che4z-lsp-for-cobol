@@ -86,14 +86,6 @@ export namespace workspace {
         return Promise.resolve(Buffer.from(result));
       }
     }),
-    // readFileOrig: async (uri: UriType): Promise<Uint8Array | undefined> => {
-    //   const path = uri.fsPath;
-    //   try {
-    //     return await readFile(path);
-    //   } catch (_err) {
-    //     // ignore
-    //   }
-    // },
     writeFile: jest.fn(),
     delete: jest.fn().mockReturnValue(true),
     readDirectory: jest.fn().mockImplementation((uri: UriType) => {

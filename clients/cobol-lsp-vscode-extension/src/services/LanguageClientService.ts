@@ -118,7 +118,7 @@ export class LanguageClientService {
     return languageClient.sendRequest("extended/analysis", params);
   }
 
-  public async invalidateConfiguration() {
+  public invalidateConfiguration = async () => {
     const languageClient = this.getLanguageClient();
     await languageClient.sendNotification(
       DidChangeConfigurationNotification.type,
@@ -126,7 +126,7 @@ export class LanguageClientService {
         settings: null,
       },
     );
-  }
+  };
 
   private fileChanges: FileEvent[] = [];
   private fileChangeTimer: ReturnType<typeof setTimeout> | undefined =

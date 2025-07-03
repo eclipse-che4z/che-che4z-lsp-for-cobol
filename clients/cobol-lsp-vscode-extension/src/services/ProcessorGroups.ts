@@ -28,7 +28,6 @@ import {
 } from "./ProcessorGroupsLoader";
 import { DEFAULT_DIALECT } from "../constants";
 import { getVariablesFromUri } from "./util/FSUtils";
-import { debug } from "./copybook/CopybooksCompletionProvider";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -205,26 +204,28 @@ async function loadProcessorGroupSettings<
   return defaultValue;
 }
 
-export function setUpProgramConfigWatcher(fn: () => void) {
+export function setUpProgramConfigWatcher(fn: () => unknown) {
   const callback = () => {
-    debug("pgm_conf.json changed");
     clearWorkspaceConfigCache();
     fn();
   };
-  const watcher = workspace.createFileSystemWatcher("**/pgm_conf.json");
+  const watcher = workspace.createFileSystemWatcher(
+    ".cobolplugin/pgm_conf.json",
+  );
   watcher.onDidChange((_uri) => callback());
   watcher.onDidDelete((_uri) => callback());
   watcher.onDidCreate((_uri) => callback());
   return watcher;
 }
 
-export function setUpProcessorGroupConfigWatcher(fn: () => void) {
+export function setUpProcessorGroupConfigWatcher(fn: () => unknown) {
   const callback = () => {
-    debug("proc_grps.json changed");
     clearWorkspaceConfigCache();
     fn();
   };
-  const watcher = workspace.createFileSystemWatcher("**/proc_grps.json");
+  const watcher = workspace.createFileSystemWatcher(
+    ".cobolplugin/proc_grps.json",
+  );
   watcher.onDidChange((_uri) => callback());
   watcher.onDidDelete((_uri) => callback());
   watcher.onDidCreate((_uri) => callback());

@@ -1,4 +1,4 @@
-import { debug } from "../copybook/CopybooksCompletionProvider";
+import * as vscode from "vscode";
 
 export class Memoize<TArgs extends unknown[], TReturn> {
   private cache = new Map<string, Promise<TReturn | undefined>>();
@@ -44,4 +44,13 @@ export class Memoize<TArgs extends unknown[], TReturn> {
   clearCache = () => {
     this.cache.clear();
   };
+}
+
+let debugChannel: vscode.OutputChannel;
+
+function debug(message: string, id = "DebugChannel") {
+  if (!debugChannel) {
+    debugChannel = vscode.window.createOutputChannel(id);
+  }
+  debugChannel.appendLine(message);
 }
