@@ -73,13 +73,10 @@ export namespace workspace {
   }
   export const fs = {
     readFile: jest.fn().mockImplementation((uri: UriType) => {
-      const resultKey = Object.keys(readFileResult).find(
-        (key: string) => uri.path === key,
-      );
-      if (!resultKey) {
-        return Promise.reject(new FileNotFound());
+      const result = readFileResult[uri.path];
+      if (!result) {
+        throw new FileNotFound();
       }
-      const result = readFileResult[resultKey];
       if (result instanceof Error) {
         throw result;
       } else {
