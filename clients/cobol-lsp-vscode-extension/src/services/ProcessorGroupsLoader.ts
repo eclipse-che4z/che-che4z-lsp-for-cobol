@@ -155,6 +155,7 @@ const ProcessorGroupsModel = t.type({
 });
 
 type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
+export type ProcessorGroupsDefinition = t.TypeOf<typeof ProcessorGroupsModel>;
 
 export type CopybookLibTypes =
   | typeof LocalPathLib

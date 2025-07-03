@@ -56,6 +56,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   vscode.window.activeTextEditor = undefined;
 });
+
 describe("Check plugin extension for cobol starts successfully.", () => {
   test("start extension", async () => {
     await activate(context);

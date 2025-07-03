@@ -21,10 +21,13 @@ import {
   B4GTypeMetadata,
   watcherChangeEventHandler,
 } from "../../services/BridgeForGitLoader";
-// import * as b4gLoader from "../../services/BridgeForGitLoader";
 import * as vscode from "vscode";
 import { loadProcessorGroup } from "../../services/ProcessorGroups";
 import { initializeExternalAPIs } from "../../services/ExternalAPIsService";
+import {
+  ProcessorGroupsDefinition,
+  ProgramsConfig,
+} from "../../services/ProcessorGroupsLoader";
 
 const WS_PATH = "/my/b4g/workspace";
 const WS_URI = vscode.Uri.file(WS_PATH);
@@ -49,10 +52,12 @@ const b4gJson: B4GTypeMetadata = {
   fileExtension: "cob",
 };
 
-const pgJson = {
+const pgJson: ProcessorGroupsDefinition = {
   pgroups: [{ name: "pg1" }, { name: "pg2" }, { name: "DEFGRP" }],
 };
-const pgMapJson = { pgms: [{ program: "main.cob", pgroup: "pg1" }] };
+const pgMapJson: ProgramsConfig = {
+  pgms: [{ program: "main.cob", pgroup: "pg1" }],
+};
 
 describe("Bridge for Git group tests", () => {
   beforeEach(async () => {
@@ -79,6 +84,12 @@ describe("Bridge for Git group tests", () => {
         const cfg = await loadProcessorGroup(document);
         expect(cfg?.name).toBe("pg2");
       });
+
+      test("files without correct extension is matched to the default pg", async () => {
+        const document = vscode.Uri.joinPath(WS_URI, "main");
+        const cfg = await loadProcessorGroup(document);
+        expect(cfg?.name).toBe("DEFGRP");
+      });
     });
 
     describe("fileExtension setting is empty", () => {
@@ -86,8 +97,14 @@ describe("Bridge for Git group tests", () => {
         b4gJson.fileExtension = "";
         readFileResult[`${WS_PATH}/.bridge.json`] = JSON.stringify(b4gJson);
       });
-      test("No extension case", async () => {
+      test("No extension -> matched to b4g pg group", async () => {
         const document = vscode.Uri.joinPath(WS_URI, "main");
+        const cfg = await loadProcessorGroup(document);
+        expect(cfg?.name).toBe("pg2");
+      });
+
+      test("File with extension case - extension is ignored, document is still matched with b4g definition", async () => {
+        const document = vscode.Uri.joinPath(WS_URI, "main.cob");
         const cfg = await loadProcessorGroup(document);
         expect(cfg?.name).toBe("pg2");
       });
