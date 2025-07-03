@@ -94,15 +94,21 @@ describe("Local copybook library", () => {
     });
 
     describe("Path variables are evaluated during copybook resolution", () => {
-      findFilesResult["/workspace/copybooks"] = [
-        vscode.Uri.file("/workspace/ABCPROG/copybooks/ABCCOPY.cpy"),
-      ];
-      findFilesResult["/path/to/program/copybooks"] = [
-        vscode.Uri.file("/path/to/program/copybooks/ABCCOPY.cpy"),
-      ];
-      findFilesResult["/other/copybooks"] = [
-        vscode.Uri.file("/other/copybooks/ABCCOPY.cpy"),
-      ];
+      beforeEach(() => {
+        findFilesResult["/workspace/copybooks"] = [
+          vscode.Uri.file("/workspace/ABCPROG/copybooks/ABCCOPY.cpy"),
+        ];
+        findFilesResult["/path/to/program/copybooks"] = [
+          vscode.Uri.file("/path/to/program/copybooks/ABCCOPY.cpy"),
+        ];
+        findFilesResult["/other/copybooks"] = [
+          vscode.Uri.file("/other/copybooks/ABCCOPY.cpy"),
+        ];
+        findFilesResult["/program/copybooks"] = [
+          vscode.Uri.file("/program/copybooks/ABCCOPY.cpy"),
+        ];
+      });
+
       it("replaces ${workspaceFolder} and ${fileBasenameNoExtension} variables with values", async () => {
         const lib = new LocalPathLib(
           "${workspaceFolder}/${fileBasenameNoExtension}/copybooks",
@@ -143,7 +149,7 @@ describe("Local copybook library", () => {
       });
 
       it("replaces ${fileDirnameBasename} variable with a value", async () => {
-        const lib = new LocalPathLib("${fileDirnameBasename}/copybooks");
+        const lib = new LocalPathLib("/${fileDirnameBasename}/copybooks");
         const document = vscode.Uri.file("/path/to/program/ABCPROG.cbl");
         const result = await lib.resolveCopybookUri(
           "ABCCOPY",
@@ -151,7 +157,7 @@ describe("Local copybook library", () => {
           DEFAULT_DIALECT,
         );
         expect(result).toEqual(
-          vscode.Uri.file("/path/to/program/copybooks/ABCCOPY.cpy"),
+          vscode.Uri.file("/program/copybooks/ABCCOPY.cpy"),
         );
       });
     });
