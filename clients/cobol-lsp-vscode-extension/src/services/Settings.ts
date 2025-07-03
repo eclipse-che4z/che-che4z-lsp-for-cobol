@@ -46,7 +46,6 @@ import {
 import { SupportedVariables } from "./util/FSUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
-import { debug } from "./copybook/CopybooksCompletionProvider";
 
 const NONE: string = "NONE";
 const MAX_VM_COUNT = 50000;
@@ -330,7 +329,6 @@ export class SettingsService {
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get(section);
 
-    debug(`set: ${JSON.stringify(pathList)}`);
     return pathList ?? [];
   }
 
