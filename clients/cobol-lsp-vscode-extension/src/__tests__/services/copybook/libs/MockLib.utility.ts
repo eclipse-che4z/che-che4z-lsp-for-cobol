@@ -2,7 +2,9 @@ import { Uri, OutputChannel } from "vscode";
 import CopybookLib from "../../../../services/copybookLibs/CopybookLib";
 
 export class MockLib implements CopybookLib {
-  constructor(private directory: { [key: string]: Uri }) {}
+  constructor(
+    private directory: { [key: string]: Uri | (() => Promise<Uri>) },
+  ) {}
 
   resolveCopybookUri(
     copybookName: string,

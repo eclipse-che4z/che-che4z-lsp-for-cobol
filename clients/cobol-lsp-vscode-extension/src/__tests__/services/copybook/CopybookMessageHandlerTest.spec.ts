@@ -8,6 +8,7 @@ import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { MockLib } from "./libs/MockLib.utility";
 import { DEFAULT_DIALECT } from "../../../constants";
 import { ErrorLib } from "./libs/ErrorLib.utility";
+import { getOutputChannel } from "../../../extension";
 
 export type Writable<T> = {
   -readonly [P in keyof T]: T[P];
@@ -43,9 +44,9 @@ describe("CopybookMessageHandler", () => {
       const uri = vscode.Uri.file("/workspace/nonexisting");
       const result = await readFileContent(uri.toString());
       expect(result).toBeUndefined();
-      // expect(outputChannel.appendLine).toHaveBeenCalledWith(
-      //   expect.stringContaining("file/content message handler error"),
-      // );
+      expect(getOutputChannel().error).toHaveBeenCalledWith(
+        expect.stringContaining("file/content message handler error"),
+      );
     });
   });
 
@@ -60,6 +61,19 @@ describe("CopybookMessageHandler", () => {
       LOCAL: vscode.Uri.file("/copybooks/LOCAL.cpy"),
       AAA: vscode.Uri.file("/copybooks/AAA.cpy"),
     };
+    const downloadSpyA = jest
+      .fn()
+      .mockResolvedValue(vscode.Uri.file("/endevor/cache/A/EEE"));
+    const endevorCopybooksA = {
+      EEE: downloadSpyA,
+    };
+
+    const downloadSpyB = jest
+      .fn()
+      .mockResolvedValue(vscode.Uri.file("/endevor/cache/B/EEE"));
+    const endevorCopybooksB = {
+      EEE: downloadSpyB,
+    };
 
     describe("successful resolving", () => {
       beforeEach(() => {
@@ -68,6 +82,8 @@ describe("CopybookMessageHandler", () => {
           .mockResolvedValue([
             new MockLib(remoteCopybooks),
             new MockLib(localCopybooks),
+            new MockLib(endevorCopybooksA),
+            new MockLib(endevorCopybooksB),
           ]);
       });
 
@@ -89,6 +105,20 @@ describe("CopybookMessageHandler", () => {
           DEFAULT_DIALECT,
         );
         expect(resultAAA).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
+      });
+
+      it("copybook might be resoled into a function that downloads copybook to local cache", async () => {
+        const document = "/program.cob";
+        const result = await resolveCopybookURI(
+          document,
+          "EEE",
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual("file:///endevor/cache/A/EEE");
+
+        // only the first resolved copybook is downloaded
+        expect(downloadSpyA).toHaveBeenCalledTimes(1);
+        expect(downloadSpyB).not.toHaveBeenCalled();
       });
     });
 
