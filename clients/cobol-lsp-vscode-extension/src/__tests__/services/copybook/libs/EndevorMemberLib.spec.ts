@@ -29,10 +29,7 @@ describe("Endevor Member Lib", () => {
     jest
       .spyOn(E4ECopybookService, "getE4EAPI")
       .mockResolvedValue({ api: e4eMock });
-    await initializeExternalAPIs(
-      vscode.Uri.file("/storage"),
-      vscode.window.createOutputChannel("test"),
-    );
+    await initializeExternalAPIs(vscode.Uri.file("/storage"));
   });
 
   describe("resolveCopybookUri", () => {

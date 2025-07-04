@@ -1,4 +1,4 @@
-import { Uri, OutputChannel } from "vscode";
+import { Uri } from "vscode";
 import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
 import {
@@ -7,6 +7,7 @@ import {
 } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
+import { getOutputChannel } from "../../extension";
 
 export class EndevorMemberLib extends EndevorLib implements CopybookLib {
   constructor(private config: EndevorDatasetConfigModel) {
@@ -56,11 +57,7 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
     }
   }
 
-  async listCopybooks(
-    documentUri: Uri,
-    _dialect: string,
-    _outputChannel?: OutputChannel,
-  ): Promise<string[]> {
+  async listCopybooks(documentUri: Uri, _dialect: string): Promise<string[]> {
     if (!this.configCheck(documentUri)) {
       return [];
     }
@@ -70,8 +67,14 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
         profile,
         this.config.dataset,
       );
-      // TODO? handle error in better way?
-      if (list instanceof Error) return [];
+      if (list instanceof Error) {
+        getOutputChannel().error(
+          list,
+          this.config,
+          `Unable to list copybooks from Endevor dataset`,
+        );
+        return [];
+      }
       return list?.map((m) => m.member) ?? [];
     }
     return [];

@@ -56,7 +56,6 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
   async listCopybooks(
     documentUri: vscode.Uri,
     _dialect: string,
-    _outputChannel?: vscode.OutputChannel,
   ): Promise<string[]> {
     const profile = this.getProfile(documentUri);
 

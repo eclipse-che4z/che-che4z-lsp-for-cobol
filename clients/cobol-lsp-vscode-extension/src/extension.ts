@@ -74,21 +74,20 @@ interface __AnalysisApi {
 }
 
 let languageClientService: LanguageClientService;
-let outputChannel: vscode.OutputChannel;
+let outputChannel: vscode.LogOutputChannel | undefined;
 let controlFlowChannel: vscode.LogOutputChannel;
 let analysisService: ControlFlowAnalysisService;
 const API_VERSION: string = "1.0.1";
 
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
-  outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
   controlFlowChannel = vscode.window.createOutputChannel(
     "COBOL Language Support Control Flow",
     { log: true },
   );
 
   analysisService = new ControlFlowAnalysisService(
-    outputChannel,
+    getOutputChannel(),
     controlFlowChannel,
   );
   try {
@@ -97,12 +96,12 @@ async function initialize(context: vscode.ExtensionContext) {
     const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
       error,
     )}`;
-    outputChannel.appendLine(message);
+    getOutputChannel().appendLine(message);
     throw Error(message);
   }
 
   languageClientService = new LanguageClientService(
-    outputChannel,
+    getOutputChannel(),
     context.globalStorageUri,
     {
       executeCommand: (command, args, next) => {
@@ -114,7 +113,7 @@ async function initialize(context: vscode.ExtensionContext) {
     },
   );
 
-  await initializeExternalAPIs(context.globalStorageUri, outputChannel, () =>
+  await initializeExternalAPIs(context.globalStorageUri, () =>
     languageClientService.invalidateConfiguration(),
   );
 
@@ -192,7 +191,7 @@ export async function activate(
     }
   } catch (err) {
     if (err instanceof Error) {
-      outputChannel.appendLine(err.toString());
+      getOutputChannel().appendLine(err.toString());
       languageClientService.enableNativeBuild();
       registerExceptionEvent(
         "RuntimeException",
@@ -210,18 +209,13 @@ export async function activate(
   );
   languageClientService.addRequestHandler(
     "workspace/configuration",
-    (r: Parameters<typeof lspConfigHandler>[0]) =>
-      lspConfigHandler(r, outputChannel),
+    (r: Parameters<typeof lspConfigHandler>[0]) => lspConfigHandler(r),
   );
   languageClientService.addNotificationHandler(
     "cfast/ready",
     analysisService.makeControlFlowAstNotificationHandler(),
   );
-  languageClientService.addRequestHandler(
-    "copybook/uri",
-    resolveCopybookURI,
-    // externalApis.makeResolveCopybookUriHandler(),
-  );
+  languageClientService.addRequestHandler("copybook/uri", resolveCopybookURI);
   languageClientService.addRequestHandler("file/content", readFileContent);
 
   await languageClientService.start();
@@ -264,7 +258,7 @@ function findPosition(uri: string): vscode.Position {
       return e.selection.start;
     }
   }
-  outputChannel.appendLine(
+  getOutputChannel().appendLine(
     "Cant find editor for " + uri + " the first program/function will be used.",
   );
   return new vscode.Position(0, 0);
@@ -286,7 +280,7 @@ const registerNewDialect = async (
   extensionId: string,
   dialect: DialectDetail,
 ) => {
-  outputChannel.appendLine(
+  getOutputChannel().appendLine(
     "Register new dialect: \r\n" + JSON.stringify(dialect),
   );
 
@@ -310,7 +304,7 @@ const registerNewDialect = async (
     dialect.snippets.fsPath,
     dialect.isCopyStatement,
   );
-  outputChannel.appendLine("Restart analysis");
+  getOutputChannel().appendLine("Restart analysis");
   await languageClientService.invalidateConfiguration();
 
   const unregisterDialect = async () => {
@@ -411,7 +405,7 @@ function registerCommands(context: vscode.ExtensionContext) {
           }
         } catch (error) {
           vscode.window.showErrorMessage(FAIL_CREATE_COPYBOOK_FOLDER_MSG);
-          outputChannel.appendLine(
+          getOutputChannel().appendLine(
             `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${getErrorMessage(error)}`,
           );
         }
@@ -455,4 +449,14 @@ function registerCodeActions(context: vscode.ExtensionContext) {
       new ServerRuntimeCodeActionProvider(),
     ),
   );
+}
+
+export function getOutputChannel() {
+  if (!outputChannel) {
+    outputChannel = vscode.window.createOutputChannel(
+      "COBOL Language Support",
+      { log: true },
+    );
+  }
+  return outputChannel;
 }

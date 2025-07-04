@@ -1,3 +1,4 @@
+import { getOutputChannel } from "../../extension";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
 import { LibsDefinitions } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
@@ -63,7 +64,6 @@ export default class LocalPathLib implements CopybookLib {
   async listCopybooks(
     documentUri: vscode.Uri,
     dialect: string,
-    outputChannel?: vscode.OutputChannel,
   ): Promise<string[]> {
     const uris = this.getUris(documentUri);
 
@@ -84,8 +84,8 @@ export default class LocalPathLib implements CopybookLib {
       if (result.status === "fulfilled") {
         result.value.forEach((copybook) => copybooks.push(copybook.filename));
       } else {
-        outputChannel?.appendLine(
-          `Unable to load copybooks completions: ${result.reason}`,
+        getOutputChannel().error(
+          `Unable to load copybooks completions: ${JSON.stringify(result.reason)}`,
         );
       }
     });

@@ -19,10 +19,7 @@ describe("USS copybook lib", () => {
     Utils.getZoweExplorerAPI = jest
       .fn()
       .mockResolvedValue({ api: zoweExplorerApiMock });
-    await initializeExternalAPIs(
-      vscode.Uri.file("/storage"),
-      vscode.window.createOutputChannel("test"),
-    );
+    await initializeExternalAPIs(vscode.Uri.file("/storage"));
     jest
       .spyOn(ProfileUtils, "getAvailableProfiles")
       .mockReturnValue(["profile"]);

@@ -14,8 +14,11 @@
 
 import * as vscode from "vscode";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
+import { getOutputChannel } from "../../extension";
 
-export async function readFileContent(fileUri: string): Promise<string> {
+export async function readFileContent(
+  fileUri: string,
+): Promise<string | undefined> {
   const uri = vscode.Uri.parse(fileUri);
   const openFile = vscode.workspace.textDocuments.find(
     (doc) => doc.uri.toString() === fileUri,
@@ -23,9 +26,16 @@ export async function readFileContent(fileUri: string): Promise<string> {
   if (openFile) {
     return openFile.getText();
   }
-  const data = await vscode.workspace.fs.readFile(uri);
-  const content = new TextDecoder().decode(data);
-  return content;
+  try {
+    const data = await vscode.workspace.fs.readFile(uri);
+    const content = new TextDecoder().decode(data);
+    return content;
+  } catch (err) {
+    getOutputChannel().error(
+      `file/content message handler error ${fileUri} ${JSON.stringify(err)}`,
+    );
+    return;
+  }
 }
 
 export async function resolveCopybookURI(

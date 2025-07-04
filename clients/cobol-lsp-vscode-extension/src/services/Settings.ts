@@ -46,6 +46,7 @@ import {
 import { SupportedVariables } from "./util/FSUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
+import { getOutputChannel } from "../extension";
 
 const NONE: string = "NONE";
 const MAX_VM_COUNT = 50000;
@@ -73,7 +74,6 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   ) => Promise<R>,
   item: Item,
   result: (R | undefined)[],
-  outputChannel?: vscode.OutputChannel,
 ) {
   if (item.scopeUri) {
     try {
@@ -96,7 +96,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     } catch (err) {
       if (err instanceof DecodingError) {
-        outputChannel?.appendLine(
+        getOutputChannel().appendLine(
           `Invalid settings: ${item.section} - ${err.message}`,
         );
       }
@@ -106,10 +106,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   }
 }
 
-export async function lspConfigHandler(
-  request: Request,
-  outputChannel?: vscode.OutputChannel,
-) {
+export async function lspConfigHandler(request: Request) {
   const result: unknown[] = [];
   for (const item of request.items) {
     try {
@@ -126,7 +123,6 @@ export async function lspConfigHandler(
             loadProcessorGroupDialectConfig,
             item,
             result,
-            outputChannel,
           );
           break;
         case SETTINGS_CPY_LOCAL_PATH:
@@ -141,7 +137,6 @@ export async function lspConfigHandler(
             loadProcessorGroupSqlBackendConfig,
             item,
             result,
-            outputChannel,
           );
           break;
         case SETTINGS_CPY_FILE_ENCODING:
@@ -153,7 +148,6 @@ export async function lspConfigHandler(
             loadProcessorGroupCompileOptionsConfig,
             item,
             result,
-            outputChannel,
           );
           break;
         case DIALECT_LIBS:

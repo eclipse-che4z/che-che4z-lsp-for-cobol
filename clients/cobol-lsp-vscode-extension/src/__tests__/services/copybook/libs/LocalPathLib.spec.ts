@@ -14,10 +14,7 @@ import { loadProcessorGroupCopybooksLibs } from "../../../../services/ProcessorG
 
 describe("Local copybook library", () => {
   beforeEach(async () => {
-    await initializeExternalAPIs(
-      vscode.Uri.file("/storage"),
-      vscode.window.createOutputChannel("test"),
-    );
+    await initializeExternalAPIs(vscode.Uri.file("/storage"));
     getConfigurationResult["copybook-extensions"] = [".CPY", ".cpy", ""];
     localCopybooks.clearCache();
   });

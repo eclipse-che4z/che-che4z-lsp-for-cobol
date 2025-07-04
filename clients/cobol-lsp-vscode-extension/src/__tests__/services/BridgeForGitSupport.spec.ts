@@ -61,10 +61,7 @@ const pgMapJson: ProgramsConfig = {
 
 describe("Bridge for Git group tests", () => {
   beforeEach(async () => {
-    await initializeExternalAPIs(
-      vscode.Uri.file("/storage"),
-      vscode.window.createOutputChannel("test"),
-    );
+    await initializeExternalAPIs(vscode.Uri.file("/storage"));
     getWorkspaceFolderResult.uri = WS_URI;
     readFileResult[`${WS_PATH}/.cobolplugin/proc_grps.json`] =
       JSON.stringify(pgJson);

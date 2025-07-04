@@ -62,10 +62,7 @@ describe("CopybooksCompletionProvider", () => {
       onCancellationRequested: jest.fn(),
     };
     completionContextMock = {} as unknown as CompletionContext;
-    await initializeExternalAPIs(
-      Uri.file("/storage"),
-      window.createOutputChannel("test"),
-    );
+    await initializeExternalAPIs(Uri.file("/storage"));
     loadPGLibsSpy = jest
       .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
       .mockResolvedValue([

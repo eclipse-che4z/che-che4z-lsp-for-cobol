@@ -12,12 +12,12 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as path from "path";
-import type {
-  CompletionItem as VSCodeCompletionItem,
-  OutputChannel as OutputChannelType,
-  Position as PositionType,
-  Uri as UriType,
-  TextDocument,
+import {
+  type CompletionItem as VSCodeCompletionItem,
+  type LogOutputChannel as LogOutputChannelType,
+  type Position as PositionType,
+  type Uri as UriType,
+  type TextDocument,
 } from "vscode";
 import { URI, Utils } from "vscode-uri";
 
@@ -171,7 +171,7 @@ export namespace window {
     onDidChangeSelection: jest.fn(),
   });
   export const setStatusBarMessage = jest.fn().mockResolvedValue(true);
-  export const createOutputChannel = (name: string): OutputChannelType => ({
+  export const createOutputChannel = (name: string): LogOutputChannelType => ({
     name,
     append: jest.fn(),
     appendLine: jest.fn(),
@@ -180,6 +180,13 @@ export namespace window {
     show: jest.fn(),
     hide: jest.fn(),
     dispose: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    info: jest.fn(),
+    trace: jest.fn(),
+    warn: jest.fn(),
+    onDidChangeLogLevel: jest.fn(),
+    logLevel: 2,
   });
   export const activeTextEditor = {
     document: {

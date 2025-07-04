@@ -38,6 +38,15 @@ describe("CopybookMessageHandler", () => {
       const result = await readFileContent(uri.toString());
       expect(result).toEqual("EDITED");
     });
+
+    it("returns undefined for nonexisting files", async () => {
+      const uri = vscode.Uri.file("/workspace/nonexisting");
+      const result = await readFileContent(uri.toString());
+      expect(result).toBeUndefined();
+      // expect(outputChannel.appendLine).toHaveBeenCalledWith(
+      //   expect.stringContaining("file/content message handler error"),
+      // );
+    });
   });
 
   describe("resolveCopybookURI", () => {
@@ -52,7 +61,7 @@ describe("CopybookMessageHandler", () => {
       AAA: vscode.Uri.file("/copybooks/AAA.cpy"),
     };
 
-    describe("sucessful resolving", () => {
+    describe("successful resolving", () => {
       beforeEach(() => {
         jest
           .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")

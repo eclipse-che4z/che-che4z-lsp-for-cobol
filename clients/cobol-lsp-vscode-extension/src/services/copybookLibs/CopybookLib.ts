@@ -7,9 +7,5 @@ export default interface CopybookLib {
     dialect: string,
   ): Promise<vscode.Uri | (() => Promise<vscode.Uri | undefined>) | undefined>;
 
-  listCopybooks(
-    documentUri: vscode.Uri,
-    dialect: string,
-    outputChannel?: vscode.OutputChannel,
-  ): Promise<string[]>;
+  listCopybooks(documentUri: vscode.Uri, dialect: string): Promise<string[]>;
 }

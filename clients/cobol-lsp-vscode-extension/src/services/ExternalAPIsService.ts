@@ -22,6 +22,7 @@ import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
 import { clearDiagnostics, showDiagnostics } from "./DiagnosticsService";
+import { getOutputChannel } from "../extension";
 
 export class CopybookName {
   constructor(
@@ -34,7 +35,6 @@ export let externalApis: ExternalAPIsService;
 
 export async function initializeExternalAPIs(
   storagePath: vscode.Uri,
-  outputChannel: vscode.OutputChannel,
   configurationInvalidation?: () => unknown,
 ) {
   const maybeE4E = await getE4EAPI();
@@ -44,7 +44,6 @@ export async function initializeExternalAPIs(
     storagePath,
     maybeZowe && "api" in maybeZowe ? maybeZowe.api : undefined,
     maybeE4E && "api" in maybeE4E ? maybeE4E.api : undefined,
-    outputChannel,
     configurationInvalidation,
   );
 
@@ -54,11 +53,11 @@ export async function initializeExternalAPIs(
     });
   }
 
-  if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
+  if (!maybeE4E) getOutputChannel().appendLine(E4E_INCOMPATIBLE);
   else if ("futureApi" in maybeE4E)
     void maybeE4E.futureApi.then((api) => {
       if (api) externalApis.e4eAppeared(api.api);
-      else outputChannel.appendLine(E4E_INCOMPATIBLE);
+      else getOutputChannel().appendLine(E4E_INCOMPATIBLE);
     });
 }
 
@@ -105,7 +104,6 @@ class ExternalAPIsService {
     private storagePath: vscode.Uri,
     explorer?: IApiRegisterClient,
     e4e?: E4E,
-    private outputChannel?: vscode.OutputChannel,
     private configurationInvalidation?: () => unknown,
   ) {
     if (e4e) this.e4eAppeared(e4e);
@@ -117,7 +115,6 @@ class ExternalAPIsService {
     this.e4eDownloader = new CopybookDownloaderForE4E(
       this.storagePath,
       this.e4eApi,
-      this.outputChannel,
     );
     clearDiagnostics();
   }
@@ -129,7 +126,7 @@ class ExternalAPIsService {
     clearDiagnostics();
     if (this.explorerApi.onProfileUpdated) {
       this.explorerApi.onProfileUpdated((profile: IProfileLoaded) => {
-        this.outputChannel?.appendLine(`Zowe profile ${profile.name} updated`);
+        getOutputChannel().appendLine(`Zowe profile ${profile.name} updated`);
         this.clearCache();
         if (this.configurationInvalidation) {
           this.configurationInvalidation();

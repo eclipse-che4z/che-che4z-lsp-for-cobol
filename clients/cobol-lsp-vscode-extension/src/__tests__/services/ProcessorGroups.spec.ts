@@ -161,10 +161,7 @@ beforeEach(async () => {
   jest
     .spyOn(E4ECopybookService, "getE4EAPI")
     .mockResolvedValue({ api: e4eMock });
-  await initializeExternalAPIs(
-    Uri.file("/storage"),
-    vscode.window.createOutputChannel("test"),
-  );
+  await initializeExternalAPIs(Uri.file("/storage"));
   clearWorkspaceConfigCache();
 });
 
