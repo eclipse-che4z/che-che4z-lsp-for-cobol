@@ -39,15 +39,12 @@ import {
 import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
-  loadProcessorGroupCopybookEncodingConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupCopybookPaths,
-  loadProcessorGroupCopybookPathsConfig,
   loadProcessorGroupDialectConfig,
   loadProcessorGroupSqlBackendConfig,
 } from "./ProcessorGroups";
 import { getVariablesFromUri, SupportedVariables } from "./util/FSUtils";
-import { SettingsUtils } from "./util/SettingsUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
 
@@ -66,13 +63,7 @@ interface Item {
 
 const DialectsConfigurationCodec = t.array(t.string);
 export type DialectsConfiguration = t.TypeOf<typeof DialectsConfigurationCodec>;
-const CopybooksLocalPathsConfigurationCodec = t.array(t.string);
-export type CopybooksLocalPathsConfiguration = t.TypeOf<
-  typeof CopybooksLocalPathsConfigurationCodec
->;
-const CopybookExtensionsConfigurationCodec = t.array(t.string);
 const TargetSQLBackendConfigurationCodec = t.string;
-const CopybookEncodingConfigurationCodec = t.string;
 const CompileOptionsConfigurationCodec = t.string;
 
 async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
@@ -140,37 +131,10 @@ export async function lspConfigHandler(
           );
           break;
         case SETTINGS_CPY_LOCAL_PATH:
-          if (vscode.workspace.getConfiguration().get(item.section)) {
-            await handleProcessorGroupConfigurationRequest(
-              CopybooksLocalPathsConfigurationCodec,
-              loadProcessorGroupCopybookPathsConfig,
-              item,
-              result,
-              outputChannel,
-            );
-          } else {
-            // if no configuration for local or remote copybook paths is provided
-            // use pattern for workspace folder and subfolders as a default value
-            if (
-              !vscode.workspace
-                .getConfiguration(SETTINGS_CPY_SECTION)
-                .get(PATHS_DSN) &&
-              !vscode.workspace
-                .getConfiguration(SETTINGS_CPY_SECTION)
-                .get(PATHS_USS)
-            ) {
-              result.push(["**"]);
-            }
-          }
+          // server should not need to know local paths to copybook folders
           break;
         case SETTINGS_CPY_EXTENSIONS:
-          await handleProcessorGroupConfigurationRequest(
-            CopybookExtensionsConfigurationCodec,
-            loadProcessorGroupCopybookExtensionsConfig,
-            item,
-            result,
-            outputChannel,
-          );
+          // server should not need to know allowed copybook extensions
           break;
         case SETTINGS_SQL_BACKEND:
           await handleProcessorGroupConfigurationRequest(
@@ -182,13 +146,7 @@ export async function lspConfigHandler(
           );
           break;
         case SETTINGS_CPY_FILE_ENCODING:
-          await handleProcessorGroupConfigurationRequest(
-            CopybookEncodingConfigurationCodec,
-            loadProcessorGroupCopybookEncodingConfig,
-            item,
-            result,
-            outputChannel,
-          );
+          // server should not need to know copybook files encodings
           break;
         case SETTINGS_COMPILE_OPTIONS:
           await handleProcessorGroupConfigurationRequest(
@@ -269,10 +227,13 @@ export class SettingsService {
         dialectType,
       ),
     ];
-    const wsFolders = SettingsUtils.getWorkspaceFoldersPath(true);
 
     if (convertToAbsolutePaths) {
-      return SettingsService.prepareLocalSearchFolders(paths, wsFolders);
+      const uris = SettingsService.prepareLocalSearchUris(
+        paths,
+        vscode.workspace.workspaceFolders ?? [],
+      );
+      return uris.map((u) => u.fsPath);
     }
     return paths;
   }

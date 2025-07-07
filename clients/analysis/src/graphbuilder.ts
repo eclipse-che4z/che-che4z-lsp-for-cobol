@@ -41,11 +41,10 @@ import {
 import { createRange } from "./utils";
 import {
   DiagnosticDto,
-  DiagnosticRelatedInformationDto,
   DiagnosticSeverityDto,
   DiagnosticTagDto,
+  EventDto,
   LocationDto,
-  PositionDto,
   RangeDto,
 } from "./model/external";
 import { Channel } from "./vm/logger";
@@ -57,7 +56,10 @@ export class EngineProcessingResult {
     string,
     DiagnosticDto[]
   >();
+  events: EventDto[] = [];
 }
+
+const TELEMETRY_ANALYSIS_LIMIT = "ccf.analysis.limit";
 
 /**
  * Graph Builder
@@ -117,13 +119,14 @@ export class ControlFlowGraphBuilder {
    */
   public build(programs: Program[]): EngineProcessingResult {
     const diagnostics = new Map<string, DiagnosticDto[]>();
+    const events: EventDto[] = [];
     const locationsSet = new Set<string>();
 
     const enters = programs.map((program) => {
       const listing = new ProgramListing(program);
       listing.getUris().forEach((uri) => locationsSet.add(uri));
 
-      const listener = new BuildGraphListener(program, diagnostics);
+      const listener = new BuildGraphListener(program, diagnostics, events);
       const optimizer = new IbmOptimizer();
 
       const processor = new VirtualProcessor(
@@ -146,7 +149,7 @@ export class ControlFlowGraphBuilder {
     });
     const locations = Array.from(locationsSet.values());
 
-    return { enters, locations, diagnostics };
+    return { enters, locations, diagnostics, events };
   }
 }
 
@@ -157,6 +160,7 @@ class BuildGraphListener implements VirtualProcessorListener {
   public constructor(
     private program: Program,
     private diagnostics: Map<string, DiagnosticDto[]>,
+    private events: EventDto[]
   ) {
     this.builder = new GraphBuilder(program);
     this.latestLocation = {
@@ -182,7 +186,7 @@ class BuildGraphListener implements VirtualProcessorListener {
     this.builder.addLink(node1, node2);
   }
 
-  public maximumVMCountReached(): void {
+  public maximumVMCountReached(limit: number): void {
     const location = {
       uri: this.program.location.uri,
       start: { line: 1, character: 1 },
@@ -194,6 +198,10 @@ class BuildGraphListener implements VirtualProcessorListener {
       location,
       DiagnosticSeverityDto.Warning,
     );
+    this.events.push({
+      eventName: TELEMETRY_ANALYSIS_LIMIT,
+      message: `Graph generation incomplete due to reaching VM limit: ${limit}`,
+    });
   }
 
   public reportFallThru(path: CobolInstruction[]): void {

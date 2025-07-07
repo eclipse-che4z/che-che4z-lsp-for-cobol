@@ -138,8 +138,6 @@ public class AnalysisService {
           engine.analyze(uri, text, config, documentService.get(uri).getLanguageId());
       documentService.processAnalysisResult(uri, result, text);
       ThreadInterruptionUtil.checkThreadInterrupted();
-      copybookService.sendCopybookDownloadRequest(
-          uri, DocumentServiceHelper.extractCopybookUris(result), copybookProcessingMode);
 
       cfastBuilder.ifPresent(
           builder ->

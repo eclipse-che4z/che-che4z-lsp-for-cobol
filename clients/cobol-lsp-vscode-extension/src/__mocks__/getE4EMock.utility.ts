@@ -66,7 +66,7 @@ export const e4eMock: E4E = {
 
 export const e4eResponseEndevorFirst: e4eResponse = {
   profile: { instance: "instance", profile: "profile" },
-  uri: "document-uri",
+  uri: "file://document-uri",
   elements: {
     ["copybook"]: {
       use_map: false,
@@ -86,7 +86,7 @@ export const e4eResponseEndevorFirst: e4eResponse = {
 };
 export const e4eResponseDatasetFirst: e4eResponse = {
   profile: { instance: "instance", profile: "profile" },
-  uri: "document-uri",
+  uri: "file://document-uri",
   elements: {
     ["copybook"]: {
       dataset: "dataset",

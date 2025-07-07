@@ -12,36 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { globSync, hasMagic } from "glob";
 import * as vscode from "vscode";
-import { Utils } from "./Utils";
-/**
- * This method scans the list of folders as given input and find the required entity name within the folder.
- * If found returns its URI representation
- * @param copybookName name of the entity asked by the server
- * @param copybookFolders list of folders from where to search the copybook
- * @param extensions list of possible copybooks extensions
- */
-export function searchCopybookInExtensionFolder(
-  copybookName: string,
-  copybookFolders: string[] | undefined,
-  extensions: string[] | undefined,
-  storagePath: string,
-): vscode.Uri | undefined {
-  if (!copybookFolders || !extensions) return undefined;
-  const extensionFolder = cleanWorkspaceFolderName(storagePath);
-  for (const p of copybookFolders) {
-    for (const ext of extensions) {
-      const searchResult = globSearch(extensionFolder, p, copybookName, ext);
-      if (searchResult) {
-        return vscode.Uri.file(searchResult);
-      }
-    }
-  }
-  return undefined;
-}
 
 export const backwardSlashRegex = new RegExp("\\\\", "g");
 
@@ -51,6 +22,11 @@ export function cleanWorkspaceFolderName(workspaceFolderPath: string) {
 
 export function normalizePath(folder: string): string {
   return vscode.Uri.file(folder).fsPath;
+}
+
+function hasMagic(input: string) {
+  const pattern = /[*?{}[\]()!]/;
+  return pattern.test(input);
 }
 
 export function createFileSearchPattern(
@@ -84,43 +60,18 @@ export function createFileSearchPattern(
   return new vscode.RelativePattern(baseUri, pattern);
 }
 
-function globSearch(
-  workspaceFolder: string,
-  resource: string,
-  copybookName: string,
-  ext: string,
-): string | undefined {
-  const pathName: string = path.isAbsolute(resource)
-    ? resource
-    : path.normalize(path.join(workspaceFolder, resource));
-  const segments = pathName.split(path.sep);
-  const cwdSegments: string[] = [];
-  for (const s of segments) {
-    if (!hasMagic(s)) {
-      cwdSegments.push(s);
-    } else {
-      break;
-    }
-  }
-  // One must use forward-slashes only in glob expressions
-  const cwd = path
-    .resolve("/", ...cwdSegments)
-    .replace(backwardSlashRegex, "/");
-  const normalizePathName = pathName.replace(backwardSlashRegex, "/");
-  let pattern =
-    normalizePathName === cwd && !Utils.isUNCPath(normalizePathName)
-      ? ""
-      : normalizePathName.replace(cwd.endsWith("/") ? cwd : cwd + "/", "");
-  const suffix =
-    (pattern.length === 0 || pattern.endsWith("/") ? "" : "/") +
-    copybookName +
-    ext;
-  pattern = pattern + suffix;
-  const result = globSync(pattern, { cwd, dot: true });
-  // TODO report the case with more then one copybook fit the pattern.
-  return result[0]
-    ? normalizePath(fs.realpathSync.native(path.resolve(cwd, result[0])))
-    : undefined;
+export function createCaseInsensitivePattern(name: string) {
+  return name
+    .split("")
+    .map((letter) => {
+      const lc = letter.toLowerCase();
+      const uc = letter.toUpperCase();
+      if (lc === uc) {
+        return lc;
+      }
+      return `[${lc}${uc}]`;
+    })
+    .join("");
 }
 
 export type SupportedVariables = {
@@ -141,13 +92,13 @@ export function getVariablesFromUri(
 
   return {
     filename: includeExt || dot <= 0 ? file : file.substring(0, dot),
-    dirName: p.fsPath,
+    dirName: p.path,
     dirBasename: p.path.substring(p.path.lastIndexOf("/") + 1),
     extension: dot > 0 ? file.substring(dot) : "",
   };
 }
 
-export function splitFilename(filename: string): [string, string | null] {
+export function splitFilename(filename: string): [string, string] | [string] {
   const lastDotIndex = filename.lastIndexOf(".");
   if (lastDotIndex > 0) {
     const name = filename.slice(0, lastDotIndex);
@@ -155,6 +106,6 @@ export function splitFilename(filename: string): [string, string | null] {
 
     return [name, extension];
   } else {
-    return [filename, null];
+    return [filename];
   }
 }

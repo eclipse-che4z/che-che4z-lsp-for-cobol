@@ -194,7 +194,7 @@ public class DocumentModelService {
   }
 
   private void removeAllRelatedDiagnostics(CobolDocumentModel documentModel) {
-    AnalysisResult analysisResult = documentModel.getAnalysisResult();
+    AnalysisResult analysisResult = documentModel.getLastAnalysisResult();
     if (analysisResult == null || analysisResult.getDiagnostics() == null) {
       return;
     }

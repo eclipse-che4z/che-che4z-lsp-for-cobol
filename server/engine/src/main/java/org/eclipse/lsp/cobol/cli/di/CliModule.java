@@ -32,9 +32,12 @@ import org.eclipse.lsp.cobol.common.action.CodeActionProvider;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkService;
 import org.eclipse.lsp.cobol.common.benchmark.BenchmarkServiceImpl;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.PredefinedCopybookStore;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.common.file.FileSystemService;
 import org.eclipse.lsp.cobol.common.file.WorkspaceFileService;
+import org.eclipse.lsp.cobol.common.io.ResolveCopybookUri;
+import org.eclipse.lsp.cobol.common.io.ResolveFileContent;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
@@ -70,6 +73,8 @@ import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.delegates.validations.CobolLanguageEngineFacade;
+import org.eclipse.lsp.cobol.service.io.impl.DiskBasedFileContent;
+import org.eclipse.lsp.cobol.service.io.impl.NonCacheResolveCopybookUri;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -89,6 +94,9 @@ public class CliModule extends AbstractModule {
     bind(LocaleStore.class).to(LocaleStoreImpl.class);
     bind(ConfigurationService.class).to(CachingConfigurationService.class);
     bind(CopybookNameService.class).to(CopybookNameServiceImpl.class);
+    bind(ResolveCopybookUri.class).to(NonCacheResolveCopybookUri.class);
+    bind(ResolveFileContent.class).to(DiskBasedFileContent.class);
+    bind(PredefinedCopybookStore.class).to(PredefinedCopybookStoreImpl.class);
     bind(ParseTreeListener.class).to(InterruptingTreeListener.class);
     bind(String.class)
         .annotatedWith(named("resourceFileLocation"))

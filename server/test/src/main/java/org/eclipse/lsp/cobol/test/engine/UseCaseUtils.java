@@ -17,21 +17,28 @@ package org.eclipse.lsp.cobol.test.engine;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.lsp.cobol.common.copybook.CopybookId.COBOL;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 
 import com.google.inject.Injector;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.StreamSupport;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.*;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+// import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.PredefinedCopybookStore;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.common.io.ResolveCopybookUri;
+import org.eclipse.lsp.cobol.common.io.ResolveFileContent;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.UseCaseInitializer;
 import org.eclipse.lsp4j.Diagnostic;
@@ -128,15 +135,19 @@ public class UseCaseUtils {
             .orElseThrow(() -> new RuntimeException("UseCase initializer not found"));
 
     TrueDialectService dialectService = injector.getInstance(TrueDialectService.class);
-
-    CopybookService copybookService = injector.getInstance(CopybookService.class);
+    PredefinedCopybookStore predefinedCopybookStore =
+        injector.getInstance(PredefinedCopybookStore.class);
+    ResolveCopybookUri resolveCopybookUri = injector.getInstance(ResolveCopybookUri.class);
+    ResolveFileContent resolveFileContent = injector.getInstance(ResolveFileContent.class);
     CleanerPreprocessor preprocessor = dialectService.getPreprocessor(languageId);
-    PredefinedCopybookUtils.loadPredefinedCopybooks(
+    List<CopybookModel> predefinedCopybooks =
+        PredefinedCopybookUtils.loadPredefinedCopybooks(
             useCase.getSqlBackend(),
             useCase.getCopybooks(),
             useCase.documentUri,
-            useCase.compilerOptions)
-        .forEach(pc -> copybookService.store(pc, preprocessor));
+            useCase.compilerOptions);
+
+    predefinedCopybooks.forEach(pc -> predefinedCopybookStore.store(pc, preprocessor));
 
     useCase
         .getCopybooks()
@@ -149,8 +160,20 @@ public class UseCaseUtils {
                       cobolText.getFileName().toUpperCase(),
                       cobolText.getDialectType(),
                       copybookText);
-              copybookService.store(
-                  UseCaseUtils.toCopybookModel(cobolText, useCase.documentUri), preprocessor);
+              CopybookName copybookName =
+                  new CopybookName(cobolText.getFileName(), cobolText.getDialectType());
+              CopybookModel copybookModel = toCopybookModel(cobolText, useCase.documentUri);
+
+              doReturn(copybookModel.getUri())
+                  .when(resolveCopybookUri)
+                  .resolveCopybookUri(
+                      eq(useCase.documentUri),
+                      eq(copybookName),
+                      eq(Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL)));
+
+              doReturn(CompletableFuture.completedFuture(copybookModel.getContent()))
+                  .when(resolveFileContent)
+                  .getFileContent(eq(copybookModel.getUri()));
             });
 
     SubroutineService subroutines = injector.getInstance(SubroutineService.class);

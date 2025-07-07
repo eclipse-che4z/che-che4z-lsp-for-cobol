@@ -14,20 +14,14 @@
  */
 package org.eclipse.lsp.cobol.service.copybooks;
 
-import static java.util.stream.Collectors.toList;
-
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
@@ -36,13 +30,9 @@ import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.eclipse.lsp.cobol.common.file.FileSystemService;
-import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
-import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
-import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.io.ResolveCopybookUri;
+import org.eclipse.lsp.cobol.common.io.ResolveFileContent;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
-import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
-import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 
 /**
  * This service processes copybook requests and returns content by its name. The service also caches
@@ -53,31 +43,33 @@ import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 @SuppressWarnings("UnstableApiUsage")
 public class CopybookServiceImpl implements CopybookService {
 
-  private final Map<String, List<SyntaxError>> preprocessCopybookErrors = new ConcurrentHashMap<>();
-  private final Map<String, Set<CopybookModel>> copybookUsage = new ConcurrentHashMap<>();
-  private final Provider<CobolLanguageClient> clientProvider;
-  private final FileSystemService files;
   private static final String COBOL = "COBOL";
+  protected final Map<String, List<SyntaxError>> preprocessCopybookErrors =
+      new ConcurrentHashMap<>();
+  protected final Map<String, Set<CopybookModel>> copybookUsage = new ConcurrentHashMap<>();
+  private final ResolveCopybookUri resolveCopybookUri;
+  private final ResolveFileContent resolveFileContent;
+  private final PredefinedCopybookStore predefinedCopybookStoreImpl;
+  private final CopybookCache copybookCache;
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
 
-  private final CopybookCache copybookCache;
-
   @Inject
   public CopybookServiceImpl(
-      Provider<CobolLanguageClient> clientProvider,
-      FileSystemService files,
+      ResolveCopybookUri resolveCopybookUri,
+      ResolveFileContent resolveFileContent,
+      PredefinedCopybookStore predefinedCopybookStoreImpl,
       CopybookCache copybookCache) {
-    this.files = files;
-    this.clientProvider = clientProvider;
+    this.resolveCopybookUri = resolveCopybookUri;
+    this.resolveFileContent = resolveFileContent;
+    this.predefinedCopybookStoreImpl = predefinedCopybookStoreImpl;
     this.copybookCache = copybookCache;
   }
 
   @Override
   public void invalidateCache(boolean onlyNonImplicit) {
     LOG.debug("Copybooks for downloading: {}", copybooksForDownloading);
-    LOG.debug("Copybook cache: {}", copybookCache);
     LOG.debug("Cache invalidated");
     copybookUsage.clear();
     copybooksForDownloading.clear();
@@ -91,10 +83,11 @@ public class CopybookServiceImpl implements CopybookService {
   /**
    * Removes cache for the passed {@link CopybookId}
    *
-   * @param copybookId is a copybook identifier
+   * @param copybookModel is a copybook model to be invalidated
    */
-  public void invalidateCache(CopybookId copybookId) {
-    copybookCache.invalidate(copybookId);
+  @SuppressWarnings("unchecked")
+  public void invalidateCache(CopybookModel copybookModel) {
+    copybookCache.invalidate(copybookModel.getCopybookId());
   }
 
   /**
@@ -119,46 +112,71 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
       CleanerPreprocessor preprocessor) {
+    ThreadInterruptionUtil.checkThreadInterrupted();
+
+    CopybookModel copybookModel;
     try {
-      ThreadInterruptionUtil.checkThreadInterrupted();
-
-      CopybookModel copybookModel =
-          getFromCache(programDocumentUri, copybookId, copybookName, preprocessor);
-      copybookUsage.computeIfAbsent(programDocumentUri, k -> new HashSet<>()).add(copybookModel);
-
-      List<SyntaxError> errors =
-          Optional.ofNullable(copybookModel.getUri())
-              .map(d -> preprocessCopybookErrors.getOrDefault(d, Collections.emptyList()))
-              .orElse(Collections.emptyList());
-
-      return new ResultWithErrors<>(copybookModel, errors);
-    } catch (ExecutionException | UncheckedExecutionException | ExecutionError e) {
+      copybookModel =
+          copybookCache.get(
+              copybookId, () -> getCopybook(copybookName, programDocumentUri, preprocessor));
+    } catch (ExecutionException e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return new ResultWithErrors<>(
           new CopybookModel(copybookId, copybookName, null, null), Collections.emptyList());
     }
+    List<SyntaxError> errors =
+        Optional.ofNullable(copybookModel.getUri())
+            .map(d -> preprocessCopybookErrors.getOrDefault(d, Collections.emptyList()))
+            .orElse(Collections.emptyList());
+    return new ResultWithErrors<>(copybookModel, errors);
   }
 
-  private CopybookModel getFromCache(
-      String programDocumentUri,
-      CopybookId copybookId,
-      CopybookName copybookName,
-      CleanerPreprocessor preprocessor)
-      throws ExecutionException {
-    return copybookCache.get(
-        copybookId,
-        () -> {
-          ThreadInterruptionUtil.checkThreadInterrupted();
-          CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri);
-          if (preprocessor != null && copybookModel.getUri() != null) {
-            ResultWithErrors<CopybookModel> copybookModelResultWithErrors =
-                cleanupCopybook(copybookModel, preprocessor);
-            copybookModel = copybookModelResultWithErrors.getResult();
-            preprocessCopybookErrors.put(
-                copybookModel.getUri(), copybookModelResultWithErrors.getErrors());
-          }
-          return copybookModel;
-        });
+  private CopybookModel getCopybook(
+      CopybookName copybookName, String programDocumentUri, CleanerPreprocessor preprocessor) {
+    try {
+      String copybookUri =
+          resolveCopybookUri.resolveCopybookUri(
+              programDocumentUri,
+              copybookName,
+              Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
+      if (copybookUri == null) {
+        ResultWithErrors<CopybookModel> predefinedCopybook =
+            predefinedCopybookStoreImpl.resolve(copybookName, programDocumentUri);
+        if (predefinedCopybook.getResult().getContent() == null) {
+          return registerForDownloading(copybookName, programDocumentUri);
+        }
+        return predefinedCopybook.getResult();
+      }
+      String fileContent = resolveFileContent.getFileContent(copybookUri).join();
+
+      if (fileContent == null) {
+        return CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri);
+      }
+
+      CopybookModel dirtyCopybook =
+          new CopybookModel(
+              copybookName.toCopybookId(programDocumentUri),
+              copybookName,
+              copybookUri,
+              fileContent);
+      ResultWithErrors<CopybookModel> copybookModelResultWithErrors =
+          CopybookUtility.cleanupCopybook(dirtyCopybook, preprocessor);
+      copybookUsage
+          .computeIfAbsent(programDocumentUri, k -> new HashSet<>())
+          .add(copybookModelResultWithErrors.getResult());
+      preprocessCopybookErrors.put(
+          dirtyCopybook.getUri(), copybookModelResultWithErrors.getErrors());
+      return copybookModelResultWithErrors.getResult();
+    } catch (UncheckedExecutionException | ExecutionError e) {
+      LOG.error("Can't resolve copybook '{}'.", copybookName, e);
+      return CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri);
+    }
+  }
+
+  private CopybookModel registerForDownloading(CopybookName copybookName, String programUri) {
+    LOG.debug("Not resolved copybook {} of {}", copybookName, programUri);
+    LOG.debug("Copybook download not supported any more.");
+    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, null, null);
   }
 
   @Override
@@ -170,175 +188,11 @@ public class CopybookServiceImpl implements CopybookService {
   public void store(CopybookModel copybookModel, CleanerPreprocessor preprocessor) {
     if (preprocessor != null) {
       ResultWithErrors<CopybookModel> processedCopybook =
-          cleanupCopybook(copybookModel, preprocessor);
+          CopybookUtility.cleanupCopybook(copybookModel, preprocessor);
       copybookModel = processedCopybook.getResult();
       preprocessCopybookErrors.put(copybookModel.getUri(), processedCopybook.getErrors());
     }
     store(copybookModel);
-  }
-
-  private CopybookModel resolveSync(
-      @NonNull CopybookName copybookName, @NonNull String programUri) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    LOG.debug("Trying to resolve copybook {} for {}", copybookName, programUri);
-    Optional<CopybookModel> copybookModel =
-        tryResolveCopybookFromWorkspace(copybookName, programUri);
-    if (copybookModel.isPresent()) {
-      return copybookModel.get();
-    }
-    Optional<CopybookModel> predefineCopybook = tryResolvePredefinedCopybook(copybookName);
-    return predefineCopybook.orElseGet(() -> registerForDownloading(copybookName, programUri));
-  }
-
-  private Optional<CopybookModel> tryResolvePredefinedCopybook(CopybookName copybookName) {
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    CopybookName predefineCopybookName =
-        new CopybookName(
-            copybookName.getDisplayName().toUpperCase(),
-            copybookName.getDialectType(),
-            copybookName.getExtension());
-    CopybookId copybookId =
-        predefineCopybookName.toCopybookId(
-            ImplicitCodeUtils.createFullUrl(predefineCopybookName.getDisplayName()));
-    try {
-      CopybookModel copybookModel =
-          copybookCache.get(
-              copybookId, () -> new CopybookModel(copybookId, predefineCopybookName, null, null));
-      if (copybookModel.getContent() == null || copybookModel.getUri() == null)
-        return Optional.empty();
-      return Optional.of(copybookModel);
-    } catch (ExecutionException e) {
-      return Optional.empty();
-    }
-  }
-
-  private ResultWithErrors<CopybookModel> cleanupCopybook(
-      CopybookModel dirtyCopybook, CleanerPreprocessor preprocessor) {
-    ResultWithErrors<ExtendedText> textTransformationsResultWithErrors =
-        preprocessor.cleanUpCode(dirtyCopybook.getUri(), dirtyCopybook.getContent());
-    String cleanText =
-        CharMatcher.whitespace()
-            .trimTrailingFrom(textTransformationsResultWithErrors.getResult().toString());
-    CopybookModel copybookModel =
-        new CopybookModel(
-            dirtyCopybook.getCopybookId(),
-            dirtyCopybook.getCopybookName(),
-            dirtyCopybook.getUri(),
-            cleanText);
-    return new ResultWithErrors<>(
-        copybookModel,
-        adjustErrorLocation(dirtyCopybook, textTransformationsResultWithErrors.getErrors()));
-  }
-
-  private List<SyntaxError> adjustErrorLocation(
-      CopybookModel dirtyCopybook, List<SyntaxError> originalErrors) {
-    return originalErrors.stream()
-        .map(
-            error ->
-                error.toBuilder().location(getErrorOriginalLocation(dirtyCopybook, error)).build())
-        .collect(toList());
-  }
-
-  private OriginalLocation getErrorOriginalLocation(
-      CopybookModel dirtyCopybook, SyntaxError error) {
-    return new OriginalLocation(
-        Optional.ofNullable(error.getLocation()).map(OriginalLocation::getLocation).orElse(null),
-        CopybooksRepository.toId(
-            dirtyCopybook.getCopybookName().getQualifiedName(),
-            dirtyCopybook.getCopybookName().getDialectType(),
-            dirtyCopybook.getUri()));
-  }
-
-  private Optional<CopybookModel> tryResolveCopybookFromWorkspace(
-      CopybookName copybookName, String programUri) {
-    LOG.debug(
-        "Trying to resolve copybook copybook {} for {} from workspace",
-        copybookName,
-        files.getNameFromURI(programUri));
-    ThreadInterruptionUtil.checkThreadInterrupted();
-    final Optional<CopybookModel> copybookModel =
-        resolveCopybookFromWorkspace(copybookName, programUri)
-            .map(uri -> loadCopybook(uri, copybookName, programUri));
-    LOG.debug("Copybook from workspace: {}", copybookModel);
-    return copybookModel;
-  }
-
-  @SuppressWarnings("java:S2142")
-  private Optional<String> resolveCopybookFromWorkspace(
-      CopybookName copybookName, String programUri) {
-    try {
-      CompletableFuture<String> future =
-          clientProvider
-              .get()
-              .resolveCopybook(
-                  programUri,
-                  copybookName.getDisplayName(),
-                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
-
-      if (future == null) {
-        return Optional.empty();
-      }
-      return Optional.ofNullable(future.get());
-    } catch (InterruptedException e) {
-      // rethrowing the InterruptedException to interrupt the parent thread.
-      throw new UncheckedExecutionException(e);
-    } catch (ExecutionException e) {
-      LOG.warn("An exception thrown while resolving a copybook from the workspace", e);
-      return Optional.empty();
-    }
-  }
-
-  private CopybookModel registerForDownloading(CopybookName copybookName, String programUri) {
-    String cobolFileName = files.getNameFromURI(programUri);
-    LOG.debug("Registering copybook {} of {} for further downloading", copybookName, cobolFileName);
-    Optional.ofNullable(cobolFileName)
-        .map(
-            name ->
-                copybooksForDownloading.computeIfAbsent(name, s -> ConcurrentHashMap.newKeySet()))
-        .ifPresent(it -> it.add(copybookName));
-    return new CopybookModel(copybookName.toCopybookId(programUri), copybookName, null, null);
-  }
-
-  private CopybookModel loadCopybook(String uri, CopybookName copybookName, String programUri) {
-    Path file = files.getPathFromURI(uri);
-    LOG.debug(
-        "Loading {} with URI {} for {} from path {}",
-        copybookName,
-        uri,
-        files.getNameFromURI(programUri),
-        file);
-    return files.fileExists(file)
-        ? new CopybookModel(
-            copybookName.toCopybookId(programUri),
-            copybookName,
-            uri,
-            files.getContentByPath(Objects.requireNonNull(file)))
-        : registerForDownloading(copybookName, programUri);
-  }
-
-  @Override
-  public void sendCopybookDownloadRequest(
-      String documentUri, Collection<String> copybookUris, CopybookProcessingMode processingMode) {
-    LOG.debug("Copybooks expecting downloading: {}", copybooksForDownloading);
-    Set<String> uris = new HashSet<>(copybookUris);
-    uris.add(documentUri);
-
-    if (processingMode.download) {
-      List<CopyBookDTO> copybooksToDownload =
-          uris.stream()
-              .map(files::getNameFromURI)
-              .map(copybooksForDownloading::remove)
-              .filter(Objects::nonNull)
-              .flatMap(Set::stream)
-              .map(CopyBookDTO::new)
-              .collect(toList());
-      LOG.debug("Copybooks to download: {}", copybooksToDownload);
-      if (!copybooksToDownload.isEmpty()) {
-        clientProvider
-            .get()
-            .downloadCopybooks(documentUri, copybooksToDownload, !processingMode.userInteraction);
-      }
-    }
   }
 
   /**

@@ -57,6 +57,7 @@ function getZoweExplorerMock(): IApiRegisterClient {
       },
     }),
     registeredApiTypes: () => ["zosmf"],
+    onProfileUpdated: jest.fn(),
   };
 }
 

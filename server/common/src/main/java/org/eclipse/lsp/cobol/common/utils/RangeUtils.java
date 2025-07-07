@@ -37,21 +37,14 @@ public class RangeUtils {
    */
   public static Optional<Node> findNodeByPosition(Node node, String uri, Position position) {
     Node candidate = null;
-    if (isFromCopybook(uri, node)) {
-      if (node.getChildren().isEmpty()) {
-        return Optional.of(node);
-      }
-      candidate = node;
-    }
-
-    if (isInside(uri, position, node.getLocality())) {
-      if (node.getChildren().isEmpty()) {
-        return Optional.of(node);
-      }
-      candidate = node;
-    }
-
     for (Node child : node.getChildren()) {
+      if (isFromCopybook(uri, child)) {
+        candidate = child;
+      }
+
+      if (isInside(uri, position, child.getLocality())) {
+        candidate = child;
+      }
       Optional<Node> nodeByPosition = findNodeByPosition(child, uri, position);
       if (nodeByPosition.isPresent()) {
         return nodeByPosition;

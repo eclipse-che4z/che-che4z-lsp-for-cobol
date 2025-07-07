@@ -14,14 +14,8 @@
 
 import * as path from "path";
 import { Minimatch } from "minimatch";
-import { globSync } from "glob";
 import { Uri, workspace } from "vscode";
-import {
-  backwardSlashRegex,
-  cleanWorkspaceFolderName,
-  getVariablesFromUri,
-  normalizePath,
-} from "./util/FSUtils";
+import { getVariablesFromUri } from "./util/FSUtils";
 import { DialectsConfiguration, SettingsService } from "./Settings";
 import { B4GTypeMetadata, loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
@@ -43,61 +37,42 @@ export async function loadProcessorGroupCopybookPaths(
   dialectType: string,
 ): Promise<string[]> {
   return (
-    await loadProcessorGroupSettings(
-      documentUri,
-      "libs",
-      [] as string[],
-      dialectType,
-    )
+    await loadProcessorGroupSettings(documentUri, "libs", [], dialectType)
   ).filter((element) => typeof element == "string");
 }
+
+export type ProcessorGroupCopybookPathConfig =
+  | Uri
+  | ZoweDatasetConfigModel
+  | ZoweUssConfigModel
+  | EndevorConfigModel;
 
 export async function loadProcessorGroupCopybookPathsConfig(
   item: { scopeUri: string },
   configObject: string[],
   dialect?: string,
-): Promise<
-  (string | ZoweDatasetConfigModel | ZoweUssConfigModel | EndevorConfigModel)[]
-> {
-  const allConfigs: (
-    | string
-    | ZoweDatasetConfigModel
-    | ZoweUssConfigModel
-    | EndevorConfigModel
-  )[] = [
-    ...(await loadProcessorGroupSettings(
-      item.scopeUri,
-      "libs",
-      [] as string[],
-      dialect,
-    )),
-    ...configObject,
+): Promise<ProcessorGroupCopybookPathConfig[]> {
+  const allConfigs: ProcessorGroupCopybookPathConfig[] = [
+    ...(await loadProcessorGroupSettings(item.scopeUri, "libs", [], dialect)),
+    ...configObject.map((path) => Uri.file(path)),
   ];
 
-  const configs: (
-    | string
-    | ZoweDatasetConfigModel
-    | ZoweUssConfigModel
-    | EndevorConfigModel
-  )[] = [];
+  const configs: ProcessorGroupCopybookPathConfig[] = [];
   const variables = getVariablesFromUri(item.scopeUri, false);
-  const wsUri = workspace.getWorkspaceFolder(Uri.parse(item.scopeUri))?.uri;
-  let cleanWsFolder: string | undefined;
-  if (wsUri) cleanWsFolder = cleanWorkspaceFolderName(wsUri.fsPath);
 
   for (const config of allConfigs) {
     if (typeof config === "string") {
-      const tempConfig = SettingsService.evaluateVariables([config], variables);
+      const evaluatedPaths = SettingsService.evaluateVariables(
+        [config],
+        variables,
+      );
 
-      if (cleanWsFolder === undefined) {
-        configs.push(config);
-      } else {
-        const globs = globSync(
-          tempConfig.map((ele) => ele.replace(backwardSlashRegex, "/")),
-          { cwd: cleanWsFolder, absolute: true },
-        ).map((s) => normalizePath(s));
-        configs.push(...globs);
-      }
+      const searchUris = SettingsService.prepareLocalSearchUris(
+        evaluatedPaths,
+        workspace.workspaceFolders ?? [],
+      );
+
+      configs.push(...searchUris);
     } else {
       if (USS in config) {
         config.uss = SettingsService.evaluateVariables(
@@ -118,17 +93,6 @@ export async function loadProcessorGroupCopybookExtensionsConfig(
   return loadProcessorGroupSettings(
     item.scopeUri,
     "copybook-extensions",
-    configObject,
-  );
-}
-
-export async function loadProcessorGroupCopybookEncodingConfig(
-  item: { scopeUri: string },
-  configObject: string,
-): Promise<string> {
-  return loadProcessorGroupSettings(
-    item.scopeUri,
-    "copybook-file-encoding",
     configObject,
   );
 }
@@ -280,12 +244,7 @@ function selectProcessorGroup(
 }
 
 type AttributeTypes = {
-  libs: (
-    | string
-    | ZoweDatasetConfigModel
-    | ZoweUssConfigModel
-    | EndevorConfigModel
-  )[];
+  libs: ProcessorGroupCopybookPathConfig[];
   name: string;
   "target-sql-backend": string;
   "compiler-options": string;

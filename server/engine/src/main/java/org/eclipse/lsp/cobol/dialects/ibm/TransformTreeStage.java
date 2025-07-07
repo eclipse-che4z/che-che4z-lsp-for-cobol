@@ -146,7 +146,12 @@ public class TransformTreeStage
           context.getCopybooksRepository().getDefinitions().get(name).stream()
               .findFirst()
               .orElse(null);
-      rootNode.addChild(new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
+      Optional<Node> nodeByPosition =
+          RangeUtils.findNodeByPosition(
+              rootNode, statementLocality.getUri(), statementLocality.getRange().getStart());
+      nodeByPosition
+          .orElse(rootNode)
+          .addChild(new CopyNode(statementLocality, copybook.getValue(), name, copybookUri));
     }
   }
 

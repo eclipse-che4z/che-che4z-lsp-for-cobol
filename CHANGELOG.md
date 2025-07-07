@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to the COBOL Language Support extension are documented in this file.
 
-## [2.4.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.4.0...2.4.1) (2025-06-XX)
+## [2.4.1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/compare/2.4.0...2.4.1) (2025-07-02)
 
 ### Bug Fixes
 * 2nd pass usage resolution in usecase engine ([ce402db](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/ce402db7a124813cecbbef47ad771f43405be473))
@@ -16,10 +16,13 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Fix copybook replacing [#2819](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2819) ([#2827](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2827)) ([f16217e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f16217ecaac487d3a4ff68938eedf2cc10bf7f21))
 * Fix evaluate statement ([c2ba1be](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/c2ba1be4f6b6c7f9043632e2f4ffe19c25794653))
 * Fix Go To Definition ([0b38d48](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0b38d4871e290532f4f35fe988b50d4d11d7553a))
+* Fix infinite logging loop ([#2858](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2858)) ([5f838a1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/5f838a18215848c455332f0166e07a7fe47becba))
+* Fix reference from copybooks ([#2857](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/pull/2857))([4017bd5](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/4017bd528103142c7276d5a7e3a5b3dedb1c12e3))
 * Fix snippet generation for small copybooks ([#2817](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2817)) ([f814905](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/f814905f862736ddf4f4472df3b4e4556f155757))
 * Fix unwrapping variables if same copybook is placed multiple times ([fdb43b1](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/fdb43b1eebdb0007f5226838f4ae87bec4d499e1))
 * Fix wrong identification of floating comment [#2837](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2837) ([1581dd2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/1581dd2807145eafcef7348ad1f9a3b44f936f70))
 * IDMS nested copybooks ([dfbc749](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/dfbc749daf61d00d24d5427fd8fbe80fbd3740d2))
+* Ignore didChangeConfiguration events which do not impact the analysis ([#2850](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2850)) ([c6b617e](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/c6b617ea7e3a4cd87bc197199e617c44037761c8))
 * Infinite loop on Endevor configuration retrieval failure ([#2834](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2834)) ([459fc63](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/459fc632db07327ebf92aad7caeed4fe3d8e3585))
 * Insert COBOL Snippets now returns correct entry when there are duplicate prefixes ([#2808](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2808)) ([d19a017](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/d19a0171e3c8339472a6374f4beab37677d715c0))
 * Prevent zowe profile popup for local only programs ([#2771](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2771)) ([536c941](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/536c941b799539d19529bf8b9df0a44d7e37711a))
@@ -35,6 +38,7 @@ All notable changes to the COBOL Language Support extension are documented in th
 * Use default dialect name for SQL dialect ([#2770](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2770)) ([2f8bc28](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/2f8bc2865eb5ec667e28a67015a3770ec2c1abcc))
 * Use real copybook location from configuration to check credentials ([#2593](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/issues/2593)) ([0d8d11f](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/0d8d11f233b37dbf8241838c0ef9dab7963e767a))
 * Usecase grammar issues ([6556178](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/6556178f113b425cc5814070fa8cc50291667c02))
+* Use TextDecoder instead of Buffer module for decoding base64 string ([00f7a70](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/00f7a70ef5f4c383003b56098c3eaa99d0b49ed9))
 * Variable unwrap ([8ef5cd2](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/commit/8ef5cd21655b48c8c76df9c991eb252c817d52fa))
 
 ### Features

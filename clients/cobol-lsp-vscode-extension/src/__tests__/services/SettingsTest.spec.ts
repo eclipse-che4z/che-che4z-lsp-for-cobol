@@ -40,20 +40,7 @@ describe("SettingsService evaluate variables", () => {
   beforeAll(() => {
     (vscode.workspace.workspaceFolders as vscode.WorkspaceFolder[]) = [
       {
-        uri: {
-          path: makePath("/tmp-ws"),
-          scheme: "",
-          authority: "",
-          query: "",
-          fragment: "",
-          fsPath: makefsPath("/tmp-ws"),
-          with: function (): vscode.Uri {
-            throw new Error("Function not implemented.");
-          },
-          toJSON: function () {
-            throw new Error("Function not implemented.");
-          },
-        },
+        uri: vscode.Uri.file(makefsPath("/tmp-ws")),
         name: "workspace",
         index: 0,
       },
@@ -101,7 +88,7 @@ describe("SettingsService evaluate variables", () => {
       "file://" + makePath("/toplevel/program"),
       "COBOL",
     );
-    expect(paths[0]).toEqual(makefsPath("/toplevel") + "/copybooks");
+    expect(paths[0]).toEqual(makefsPath("/toplevel") + `${path.sep}copybooks`);
   });
 
   test("Evaluate fileDirnameBasename", async () => {
@@ -123,7 +110,7 @@ describe("SettingsService evaluate variables", () => {
       "file://" + makePath("/toplevel/program"),
       "COBOL",
     );
-    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + "/copybooks");
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + `${path.sep}copybooks`);
   });
 
   test("Evaluate workspaceFolder with name", async () => {
@@ -136,7 +123,7 @@ describe("SettingsService evaluate variables", () => {
       "file://" + makePath("/toplevel/program"),
       "COBOL",
     );
-    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + "/copybooks");
+    expect(paths[0]).toEqual(makefsPath("/tmp-ws") + `${path.sep}copybooks`);
   });
 
   test("Get local settings for a dialect", async () => {
@@ -144,7 +131,7 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: tracking,
     });
-    await SettingsService.getCopybookLocalPath("PROGRAM", "COBOL");
+    await SettingsService.getCopybookLocalPath("file:///PROGRAM", "COBOL");
     expect(tracking).toHaveBeenCalledWith("paths-local");
   });
 
@@ -153,7 +140,7 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: tracking,
     });
-    await SettingsService.getCopybookLocalPath("PROGRAM", "MAID");
+    await SettingsService.getCopybookLocalPath("file:///PROGRAM", "MAID");
     expect(tracking).toHaveBeenCalledWith("maid.paths-local");
   });
 
@@ -237,7 +224,9 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "dialect.paths-uss",
       undefined,
     );
-    expect(SettingsService.getUssPath("doc-uri", "dialect")).toHaveLength(0);
+    expect(
+      SettingsService.getUssPath("file:///doc-uri", "dialect"),
+    ).toHaveLength(0);
   });
 
   test("returns configured array when dialect configuration is provided", () => {
@@ -245,7 +234,10 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "dialect.paths-uss",
       ["configured-dialect-settings"],
     );
-    const configuredValue = SettingsService.getUssPath("doc-uri", "dialect");
+    const configuredValue = SettingsService.getUssPath(
+      "file:///doc-uri",
+      "dialect",
+    );
     expect(configuredValue).toHaveLength(1);
     expect(configuredValue[0]).toBe("configured-dialect-settings");
   });
@@ -255,7 +247,7 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
       "configured-cobol-settings",
     ]);
     const configuredValue = SettingsService.getUssPath(
-      "doc-uri",
+      "file:///doc-uri",
       SettingsService.DEFAULT_DIALECT,
     );
     expect(configuredValue).toHaveLength(1);
@@ -372,7 +364,7 @@ describe("SettingService lspConfigHandler", () => {
         };
       });
 
-      test("returns local copybook path setting", async () => {
+      test("returns empty array - server should not need to know local copybook paths", async () => {
         const result = await lspConfigHandler({
           items: [
             {
@@ -382,71 +374,7 @@ describe("SettingService lspConfigHandler", () => {
           ],
         });
 
-        expect(result).toEqual(expect.arrayContaining([["local-copybooks"]]));
-      });
-    });
-
-    describe("local copybooks path is not configured", () => {
-      describe("remote copybooks are not configured", () => {
-        beforeAll(() => {
-          configurationProperties = {};
-        });
-
-        test("returns ** pattern as default value for local copybook resolving", async () => {
-          const result = await lspConfigHandler({
-            items: [
-              {
-                section: SETTINGS_CPY_LOCAL_PATH,
-                scopeUri: "file:///workspace/program.cob",
-              },
-            ],
-          });
-
-          expect(result).toEqual(expect.arrayContaining([["**"]]));
-        });
-      });
-      describe("remote copybooks are configured", () => {
-        describe("remove copybooks dsn is set", () => {
-          beforeAll(() => {
-            configurationProperties = {
-              "paths-dsn": ["DATASET.WITH.COPYBOOK"],
-            };
-          });
-
-          test("returns no paths for local copybook resolving", async () => {
-            const result = await lspConfigHandler({
-              items: [
-                {
-                  section: SETTINGS_CPY_LOCAL_PATH,
-                  scopeUri: "file:///workspace/program.cob",
-                },
-              ],
-            });
-
-            expect(result).toEqual([]);
-          });
-        });
-
-        describe("remove copybooks uss directory is set", () => {
-          beforeAll(() => {
-            configurationProperties = {
-              "paths-uss": ["/users/user/copybooks"],
-            };
-          });
-
-          test("returns no paths for local copybook resolving", async () => {
-            const result = await lspConfigHandler({
-              items: [
-                {
-                  section: SETTINGS_CPY_LOCAL_PATH,
-                  scopeUri: "file:///workspace/program.cob",
-                },
-              ],
-            });
-
-            expect(result).toEqual([]);
-          });
-        });
+        expect(result).toEqual(expect.arrayContaining([]));
       });
     });
   });
@@ -469,36 +397,6 @@ describe("SettingService lspConfigHandler", () => {
 
       expect(result).toEqual(expect.arrayContaining([configurationValue]));
       expect(configKey).toEqual("unknown.config.section");
-    });
-  });
-
-  describe("Invalid configuration provided", () => {
-    const outputChannelMock = {
-      appendLine: jest.fn(),
-    } as unknown as vscode.OutputChannel;
-    beforeAll(() => {
-      jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({
-        get: () => ["correct-path", 2, false],
-      } as unknown as vscode.WorkspaceConfiguration);
-    });
-
-    test("returns empty setting instead of wrong configuration", async () => {
-      const result = await lspConfigHandler(
-        {
-          items: [
-            {
-              section: SETTINGS_CPY_LOCAL_PATH,
-              scopeUri: "file:///workspace/program.cob",
-            },
-          ],
-        },
-        outputChannelMock,
-      );
-
-      expect(result).toEqual(expect.arrayContaining([]));
-      expect(outputChannelMock.appendLine).toHaveBeenCalledWith(
-        "Invalid settings: cobol-lsp.cpy-manager.paths-local - Invalid value 2 supplied to : Array<string>/1: string\nInvalid value false supplied to : Array<string>/2: string",
-      );
     });
   });
 });

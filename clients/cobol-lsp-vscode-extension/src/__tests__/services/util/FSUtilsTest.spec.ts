@@ -25,7 +25,7 @@ describe("FSUtils tests", () => {
         Uri.parse("file:///test/path"),
         "FILE",
       );
-      expect(pattern.base).toEqual({ path: "/test/path" });
+      expect(pattern.baseUri).toEqual(Uri.file("/test/path"));
       expect(pattern.pattern).toEqual("FILE");
     });
 
@@ -34,7 +34,7 @@ describe("FSUtils tests", () => {
         Uri.parse("file:///base/path/*/pattern/path"),
         "*",
       );
-      expect(pattern.base).toEqual({ path: "/base/path" });
+      expect(pattern.baseUri).toEqual(Uri.file("/base/path"));
       expect(pattern.pattern).toEqual("*/pattern/path/*");
     });
   });

@@ -13,7 +13,6 @@
  */
 
 import * as vscode from "vscode";
-import { fetchCopybookCommand } from "../commands/FetchCopybookCommand";
 import { gotoCopybookSettings } from "../commands/OpenSettingsCommand";
 import { initSmartTab } from "../commands/SmartTabCommand";
 import { activate } from "../extension";
@@ -24,7 +23,6 @@ import { Utils } from "../services/util/Utils";
 import { registerEvent } from "../services/reporter";
 
 jest.mock("../commands/SmartTabCommand");
-jest.mock("../commands/FetchCopybookCommand");
 jest.mock("../commands/OpenSettingsCommand");
 jest.mock("../services/LanguageClientService");
 jest.mock("../services/copybook/CopybookDownloadService");
@@ -69,9 +67,8 @@ describe("Check plugin extension for cobol starts successfully.", () => {
       "Extension activation event was triggered",
     );
 
-    expect(vscode.commands.registerCommand).toHaveBeenCalledTimes(12);
+    expect(vscode.commands.registerCommand).toHaveBeenCalledTimes(11);
 
-    expect(fetchCopybookCommand).toHaveBeenCalled();
     expect(gotoCopybookSettings).toHaveBeenCalled();
     expect(initSmartTab).toHaveBeenCalled();
 

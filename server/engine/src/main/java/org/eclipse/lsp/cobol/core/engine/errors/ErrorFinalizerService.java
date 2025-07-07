@@ -287,13 +287,17 @@ public class ErrorFinalizerService {
    * update the diagnostics level set by client
    *
    * @param levels
+   * @return a boolean if filterDiagnostics is changed
    */
-  public void updateDiagnosticsLevel(List<Object> levels) {
+  public boolean updateDiagnosticsLevel(List<Object> levels) {
     if (levels != null && !levels.isEmpty()) {
       if (levels.get(0) instanceof JsonElement) {
         JsonElement option = (JsonElement) levels.get(0);
+        boolean isUpdated = AnalysisMode.valueOf(option.getAsString()) != filterDiagnostics;
         filterDiagnostics = AnalysisMode.valueOf(option.getAsString());
+        return isUpdated;
       }
     }
+    return false;
   }
 }

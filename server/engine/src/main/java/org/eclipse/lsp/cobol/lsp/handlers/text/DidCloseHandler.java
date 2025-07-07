@@ -77,8 +77,7 @@ public class DidCloseHandler {
       CopybookServiceImpl copybookServiceImpl = (CopybookServiceImpl) copybookService;
       copybookServiceImpl.getCopybookUsage(uri).stream()
           .filter(copybookModel -> Objects.isNull(copybookModel.getContent()))
-          .forEach(
-              copybookModel -> copybookServiceImpl.invalidateCache(copybookModel.getCopybookId()));
+          .forEach(copybookServiceImpl::invalidateCache);
     }
     asyncAnalysisService.cancelAnalysis(uri);
   }

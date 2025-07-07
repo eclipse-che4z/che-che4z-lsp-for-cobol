@@ -150,7 +150,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     ExecutorService analysisExecutor = getExecutor(uri);
     CobolDocumentModel documentModel = documentModelService.get(uri);
     if (documentModel.getLastAnalysisResult() != null) {
-      // initiate cancel on prev running analysis
       cancelRunningAnalysis(ImmutableList.of(documentModel));
     }
     FutureTask<CobolDocumentModel> futureTask =
@@ -214,6 +213,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     };
   }
 
+  /** Publishes diagnostics */
+  public void republishDiagnostics() {
+    communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+  }
+
   /**
    * IMPORTANT: 1. Never shutdown or terminate Executor service as we rely on this for
    * synchronization 2. Each uri will always have a singleThreadExecutor and should not be modified
@@ -242,6 +246,36 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   /** Trigger reanalyse of opened programs considering its triggered by IDE. */
   public void reanalyseOpenedPrograms() throws InterruptedException {
     reanalyseOpenedPrograms(SourceUnitGraph.EventSource.IDE);
+  }
+
+  /**
+   * Trigger reanalyse of passed programs based on source event (IDE or FILE_SYSTEM).
+   *
+   * @param cobolDocUri document URI to be analyzed
+   * @param invalidCopybookUris List of copybook uri which has affected this analysis
+   * @param eventSource {@link org.eclipse.lsp.cobol.lsp.SourceUnitGraph.EventSource}
+   */
+  public void reanalyseProgram(
+      String cobolDocUri,
+      Set<String> invalidCopybookUris,
+      SourceUnitGraph.EventSource eventSource) {
+    copybookService.getCopybookUsage(cobolDocUri).stream()
+        .filter(model -> Objects.nonNull(model.getUri()))
+        .filter(model -> invalidCopybookUris.contains(model.getUri()))
+        .forEach(copybookService::invalidateCache);
+    LOG.info("Copybook cache for uris {} is cleared", invalidCopybookUris);
+
+    subroutineService.invalidateCache();
+    LOG.info("subroutine cache cleared!");
+
+    CobolDocumentModel document = documentModelService.get(cobolDocUri);
+    scheduleAnalysis(
+        cobolDocUri,
+        document.getText(),
+        analysisResultsRevisions.get(document.getUri()),
+        false,
+        true,
+        eventSource);
   }
 
   /**
@@ -301,13 +335,12 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .collect(Collectors.toList());
     for (String uri : openedUris) {
       String languageId = documentModelService.get(uri).getLanguageId();
-      // TODO: update cache directly from workspace document graph
       copybookService.getCopybookUsage(uri).stream()
           .filter(model -> Objects.nonNull(model.getUri()))
           .filter(model -> model.getUri().equals(copybookUri))
           .forEach(
               copybookModel -> {
-                copybookService.invalidateCache(copybookModel.getCopybookId());
+                copybookService.invalidateCache(copybookModel);
                 if (copybookContent != null) {
                   copybookModel.setContent(copybookContent);
                   copybookService.store(
@@ -401,5 +434,16 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     SINGLE_THREAD_EXECUTOR.execute(
         () ->
             this.analysisStateListeners.forEach(lis -> lis.notifyState(state, model, eventSource)));
+  }
+
+  /**
+   * Check if given document is copybook or not
+   *
+   * @param uri - document uri
+   * @param text - document text
+   * @return true for copybook and false otherwise
+   */
+  public boolean isCopybook(String uri, String text) {
+    return this.analysisService.isCopybook(uri, text);
   }
 }

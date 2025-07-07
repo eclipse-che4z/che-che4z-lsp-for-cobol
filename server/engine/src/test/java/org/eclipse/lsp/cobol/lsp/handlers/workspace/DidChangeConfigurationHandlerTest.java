@@ -76,7 +76,8 @@ class DidChangeConfigurationHandlerTest {
             copybookService,
             errorFinalizerService);
 
-    when(copybookNameService.copybookLocalFolders(null)).thenReturn(completedFuture(emptyList()));
+    when(copybookNameService.copybookLocalFolders(null))
+        .thenReturn(completedFuture(ImmutableList.of("some-path")));
     when(settingsService.fetchConfiguration(LOCALE.label))
         .thenReturn(completedFuture(singletonList("LOCALE")));
     when(settingsService.fetchConfiguration(LOGGING_LEVEL.label))
@@ -85,12 +86,15 @@ class DidChangeConfigurationHandlerTest {
         .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
     when(watchingService.getWatchingFolders()).thenReturn(emptyList());
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
 
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
+    when(keywords.updateStorage()).thenReturn(CompletableFuture.completedFuture(null));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(new Object()));
-    verify(watchingService).addWatchers(emptyList());
+    verify(watchingService).addWatchers(ImmutableList.of("some-path"));
     verify(watchingService).removeWatchers(emptyList());
     verify(asyncAnalysisService).reanalyseOpenedPrograms();
   }
@@ -136,12 +140,14 @@ class DidChangeConfigurationHandlerTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
-
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
+    when(keywords.updateStorage()).thenReturn(CompletableFuture.completedFuture(null));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(new Object()));
-    verify(watchingService).addWatchers(emptyList());
-    verify(watchingService).removeWatchers(emptyList());
-    verify(asyncAnalysisService).reanalyseOpenedPrograms();
+    verify(watchingService, never()).addWatchers(emptyList());
+    verify(watchingService, never()).removeWatchers(emptyList());
+    verify(asyncAnalysisService, never()).reanalyseOpenedPrograms();
     verify(localeStore).notifyLocaleStore();
   }
 
@@ -187,7 +193,9 @@ class DidChangeConfigurationHandlerTest {
     when(localeStore.notifyLocaleStore()).thenReturn(e -> {});
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
-
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
+    when(keywords.updateStorage()).thenReturn(CompletableFuture.completedFuture(null));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(new Object()));
 
@@ -242,7 +250,9 @@ class DidChangeConfigurationHandlerTest {
         .thenReturn(completedFuture(ImmutableList.of(CobolLanguageId.COBOL.getLayout())));
     when(settingsService.fetchConfiguration(ANALYSIS_MODE.label))
         .thenReturn(completedFuture((ImmutableList.of(false))));
-
+    when(settingsService.fetchTextConfiguration(DIALECTS.label))
+        .thenReturn(completedFuture(ImmutableList.of()));
+    when(keywords.updateStorage()).thenReturn(CompletableFuture.completedFuture(null));
     didChangeConfigurationHandler.didChangeConfiguration(
         new DidChangeConfigurationParams(localeStore));
     verify(watchingService).addWatchers(emptyList());

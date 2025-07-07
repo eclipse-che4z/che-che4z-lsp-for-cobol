@@ -27,8 +27,8 @@ describe("LocalCopybookService tests", () => {
     jest
       .spyOn(vscode.workspace, "findFiles")
       .mockImplementation((pattern: vscode.GlobPattern) => {
-        if (pattern instanceof Object && "base" in pattern) {
-          const files = folderContent[pattern.base] ?? [];
+        if (pattern instanceof Object && "baseUri" in pattern) {
+          const files = folderContent[pattern.baseUri.toString()] ?? [];
           return Promise.resolve(files.map(vscode.Uri.file));
         }
         return Promise.resolve([]);
@@ -50,13 +50,13 @@ describe("LocalCopybookService tests", () => {
             "/test/path/COPYBOOK.CPY",
             "/test/path/subfolder/SUBCOPY.CPY",
           ],
-          "file:///another/path": ["/another/path/COPYBK2"],
+          "file:///workspace/another/path": ["/workspace/another/path/COPYBK2"],
         };
       });
 
       it("return copybooks", async () => {
         const results = await listLocalCopybooks(
-          "PROGRAM.cbl",
+          "file:///PROGRAM.cbl",
           DEFAULT_DIALECT,
         );
 

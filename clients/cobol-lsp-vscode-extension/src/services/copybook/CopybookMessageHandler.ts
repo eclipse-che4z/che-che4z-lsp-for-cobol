@@ -12,90 +12,17 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { SettingsService } from "../Settings";
-import { searchCopybookInExtensionFolder } from "../util/FSUtils";
-import { CopybookURI } from "./CopybookURI";
-import { Uri } from "vscode";
+import { Uri, workspace } from "vscode";
 
-enum CopybookFolderKind {
-  "local",
-  "downloaded-dsn",
-  "downloaded-uss",
-}
-
-export async function searchCopybook(
-  documentUri: string,
-  copybookName: string,
-  dialectType: string,
-  storagePath: string,
-): Promise<Uri | undefined> {
-  let result: Uri | undefined;
-
-  for (let i = 0; i < Object.values(CopybookFolderKind).length; i++) {
-    const folderKind = Object.values(CopybookFolderKind)[i];
-    const targetFolder = await getTargetFolderForCopybook(
-      folderKind,
-      documentUri,
-      dialectType,
-      storagePath,
-    );
-    const allowedExtensions = await resolveAllowedExtensions(
-      folderKind,
-      documentUri,
-    );
-    result = searchCopybookInExtensionFolder(
-      copybookName,
-      targetFolder,
-      allowedExtensions,
-      storagePath,
-    );
-    if (result) {
-      return result;
-    }
+export async function readFileContent(fileUri: string): Promise<string> {
+  const uri = Uri.parse(fileUri);
+  const openFile = workspace.textDocuments.find(
+    (doc) => doc.uri.toString() === fileUri,
+  );
+  if (openFile) {
+    return openFile.getText();
   }
-  return result;
-}
-
-async function getTargetFolderForCopybook(
-  folderKind: string | CopybookFolderKind,
-  documentUri: string,
-  dialectType: string,
-  storagePath: string,
-): Promise<string[]> {
-  let result: string[] = [];
-  const profile = SettingsService.getProfileName()!;
-  switch (folderKind) {
-    case CopybookFolderKind[CopybookFolderKind.local]:
-      result = await SettingsService.getCopybookLocalPath(
-        documentUri,
-        dialectType,
-      );
-      break;
-    case CopybookFolderKind[CopybookFolderKind["downloaded-dsn"]]:
-      result = SettingsService.getDsnPath(documentUri, dialectType).map(
-        (dnsPath) =>
-          CopybookURI.createDatasetPath([profile], dnsPath, storagePath).fsPath,
-      );
-      break;
-    case CopybookFolderKind[CopybookFolderKind["downloaded-uss"]]:
-      result = SettingsService.getUssPath(documentUri, dialectType).map(
-        (dnsPath) =>
-          CopybookURI.createDatasetPath([profile], dnsPath, storagePath).fsPath,
-      );
-      break;
-  }
-  return result;
-}
-
-async function resolveAllowedExtensions(
-  folderKind: string | CopybookFolderKind,
-  documentUri: string,
-): Promise<string[] | undefined> {
-  switch (folderKind) {
-    case "downloaded-dsn":
-    case "downloaded-uss":
-      return [""];
-    default:
-      return SettingsService.getCopybookExtension(documentUri);
-  }
+  const data = await workspace.fs.readFile(uri);
+  const content = new TextDecoder().decode(data);
+  return content;
 }
