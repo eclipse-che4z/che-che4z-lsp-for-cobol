@@ -98,95 +98,6 @@ describe("e4e copybook downloader tests", () => {
       });
     });
   });
-  // it("check download performed with respect to configuration order", async () => {
-  //   const e4eDownloader = new CopybookDownloaderForE4E(
-  //     vscode.Uri.file("/storagePath"),
-  //     e4e,
-  //   );
-  //   const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
-  //   const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-  //   e4eDownloader.getE4EConfig = async () =>
-  //     Promise.resolve(e4eResponseEndevorFirst);
-  //   await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
-  //   expect(spyDownloadElement).toHaveBeenCalledWith(
-  //     e4eResponseEndevorFirst.profile,
-  //     {
-  //       use_map: false,
-  //       environment: "environment",
-  //       stage: "stage",
-  //       system: "system",
-  //       subsystem: "subsystem",
-  //       type: "type",
-  //       element: "copybook",
-  //       fingerprint: "fingerprint",
-  //     },
-  //   );
-  //   expect(spyDownloadDataset).not.toHaveBeenCalled();
-  // });
-  // it("check download performed only for element when no member matches", async () => {
-  //   const e4eDownloader = new CopybookDownloaderForE4E(
-  //     vscode.Uri.file("/storagePath"),
-  //     e4e,
-  //   );
-  //   const spyDownloadDataset = jest.spyOn(e4eDownloader, "downloadDatasetE4E");
-  //   const spyDownloadElement = jest.spyOn(e4eDownloader, "downloadElementE4E");
-  //   e4eDownloader.getE4EConfig = async () =>
-  //     Promise.resolve(e4eResponseEndevorFirst);
-  //   await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
-  //   expect(spyDownloadElement).toHaveBeenCalledWith(
-  //     e4eResponseEndevorFirst.profile,
-  //     {
-  //       use_map: false,
-  //       environment: "environment",
-  //       stage: "stage",
-  //       system: "system",
-  //       subsystem: "subsystem",
-  //       type: "type",
-  //       element: "copybook",
-  //       fingerprint: "fingerprint",
-  //     },
-  //   );
-  //   expect(spyDownloadDataset).not.toHaveBeenCalled();
-  // });
-  // it("check downloadDatasetE4E does not perform IO in case of Error", async () => {
-  //   const getMember = jest.fn(() => Error("failed"));
-  //   const outputChannel = vscode.window.createOutputChannel("log");
-  //   const e4eDownloader = new CopybookDownloaderForE4E(
-  //     vscode.Uri.file("/storagePath"),
-  //     {
-  //       getMember,
-  //     } as unknown as E4E,
-  //     outputChannel,
-  //   );
-  //   e4eDownloader.getE4EConfig = async () =>
-  //     await Promise.resolve(e4eResponseDatasetFirst);
-  //   await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
-  //   expect(getMember).toHaveBeenCalled();
-  //   expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
-  //   expect(outputChannel.appendLine).toHaveBeenCalledWith(
-  //     expect.stringContaining("Error while downloading element from Endevor"),
-  //   );
-  // });
-
-  // it("check downloadElementE4E does not perform IO in case of Error", async () => {
-  //   const getElement = jest.fn(() => Error("failed"));
-  //   const outputChannel = vscode.window.createOutputChannel("log");
-  //   const e4eDownloader = new CopybookDownloaderForE4E(
-  //     vscode.Uri.file("/storagePath"),
-  //     {
-  //       getElement,
-  //     } as unknown as E4E,
-  //     outputChannel,
-  //   );
-  //   e4eDownloader.getE4EConfig = async () =>
-  //     Promise.resolve(e4eResponseEndevorFirst);
-  //   await e4eDownloader.downloadCopybookE4E("uri", "copybook", DEFAULT_DIALECT);
-  //   expect(getElement).toHaveBeenCalled();
-  //   expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
-  //   expect(outputChannel.appendLine).toHaveBeenCalledWith(
-  //     expect.stringContaining("Error while downloading element from Endevor"),
-  //   );
-  // });
 
   it("checks getProfileInfo uses cache for same partialProfile", async () => {
     const e4eMock: E4E = {
@@ -237,7 +148,7 @@ describe("e4e copybook downloader tests", () => {
           .spyOn(vscode.workspace.fs, "stat")
           .mockRejectedValue(new FileNotFound());
       });
-      // file is written to cache
+
       it("downloads the content and writes it to cache directory", async () => {
         const e4eDownloader = new CopybookDownloaderForE4E(
           vscode.Uri.file("/storage"),
@@ -307,6 +218,7 @@ describe("e4e copybook downloader tests", () => {
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
           expect.stringContaining("Unable to download E4E member"),
         );
+        expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
       });
     });
   });
@@ -347,7 +259,7 @@ describe("e4e copybook downloader tests", () => {
           .spyOn(vscode.workspace.fs, "stat")
           .mockRejectedValue(new FileNotFound());
       });
-      // file is written to cache
+
       it("downloads the content and writes it to cache directory", async () => {
         const e4eDownloader = new CopybookDownloaderForE4E(
           vscode.Uri.file("/storage"),
@@ -408,6 +320,7 @@ describe("e4e copybook downloader tests", () => {
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
           expect.stringContaining("Unable to download E4E element"),
         );
+        expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
       });
     });
   });

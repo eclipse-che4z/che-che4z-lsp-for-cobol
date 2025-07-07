@@ -75,7 +75,7 @@ describe("CopybookMessageHandler", () => {
       EEE: downloadSpyB,
     };
 
-    describe("successful resolving", () => {
+    describe("resolving copybook name to URI", () => {
       beforeEach(() => {
         jest
           .spyOn(ProcessorGroups, "loadProcessorGroupCopybooksLibs")
@@ -87,7 +87,7 @@ describe("CopybookMessageHandler", () => {
           ]);
       });
 
-      it("resolves copybook name to URI", async () => {
+      it("respects order of processor groups - first resolved result is returned", async () => {
         const document = "/program.cob";
         const result = await resolveCopybookURI(
           document,
@@ -95,16 +95,6 @@ describe("CopybookMessageHandler", () => {
           DEFAULT_DIALECT,
         );
         expect(result).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
-      });
-
-      it("respects order of processor groups - first resolved result is returned", async () => {
-        const document = "/program.cob";
-        const resultAAA = await resolveCopybookURI(
-          document,
-          "AAA",
-          DEFAULT_DIALECT,
-        );
-        expect(resultAAA).toEqual("zowe-ds:/zosmf/COBOL.COPYBOOK/AAA");
       });
 
       it("copybook might be resoled into a function that downloads copybook to local cache", async () => {
