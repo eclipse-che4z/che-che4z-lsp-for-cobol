@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2025 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+
 import {
   FileNotFound,
   getConfigurationResult,
@@ -31,6 +45,7 @@ describe("USS copybook lib", () => {
       readDirectoryResult["/profile/remote/uss/copybooks"] = [
         ["COPYBOOK.CPY", vscode.FileType.File],
         ["CaSEsEnSiTiVe.CpY", vscode.FileType.File],
+        ["BADEXT.txt", vscode.FileType.File],
         ["directory", vscode.FileType.Directory],
       ];
       readDirectoryResult["/profile/remote/uss/ABCPROG/copybooks"] = [
@@ -51,6 +66,20 @@ describe("USS copybook lib", () => {
         expect(result).toEqual(
           vscode.Uri.parse(
             "zowe-uss:/profile/remote/uss/copybooks/COPYBOOK.CPY",
+          ),
+        );
+      });
+
+      it("resolving is case insensitive", async () => {
+        const lib = new UssPathLib("/remote/uss/copybooks", "profile");
+        const result = await lib.resolveCopybookUri(
+          "cAseSensitive",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(
+          vscode.Uri.parse(
+            "zowe-uss:/profile/remote/uss/copybooks/CaSEsEnSiTiVe.CpY",
           ),
         );
       });
@@ -87,7 +116,31 @@ describe("USS copybook lib", () => {
       });
     });
 
-    describe("uss directory doesnt exists", () => {
+    describe("copybook can be to file, not directory", () => {
+      it("resolves to undefined", async () => {
+        const lib = new UssPathLib("/remote/uss/copybooks", "profile");
+        const result = await lib.resolveCopybookUri(
+          "directory",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe("file extension has to match configuration", () => {
+      it("resolves to undefined", async () => {
+        const lib = new UssPathLib("/remote/uss/copybooks", "profile");
+        const result = await lib.resolveCopybookUri(
+          "BADEXT",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe("uss directory doesn't exists", () => {
       it("throws File Not Found error", async () => {
         const lib = new UssPathLib("/remote/uss/not-exists", "profile");
         await expect(

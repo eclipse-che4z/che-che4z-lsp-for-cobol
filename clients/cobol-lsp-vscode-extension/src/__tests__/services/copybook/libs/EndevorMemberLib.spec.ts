@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2025 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+
 import { EndevorMemberLib } from "../../../../services/copybookLibs/EndevorMemberLib";
 import * as vscode from "vscode";
 import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService";
@@ -36,7 +50,7 @@ describe("Endevor Member Lib", () => {
     it("resolves copybook into function that can be used to download copybook to local cache", async () => {
       const lib = new EndevorMemberLib({
         dataset,
-        profile: "profile",
+        profile: "instance@profile",
       });
       const document = vscode.Uri.file("/program.cbl");
       const result = await lib.resolveCopybookUri(
@@ -45,6 +59,11 @@ describe("Endevor Member Lib", () => {
         DEFAULT_DIALECT,
       );
       expect(typeof result).toEqual("function");
+
+      expect(e4eMock.getProfileInfo).toHaveBeenCalledWith({
+        instance: "instance",
+        profile: "profile",
+      });
 
       // copybook is resolved, but hasn't been downloaded yet
       expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
@@ -75,6 +94,11 @@ describe("Endevor Member Lib", () => {
         document,
         DEFAULT_DIALECT,
       );
+
+      expect(e4eMock.getProfileInfo).toHaveBeenCalledWith(
+        vscode.Uri.file("/program.cbl").toString(),
+      );
+
       expect(typeof result).toEqual("function");
 
       const downloadResult = await result!();

@@ -209,9 +209,7 @@ export function setUpProgramConfigWatcher(fn: () => unknown) {
     clearWorkspaceConfigCache();
     fn();
   };
-  const watcher = workspace.createFileSystemWatcher(
-    ".cobolplugin/pgm_conf.json",
-  );
+  const watcher = workspace.createFileSystemWatcher("**/pgm_conf.json");
   watcher.onDidChange((_uri) => callback());
   watcher.onDidDelete((_uri) => callback());
   watcher.onDidCreate((_uri) => callback());
@@ -223,9 +221,7 @@ export function setUpProcessorGroupConfigWatcher(fn: () => unknown) {
     clearWorkspaceConfigCache();
     fn();
   };
-  const watcher = workspace.createFileSystemWatcher(
-    ".cobolplugin/proc_grps.json",
-  );
+  const watcher = workspace.createFileSystemWatcher("**/proc_grps.json");
   watcher.onDidChange((_uri) => callback());
   watcher.onDidDelete((_uri) => callback());
   watcher.onDidCreate((_uri) => callback());

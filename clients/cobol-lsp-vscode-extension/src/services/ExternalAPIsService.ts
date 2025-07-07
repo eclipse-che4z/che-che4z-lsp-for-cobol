@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Broadcom.
+ * Copyright (c) 2025 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -23,13 +23,6 @@ import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
 import { clearDiagnostics, showDiagnostics } from "./DiagnosticsService";
 import { getOutputChannel } from "../extension";
-
-export class CopybookName {
-  constructor(
-    public name: string,
-    public dialect: string,
-  ) {}
-}
 
 export let externalApis: ExternalAPIsService;
 
@@ -81,6 +74,16 @@ class ExternalAPIsService {
   ussService?: CopybookDownloaderForUss;
   e4eDownloader?: CopybookDownloaderForE4E;
 
+  constructor(
+    private storagePath: vscode.Uri,
+    explorer?: IApiRegisterClient,
+    e4e?: E4E,
+    private configurationInvalidation?: () => unknown,
+  ) {
+    if (e4e) this.e4eAppeared(e4e);
+    if (explorer) this.explorerAppeared(explorer);
+  }
+
   /**
    * Clears downloaders cache
    */
@@ -89,6 +92,7 @@ class ExternalAPIsService {
     this.ussService?.clearMemberListCache();
     this.e4eDownloader?.clearProfiles();
   }
+
   clearProfiles() {
     this.e4eDownloader?.clearProfiles();
   }
@@ -98,16 +102,6 @@ class ExternalAPIsService {
       SettingsService.getCopybookEndevorDependencySettings() ===
         ENDEVOR_PROCESSOR && this.e4eApi?.isEndevorElement(documentUri)
     );
-  }
-
-  constructor(
-    private storagePath: vscode.Uri,
-    explorer?: IApiRegisterClient,
-    e4e?: E4E,
-    private configurationInvalidation?: () => unknown,
-  ) {
-    if (e4e) this.e4eAppeared(e4e);
-    if (explorer) this.explorerAppeared(explorer);
   }
 
   public e4eAppeared(api: E4E) {
