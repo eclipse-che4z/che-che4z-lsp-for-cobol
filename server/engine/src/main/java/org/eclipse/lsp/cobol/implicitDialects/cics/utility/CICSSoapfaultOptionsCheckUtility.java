@@ -113,7 +113,8 @@ public class CICSSoapfaultOptionsCheckUtility extends CICSOptionsCheckBaseUtilit
   private void checkAdd(CICSParser.Cics_soapfault_addContext ctx) {
     checkHasExactlyOneOption("FAULTSTRING or SUBCODESTR", ctx, ctx.FAULTSTRING(), ctx.SUBCODESTR());
     checkOptionalWithLength(ctx.SUBCODESTR(), ctx.SUBCODELEN(), ctx, "SUBCODESTR", "SUBCODELEN");
-    checkOptionalWithLength(ctx.FAULTSTRING(), ctx.SUBCODELEN(), ctx, "SUBCODESTR", "FAULTSTRLEN");
+    checkOptionalWithLength(
+        ctx.FAULTSTRING(), ctx.FAULTSTRLEN(), ctx, "FAULTSTRING", "FAULTSTRLEN");
   }
 
   private void checkDelete(CICSParser.Cics_soapfault_deleteContext ctx) {

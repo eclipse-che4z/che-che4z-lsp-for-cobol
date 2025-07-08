@@ -258,7 +258,10 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
     checkPrerequisiteIsMet(
         ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCHANNEL without TOCONTAINER");
 
-    checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
+    if (!ctx.INTO().isEmpty() || !ctx.SET().isEmpty()) {
+      checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
+      if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
+    }
 
     if (!ctx.TOLENGTH().isEmpty())
       checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
@@ -278,7 +281,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.NOCLICONVERT(),
         ctx.CLIENTCONV());
     checkOptionalWithLength(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH", "PATHLENGTH");
-    checkOptionalWithLength(ctx.INTO(), ctx.MAXLENGTH(), ctx, "INTO", "MAXLENGTH");
     checkOptionalWithLength(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD", "PASSWORDLEN");
     checkOptionalWithLength(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME", "USERNAMELEN");
   }

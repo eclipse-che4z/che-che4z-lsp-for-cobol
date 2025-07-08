@@ -200,7 +200,7 @@ cics_assign_parameter1: ABCODE cics_data_area | ABDUMP cics_data_area | ABOFFSET
 
 cics_assign_parameter2: MAPLINE cics_data_area | MAPWIDTH cics_data_area | MICROVERSION cics_data_area | MINORVERSION cics_data_area |
              MSRCONTROL cics_data_area | NATLANGINUSE cics_data_area |NETNAME cics_data_area | NEXTTRANSID cics_data_area |
-             NUMTAB cics_data_area | OPCLASS cics_data_area | OPERKEYS cics_data_area | OPID cics_data_area | OPSECURITY cics_data_area | ORGABCODE cics_data_area |
+             NUMTAB cics_data_area | OPCLASS cics_data_area | OPERATION cics_data_area | OPERKEYS cics_data_area | OPID cics_data_area | OPSECURITY cics_data_area | ORGABCODE cics_data_area |
              OUTLINE cics_data_area | PAGENUM cics_data_area | PARTNPAGE cics_data_area | PARTNS cics_data_area |
              PARTNSET cics_data_area | PLATFORM cics_data_area | PRINSYSID cics_data_area | PROCESS cics_data_area | PROCESSTYPE cics_data_area |
              PROGRAM cics_data_area | PS cics_data_area | QNAME cics_data_area | RESSEC cics_data_area |
@@ -1072,7 +1072,7 @@ cics_web_converse: ((CONVERSE | GET | HEAD | PATCH | POST | PUT | TRACE | OPTION
             (SESSTOKEN | URIMAP | PATHLENGTH | QUERYSTRLEN | DOCTOKEN | FROMLENGTH | CONTAINER | CHANNEL | USERNAME | USERNAMELEN | PASSWORD | PASSWORDLEN | TOCONTAINER | TOCHANNEL | MAXLENGTH | STATUSLEN | CHARACTERSET) cics_data_value |
             (PATH | MEDIATYPE | QUERYSTRING | FROM | INTO | TOLENGTH | STATUSCODE | STATUSTEXT | BODYCHARSET) cics_data_area |
             (METHOD | DOCSTATUS | ACTION | CLOSESTATUS | AUTHENTICATE | CLIENTCONV) cics_cvda |
-            SET cics_ref | cics_handle_response)+;
+            (SET cics_ref | cics_data_area) | cics_handle_response)+;
 cics_web_endbrowse: (ENDBROWSE | FORMFIELD | HTTPHEADER | SESSTOKEN cics_data_value | QUERYPARM | cics_handle_response)+; // All three variants
 cics_web_extract: (EXTRACT | HOSTLENGTH cics_data_value |
             (HOST | HTTPMETHOD | METHODLENGTH | HTTPVERSION | VERSIONLEN | PATH | PATHLENGTH | PORTNUMBER | QUERYSTRING | QUERYSTRLEN | URIMAP | SESSTOKEN | REALM | REALMLEN) cics_data_area |

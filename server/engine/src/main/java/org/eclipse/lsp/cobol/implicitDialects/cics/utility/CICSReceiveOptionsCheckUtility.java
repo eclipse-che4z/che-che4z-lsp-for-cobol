@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -115,42 +113,12 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
     else if (noLengthOptionsEnabled()) {
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
-    if (!checkMapHasLiteral(ctx)) {
-      checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
-    }
     checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
     checkHasMutuallyExclusiveOptions("TERMINAL or FROM", ctx.TERMINAL(), ctx.FROM());
   }
 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
-    if (!checkMapHasLiteral(ctx)) {
-      checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
-    }
     if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
-  }
-
-  private boolean checkMapHasLiteral(ParserRuleContext ctx) {
-    if (ctx.children == null) return false;
-    for (int index = 0; index < ctx.children.size() - 1; index++) {
-      ParseTree item = ctx.children.get(index);
-      if (TerminalNode.class.isAssignableFrom(item.getClass())) {
-        TerminalNode node = (TerminalNode) item;
-        if (node.getSymbol().getType() == CICSParser.MAP) {
-          ParseTree param = ctx.children.get(index + 1);
-          if (ParserRuleContext.class.isAssignableFrom(param.getClass())) {
-            ParserRuleContext name = (ParserRuleContext) param;
-            if (name.getRuleIndex() == CICSParser.RULE_cics_name) {
-              if ((((CICSParser.Cics_nameContext) name)
-                  .name().variableNameUsage().stream()
-                      .anyMatch(variable -> variable.NONNUMERICLITERAL() != null))) {
-                return true;
-              }
-            }
-          }
-        }
-      }
-    }
-    return false;
   }
 }
