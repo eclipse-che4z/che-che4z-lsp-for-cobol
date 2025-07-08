@@ -27,14 +27,15 @@ import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMoc
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { ZoweExplorerDownloader } from "../../../../services/copybook/downloader/ZoweExplorerDownloader";
 import { DEFAULT_DIALECT } from "../../../../constants";
+import * as DiagnosticsService from "../../../../services/DiagnosticsService";
 
 describe("Dataset copybook lib", () => {
   let zoweExplorerApiMock: IApiRegisterClient;
 
   beforeEach(async () => {
     zoweExplorerApiMock = createZoweExplorerMock();
-    Utils.getZoweExplorerAPI = jest
-      .fn()
+    jest
+      .spyOn(Utils, "getZoweExplorerAPI")
       .mockResolvedValue({ api: zoweExplorerApiMock });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
     jest
@@ -90,7 +91,7 @@ describe("Dataset copybook lib", () => {
     });
 
     describe("invalid configuration check", () => {
-      it("resolves to undefined if configuration check fails - i.e. profile is not configured", async () => {
+      it("resolves to undefined if configuration check fails - profile is not configured", async () => {
         const lib = new DatasetLib("DATASET.WITH.COPYBOOK", "invalid-profile");
         const result = await lib.resolveCopybookUri(
           "COPYBOOK",
@@ -98,6 +99,64 @@ describe("Dataset copybook lib", () => {
           DEFAULT_DIALECT,
         );
         expect(result).toBeUndefined();
+        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+          "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalid-profile",
+        );
+      });
+
+      describe("ZE not installed", () => {
+        let showDiagnosticsSpy: jest.SpyInstance;
+        let clearDiagnosticsSpy: jest.SpyInstance;
+
+        beforeEach(async () => {
+          jest.spyOn(Utils, "getZoweExplorerAPI").mockResolvedValue(undefined);
+          await initializeExternalAPIs(vscode.Uri.file("/storage"));
+          showDiagnosticsSpy = jest.spyOn(
+            DiagnosticsService,
+            "showDiagnostics",
+          );
+          clearDiagnosticsSpy = jest.spyOn(
+            DiagnosticsService,
+            "clearDiagnostics",
+          );
+        });
+
+        it("resolves to undefined if configuration check fails - ZE not installed", async () => {
+          const lib = new DatasetLib("DATASET.WITH.COPYBOOK", "profile");
+          const result = await lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          );
+          expect(result).toBeUndefined();
+          expect(showDiagnosticsSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ path: "/program.cbl" }),
+            [
+              {
+                message: "Zowe Explorer is not installed",
+                range: {
+                  end: { character: 0, line: 1 },
+                  start: { character: 0, line: 0 },
+                },
+                severity: 1,
+              },
+            ],
+          );
+
+          // diagnostics disappear after ZE installation and copybook can be resolved
+          externalApis.explorerAppeared(zoweExplorerApiMock);
+          const resultAfter = await lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          );
+          expect(clearDiagnosticsSpy).toHaveBeenCalled();
+          expect(resultAfter).toEqual(
+            vscode.Uri.parse(
+              "zowe-ds:/profile/DATASET.WITH.COPYBOOK/COPYBOOK.cpy",
+            ),
+          );
+        });
       });
     });
 

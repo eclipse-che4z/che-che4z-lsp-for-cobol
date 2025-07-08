@@ -89,7 +89,7 @@ export async function loadProcessorGroupDialectConfig(
   const dialects = pgCfg.preprocessors.map((p) => p.name);
 
   // "SQL" is not a real dialect, we will use it only to set up sql backend for now
-  const result = dialects.filter((name) => name != "SQL");
+  const result = dialects.filter((name) => name !== "SQL");
   return result.length > 0 ? result : dialectConfig;
 }
 
@@ -135,11 +135,9 @@ export async function loadProcessorGroup(documentUri: Uri) {
 
   if (!workspaceConfig) {
     const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
-    if (workspaceUri === undefined) {
-      return readSettingConfig(DEFAULT_DIALECT);
+    if (workspaceUri) {
+      workspaceConfig = await readWorkspaceConfig(workspaceUri);
     }
-
-    workspaceConfig = await readWorkspaceConfig(workspaceUri);
   }
 
   if (workspaceConfig) {
@@ -153,6 +151,7 @@ export async function loadProcessorGroup(documentUri: Uri) {
       return matchedGroup;
     }
   }
+
   return readSettingConfig(DEFAULT_DIALECT);
 }
 
@@ -182,7 +181,7 @@ async function loadProcessorGroupSettings<
   dialect: string = "COBOL",
 ) {
   const processorGroup = await loadProcessorGroup(documentUri);
-  if (processorGroup === undefined) {
+  if (!processorGroup) {
     return defaultValue;
   }
 
@@ -205,25 +204,25 @@ async function loadProcessorGroupSettings<
 }
 
 export function setUpProgramConfigWatcher(fn: () => unknown) {
-  const callback = () => {
+  const handler = () => {
     clearWorkspaceConfigCache();
     fn();
   };
   const watcher = workspace.createFileSystemWatcher("**/pgm_conf.json");
-  watcher.onDidChange((_uri) => callback());
-  watcher.onDidDelete((_uri) => callback());
-  watcher.onDidCreate((_uri) => callback());
+  watcher.onDidChange((_uri) => handler());
+  watcher.onDidDelete((_uri) => handler());
+  watcher.onDidCreate((_uri) => handler());
   return watcher;
 }
 
 export function setUpProcessorGroupConfigWatcher(fn: () => unknown) {
-  const callback = () => {
+  const handler = () => {
     clearWorkspaceConfigCache();
     fn();
   };
   const watcher = workspace.createFileSystemWatcher("**/proc_grps.json");
-  watcher.onDidChange((_uri) => callback());
-  watcher.onDidDelete((_uri) => callback());
-  watcher.onDidCreate((_uri) => callback());
+  watcher.onDidChange((_uri) => handler());
+  watcher.onDidDelete((_uri) => handler());
+  watcher.onDidCreate((_uri) => handler());
   return watcher;
 }

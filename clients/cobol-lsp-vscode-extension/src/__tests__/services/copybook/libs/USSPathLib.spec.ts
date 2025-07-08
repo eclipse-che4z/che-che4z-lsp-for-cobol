@@ -18,20 +18,24 @@ import {
   readDirectoryResult,
 } from "../../../../__mocks__/vscode";
 import * as vscode from "vscode";
-import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService";
+import {
+  externalApis,
+  initializeExternalAPIs,
+} from "../../../../services/ExternalAPIsService";
 import { Utils } from "../../../../services/util/Utils";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { UssPathLib } from "../../../../services/copybookLibs/UssPathLib";
 import { DEFAULT_DIALECT } from "../../../../constants";
+import * as DiagnosticsService from "../../../../services/DiagnosticsService";
 
 describe("USS copybook lib", () => {
   let zoweExplorerApiMock: IApiRegisterClient;
 
   beforeEach(async () => {
     zoweExplorerApiMock = createZoweExplorerMock();
-    Utils.getZoweExplorerAPI = jest
-      .fn()
+    jest
+      .spyOn(Utils, "getZoweExplorerAPI")
       .mockResolvedValue({ api: zoweExplorerApiMock });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
     jest
@@ -162,6 +166,58 @@ describe("USS copybook lib", () => {
           DEFAULT_DIALECT,
         );
         expect(result).toBeUndefined();
+      });
+    });
+
+    describe("ZE not installed", () => {
+      let showDiagnosticsSpy: jest.SpyInstance;
+      let clearDiagnosticsSpy: jest.SpyInstance;
+
+      beforeEach(async () => {
+        jest.spyOn(Utils, "getZoweExplorerAPI").mockResolvedValue(undefined);
+        await initializeExternalAPIs(vscode.Uri.file("/storage"));
+        showDiagnosticsSpy = jest.spyOn(DiagnosticsService, "showDiagnostics");
+        clearDiagnosticsSpy = jest.spyOn(
+          DiagnosticsService,
+          "clearDiagnostics",
+        );
+      });
+
+      it("resolves to undefined if configuration check fails - ZE not installed", async () => {
+        const lib = new UssPathLib("/remote/uss/copybooks", "profile");
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
+        expect(showDiagnosticsSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ path: "/program.cbl" }),
+          [
+            {
+              message: "Zowe Explorer is not installed",
+              range: {
+                end: { character: 0, line: 1 },
+                start: { character: 0, line: 0 },
+              },
+              severity: 1,
+            },
+          ],
+        );
+
+        // diagnostics disappear after ZE installation and copybook can be resolved
+        externalApis.explorerAppeared(zoweExplorerApiMock);
+        const resultAfter = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(clearDiagnosticsSpy).toHaveBeenCalled();
+        expect(resultAfter).toEqual(
+          vscode.Uri.parse(
+            "zowe-uss:/profile/remote/uss/copybooks/COPYBOOK.CPY",
+          ),
+        );
       });
     });
   });

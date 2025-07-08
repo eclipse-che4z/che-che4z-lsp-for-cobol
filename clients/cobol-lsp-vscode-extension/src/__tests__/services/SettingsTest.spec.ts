@@ -148,29 +148,6 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
     expect(configuredValue[0]).toBe("configured-cobol-settings");
   });
 });
-describe("SettingsService prepares local search folders", () => {
-  test("returns all paths are transformed into absolutes", () => {
-    const paths = [makefsPath("/absolute"), "relative"];
-    expect(
-      SettingsService.prepareLocalSearchFolders(paths, [
-        makefsPath("/workspacePath"),
-      ]),
-    ).toEqual([makefsPath("/absolute"), makefsPath("/workspacePath/relative")]);
-  });
-  test("all workspace paths concatanated into relative paths", () => {
-    const paths = [makefsPath("/absolute"), "relative"];
-    expect(
-      SettingsService.prepareLocalSearchFolders(paths, [
-        makefsPath("/workspacePath"),
-        makefsPath("/workspacePath2"),
-      ]),
-    ).toEqual([
-      makefsPath("/absolute"),
-      makefsPath("/workspacePath/relative"),
-      makefsPath("/workspacePath2/relative"),
-    ]);
-  });
-});
 
 describe("SettingService lspConfigHandler", () => {
   describe("dialects registry configuration", () => {

@@ -355,21 +355,6 @@ export class SettingsService {
     return maxCount;
   }
 
-  public static prepareLocalSearchFolders(
-    paths: string[],
-    wsFolders: string[],
-  ): string[] {
-    const result = [];
-    for (const p of paths) {
-      if (path.isAbsolute(p)) result.push(p);
-      else
-        wsFolders.forEach((wsFolder) => {
-          result.push(path.join(wsFolder, p));
-        });
-    }
-    return result;
-  }
-
   public static prepareLocalSearchUris(
     paths: string[],
     wsFolders: readonly vscode.WorkspaceFolder[],

@@ -14,10 +14,14 @@
 
 import { EndevorMemberLib } from "../../../../services/copybookLibs/EndevorMemberLib";
 import * as vscode from "vscode";
-import { initializeExternalAPIs } from "../../../../services/ExternalAPIsService";
+import {
+  externalApis,
+  initializeExternalAPIs,
+} from "../../../../services/ExternalAPIsService";
 import * as E4ECopybookService from "../../../../services/copybook/E4ECopybookService";
 import { E4E } from "../../../../type/e4eApi";
 import { DEFAULT_DIALECT } from "../../../../constants";
+import * as DiagnosticsService from "../../../../services/DiagnosticsService";
 
 describe("Endevor Member Lib", () => {
   let e4eMock: E4E;
@@ -159,6 +163,62 @@ describe("Endevor Member Lib", () => {
           DEFAULT_DIALECT,
         );
         expect(result).toBeUndefined();
+      });
+    });
+
+    describe("E4E is not installed", () => {
+      let showDiagnosticsSpy: jest.SpyInstance;
+      let clearDiagnosticsSpy: jest.SpyInstance;
+      beforeEach(async () => {
+        jest
+          .spyOn(E4ECopybookService, "getE4EAPI")
+          .mockResolvedValue(undefined);
+        await initializeExternalAPIs(vscode.Uri.file("/storage"));
+        showDiagnosticsSpy = jest.spyOn(DiagnosticsService, "showDiagnostics");
+        clearDiagnosticsSpy = jest.spyOn(
+          DiagnosticsService,
+          "clearDiagnostics",
+        );
+      });
+
+      it("returns undefined if e4e is not installed", async () => {
+        const lib = new EndevorMemberLib({
+          dataset,
+          profile: "profile",
+        });
+        const document = vscode.Uri.file("/program.cbl");
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          document,
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
+
+        expect(result).toBeUndefined();
+        expect(showDiagnosticsSpy).toHaveBeenCalledWith(
+          expect.objectContaining({ path: "/program.cbl" }),
+          [
+            {
+              message: "Explorer for Endevor is not installed",
+              range: {
+                end: { character: 0, line: 1 },
+                start: { character: 0, line: 0 },
+              },
+              severity: 1,
+            },
+          ],
+        );
+
+        // diagnostics disappear after ZE installation and copybook can be resolved
+        externalApis.e4eAppeared(e4eMock);
+        const resultAfter = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(clearDiagnosticsSpy).toHaveBeenCalled();
+        expect(typeof resultAfter).toEqual("function");
+        expect(clearDiagnosticsSpy).toHaveBeenCalled();
       });
     });
   });

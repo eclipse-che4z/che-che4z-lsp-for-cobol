@@ -26,6 +26,7 @@ import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 import CopybookLib from "./copybookLibs/CopybookLib";
 import { SettingsService } from "./Settings";
 import { Memoize } from "./util/Memoize";
+import { getOutputChannel } from "../extension";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -69,6 +70,12 @@ const ProgramsConfigModel = t.type({
 });
 export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
 
+const EndevorDatasetModel = t.intersection([
+  t.type({ dataset: t.string }),
+  t.partial({ profile: t.string }),
+]);
+export type EndevorDatasetConfigModel = t.TypeOf<typeof EndevorDatasetModel>;
+
 const EndevorConfigModel = t.intersection([
   t.type({
     environment: t.string,
@@ -81,16 +88,6 @@ const EndevorConfigModel = t.intersection([
   t.partial({ profile: t.string }),
 ]);
 export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
-
-const EndevorDatasetModel = t.intersection([
-  t.type({
-    dataset: t.string,
-  }),
-  t.partial({
-    profile: t.string,
-  }),
-]);
-export type EndevorDatasetConfigModel = t.TypeOf<typeof EndevorDatasetModel>;
 
 const ZoweDatasetConfigModel = t.intersection([
   t.type({ dataset: t.string }),
@@ -189,9 +186,9 @@ const readEndevorConfigCached = new Memoize(
 
       const decodedPrograms = ProgramsConfigModel.decode(endevorData);
       if (isLeft(decodedPrograms)) {
-        throw Error(
-          `Could not validate data: ${PathReporter.report(decodedPrograms).join("\n")}`,
-        );
+        const message = `Could not validate endevor processor group program data: ${PathReporter.report(decodedPrograms).join("\n")}`;
+        getOutputChannel().error(message);
+        throw Error(message);
       }
 
       const processorGroupName = decodedPrograms.right.pgms[0].pgroup;
@@ -247,7 +244,7 @@ const readWorkspaceConfigCached = new Memoize(
     return workspaceConfig;
   },
   undefined,
-  (uri) => uri.toString(),
+  (workspaceUri) => workspaceUri.toString(),
 );
 export const readWorkspaceConfig = readWorkspaceConfigCached.execute;
 
@@ -287,7 +284,6 @@ async function readProcessorGroupsFile(
     const fileContent = new TextDecoder().decode(
       await workspace.fs.readFile(procCfgPath),
     );
-    // update new cache
     const json: unknown = JSON.parse(fileContent);
     const decoded = ProcessorGroupsModel.decode(json);
     if (isLeft(decoded)) {
@@ -296,25 +292,26 @@ async function readProcessorGroupsFile(
       );
     }
 
-    return decoded.right.pgroups.map(transformProcessorGroup());
+    return decoded.right.pgroups.map(
+      transformProcessorGroup([
+        LocalPathLib,
+        DatasetLib,
+        UssPathLib,
+        EndevorElementLib,
+      ]),
+    );
   } catch (e) {
     if (hasMember(e, "code") && e.code !== "FileNotFound") {
-      // TODO: better error handling
-      console.error(e);
+      getOutputChannel().error(
+        `Error while reading ${procCfgPath.toString()} - ${JSON.stringify(e)}`,
+      );
     }
     return [];
   }
 }
 
 const transformProcessorGroup =
-  (
-    libTypes: CopybookLibTypes[] = [
-      LocalPathLib,
-      DatasetLib,
-      UssPathLib,
-      EndevorElementLib,
-    ],
-  ) =>
+  (libTypes: CopybookLibTypes[]) =>
   (input: ProcessorGroupDefinition): ProcessorGroup => {
     const result: ProcessorGroup = {
       name: input.name,
@@ -330,21 +327,21 @@ const transformProcessorGroup =
   };
 
 export function transformLibs(
-  libs?: LibsDefinitions,
-  libTypes: CopybookLibTypes[] = [],
+  libDefinitions: LibsDefinitions | undefined,
+  libTypes: CopybookLibTypes[],
 ) {
-  if (!libs) {
+  if (!libDefinitions) {
     return [];
   }
 
-  const results = libTypes.map((pg) => pg.create(libs)).flat();
+  const results = libTypes.map((lib) => lib.create(libDefinitions)).flat();
 
   return results;
 }
 
 function transformPreprocessor(
-  input?: PreprocessorDefinition,
-  libTypes: CopybookLibTypes[] = [],
+  input: PreprocessorDefinition | undefined,
+  libTypes: CopybookLibTypes[],
 ): Preprocessor[] {
   if (!input) return [];
   const preprocessors = asArray(input);
@@ -384,8 +381,9 @@ async function readProgramConfig(workspaceUri: Uri): Promise<ProgramsConfig> {
     return decoded.right;
   } catch (e) {
     if (hasMember(e, "code") && e.code !== "FileNotFound") {
-      // TODO: better error handling
-      console.error(e);
+      getOutputChannel().error(
+        `Error while reading ${pgmCfgPath.toString()} - ${JSON.stringify(e)}`,
+      );
     }
     return EMPTY_PROGRAM_CONFIG;
   }

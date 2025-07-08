@@ -63,7 +63,7 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
 
       copybookName = copybookName.toUpperCase();
       const foundElement = elements?.find(
-        (x) => x.element.toUpperCase() == copybookName,
+        (e) => e.element.toUpperCase() == copybookName,
       );
 
       if (foundElement) {

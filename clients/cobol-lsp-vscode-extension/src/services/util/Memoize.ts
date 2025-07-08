@@ -1,4 +1,16 @@
-import * as vscode from "vscode";
+/*
+ * Copyright (c) 2025 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
 
 export class Memoize<TArgs extends unknown[], TReturn> {
   private cache = new Map<string, Promise<TReturn | undefined>>();
@@ -14,11 +26,9 @@ export class Memoize<TArgs extends unknown[], TReturn> {
     const key = this.generateKey(...args);
 
     if (this.cache.has(key)) {
-      debug(`Cached:  ${key} - ${JSON.stringify(this.cache.get(key))}`);
       return this.cache.get(key)!;
     }
 
-    debug(`Fetching:  ${key}`);
     const promise = this.fn(...args);
     this.cache.set(key, promise);
 
@@ -35,8 +45,6 @@ export class Memoize<TArgs extends unknown[], TReturn> {
   };
 
   invalidateCache = (...args: TArgs): void => {
-    debug(`Invalidate:  ${JSON.stringify(args)}`);
-
     const key = this.generateKey(...args);
     this.cache.delete(key);
   };
@@ -44,13 +52,4 @@ export class Memoize<TArgs extends unknown[], TReturn> {
   clearCache = () => {
     this.cache.clear();
   };
-}
-
-let debugChannel: vscode.OutputChannel;
-
-function debug(message: string, id = "DebugChannel") {
-  if (!debugChannel) {
-    debugChannel = vscode.window.createOutputChannel(id);
-  }
-  debugChannel.appendLine(message);
 }

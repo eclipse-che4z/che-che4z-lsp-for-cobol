@@ -19,7 +19,6 @@ import {
   TextDocument,
   TextLine,
   Uri,
-  window,
 } from "vscode";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
 import {
