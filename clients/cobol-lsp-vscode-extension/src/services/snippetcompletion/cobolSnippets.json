@@ -275,7 +275,7 @@
   "COLLATING": {
     "prefix": "COLLATING",
     "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBCDIC,ASCII|}"],
-    "description": "Part of the IDENTIFICATION DIVISION. Note that the default option is EBCDIC"
+    "description": "IDENTIFICATION DIVISION - COLLATING SEQUENCE determines the type of sequence used in operations on alphanumeric items. (EBCDIC vs. ASCII)"
   },
   "COMP": {
     "prefix": "COMP",
