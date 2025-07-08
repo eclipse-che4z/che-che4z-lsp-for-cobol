@@ -42,7 +42,7 @@ public class TestCicsInquireUrimap {
           + "                  DeFINetimE ( 12990    )\n"
           + "                  IpreSolved ( {$variable} )  \n"
           + "                  teMplAteNaME ( +,92E-9   )  \n"
-          + "                  anALyZersTAT ( AdDresS of liNaGE-CoUNTEr       )\n"
+          + "                  anALyZersTAT ( \"AdDresS of liNaGE-CoUNTEr\"       )\n"
           + "                  iNSTAlLAGENt ( Z\"\"   )     \n"
           + "            END-EXEC.";
 
