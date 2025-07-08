@@ -344,6 +344,21 @@ public class TestCicsReceive {
   }
 
   @Test
+  void testReceiveInvalidTwo() {
+    UseCaseEngine.runTest(
+        getTestString(RECEIVE_INVALID_TWO),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: INTO or SET when specifying MAP param without literal",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
   void testReceiveInvalidThree() {
     UseCaseEngine.runTest(
         getTestString(RECEIVE_INVALID_THREE),
@@ -359,6 +374,21 @@ public class TestCicsReceive {
             new Diagnostic(
                 new Range(),
                 "Exactly one option required, options are mutually exclusive: TERMINAL or FROM",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testReceiveInvalidFour() {
+    UseCaseEngine.runTest(
+        getTestString(RECEIVE_INVALID_FOUR),
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "errorOne",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: INTO or SET when specifying MAP param without literal",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
