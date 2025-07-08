@@ -274,7 +274,7 @@
   },
   "COLLATING": {
     "prefix": "COLLATING",
-    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBDIC,ASCII|}"],
+    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBCDIC,ASCII|}"],
     "description": "Part of the IDENTIFICATION DIVISION. Note that the default option is EBCDIC"
   },
   "COMP": {
@@ -2704,8 +2704,8 @@
   },
   "SEQUENCE": {
     "prefix": "SEQUENCE",
-    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBDIC,ASCII|}"],
-    "description": "COLLATING SEQUENCE determins the true/false value of alphanumeric comparisons. (EBCDIC vs. ASCII)"
+    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBCDIC,ASCII|}"],
+    "description": "COLLATING SEQUENCE determines the type of sequence used in operations on alphanumeric items. (EBCDIC vs. ASCII)"
   },
   "SEQUENTIAL": {
     "prefix": "SEQUENTIAL",
