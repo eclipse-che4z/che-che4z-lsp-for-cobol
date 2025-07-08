@@ -19,7 +19,7 @@ import { ENVIRONMENT } from "../../constants";
 import { LibsDefinitions, EndevorConfigModel } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
-import { getOutputChannel } from "../../extension";
+import { getOutputChannel } from "../util/OutputChannel";
 
 export class EndevorElementLib extends EndevorLib implements CopybookLib {
   constructor(private config: EndevorConfigModel) {

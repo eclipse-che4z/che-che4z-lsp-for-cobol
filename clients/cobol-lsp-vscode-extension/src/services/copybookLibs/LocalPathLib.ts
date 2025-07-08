@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { getOutputChannel } from "../../extension";
+import { getOutputChannel } from "../util/OutputChannel";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
 import { LibsDefinitions } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";

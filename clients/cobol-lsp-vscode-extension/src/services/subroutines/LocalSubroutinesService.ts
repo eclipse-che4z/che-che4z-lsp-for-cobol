@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
 import { COBOL_EXT_ARRAY_CASE_INSENSITIVE } from "../../constants";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { getOutputChannel } from "../../extension";
+import { getOutputChannel } from "../util/OutputChannel";
 
 const localSubroutines = new LocalFilesystemResourceService();
 

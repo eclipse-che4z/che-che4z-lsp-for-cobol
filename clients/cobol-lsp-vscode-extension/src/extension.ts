@@ -67,6 +67,7 @@ import {
   resolveCopybookURI,
 } from "./services/copybook/CopybookMessageHandler";
 import { invalidateConfig } from "./services/ProcessorGroupsLoader";
+import { getOutputChannel } from "./services/util/OutputChannel";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -74,7 +75,6 @@ interface __AnalysisApi {
 }
 
 let languageClientService: LanguageClientService;
-let outputChannel: vscode.LogOutputChannel | undefined;
 let controlFlowChannel: vscode.LogOutputChannel;
 let analysisService: ControlFlowAnalysisService;
 const API_VERSION: string = "1.0.1";
@@ -449,14 +449,4 @@ function registerCodeActions(context: vscode.ExtensionContext) {
       new ServerRuntimeCodeActionProvider(),
     ),
   );
-}
-
-export function getOutputChannel() {
-  if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel(
-      "COBOL Language Support",
-      { log: true },
-    );
-  }
-  return outputChannel;
 }

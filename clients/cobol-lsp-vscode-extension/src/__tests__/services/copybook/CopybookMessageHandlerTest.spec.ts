@@ -8,7 +8,7 @@ import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { MockLib } from "./libs/MockLib.utility";
 import { DEFAULT_DIALECT } from "../../../constants";
 import { ErrorLib } from "./libs/ErrorLib.utility";
-import { getOutputChannel } from "../../../extension";
+import { getOutputChannel } from "../../../services/util/OutputChannel";
 
 export type Writable<T> = {
   -readonly [P in keyof T]: T[P];

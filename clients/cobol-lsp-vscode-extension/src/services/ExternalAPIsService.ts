@@ -22,7 +22,7 @@ import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
 import { clearDiagnostics, showDiagnostics } from "./DiagnosticsService";
-import { getOutputChannel } from "../extension";
+import { getOutputChannel } from "./util/OutputChannel";
 
 export let externalApis: ExternalAPIsService;
 
