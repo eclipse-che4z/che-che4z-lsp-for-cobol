@@ -252,15 +252,7 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(
           ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
     }
-    checkHasAtLeastOneOption(
-        "INTO or SET or TOLENGTH or TOCONTAINER",
-        ctx,
-        ctx.INTO(),
-        ctx.SET(),
-        ctx.TOLENGTH(),
-        ctx.TOCONTAINER());
-
-    checkMutuallyExclusiveOptions(
+    checkHasExactlyOneOption(
         "INTO, SET or TOCONTAINER", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
     checkPrerequisiteIsMet(
         ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCHANNEL without TOCONTAINER");
