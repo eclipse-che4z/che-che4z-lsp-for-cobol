@@ -39,8 +39,8 @@ describe("Test CompletionProvider", () => {
     "../../../../../idms-dialect-support/snippets.json",
   );
   beforeAll(async () => {
-    readFileResult[dacoSnippetPath] = (
-      await readFile(dacoSnippetPath)
+    readFileResult[vscode.Uri.file(dacoSnippetPath).path] = (
+      await readFile(vscode.Uri.file(dacoSnippetPath).path)
     ).toString();
     readFileResult[idmsSnippetPath] = (
       await readFile(idmsSnippetPath)
