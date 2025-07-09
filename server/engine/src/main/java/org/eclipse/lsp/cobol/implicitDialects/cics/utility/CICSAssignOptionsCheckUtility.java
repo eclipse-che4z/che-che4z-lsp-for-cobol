@@ -94,6 +94,7 @@ public class CICSAssignOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.NEXTTRANSID, ErrorSeverity.ERROR);
           put(CICSLexer.NUMTAB, ErrorSeverity.ERROR);
           put(CICSLexer.OPCLASS, ErrorSeverity.ERROR);
+          put(CICSLexer.OPERATION, ErrorSeverity.ERROR);
           put(CICSLexer.OPERKEYS, ErrorSeverity.ERROR);
           put(CICSLexer.OPID, ErrorSeverity.ERROR);
           put(CICSLexer.OPSECURITY, ErrorSeverity.ERROR);
