@@ -252,8 +252,11 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(
           ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
     }
-    checkHasExactlyOneOption(
-        "INTO, SET or TOCONTAINER", ctx, ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
+    if (!ctx.TOLENGTH().isEmpty())
+      checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+    else
+      checkHasExactlyOneOption(
+          "INTO, SET or TOCONTAINER", ctx, ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
     checkPrerequisiteIsMet(
         ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCHANNEL without TOCONTAINER");
 
@@ -262,9 +265,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
         checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
     }
-
-    if (!ctx.TOLENGTH().isEmpty())
-      checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
 
     checkAllOptionsArePresentOrAbsent(
         "STATUSCODE, STATUSTEXT, STATUSLEN",

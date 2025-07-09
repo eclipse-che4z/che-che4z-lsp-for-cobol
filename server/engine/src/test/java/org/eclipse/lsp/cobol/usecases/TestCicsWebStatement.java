@@ -599,7 +599,7 @@ public class TestCicsWebStatement {
             "error",
             new Diagnostic(
                 new Range(),
-                "Must include one or more of the following: INTO or SET or TOLENGTH or TOCONTAINER",
+                "Exactly one option required, none provided: INTO, SET or TOCONTAINER",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         "NOLENGTH");
