@@ -147,13 +147,12 @@ describe("USS copybook lib", () => {
     describe("uss directory doesn't exists", () => {
       it("throws File Not Found error", async () => {
         const lib = new UssPathLib("/remote/uss/not-exists", "profile");
-        await expect(
-          lib.resolveCopybookUri(
-            "COPYBOOK",
-            vscode.Uri.file("/program.cbl"),
-            DEFAULT_DIALECT,
-          ),
-        ).rejects.toEqual(new FileNotFound());
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
       });
     });
 
@@ -247,13 +246,12 @@ describe("USS copybook lib", () => {
     describe("dataset doesn't exists", () => {
       it("throws File Not Found error", async () => {
         const lib = new UssPathLib("/remote/uss/not-exists", "profile");
-        await expect(
-          lib.resolveCopybookUri(
-            "COPYBOOK",
-            vscode.Uri.file("/program.cbl"),
-            DEFAULT_DIALECT,
-          ),
-        ).rejects.toEqual(new FileNotFound());
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
       });
     });
 

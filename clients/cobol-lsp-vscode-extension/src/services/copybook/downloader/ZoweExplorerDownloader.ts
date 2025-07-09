@@ -67,8 +67,6 @@ export abstract class ZoweExplorerDownloader {
             }
           })();
         }
-
-        throw err;
       }
     }
   }

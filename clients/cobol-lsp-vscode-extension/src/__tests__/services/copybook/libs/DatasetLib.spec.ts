@@ -78,15 +78,14 @@ describe("Dataset copybook lib", () => {
     });
 
     describe("dataset doesnt exists", () => {
-      it("throws File not found error", async () => {
+      it("resolves to undefined", async () => {
         const lib = new DatasetLib("DOESNT.EXIST.DATASET", "profile");
-        await expect(
-          lib.resolveCopybookUri(
-            "COPYBOOK",
-            vscode.Uri.file("/program.cbl"),
-            DEFAULT_DIALECT,
-          ),
-        ).rejects.toEqual(new FileNotFound());
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
       });
     });
 
@@ -197,13 +196,12 @@ describe("Dataset copybook lib", () => {
         const lib = new DatasetLib("DOESNT.EXIST.DATASET", "profile");
 
         for (let attempts = 0; attempts < 3; attempts++) {
-          await expect(
-            lib.resolveCopybookUri(
-              "COPYBOOK",
-              vscode.Uri.file("/program.cbl"),
-              DEFAULT_DIALECT,
-            ),
-          ).rejects.toEqual(new FileNotFound());
+          const result = await lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          );
+          expect(result).toBeUndefined();
         }
         expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(3);
         expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -215,7 +213,7 @@ describe("Dataset copybook lib", () => {
         );
 
         // next request do not call Zowe any more
-        const result = await lib.resolveCopybookUri(
+        let result = await lib.resolveCopybookUri(
           "COPYBOOK",
           vscode.Uri.file("/program.cbl"),
           DEFAULT_DIALECT,
@@ -226,13 +224,12 @@ describe("Dataset copybook lib", () => {
         // after reenabling the lib, the requests are sent again.
         externalApis.dsnService?.reenableFailedRequests();
 
-        await expect(
-          lib.resolveCopybookUri(
-            "COPYBOOK",
-            vscode.Uri.file("/program.cbl"),
-            DEFAULT_DIALECT,
-          ),
-        ).rejects.toEqual(new FileNotFound());
+        result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
 
         expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(4);
       });
@@ -266,13 +263,12 @@ describe("Dataset copybook lib", () => {
     describe("dataset doesn't exists", () => {
       it("throws File not found error", async () => {
         const lib = new DatasetLib("DOESNT.EXIST.DATASET", "profile");
-        await expect(
-          lib.resolveCopybookUri(
-            "COPYBOOK",
-            vscode.Uri.file("/program.cbl"),
-            DEFAULT_DIALECT,
-          ),
-        ).rejects.toEqual(new FileNotFound());
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toBeUndefined();
       });
     });
 
