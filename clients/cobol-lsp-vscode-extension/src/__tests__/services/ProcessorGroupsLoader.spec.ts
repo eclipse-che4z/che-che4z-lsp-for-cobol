@@ -12,11 +12,22 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { getConfigurationResult } from "../../__mocks__/vscode";
+import {
+  FileNotFound,
+  getConfigurationResult,
+  getWorkspaceFolderResult,
+  readFileResult,
+} from "../../__mocks__/vscode";
 import { DEFAULT_DIALECT } from "../../constants";
 import { DatasetLib } from "../../services/copybookLibs/DatasetLib";
 import LocalPathLib from "../../services/copybookLibs/LocalPathLib";
-import { readSettingConfig } from "../../services/ProcessorGroupsLoader";
+import {
+  clearWorkspaceConfigCache,
+  readSettingConfig,
+  readWorkspaceConfig,
+} from "../../services/ProcessorGroupsLoader";
+import * as vscode from "vscode";
+import { getOutputChannel } from "../../services/util/OutputChannel";
 
 describe("ProcessorGroupsLoader", () => {
   describe("readSettingConfig", () => {
@@ -59,6 +70,75 @@ describe("ProcessorGroupsLoader", () => {
         const result = readSettingConfig(DEFAULT_DIALECT);
         expect(result.libs![0]).toEqual(new DatasetLib("FIRST.DATASET"));
         expect(result.libs![1]).toEqual(new DatasetLib("SECOND.DATASET"));
+      });
+    });
+  });
+
+  describe("readWorkspaceConfig", () => {
+    const WORKSPACE_PATH = "/tests/processor-groups-loader";
+    const WORKSPACE_URI = vscode.Uri.file(WORKSPACE_PATH);
+
+    beforeEach(() => {
+      clearWorkspaceConfigCache();
+    });
+
+    describe("proc_grps.json file doesn't exist", () => {
+      beforeEach(() => {
+        getWorkspaceFolderResult.uri = WORKSPACE_URI;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] =
+          new FileNotFound();
+      });
+
+      it("returns undefined", async () => {
+        const result = await readWorkspaceConfig(WORKSPACE_URI);
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe("proc_grps.json is invalid", () => {
+      beforeEach(() => {
+        getWorkspaceFolderResult.uri = WORKSPACE_URI;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] = "{}";
+      });
+
+      it("returns undefined & error is logged", async () => {
+        const result = await readWorkspaceConfig(WORKSPACE_URI);
+        expect(result).toBeUndefined();
+        expect(getOutputChannel().error).toHaveBeenCalledWith(
+          expect.stringContaining("Could not validate data"),
+        );
+      });
+    });
+
+    describe("pgm_conf.json doesn't exist", () => {
+      beforeEach(() => {
+        getWorkspaceFolderResult.uri = WORKSPACE_URI;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] =
+          `{"pgroups": []}`;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/pgm_conf.json`] =
+          new FileNotFound();
+      });
+
+      it("returns undefined", async () => {
+        const result = await readWorkspaceConfig(WORKSPACE_URI);
+        expect(result).toBeUndefined();
+      });
+    });
+
+    describe("pgm_conf.json is invalid", () => {
+      beforeEach(() => {
+        getWorkspaceFolderResult.uri = WORKSPACE_URI;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] =
+          `{"pgroups": []}`;
+        readFileResult[`${WORKSPACE_PATH}/.cobolplugin/pgm_conf.json`] = "{}";
+      });
+
+      it("returns undefined & error is logged", async () => {
+        const result = await readWorkspaceConfig(WORKSPACE_URI);
+        expect(result).toBeUndefined();
+        expect(getOutputChannel().error).toHaveBeenCalledWith(
+          expect.stringContaining("Could not validate data"),
+        );
       });
     });
   });

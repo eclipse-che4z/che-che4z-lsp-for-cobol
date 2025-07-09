@@ -82,7 +82,7 @@ export async function loadProcessorGroupDialectConfig(
   dialectConfig: DialectsConfiguration,
 ) {
   const pgCfg = await loadProcessorGroup(item.scopeUri);
-  if (pgCfg === undefined || pgCfg.preprocessors == undefined) {
+  if (!pgCfg.preprocessors) {
     return dialectConfig;
   }
 

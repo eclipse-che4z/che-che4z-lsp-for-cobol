@@ -31,7 +31,6 @@ import { getOutputChannel } from "./util/OutputChannel";
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
 const PG_PROC_FILE = "proc_grps.json";
-const EMPTY_PROGRAM_CONFIG = { pgms: [] };
 
 type ProgramConfig = {
   program: string;
@@ -184,14 +183,7 @@ const readEndevorConfigCached = new Memoize(
         workspaceConfig.processorGroups[pg.name] = pg;
       });
 
-      const decodedPrograms = ProgramsConfigModel.decode(endevorData);
-      if (isLeft(decodedPrograms)) {
-        const message = `Could not validate endevor processor group program data: ${PathReporter.report(decodedPrograms).join("\n")}`;
-        getOutputChannel().error(message);
-        throw Error(message);
-      }
-
-      const processorGroupName = decodedPrograms.right.pgms[0].pgroup;
+      const processorGroupName = endevorData.pgms[0].pgroup;
       const processorGroup = processorGroups.find(
         (pg) => pg.name === processorGroupName,
       );
@@ -215,18 +207,21 @@ export const readEndevorConfig = readEndevorConfigCached.execute;
 export const invalidateEndevorConfig = readEndevorConfigCached.invalidateCache;
 
 const readWorkspaceConfigCached = new Memoize(
-  async function (workspaceUri: Uri): Promise<WorkspaceConfig> {
+  async function (workspaceUri: Uri): Promise<WorkspaceConfig | undefined> {
+    const processorGroups = await readProcessorGroupsFile(workspaceUri);
+    if (!processorGroups) return;
+
     const workspaceConfig: WorkspaceConfig = {
       processorGroups: {},
       programs: [],
     };
 
-    const processorGroups = await readProcessorGroupsFile(workspaceUri);
     processorGroups.forEach((pg) => {
       workspaceConfig.processorGroups[pg.name] = pg;
     });
 
     const programs = await readProgramConfig(workspaceUri);
+    if (!programs) return;
 
     programs.pgms.forEach((program) => {
       let processorGroup = processorGroups.find(
@@ -278,7 +273,7 @@ export function invalidateConfig(documentUri: Uri) {
 
 async function readProcessorGroupsFile(
   workspaceUri: Uri,
-): Promise<ProcessorGroup[]> {
+): Promise<ProcessorGroup[] | undefined> {
   const procCfgPath = Uri.joinPath(workspaceUri, PG_FOLDER, PG_PROC_FILE);
   try {
     const fileContent = new TextDecoder().decode(
@@ -301,12 +296,14 @@ async function readProcessorGroupsFile(
       ]),
     );
   } catch (e) {
-    if (hasMember(e, "code") && e.code !== "FileNotFound") {
+    if (
+      e instanceof Error &&
+      (!hasMember(e, "code") || e.code !== "FileNotFound")
+    ) {
       getOutputChannel().error(
-        `Error while reading ${procCfgPath.toString()} - ${JSON.stringify(e)}`,
+        `Error while reading ${procCfgPath.toString()} - ${e.message}`,
       );
     }
-    return [];
   }
 }
 
@@ -363,7 +360,9 @@ function transformPreprocessor(
   return transformed;
 }
 
-async function readProgramConfig(workspaceUri: Uri): Promise<ProgramsConfig> {
+async function readProgramConfig(
+  workspaceUri: Uri,
+): Promise<ProgramsConfig | undefined> {
   const pgmCfgPath = Uri.joinPath(workspaceUri, PG_FOLDER, PGR_PGM_FILE);
 
   try {
@@ -380,12 +379,14 @@ async function readProgramConfig(workspaceUri: Uri): Promise<ProgramsConfig> {
     }
     return decoded.right;
   } catch (e) {
-    if (hasMember(e, "code") && e.code !== "FileNotFound") {
+    if (
+      e instanceof Error &&
+      (!hasMember(e, "code") || e.code !== "FileNotFound")
+    ) {
       getOutputChannel().error(
-        `Error while reading ${pgmCfgPath.toString()} - ${JSON.stringify(e)}`,
+        `Error while reading ${pgmCfgPath.toString()} - ${e.message}`,
       );
     }
-    return EMPTY_PROGRAM_CONFIG;
   }
 }
 
