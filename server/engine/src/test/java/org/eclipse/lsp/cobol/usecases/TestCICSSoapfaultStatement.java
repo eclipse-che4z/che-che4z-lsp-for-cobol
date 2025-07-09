@@ -70,6 +70,8 @@ public class TestCICSSoapfaultStatement {
   private static final String SOAPFAULT_CREATE_TRANS_NOLENGTH_INVALID_5 =
       "SOAPFAULT {_CREATE CLIENT FAULTSTRING({$varOne}) FAULTSTRLEN({$varOne})"
           + " ROLE({$varFour})|error_}";
+  private static final String SOAPFAULT_ADD_NOLENGTH_INVALID =
+      "SOAPFAULT {_ADD FAULTSTRING({$varOne})|error_}";
 
   // Valid Test Cases
   @Test
@@ -225,6 +227,20 @@ public class TestCICSSoapfaultStatement {
             new Diagnostic(
                 new Range(),
                 "Missing required option: ROLELENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testSoapFaultAddNoLengthInvalid() {
+    CICSTestUtils.errorTest(
+        SOAPFAULT_ADD_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: FAULTSTRLEN",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         "NOLENGTH");

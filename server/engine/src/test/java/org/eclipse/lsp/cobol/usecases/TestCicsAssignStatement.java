@@ -87,6 +87,7 @@ public class TestCicsAssignStatement {
           + "NEXTTRANSID('name')\n"
           + "NUMTAB('name')\n"
           + "OPCLASS('name')\n"
+          + "OPERATION('name')\n"
           + "OPERKEYS('name')\n"
           + "OPID('name')\n"
           + "OPSECURITY('name')\n"

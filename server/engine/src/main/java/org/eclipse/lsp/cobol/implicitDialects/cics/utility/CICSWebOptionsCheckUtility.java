@@ -252,6 +252,13 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(
           ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
     }
+    checkHasAtLeastOneOption(
+        "INTO or SET or TOLENGTH or TOCONTAINER",
+        ctx,
+        ctx.INTO(),
+        ctx.SET(),
+        ctx.TOLENGTH(),
+        ctx.TOCONTAINER());
 
     checkMutuallyExclusiveOptions(
         "INTO, SET or TOCONTAINER", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
@@ -260,7 +267,8 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
     if (!ctx.INTO().isEmpty() || !ctx.SET().isEmpty()) {
       checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
-      if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
+      if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
+        checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
     }
 
     if (!ctx.TOLENGTH().isEmpty())
