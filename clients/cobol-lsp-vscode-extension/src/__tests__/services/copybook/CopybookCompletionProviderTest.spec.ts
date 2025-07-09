@@ -27,7 +27,7 @@ import {
 } from "../../../services/DialectRegistry";
 import { initializeExternalAPIs } from "../../../services/ExternalAPIsService";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
-import { MockLib } from "./libs/MockLib.utility";
+import { MockLib } from "./CopybookMessageHandlerTest.spec";
 import { DEFAULT_DIALECT } from "../../../constants";
 describe("CopybooksCompletionProvider", () => {
   const remoteCopybooks = {

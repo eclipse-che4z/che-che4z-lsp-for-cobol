@@ -10,7 +10,6 @@ module.exports = {
     "<rootDir>/src/web",
     "<rootDir>/.vscode-test",
     "<rootDir>/.vscode-test-web",
-    ".utility.ts",
   ],
   collectCoverage: true,
   collectCoverageFrom: [

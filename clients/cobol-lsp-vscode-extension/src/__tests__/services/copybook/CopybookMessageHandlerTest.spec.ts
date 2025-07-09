@@ -5,10 +5,9 @@ import {
 } from "../../../services/copybook/CopybookMessageHandler";
 import * as vscode from "vscode";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
-import { MockLib } from "./libs/MockLib.utility";
 import { DEFAULT_DIALECT } from "../../../constants";
-import { ErrorLib } from "./libs/ErrorLib.utility";
 import { getOutputChannel } from "../../../services/util/OutputChannel";
+import CopybookLib from "../../../services/copybookLibs/CopybookLib";
 
 export type Writable<T> = {
   -readonly [P in keyof T]: T[P];
@@ -140,3 +139,44 @@ describe("CopybookMessageHandler", () => {
     });
   });
 });
+
+export class MockLib implements CopybookLib {
+  constructor(
+    private directory: {
+      [key: string]: vscode.Uri | (() => Promise<vscode.Uri>);
+    },
+  ) {}
+
+  resolveCopybookUri(
+    copybookName: string,
+    _documentUri: vscode.Uri,
+    _dialect: string,
+  ): Promise<vscode.Uri | (() => Promise<vscode.Uri | undefined>) | undefined> {
+    return Promise.resolve(this.directory[copybookName]);
+  }
+
+  listCopybooks(
+    _documentUri: vscode.Uri,
+    _dialect: string,
+    _outputChannel?: vscode.OutputChannel,
+  ): Promise<string[]> {
+    return Promise.resolve(Object.keys(this.directory));
+  }
+}
+
+export class ErrorLib implements CopybookLib {
+  resolveCopybookUri(
+    _copybookName: string,
+    _documentUri: vscode.Uri,
+    _dialect: string,
+  ): Promise<vscode.Uri | (() => Promise<vscode.Uri | undefined>) | undefined> {
+    return Promise.reject(new Error("Resolve error"));
+  }
+  listCopybooks(
+    _documentUri: vscode.Uri,
+    _dialect: string,
+    _outputChannel?: vscode.OutputChannel,
+  ): Promise<string[]> {
+    return Promise.reject(new Error("List error"));
+  }
+}
