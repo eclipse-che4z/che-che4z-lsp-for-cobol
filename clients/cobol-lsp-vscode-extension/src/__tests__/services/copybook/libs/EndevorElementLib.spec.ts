@@ -21,7 +21,7 @@ import * as E4ECopybookService from "../../../../services/copybook/E4ECopybookSe
 import { E4E } from "../../../../type/e4eApi";
 import { EndevorElementLib } from "../../../../services/copybookLibs/EndevorElementLib";
 import { DEFAULT_DIALECT } from "../../../../constants";
-import * as DiagnosticsService from "../../../../services/DiagnosticsService";
+import { diagnosticsCollectionMock } from "../../../../__mocks__/vscode";
 
 describe("Endevor Element Lib", () => {
   let e4eMock: E4E;
@@ -146,18 +146,11 @@ describe("Endevor Element Lib", () => {
     });
 
     describe("E4E is not installed", () => {
-      let showDiagnosticsSpy: jest.SpyInstance;
-      let clearDiagnosticsSpy: jest.SpyInstance;
       beforeEach(async () => {
         jest
           .spyOn(E4ECopybookService, "getE4EAPI")
           .mockResolvedValue(undefined);
         await initializeExternalAPIs(vscode.Uri.file("/storage"));
-        showDiagnosticsSpy = jest.spyOn(DiagnosticsService, "showDiagnostics");
-        clearDiagnosticsSpy = jest.spyOn(
-          DiagnosticsService,
-          "clearDiagnostics",
-        );
       });
 
       it("returns undefined if e4e is not installed", async () => {
@@ -178,7 +171,7 @@ describe("Endevor Element Lib", () => {
         expect(result).toBeUndefined();
 
         expect(result).toBeUndefined();
-        expect(showDiagnosticsSpy).toHaveBeenCalledWith(
+        expect(diagnosticsCollectionMock.set).toHaveBeenCalledWith(
           expect.objectContaining({ path: "/program.cbl" }),
           [
             {
@@ -191,6 +184,7 @@ describe("Endevor Element Lib", () => {
             },
           ],
         );
+        diagnosticsCollectionMock.set.mockClear();
 
         // diagnostics disappear after ZE installation and copybook can be resolved
         externalApis.e4eAppeared(e4eMock);
@@ -199,9 +193,9 @@ describe("Endevor Element Lib", () => {
           vscode.Uri.file("/program.cbl"),
           DEFAULT_DIALECT,
         );
-        expect(clearDiagnosticsSpy).toHaveBeenCalled();
         expect(typeof resultAfter).toEqual("function");
-        expect(clearDiagnosticsSpy).toHaveBeenCalled();
+        expect(diagnosticsCollectionMock.clear).toHaveBeenCalled();
+        expect(diagnosticsCollectionMock.set).not.toHaveBeenCalled();
       });
     });
   });

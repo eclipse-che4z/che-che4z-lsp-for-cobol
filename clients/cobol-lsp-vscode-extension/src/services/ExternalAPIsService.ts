@@ -21,10 +21,11 @@ import { CopybookDownloaderForDsn as CopybookDownloaderForDsn } from "./copybook
 import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
-import { clearDiagnostics, showDiagnostics } from "./DiagnosticsService";
 import { getOutputChannel } from "./util/OutputChannel";
 
 export let externalApis: ExternalAPIsService;
+const diagnosticCollection: vscode.DiagnosticCollection =
+  vscode.languages.createDiagnosticCollection("External APIs Diagnostics");
 
 export async function initializeExternalAPIs(
   storagePath: vscode.Uri,
@@ -55,7 +56,7 @@ export async function initializeExternalAPIs(
 }
 
 export function missingExtension(documentUri: vscode.Uri, message: string) {
-  showDiagnostics(documentUri, [
+  diagnosticCollection.set(documentUri, [
     {
       range: new vscode.Range(
         new vscode.Position(0, 0),
@@ -65,6 +66,10 @@ export function missingExtension(documentUri: vscode.Uri, message: string) {
       severity: vscode.DiagnosticSeverity.Warning,
     },
   ]);
+}
+
+export function deleteDiagnostics(documentUri: vscode.Uri) {
+  diagnosticCollection.delete(documentUri);
 }
 
 class ExternalAPIsService {
@@ -110,14 +115,14 @@ class ExternalAPIsService {
       this.storagePath,
       this.e4eApi,
     );
-    clearDiagnostics();
+    diagnosticCollection.clear();
   }
 
   public explorerAppeared(api: IApiRegisterClient) {
     this.explorerApi = api;
     this.ussService = new CopybookDownloaderForUss(this.explorerApi);
     this.dsnService = new CopybookDownloaderForDsn(this.explorerApi);
-    clearDiagnostics();
+    diagnosticCollection.clear();
     if (this.explorerApi.onProfileUpdated) {
       this.explorerApi.onProfileUpdated((profile: IProfileLoaded) => {
         getOutputChannel().appendLine(`Zowe profile ${profile.name} updated`);

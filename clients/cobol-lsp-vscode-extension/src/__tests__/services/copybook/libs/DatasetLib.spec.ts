@@ -13,6 +13,7 @@
  */
 
 import {
+  diagnosticsCollectionMock,
   FileNotFound,
   readDirectoryResult,
 } from "../../../../__mocks__/vscode";
@@ -27,7 +28,6 @@ import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMoc
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { ZoweExplorerDownloader } from "../../../../services/copybook/downloader/ZoweExplorerDownloader";
 import { DEFAULT_DIALECT } from "../../../../constants";
-import * as DiagnosticsService from "../../../../services/DiagnosticsService";
 
 describe("Dataset copybook lib", () => {
   let zoweExplorerApiMock: IApiRegisterClient;
@@ -104,20 +104,9 @@ describe("Dataset copybook lib", () => {
       });
 
       describe("ZE not installed", () => {
-        let showDiagnosticsSpy: jest.SpyInstance;
-        let clearDiagnosticsSpy: jest.SpyInstance;
-
         beforeEach(async () => {
           jest.spyOn(Utils, "getZoweExplorerAPI").mockResolvedValue(undefined);
           await initializeExternalAPIs(vscode.Uri.file("/storage"));
-          showDiagnosticsSpy = jest.spyOn(
-            DiagnosticsService,
-            "showDiagnostics",
-          );
-          clearDiagnosticsSpy = jest.spyOn(
-            DiagnosticsService,
-            "clearDiagnostics",
-          );
         });
 
         it("resolves to undefined if configuration check fails - ZE not installed", async () => {
@@ -128,7 +117,7 @@ describe("Dataset copybook lib", () => {
             DEFAULT_DIALECT,
           );
           expect(result).toBeUndefined();
-          expect(showDiagnosticsSpy).toHaveBeenCalledWith(
+          expect(diagnosticsCollectionMock.set).toHaveBeenCalledWith(
             expect.objectContaining({ path: "/program.cbl" }),
             [
               {
@@ -149,7 +138,7 @@ describe("Dataset copybook lib", () => {
             vscode.Uri.file("/program.cbl"),
             DEFAULT_DIALECT,
           );
-          expect(clearDiagnosticsSpy).toHaveBeenCalled();
+          expect(diagnosticsCollectionMock.clear).toHaveBeenCalled();
           expect(resultAfter).toEqual(
             vscode.Uri.parse(
               "zowe-ds:/profile/DATASET.WITH.COPYBOOK/COPYBOOK.cpy",

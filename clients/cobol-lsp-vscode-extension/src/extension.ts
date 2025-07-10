@@ -26,6 +26,7 @@ import {
   ZOWE_FOLDER,
 } from "./constants";
 import {
+  deleteDiagnostics,
   externalApis,
   initializeExternalAPIs,
 } from "./services/ExternalAPIsService";
@@ -113,8 +114,9 @@ async function initialize(context: vscode.ExtensionContext) {
     },
   );
 
-  await initializeExternalAPIs(context.globalStorageUri, () =>
-    languageClientService.invalidateConfiguration(),
+  await initializeExternalAPIs(
+    context.globalStorageUri,
+    languageClientService.invalidateConfiguration,
   );
 
   const configurationWatcher = new ConfigurationWatcher();
@@ -178,6 +180,7 @@ export async function activate(
     vscode.workspace.onDidCloseTextDocument((document) => {
       void analysisService.invalidate(document.uri.toString(), true);
       invalidateConfig(document.uri);
+      deleteDiagnostics(document.uri);
     }),
   );
 

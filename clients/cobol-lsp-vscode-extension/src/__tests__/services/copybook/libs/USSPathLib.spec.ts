@@ -13,6 +13,7 @@
  */
 
 import {
+  diagnosticsCollectionMock,
   FileNotFound,
   getConfigurationResult,
   readDirectoryResult,
@@ -27,7 +28,6 @@ import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMoc
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { UssPathLib } from "../../../../services/copybookLibs/UssPathLib";
 import { DEFAULT_DIALECT } from "../../../../constants";
-import * as DiagnosticsService from "../../../../services/DiagnosticsService";
 
 describe("USS copybook lib", () => {
   let zoweExplorerApiMock: IApiRegisterClient;
@@ -169,17 +169,9 @@ describe("USS copybook lib", () => {
     });
 
     describe("ZE not installed", () => {
-      let showDiagnosticsSpy: jest.SpyInstance;
-      let clearDiagnosticsSpy: jest.SpyInstance;
-
       beforeEach(async () => {
         jest.spyOn(Utils, "getZoweExplorerAPI").mockResolvedValue(undefined);
         await initializeExternalAPIs(vscode.Uri.file("/storage"));
-        showDiagnosticsSpy = jest.spyOn(DiagnosticsService, "showDiagnostics");
-        clearDiagnosticsSpy = jest.spyOn(
-          DiagnosticsService,
-          "clearDiagnostics",
-        );
       });
 
       it("resolves to undefined if configuration check fails - ZE not installed", async () => {
@@ -190,7 +182,7 @@ describe("USS copybook lib", () => {
           DEFAULT_DIALECT,
         );
         expect(result).toBeUndefined();
-        expect(showDiagnosticsSpy).toHaveBeenCalledWith(
+        expect(diagnosticsCollectionMock.set).toHaveBeenCalledWith(
           expect.objectContaining({ path: "/program.cbl" }),
           [
             {
@@ -203,6 +195,7 @@ describe("USS copybook lib", () => {
             },
           ],
         );
+        diagnosticsCollectionMock.set.mockClear();
 
         // diagnostics disappear after ZE installation and copybook can be resolved
         externalApis.explorerAppeared(zoweExplorerApiMock);
@@ -211,12 +204,13 @@ describe("USS copybook lib", () => {
           vscode.Uri.file("/program.cbl"),
           DEFAULT_DIALECT,
         );
-        expect(clearDiagnosticsSpy).toHaveBeenCalled();
         expect(resultAfter).toEqual(
           vscode.Uri.parse(
             "zowe-uss:/profile/remote/uss/copybooks/COPYBOOK.CPY",
           ),
         );
+        expect(diagnosticsCollectionMock.clear).toHaveBeenCalled();
+        expect(diagnosticsCollectionMock.set).not.toHaveBeenCalled();
       });
     });
   });

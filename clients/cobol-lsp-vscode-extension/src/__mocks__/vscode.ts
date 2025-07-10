@@ -53,6 +53,12 @@ export const getConfigurationResult: { [key: string]: unknown } = {
   "cobol-lsp.smart-tab": undefined,
 };
 
+export const diagnosticsCollectionMock = {
+  set: jest.fn(),
+  clear: jest.fn(),
+  delete: jest.fn(),
+};
+
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
   export const workspaceFolders = workspaceFoldersMock;
@@ -305,11 +311,9 @@ export const TextEditorEdit = {
 export const languages = {
   registerCodeActionsProvider: jest.fn(),
   registerCompletionItemProvider: jest.fn(),
-  createDiagnosticCollection: jest.fn().mockReturnValue({
-    set: jest.fn(),
-    clear: jest.fn(),
-    delete: jest.fn(),
-  }),
+  createDiagnosticCollection: jest
+    .fn()
+    .mockReturnValue(diagnosticsCollectionMock),
 };
 
 export class FileNotFound extends Error {
