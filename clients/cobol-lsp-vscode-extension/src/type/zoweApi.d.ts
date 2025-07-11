@@ -20,7 +20,7 @@ interface IApiRegisterClient {
   getUssApi(profile: IProfileLoaded): IUss;
   getMvsApi(profile: IProfileLoaded): IMvs;
   registeredApiTypes(): string[];
-  onProfileUpdated(fn: (profile: IProfileLoaded) => unknown): void;
+  onProfileUpdated?(fn: (profile: IProfileLoaded) => unknown): void;
 }
 
 interface IApiExplorerExtender {

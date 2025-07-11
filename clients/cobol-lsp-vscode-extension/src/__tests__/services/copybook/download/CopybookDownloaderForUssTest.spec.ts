@@ -13,7 +13,6 @@
  */
 
 import { ProfileUtils } from "../../../../services/util/ProfileUtils";
-import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import * as vscode from "vscode";
 import { TextEncoder } from "util";
 import { SettingsService } from "../../../../services/Settings";
@@ -52,7 +51,7 @@ describe("Tests Copybook download from USS", () => {
       jest
         .spyOn(SettingsService, "getCopybookExtension")
         .mockResolvedValue([".cpy", ""]);
-      downloader = new CopybookDownloaderForUss(createZoweExplorerMock());
+      downloader = new CopybookDownloaderForUss();
     });
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {

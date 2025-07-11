@@ -47,8 +47,7 @@ export const PROFILE_NAME_PLACEHOLDER = "<profilename>";
 export const DOWNLOAD_QUEUE_LOCKED_ERROR_MSG = `Invalid credentials for profile: ${PROFILE_NAME_PLACEHOLDER}. Copybook retrieval is blocked. Ensure the profile contains correct credentials.`;
 export const UNLOCK_DOWNLOAD_QUEUE_MSG = "Unblock and retry";
 export const INVALID_CREDENTIALS_ERROR_MSG = `Incorrect credentials in Zowe profile ${PROFILE_NAME_PLACEHOLDER}.`;
-export const PROVIDE_PROFILE_MSG =
-  "Please specify a valid Zowe Explorer profile to download copybooks from the mainframe.";
+export const PROVIDE_PROFILE_MSG = `Please specify a valid Zowe Explorer profile to download copybooks from the mainframe. Provided invalid profile name: ${PROFILE_NAME_PLACEHOLDER}`;
 export const SEGMENT_PLACEHOLDER = "<segment>";
 export const DSN_MUSTBE_NOT_EMPTY = "Dataset name segment must not be empty.";
 export const DSN_NOMORE_8CHARS =

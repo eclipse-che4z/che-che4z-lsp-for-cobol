@@ -25,7 +25,6 @@ import {
 } from "../../../../services/ExternalAPIsService";
 import { Utils } from "../../../../services/util/Utils";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
-import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { ZoweExplorerDownloader } from "../../../../services/copybook/downloader/ZoweExplorerDownloader";
 import { DEFAULT_DIALECT } from "../../../../constants";
 
@@ -38,9 +37,6 @@ describe("Dataset copybook lib", () => {
       .spyOn(Utils, "getZoweExplorerAPI")
       .mockResolvedValue({ api: zoweExplorerApiMock });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
-    jest
-      .spyOn(ProfileUtils, "getAvailableProfiles")
-      .mockReturnValue(["profile"]);
   });
 
   describe("resolveCopybookUri", () => {
@@ -90,17 +86,41 @@ describe("Dataset copybook lib", () => {
     });
 
     describe("invalid configuration check", () => {
-      it("resolves to undefined if configuration check fails - profile is not configured", async () => {
-        const lib = new DatasetLib("DATASET.WITH.COPYBOOK", "invalid-profile");
-        const result = await lib.resolveCopybookUri(
-          "COPYBOOK",
-          vscode.Uri.file("/program.cbl"),
-          DEFAULT_DIALECT,
-        );
-        expect(result).toBeUndefined();
-        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-          "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe. Provided invalid profile name: invalid-profile",
-        );
+      describe("Profile not configured", () => {
+        let statSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+          ZoweExplorerDownloader.profileStore.clear();
+          jest.clearAllMocks();
+          statSpy = jest
+            .spyOn(vscode.workspace.fs, "stat")
+            .mockRejectedValue(
+              new Error(
+                "Zowe Explorer Profiles Cache error: Could not find profile named: invalid-profile.",
+              ),
+            );
+        });
+
+        afterEach(() => {
+          statSpy.mockRestore();
+        });
+
+        it("resolves to undefined if configuration check fails - profile is not configured", async () => {
+          const lib = new DatasetLib(
+            "DATASET.WITH.COPYBOOK",
+            "invalid-profile",
+          );
+          const result = await lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          );
+          expect(result).toBeUndefined();
+          expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+            "Please specify a valid Zowe Explorer profile to download copybooks from the mainframe. Provided invalid profile name: invalid-profile",
+            "Unblock and retry",
+          );
+        });
       });
 
       describe("ZE not installed", () => {
@@ -168,7 +188,10 @@ describe("Dataset copybook lib", () => {
       });
 
       it("resolves to undefined if invalid credentials are used", async () => {
-        const lib = new DatasetLib("DATASET.WITH.COPYBOOK", "profile");
+        const lib = new DatasetLib(
+          "DATASET.WITH.COPYBOOK",
+          "invalid-credentials",
+        );
         const result = await lib.resolveCopybookUri(
           "COPYBOOK",
           vscode.Uri.file("/program.cbl"),

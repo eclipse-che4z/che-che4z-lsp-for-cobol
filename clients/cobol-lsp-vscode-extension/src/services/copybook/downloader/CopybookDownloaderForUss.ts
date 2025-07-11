@@ -22,7 +22,7 @@ import * as vscode from "vscode";
  * Copybook downloader from USS using Zowe Explorer
  */
 export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
-  constructor(protected readonly explorerAPI: IApiRegisterClient) {
+  constructor() {
     super();
   }
 

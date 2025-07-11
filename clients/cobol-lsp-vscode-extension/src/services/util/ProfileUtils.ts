@@ -18,40 +18,14 @@ import { SettingsService } from "../Settings";
 export class ProfileUtils {
   public static getProfileNameForCopybook(
     documentUri: vscode.Uri,
-    zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
-    if (!zoweExplorerApi) {
-      return undefined;
-    }
-    return ProfileUtils.getValidProfileForCopybookDownload(
-      documentUri,
-      zoweExplorerApi,
-    );
-  }
-
-  public static getAvailableProfiles(zoweExplorerApi?: IApiRegisterClient) {
-    let availableProfiles: string[] = [];
-    if (!zoweExplorerApi) return availableProfiles;
-    zoweExplorerApi.registeredApiTypes().forEach((profileType) => {
-      availableProfiles = availableProfiles.concat(
-        zoweExplorerApi
-          .getExplorerExtenderApi()
-          .getProfilesCache()
-          .getProfiles(profileType)
-          ?.map((ele) => ele.name),
-      );
-    });
-    return availableProfiles;
+    return ProfileUtils.getValidProfileForCopybookDownload(documentUri);
   }
 
   private static getValidProfileForCopybookDownload(
     documentUri: vscode.Uri,
-    zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
-    const profileFromDoc = ProfileUtils.getProfileFromDocument(
-      documentUri,
-      zoweExplorerApi,
-    );
+    const profileFromDoc = ProfileUtils.getProfileFromDocument(documentUri);
     const passedProfile = SettingsService.getProfileName();
     if (!passedProfile && profileFromDoc) {
       return profileFromDoc;
@@ -61,27 +35,11 @@ export class ProfileUtils {
 
   public static getProfileFromDocument(
     documentUri: vscode.Uri,
-    zoweExplorerApi: IApiRegisterClient | undefined,
   ): string | undefined {
     if (documentUri.scheme === "zowe-ds" || documentUri.scheme === "zowe-uss") {
       const profile = documentUri.path.split("/")[1];
       if (!profile) return undefined;
       return profile;
     }
-
-    if (documentUri.scheme !== "file") return;
-
-    if (!zoweExplorerApi) return;
-    const eeApi = zoweExplorerApi.getExplorerExtenderApi();
-
-    const fsPath = documentUri.fsPath;
-
-    const openedFile =
-      (eeApi.ussFileProvider.openFiles &&
-        eeApi.ussFileProvider.openFiles[fsPath]) ||
-      (eeApi.datasetProvider.openFiles &&
-        eeApi.datasetProvider.openFiles[fsPath]);
-
-    return openedFile?.profile.name;
   }
 }

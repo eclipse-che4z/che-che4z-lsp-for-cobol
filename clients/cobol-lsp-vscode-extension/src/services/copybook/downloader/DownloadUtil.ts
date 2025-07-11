@@ -15,157 +15,131 @@ import * as vscode from "vscode";
 import {
   DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
   PROFILE_NAME_PLACEHOLDER,
+  PROVIDE_PROFILE_MSG,
   UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../../constants";
-import { ZoweExplorerDownloader } from "./ZoweExplorerDownloader";
 import { hasMember } from "../../util/Utils";
 import { registerExceptionEvent } from "../../reporter";
+import { Memoize } from "../../util/Memoize";
 
-/**
- * Utility class for downloading copybooks
- */
-export class DownloadUtil {
-  /**
-   * returns true if the passed profile has invalid credentials, false otherwise
-   * @param profileName
-   * @param remoteLocation DSN or USS that is used to test mainframe access
-   * @returns true if the passed profile has invalid credentials, false otherwise
-   */
-  public static async checkForInvalidCredProfile(
-    profileName: string,
-    remoteLocation: MainframeRemoteLocation,
-    retry = true,
-  ): Promise<boolean> {
-    if (
-      ZoweExplorerDownloader.profileStore.get(profileName) === "valid-profile"
-    ) {
-      return false;
+const getProfileStatusCached = new Memoize(
+  testZoweAccess,
+  undefined,
+  (profileName: string) => profileName,
+);
+
+export const getProfileStatus = getProfileStatusCached.execute;
+
+async function testZoweAccess(
+  profileName: string,
+  remoteLocation: MainframeRemoteLocation,
+  retry: boolean,
+) {
+  try {
+    if (remoteLocation.uss) {
+      await vscode.workspace.fs.stat(
+        vscode.Uri.parse(
+          `zowe-uss:/${profileName}/${remoteLocation.uss}?fetch=true`,
+        ),
+      );
+    } else if (remoteLocation.dsn) {
+      await vscode.workspace.fs.stat(
+        vscode.Uri.parse(
+          `zowe-ds:/${profileName}/${remoteLocation.dsn}?fetch=true`,
+        ),
+      );
     }
-
-    try {
-      if (remoteLocation.uss) {
-        await vscode.workspace.fs.stat(
-          vscode.Uri.parse(
-            `zowe-uss:/${profileName}/${remoteLocation.uss}?fetch=true`,
-          ),
-        );
-      } else if (remoteLocation.dsn) {
-        await vscode.workspace.fs.stat(
-          vscode.Uri.parse(
-            `zowe-ds:/${profileName}/${remoteLocation.dsn}?fetch=true`,
-          ),
-        );
-      }
-    } catch (error) {
-      // TODO: This retry mechanism should be removed once this ZE bug is fixed
-      // https://github.com/zowe/zowe-explorer-vscode/issues/3662
-      if (retry) {
-        return await this.checkForInvalidCredProfile(
+    return "valid-profile";
+  } catch (err) {
+    if (isNotFoundError(err)) return "valid-profile";
+    if (isPermissionError(err)) return "valid-profile";
+    if (isProfileNotConfiguredError(err)) {
+      const message = PROVIDE_PROFILE_MSG.replace(
+        PROFILE_NAME_PLACEHOLDER,
+        profileName,
+      );
+      void showQueueLockedDialog(profileName, message);
+      return "locked-profile";
+    }
+    if (isInvalidCredentials(err)) {
+      if (retry)
+        return await testZoweAccess(profileName, remoteLocation, false);
+      else {
+        const message = DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(
+          PROFILE_NAME_PLACEHOLDER,
           profileName,
-          remoteLocation,
-          false,
         );
+        void showQueueLockedDialog(profileName, message);
+        return "locked-profile";
       }
-      if (this.checkForInvalidCredentials(error, profileName)) {
-        return true;
-      }
     }
 
-    ZoweExplorerDownloader.profileStore.set(profileName, "valid-profile");
-    return false;
-  }
-
-  private static checkForInvalidCredentials(
-    e: unknown,
-    profileName: string,
-  ): boolean {
-    if (this.isNotFoundError(e) || this.isPermissionError(e)) {
-      // Cannot access the dataset, but credentials are working fine
-      return false;
-    }
-
-    if (this.isInvalidCredentials(e)) {
-      ZoweExplorerDownloader.profileStore.set(profileName, "locked-profile");
-      return true;
-    }
-
+    // unknown type of error, register it and assume profile is ok
     registerExceptionEvent(
       "InvalidCredentialsException",
-      JSON.stringify(e),
+      JSON.stringify(err),
       ["copybook", "COBOL", "invalid-credentials-check"],
       "There is an issue with zowe api layer",
     );
-    return true;
+    return "valid-profile";
   }
+}
 
-  /**
-   * checks if a zowe profile is locked due to invalid credentials
-   * @param profileName
-   * @returns True is zowe profile is locked, false otherwise
-   */
-  public static async isProfileLocked(profileName: string): Promise<boolean> {
-    const profileStatus = ZoweExplorerDownloader.profileStore.get(profileName);
-    if (profileStatus === "valid-profile" || !profileStatus) {
-      return false;
-    }
+/**
+ * Returns true if provided credentials are correct but
+ * selected dataset or uss folder doesn't exist.
+ */
+function isNotFoundError(e: unknown) {
+  return hasMember(e, "code") && e.code === "FileNotFound";
+}
 
-    const shouldUnlock = await this.showQueueLockedDialog(profileName);
-    if (shouldUnlock) {
-      ZoweExplorerDownloader.profileStore.delete(profileName);
-    }
+/**
+ * Returns true if provided credentials are correct but user doesn't
+ * have permission to access selected dataset (ISRZ002)
+ * or uss directory (EDC5111I).
+ */
+function isPermissionError(e: unknown) {
+  return (
+    hasMember(e, "message") &&
+    typeof e.message === "string" &&
+    (e.message.includes("EDC5111I Permission denied") ||
+      e.message.includes("ISRZ002 Authorization failed"))
+  );
+}
 
-    return shouldUnlock;
-  }
+function isProfileNotConfiguredError(err: unknown) {
+  return (
+    hasMember(err, "message") &&
+    typeof err.message === "string" &&
+    err.message.includes(
+      "Zowe Explorer Profiles Cache error: Could not find profile named",
+    )
+  );
+}
 
-  private static async showQueueLockedDialog(
-    profileName: string,
-  ): Promise<boolean> {
-    const action = await vscode.window.showErrorMessage(
-      DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(
-        PROFILE_NAME_PLACEHOLDER,
-        profileName,
-      ),
-      UNLOCK_DOWNLOAD_QUEUE_MSG,
-    );
+/**
+ * Checks if the error returned by Zowe Explorer is caused
+ * by invalid credentials. Error with status code 401 is returned
+ * in that case.
+ */
+function isInvalidCredentials(e: unknown) {
+  return (
+    hasMember(e, "message") &&
+    typeof e.message === "string" &&
+    e.message.includes(
+      "Rest API failure with HTTP(S) status 401\nThis operation requires authentication.",
+    )
+  );
+}
 
-    return action === UNLOCK_DOWNLOAD_QUEUE_MSG;
-  }
+async function showQueueLockedDialog(profileName: string, message: string) {
+  const action = await vscode.window.showErrorMessage(
+    message,
+    UNLOCK_DOWNLOAD_QUEUE_MSG,
+  );
 
-  /**
-   * Checks if the error returned by Zowe Explorer is caused
-   * by invalid credentials. Error with status code 401 is returned
-   * in that case.
-   */
-  private static isInvalidCredentials(e: unknown) {
-    return (
-      hasMember(e, "message") &&
-      typeof e.message === "string" &&
-      e.message.includes(
-        "Rest API failure with HTTP(S) status 401\nThis operation requires authentication.",
-      )
-    );
-  }
-
-  /**
-   * Returns true if provided credentials are correct but user doesn't
-   * have permission to access selected dataset (ISRZ002)
-   * or uss directory (EDC5111I).
-   */
-  private static isPermissionError(e: unknown) {
-    return (
-      hasMember(e, "message") &&
-      typeof e.message === "string" &&
-      (e.message.includes("EDC5111I Permission denied") ||
-        e.message.includes("ISRZ002 Authorization failed"))
-    );
-  }
-
-  /**
-   * Returns true if provided credentials are correct but
-   * selected dataset or uss folder doesn't exist.
-   */
-  private static isNotFoundError(e: unknown) {
-    return hasMember(e, "code") && e.code === "FileNotFound";
+  if (action === UNLOCK_DOWNLOAD_QUEUE_MSG) {
+    getProfileStatusCached.invalidateCache(profileName, null!, false);
   }
 }
 

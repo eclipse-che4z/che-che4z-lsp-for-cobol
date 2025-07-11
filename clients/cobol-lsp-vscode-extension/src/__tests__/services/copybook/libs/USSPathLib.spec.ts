@@ -25,7 +25,6 @@ import {
 } from "../../../../services/ExternalAPIsService";
 import { Utils } from "../../../../services/util/Utils";
 import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
-import { ProfileUtils } from "../../../../services/util/ProfileUtils";
 import { UssPathLib } from "../../../../services/copybookLibs/UssPathLib";
 import { DEFAULT_DIALECT } from "../../../../constants";
 
@@ -38,9 +37,6 @@ describe("USS copybook lib", () => {
       .spyOn(Utils, "getZoweExplorerAPI")
       .mockResolvedValue({ api: zoweExplorerApiMock });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
-    jest
-      .spyOn(ProfileUtils, "getAvailableProfiles")
-      .mockReturnValue(["profile"]);
     getConfigurationResult["copybook-extensions"] = [".CPY", ".cpy", ""];
   });
 

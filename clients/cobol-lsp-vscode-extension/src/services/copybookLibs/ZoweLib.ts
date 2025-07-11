@@ -16,10 +16,9 @@ import * as vscode from "vscode";
 import { ProfileUtils } from "../util/ProfileUtils";
 import { externalApis, missingExtension } from "../ExternalAPIsService";
 import {
-  DownloadUtil,
+  getProfileStatus,
   MainframeRemoteLocation,
 } from "../copybook/downloader/DownloadUtil";
-import { PROVIDE_PROFILE_MSG_PROC_GRUOPS } from "../../constants";
 
 export abstract class ZoweLib {
   constructor(protected profile?: string) {}
@@ -27,10 +26,7 @@ export abstract class ZoweLib {
   protected getProfile(documentUri: vscode.Uri) {
     return (
       this.profile ??
-      ProfileUtils.getProfileNameForCopybook(
-        documentUri,
-        externalApis.explorerApi,
-      ) ??
+      ProfileUtils.getProfileNameForCopybook(documentUri) ??
       "profile"
     );
   }
@@ -43,25 +39,12 @@ export abstract class ZoweLib {
       return false;
     }
 
-    if (await DownloadUtil.isProfileLocked(profile)) {
-      return false;
-    }
-
-    const availableProfiles = ProfileUtils.getAvailableProfiles(
-      externalApis.explorerApi,
+    const profileStatus = await getProfileStatus(
+      profile,
+      this.credentialsTestLocation(),
+      true,
     );
-    if (!availableProfiles.includes(profile)) {
-      const msg = `${PROVIDE_PROFILE_MSG_PROC_GRUOPS} Provided invalid profile name: ${profile}`;
-      vscode.window.showErrorMessage(msg);
-      return false;
-    }
-
-    if (
-      await DownloadUtil.checkForInvalidCredProfile(
-        profile,
-        this.credentialsTestLocation(),
-      )
-    ) {
+    if (profileStatus === "locked-profile") {
       return false;
     }
 

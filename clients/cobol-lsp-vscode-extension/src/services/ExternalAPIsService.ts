@@ -73,7 +73,6 @@ export function deleteDiagnostics(documentUri: vscode.Uri) {
 }
 
 class ExternalAPIsService {
-  explorerApi: IApiRegisterClient | undefined;
   e4eApi: E4E | undefined;
   dsnService?: CopybookDownloaderForDsn;
   ussService?: CopybookDownloaderForUss;
@@ -119,12 +118,11 @@ class ExternalAPIsService {
   }
 
   public explorerAppeared(api: IApiRegisterClient) {
-    this.explorerApi = api;
-    this.ussService = new CopybookDownloaderForUss(this.explorerApi);
-    this.dsnService = new CopybookDownloaderForDsn(this.explorerApi);
+    this.ussService = new CopybookDownloaderForUss();
+    this.dsnService = new CopybookDownloaderForDsn();
     diagnosticCollection.clear();
-    if (this.explorerApi.onProfileUpdated) {
-      this.explorerApi.onProfileUpdated((profile: IProfileLoaded) => {
+    if (api.onProfileUpdated) {
+      api.onProfileUpdated((profile: IProfileLoaded) => {
         getOutputChannel().appendLine(`Zowe profile ${profile.name} updated`);
         this.clearCache();
         if (this.configurationInvalidation) {

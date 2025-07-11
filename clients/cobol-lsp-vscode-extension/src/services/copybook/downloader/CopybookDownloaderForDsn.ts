@@ -22,7 +22,7 @@ import * as vscode from "vscode";
  * Copybook downloader from MVS using Zowe Explorer
  */
 export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
-  constructor(protected readonly explorerAPI: IApiRegisterClient) {
+  constructor() {
     super();
   }
 
