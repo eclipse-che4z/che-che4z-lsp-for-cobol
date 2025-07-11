@@ -48,20 +48,14 @@ public class CompilerDirectivesErrorListener extends BaseErrorListener {
     Position start = new Position(line - 1, charPositionInLine);
     Position end = new Position(line - 1, ((CommonToken) offendingSymbol).getStopIndex() + 1);
     Range range = CompilerDirectivesUtils.shiftRange(new Range(start, end), startPosition);
-    Location location = analysisContext.getExtendedDocument().mapLocation(range);
-    String copybookId =
-        analysisContext.getCopybooksRepository() == null
-            ? null
-            : analysisContext.getCopybooksRepository().getCopybookIdByUri(location.getUri());
+    Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
     SyntaxError error =
         SyntaxError.syntaxError()
             .errorSource(ErrorSource.PARSING)
             .suggestion(msg)
-            .location(new OriginalLocation(location, copybookId))
+            .location(new OriginalLocation(location, null))
             .severity(ErrorSeverity.ERROR)
             .build();
-    if (!analysisContext.getAccumulatedErrors().contains(error)) {
-      analysisContext.getAccumulatedErrors().add(error);
-    }
+    analysisContext.getAccumulatedErrors().add(error);
   }
 }
