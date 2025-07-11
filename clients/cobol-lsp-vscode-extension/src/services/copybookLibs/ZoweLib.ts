@@ -13,22 +13,18 @@
  */
 
 import * as vscode from "vscode";
-import { ProfileUtils } from "../util/ProfileUtils";
 import { externalApis, missingExtension } from "../ExternalAPIsService";
+
 import {
+  getProfileNameForCopybook,
   getProfileStatus,
-  MainframeRemoteLocation,
-} from "../copybook/downloader/DownloadUtil";
+} from "../util/ProfileUtils";
 
 export abstract class ZoweLib {
   constructor(protected profile?: string) {}
 
   protected getProfile(documentUri: vscode.Uri) {
-    return (
-      this.profile ??
-      ProfileUtils.getProfileNameForCopybook(documentUri) ??
-      "profile"
-    );
+    return this.profile ?? getProfileNameForCopybook(documentUri) ?? "profile";
   }
 
   async configCheck(documentUri: vscode.Uri) {
@@ -41,7 +37,7 @@ export abstract class ZoweLib {
 
     const profileStatus = await getProfileStatus(
       profile,
-      this.credentialsTestLocation(),
+      () => this.accessCheck(profile),
       true,
     );
     if (profileStatus === "locked-profile") {
@@ -51,5 +47,5 @@ export abstract class ZoweLib {
     return true;
   }
 
-  abstract credentialsTestLocation(): MainframeRemoteLocation;
+  abstract accessCheck(profile: string): Promise<void>;
 }

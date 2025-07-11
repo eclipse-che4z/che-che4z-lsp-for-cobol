@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ProfileUtils } from "../../../../services/util/ProfileUtils";
+import * as ProfileUtils from "../../../../services/util/ProfileUtils";
 import * as vscode from "vscode";
 import { TextEncoder } from "util";
 import { SettingsService } from "../../../../services/Settings";
@@ -39,8 +39,8 @@ describe("Tests Copybook download from USS", () => {
     });
 
     it("checks eligibility based on DSN settings", () => {
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
+      jest
+        .spyOn(ProfileUtils, "getProfileNameForCopybook")
         .mockReturnValue("test-profile");
     });
   });

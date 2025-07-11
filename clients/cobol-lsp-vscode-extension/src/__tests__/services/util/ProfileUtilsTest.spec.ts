@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import { ProfileUtils } from "../../../services/util/ProfileUtils";
+import { getProfileNameForCopybook } from "../../../services/util/ProfileUtils";
 
 describe("Test profile Utils", () => {
   const programUri = vscode.Uri.file("/COBOLFILE.cbl");
@@ -22,8 +22,6 @@ describe("Test profile Utils", () => {
       get: jest.fn().mockReturnValue("profileInSettings"),
     });
 
-    expect(ProfileUtils.getProfileNameForCopybook(programUri)).toBe(
-      "profileInSettings",
-    );
+    expect(getProfileNameForCopybook(programUri)).toBe("profileInSettings");
   });
 });

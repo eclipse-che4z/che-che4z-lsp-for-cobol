@@ -20,7 +20,6 @@ import { USS } from "../../constants";
 import * as vscode from "vscode";
 import { externalApis } from "../ExternalAPIsService";
 import { ZoweLib } from "./ZoweLib";
-import { MainframeRemoteLocation } from "../copybook/downloader/DownloadUtil";
 
 export class UssPathLib extends ZoweLib implements CopybookLib {
   constructor(
@@ -100,7 +99,9 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
     return members?.map((m) => m.name) ?? [];
   }
 
-  credentialsTestLocation(): MainframeRemoteLocation {
-    return { uss: this.uss };
+  async accessCheck(profile: string): Promise<void> {
+    await vscode.workspace.fs.stat(
+      vscode.Uri.parse(`zowe-uss:/${profile}${this.uss}`),
+    );
   }
 }

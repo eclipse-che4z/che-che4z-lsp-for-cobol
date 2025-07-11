@@ -18,7 +18,6 @@ import CopybookLib from "./CopybookLib";
 import { LibsDefinitions } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { ZoweLib } from "./ZoweLib";
-import { MainframeRemoteLocation } from "../copybook/downloader/DownloadUtil";
 
 export class DatasetLib extends ZoweLib implements CopybookLib {
   constructor(
@@ -38,8 +37,10 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
     return libs;
   }
 
-  credentialsTestLocation(): MainframeRemoteLocation {
-    return { dsn: this.dsn };
+  async accessCheck(profile: string): Promise<void> {
+    await vscode.workspace.fs.stat(
+      vscode.Uri.parse(`zowe-ds:/${profile}/${this.dsn}`),
+    );
   }
 
   async resolveCopybookUri(
