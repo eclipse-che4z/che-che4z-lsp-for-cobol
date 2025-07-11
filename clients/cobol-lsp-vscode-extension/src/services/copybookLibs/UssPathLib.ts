@@ -90,18 +90,29 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
       dialect,
     );
 
+    const variables = getVariablesFromUri(documentUri, false);
+    const evaluatedPath = SettingsService.evaluateVariables(
+      this.uss,
+      variables,
+    );
+
     const members = await externalApis.ussService?.getAllMembers(
       profile,
-      this.uss,
+      evaluatedPath,
       allowedExtensions,
     );
 
     return members?.map((m) => m.name) ?? [];
   }
 
-  async accessCheck(profile: string): Promise<void> {
+  async accessCheck(profile: string, documentUri: vscode.Uri): Promise<void> {
+    const variables = getVariablesFromUri(documentUri, false);
+    const evaluatedPath = SettingsService.evaluateVariables(
+      this.uss,
+      variables,
+    );
     await vscode.workspace.fs.stat(
-      vscode.Uri.parse(`zowe-uss:/${profile}${this.uss}`),
+      vscode.Uri.parse(`zowe-uss:/${profile}${evaluatedPath}`),
     );
   }
 }

@@ -22,6 +22,7 @@ import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
 import { getOutputChannel } from "./util/OutputChannel";
+import { clearProfiles } from "./util/ProfileUtils";
 
 export let externalApis: ExternalAPIsService;
 const diagnosticCollection: vscode.DiagnosticCollection =
@@ -99,6 +100,7 @@ class ExternalAPIsService {
 
   clearProfiles() {
     this.e4eDownloader?.clearProfiles();
+    clearProfiles();
   }
 
   public handleAsEndevorElement(documentUri: string) {

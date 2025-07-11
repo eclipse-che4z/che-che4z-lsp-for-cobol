@@ -35,10 +35,8 @@ export abstract class ZoweLib {
       return false;
     }
 
-    const profileStatus = await getProfileStatus(
-      profile,
-      () => this.accessCheck(profile),
-      true,
+    const profileStatus = await getProfileStatus(profile, () =>
+      this.accessCheck(profile, documentUri),
     );
     if (profileStatus === "locked-profile") {
       return false;
@@ -47,5 +45,5 @@ export abstract class ZoweLib {
     return true;
   }
 
-  abstract accessCheck(profile: string): Promise<void>;
+  abstract accessCheck(profile: string, documentUri: vscode.Uri): Promise<void>;
 }

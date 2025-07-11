@@ -23,6 +23,7 @@ import {
 import { hasMember } from "../util/Utils";
 import { registerExceptionEvent } from "../reporter";
 import { Memoize } from "../util/Memoize";
+import { getOutputChannel } from "./OutputChannel";
 
 export function getProfileNameForCopybook(
   documentUri: vscode.Uri,
@@ -50,12 +51,14 @@ function getProfileFromDocument(documentUri: vscode.Uri): string | undefined {
 }
 
 const getProfileStatusCached = new Memoize(
-  testZoweAccess,
+  (profileName: string, check: () => Promise<void>) =>
+    testZoweAccess(profileName, check, true),
   undefined,
   (profileName: string) => profileName,
 );
 
 export const getProfileStatus = getProfileStatusCached.execute;
+export const clearProfiles = getProfileStatusCached.clearCache;
 
 async function testZoweAccess(
   profileName: string,
@@ -89,6 +92,9 @@ async function testZoweAccess(
     }
 
     // unknown type of error, register it and assume profile is ok
+    getOutputChannel().error(
+      `Unknown error while validating ZOWE profile ${profileName}: ${JSON.stringify(err)}`,
+    );
     registerExceptionEvent(
       "InvalidCredentialsException",
       JSON.stringify(err),
@@ -153,6 +159,6 @@ async function showQueueLockedDialog(profileName: string, message: string) {
   );
 
   if (action === UNLOCK_DOWNLOAD_QUEUE_MSG) {
-    getProfileStatusCached.invalidateCache(profileName, null!, false);
+    getProfileStatusCached.invalidateCache(profileName, null!);
   }
 }
