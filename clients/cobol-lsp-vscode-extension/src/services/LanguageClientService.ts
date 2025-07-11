@@ -19,6 +19,9 @@ import * as vscode from "vscode";
 
 import {
   DidChangeConfigurationNotification,
+  DidChangeWatchedFilesNotification,
+  FileChangeType,
+  FileEvent,
   GenericNotificationHandler,
   GenericRequestHandler,
   LanguageClient,
@@ -36,6 +39,7 @@ import {
   setUpProcessorGroupConfigWatcher,
   setUpProgramConfigWatcher,
 } from "./ProcessorGroups";
+import { localCopybooks } from "./copybook/LocalCopybooksService";
 
 const extensionId = "BroadcomMFD.cobol-language-support";
 
@@ -124,6 +128,30 @@ export class LanguageClientService {
     );
   }
 
+  private fileChanges: FileEvent[] = [];
+  private fileChangeTimer: ReturnType<typeof setTimeout> | undefined =
+    undefined;
+  public sendFileChangeNotification(file: vscode.Uri) {
+    this.fileChanges.push({
+      uri: file.toString(),
+      type: FileChangeType.Changed,
+    });
+    if (this.fileChangeTimer !== undefined) return;
+    this.fileChangeTimer = setTimeout(() => {
+      const changes = this.fileChanges;
+      this.fileChangeTimer = undefined;
+      this.fileChanges = [];
+
+      const languageClient = this.getLanguageClient();
+      void languageClient.sendNotification(
+        DidChangeWatchedFilesNotification.type,
+        {
+          changes,
+        },
+      );
+    }, 250);
+  }
+
   public async start() {
     const languageClient = this.getLanguageClient();
     await languageClient.start();
@@ -147,6 +175,9 @@ export class LanguageClientService {
         this.createServerOptions(this.executablePath)!,
         this.createClientOptions(),
       );
+      localCopybooks.registerFileChangeWatcher((uri: vscode.Uri) =>
+        this.sendFileChangeNotification(uri),
+      );
     }
     return this.languageClient;
   }
@@ -164,6 +195,18 @@ export class LanguageClientService {
             new vscode.RelativePattern(this.storagePath, "**/*"),
           ),
           setupBridge4GitWatcher(),
+          vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(
+              vscode.Uri.from({ scheme: "zowe-uss", path: "/" }),
+              "**/*",
+            ),
+          ),
+          vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(
+              vscode.Uri.from({ scheme: "zowe-ds", path: "/" }),
+              "**/*",
+            ),
+          ),
         ],
       },
     };

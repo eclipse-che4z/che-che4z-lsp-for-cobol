@@ -27,8 +27,8 @@ describe("LocalSubroutinesService tests", () => {
     jest
       .spyOn(vscode.workspace, "findFiles")
       .mockImplementation((pattern: vscode.GlobPattern) => {
-        if (pattern instanceof Object && "base" in pattern) {
-          const files = folderContent[pattern.base] ?? [];
+        if (pattern instanceof Object && "baseUri" in pattern) {
+          const files = folderContent[pattern.baseUri.toString()] ?? [];
           return Promise.resolve(files.map(vscode.Uri.file));
         }
         return Promise.resolve([]);

@@ -274,8 +274,8 @@
   },
   "COLLATING": {
     "prefix": "COLLATING",
-    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBDIC,ASCII|}"],
-    "description": "Part of the IDENTIFICATION DIVISION. Note that the default option is EBCDIC"
+    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBCDIC,ASCII|}"],
+    "description": "IDENTIFICATION DIVISION - COLLATING SEQUENCE determines the type of sequence used in operations on alphanumeric items. (EBCDIC vs. ASCII)"
   },
   "COMP": {
     "prefix": "COMP",
@@ -1782,7 +1782,7 @@
   "LESS": {
     "prefix": "LESS",
     "body": [
-      "IF ${1:VAR1} LESS THEN ${2:VAR2} THEN",
+      "IF ${1:VAR1} LESS THAN ${2:VAR2} THEN",
       "\t${3:ifTrue}",
       "END-IF."
     ],
@@ -2704,8 +2704,8 @@
   },
   "SEQUENCE": {
     "prefix": "SEQUENCE",
-    "body": ["SEQUENCE ${1:item}"],
-    "description": "SEQUENCE"
+    "body": ["PROGRAM COLLATING SEQUENCE IS ${1|EBCDIC,ASCII|}"],
+    "description": "COLLATING SEQUENCE determines the type of sequence used in operations on alphanumeric items. (EBCDIC vs. ASCII)"
   },
   "SEQUENTIAL": {
     "prefix": "SEQUENTIAL",
@@ -2945,7 +2945,7 @@
   "COMPUTE SUM (Values)": {
     "prefix": "SUM",
     "body": [
-      "COMPUTE ${1:resultNum} = FUNCTION SUM(${2:arg-1}),${3:arg-2},${4:arg-3})"
+      "COMPUTE ${1:resultNum} = FUNCTION SUM(${2:arg-1},${3:arg-2},${4:arg-3})"
     ],
     "description": "The SUM function returns a value that is the sum of the arguments."
   },
@@ -3215,6 +3215,15 @@
       "\tUNTIL ${3:TBL-IDX} >= ${4:WS-TBL-MAX}."
     ],
     "description": "PROCEDURE DIVISION - VARYING increases or decreases the value of one or more variable subscripts or table indexes. Note that the PERFORM statement can be an inline PERFORM that varies a variable from low-to-high."
+  },
+  "RECORD IS VARYING": {
+    "prefix": "VARYING",
+    "body": [
+      "FD ${1:MSTR-FILE}",
+      "\tRECORDING MODE IS VB",
+      "\tRECORD IS VARYING FROM ${1:10} TO ${2:200} CHARACTERS."
+    ],
+    "description": "VARYING in a COBOL FD or SD describes the lowest and highest number of bytes contained in the variable length file."
   },
   "VOLATILE": {
     "prefix": "VOLATILE",

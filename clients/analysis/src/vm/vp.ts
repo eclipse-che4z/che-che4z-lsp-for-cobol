@@ -41,7 +41,7 @@ export class VirtualProcessor {
       }
       // Guard condition
       if (this.vms.length > this.maxVmCount) {
-        this.listener.maximumVMCountReached();
+        this.listener.maximumVMCountReached(this.maxVmCount);
         return;
       }
     }

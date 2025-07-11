@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
+import org.eclipse.lsp.cobol.lsp.events.notifications.DidOpenNotification;
 import org.eclipse.lsp.cobol.lsp.events.queries.CompletionQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
@@ -101,7 +102,8 @@ class CobolTextDocumentServiceTest {
         new AnalysisHandler(
             asyncAnalysisService, analysisService, builder, communications, documentModelService);
 
-    DidOpenHandler didOpenHandler = new DidOpenHandler(asyncAnalysisService, watcherService);
+    DidOpenHandler didOpenHandler =
+        new DidOpenHandler(asyncAnalysisService, mock(SourceUnitGraph.class));
     DidCloseHandler didCloseHandler =
         new DidCloseHandler(
             disposableLSPStateService,
@@ -176,12 +178,8 @@ class CobolTextDocumentServiceTest {
   @Test
   void testDidOpen() {
     DidOpenTextDocumentParams params = mock(DidOpenTextDocumentParams.class);
-    TextDocumentItem textDocumentItem = mock(TextDocumentItem.class);
-    when(params.getTextDocument()).thenReturn(textDocumentItem);
-    when(textDocumentItem.getUri()).thenReturn(URI);
-    when(documentModelService.get(anyString())).thenReturn(new CobolDocumentModel(URI));
     service.didOpen(params);
-    Mockito.verify(lspMessageBroker, times(0)).query(any());
+    Mockito.verify(lspMessageBroker, times(1)).notify(any(DidOpenNotification.class));
   }
 
   @Test

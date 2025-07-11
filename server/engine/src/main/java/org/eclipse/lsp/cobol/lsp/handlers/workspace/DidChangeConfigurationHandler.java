@@ -95,21 +95,25 @@ public class DidChangeConfigurationHandler {
     settingsService
         .fetchConfiguration(COBOL_PROGRAM_LAYOUT.label)
         .thenAccept(codeLayoutStore.updateCodeLayout());
-    settingsService
-        .fetchConfiguration(ANALYSIS_MODE.label)
-        .thenAccept(errorFinalizerService::updateDiagnosticsLevel);
     copybookNameService.collectLocalCopybookNames();
     reanalyseIfRequired();
   }
 
   private void reanalyseIfRequired() {
     List<String> prevDialects = keywords.getDialectType();
+    CompletableFuture<Boolean> analysisModeFuture =
+        settingsService
+            .fetchConfiguration(ANALYSIS_MODE.label)
+            .thenApply(errorFinalizerService::updateDiagnosticsLevel);
     CompletableFuture<Boolean> copybookFolderFuture =
         copybookNameService
             .copybookLocalFolders(null)
             .thenApply(
                 localFolders -> {
                   List<String> watchingFolders = watchingService.getWatchingFolders();
+                  // TODO: remove below patch when proper solution exists
+                  // client doesnt return locale path to server now.
+                  if (localFolders.isEmpty() && watchingFolders.isEmpty()) return true;
                   if (!new HashSet<>(watchingFolders).equals(new HashSet<>(localFolders))) {
                     acceptSettingsChange(localFolders);
                     return true;
@@ -124,6 +128,7 @@ public class DidChangeConfigurationHandler {
                     !new HashSet<>(prevDialects).equals(new HashSet<>(keywords.getDialectType())));
     copybookFolderFuture
         .thenCombine(dialectFuture, (b1, b2) -> b1 || b2)
+        .thenCombine(analysisModeFuture, (b1, b2) -> b1 || b2)
         .thenAccept(
             shouldReAnalyse -> {
               if (shouldReAnalyse) {

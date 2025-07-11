@@ -21,7 +21,6 @@ import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidOpenNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
-import org.eclipse.lsp.cobol.service.WatcherService;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 
 /** LSP DidOpen Handler */
@@ -29,12 +28,13 @@ import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 public class DidOpenHandler {
 
   private final AsyncAnalysisService asyncAnalysisService;
-  private final WatcherService watcherService;
+  private final SourceUnitGraph sourceUnitGraph;
 
   @Inject
-  public DidOpenHandler(AsyncAnalysisService asyncAnalysisService, WatcherService watcherService) {
+  public DidOpenHandler(
+      AsyncAnalysisService asyncAnalysisService, SourceUnitGraph sourceUnitGraph) {
     this.asyncAnalysisService = asyncAnalysisService;
-    this.watcherService = watcherService;
+    this.sourceUnitGraph = sourceUnitGraph;
   }
 
   /**
@@ -48,9 +48,15 @@ public class DidOpenHandler {
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }
-    watcherService.addRuntimeWatchers(uri);
     asyncAnalysisService.openDocument(
         uri, params.getTextDocument().getText(), params.getTextDocument().getLanguageId());
+
+    if (this.asyncAnalysisService.isCopybook(uri, params.getTextDocument().getText())
+        || this.sourceUnitGraph.isUserSuppliedCopybook(uri)) {
+      asyncAnalysisService.republishDiagnostics();
+      return;
+    }
+
     asyncAnalysisService.scheduleAnalysis(
         uri,
         params.getTextDocument().getText(),

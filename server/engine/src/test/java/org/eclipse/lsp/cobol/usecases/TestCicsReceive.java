@@ -352,7 +352,8 @@ public class TestCicsReceive {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: INTO when specifying MAP param without literal",
+                "Exactly one option required, none provided: INTO or SET when specifying MAP"
+                    + " param without literal",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -388,7 +389,8 @@ public class TestCicsReceive {
             "errorOne",
             new Diagnostic(
                 new Range(),
-                "Missing required option: INTO when specifying MAP param without literal",
+                "Exactly one option required, none provided: INTO or SET when specifying MAP"
+                    + " param without literal",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());

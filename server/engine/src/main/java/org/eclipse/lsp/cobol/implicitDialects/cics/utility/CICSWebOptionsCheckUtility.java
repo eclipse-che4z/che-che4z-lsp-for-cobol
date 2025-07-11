@@ -252,16 +252,19 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
       checkHasIllegalOptions(
           ctx.USERNAMELEN(), "USERNAMELEN without NONE, BASICAUTH or AUTHENTICATE");
     }
-
-    checkMutuallyExclusiveOptions(
-        "INTO, SET or TOCONTAINER", ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
+    if (!ctx.TOLENGTH().isEmpty())
+      checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+    else
+      checkHasExactlyOneOption(
+          "INTO, SET or TOCONTAINER", ctx, ctx.INTO(), ctx.SET(), ctx.TOCONTAINER());
     checkPrerequisiteIsMet(
         ctx.TOCONTAINER(), ctx.TOCHANNEL(), ctx, "TOCHANNEL without TOCONTAINER");
 
-    checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
-
-    if (!ctx.TOLENGTH().isEmpty())
-      checkHasExactlyOneOption("INTO or SET", ctx, ctx.INTO(), ctx.SET());
+    if (!ctx.INTO().isEmpty() || !ctx.SET().isEmpty()) {
+      checkHasMandatoryOptions(ctx.TOLENGTH(), ctx, "TOLENGTH");
+      if (noLengthOptionsEnabled() && !ctx.INTO().isEmpty())
+        checkHasMandatoryOptions(ctx.MAXLENGTH(), ctx, "MAXLENGTH");
+    }
 
     checkAllOptionsArePresentOrAbsent(
         "STATUSCODE, STATUSTEXT, STATUSLEN",
@@ -278,7 +281,6 @@ public class CICSWebOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
         ctx.NOCLICONVERT(),
         ctx.CLIENTCONV());
     checkOptionalWithLength(ctx.PATH(), ctx.PATHLENGTH(), ctx, "PATH", "PATHLENGTH");
-    checkOptionalWithLength(ctx.INTO(), ctx.MAXLENGTH(), ctx, "INTO", "MAXLENGTH");
     checkOptionalWithLength(ctx.PASSWORD(), ctx.PASSWORDLEN(), ctx, "PASSWORD", "PASSWORDLEN");
     checkOptionalWithLength(ctx.USERNAME(), ctx.USERNAMELEN(), ctx, "USERNAME", "USERNAMELEN");
   }

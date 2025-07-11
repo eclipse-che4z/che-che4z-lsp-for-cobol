@@ -42,7 +42,9 @@ export async function listLocalSubroutines(
 
   results.forEach((result) => {
     if (result.status === "fulfilled") {
-      result.value.forEach((subroutine) => subroutines.push(subroutine));
+      result.value.forEach((subroutine) =>
+        subroutines.push(subroutine.filename),
+      );
     } else {
       outputChannel?.appendLine(
         `Unable to load subroutines completions: ${result.reason}`,

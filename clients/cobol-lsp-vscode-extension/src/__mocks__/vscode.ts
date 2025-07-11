@@ -18,15 +18,23 @@ import type {
   Position as PositionType,
   Uri as UriType,
 } from "vscode";
-import { Uri as UriMock } from "./UriMock";
+import { URI, Utils } from "vscode-uri";
 
 import { readFile } from "fs/promises";
+
+export const readDirectoryResult: {
+  [path: string]:
+    | (string | { name: string; mode?: string } | [string, FileType])[]
+    | Error;
+} = {};
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
   export const workspaceFolders = [
     {
-      uri: UriMock.parse("/"),
+      name: "workspace",
+      uri: URI.parse("/workspace"),
+      index: 0,
     },
   ];
   export function getConfiguration() {
@@ -44,6 +52,7 @@ export namespace workspace {
       onDidCreate: jest.fn(),
       onDidDelete: jest.fn(),
       onDidChange: jest.fn(),
+      dispose: jest.fn(),
     };
   }
   export const fs = {
@@ -57,8 +66,35 @@ export namespace workspace {
     },
     writeFile: jest.fn(),
     delete: jest.fn().mockReturnValue(true),
-    readDirectory: jest.fn().mockResolvedValue([["fileName", 2]]),
+    readDirectory: jest.fn().mockImplementation((uri: UriType) => {
+      const resultKey = Object.keys(readDirectoryResult).find(
+        (key: string) => uri.path === key,
+      );
+      if (!resultKey) {
+        return Promise.resolve([]);
+      }
+      const result = readDirectoryResult[resultKey];
+      if (result instanceof Error) {
+        throw result;
+      } else {
+        return Promise.resolve(
+          result.map((file) => {
+            if (typeof file === "string") {
+              return [`${file}.cpy`, FileType.File];
+            } else if (Array.isArray(file)) {
+              return file;
+            } else if (typeof file === "object") {
+              return [
+                file.name,
+                file.mode?.startsWith("d") ? FileType.Directory : FileType.File,
+              ];
+            }
+          }),
+        );
+      }
+    }),
     createDirectory: jest.fn(),
+    stat: jest.fn(),
   };
 
   export const onDidChangeConfiguration = jest
@@ -92,6 +128,7 @@ export namespace window {
     .fn()
     .mockImplementation(() => Promise.resolve());
   export const showInformationMessage = jest.fn().mockReturnValue("Ok");
+  export const showInputBox = jest.fn();
   export const createStatusBarItem = () => {
     return { show: () => {} };
   };
@@ -139,7 +176,8 @@ export enum StatusBarAlignment {
   Right,
 }
 
-export const Uri = UriMock;
+export const Uri = URI;
+Object.assign(Uri, Utils);
 
 export enum ConfigurationTarget {
   Global = 1,
@@ -232,7 +270,7 @@ export const languages = {
   }),
 };
 
-class FileNotFound extends Error {
+export class FileNotFound extends Error {
   code: string;
   constructor() {
     super();
@@ -248,8 +286,8 @@ export const FileSystemError = {
 
 export const RelativePattern = jest
   .fn()
-  .mockImplementation((base: string, pattern: string) => ({
-    base,
+  .mockImplementation((baseUri: URI, pattern: string) => ({
+    baseUri,
     pattern,
   }));
 
@@ -267,4 +305,11 @@ export enum DiagnosticSeverity {
   Warning = 1,
   Information = 2,
   Hint = 3,
+}
+
+export enum FileType {
+  Unknown = 0,
+  File = 1,
+  Directory = 2,
+  SymbolicLink = 64,
 }

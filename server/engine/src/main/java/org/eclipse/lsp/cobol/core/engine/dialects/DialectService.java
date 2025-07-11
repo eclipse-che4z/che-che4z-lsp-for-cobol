@@ -28,6 +28,7 @@ import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.copybook.CopybookModel;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
+import org.eclipse.lsp.cobol.common.copybook.PredefinedCopybookStore;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
@@ -54,6 +55,9 @@ public class DialectService {
   private final Map<String, CobolDialect> dialectSuppliers;
   private final DialectDiscoveryService discoveryService;
   private final CopybookService copybookService;
+
+  private final PredefinedCopybookStore predefinedCopybookService;
+
   private final MessageService messageService;
   private final ErrorFinalizerService errorFinalizerService;
 
@@ -61,8 +65,10 @@ public class DialectService {
   public DialectService(
       DialectDiscoveryService discoveryService,
       CopybookService copybookService,
+      PredefinedCopybookStore predefinedCopybookService,
       MessageService messageService,
       ErrorFinalizerService errorFinalizerService) {
+    this.predefinedCopybookService = predefinedCopybookService;
     this.errorFinalizerService = errorFinalizerService;
     this.dialectSuppliers = new HashMap<>();
     this.discoveryService = discoveryService;
@@ -382,7 +388,7 @@ public class DialectService {
     dialects.addAll(getActiveImplicitDialects(config));
     for (CobolDialect dialect : dialects) {
       List<CopybookModel> predefinedCopybook = dialect.getPredefinedCopybook(config);
-      predefinedCopybook.forEach(model -> copybookService.store(model, preprocessor));
+      predefinedCopybook.forEach(model -> predefinedCopybookService.store(model, preprocessor));
     }
   }
 }

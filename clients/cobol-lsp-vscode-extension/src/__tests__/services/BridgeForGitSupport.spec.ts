@@ -18,7 +18,7 @@ import { loadProcessorsConfigForDocument } from "../../services/ProcessorGroups"
 jest.mock("vscode", () => {
   /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
   const vscode = jest.requireActual("../../__mocks__/vscode");
-  const WS_URI = new vscode.Uri("/c:/my/workspace");
+  const WS_URI = vscode.Uri.file("c:/my/workspace");
   return {
     ...vscode,
     workspace: {

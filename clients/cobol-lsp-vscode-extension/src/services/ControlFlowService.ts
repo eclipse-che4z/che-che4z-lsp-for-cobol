@@ -20,12 +20,16 @@ import {
   DiagnosticRelatedInformationDto,
   DiagnosticSeverityDto,
   DiagnosticTagDto,
+  EventDto,
   LocationDto,
   RangeDto,
 } from "@code4z/analysis/lib/model/external";
 import { SettingsService } from "./Settings";
 import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
+import { registerEvent, registerExceptionEvent } from "./reporter";
+
+const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
 /**
  * Control Flow Analysis callback
@@ -51,6 +55,7 @@ interface AnalysisServiceDelegate {
     graphs: GraphDTO[],
     locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
+    events: EventDto[],
     requestVersion: number,
   ): void;
 }
@@ -98,6 +103,7 @@ export class AnalysisTask {
           data.payload.graphs,
           data.payload.locations,
           convertDiagnostics(data.payload.diagnostics),
+          data.payload.events,
           this.requestVersion,
         );
       } else if (data.type === "log") {
@@ -123,7 +129,11 @@ export class AnalysisTask {
       this.mainChannel?.appendLine(
         `Error starting Control Flow Analysis: ${code}`,
       );
-      this.delegate.finishTask(this.documentUri, [], [], new Map(), 0);
+      const event: EventDto = {
+        eventName: EVENT_ANALYSIS_ERROR,
+        message: `Error starting Control Flow Analysis: ${code}`,
+      };
+      this.delegate.finishTask(this.documentUri, [], [], new Map(), [event], 0);
     });
 
     this.worker.postMessage({
@@ -224,6 +234,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     graphs: GraphDTO[],
     locations: string[],
     diagnostics: Map<string, vscode.Diagnostic[]>,
+    events: EventDto[],
     requestVersion: number,
   ): void {
     this.logChannel?.debug(
@@ -251,6 +262,14 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
 
     this.diagnosticService.showAllDiagnostics(documentUri, diagnostics);
+    events.forEach((event) => {
+      if ("eventName" in event) {
+        registerEvent(event.eventName, ["ccf"], event.message);
+      } else {
+        registerExceptionEvent(event.errorName, event.message, ["ccf"]);
+      }
+    });
+
     this.tasks.delete(documentUri);
   }
 

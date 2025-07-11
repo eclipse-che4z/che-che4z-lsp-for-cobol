@@ -16,50 +16,9 @@ export const getContentMock = jest.fn();
 export const getUSSContentsMock = jest.fn();
 export const allMemberMock = jest.fn().mockReturnValue({
   apiResponse: {
-    items: [
-      {
-        member: "copybook",
-      },
-      { member: "DATASET2" },
-    ],
+    items: [],
   },
 });
-class MemberError extends Error {
-  mDetails: {
-    errorCode: number;
-  };
-
-  constructor(message: string, errorCode: number) {
-    super(message);
-    this.mDetails = {
-      errorCode,
-    };
-  }
-}
-
-export const unauthorizedErrorMock = jest
-  .fn()
-  .mockRejectedValue(
-    new MemberError(
-      "Rest API failure with HTTP(S) status 401\nThis operation requires authentication.\nToken is not valid or expired.",
-      401,
-    ),
-  );
-export const notFoundErrorMock = jest
-  .fn()
-  .mockRejectedValue(
-    new MemberError(
-      "Rest API failure with HTTP(S) status 404\nISRZ002 Data set not cataloged",
-      404,
-    ),
-  );
-export const permissionsErrorMock = jest.fn().mockRejectedValue(
-  new MemberError(
-    `Rest API failure with HTTP(S) status 500
-ISRZ002 Authorization failed - You may not use this protected data set. Open 913 abend.`,
-    500,
-  ),
-);
 
 export const mvsApiMock = (allMembers = allMemberMock) =>
   jest.fn().mockReturnValue({
@@ -69,11 +28,7 @@ export const mvsApiMock = (allMembers = allMemberMock) =>
 
 export const allUSSFilemembers = jest.fn().mockReturnValue({
   apiResponse: {
-    items: [
-      { name: "uss_copybook", mode: "-rwxr-xr-x" },
-      { name: "uss_withExt.cpy", mode: "-rwxr-xr-x" },
-      { name: "USS_DATASET2", mode: "-rwxr-xr-x" },
-    ],
+    items: [],
   },
 });
 
@@ -97,4 +52,5 @@ export const createZoweExplorerMock = (
   getMvsApi: mvsApiMock(allMembers),
   getUssApi: ussApiMock(fileList),
   registeredApiTypes: jest.fn().mockReturnValue([]),
+  onProfileUpdated: jest.fn(),
 });

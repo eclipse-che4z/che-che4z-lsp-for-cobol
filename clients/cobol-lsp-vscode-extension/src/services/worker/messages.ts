@@ -15,6 +15,7 @@ import { Program } from "@code4z/analysis/lib/model/cfast";
 import {
   DiagnosticDto,
   DiagnosticSeverityDto,
+  EventDto,
 } from "@code4z/analysis/lib/model/external";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 
@@ -33,6 +34,7 @@ export type WorkerProcessingResult = {
   graphs: GraphDTO[];
   locations: string[];
   diagnostics: Map<string, DiagnosticDto[]>;
+  events: EventDto[];
 };
 
 export type WorkerResultMessage =

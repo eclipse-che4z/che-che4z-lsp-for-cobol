@@ -13,92 +13,20 @@
  */
 
 import { CopybookDownloaderForDsn } from "../../../../services/copybook/downloader/CopybookDownloaderForDsn";
-import { ProfileUtils } from "../../../../services/util/ProfileUtils";
-import {
-  createZoweExplorerMock,
-  allMemberMock,
-  getContentMock,
-} from "../../../../__mocks__/getZoweExplorerMock.utility";
+import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import * as vscode from "vscode";
-import { TextEncoder } from "util";
-import { SettingsService } from "../../../../services/Settings";
+import { readDirectoryResult } from "../../../../__mocks__/vscode";
 
 describe("Tests Copybook download from DNS", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest
-      .spyOn(vscode.workspace.fs, "readFile")
-      .mockReturnValue(
-        Promise.resolve(new TextEncoder().encode("copybook content")),
-      );
+    readDirectoryResult["/profile/dataset"] = ["copybook"];
   });
 
   describe("checks the copybook download using ZE DSN API's", () => {
-    const downloader = new CopybookDownloaderForDsn(
-      "storage-path",
-      createZoweExplorerMock(),
-    );
-    it("checks not eligible copybook are not downloaded", async () => {
-      const isDowloaded = await downloader.downloadCopybook(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isDowloaded).toBeFalsy();
-    });
-
-    it("checks eligible copybook which are not present in the DSN provided do not invoke ZE Api's", async () => {
-      const isDowloaded = await downloader.downloadCopybook(
-        { name: "copybook-name", dialect: "COBOL" },
-        "document-uri",
-        "DNS.PATH",
-      );
-      expect(isDowloaded).toBeFalsy();
-    });
+    const downloader = new CopybookDownloaderForDsn(createZoweExplorerMock());
 
     describe("checks eligible copybook invoke appropriate ZE Api's", () => {
-      ProfileUtils.getProfileNameForCopybook = jest
-        .fn()
-        .mockReturnValue("test-profile");
-      SettingsService.getCopybookFileEncoding = jest
-        .fn()
-        .mockReturnValue("utf8");
-      vscode.Uri.joinPath = jest
-        .fn()
-        .mockReturnValue({ fsPath: "profile/dsn.path/copybook" });
-
-      it("checks appropriate call for ZE API's", async () => {
-        downloader.clearMemberListCache();
-        const isDowloaded = await downloader.downloadCopybook(
-          { name: "copybook", dialect: "COBOL" },
-          "DNS.PATH",
-          "profile",
-        );
-        expect(allMemberMock).toHaveBeenCalledWith("DNS.PATH");
-        expect(getContentMock).toHaveBeenCalledWith("DNS.PATH(copybook)", {
-          file: "profile/dsn.path/copybook",
-          binary: true,
-          returnEtag: true,
-        });
-        expect(isDowloaded).toBeTruthy();
-      });
-
-      it("checks cache is used if download is trigged again for same profile and dataset", async () => {
-        // trigger download again and check cache impl
-        const isDowloaded = await downloader.downloadCopybook(
-          { name: "copybook", dialect: "COBOL" },
-          "DNS.PATH",
-          "profile",
-        );
-        // cache resolves the members
-        expect(allMemberMock).not.toHaveBeenCalled();
-        expect(getContentMock).toHaveBeenCalledWith("DNS.PATH(copybook)", {
-          file: "profile/dsn.path/copybook",
-          binary: true,
-          returnEtag: true,
-        });
-        expect(isDowloaded).toBeTruthy();
-      });
       it("checks hasMember adds fetched list to cache when cache doesn't have the member and hasMember uses cache when have member is cached", async () => {
         await downloader.hasMember("profile", "dataset", "copybook");
         const res = await downloader.hasMember(
@@ -106,8 +34,8 @@ describe("Tests Copybook download from DNS", () => {
           "dataset",
           "copybook",
         );
-        expect(allMemberMock).toHaveBeenCalledTimes(1);
-        expect(res).toStrictEqual(true);
+        expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(1);
+        expect(res).toStrictEqual({ extension: ".cpy", name: "copybook" });
       });
     });
   });

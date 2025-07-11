@@ -158,7 +158,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitCicsDfhRespLiteral(CICSParser.CicsDfhRespLiteralContext ctx) {
+  public List<Node> visitCicsDfhResp(CICSParser.CicsDfhRespContext ctx) {
     addReplacementContext(ctx);
     return visitChildren(ctx);
   }
@@ -196,7 +196,7 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitCicsDfhValueLiteral(CICSParser.CicsDfhValueLiteralContext ctx) {
+  public List<Node> visitCicsDfhValue(CICSParser.CicsDfhValueContext ctx) {
     addReplacementContext(ctx);
     return visitChildren(ctx);
   }

@@ -53,6 +53,7 @@ jest.mock("@code4z/analysis/lib/graphbuilder", () => ({
         enters: [],
         locations: [],
         diagnostics: [],
+        events: [],
       };
     }
   },
@@ -62,6 +63,7 @@ let payload = {
   graphs: [],
   locations: [],
   diagnostics: new Map(),
+  events: [],
 } as unknown;
 
 let messageType = "result";

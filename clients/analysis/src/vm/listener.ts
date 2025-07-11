@@ -36,8 +36,9 @@ export interface VirtualProcessorListener {
 
   /**
    * Fires when Virtual Processor reach the maximum VM count
+   * @param limit - VM count limit
    */
-  maximumVMCountReached(): void;
+  maximumVMCountReached(limit: number): void;
 
   /**
    * Fires when latest statement of the program was executed and control falls down

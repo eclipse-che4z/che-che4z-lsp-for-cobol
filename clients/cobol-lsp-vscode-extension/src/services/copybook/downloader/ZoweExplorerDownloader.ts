@@ -12,106 +12,23 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as vscode from "vscode";
-import * as iconv from "iconv-lite";
-import { SettingsService } from "../../Settings";
-import { CopybookURI } from "../CopybookURI";
-import { getErrorMessage } from "../../util/ErrorsUtils";
 import { FAILED_REQUESTS_LIMIT } from "../../../constants";
 import { hasMember } from "../../util/Utils";
+
+export interface MemberCacheItem {
+  name: string;
+  extension?: string;
+}
 
 export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
     new Map();
-  protected memberListCache: Map<string, string[]> = new Map();
+  protected memberListCache: Map<string, MemberCacheItem[]> = new Map();
   protected failedRequests: Map<string, number> = new Map();
-  private ZoweDownloadQueue = new Map<string, Promise<boolean>>();
+  protected abstract schema: string;
+  protected abstract separator: string;
 
-  public clearZoweDownloadQueue() {
-    this.ZoweDownloadQueue.clear();
-  }
-
-  constructor(
-    private readonly storagePath: string,
-    protected readonly explorerAPI: IApiRegisterClient,
-  ) {}
-
-  protected abstract downloadCopybookContent(
-    dataset: string,
-    member: string,
-    profileName: string,
-  ): Promise<boolean>;
-
-  protected getDownloadOptions(
-    profileName: string,
-    dataset: string,
-    member: string,
-    loadedProfile: IProfileLoaded,
-  ) {
-    const copybookEncoding = SettingsService.getCopybookFileEncoding();
-    const baseUri = CopybookURI.createDatasetPath(
-      [profileName],
-      dataset,
-      this.storagePath,
-    );
-    const fileUri = vscode.Uri.joinPath(baseUri, member);
-    return {
-      apiOptions: {
-        file: fileUri.fsPath,
-        returnEtag: true,
-        ...(copybookEncoding
-          ? { binary: true }
-          : { encoding: loadedProfile.profile.encoding }),
-      },
-      fileUri,
-      decode: copybookEncoding,
-    };
-  }
-
-  protected async decodeBinaryContent(
-    filePath: vscode.Uri,
-    encoding: string,
-    insertNewLineOn80Char: boolean = false,
-  ) {
-    const fileContents = await vscode.workspace.fs.readFile(filePath);
-    let newContent = iconv.decode(Buffer.from(fileContents), encoding);
-
-    if (insertNewLineOn80Char) {
-      // Based on assumption - Most of source code on z/OS is 80 characters per record - JCL, HLASM, COBOL
-      // Can be exposed later on as a setting.
-      newContent = newContent.replace(/.{80}/g, `$&\n`);
-    }
-    const writeData = Buffer.from(newContent, "utf8");
-    await vscode.workspace.fs.writeFile(filePath, writeData);
-  }
-
-  protected async downloadCopybookFromMFUsingZowe(
-    dataset: string,
-    member: string,
-    profileName: string,
-  ): Promise<boolean> {
-    const copybookPath = CopybookURI.createCopybookPath(
-      [profileName],
-      dataset,
-      member,
-      this.storagePath,
-    );
-
-    const queueResponse = this.ZoweDownloadQueue.get(copybookPath);
-    if (queueResponse) {
-      return queueResponse;
-    }
-    const response = this.downloadCopybookContent(dataset, member, profileName)
-      .catch((err: unknown) => {
-        const message = getErrorMessage(err);
-        vscode.window.showErrorMessage(
-          message ?? "Unable to download copybook",
-        );
-        return false;
-      })
-      .finally(() => this.ZoweDownloadQueue.delete(copybookPath));
-    this.ZoweDownloadQueue.set(copybookPath, response);
-    return response;
-  }
+  constructor(protected readonly explorerAPI: IApiRegisterClient) {}
 
   protected createId(profileName: string, path: string) {
     return `${profileName}-${path}`;
@@ -157,6 +74,35 @@ export abstract class ZoweExplorerDownloader {
 
         throw err;
       }
+    }
+  }
+
+  public async hasMember(
+    profileName: string,
+    uss: string,
+    copybookName: string,
+  ): Promise<MemberCacheItem | undefined> {
+    const members = await this.getAllMembers(profileName, uss);
+    copybookName = copybookName.toUpperCase();
+    return members.find((member) => member.name.toUpperCase() === copybookName);
+  }
+
+  public abstract getAllMembers(
+    profileName: string,
+    dataset: string,
+  ): Promise<MemberCacheItem[]>;
+
+  public async resolveCopybookUri(
+    profileName: string,
+    dataset: string,
+    copybookName: string,
+  ) {
+    const member = await this.hasMember(profileName, dataset, copybookName);
+
+    if (member) {
+      return vscode.Uri.parse(
+        `${this.schema}:/${profileName}${this.separator}${dataset}/${member.name}${member.extension ? member.extension : ""}`,
+      );
     }
   }
 }
