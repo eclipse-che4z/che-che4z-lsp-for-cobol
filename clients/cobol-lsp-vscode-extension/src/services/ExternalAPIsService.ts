@@ -73,6 +73,10 @@ export function deleteDiagnostics(documentUri: vscode.Uri) {
   diagnosticCollection.delete(documentUri);
 }
 
+export function clearDiagnostics() {
+  diagnosticCollection.clear();
+}
+
 class ExternalAPIsService {
   e4eApi: E4E | undefined;
   dsnService?: CopybookDownloaderForDsn;

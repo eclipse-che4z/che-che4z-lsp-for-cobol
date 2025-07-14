@@ -28,6 +28,7 @@ import {
 } from "./ProcessorGroupsLoader";
 import { DEFAULT_DIALECT } from "../constants";
 import { getVariablesFromUri } from "./util/FSUtils";
+import { clearDiagnostics } from "./ExternalAPIsService";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -206,6 +207,7 @@ async function loadProcessorGroupSettings<
 export function setUpProgramConfigWatcher(fn: () => unknown) {
   const handler = () => {
     clearWorkspaceConfigCache();
+    clearDiagnostics();
     fn();
   };
   const watcher = workspace.createFileSystemWatcher("**/pgm_conf.json");
@@ -218,6 +220,7 @@ export function setUpProgramConfigWatcher(fn: () => unknown) {
 export function setUpProcessorGroupConfigWatcher(fn: () => unknown) {
   const handler = () => {
     clearWorkspaceConfigCache();
+    clearDiagnostics();
     fn();
   };
   const watcher = workspace.createFileSystemWatcher("**/proc_grps.json");
