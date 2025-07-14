@@ -18,17 +18,43 @@ import {
   getProfileNameForCopybook,
   getProfileStatus,
 } from "../../../services/util/ProfileUtils";
+import { getConfigurationResult } from "../../../__mocks__/vscode";
 
 describe("Test profile Utils", () => {
-  it("checks a profile passed through settings is always given preference over profile from doc path for copybook download", () => {
-    const programUri = vscode.Uri.parse(
-      "zowe-ds:/documentProfile/COBOLFILE.cbl",
-    );
-    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
-      get: jest.fn().mockReturnValue("profileInSettings"),
+  describe("getProfileNameForCopybook", () => {
+    describe("profile in settings configured", () => {
+      beforeEach(() => {
+        getConfigurationResult["profiles"] = "profileInSettings";
+      });
+
+      it("checks a profile passed through settings is always given preference over profile from doc path for copybook download", () => {
+        const programUri = vscode.Uri.parse(
+          "zowe-ds:/documentProfile/COBOLFILE.cbl",
+        );
+
+        expect(getProfileNameForCopybook(programUri)).toBe("profileInSettings");
+      });
     });
 
-    expect(getProfileNameForCopybook(programUri)).toBe("profileInSettings");
+    describe("profile in settings empty", () => {
+      beforeEach(() => {
+        getConfigurationResult["profiles"] = undefined;
+      });
+
+      it("return profile name from document URI", () => {
+        const programUri = vscode.Uri.parse(
+          "zowe-ds:/documentProfile/DATASET.WITH.COBOL/COBOL.cbl",
+        );
+
+        expect(getProfileNameForCopybook(programUri)).toBe("documentProfile");
+      });
+
+      it("returns undefined for non-zowe uris", () => {
+        expect(
+          getProfileNameForCopybook(vscode.Uri.file("/workspace/doc.cpy")),
+        ).toBeUndefined();
+      });
+    });
   });
 
   describe("getProfileStatus", () => {

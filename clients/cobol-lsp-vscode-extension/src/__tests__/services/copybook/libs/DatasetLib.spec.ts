@@ -24,18 +24,14 @@ import {
   initializeExternalAPIs,
 } from "../../../../services/ExternalAPIsService";
 import { Utils } from "../../../../services/util/Utils";
-import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { ZoweExplorerDownloader } from "../../../../services/copybook/downloader/ZoweExplorerDownloader";
 import { DEFAULT_DIALECT } from "../../../../constants";
 
 describe("Dataset copybook lib", () => {
-  let zoweExplorerApiMock: IApiRegisterClient;
-
   beforeEach(async () => {
-    zoweExplorerApiMock = createZoweExplorerMock();
     jest
       .spyOn(Utils, "getZoweExplorerAPI")
-      .mockResolvedValue({ api: zoweExplorerApiMock });
+      .mockResolvedValue({ api: {} as IApiRegisterClient });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
   });
 
@@ -152,7 +148,7 @@ describe("Dataset copybook lib", () => {
           );
 
           // diagnostics disappear after ZE installation and copybook can be resolved
-          externalApis.explorerAppeared(zoweExplorerApiMock);
+          externalApis.explorerAppeared({} as IApiRegisterClient);
           const resultAfter = await lib.resolveCopybookUri(
             "COPYBOOK",
             vscode.Uri.file("/program.cbl"),

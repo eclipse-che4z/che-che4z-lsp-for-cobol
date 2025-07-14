@@ -24,18 +24,14 @@ import {
   initializeExternalAPIs,
 } from "../../../../services/ExternalAPIsService";
 import { Utils } from "../../../../services/util/Utils";
-import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { UssPathLib } from "../../../../services/copybookLibs/UssPathLib";
 import { DEFAULT_DIALECT } from "../../../../constants";
 
 describe("USS copybook lib", () => {
-  let zoweExplorerApiMock: IApiRegisterClient;
-
   beforeEach(async () => {
-    zoweExplorerApiMock = createZoweExplorerMock();
     jest
       .spyOn(Utils, "getZoweExplorerAPI")
-      .mockResolvedValue({ api: zoweExplorerApiMock });
+      .mockResolvedValue({ api: {} as IApiRegisterClient });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
     getConfigurationResult["copybook-extensions"] = [".CPY", ".cpy", ""];
   });
@@ -194,7 +190,7 @@ describe("USS copybook lib", () => {
         diagnosticsCollectionMock.set.mockClear();
 
         // diagnostics disappear after ZE installation and copybook can be resolved
-        externalApis.explorerAppeared(zoweExplorerApiMock);
+        externalApis.explorerAppeared({} as IApiRegisterClient);
         const resultAfter = await lib.resolveCopybookUri(
           "COPYBOOK",
           vscode.Uri.file("/program.cbl"),
