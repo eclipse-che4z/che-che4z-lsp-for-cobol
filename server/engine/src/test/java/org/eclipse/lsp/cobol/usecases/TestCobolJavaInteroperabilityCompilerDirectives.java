@@ -445,19 +445,22 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "The JAVA-CALLABLE directive can only be specified before the PROCEDURE DIVISION of the first program.",
+                "The JAVA-CALLABLE directive can only be specified before the PROCEDURE DIVISION of"
+                    + " the first program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a"
+                    + " non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a"
+                    + " non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -660,19 +663,22 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a"
+                    + " non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a"
+                    + " non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "The JAVA-CALLABLE directive can only be specified before the PROCEDURE DIVISION of the first program.",
+                "The JAVA-CALLABLE directive can only be specified before the PROCEDURE DIVISION of"
+                    + " the first program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
