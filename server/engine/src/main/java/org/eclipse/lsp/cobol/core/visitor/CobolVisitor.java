@@ -19,6 +19,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.antlr.v4.runtime.Lexer.HIDDEN;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.eclipse.lsp.cobol.common.OutlineNodeNames.FILLER_NAME;
 import static org.eclipse.lsp.cobol.common.VariableConstants.*;
 import static org.eclipse.lsp.cobol.core.CobolParser.*;
@@ -85,8 +86,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   private final TextExtractionState text;
 
   private static final Pattern JAVA_DIRECTIVE_PATTERN =
-      Pattern.compile(
-          "(?i)\\s*(>>)(\\s*)(JAVA-CALLABLE|JAVA-SHAREABLE\\s+(?:ON|OFF))(?:\\s+(.+))?\\s*$");
+      Pattern.compile("(?i)>>(\\s*)(JAVA-CALLABLE|JAVA-SHAREABLE\\s+(?:ON|OFF))\\s*(\\S.*)?$");
 
   public CobolVisitor(
       @NonNull CopybooksRepository copybooks,
@@ -130,8 +130,6 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   static class JavaDirectiveRange {
     int dataDivStart;
     int dataDivEnd;
-    int workingStorageStart;
-    int workingStorageEnd;
   }
 
   int javaCallableLimit = -1;
@@ -163,27 +161,12 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         if (pdiv != null) endCandidate = pdiv.start.getTokenIndex();
         else if (end != null) endCandidate = end.start.getTokenIndex();
       }
-      if (dctx == null || dctx.stop == null) continue;
+      if (dctx == null || dctx.start == null) continue;
 
       JavaDirectiveRange r = new JavaDirectiveRange();
-      r.dataDivStart = dctx.stop.getTokenIndex();
+      r.dataDivStart = dctx.start.getTokenIndex();
       r.dataDivEnd = endCandidate;
 
-      if (dctx.dataDivisionSection() != null) {
-        for (DataDivisionSectionContext section : dctx.dataDivisionSection()) {
-          if (section.workingStorageSection() != null) {
-            r.workingStorageStart = section.workingStorageSection().start.getTokenIndex();
-            int sectionIndex = dctx.dataDivisionSection().indexOf(section);
-            if (sectionIndex + 1 < dctx.dataDivisionSection().size()) {
-              r.workingStorageEnd =
-                  dctx.dataDivisionSection().get(sectionIndex + 1).start.getTokenIndex();
-            } else {
-              r.workingStorageEnd = r.dataDivEnd;
-            }
-            break;
-          }
-        }
-      }
       validShareableRanges.add(r);
     }
 
@@ -197,117 +180,64 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   int getCompilerLineTokenType(Token t) {
     String tokenText = t.getText();
     Matcher matcher = JAVA_DIRECTIVE_PATTERN.matcher(tokenText);
-    if (matcher.matches()) {
-      String directive = matcher.group(3).toUpperCase();
-      if (directive.equals("JAVA-CALLABLE")) {
-        return JAVACALLABLE;
-      } else if (directive.contains("ON")) {
-        return JAVASHAREABLEON;
-      } else if (directive.contains("OFF")) {
-        return JAVASHAREABLEOFF;
-      }
+    if (!matcher.matches()) return 0;
+    if (matcher.group(1).length() > 1) {
+      createDirectiveError(t, "compilerDirective.tooManyBlanks");
     }
+    if (!isBlank(matcher.group(3))) {
+      createDirectiveError(t, "compilerDirective.extraText");
+    }
+    String directive = matcher.group(2).toUpperCase();
+    if (directive.equals("JAVA-CALLABLE")) {
+      return JAVACALLABLE;
+    } else if (directive.endsWith("ON")) {
+      return JAVASHAREABLEON;
+    } else if (directive.endsWith("OFF")) {
+      return JAVASHAREABLEOFF;
+    }
+
     return 0;
   }
 
   void validateJavaDirectives(
-      List<JavaDirectiveRange> validJavaRanges,
-      List<Token> compilerLineDirectives,
-      List<NestedProgramUnitContext> nestedPrograms) {
+      List<JavaDirectiveRange> validJavaRanges, List<Token> compilerLineDirectives) {
     int currentRange = 0;
     boolean shareable = false;
     for (Token t : compilerLineDirectives) {
       final int tokenType = getCompilerLineTokenType(t);
       final int tokenId = t.getTokenIndex();
-      final String tokenText = t.getText();
-
-      boolean inNestedProgram = false;
-      for (NestedProgramUnitContext nested : nestedPrograms) {
-        if (isTokenWithinContext(t, nested)) {
-          createDirectiveError(
-              t,
-              calculateOffsetForToken(tokenText),
-              "compilerDirective.validation.nestedProgram",
-              tokenText.replaceAll(">>\\s?", ""));
-          inNestedProgram = true;
-          break;
-        }
-      }
-
-      if (inNestedProgram) {
-        continue;
-      }
 
       switch (tokenType) {
         case JAVACALLABLE:
           if (tokenId >= javaCallableLimit) {
-            createDirectiveError(
-                t,
-                calculateOffsetForToken(tokenText),
-                "compilerDirective.validation.dataSection",
-                tokenText.replaceAll(">>\\s?", ""));
+            createDirectiveError(t, "compilerDirective.javaCallable.position");
           }
-          validateDirectiveSyntax(t);
           break;
         case JAVASHAREABLEON:
         case JAVASHAREABLEOFF:
           while (currentRange < validJavaRanges.size()
-              && tokenId > validJavaRanges.get(currentRange).dataDivEnd) {
+              && tokenId < validJavaRanges.get(currentRange).dataDivStart) {
             shareable = false;
             ++currentRange;
           }
 
-          boolean inWorkingStorage = false;
-          if (currentRange < validJavaRanges.size()) {
-            JavaDirectiveRange range = validJavaRanges.get(currentRange);
-            if (range.workingStorageStart != 0
-                && tokenId >= range.workingStorageStart
-                && tokenId < range.workingStorageEnd) {
-              inWorkingStorage = true;
-            }
-          }
-
-          if (!inWorkingStorage) {
-            createDirectiveError(
-                t,
-                calculateOffsetForToken(tokenText),
-                "compilerDirective.validation.workingSection",
-                tokenText.replaceAll(">>\\s?", ""));
+          if (currentRange >= validJavaRanges.size()
+              || tokenId >= validJavaRanges.get(currentRange).dataDivEnd) {
+            createDirectiveError(t, "compilerDirective.javaShareable.dataSection");
           } else if (tokenType == JAVASHAREABLEON) {
+            if (shareable) {
+              createDirectiveError(t, "compilerDirective.javaShareable.On");
+            }
             shareable = true;
           } else {
             if (!shareable) {
-              createDirectiveError(
-                  t,
-                  calculateOffsetForToken(tokenText),
-                  "compilerDirective.validation.javaShareableOff",
-                  tokenText.replaceAll(">>\\s?", ""));
+              createDirectiveError(t, "compilerDirective.javaShareable.Off");
             }
             shareable = false;
           }
-          validateDirectiveSyntax(t);
           break;
         default:
           break;
-      }
-    }
-  }
-
-  private void validateDirectiveSyntax(Token token) {
-    String tokenText = token.getText();
-    Matcher matcher = JAVA_DIRECTIVE_PATTERN.matcher(tokenText);
-    if (matcher.matches()) {
-      String spaces = matcher.group(2);
-      String extraText =
-          matcher.groupCount() >= 4 && matcher.group(4) != null ? matcher.group(4).trim() : "";
-      if (spaces.length() > 1) {
-        int offset = tokenText.indexOf(">>") + 2 + spaces.length();
-        createDirectiveError(token, offset, "compilerDirective.invalid", matcher.group(3).trim());
-        return;
-      }
-      if (!extraText.isEmpty()) {
-        int extraTextStartPos = tokenText.lastIndexOf(extraText);
-        createDirectiveError(token, extraTextStartPos, "compilerOption.invalid", extraText);
       }
     }
   }
@@ -320,24 +250,9 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
         tokenStream.getTokens().stream()
             .filter(t -> t.getType() == CobolLexer.COMPILERLINE)
             .collect(toList());
-
-    List<NestedProgramUnitContext> nestedPrograms = new ArrayList<>();
-    for (ProgramOrFunctionUnitContext p : ctx.programOrFunctionUnit()) {
-      if (p.programDetails() != null) {
-        nestedPrograms.addAll(p.programDetails().nestedProgramUnit());
-      }
-    }
-    validateJavaDirectives(getValidShareableRanges(ctx), compilerLineTokens, nestedPrograms);
+    validateJavaDirectives(getValidShareableRanges(ctx), compilerLineTokens);
 
     return result;
-  }
-
-  private boolean isTokenWithinContext(Token token, ParserRuleContext ctx) {
-    if (ctx.start == null || ctx.stop == null) {
-      return false;
-    }
-    int tokenIndex = token.getTokenIndex();
-    return tokenIndex >= ctx.start.getTokenIndex() && tokenIndex <= ctx.stop.getTokenIndex();
   }
 
   @Override
@@ -2112,19 +2027,11 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     errors.add(error);
   }
 
-  private void createDirectiveError(Token token, int startOffset, String messageKey, String args) {
-    Range range =
-        new Range(
-            new Position(token.getLine() - 1, token.getCharPositionInLine() + startOffset),
-            new Position(
-                token.getLine() - 1, token.getCharPositionInLine() + token.getText().length()));
-    Location location = extendedDocument.mapLocation(range);
-    Locality locality = locationToLocality(location);
-    throwException(locality, MessageTemplate.of(messageKey, args), ErrorSeverity.ERROR);
-  }
-
-  private int calculateOffsetForToken(String tokenText) {
-    return tokenText.startsWith(">> ") ? 3 : 2;
+  private void createDirectiveError(Token token, String messageKey) {
+    throwException(
+        locationToLocality(getLocation(token)),
+        MessageTemplate.of(messageKey),
+        ErrorSeverity.ERROR);
   }
 
   private void areaAWarning(Token token) {
@@ -2202,7 +2109,8 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return ImmutableList.of(node);
   }
 
-  // TODO: Add check that name does not present in the predefined variables list (? - to check)
+  // TODO: Add check that name does not present in the predefined variables list
+  // (? - to check)
   private VariableNameAndLocality extractNameAndLocality(EntryNameContext context) {
     if (context == null || context.dataName() == null) return null;
     return extractNameAndLocality(context.dataName());

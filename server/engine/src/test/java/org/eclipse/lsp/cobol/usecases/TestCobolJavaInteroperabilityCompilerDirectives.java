@@ -67,14 +67,14 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       >>  {_JAVA-SHAREABLE ON|error1_}\n"
+          + "       {_>>  JAVA-SHAREABLE ON|error1_}\n"
           + "       01 {$*G1}.\n"
           + "         03 {$*N1} PIC S9(9) COMP-5.\n"
           + "         03 {$*G1SUB}.\n"
           + "           05 {$*S1} PIC X(20).\n"
-          + "       >>  {_JAVA-SHAREABLE OFF|error2_}\n"
+          + "       {_>>  JAVA-SHAREABLE OFF|error2_}\n"
           + "       01 {$*TESTW} pic x(9).\n"
-          + "       >>  {JAVA-CALLABLE|error3}\n"
+          + "       {_>>  JAVA-CALLABLE|error3_}\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$TESTW}.\n"
           + "           GOBACK.\n";
@@ -84,14 +84,14 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       >> JAVA-SHAREABLE ON {_aaa bbb|error1_}\n"
+          + "       {_>> JAVA-SHAREABLE ON aaa bbb|error1_}\n"
           + "       01 {$*G1}.\n"
           + "         03 {$*N1} PIC S9(9) COMP-5.\n"
           + "         03 {$*G1SUB}.\n"
           + "           05 {$*S1} PIC X(20).\n"
-          + "       >> JAVA-SHAREABLE OFF {_ccc ddd ff|error2_}\n"
+          + "       {_>> JAVA-SHAREABLE OFF ccc ddd ff|error2_}\n"
           + "       01 {$*TESTW} pic x(9).\n"
-          + "       >> JAVA-CALLABLE {_gg hh i|error3_}\n"
+          + "       {_>> JAVA-CALLABLE gg hh i|error3_}\n"
           + "       PROCEDURE DIVISION.\n"
           + "           DISPLAY {$TESTW}.\n"
           + "           GOBACK.\n";
@@ -104,9 +104,20 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       01 {$*N1} PIC S9(9) COMP-5.\n"
           + "       PROCEDURE \n"
           + "       DIVISION.\n"
-          + "       >>{_JAVA-CALLABLE|error1_}\n"
-          + "       >>{_JAVA-SHAREABLE ON|error2_}\n"
-          + "       >>{_JAVA-SHAREABLE OFF|error3_}\n"
+          + "       {_>>JAVA-CALLABLE|error1_}\n"
+          + "       {_>>JAVA-SHAREABLE ON|error2_}\n"
+          + "       {_>>JAVA-SHAREABLE OFF|error3_}\n"
+          + "           GOBACK.\n";
+
+  private static final String TEXT_SHAREABLE_ON_ERROR =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       >> JAVA-SHAREABLE ON\n"
+          + "       {_>>JAVA-SHAREABLE ON|error1_}\n"
+          + "       01 {$*N1} PIC S9(9) COMP-5.\n"
+          + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
 
   private static final String TEXT_SHAREABLE_OFF_ERROR =
@@ -114,7 +125,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       >>{_JAVA-SHAREABLE OFF|error1_}\n"
+          + "       {_>>JAVA-SHAREABLE OFF|error1_}\n"
           + "       01 {$*N1} PIC S9(9) COMP-5.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n";
@@ -284,7 +295,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
   private static final String COPYBOOK_TEXT_WITH_ERROR =
       "       01 {$*varOne}   PIC S9 VALUE +10.\n"
           + "       01 {$*varOne}   PIC S9 VALUE +10.\n"
-          + "       >>JAVA-SHAREABLE ON {fdgfd|error2}\n"
+          + "       {_>>JAVA-SHAREABLE ON fdgfd|error2_}\n"
           + "       01 {$*varTwo}   PIC S9 VALUE +100.";
 
   private static final String TEXT_WITH_COPYBOOK_PGM1 =
@@ -352,10 +363,10 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "       PROGRAM-ID. TEST2.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       >>{_JAVA-SHAREABLE ON|error1_}\n"
+          + "       {_>>JAVA-SHAREABLE ON|error1_}\n"
           + "       01 {$*N1} PIC X(50) VALUE 'DIVISION'.\n"
-          + "       >>{_JAVA-SHAREABLE OFF|error2_}\n"
-          + "       >>{JAVA-CALLABLE|error3}\n"
+          + "       {_>>JAVA-SHAREABLE OFF|error2_}\n"
+          + "       {_>>JAVA-CALLABLE|error3_}\n"
           + "       PROCEDURE DIVISION.\n"
           + "           GOBACK.\n"
           + "       END PROGRAM TEST2.\n"
@@ -380,19 +391,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "An invalid directive was found: JAVA-SHAREABLE ON",
+                "At most one blank character is allowed after >>.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "An invalid directive was found: JAVA-SHAREABLE OFF",
+                "At most one blank character is allowed after >>.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "An invalid directive was found: JAVA-CALLABLE",
+                "At most one blank character is allowed after >>.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -407,19 +418,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: aaa bbb",
+                "Line with a compiler directive can only be padded with blanks.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: ccc ddd ff",
+                "Line with a compiler directive can only be padded with blanks.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: gg hh i",
+                "Line with a compiler directive can only be padded with blanks.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -434,21 +445,34 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "The JAVA-CALLABLE directive can only be specified in the DATA DIVISION.",
+                "The JAVA-CALLABLE directive can only be specified before the PROCEDURE DIVISION of the first program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE ON directive can only be specified in the WORKING-STORAGE"
-                    + " SECTION.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE OFF directive can only be specified in the WORKING-STORAGE"
-                    + " SECTION.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        ImmutableList.of());
+  }
+
+  @Test
+  void testShareableOnError() {
+    UseCaseEngine.runTest(
+        TEXT_SHAREABLE_ON_ERROR,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "error1",
+            new Diagnostic(
+                new Range(),
+                "The JAVA-SHAREABLE state was already ON.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -463,8 +487,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE OFF directive was found but JAVA-SHAREABLE was already in"
-                    + " the OFF state.",
+                "The JAVA-SHAREABLE state was already OFF.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
@@ -605,7 +628,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error2",
             new Diagnostic(
                 new Range(),
-                "An invalid option was found: fdgfd",
+                "Line with a compiler directive can only be padded with blanks.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
@@ -637,19 +660,19 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
             "error1",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE ON directive cannot be used in a nested program.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error2",
             new Diagnostic(
                 new Range(),
-                "The JAVA-SHAREABLE OFF directive cannot be used in a nested program.",
+                "The JAVA-SHAREABLE directive can only be specified in the DATA DIVISION of a non-nested program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "error3",
             new Diagnostic(
                 new Range(),
-                "The JAVA-CALLABLE directive cannot be used in a nested program.",
+                "The JAVA-CALLABLE directive can only be specified before the PROCEDURE DIVISION of the first program.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of());
