@@ -16,8 +16,8 @@ import { Uri } from "vscode";
 import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
 import {
-  LibsDefinitions,
   EndevorDatasetConfigModel,
+  LibDefinition,
 } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
@@ -28,14 +28,10 @@ export class EndevorMemberLib extends EndevorLib implements CopybookLib {
     super(config.profile);
   }
 
-  static create(configs: LibsDefinitions) {
-    const libs = [];
-    for (const config of configs) {
-      if (hasMember(config, "dataset")) {
-        libs.push(new EndevorMemberLib(config));
-      }
+  static create(config: LibDefinition) {
+    if (hasMember(config, "dataset")) {
+      return new EndevorMemberLib(config);
     }
-    return libs;
   }
 
   async resolveCopybookUri(

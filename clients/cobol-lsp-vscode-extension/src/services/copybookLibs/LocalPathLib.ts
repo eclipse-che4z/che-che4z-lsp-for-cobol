@@ -14,7 +14,7 @@
 
 import { getOutputChannel } from "../util/OutputChannel";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { LibsDefinitions } from "../ProcessorGroupsLoader";
+import { LibDefinition } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
 import CopybookLib from "./CopybookLib";
@@ -25,14 +25,10 @@ export const localCopybooks = new LocalFilesystemResourceService();
 export default class LocalPathLib implements CopybookLib {
   constructor(private path: string) {}
 
-  static create(configs: LibsDefinitions) {
-    const libs = [];
-    for (const config of configs) {
-      if (typeof config === "string") {
-        libs.push(new LocalPathLib(config));
-      }
+  static create(config: LibDefinition) {
+    if (typeof config === "string") {
+      return new LocalPathLib(config);
     }
-    return libs;
   }
 
   private getUris(documentUri: vscode.Uri) {

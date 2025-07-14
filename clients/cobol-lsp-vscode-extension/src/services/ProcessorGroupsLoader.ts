@@ -100,15 +100,15 @@ const ZoweUssConfigModel = t.intersection([
 ]);
 export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
 
-const LibsModel = t.array(
-  t.union([
-    t.string,
-    EndevorConfigModel,
-    EndevorDatasetModel,
-    ZoweDatasetConfigModel,
-    ZoweUssConfigModel,
-  ]),
-);
+const LibModel = t.union([
+  t.string,
+  EndevorConfigModel,
+  EndevorDatasetModel,
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
+]);
+const LibsModel = t.array(LibModel);
+export type LibDefinition = t.TypeOf<typeof LibModel>;
 export type LibsDefinitions = t.TypeOf<typeof LibsModel>;
 
 const PreprocessorItemModel = t.union([
@@ -326,14 +326,24 @@ const transformProcessorGroup =
 export function transformLibs(
   libDefinitions: LibsDefinitions | undefined,
   libTypes: CopybookLibTypes[],
-) {
+): CopybookLib[] {
   if (!libDefinitions) {
     return [];
   }
 
-  const results = libTypes.map((lib) => lib.create(libDefinitions)).flat();
+  const libs = [];
 
-  return results;
+  for (const libDefinition of libDefinitions) {
+    for (const libType of libTypes) {
+      const libInstance = libType.create(libDefinition);
+      if (libInstance) {
+        libs.push(libInstance);
+        break;
+      }
+    }
+  }
+
+  return libs;
 }
 
 function transformPreprocessor(

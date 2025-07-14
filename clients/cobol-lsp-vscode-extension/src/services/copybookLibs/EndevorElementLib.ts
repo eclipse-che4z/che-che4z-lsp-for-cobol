@@ -16,7 +16,7 @@ import { Uri } from "vscode";
 import CopybookLib from "./CopybookLib";
 import { hasMember } from "../util/Utils";
 import { ENVIRONMENT } from "../../constants";
-import { LibsDefinitions, EndevorConfigModel } from "../ProcessorGroupsLoader";
+import { EndevorConfigModel, LibDefinition } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
 import { getOutputChannel } from "../util/OutputChannel";
@@ -26,14 +26,10 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
     super(config.profile);
   }
 
-  static create(configs: LibsDefinitions) {
-    const libs = [];
-    for (const config of configs) {
-      if (hasMember(config, ENVIRONMENT)) {
-        libs.push(new EndevorElementLib(config));
-      }
+  static create(config: LibDefinition) {
+    if (hasMember(config, ENVIRONMENT)) {
+      return new EndevorElementLib(config);
     }
-    return libs;
   }
 
   async resolveCopybookUri(

@@ -15,7 +15,7 @@
 import { DATASET } from "../../constants";
 import * as vscode from "vscode";
 import CopybookLib from "./CopybookLib";
-import { LibsDefinitions } from "../ProcessorGroupsLoader";
+import { LibDefinition } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { ZoweLib } from "./ZoweLib";
 
@@ -27,14 +27,10 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
     super(profile);
   }
 
-  static create(configs: LibsDefinitions) {
-    const libs = [];
-    for (const config of configs) {
-      if (typeof config === "object" && DATASET in config) {
-        libs.push(new DatasetLib(config.dataset, config.profile));
-      }
+  static create(config: LibDefinition) {
+    if (typeof config === "object" && DATASET in config) {
+      return new DatasetLib(config.dataset, config.profile);
     }
-    return libs;
   }
 
   async accessCheck(profile: string): Promise<void> {

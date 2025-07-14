@@ -23,8 +23,10 @@ import { DatasetLib } from "../../services/copybookLibs/DatasetLib";
 import LocalPathLib from "../../services/copybookLibs/LocalPathLib";
 import {
   clearWorkspaceConfigCache,
+  LibsDefinitions,
   readSettingConfig,
   readWorkspaceConfig,
+  transformLibs,
 } from "../../services/ProcessorGroupsLoader";
 import * as vscode from "vscode";
 import { getOutputChannel } from "../../services/util/OutputChannel";
@@ -140,6 +142,26 @@ describe("ProcessorGroupsLoader", () => {
           expect.stringContaining("Could not validate data"),
         );
       });
+    });
+  });
+
+  describe("transformLibs", () => {
+    it("keep order of libraries", () => {
+      const input: LibsDefinitions = [
+        "/local/lib/1",
+        { dataset: "remote.lib.1" },
+        "/local/lib/2",
+        { dataset: "remote.lib.2" },
+      ];
+
+      const result = transformLibs(input, [LocalPathLib, DatasetLib]);
+
+      expect(result).toEqual([
+        new LocalPathLib("/local/lib/1"),
+        new DatasetLib("remote.lib.1"),
+        new LocalPathLib("/local/lib/2"),
+        new DatasetLib("remote.lib.2"),
+      ]);
     });
   });
 });
