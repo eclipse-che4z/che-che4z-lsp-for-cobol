@@ -35,7 +35,7 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
 
   async accessCheck(profile: string): Promise<void> {
     await vscode.workspace.fs.stat(
-      vscode.Uri.parse(`zowe-ds:/${profile}/${this.dsn}`),
+      vscode.Uri.parse(`zowe-ds:/${profile}/${this.dsn}?fetch=true`),
     );
   }
 

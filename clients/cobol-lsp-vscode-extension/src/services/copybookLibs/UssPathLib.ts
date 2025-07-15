@@ -108,7 +108,7 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
       variables,
     );
     await vscode.workspace.fs.stat(
-      vscode.Uri.parse(`zowe-uss:/${profile}${evaluatedPath}`),
+      vscode.Uri.parse(`zowe-uss:/${profile}${evaluatedPath}?fetch=true`),
     );
   }
 }
