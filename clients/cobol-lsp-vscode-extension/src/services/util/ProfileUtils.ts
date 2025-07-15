@@ -127,6 +127,8 @@ function isPermissionError(e: unknown) {
   );
 }
 
+// This is broken with ZE version 3.2.2 but works fine with 3.2.1
+// https://github.com/zowe/zowe-explorer-vscode/issues/3760
 function isProfileNotConfiguredError(err: unknown) {
   return (
     hasMember(err, "message") &&
