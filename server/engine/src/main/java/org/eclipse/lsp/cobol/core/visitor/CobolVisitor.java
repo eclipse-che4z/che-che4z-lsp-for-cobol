@@ -173,14 +173,18 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     return validShareableRanges;
   }
 
-  static final int JAVACALLABLE = 1;
-  static final int JAVASHAREABLEON = 2;
-  static final int JAVASHAREABLEOFF = 3;
+  /** JavaTokenType */
+  enum JavaTokenType {
+    UNKNOWN,
+    JAVACALLABLE,
+    JAVASHAREABLEON,
+    JAVASHAREABLEOFF,
+  }
 
-  int getCompilerLineTokenType(Token t) {
+  JavaTokenType getCompilerLineTokenType(Token t) {
     String tokenText = t.getText();
     Matcher matcher = JAVA_DIRECTIVE_PATTERN.matcher(tokenText);
-    if (!matcher.matches()) return 0;
+    if (!matcher.matches()) return JavaTokenType.UNKNOWN;
     if (matcher.group(1).length() > 1) {
       createDirectiveError(t, "compilerDirective.tooManyBlanks");
     }
@@ -189,14 +193,14 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     }
     String directive = matcher.group(2).toUpperCase();
     if (directive.equals("JAVA-CALLABLE")) {
-      return JAVACALLABLE;
+      return JavaTokenType.JAVACALLABLE;
     } else if (directive.endsWith("ON")) {
-      return JAVASHAREABLEON;
+      return JavaTokenType.JAVASHAREABLEON;
     } else if (directive.endsWith("OFF")) {
-      return JAVASHAREABLEOFF;
+      return JavaTokenType.JAVASHAREABLEOFF;
     }
 
-    return 0;
+    return JavaTokenType.UNKNOWN;
   }
 
   void validateJavaDirectives(
@@ -204,7 +208,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     int currentRange = 0;
     boolean shareable = false;
     for (Token t : compilerLineDirectives) {
-      final int tokenType = getCompilerLineTokenType(t);
+      final JavaTokenType tokenType = getCompilerLineTokenType(t);
       final int tokenId = t.getTokenIndex();
 
       switch (tokenType) {
@@ -224,7 +228,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
           if (currentRange >= validJavaRanges.size()
               || tokenId >= validJavaRanges.get(currentRange).dataDivEnd) {
             createDirectiveError(t, "compilerDirective.javaShareable.dataSection");
-          } else if (tokenType == JAVASHAREABLEON) {
+          } else if (tokenType == JavaTokenType.JAVASHAREABLEON) {
             if (shareable) {
               createDirectiveError(t, "compilerDirective.javaShareable.On");
             }
