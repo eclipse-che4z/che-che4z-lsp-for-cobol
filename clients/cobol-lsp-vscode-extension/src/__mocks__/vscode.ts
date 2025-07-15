@@ -86,7 +86,7 @@ export namespace workspace {
       if (result instanceof Error) {
         throw result;
       } else {
-        return Promise.resolve(Buffer.from(result));
+        return Promise.resolve(new TextEncoder().encode(result));
       }
     }),
     writeFile: jest.fn(),
