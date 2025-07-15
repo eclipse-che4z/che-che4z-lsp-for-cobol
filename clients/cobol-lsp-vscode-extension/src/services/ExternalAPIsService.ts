@@ -21,7 +21,7 @@ import { CopybookDownloaderForDsn as CopybookDownloaderForDsn } from "./copybook
 import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
-import { getOutputChannel } from "./util/OutputChannel";
+import { outputChannel } from "../extension";
 import { clearProfiles } from "./util/ProfileUtils";
 
 export let externalApis: ExternalAPIsService;
@@ -48,11 +48,11 @@ export async function initializeExternalAPIs(
     });
   }
 
-  if (!maybeE4E) getOutputChannel().appendLine(E4E_INCOMPATIBLE);
+  if (!maybeE4E) outputChannel.appendLine(E4E_INCOMPATIBLE);
   else if ("futureApi" in maybeE4E)
     void maybeE4E.futureApi.then((api) => {
       if (api) externalApis.e4eAppeared(api.api);
-      else getOutputChannel().appendLine(E4E_INCOMPATIBLE);
+      else outputChannel.appendLine(E4E_INCOMPATIBLE);
     });
 }
 
@@ -129,7 +129,7 @@ class ExternalAPIsService {
     diagnosticCollection.clear();
     if (api.onProfileUpdated) {
       api.onProfileUpdated((profile: IProfileLoaded) => {
-        getOutputChannel().appendLine(`Zowe profile ${profile.name} updated`);
+        outputChannel.appendLine(`Zowe profile ${profile.name} updated`);
         this.clearCache();
         if (this.configurationInvalidation) {
           this.configurationInvalidation();

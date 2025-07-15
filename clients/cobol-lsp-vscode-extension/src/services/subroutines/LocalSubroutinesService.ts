@@ -16,7 +16,7 @@ import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
 import { COBOL_EXT_ARRAY_CASE_INSENSITIVE } from "../../constants";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
-import { getOutputChannel } from "../util/OutputChannel";
+import { outputChannel } from "../../extension";
 
 const localSubroutines = new LocalFilesystemResourceService();
 
@@ -45,7 +45,7 @@ export async function listLocalSubroutines(): Promise<string[]> {
         subroutines.push(subroutine.filename),
       );
     } else {
-      getOutputChannel().appendLine(
+      outputChannel.appendLine(
         `Unable to load subroutines completions: ${result.reason}`,
       );
     }

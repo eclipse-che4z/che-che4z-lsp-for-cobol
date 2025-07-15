@@ -46,7 +46,7 @@ import {
 import { SupportedVariables } from "./util/FSUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
-import { getOutputChannel } from "./util/OutputChannel";
+import { outputChannel } from "../extension";
 
 const NONE: string = "NONE";
 const MAX_VM_COUNT = 50000;
@@ -96,7 +96,7 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
       }
     } catch (err) {
       if (err instanceof DecodingError) {
-        getOutputChannel().appendLine(
+        outputChannel.appendLine(
           `Invalid settings: ${item.section} - ${err.message}`,
         );
       }

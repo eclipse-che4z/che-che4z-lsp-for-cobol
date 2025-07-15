@@ -23,7 +23,7 @@ import {
 import { hasMember } from "../util/Utils";
 import { registerExceptionEvent } from "../reporter";
 import { Memoize } from "../util/Memoize";
-import { getOutputChannel } from "./OutputChannel";
+import { outputChannel } from "../../extension";
 
 export function getProfileNameForCopybook(
   documentUri: vscode.Uri,
@@ -92,7 +92,7 @@ async function testZoweAccess(
     }
 
     // unknown type of error, register it and assume profile is ok
-    getOutputChannel().error(
+    outputChannel.error(
       `Unknown error while validating ZOWE profile ${profileName}: ${JSON.stringify(err)}`,
     );
     registerExceptionEvent(

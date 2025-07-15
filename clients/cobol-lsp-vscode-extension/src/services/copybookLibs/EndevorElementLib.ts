@@ -19,7 +19,7 @@ import { ENVIRONMENT } from "../../constants";
 import { EndevorConfigModel, LibDefinition } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
-import { getOutputChannel } from "../util/OutputChannel";
+import { outputChannel } from "../../extension";
 
 export class EndevorElementLib extends EndevorLib implements CopybookLib {
   constructor(private config: EndevorConfigModel) {
@@ -87,7 +87,7 @@ export class EndevorElementLib extends EndevorLib implements CopybookLib {
       });
 
       if (list instanceof Error) {
-        getOutputChannel().error(
+        outputChannel.error(
           list,
           this.config,
           `Unable to list copybooks from Endevor dataset`,

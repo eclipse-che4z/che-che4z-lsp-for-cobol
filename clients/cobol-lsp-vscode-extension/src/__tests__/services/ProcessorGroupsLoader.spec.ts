@@ -29,7 +29,7 @@ import {
   transformLibs,
 } from "../../services/ProcessorGroupsLoader";
 import * as vscode from "vscode";
-import { getOutputChannel } from "../../services/util/OutputChannel";
+import { outputChannel } from "../../extension";
 
 describe("ProcessorGroupsLoader", () => {
   describe("readSettingConfig", () => {
@@ -106,7 +106,7 @@ describe("ProcessorGroupsLoader", () => {
       it("returns undefined & error is logged", async () => {
         const result = await readWorkspaceConfig(WORKSPACE_URI);
         expect(result).toBeUndefined();
-        expect(getOutputChannel().error).toHaveBeenCalledWith(
+        expect(outputChannel.error).toHaveBeenCalledWith(
           expect.stringContaining("Could not validate data"),
         );
       });
@@ -138,7 +138,7 @@ describe("ProcessorGroupsLoader", () => {
       it("returns undefined & error is logged", async () => {
         const result = await readWorkspaceConfig(WORKSPACE_URI);
         expect(result).toBeUndefined();
-        expect(getOutputChannel().error).toHaveBeenCalledWith(
+        expect(outputChannel.error).toHaveBeenCalledWith(
           expect.stringContaining("Could not validate data"),
         );
       });

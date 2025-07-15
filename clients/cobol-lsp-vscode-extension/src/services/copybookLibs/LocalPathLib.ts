@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { getOutputChannel } from "../util/OutputChannel";
+import { outputChannel } from "../../extension";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
 import { LibDefinition } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
@@ -94,7 +94,7 @@ export default class LocalPathLib implements CopybookLib {
       if (result.status === "fulfilled") {
         result.value.forEach((copybook) => copybooks.push(copybook.filename));
       } else {
-        getOutputChannel().error(
+        outputChannel.error(
           `Unable to load copybooks completions: ${JSON.stringify(result.reason)}`,
         );
       }

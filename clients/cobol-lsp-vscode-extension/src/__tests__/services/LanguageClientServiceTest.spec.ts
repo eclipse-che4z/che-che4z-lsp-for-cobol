@@ -25,7 +25,7 @@ import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 import { getErrorMessage } from "../../services/util/ErrorsUtils";
 import { registerEvent } from "../../services/reporter";
-import { getOutputChannel } from "../../services/util/OutputChannel";
+import { outputChannel } from "../../extension";
 
 jest.mock("../../services/reporter");
 jest.mock("../../services/copybook/CopybookURI");
@@ -63,7 +63,7 @@ describe("LanguageClientService positive scenario", () => {
   beforeEach(() => {
     middleware = {};
     languageClientService = new LanguageClientService(
-      getOutputChannel(),
+      outputChannel,
       vscode.Uri.file("/storagePath"),
       middleware,
     );
@@ -189,7 +189,7 @@ describe("LanguageClientService positive scenario", () => {
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         middleware: {},
-        outputChannel: getOutputChannel(),
+        outputChannel: outputChannel,
         synchronize: {
           fileEvents: [undefined, undefined, undefined, undefined],
         },
@@ -211,7 +211,7 @@ describe("LanguageClientService positive scenario", () => {
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         middleware: {},
-        outputChannel: getOutputChannel(),
+        outputChannel: outputChannel,
         synchronize: {
           fileEvents: [undefined, undefined, undefined, undefined],
         },
@@ -287,7 +287,7 @@ describe("LanguageClientService negative scenario.", () => {
     jest.spyOn(fs, "existsSync").mockReturnValue(false);
     try {
       await new LanguageClientService(
-        getOutputChannel(),
+        outputChannel,
         vscode.Uri.file("/storagePath"),
         middleware,
       ).checkPrerequisites();

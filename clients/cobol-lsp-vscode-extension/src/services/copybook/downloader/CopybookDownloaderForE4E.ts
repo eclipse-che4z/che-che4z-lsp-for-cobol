@@ -25,7 +25,7 @@ import { CopybookURI } from "../CopybookURI";
 import { E4E_FOLDER, USE_MAP } from "../../../constants";
 import { asPartialProfile, hasMember, Utils } from "../../util/Utils";
 import { SettingsService } from "../../Settings";
-import { getOutputChannel } from "../../util/OutputChannel";
+import { outputChannel } from "../../../extension";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",
@@ -247,11 +247,11 @@ export class CopybookDownloaderForE4E {
       } catch (err) {
         if (err instanceof vscode.FileSystemError.FileExists) {
           // ok - directory already exists, nothing to do
-          getOutputChannel().appendLine(
+          outputChannel.appendLine(
             `FileExists error while allocating '${finishedPath.toString()}' directory for copybooks: ${JSON.stringify(err)}`,
           );
         } else {
-          getOutputChannel().appendLine(
+          outputChannel.appendLine(
             `Unable to allocate ${finishedPath.toString()} - ${hasMember(err, "msg") && typeof err.msg === "string" && err.msg} ${JSON.stringify(err)}`,
           );
           break;

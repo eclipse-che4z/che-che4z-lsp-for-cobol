@@ -6,7 +6,7 @@ import {
 import * as vscode from "vscode";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { DEFAULT_DIALECT } from "../../../constants";
-import { getOutputChannel } from "../../../services/util/OutputChannel";
+import { outputChannel } from "../../../extension";
 import CopybookLib from "../../../services/copybookLibs/CopybookLib";
 
 export type Writable<T> = {
@@ -43,7 +43,7 @@ describe("CopybookMessageHandler", () => {
       const uri = vscode.Uri.file("/workspace/nonexisting");
       const result = await readFileContent(uri.toString());
       expect(result).toBeUndefined();
-      expect(getOutputChannel().error).toHaveBeenCalledWith(
+      expect(outputChannel.error).toHaveBeenCalledWith(
         expect.stringContaining("file/content message handler error"),
       );
     });

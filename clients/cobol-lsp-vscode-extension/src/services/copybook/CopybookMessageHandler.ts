@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
-import { getOutputChannel } from "../util/OutputChannel";
+import { outputChannel } from "../../extension";
 
 export async function readFileContent(
   fileUri: string,
@@ -31,7 +31,7 @@ export async function readFileContent(
     const content = new TextDecoder().decode(data);
     return content;
   } catch (err) {
-    getOutputChannel().error(
+    outputChannel.error(
       `file/content message handler error ${fileUri} ${JSON.stringify(err)}`,
     );
     return;

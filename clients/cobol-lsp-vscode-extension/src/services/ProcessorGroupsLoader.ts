@@ -26,7 +26,7 @@ import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 import CopybookLib from "./copybookLibs/CopybookLib";
 import { SettingsService } from "./Settings";
 import { Memoize } from "./util/Memoize";
-import { getOutputChannel } from "./util/OutputChannel";
+import { outputChannel } from "../extension";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
@@ -300,7 +300,7 @@ async function readProcessorGroupsFile(
       e instanceof Error &&
       (!hasMember(e, "code") || e.code !== "FileNotFound")
     ) {
-      getOutputChannel().error(
+      outputChannel.error(
         `Error while reading ${procCfgPath.toString()} - ${e.message}`,
       );
     }
@@ -393,7 +393,7 @@ async function readProgramConfig(
       e instanceof Error &&
       (!hasMember(e, "code") || e.code !== "FileNotFound")
     ) {
-      getOutputChannel().error(
+      outputChannel.error(
         `Error while reading ${pgmCfgPath.toString()} - ${e.message}`,
       );
     }

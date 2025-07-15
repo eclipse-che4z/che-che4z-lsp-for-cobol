@@ -68,7 +68,6 @@ import {
   resolveCopybookURI,
 } from "./services/copybook/CopybookMessageHandler";
 import { invalidateConfig } from "./services/ProcessorGroupsLoader";
-import { getOutputChannel } from "./services/util/OutputChannel";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -80,6 +79,9 @@ let controlFlowChannel: vscode.LogOutputChannel;
 let analysisService: ControlFlowAnalysisService;
 const API_VERSION: string = "1.0.1";
 
+export const outputChannel: vscode.LogOutputChannel =
+  vscode.window.createOutputChannel("COBOL Language Support", { log: true });
+
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
   controlFlowChannel = vscode.window.createOutputChannel(
@@ -88,7 +90,7 @@ async function initialize(context: vscode.ExtensionContext) {
   );
 
   analysisService = new ControlFlowAnalysisService(
-    getOutputChannel(),
+    outputChannel,
     controlFlowChannel,
   );
   try {
@@ -97,12 +99,12 @@ async function initialize(context: vscode.ExtensionContext) {
     const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
       error,
     )}`;
-    getOutputChannel().appendLine(message);
+    outputChannel.appendLine(message);
     throw Error(message);
   }
 
   languageClientService = new LanguageClientService(
-    getOutputChannel(),
+    outputChannel,
     context.globalStorageUri,
     {
       executeCommand: (command, args, next) => {
@@ -194,7 +196,7 @@ export async function activate(
     }
   } catch (err) {
     if (err instanceof Error) {
-      getOutputChannel().appendLine(err.toString());
+      outputChannel.appendLine(err.toString());
       languageClientService.enableNativeBuild();
       registerExceptionEvent(
         "RuntimeException",
@@ -261,7 +263,7 @@ function findPosition(uri: string): vscode.Position {
       return e.selection.start;
     }
   }
-  getOutputChannel().appendLine(
+  outputChannel.appendLine(
     "Cant find editor for " + uri + " the first program/function will be used.",
   );
   return new vscode.Position(0, 0);
@@ -283,7 +285,7 @@ const registerNewDialect = async (
   extensionId: string,
   dialect: DialectDetail,
 ) => {
-  getOutputChannel().appendLine(
+  outputChannel.appendLine(
     "Register new dialect: \r\n" + JSON.stringify(dialect),
   );
 
@@ -307,7 +309,7 @@ const registerNewDialect = async (
     dialect.snippets.fsPath,
     dialect.isCopyStatement,
   );
-  getOutputChannel().appendLine("Restart analysis");
+  outputChannel.appendLine("Restart analysis");
   await languageClientService.invalidateConfiguration();
 
   const unregisterDialect = async () => {
@@ -408,7 +410,7 @@ function registerCommands(context: vscode.ExtensionContext) {
           }
         } catch (error) {
           vscode.window.showErrorMessage(FAIL_CREATE_COPYBOOK_FOLDER_MSG);
-          getOutputChannel().appendLine(
+          outputChannel.appendLine(
             `${FAIL_CREATE_COPYBOOK_FOLDER_MSG} : ${getErrorMessage(error)}`,
           );
         }
