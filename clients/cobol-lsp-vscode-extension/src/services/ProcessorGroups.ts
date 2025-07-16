@@ -95,22 +95,23 @@ export async function loadProcessorGroupDialectConfig(
 }
 
 function matchProcessorGroup(wsCfg: WorkspaceConfig, documentUri: Uri) {
-  const relativeDocPath = workspace.asRelativePath(documentUri, false);
-
+  const relativeDocPath = toForwardSlashUppercase(
+    workspace.asRelativePath(documentUri, false),
+  );
   const candidates: ProcessorGroup[] = [];
   for (const programConfig of wsCfg.programs) {
+    const programDefinition = toForwardSlashUppercase(programConfig.program);
     // exact match
     if (path.isAbsolute(programConfig.program)) {
-      if (pathMatches(programConfig.program, documentUri.fsPath)) {
+      if (programDefinition === toForwardSlashUppercase(documentUri.fsPath)) {
         return programConfig.processorGroup;
-      }
-    } else {
-      if (relativeDocPath === programConfig.program) {
-        candidates.push(programConfig.processorGroup);
       }
     }
 
-    const m = new Minimatch(programConfig.program, { nocase: true, dot: true });
+    const m = new Minimatch(programDefinition, {
+      nocase: true,
+      dot: true,
+    });
     if (m.match(relativeDocPath)) {
       candidates.push(programConfig.processorGroup);
     }
@@ -121,14 +122,8 @@ function matchProcessorGroup(wsCfg: WorkspaceConfig, documentUri: Uri) {
   return candidates[0];
 }
 
-function pathMatches(program: string, documentPath: string) {
-  return (
-    program === documentPath ||
-    (path.sep === "/"
-      ? program.split("\\").join(path.sep) === documentPath
-      : program.split("/").join(path.sep).toUpperCase() ===
-        documentPath.toUpperCase())
-  );
+function toForwardSlashUppercase(path: string): string {
+  return path.split("\\").join("/").toUpperCase();
 }
 
 export async function loadProcessorGroup(documentUri: Uri) {

@@ -109,6 +109,14 @@ beforeEach(async () => {
                   "profile": "instance.internal.connection"
                 }
               ]
+          },
+          {
+            "name": "back-slash",
+            "libs": [ "/back" ]
+          },
+          {
+            "name": "forward-slash",
+            "libs": [ "/forward" ]
           }
       ]
   }`;
@@ -117,6 +125,8 @@ beforeEach(async () => {
         { "program": "c:\\\\my\\\\workspace\\\\TEST.cob", "pgroup": "DAF" },
         { "program": "${WORKSPACE_PATH}/abs/TEST.cob", "pgroup": "ABS" },
         { "program": "TEST.cob", "pgroup": "DAF" },
+        { "program": "bAcK\\\\TeSt.cob", "pgroup": "back-slash" },
+        { "program": "FoRwArD/TeSt.cob", "pgroup": "forward-slash" },
         { "program": "*DAF.cob", "pgroup": "DAF" },
         { "program": "IDMS/TEST.cob", "pgroup": "IDMSPG" }
     ]
@@ -368,5 +378,23 @@ describe("Processor groups configuration provides lib path in Windows", () => {
       DEFAULT_DIALECT,
     );
     expect(result).toStrictEqual([new LocalPathLib("/copy")]);
+  });
+
+  it("forward slash in PGM definition", async () => {
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "FORWard/teST.cob");
+    const result = await loadProcessorGroupCopybooksLibs(
+      document,
+      DEFAULT_DIALECT,
+    );
+    expect(result).toStrictEqual([new LocalPathLib("/forward")]);
+  });
+
+  it("backward slash in PGM definition", async () => {
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "baCK/TEst.cob");
+    const result = await loadProcessorGroupCopybooksLibs(
+      document,
+      DEFAULT_DIALECT,
+    );
+    expect(result).toStrictEqual([new LocalPathLib("/back")]);
   });
 });
