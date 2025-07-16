@@ -38,7 +38,6 @@ import {
 import * as vscode from "vscode";
 import * as E4ECopybookService from "../../services/copybook/E4ECopybookService";
 import { E4E, E4EExternalConfigurationResponse } from "../../type/e4eApi";
-import { clearWorkspaceConfigCache } from "../../services/ProcessorGroupsLoader";
 
 const WORKSPACE_PATH = "/tests/processor-groups";
 const WORKSPACE_URI = Uri.file(WORKSPACE_PATH);
@@ -162,7 +161,6 @@ beforeEach(async () => {
     .spyOn(E4ECopybookService, "getE4EAPI")
     .mockResolvedValue({ api: e4eMock });
   await initializeExternalAPIs(Uri.file("/storage"));
-  clearWorkspaceConfigCache();
 });
 
 describe("Processor groups", () => {

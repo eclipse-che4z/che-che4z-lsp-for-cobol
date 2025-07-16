@@ -22,7 +22,6 @@ import { DEFAULT_DIALECT } from "../../constants";
 import { DatasetLib } from "../../services/copybookLibs/DatasetLib";
 import LocalPathLib from "../../services/copybookLibs/LocalPathLib";
 import {
-  clearWorkspaceConfigCache,
   LibsDefinitions,
   readSettingConfig,
   readWorkspaceConfig,
@@ -79,10 +78,6 @@ describe("ProcessorGroupsLoader", () => {
   describe("readWorkspaceConfig", () => {
     const WORKSPACE_PATH = "/tests/processor-groups-loader";
     const WORKSPACE_URI = vscode.Uri.file(WORKSPACE_PATH);
-
-    beforeEach(() => {
-      clearWorkspaceConfigCache();
-    });
 
     describe("proc_grps.json file doesn't exist", () => {
       beforeEach(() => {

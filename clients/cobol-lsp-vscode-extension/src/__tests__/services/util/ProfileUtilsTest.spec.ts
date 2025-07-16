@@ -14,7 +14,6 @@
 
 import * as vscode from "vscode";
 import {
-  clearProfiles,
   getProfileNameForCopybook,
   getProfileStatus,
 } from "../../../services/util/ProfileUtils";
@@ -59,10 +58,6 @@ describe("Test profile Utils", () => {
 
   describe("getProfileStatus", () => {
     describe("result is cached", () => {
-      beforeEach(() => {
-        clearProfiles();
-      });
-
       it("calls the check function only once for each profile name", async () => {
         const testCheck = jest.fn();
 

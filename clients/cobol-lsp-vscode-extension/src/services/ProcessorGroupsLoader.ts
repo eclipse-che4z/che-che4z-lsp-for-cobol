@@ -204,7 +204,6 @@ const readEndevorConfigCached = new Memoize(
   workspace.asRelativePath,
 );
 export const readEndevorConfig = readEndevorConfigCached.execute;
-export const invalidateEndevorConfig = readEndevorConfigCached.invalidateCache;
 
 const readWorkspaceConfigCached = new Memoize(
   async function (workspaceUri: Uri): Promise<WorkspaceConfig | undefined> {
@@ -269,6 +268,11 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
 export function invalidateConfig(documentUri: Uri) {
   readWorkspaceConfigCached.invalidateCache(documentUri);
   readEndevorConfigCached.invalidateCache(documentUri);
+}
+
+export function clearWorkspaceConfigCache() {
+  readWorkspaceConfigCached.clearCache();
+  readEndevorConfigCached.clearCache();
 }
 
 async function readProcessorGroupsFile(
@@ -398,9 +402,4 @@ async function readProgramConfig(
       );
     }
   }
-}
-
-export function clearWorkspaceConfigCache() {
-  readWorkspaceConfigCached.clearCache();
-  readEndevorConfigCached.clearCache();
 }

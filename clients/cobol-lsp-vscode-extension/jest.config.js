@@ -10,6 +10,7 @@ module.exports = {
     "<rootDir>/src/web",
     "<rootDir>/.vscode-test",
     "<rootDir>/.vscode-test-web",
+    "<rootDir>/src/__tests__/jest.setup.ts",
   ],
   collectCoverage: true,
   collectCoverageFrom: [
@@ -32,4 +33,5 @@ module.exports = {
       // "statements": -10
     },
   },
+  setupFilesAfterEnv: ["<rootDir>/src/__tests__/jest.setup.ts"],
 };
