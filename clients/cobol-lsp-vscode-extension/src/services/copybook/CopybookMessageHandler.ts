@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
-import { outputChannel } from "../../extension";
+import { outputChannel } from "../util/OutputChannel";
 
 export async function readFileContent(
   fileUri: string,

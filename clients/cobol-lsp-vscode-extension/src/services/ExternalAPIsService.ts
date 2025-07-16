@@ -21,8 +21,8 @@ import { CopybookDownloaderForDsn as CopybookDownloaderForDsn } from "./copybook
 import { SettingsService } from "./Settings";
 import { getE4EAPI } from "./copybook/E4ECopybookService";
 import { Utils } from "./util/Utils";
-import { outputChannel } from "../extension";
 import { clearProfiles } from "./util/ProfileUtils";
+import { outputChannel } from "./util/OutputChannel";
 
 export let externalApis: ExternalAPIsService;
 const diagnosticCollection: vscode.DiagnosticCollection =

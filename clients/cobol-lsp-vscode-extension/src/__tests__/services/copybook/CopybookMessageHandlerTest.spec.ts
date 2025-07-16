@@ -6,8 +6,8 @@ import {
 import * as vscode from "vscode";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { DEFAULT_DIALECT } from "../../../constants";
-import { outputChannel } from "../../../extension";
 import CopybookLib from "../../../services/copybookLibs/CopybookLib";
+import { outputChannel } from "../../../services/util/OutputChannel";
 
 export type Writable<T> = {
   -readonly [P in keyof T]: T[P];

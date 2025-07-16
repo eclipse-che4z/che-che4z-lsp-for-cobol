@@ -25,7 +25,7 @@ import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 import { getErrorMessage } from "../../services/util/ErrorsUtils";
 import { registerEvent } from "../../services/reporter";
-import { outputChannel } from "../../extension";
+import { outputChannel } from "../../services/util/OutputChannel";
 
 jest.mock("../../services/reporter");
 jest.mock("../../services/copybook/CopybookURI");

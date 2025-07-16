@@ -12,11 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { outputChannel } from "../../extension";
 import { LocalFilesystemResourceService } from "../LocalFilesystemResourceService";
 import { LibDefinition } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
+import { outputChannel } from "../util/OutputChannel";
 import CopybookLib from "./CopybookLib";
 import * as vscode from "vscode";
 

@@ -68,6 +68,7 @@ import {
   resolveCopybookURI,
 } from "./services/copybook/CopybookMessageHandler";
 import { invalidateConfig } from "./services/ProcessorGroupsLoader";
+import { outputChannel } from "./services/util/OutputChannel";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -79,8 +80,7 @@ let controlFlowChannel: vscode.LogOutputChannel;
 let analysisService: ControlFlowAnalysisService;
 const API_VERSION: string = "1.0.1";
 
-export const outputChannel: vscode.LogOutputChannel =
-  vscode.window.createOutputChannel("COBOL Language Support", { log: true });
+vscode.window.createOutputChannel("COBOL Language Support", { log: true });
 
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing

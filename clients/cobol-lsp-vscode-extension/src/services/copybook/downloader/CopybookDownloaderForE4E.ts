@@ -25,7 +25,7 @@ import { CopybookURI } from "../CopybookURI";
 import { E4E_FOLDER, USE_MAP } from "../../../constants";
 import { asPartialProfile, hasMember, Utils } from "../../util/Utils";
 import { SettingsService } from "../../Settings";
-import { outputChannel } from "../../../extension";
+import { outputChannel } from "../../util/OutputChannel";
 
 const defaultConfigs: ExternalConfigurationOptions = {
   compiler: "IGYCRCTL",

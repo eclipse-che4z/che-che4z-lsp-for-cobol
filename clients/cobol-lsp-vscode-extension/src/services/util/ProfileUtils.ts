@@ -23,7 +23,7 @@ import {
 import { hasMember } from "../util/Utils";
 import { registerExceptionEvent } from "../reporter";
 import { Memoize } from "../util/Memoize";
-import { outputChannel } from "../../extension";
+import { outputChannel } from "./OutputChannel";
 
 export function getProfileNameForCopybook(
   documentUri: vscode.Uri,

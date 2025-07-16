@@ -26,7 +26,7 @@ import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 import CopybookLib from "./copybookLibs/CopybookLib";
 import { SettingsService } from "./Settings";
 import { Memoize } from "./util/Memoize";
-import { outputChannel } from "../extension";
+import { outputChannel } from "./util/OutputChannel";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";

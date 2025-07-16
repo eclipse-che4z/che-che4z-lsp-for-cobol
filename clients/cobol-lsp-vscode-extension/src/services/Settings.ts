@@ -46,7 +46,7 @@ import {
 import { SupportedVariables } from "./util/FSUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
-import { outputChannel } from "../extension";
+import { outputChannel } from "./util/OutputChannel";
 
 const NONE: string = "NONE";
 const MAX_VM_COUNT = 50000;

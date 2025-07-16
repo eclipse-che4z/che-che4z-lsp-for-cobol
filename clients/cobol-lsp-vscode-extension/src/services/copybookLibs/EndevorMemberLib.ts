@@ -21,7 +21,7 @@ import {
 } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { EndevorLib } from "./EndevorLib";
-import { outputChannel } from "../../extension";
+import { outputChannel } from "../util/OutputChannel";
 
 export class EndevorMemberLib extends EndevorLib implements CopybookLib {
   constructor(private config: EndevorDatasetConfigModel) {

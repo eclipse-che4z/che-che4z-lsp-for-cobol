@@ -28,7 +28,7 @@ import {
   transformLibs,
 } from "../../services/ProcessorGroupsLoader";
 import * as vscode from "vscode";
-import { outputChannel } from "../../extension";
+import { outputChannel } from "../../services/util/OutputChannel";
 
 describe("ProcessorGroupsLoader", () => {
   describe("readSettingConfig", () => {
