@@ -165,7 +165,8 @@ class TestCicsTranslatorOptionsPosition {
   void testTou10() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL NOADATA, CICS(FLAG(I,W)), NOADATA                                     123456",
+            "123456 CBL NOADATA, CICS(FLAG(I,W)), NOADATA                                    "
+                + " 123456",
             URI);
     DialectProcessingContext context = mock(DialectProcessingContext.class);
     when(context.getExtendedDocument()).thenReturn(extDoc);
@@ -181,7 +182,8 @@ class TestCicsTranslatorOptionsPosition {
   void testTou11() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 PROCESS NOADATA, CICS(FLAG(I,W)), NOADATA                                 123456",
+            "123456 PROCESS NOADATA, CICS(FLAG(I,W)), NOADATA                                "
+                + " 123456",
             URI);
     DialectProcessingContext context = mock(DialectProcessingContext.class);
     when(context.getExtendedDocument()).thenReturn(extDoc);
