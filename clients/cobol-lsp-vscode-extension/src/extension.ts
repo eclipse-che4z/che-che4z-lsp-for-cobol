@@ -80,8 +80,6 @@ let controlFlowChannel: vscode.LogOutputChannel;
 let analysisService: ControlFlowAnalysisService;
 const API_VERSION: string = "1.0.1";
 
-vscode.window.createOutputChannel("COBOL Language Support", { log: true });
-
 async function initialize(context: vscode.ExtensionContext) {
   // We need lazy initialization to be able to mock this for unit testing
   controlFlowChannel = vscode.window.createOutputChannel(
