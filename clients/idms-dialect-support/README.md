@@ -10,7 +10,13 @@
 
 COBOL Language Support for IDMS is an add-on for the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) extension. This add-on enables language server protocol features for the [IDMS](https://techdocs.broadcom.com/idms) dialect of COBOL, and support for IDMS copybooks.
 
-## Prerequisites
+<img align="left" alt="This extension is part of the Code4z experience" width="60" height="82" style="padding-right:20px;" src="https://github.com/BroadcomMFD/code4z/blob/main/icon3.png?raw=true" />
+
+COBOL Language Support for IDMS is part of the [Code4z](https://techdocs.broadcom.com/code4z) experience from Broadcom, which offers a modern experience for mainframe application developers. To get started with Code4z, check out our foundational [extension pack](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.code4z-extension-pack).
+
+<br />
+
+## Address Software Requirements
 
 - COBOL Language Support extension version 2.1.0 or higher.
 - Java version 8 or higher with the PATH variable correctly configured. For more information, see the [Java documentation](https://www.java.com/en/download/help/path.html).
