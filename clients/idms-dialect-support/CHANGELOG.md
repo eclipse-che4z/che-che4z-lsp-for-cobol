@@ -8,6 +8,18 @@ All notable changes to the "COBOL Language Support for IDMS" extension are docum
 - Resolve nested COPY IDMS statement inside the IDMS copybook
 - Readme update
 
+## 1.0.5 (2025-02-26)
+
+- Miscellaneous bug fixes
+
+## 1.0.4 (2024-10-25)
+
+- Miscellaneous bug fixes
+
+## 1.0.3 (2024-08-22)
+
+- Miscellaneous bug fixes
+
 ## 1.0.2 (2023-12-20)
 
 - Dialect add-ons now require COBOL Language Support version 2.1.0 or later to run.
