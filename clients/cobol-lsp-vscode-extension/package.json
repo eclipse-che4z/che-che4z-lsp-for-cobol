@@ -1,10 +1,10 @@
 {
   "name": "cobol-language-support",
   "displayName": "COBOL Language Support",
-  "description": "Autocomplete, highlighting and diagnostics for COBOL code and copybooks.",
+  "description": "Code4z rich language support extension for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
@@ -23,7 +23,7 @@
     "cobol",
     "z/os",
     "zowe",
-    "zos",
+    "code4z",
     "ibm",
     "datacom",
     "cics",
