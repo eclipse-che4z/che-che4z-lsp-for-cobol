@@ -1,10 +1,10 @@
 {
   "name": "cobol-language-support-for-idms",
   "displayName": "COBOL Language Support for IDMS",
-  "description": "Autocomplete, highlighting and diagnostics for IDMS COBOL code and copybooks",
+  "description": "Code4z rich language support extension for IDMS COBOL code and copybooks",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "preview": false,
   "publisher": "BroadcomMFD",
   "keywords": [
@@ -16,7 +16,7 @@
     "mainframe",
     "zowe",
     "lsp",
-    "zos",
+    "code4z",
     "z/os"
   ],
   "icon": "resources/logo.png",
