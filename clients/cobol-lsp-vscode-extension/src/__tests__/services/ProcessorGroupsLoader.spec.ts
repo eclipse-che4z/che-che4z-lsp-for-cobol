@@ -111,14 +111,23 @@ describe("ProcessorGroupsLoader", () => {
       beforeEach(() => {
         getWorkspaceFolderResult.uri = WORKSPACE_URI;
         readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] =
-          `{"pgroups": []}`;
+          `{"pgroups": [{ "name": "b4g group" }]}`;
         readFileResult[`${WORKSPACE_PATH}/.cobolplugin/pgm_conf.json`] =
           new FileNotFound();
       });
 
-      it("returns undefined", async () => {
+      it("returns just process groups definitions and empty programs", async () => {
         const result = await readWorkspaceConfig(WORKSPACE_URI);
-        expect(result).toBeUndefined();
+        expect(result).toEqual({
+          processorGroups: {
+            "b4g group": {
+              libs: [],
+              name: "b4g group",
+              preprocessors: [],
+            },
+          },
+          programs: [],
+        });
       });
     });
 
@@ -126,13 +135,22 @@ describe("ProcessorGroupsLoader", () => {
       beforeEach(() => {
         getWorkspaceFolderResult.uri = WORKSPACE_URI;
         readFileResult[`${WORKSPACE_PATH}/.cobolplugin/proc_grps.json`] =
-          `{"pgroups": []}`;
+          `{"pgroups": [{ "name": "b4g group" }]}`;
         readFileResult[`${WORKSPACE_PATH}/.cobolplugin/pgm_conf.json`] = "{}";
       });
 
-      it("returns undefined & error is logged", async () => {
+      it("returns just processor groups definitions and empty programs", async () => {
         const result = await readWorkspaceConfig(WORKSPACE_URI);
-        expect(result).toBeUndefined();
+        expect(result).toEqual({
+          processorGroups: {
+            "b4g group": {
+              libs: [],
+              name: "b4g group",
+              preprocessors: [],
+            },
+          },
+          programs: [],
+        });
         expect(outputChannel.error).toHaveBeenCalledWith(
           expect.stringContaining("Could not validate data"),
         );

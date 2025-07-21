@@ -220,7 +220,7 @@ const readWorkspaceConfigCached = new Memoize(
     });
 
     const programs = await readProgramConfig(workspaceUri);
-    if (!programs) return;
+    if (!programs) return workspaceConfig;
 
     programs.pgms.forEach((program) => {
       let processorGroup = processorGroups.find(
