@@ -17,7 +17,7 @@ This extension is a part of the Che4z open-source project. To contribute and rep
 
 COBOL Language Support is also part of [Code4z](https://techdocs.broadcom.com/code4z), an all-round VS Code extension package that offers a modern experience for mainframe application developers, including tools for language support, data editing, testing, and source code management. For an interactive overview of Code4z, see the [Code4z Developer Cockpit](https://mainframe.broadcom.com/code4z-developer-cockpit).
 
-## Prerequisites
+## Address Software Requirements
 
 There are no client or server-side prerequisites for COBOL Language Support.
 
