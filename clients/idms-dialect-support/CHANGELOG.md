@@ -2,7 +2,7 @@
 
 All notable changes to the "COBOL Language Support for IDMS" extension are documented in this file.
 
-## 1.0.6 (2025-07-XX)
+## 1.0.6 (2025-07-23)
 
 - Tolerate copy IDMS LR statements
 - Resolve nested COPY IDMS statement inside the IDMS copybook
