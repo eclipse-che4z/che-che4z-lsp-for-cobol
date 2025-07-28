@@ -50,12 +50,26 @@ export class LanguageClientService {
   private handlers: Array<(languageClient: LanguageClient) => void> = [];
   private isNativeBuildEnabled: boolean = false;
   private executableService: NativeExecutableService;
+  private middleware: Middleware;
 
   constructor(
     private outputChannel: vscode.OutputChannel,
     private storagePath: vscode.Uri,
-    private middleware: Middleware,
+    middleware: Middleware,
   ) {
+    this.middleware = {
+      ...middleware,
+      sendNotification: (m, n, p) => {
+        console.log("sendNotification:", JSON.stringify(m), JSON.stringify(p));
+        return n(m, p);
+      },
+      sendRequest: async (t, p, c, n) => {
+        console.log("sendRequest:", JSON.stringify(t), JSON.stringify(p));
+        const resp = await n(t, p, c);
+        console.log("response:", JSON.stringify(resp));
+        return resp;
+      },
+    };
     const ext = vscode.extensions.getExtension(extensionId)!;
     this.executablePath = join(
       ext.extensionPath,
@@ -167,7 +181,7 @@ export class LanguageClientService {
     return this.getLanguageClient()?.stop();
   }
 
-  private getLanguageClient() {
+  public getLanguageClient() {
     if (!this.languageClient) {
       this.languageClient = new LanguageClient(
         LANGUAGE_ID,
@@ -187,6 +201,14 @@ export class LanguageClientService {
       middleware: this.middleware,
       documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
       outputChannel: this.outputChannel,
+      connectionOptions: {
+        messageStrategy: {
+          handleMessage: (m, n) => {
+            console.log("handleMessage:", JSON.stringify(m));
+            n(m);
+          },
+        },
+      },
       synchronize: {
         fileEvents: [
           setUpProgramConfigWatcher(this.invalidateConfiguration),

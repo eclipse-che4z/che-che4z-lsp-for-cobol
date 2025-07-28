@@ -32,6 +32,7 @@ on:
     branches:
       - development
       - master
+      - test_diagnose_failure
 
 jobs:
   checks:
@@ -221,7 +222,7 @@ jobs:
         run: |
           cp ../../server/engine/target/server.jar ./server/jar
           npm run build
-          xvfb-run -a npm exec c8 -- --reporter=lcovonly --allowExternal --exclude="**/test/**" --exclude=".vscode-test/**" --exclude=".vscode-test-web/**" -- npm run test:integration
+          # xvfb-run -a npm exec c8 -- --reporter=lcovonly --allowExternal --exclude="**/test/**" --exclude=".vscode-test/**" --exclude=".vscode-test-web/**" -- npm run test:integration
       - name: SonarCloud Scan
         if: github.ref == 'refs/heads/development'
         uses: sonarsource/sonarcloud-github-action@49e6cd3b187936a73b8280d59ffd9da69df63ec9

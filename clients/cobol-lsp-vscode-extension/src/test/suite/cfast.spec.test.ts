@@ -14,12 +14,14 @@
 import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
+import type { LanguageClientService } from "../../services/LanguageClientService";
 
 interface Extension {
   analysis: (
     uri: string,
     text: string,
   ) => Promise<{ controlFlowAST: { name: string }[] }>;
+  languageClientService: LanguageClientService;
 }
 
 suite("Integration Test Suite: CFAST generation", function () {

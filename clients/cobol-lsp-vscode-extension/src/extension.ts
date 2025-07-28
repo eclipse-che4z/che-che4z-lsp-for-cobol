@@ -128,7 +128,10 @@ async function initialize(context: vscode.ExtensionContext) {
 
 export async function activate(
   context: vscode.ExtensionContext,
-): Promise<__ExtensionApi & __AnalysisApi> {
+): Promise<
+  __ExtensionApi &
+    __AnalysisApi & { languageClientService: LanguageClientService }
+> {
   await initTelemetry(context);
   DialectRegistry.clear();
   const { configurationWatcher } = await initialize(context);
@@ -253,6 +256,7 @@ export async function activate(
     getControlFlowAnalysis(documentUri: string) {
       return analysisService.getAnalysis(documentUri);
     },
+    languageClientService,
   };
 }
 function findPosition(uri: string): vscode.Position {
