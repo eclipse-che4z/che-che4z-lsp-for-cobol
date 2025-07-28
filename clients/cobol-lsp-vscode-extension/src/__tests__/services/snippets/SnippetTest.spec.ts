@@ -17,7 +17,7 @@ import { SnippetCompletionProvider } from "../../../services/snippetcompletion/S
 import {
   DialectInfo,
   DialectRegistry,
-} from "../../../services/DialectRegistry";
+} from "../../../services/../dialect/DialectRegistry";
 import path = require("path");
 import { createExtensionContextMock } from "../../../__mocks__/ExtensionContext.utility";
 import { readFileResult } from "../../../__mocks__/vscode";
@@ -51,11 +51,13 @@ describe("Test CompletionProvider", () => {
     jest.spyOn(DialectRegistry, "getDialects").mockReturnValue([
       {
         name: "DaCo",
-        snippetPath: dacoSnippetPath,
+        snippetUri: vscode.Uri.file(dacoSnippetPath),
+        protocolVersion: 1,
       } as DialectInfo,
       {
         name: "IDMS",
-        snippetPath: idmsSnippetPath,
+        snippetUri: vscode.Uri.file(idmsSnippetPath),
+        protocolVersion: 1,
       } as DialectInfo,
     ]);
   });

@@ -29,6 +29,8 @@ import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 /** A COBOL dialect */
 public interface CobolDialect {
   String FILLER = "\u200B";
+  int COBOL_DIALECT_JAVA_VERSION = 1;
+  int COBOL_DIALECT_MODERN_VERSION = 2;
 
   /**
    * Gets the name of the dialect

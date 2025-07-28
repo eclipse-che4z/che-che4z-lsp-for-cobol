@@ -1,0 +1,9 @@
+{
+  "cobol-lsp.logging.level.root": "ALL",
+  "cobol-lsp.serverRuntime": "JAVA",
+  "editor.stickyScroll.defaultModel": "foldingProviderModel",
+  "editor.stickyScroll.maxLineCount": 10,
+  "editor.guides.indentation": true,
+  "cobol-lsp.dialects": ["SAMPLE"],
+  "cobol-lsp.cpy-manager.sample.paths-local": ["copybook"]
+}

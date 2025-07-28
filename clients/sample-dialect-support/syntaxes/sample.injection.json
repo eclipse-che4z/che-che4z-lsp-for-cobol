@@ -1,0 +1,22 @@
+{
+    "scopeName": "sample.injection",
+    "injectionSelector": "L:source.cobol",
+    "patterns": [
+        {
+            "include": "#sample-keywords"
+        },
+        {
+            "include": "#sample-copy-keywords"
+        }
+    ],
+    "repository": {
+        "sample-keywords": {
+            "match": "",
+            "name": "keyword.sample"
+        },
+        "sample-copy-keywords": {
+            "match": "",
+            "name": "keyword.cobol"
+        }
+    }
+}
