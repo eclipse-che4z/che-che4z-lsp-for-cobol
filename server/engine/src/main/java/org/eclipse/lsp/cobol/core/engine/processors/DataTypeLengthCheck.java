@@ -255,14 +255,14 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
   private boolean checkSimpleNumericWithDecimal(
       VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
 
-    if (!pictureClause.matches("(?i)S?9+V9+")) {
+    if (!pictureClause.matches("(?i)S?([09]*9[09]*)?V[09]*9[09]*")) {
       return false;
     }
 
     String numericPart =
         pictureClause.toUpperCase().startsWith("S") ? pictureClause.substring(1) : pictureClause;
 
-    String[] parts = numericPart.split("V");
+    String[] parts = numericPart.replace("0", "").split("V");
     if (parts.length != 2) {
       return false;
     }
