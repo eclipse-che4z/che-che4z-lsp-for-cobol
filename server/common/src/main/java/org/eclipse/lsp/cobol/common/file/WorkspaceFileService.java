@@ -162,9 +162,6 @@ public class WorkspaceFileService implements FileSystemService {
     String uri = ImplicitCodeUtils.createPath(name);
     String content = null;
     try (InputStream inputStream = ImplicitCodeUtils.class.getResourceAsStream(uri)) {
-      if (inputStream == null) {
-        return "";
-      }
       content = readFromInputStream(inputStream, StandardCharsets.UTF_8);
     } catch (IOException e) {
       LOG.error("Implicit code was not loaded. ", e);
