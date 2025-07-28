@@ -15,6 +15,7 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
@@ -72,9 +73,7 @@ public class TestDaCoCopyMixture {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
-            true,
-            false,
-            true,
+            AnalysisConfigSettings.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

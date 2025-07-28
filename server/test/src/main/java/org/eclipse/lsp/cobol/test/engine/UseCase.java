@@ -26,6 +26,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -64,9 +65,7 @@ public class UseCase {
   /** Compile options config */
   @Builder.Default List<String> compilerOptions = Collections.emptyList();
 
-  @Builder.Default boolean cicsTranslator = true;
-
-  @Builder.Default boolean isSqlProcessingEnabled = true;
+  @Builder.Default AnalysisConfigSettings analysisConfigSettings = AnalysisConfigSettings.ENABLED;
 
   /** preprocessor directives mapped with preprocessor name */
   Map<String, List<String>> preprocessorsDirectives;
@@ -82,9 +81,7 @@ public class UseCase {
         new AnalysisConfig(
             copybookProcessingMode,
             dialects,
-            cicsTranslator,
-            false,
-            isSqlProcessingEnabled,
+            analysisConfigSettings,
             ImmutableList.of(),
             dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);

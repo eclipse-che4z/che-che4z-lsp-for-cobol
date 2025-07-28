@@ -22,6 +22,7 @@ import static org.eclipse.lsp.cobol.test.engine.UseCaseUtils.analyze;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
@@ -73,7 +74,7 @@ class TestSqlAnalysisDisabled {
             UseCase.builder()
                 .documentUri(DOCUMENT_URI)
                 .text(UPDATE_SQL_DISABLED)
-                .cicsTranslator(true)
+                .analysisConfigSettings(AnalysisConfigSettings.ENABLED)
                 .copybookProcessingMode(CopybookProcessingMode.ENABLED)
                 .sqlBackend(SQLBackend.NONE)
                 .dialects(ImmutableList.of())

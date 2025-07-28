@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.NodeSymbolType;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
@@ -150,7 +151,7 @@ class TestOutlineTree {
                 .copybook(new CobolText("BAR", "000100     01 HIDE-IT PIC 9(9)."))
                 .copybook(new CobolText("BAZ", ""))
                 .dialects(ImmutableList.of(IdmsDialect.NAME))
-                .cicsTranslator(false)
+                .analysisConfigSettings(AnalysisConfigSettings.ENABLED_NO_CICS)
                 .build());
     assertNodeListEquals(
         expectedNodes,

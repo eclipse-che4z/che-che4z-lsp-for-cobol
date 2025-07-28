@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
@@ -39,9 +40,7 @@ public class DialectConfigs {
     return new AnalysisConfig(
         CopybookProcessingMode.DISABLED,
         ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
-        true,
-        false,
-        true,
+        AnalysisConfigSettings.ENABLED,
         ImmutableList.of(),
         createPredefinedSectionsConfig(
             ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")));
@@ -59,9 +58,7 @@ public class DialectConfigs {
     return new AnalysisConfig(
         copybookProcessingMode,
         ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
-        true,
-        false,
-        true,
+        AnalysisConfigSettings.ENABLED,
         ImmutableList.of(),
         createPredefinedSectionsConfig(predefinedSections));
   }

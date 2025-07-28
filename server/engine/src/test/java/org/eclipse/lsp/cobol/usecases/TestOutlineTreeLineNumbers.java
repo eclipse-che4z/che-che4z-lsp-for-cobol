@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Value;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.service.utils.BuildOutlineTreeFromSyntaxTree;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -83,7 +84,7 @@ class TestOutlineTreeLineNumbers {
         UseCaseUtils.analyze(
             UseCase.builder()
                 .text(TEXT)
-                .cicsTranslator(false)
+                .analysisConfigSettings(AnalysisConfigSettings.ENABLED_NO_CICS)
                 .copybook(new CobolText("BAR", ""))
                 .build());
 
@@ -108,7 +109,11 @@ class TestOutlineTreeLineNumbers {
   @Test
   void unknownNodeName_whenNodeNameIsEmpty() {
     AnalysisResult result =
-        UseCaseUtils.analyze(UseCase.builder().text(DUMMY_NODE_TEXT).cicsTranslator(false).build());
+        UseCaseUtils.analyze(
+            UseCase.builder()
+                .text(DUMMY_NODE_TEXT)
+                .analysisConfigSettings(AnalysisConfigSettings.ENABLED_NO_CICS)
+                .build());
 
     List<DocumentSymbol> actualOutline =
         BuildOutlineTreeFromSyntaxTree.convert(

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -192,9 +193,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            true,
+            AnalysisConfigSettings.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -221,9 +220,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            true,
+            AnalysisConfigSettings.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -254,9 +251,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            true,
+            AnalysisConfigSettings.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");
@@ -275,9 +270,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            false,
+            AnalysisConfigSettings.SKIP_SQL,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
@@ -298,9 +291,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            false,
+            AnalysisConfigSettings.SKIP_SQL,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
@@ -318,9 +309,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            false,
+            AnalysisConfigSettings.SKIP_SQL,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
@@ -338,9 +327,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(),
-            true,
-            false,
-            false,
+            AnalysisConfigSettings.SKIP_SQL,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
