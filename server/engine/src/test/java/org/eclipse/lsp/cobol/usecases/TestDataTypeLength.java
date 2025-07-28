@@ -145,6 +145,10 @@ public class TestDataTypeLength {
           + "       01 {$*VALID-SIMPLE-DEC1} PIC 999V99.\n"
           + "       01 {$*VALID-SIMPLE-DEC2} PIC S9999V999.\n"
           + "       01 {$*INVALID-SIMPLE-DEC|1} PIC 9999999999V999999999.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC2|2} PIC V099999999009999999999900.\n"
+          + "       01 {$*VALID-SIMPLE-DEC3} PIC V099999999999999999900.\n"
+          + "       01 {$*VALID-SIMPLE-DEC4} PIC V999999999999999999.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC3|3} PIC V09999999999999999999.\n"
           + "       PROCEDURE DIVISION.";
 
   private static final String TEXT_FLOATING_POINT =
@@ -372,6 +376,20 @@ public class TestDataTypeLength {
                 new Range(),
                 "Numeric field 'INVALID-SIMPLE-DEC' with length 19 exceeds maximum allowed length"
                     + " of 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC2' with length 19 exceeds maximum allowed"
+                    + " length of 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC3' with length 19 exceeds maximum allowed"
+                    + " length of 18 digits",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
