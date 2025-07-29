@@ -107,15 +107,16 @@ public class AnalysisService {
    * @param uri Source URI
    * @param text Content
    * @param isNew Is document just opened, or it's reanalyse request.
+   * @param langId - document language id
    */
-  public void analyzeDocument(String uri, String text, boolean isNew) {
+  public void analyzeDocument(String uri, String text, boolean isNew, String langId) {
     String logPrefix = isNew ? "[analyzeDocument] Document " : "[reanalyzeDocument] Document ";
     LOG.debug(logPrefix + uri + " opened");
 
     List<Program> astList = new LinkedList<>();
     if (!isCopybook(uri, text)) {
       LOG.debug(logPrefix + uri + " treated as a program, start analyzing");
-      astList = analyzeDocumentWithCopybooks(uri, text);
+      astList = analyzeDocumentWithCopybooks(uri, text, langId);
     }
     this.clientProvider.get().cfastReady(new ExtendedApiResult(astList, uri));
   }
@@ -125,17 +126,17 @@ public class AnalysisService {
    *
    * @param uri - document uri
    * @param text - document text
+   * @param langId - document language id
    * @return a list of program nodes
    */
-  private List<Program> analyzeDocumentWithCopybooks(String uri, String text) {
+  private List<Program> analyzeDocumentWithCopybooks(String uri, String text, String langId) {
     List<Program> astList = new LinkedList<>();
     try {
       CopybookProcessingMode copybookProcessingMode =
           CopybookProcessingMode.getCopybookProcessingMode(uri, CopybookProcessingMode.ENABLED);
       AnalysisConfig config = configurationService.getConfig(uri, copybookProcessingMode);
       ThreadInterruptionUtil.checkThreadInterrupted();
-      AnalysisResult result =
-          engine.analyze(uri, text, config, documentService.get(uri).getLanguageId());
+      AnalysisResult result = engine.analyze(uri, text, config, langId);
       documentService.processAnalysisResult(uri, result, text);
       ThreadInterruptionUtil.checkThreadInterrupted();
 

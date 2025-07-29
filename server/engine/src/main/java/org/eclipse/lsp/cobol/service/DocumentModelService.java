@@ -130,10 +130,13 @@ public class DocumentModelService {
    *
    * @param uri - document uri
    * @param text - document text
+   * @return document model associated with the uri
    */
   @Synchronized
-  public void changeDocument(String uri, String text) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> d.update(text));
+  public CobolDocumentModel changeDocument(String uri, String text) {
+    CobolDocumentModel model = docs.get(uri);
+    if (model != null) model.update(text);
+    return model;
   }
 
   /**

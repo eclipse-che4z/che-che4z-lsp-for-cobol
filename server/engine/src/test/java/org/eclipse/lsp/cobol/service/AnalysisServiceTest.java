@@ -91,7 +91,7 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
-    service.analyzeDocument(uri, text, true);
+    service.analyzeDocument(uri, text, true, "");
     verify(documentService, times(0)).processAnalysisResult(eq(uri), any(), anyString());
     verify(engine, times(0)).analyze(any(), any(), any());
   }
@@ -105,10 +105,7 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
     when(engine.analyze(any(), any(), any(), anyString())).thenReturn(result);
-    CobolDocumentModel mockDocModel = mock(CobolDocumentModel.class);
-    when(mockDocModel.getLanguageId()).thenReturn("cobol");
-    when(documentService.get(uri)).thenReturn(mockDocModel);
-    service.analyzeDocument(uri, text, true);
+    service.analyzeDocument(uri, text, true, "cobol");
     verify(documentService, times(1)).processAnalysisResult(eq(uri), any(), anyString());
     verify(engine, times(1)).analyze(any(), any(), any(), anyString());
   }
@@ -119,7 +116,7 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
-    service.analyzeDocument(uri, text, false);
+    service.analyzeDocument(uri, text, false, "");
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -129,11 +126,8 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
     when(engine.analyze(any(), any(), any(), anyString())).thenReturn(prepareAnalysisResult());
-    CobolDocumentModel mockDocModel = mock(CobolDocumentModel.class);
-    when(mockDocModel.getLanguageId()).thenReturn("cobol");
-    when(documentService.get(uri)).thenReturn(mockDocModel);
 
-    service.analyzeDocument(uri, text, false);
+    service.analyzeDocument(uri, text, false, "cobol");
     verify(engine, times(1)).analyze(any(), any(), any(), anyString());
   }
 

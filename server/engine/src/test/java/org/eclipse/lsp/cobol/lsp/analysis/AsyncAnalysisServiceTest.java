@@ -74,7 +74,7 @@ class AsyncAnalysisServiceTest {
 
   @Test
   void testReanalyseCopybooksAssociatedPrograms() {
-    Map<String, Integer> analysisResultsRevisionsMock = mock(Map.class);
+    Map<String, Integer> analysisResultsRevisionsMock = new HashMap<>();
     try {
       Field field = AsyncAnalysisService.class.getDeclaredField("analysisResultsRevisions");
       field.setAccessible(true);
@@ -90,7 +90,7 @@ class AsyncAnalysisServiceTest {
     when(documentModelService.getAllOpened()).thenReturn(ImmutableList.of(cobolDocumentModel));
     when(documentModelService.get(any())).thenReturn(cobolDocumentModel);
     when(analysisService.isCopybook(anyString(), anyString())).thenReturn(false);
-    when(analysisResultsRevisionsMock.get(cobolDocumentModel.getUri())).thenReturn(1);
+    analysisResultsRevisionsMock.put(cobolDocumentModel.getUri(), 1);
     asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
         uris, "copybookUri", "copybookContent", eventSource);
 
