@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
@@ -78,12 +79,21 @@ public class AnalysisHandler {
       throws ExecutionException, InterruptedException {
     String uri = analysisResultEvent.getUri();
     CobolDocumentModel doc = documentModelService.get(uri);
+    if (doc == null) {
+      communications.notifyGeneralMessage(MessageType.Info, "Unable to retrieve document model");
+      return new ExtendedApiResult(ImmutableList.of(), "");
+    }
     if (analysisService.isCopybook(uri, analysisResultEvent.getText())) {
       communications.notifyGeneralMessage(
           MessageType.Info, "Cannot retrieve outline tree because file was treated as a copybook");
       return new ExtendedApiResult(ImmutableList.of(), "");
     }
-    RootNode rootNode = doc.getLastAnalysisResult().getRootNode();
+    final AnalysisResult results = doc.getLastAnalysisResult();
+    if (results == null) {
+      communications.notifyGeneralMessage(MessageType.Info, "Analysis result is not available");
+      return new ExtendedApiResult(ImmutableList.of(), "");
+    }
+    RootNode rootNode = results.getRootNode();
     int line = analysisResultEvent.getLine();
     int character = analysisResultEvent.getCharacter();
     Position position = new Position(line, character);
@@ -140,10 +150,6 @@ public class AnalysisHandler {
     AnalysisResultEvent analysisResultEvent =
         ofNullable(new Gson().fromJson(params.toString(), AnalysisResultEvent.class))
             .orElseGet(() -> new AnalysisResultEvent("", "", 0, 0));
-    String uri = analysisResultEvent.getUri();
-    if (documentModelService.get(uri) == null) {
-      asyncAnalysisService.scheduleAnalysis(uri, analysisResultEvent.getText(), true);
-    }
     return ImmutableList.of(asyncAnalysisService.createDependencyOn(analysisResultEvent.getUri()));
   }
 }

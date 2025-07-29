@@ -47,11 +47,13 @@ public class DocumentModelService {
    * @param uri - document uri
    * @param text - document text
    * @param languageId
+   * @return document model
    */
   @Synchronized
-  public void openDocument(String uri, String text, String languageId) {
+  public CobolDocumentModel openDocument(String uri, String text, String languageId) {
     CobolDocumentModel model = docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text));
     Optional.ofNullable(languageId).ifPresent(model::setLanguageId);
+    return model;
   }
 
   /**

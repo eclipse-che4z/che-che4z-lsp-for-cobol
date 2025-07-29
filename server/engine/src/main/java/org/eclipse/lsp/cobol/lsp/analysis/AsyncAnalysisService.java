@@ -88,45 +88,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
   /**
-   * Schedule an analysis last known revision of the file will be assumed or 0 if none
-   *
-   * @param uri source URI
-   * @param text content
-   * @param open Is document just opened, or it's reanalyse request
-   * @return document model with analysis result
-   */
-  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(
-      String uri, String text, boolean open) {
-    return scheduleAnalysis(
-        uri,
-        text,
-        analysisResultsRevisions.getOrDefault(uri, 0),
-        open,
-        SourceUnitGraph.EventSource.IDE);
-  }
-
-  /**
-   * Schedule an analysis last known revision of the file will be assumed or 0 if none
-   *
-   * @param uri source URI
-   * @param text content
-   * @param currentRevision the document currentRevision
-   * @param open Is document just opened, or it's reanalyse request
-   * @param eventSource source of the event
-   * @return document model with analysis result
-   */
-  public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(
-      String uri,
-      String text,
-      Integer currentRevision,
-      boolean open,
-      SourceUnitGraph.EventSource eventSource) {
-    CobolDocumentModel model = documentModelService.changeDocument(uri, text);
-    if (model != null) return scheduleAnalysis(model, currentRevision, open, false, eventSource);
-    else return new FutureTask<>(() -> model);
-  }
-
-  /**
    * Schedule an analysis
    *
    * @param documentModel document model
@@ -178,7 +139,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     final String langId = documentModel.getLanguageId();
     return () -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
-        notifyAllListeners(AnalysisState.SKIPPED, documentModelService.get(uri), eventSource);
+        notifyAllListeners(AnalysisState.SKIPPED, documentModel, eventSource);
         LOG.debug(
             "[scheduleAnalysis] skip revision: "
                 + currentRevision
@@ -189,13 +150,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       LOG.debug("[scheduleAnalysis] waiting for previous analysis of {} to finish", uri);
       try {
         LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
-        notifyAllListeners(AnalysisState.STARTED, documentModelService.get(uri), eventSource);
+        notifyAllListeners(AnalysisState.STARTED, documentModel, eventSource);
         communications.notifyProgressBegin(uri);
-        documentModelService.get(uri).setOutlineResult(null);
+        documentModel.setOutlineResult(null);
         analysisService.analyzeDocument(uri, text, open, langId);
-        notifyAllListeners(AnalysisState.COMPLETED, documentModelService.get(uri), eventSource);
+        notifyAllListeners(AnalysisState.COMPLETED, documentModel, eventSource);
         analysisResults.remove(id);
-        return documentModelService.get(uri);
+        return documentModel;
       } catch (
           Exception
               genericException) { // Ideally we should not do this, but a safer catch might help to
@@ -205,9 +166,8 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             genericException,
             uri,
             genericException);
-        notifyAllListeners(
-            AnalysisState.EXCEPTIONALLY_FINISHED, documentModelService.get(uri), eventSource);
-        return documentModelService.get(uri);
+        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, documentModel, eventSource);
+        return documentModel;
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
@@ -419,9 +379,10 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uri of document
    * @param text content od document.
    * @param languageId
+   * @return document model
    */
-  public void openDocument(String uri, String text, String languageId) {
-    documentModelService.openDocument(uri, text, languageId);
+  public CobolDocumentModel openDocument(String uri, String text, String languageId) {
+    return documentModelService.openDocument(uri, text, languageId);
   }
 
   @Override

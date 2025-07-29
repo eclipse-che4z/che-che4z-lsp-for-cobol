@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp4j.DocumentHighlight;
@@ -63,8 +64,9 @@ public class DocumentHighlightHandler {
    */
   public List<DocumentHighlight> documentHighlight(DocumentHighlightParams params) {
     String uri = params.getTextDocument().getUri();
-    return occurrences.findHighlights(
-        documentModelService.get(uri).getLastAnalysisResult(), params);
+    final CobolDocumentModel documentModel = documentModelService.get(uri);
+    if (documentModel == null) return ImmutableList.of();
+    return occurrences.findHighlights(documentModel.getLastAnalysisResult(), params);
   }
 
   /**

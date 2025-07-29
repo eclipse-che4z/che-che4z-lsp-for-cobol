@@ -111,7 +111,7 @@ class CobolTextDocumentServiceTest {
             documentModelService,
             watcherService,
             copybookService);
-    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph);
+    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph, documentModelService);
     DefinitionHandler definitionHandler =
         new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
     DocumentSymbolHandler documentSymbolHandler =
