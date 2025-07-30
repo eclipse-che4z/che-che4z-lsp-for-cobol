@@ -39,13 +39,7 @@ import org.eclipse.lsp.cobol.lsp.CobolWorkspaceServiceImpl;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.*;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationBasedOnExtension;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationCombinedStrategy;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationServiceBasedOnContent;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameService;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookNameServiceImpl;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookServiceImpl;
+import org.eclipse.lsp.cobol.service.copybooks.*;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.actions.FindCopybookCommand;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
@@ -56,8 +50,8 @@ import org.eclipse.lsp.cobol.service.delegates.formations.Formation;
 import org.eclipse.lsp.cobol.service.delegates.formations.Formations;
 import org.eclipse.lsp.cobol.service.delegates.formations.TrimFormation;
 import org.eclipse.lsp.cobol.service.delegates.hover.CopybookHoverProvider;
+import org.eclipse.lsp.cobol.service.delegates.hover.DefinedAndUsedStructureHoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
-import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.service.delegates.references.ElementOccurrences;
 import org.eclipse.lsp.cobol.service.delegates.references.Occurrences;
 import org.eclipse.lsp.cobol.service.mocks.MockLanguageClient;
@@ -120,7 +114,7 @@ public class ClientServerTestModule extends AbstractModule {
   private void bindHoverActions() {
     Multibinder<HoverProvider> hoverProviderMultibinder =
         newSetBinder(binder(), HoverProvider.class);
-    hoverProviderMultibinder.addBinding().to(VariableHover.class);
+    hoverProviderMultibinder.addBinding().to(DefinedAndUsedStructureHoverProvider.class);
     hoverProviderMultibinder.addBinding().to(CopybookHoverProvider.class);
   }
 

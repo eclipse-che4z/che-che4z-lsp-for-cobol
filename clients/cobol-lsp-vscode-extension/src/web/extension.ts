@@ -23,8 +23,8 @@ import { initSmartTab, RangeTabShiftStore } from "../commands/SmartTabCommand";
 import { initTelemetry, registerEvent } from "../services/reporter";
 import { SubroutinesCompletionsProvider } from "../services/subroutines/SubroutinesCompletionsProvider";
 import { CopybooksCompletionProvider } from "../services/copybook/CopybooksCompletionProvider";
-
-let outputChannel: vscode.OutputChannel;
+import { initializeExternalAPIs } from "../services/ExternalAPIsService";
+import { outputChannel } from "../services/util/OutputChannel";
 
 export async function activate(context: ExtensionContext) {
   await initTelemetry(context);
@@ -34,8 +34,9 @@ export async function activate(context: ExtensionContext) {
     "Web extension activation event was triggered",
   );
 
-  outputChannel = vscode.window.createOutputChannel("COBOL Language Support");
   outputChannel.appendLine("Activating COBOL Language Support Web Extension");
+
+  await initializeExternalAPIs(context.globalStorageUri);
 
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
@@ -72,7 +73,7 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       { language: LANGUAGE_ID },
-      new CopybooksCompletionProvider(undefined, outputChannel),
+      new CopybooksCompletionProvider(),
     ),
   );
 }

@@ -66,7 +66,7 @@ export async function loadBridgeJsonContent(
   return reloadBridgeJsonContent(b4gPath);
 }
 
-const watcherChangeEventHandler = (uri: Uri) => {
+export const watcherChangeEventHandler = (uri: Uri) => {
   bridge4GitCacheMap.delete(uri.toString());
 };
 

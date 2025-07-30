@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -161,5 +162,29 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
       }
     }
     return super.visitCicsTranslatorDirectives(ctx);
+  }
+
+  @Override
+  public Object visitCobolJavaInteroperabilityOptions(
+      CompilerDirectivesParser.CobolJavaInteroperabilityOptionsContext ctx) {
+    for (TerminalNode commaToken : ctx.COMMACHAR()) {
+      if (commaToken.getText().length() <= 1) continue;
+      Range range =
+          CompilerDirectivesUtils.shiftRange(
+              AntlrRangeUtils.constructRange(commaToken), startPosition);
+
+      Location location = new Location(analysisContext.getExtendedDocument().getUri(), range);
+      analysisContext
+          .getAccumulatedErrors()
+          .add(
+              SyntaxError.syntaxError()
+                  .errorSource(ErrorSource.PARSING)
+                  .location(new OriginalLocation(location, null))
+                  .suggestion(
+                      messageService.getMessage("compilerDirective.javaiop.spaceAfterComma"))
+                  .severity(ErrorSeverity.ERROR)
+                  .build());
+    }
+    return super.visitCobolJavaInteroperabilityOptions(ctx);
   }
 }

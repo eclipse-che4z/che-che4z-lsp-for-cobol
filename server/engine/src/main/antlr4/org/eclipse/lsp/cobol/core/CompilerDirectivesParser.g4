@@ -161,6 +161,7 @@ cobolCompilerOption
    | INITIAL | NOINITIAL
    | INLINE | INL | NOINLINE | NOINL
    | INTDATE LPARENCHAR (ANSI | LILIAN) RPARENCHAR
+   | cobolJavaInteroperabilityOptions
    | (INVDATA | INVD) (LPARENCHAR invdataSuboptions (COMMACHAR invdataSuboptions)* RPARENCHAR)? | NOINVDATA | NOINVD
    | (LANGUAGE | LANG) LPARENCHAR (ENGLISH | EN | JAPANESE | JA | JP | UENGLISH | UE) RPARENCHAR
    | (LINECOUNT | LC) LPARENCHAR INTEGERLITERAL RPARENCHAR
@@ -212,6 +213,14 @@ cobolCompilerOption
    | (ZONEDATA | ZD) LPARENCHAR (PFD | MIG | NOPFD) RPARENCHAR
    | ZWB | NOZWB | deprecatedCompilerOptions
    ;
+
+cobolJavaInteroperabilityOptions:
+            (JAVAIOP | JIOP) LPARENCHAR cobolJavaInteroperabilitySubOptions (COMMACHAR cobolJavaInteroperabilitySubOptions)* RPARENCHAR | (NOJAVAIOP | NOJIOP);
+
+ cobolJavaInteroperabilitySubOptions : (OUTPATH | OP) LPARENCHAR LITERAL RPARENCHAR
+                | (NOJVMINITOPTIONS | NOJVMI)
+                | (JVMINITOPTIONS | JVMI) LPARENCHAR LITERAL RPARENCHAR
+                | (NOJAVA64 | JAVA64);
 
 ssrangeSuboptions
    : NOZLEN

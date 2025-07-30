@@ -26,13 +26,13 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.delegates.hover.DefinedAndUsedStructureHoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
-import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 
 /** Hovering over 88 with multiple VALUE clauses should show all of them */
@@ -50,13 +50,15 @@ class Test88ThruHover {
           + "          88 {$*BIT-FOUR} VALUES X'40'  THRU  X'7F'\n"
           + "                              X'C0' THRU X'FF'.";
   public static final String HOVER =
-      "01 EIGHT-BITS PIC X.\n"
+      "```cobol\n"
+          + "01 EIGHT-BITS PIC X.\n"
           + "  88 BIT-ONE VALUE IS X'80' THRU X'FF'.\n"
           + "  88 BIT-TWO VALUES ARE X'40' THRU X'7F'\n"
           + "                        X'C0' THRU X'FF'.\n"
           + "  88 BIT-THREE VALUE X'80' THRU X'FF'.\n"
           + "  88 BIT-FOUR VALUES X'40' THRU X'7F'\n"
-          + "                     X'C0' THRU X'FF'.";
+          + "                     X'C0' THRU X'FF'.\n\n"
+          + "```";
 
   @Test
   void test() {
@@ -72,18 +74,20 @@ class Test88ThruHover {
   }
 
   private void assertHover(AnalysisResult result) {
-    HoverProvider provider = new VariableHover();
+    HoverProvider provider = new DefinedAndUsedStructureHoverProvider();
 
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    CobolDocumentModel document = new CobolDocumentModel("", "", result);
+    document.setLanguageId(CobolLanguageId.COBOL.getId());
     final Hover actual =
         provider.getHover(
-            new CobolDocumentModel("", "", result),
+            document,
             new TextDocumentPositionParams(
                 new TextDocumentIdentifier(DOCUMENT_URI), new Position(4, 15)),
             documentGraph);
 
-    Hover expected = new Hover(ImmutableList.of(Either.forRight(new MarkedString("cobol", HOVER))));
+    Hover expected = new Hover(new MarkupContent(MarkupKind.MARKDOWN, HOVER));
     assertEquals(expected, actual);
   }
 }

@@ -25,14 +25,14 @@ import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.delegates.hover.DefinedAndUsedStructureHoverProvider;
 import org.eclipse.lsp.cobol.service.delegates.hover.HoverProvider;
-import org.eclipse.lsp.cobol.service.delegates.hover.VariableHover;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -81,36 +81,23 @@ class TestFileDescriptor {
           + "            CLOSE {$INFILE}.";
 
   private static final String HOVER =
-      "DESCRIPTION "
-          + System.lineSeparator()
-          + "----------- "
-          + System.lineSeparator()
-          + "FD  INFILE"
-          + System.lineSeparator()
-          + "LABEL RECORDS ARE STANDARD"
-          + System.lineSeparator()
-          + "DATA RECORD IS INPUTREC"
-          + System.lineSeparator()
-          + "RECORD CONTAINS 80 CHARACTERS"
-          + System.lineSeparator()
-          + "RECORDING MODE IS F"
-          + System.lineSeparator()
-          + "BLOCK CONTAINS 0 RECORDS."
-          + System.lineSeparator()
-          + " "
-          + System.lineSeparator()
-          + "FILE-CONTROL"
-          + System.lineSeparator()
-          + "------------ "
-          + System.lineSeparator()
-          + "ASSIGN TO \"C:\\INFILE.DAT\""
-          + System.lineSeparator()
-          + "ORGANIZATION IS LINE SEQUENTIAL"
-          + System.lineSeparator()
-          + "ACCESS MODE IS SEQUENTIAL"
-          + System.lineSeparator()
-          + "FILE STATUS IS IFCODE "
-          + System.lineSeparator();
+      "```cobol\n"
+          + "DESCRIPTION \n"
+          + "----------- \n"
+          + "FD  INFILE\n"
+          + "LABEL RECORDS ARE STANDARD\n"
+          + "DATA RECORD IS INPUTREC\n"
+          + "RECORD CONTAINS 80 CHARACTERS\n"
+          + "RECORDING MODE IS F\n"
+          + "BLOCK CONTAINS 0 RECORDS.\n"
+          + " \n"
+          + "FILE-CONTROL\n"
+          + "------------ \n"
+          + "ASSIGN TO \"C:\\INFILE.DAT\"\n"
+          + "ORGANIZATION IS LINE SEQUENTIAL\n"
+          + "ACCESS MODE IS SEQUENTIAL\n"
+          + "FILE STATUS IS IFCODE \n\n"
+          + "```";
 
   private static final String NO_FILE_CONTROL_TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -205,16 +192,18 @@ class TestFileDescriptor {
 
   private void assertHover(AnalysisResult result) {
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
-    HoverProvider provider = new VariableHover();
+    HoverProvider provider = new DefinedAndUsedStructureHoverProvider();
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
+    CobolDocumentModel document = new CobolDocumentModel("", "", result);
+    document.setLanguageId(CobolLanguageId.COBOL.getId());
     final Hover actual =
         provider.getHover(
-            new CobolDocumentModel("", "", result),
+            document,
             new TextDocumentPositionParams(
                 new TextDocumentIdentifier(DOCUMENT_URI), new Position(6, 24)),
             documentGraph);
 
-    Hover expected = new Hover(ImmutableList.of(Either.forRight(new MarkedString("cobol", HOVER))));
+    Hover expected = new Hover(new MarkupContent(MarkupKind.MARKDOWN, HOVER));
     assertEquals(expected, actual);
   }
 

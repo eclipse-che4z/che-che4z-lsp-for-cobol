@@ -16,20 +16,49 @@ import { workspace, Uri } from "vscode";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { isLeft } from "fp-ts/Either";
 import { TextDecoder } from "util";
+import { asArray, hasMember } from "./util/Utils";
+import LocalPathLib from "./copybookLibs/LocalPathLib";
+import { UssPathLib } from "./copybookLibs/UssPathLib";
+import { DatasetLib } from "./copybookLibs/DatasetLib";
+import { externalApis } from "./ExternalAPIsService";
+import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
+import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
+import CopybookLib from "./copybookLibs/CopybookLib";
+import { SettingsService } from "./Settings";
+import { Memoize } from "./util/Memoize";
+import { outputChannel } from "./util/OutputChannel";
 
 const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
 const PG_PROC_FILE = "proc_grps.json";
-const EMPTY_PROGRAM_CONFIG = { pgms: [] };
-const workspaceConfigs: [
-  Map<string, ProcessorGroup[]>,
-  Map<string, ProgramsConfig>,
-] = [new Map<string, ProcessorGroup[]>(), new Map<string, ProgramsConfig>()];
 
-export const enum ProcessorIndex {
-  PROCESSOR_GROUP = 0,
-  PROGRAM_CONFIG = 1,
+type ProgramConfig = {
+  program: string;
+  processorGroup: ProcessorGroup;
+};
+
+export interface WorkspaceConfig {
+  programs: ProgramConfig[];
+  processorGroups: { [key: string]: ProcessorGroup };
 }
+
+export type ProcessorGroup = {
+  name: string;
+  preprocessors?: Preprocessor[];
+} & Partial<ProcessorGroupProperties>;
+
+export type Preprocessor = {
+  name: string;
+} & Partial<ProcessorGroupProperties>;
+
+export interface ProcessorGroupProperties {
+  libs: CopybookLib[];
+  "copybook-extensions": string[];
+  "compiler-options": string[];
+  "copybook-file-encoding": string;
+  "target-sql-backend": string;
+}
+
 const ProgramsConfigModel = t.type({
   pgms: t.array(
     t.type({
@@ -38,6 +67,13 @@ const ProgramsConfigModel = t.type({
     }),
   ),
 });
+export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
+
+const EndevorDatasetModel = t.intersection([
+  t.type({ dataset: t.string }),
+  t.partial({ profile: t.string }),
+]);
+export type EndevorDatasetConfigModel = t.TypeOf<typeof EndevorDatasetModel>;
 
 const EndevorConfigModel = t.intersection([
   t.type({
@@ -50,35 +86,37 @@ const EndevorConfigModel = t.intersection([
   t.partial({ use_map: t.boolean }),
   t.partial({ profile: t.string }),
 ]);
+export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
 
 const ZoweDatasetConfigModel = t.intersection([
   t.type({ dataset: t.string }),
   t.partial({ profile: t.string }),
 ]);
+export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
 
 const ZoweUssConfigModel = t.intersection([
   t.type({ uss: t.string }),
   t.partial({ profile: t.string }),
 ]);
-
-export type ProgramsConfig = t.TypeOf<typeof ProgramsConfigModel>;
-export type EndevorConfigModel = t.TypeOf<typeof EndevorConfigModel>;
-export type ZoweDatasetConfigModel = t.TypeOf<typeof ZoweDatasetConfigModel>;
 export type ZoweUssConfigModel = t.TypeOf<typeof ZoweUssConfigModel>;
 
-const PreprocessorModel = t.union([
+const LibModel = t.union([
+  t.string,
+  EndevorConfigModel,
+  EndevorDatasetModel,
+  ZoweDatasetConfigModel,
+  ZoweUssConfigModel,
+]);
+const LibsModel = t.array(LibModel);
+export type LibDefinition = t.TypeOf<typeof LibModel>;
+export type LibsDefinitions = t.TypeOf<typeof LibsModel>;
+
+const PreprocessorItemModel = t.union([
   t.string,
   t.intersection([
     t.type({ name: t.string }),
     t.partial({
-      libs: t.array(
-        t.union([
-          t.string,
-          EndevorConfigModel,
-          ZoweDatasetConfigModel,
-          ZoweUssConfigModel,
-        ]),
-      ),
+      libs: LibsModel,
       "copybook-extensions": t.array(t.string),
       "compiler-options": t.array(t.string),
       "copybook-file-encoding": t.string,
@@ -87,22 +125,20 @@ const PreprocessorModel = t.union([
   ]),
 ]);
 
-export type Preprocessor = t.TypeOf<typeof PreprocessorModel>;
+const PreprocessorModel = t.union([
+  PreprocessorItemModel,
+  t.array(PreprocessorItemModel),
+]);
+
+type PreprocessorDefinition = t.TypeOf<typeof PreprocessorModel>;
 
 const ProcessorGroupModel = t.intersection([
   t.type({
     name: t.string,
   }),
   t.partial({
-    preprocessor: t.union([PreprocessorModel, t.array(PreprocessorModel)]),
-    libs: t.array(
-      t.union([
-        t.string,
-        EndevorConfigModel,
-        ZoweDatasetConfigModel,
-        ZoweUssConfigModel,
-      ]),
-    ),
+    preprocessor: PreprocessorModel,
+    libs: LibsModel,
     "copybook-extensions": t.array(t.string),
     "compiler-options": t.array(t.string),
     "copybook-file-encoding": t.string,
@@ -110,54 +146,143 @@ const ProcessorGroupModel = t.intersection([
   }),
 ]);
 
-export type ProcessorGroup = t.TypeOf<typeof ProcessorGroupModel>;
+const ProcessorGroupsModel = t.type({
+  pgroups: t.array(ProcessorGroupModel),
+});
 
-export async function readProgramConfigFileContent(
-  documentUri: Uri,
-): Promise<ProgramsConfig> {
-  const ws = workspace.getWorkspaceFolder(documentUri);
-  if (ws === undefined) {
-    return EMPTY_PROGRAM_CONFIG;
-  }
-  const wsUriString = ws.uri.toString();
-  const pgmCfgPath = Uri.joinPath(ws.uri, PG_FOLDER, PGR_PGM_FILE);
+type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
+export type ProcessorGroupsDefinition = t.TypeOf<typeof ProcessorGroupsModel>;
 
-  if (workspaceConfigs[ProcessorIndex.PROGRAM_CONFIG].has(wsUriString)) {
-    return workspaceConfigs[ProcessorIndex.PROGRAM_CONFIG].get(wsUriString)!;
-  } else {
-    return await readProgranConfigAndCache(wsUriString, pgmCfgPath);
-  }
+export type CopybookLibTypes =
+  | typeof LocalPathLib
+  | typeof DatasetLib
+  | typeof UssPathLib
+  | typeof EndevorElementLib
+  | typeof EndevorMemberLib;
+
+const readEndevorConfigCached = new Memoize(
+  async function (documentUri: Uri): Promise<WorkspaceConfig | undefined> {
+    if (!externalApis.handleAsEndevorElement(documentUri.toString())) {
+      return;
+    }
+
+    const workspaceConfig: WorkspaceConfig = {
+      processorGroups: {},
+      programs: [],
+    };
+
+    const endevorData =
+      await externalApis.e4eDownloader?.getEndevorProcessorGroupConfig(
+        documentUri,
+      );
+    if (endevorData) {
+      const processorGroups = endevorData.pgroups.map(
+        transformProcessorGroup([EndevorElementLib, EndevorMemberLib]),
+      );
+      processorGroups.forEach((pg) => {
+        workspaceConfig.processorGroups[pg.name] = pg;
+      });
+
+      const processorGroupName = endevorData.pgms[0].pgroup;
+      const processorGroup = processorGroups.find(
+        (pg) => pg.name === processorGroupName,
+      );
+      if (processorGroup) {
+        const programs: ProgramConfig[] = [
+          {
+            program: workspace.asRelativePath(documentUri),
+            processorGroup,
+          },
+        ];
+        workspaceConfig.programs = programs;
+      }
+    }
+
+    return workspaceConfig;
+  },
+  undefined,
+  workspace.asRelativePath,
+);
+export const readEndevorConfig = readEndevorConfigCached.execute;
+
+const readWorkspaceConfigCached = new Memoize(
+  async function (workspaceUri: Uri): Promise<WorkspaceConfig | undefined> {
+    const processorGroups = await readProcessorGroupsFile(workspaceUri);
+    if (!processorGroups) return;
+
+    const workspaceConfig: WorkspaceConfig = {
+      processorGroups: {},
+      programs: [],
+    };
+
+    processorGroups.forEach((pg) => {
+      workspaceConfig.processorGroups[pg.name] = pg;
+    });
+
+    const programs = await readProgramConfig(workspaceUri);
+    if (!programs) return workspaceConfig;
+
+    programs.pgms.forEach((program) => {
+      let processorGroup = processorGroups.find(
+        (p) => p.name === program.pgroup,
+      );
+      if (!processorGroup) {
+        processorGroup = { name: program.pgroup };
+      }
+      workspaceConfig.programs.push({
+        program: program.program,
+        processorGroup: processorGroup,
+      });
+    });
+
+    return workspaceConfig;
+  },
+  undefined,
+  (workspaceUri) => workspaceUri.toString(),
+);
+export const readWorkspaceConfig = readWorkspaceConfigCached.execute;
+
+export function readSettingConfig(dialectType: string): ProcessorGroup {
+  // local paths
+  const directoryPaths = SettingsService.getLocalPath(dialectType);
+
+  // dsn
+  const dsns: LibsDefinitions = SettingsService.getDsnPath(dialectType).map(
+    (dsn) => ({ dataset: dsn }),
+  );
+
+  // uss
+  const usss: LibsDefinitions = SettingsService.getUssPath(dialectType).map(
+    (uss) => ({ uss }),
+  );
+
+  return {
+    name: "VSCodeSettingProcessorGroup",
+    libs: transformLibs(
+      [...directoryPaths, ...dsns, ...usss],
+      [LocalPathLib, DatasetLib, UssPathLib],
+    ),
+  };
 }
 
-export async function readProcessorGroupsFileContent(
-  documentUri: Uri,
-): Promise<ProcessorGroup[]> {
-  const ws = workspace.getWorkspaceFolder(documentUri);
-  if (ws === undefined) {
-    return [];
-  }
-
-  const wsUriString = ws.uri.toString();
-  const procCfgPath = Uri.joinPath(ws.uri, PG_FOLDER, PG_PROC_FILE);
-  if (workspaceConfigs[ProcessorIndex.PROCESSOR_GROUP].has(wsUriString)) {
-    return workspaceConfigs[ProcessorIndex.PROCESSOR_GROUP].get(wsUriString)!;
-  } else {
-    return await readProcessorGroupsFileAndCache(wsUriString, procCfgPath);
-  }
+export function invalidateConfig(documentUri: Uri) {
+  readWorkspaceConfigCached.invalidateCache(documentUri);
+  readEndevorConfigCached.invalidateCache(documentUri);
 }
 
-async function readProcessorGroupsFileAndCache(
-  wsUriString: string,
-  procCfgPath: Uri,
-): Promise<ProcessorGroup[]> {
+export function clearWorkspaceConfigCache() {
+  readWorkspaceConfigCached.clearCache();
+  readEndevorConfigCached.clearCache();
+}
+
+async function readProcessorGroupsFile(
+  workspaceUri: Uri,
+): Promise<ProcessorGroup[] | undefined> {
+  const procCfgPath = Uri.joinPath(workspaceUri, PG_FOLDER, PG_PROC_FILE);
   try {
     const fileContent = new TextDecoder().decode(
       await workspace.fs.readFile(procCfgPath),
     );
-    // update new cache
-    const ProcessorGroupsModel = t.type({
-      pgroups: t.array(ProcessorGroupModel),
-    });
     const json: unknown = JSON.parse(fileContent);
     const decoded = ProcessorGroupsModel.decode(json);
     if (isLeft(decoded)) {
@@ -165,29 +290,95 @@ async function readProcessorGroupsFileAndCache(
         `Could not validate data: ${PathReporter.report(decoded).join("\n")}`,
       );
     }
-    workspaceConfigs[ProcessorIndex.PROCESSOR_GROUP].set(
-      wsUriString,
-      decoded.right.pgroups,
+
+    return decoded.right.pgroups.map(
+      transformProcessorGroup([
+        LocalPathLib,
+        DatasetLib,
+        UssPathLib,
+        EndevorElementLib,
+      ]),
     );
-    return decoded.right.pgroups;
   } catch (e) {
     if (
-      e &&
-      typeof e === "object" &&
-      "code" in e &&
-      e.code !== "FileNotFound"
+      e instanceof Error &&
+      (!hasMember(e, "code") || e.code !== "FileNotFound")
     ) {
-      console.error(e);
+      outputChannel.error(
+        `Error while reading ${procCfgPath.toString()} - ${e.message}`,
+      );
     }
-    workspaceConfigs[ProcessorIndex.PROCESSOR_GROUP].set(wsUriString, []);
-    return [];
   }
 }
 
-async function readProgranConfigAndCache(
-  wsUriString: string,
-  pgmCfgPath: Uri,
-): Promise<ProgramsConfig> {
+const transformProcessorGroup =
+  (libTypes: CopybookLibTypes[]) =>
+  (input: ProcessorGroupDefinition): ProcessorGroup => {
+    const result: ProcessorGroup = {
+      name: input.name,
+      libs: transformLibs(input.libs, libTypes),
+      preprocessors: transformPreprocessor(input.preprocessor, libTypes),
+      "compiler-options": input["compiler-options"],
+      "copybook-extensions": input["copybook-extensions"],
+      "copybook-file-encoding": input["copybook-file-encoding"],
+      "target-sql-backend": input["target-sql-backend"],
+    };
+
+    return result;
+  };
+
+export function transformLibs(
+  libDefinitions: LibsDefinitions | undefined,
+  libTypes: CopybookLibTypes[],
+): CopybookLib[] {
+  if (!libDefinitions) {
+    return [];
+  }
+
+  const libs = [];
+
+  for (const libDefinition of libDefinitions) {
+    for (const libType of libTypes) {
+      const libInstance = libType.create(libDefinition);
+      if (libInstance) {
+        libs.push(libInstance);
+        break;
+      }
+    }
+  }
+
+  return libs;
+}
+
+function transformPreprocessor(
+  input: PreprocessorDefinition | undefined,
+  libTypes: CopybookLibTypes[],
+): Preprocessor[] {
+  if (!input) return [];
+  const preprocessors = asArray(input);
+  const transformed = preprocessors.map((preprocessor) => {
+    if (typeof preprocessor === "string") {
+      return { name: preprocessor, libs: [] };
+    } else {
+      return {
+        name: preprocessor.name ?? "",
+        libs: transformLibs(preprocessor.libs, libTypes),
+        "compiler-options": preprocessor["compiler-options"],
+        "copybook-extensions": preprocessor["copybook-extensions"],
+        "copybook-file-encoding": preprocessor["copybook-file-encoding"],
+        "target-sql-backend": preprocessor["target-sql-backend"],
+      };
+    }
+  });
+
+  return transformed;
+}
+
+async function readProgramConfig(
+  workspaceUri: Uri,
+): Promise<ProgramsConfig | undefined> {
+  const pgmCfgPath = Uri.joinPath(workspaceUri, PG_FOLDER, PGR_PGM_FILE);
+
   try {
     const fileContent = new TextDecoder().decode(
       await workspace.fs.readFile(pgmCfgPath),
@@ -200,28 +391,15 @@ async function readProgranConfigAndCache(
         `Could not validate data: ${PathReporter.report(decoded).join("\n")}`,
       );
     }
-    workspaceConfigs[ProcessorIndex.PROGRAM_CONFIG].set(
-      wsUriString,
-      decoded.right,
-    );
     return decoded.right;
   } catch (e) {
     if (
-      e &&
-      typeof e === "object" &&
-      "code" in e &&
-      e.code !== "FileNotFound"
+      e instanceof Error &&
+      (!hasMember(e, "code") || e.code !== "FileNotFound")
     ) {
-      console.error(e);
+      outputChannel.error(
+        `Error while reading ${pgmCfgPath.toString()} - ${e.message}`,
+      );
     }
-    workspaceConfigs[ProcessorIndex.PROGRAM_CONFIG].set(
-      wsUriString,
-      EMPTY_PROGRAM_CONFIG,
-    );
-    return EMPTY_PROGRAM_CONFIG;
   }
-}
-
-export function clearWorkspaceConfigCache(configIndex: ProcessorIndex) {
-  workspaceConfigs[configIndex].clear();
 }

@@ -55,6 +55,8 @@ public class TestCicsWebStatement {
           + " CHARACTERSET({$varOne}) NOINCONVERT BODYCHARSET({$varOne})";
   private static final String CONVERSE_VALID_2 =
       WEB + "CONVERSE SESSTOKEN({$varOne}) GET SET({$varOne}) TOLENGTH({$varOne})";
+  private static final String CONVERSE_VALID_3 =
+      WEB + "CONVERSE SESSTOKEN({$varOne}) GET TOCONTAINER({$varOne})";
 
   private static final String ENDBROWSE_VALID = WEB + "ENDBROWSE FORMFIELD";
 
@@ -231,6 +233,9 @@ public class TestCicsWebStatement {
   private static final String WRTITE_HTTPHEADER_NOLENGTH_INVALID =
       "WEB {_WRITE HTTPHEADER({$varOne}) SESSTOKEN({$varOne})"
           + " VALUE({$varOne})|error|errorTwo_}";
+  private static final String CONVERSE_NOLENGTH_INVALID =
+      "WEB {_CONVERSE SESSTOKEN({$varOne}) GET INTO({$varOne}) TOLENGTH({$varOne})|error_}";
+  private static final String CONVERSE_INVALID = "WEB {_CONVERSE SESSTOKEN({$varOne}) GET|error_}";
 
   // Test Functions
   @Test
@@ -255,6 +260,7 @@ public class TestCicsWebStatement {
   void testConverseValid() {
     CICSTestUtils.noErrorTest(CONVERSE_VALID_1);
     CICSTestUtils.noErrorTest(CONVERSE_VALID_2);
+    CICSTestUtils.noErrorTest(CONVERSE_VALID_3);
   }
 
   @Test
@@ -566,6 +572,34 @@ public class TestCicsWebStatement {
             new Diagnostic(
                 new Range(),
                 "Missing required option: VALUELENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testConverseIntoNoLength() {
+    CICSTestUtils.errorTest(
+        CONVERSE_NOLENGTH_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Missing required option: MAXLENGTH",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())),
+        "NOLENGTH");
+  }
+
+  @Test
+  void testConverseInvalid() {
+    CICSTestUtils.errorTest(
+        CONVERSE_INVALID,
+        ImmutableMap.of(
+            "error",
+            new Diagnostic(
+                new Range(),
+                "Exactly one option required, none provided: INTO, SET or TOCONTAINER",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         "NOLENGTH");

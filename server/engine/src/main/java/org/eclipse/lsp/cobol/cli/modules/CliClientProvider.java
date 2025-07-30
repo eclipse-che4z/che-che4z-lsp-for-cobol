@@ -76,7 +76,7 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
     }
 
     @Override
-    public CompletableFuture<String> resolveCopybook(
+    public CompletableFuture<String> resolveCopybookUri(
         String cobolFileUri, String copybookName, String dialectType) {
       for (File sp : cpyPaths) {
         for (String ext : cpyExt) {

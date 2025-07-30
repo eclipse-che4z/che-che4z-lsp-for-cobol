@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
@@ -52,7 +53,7 @@ class DocumentModelServiceTest {
     String text = UUID.randomUUID().toString();
     service.openDocument(uri, text, "cobol");
 
-    assertTrue(service.get(uri).isOpened());
+    assertNotNull(service.get(uri));
   }
 
   private AnalysisResult createAnalysisResult(String uri) {
@@ -149,27 +150,33 @@ class DocumentModelServiceTest {
   @Test
   void testFindMainSource() {
     String uri = UUID.randomUUID().toString();
-    service.openDocument(uri, UUID.randomUUID().toString(), languageId);
-    service.processAnalysisResult(uri, createAnalysisResult(uri), "text");
+    service.openDocument("file1", UUID.randomUUID().toString(), languageId);
+    service.processAnalysisResult("file1", createAnalysisResult(uri), "text");
 
     when(sourceUnitGraph.getAllAssociatedFilesForACopybook(uri))
         .thenReturn(ImmutableList.of("file1", "file2"));
 
-    // uri is userSuppliedCopybook, and one associated file meets the condition
-    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(true, false, true);
+    // uri is userSuppliedCopybook, and one associated file(file1) meets the condition
+    when(sourceUnitGraph.isUserSuppliedCopybook(uri)).thenReturn(true); // copybook
+
+    // main cobol source(file1) which uses uri copybook. It's not a user supplied copybook
+    when(sourceUnitGraph.isUserSuppliedCopybook("file1")).thenReturn(false);
+
+    // dont care about others.
+    when(sourceUnitGraph.isUserSuppliedCopybook("file2")).thenReturn(new Random().nextBoolean());
     Collection<CobolDocumentModel> mainSources1 = service.findMainSource(uri);
     assertEquals(1, mainSources1.size());
 
     // uri is userSuppliedCopybook, and no file meets the condition
-    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(true, true, true);
+    when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(true);
     Collection<CobolDocumentModel> mainSources2 = service.findMainSource(uri);
     assertEquals(0, mainSources2.size());
 
     // uri is NOT userSuppliedCopybook, doc is in the list and synced
     when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
-    Collection<CobolDocumentModel> mainSources3 = service.findMainSource(uri);
+    Collection<CobolDocumentModel> mainSources3 = service.findMainSource("file1");
     assertEquals(1, mainSources3.size());
-    assertEquals(uri, mainSources3.iterator().next().getUri());
+    assertEquals("file1", mainSources3.iterator().next().getUri());
 
     // uri is not recognised
     when(sourceUnitGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);

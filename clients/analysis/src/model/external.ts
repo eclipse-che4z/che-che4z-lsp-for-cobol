@@ -12,6 +12,14 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+export type EventDto = {
+  eventName: string;
+  message: string;
+} | {
+  errorName: string;
+  message: string;
+};
+
 export type DiagnosticDto = {
   range: RangeDto;
   message: string;

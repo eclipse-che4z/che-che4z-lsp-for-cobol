@@ -19,13 +19,14 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
+import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
 
 /** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
-public class ParagraphNameNode extends Node implements DefinedAndUsedStructure {
+public class ParagraphNameNode extends Node implements DefinedAndUsedStructure, Describable {
   private final String name;
   @Setter private List<Location> definitions = ImmutableList.of();
   @Setter private List<Location> usages = ImmutableList.of();
@@ -43,5 +44,13 @@ public class ParagraphNameNode extends Node implements DefinedAndUsedStructure {
   @Override
   public List<Location> getUsages() {
     return usages;
+  }
+
+  @Override
+  public String getFormattedDisplayString() {
+    return getNearestParentByType(NodeType.PARAGRAPH)
+        .map(ParagraphNode.class::cast)
+        .map(ParagraphNode::getFullVariableDescription)
+        .orElse("");
   }
 }

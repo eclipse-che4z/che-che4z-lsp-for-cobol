@@ -14,75 +14,153 @@
 
 import * as vscode from "vscode";
 import { SettingsService } from "../Settings";
+import {
+  DOWNLOAD_QUEUE_LOCKED_ERROR_MSG,
+  PROFILE_NAME_PLACEHOLDER,
+  PROVIDE_PROFILE_MSG,
+  UNLOCK_DOWNLOAD_QUEUE_MSG,
+} from "../../constants";
+import { hasMember } from "../util/Utils";
+import { registerExceptionEvent } from "../reporter";
+import { Memoize } from "../util/Memoize";
+import { outputChannel } from "./OutputChannel";
 
-export class ProfileUtils {
-  public static getProfileNameForCopybook(
-    cobolFileName: string,
-    zoweExplorerApi: IApiRegisterClient | undefined,
-  ): string | undefined {
-    if (!zoweExplorerApi) {
-      return undefined;
-    }
-    return ProfileUtils.getValidProfileForCopybookDownload(
-      cobolFileName,
-      zoweExplorerApi,
-    );
+export function getProfileNameForCopybook(
+  documentUri: vscode.Uri,
+): string | undefined {
+  return getValidProfileForCopybookDownload(documentUri);
+}
+
+function getValidProfileForCopybookDownload(
+  documentUri: vscode.Uri,
+): string | undefined {
+  const profileFromDoc = getProfileFromDocument(documentUri);
+  const passedProfile = SettingsService.getProfileName();
+  if (!passedProfile && profileFromDoc) {
+    return profileFromDoc;
   }
+  return passedProfile;
+}
 
-  public static getAvailableProfiles(zoweExplorerApi: IApiRegisterClient) {
-    let availableProfiles: string[] = [];
-    if (!zoweExplorerApi) return availableProfiles;
-    zoweExplorerApi.registeredApiTypes().forEach((profileType) => {
-      availableProfiles = availableProfiles.concat(
-        zoweExplorerApi
-          .getExplorerExtenderApi()
-          .getProfilesCache()
-          .getProfiles(profileType)
-          ?.map((ele) => ele.name),
+function getProfileFromDocument(documentUri: vscode.Uri): string | undefined {
+  if (documentUri.scheme === "zowe-ds" || documentUri.scheme === "zowe-uss") {
+    const profile = documentUri.path.split("/")[1];
+    if (!profile) return undefined;
+    return profile;
+  }
+}
+
+const getProfileStatusCached = new Memoize(
+  (profileName: string, check: () => Promise<void>) =>
+    testZoweAccess(profileName, check, true),
+  undefined,
+  (profileName: string) => profileName,
+);
+
+export const getProfileStatus = getProfileStatusCached.execute;
+export const clearProfiles = getProfileStatusCached.clearCache;
+
+async function testZoweAccess(
+  profileName: string,
+  check: () => Promise<void>,
+  retry: boolean,
+) {
+  try {
+    await check();
+    return "valid-profile";
+  } catch (err) {
+    if (isNotFoundError(err)) return "valid-profile";
+    if (isPermissionError(err)) return "valid-profile";
+    if (isProfileNotConfiguredError(err)) {
+      const message = PROVIDE_PROFILE_MSG.replace(
+        PROFILE_NAME_PLACEHOLDER,
+        profileName,
       );
-    });
-    return availableProfiles;
-  }
+      void showQueueLockedDialog(profileName, message);
+      return "locked-profile";
+    }
+    if (isInvalidCredentials(err)) {
+      if (retry) return await testZoweAccess(profileName, check, false);
+      else {
+        const message = DOWNLOAD_QUEUE_LOCKED_ERROR_MSG.replace(
+          PROFILE_NAME_PLACEHOLDER,
+          profileName,
+        );
+        void showQueueLockedDialog(profileName, message);
+        return "locked-profile";
+      }
+    }
 
-  private static getValidProfileForCopybookDownload(
-    programUri: string,
-    zoweExplorerApi: IApiRegisterClient | undefined,
-  ): string | undefined {
-    const profileFromDoc = ProfileUtils.getProfileFromDocument(
-      programUri,
-      zoweExplorerApi,
+    // unknown type of error, register it and assume profile is ok
+    outputChannel.error(
+      `Unknown error while validating ZOWE profile ${profileName}: ${JSON.stringify(err)}`,
     );
-    const passedProfile = SettingsService.getProfileName();
-    if (!passedProfile && profileFromDoc) {
-      return profileFromDoc;
-    }
-    return passedProfile;
+    registerExceptionEvent(
+      "InvalidCredentialsException",
+      JSON.stringify(err),
+      ["copybook", "COBOL", "invalid-credentials-check"],
+      "There is an issue with zowe api layer",
+    );
+    return "valid-profile";
   }
+}
 
-  public static getProfileFromDocument(
-    programUri: string,
-    zoweExplorerApi: IApiRegisterClient | undefined,
-  ): string | undefined {
-    const uri = vscode.Uri.parse(programUri);
-    if (uri.scheme === "zowe-ds" || uri.scheme === "zowe-uss") {
-      const profile = uri.path.split("/")[1];
-      if (!profile) return undefined;
-      return profile;
-    }
+/**
+ * Returns true if provided credentials are correct but
+ * selected dataset or uss folder doesn't exist.
+ */
+function isNotFoundError(e: unknown) {
+  return hasMember(e, "code") && e.code === "FileNotFound";
+}
 
-    if (uri.scheme !== "file") return;
+/**
+ * Returns true if provided credentials are correct but user doesn't
+ * have permission to access selected dataset (ISRZ002)
+ * or uss directory (EDC5111I).
+ */
+function isPermissionError(e: unknown) {
+  return (
+    hasMember(e, "message") &&
+    typeof e.message === "string" &&
+    (e.message.includes("EDC5111I Permission denied") ||
+      e.message.includes("ISRZ002 Authorization failed"))
+  );
+}
 
-    if (!zoweExplorerApi) return;
-    const eeApi = zoweExplorerApi.getExplorerExtenderApi();
+// This is broken with ZE version 3.2.2 but works fine with 3.2.1
+// https://github.com/zowe/zowe-explorer-vscode/issues/3760
+function isProfileNotConfiguredError(err: unknown) {
+  return (
+    hasMember(err, "message") &&
+    typeof err.message === "string" &&
+    err.message.includes(
+      "Zowe Explorer Profiles Cache error: Could not find profile named",
+    )
+  );
+}
 
-    const fsPath = uri.fsPath;
+/**
+ * Checks if the error returned by Zowe Explorer is caused
+ * by invalid credentials. Error with status code 401 is returned
+ * in that case.
+ */
+function isInvalidCredentials(e: unknown) {
+  return (
+    hasMember(e, "message") &&
+    typeof e.message === "string" &&
+    e.message.includes(
+      "Rest API failure with HTTP(S) status 401\nThis operation requires authentication.",
+    )
+  );
+}
 
-    const openedFile =
-      (eeApi.ussFileProvider.openFiles &&
-        eeApi.ussFileProvider.openFiles[fsPath]) ||
-      (eeApi.datasetProvider.openFiles &&
-        eeApi.datasetProvider.openFiles[fsPath]);
+async function showQueueLockedDialog(profileName: string, message: string) {
+  const action = await vscode.window.showErrorMessage(
+    message,
+    UNLOCK_DOWNLOAD_QUEUE_MSG,
+  );
 
-    return openedFile?.profile.name;
+  if (action === UNLOCK_DOWNLOAD_QUEUE_MSG) {
+    getProfileStatusCached.invalidateCache(profileName, null!);
   }
 }

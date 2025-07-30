@@ -151,8 +151,10 @@ export class RunAnalysis {
    * @protected
    */
   protected buildJavaCommand(currentFileLocation: string) {
-    const extensionFolder: string | undefined =
-      this.extensionUri.fsPath + "/server/jar/server.jar";
+    const extensionFolder: string | undefined = vscode.Uri.joinPath(
+      this.extensionUri,
+      "/server/jar/server.jar",
+    ).fsPath;
 
     if (extensionFolder && currentFileLocation !== "") {
       return (

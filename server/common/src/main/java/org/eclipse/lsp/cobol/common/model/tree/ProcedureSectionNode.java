@@ -28,4 +28,8 @@ public class ProcedureSectionNode extends CodeBlockDefinitionNode {
   public ProcedureSectionNode(Locality location, String name, String text, Locality definition) {
     super(location, name, text, definition, NodeType.PROCEDURE_SECTION);
   }
+
+  public String getFullVariableDescription() {
+    return this.getText();
+  }
 }

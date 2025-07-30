@@ -116,7 +116,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
       checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
     }
     if (!checkMapHasLiteral(ctx)) {
-      checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
+      checkHasExactlyOneOption(
+          "INTO or SET when specifying MAP param without literal", ctx, ctx.INTO(), ctx.SET());
     }
     checkHasMutuallyExclusiveOptions("INTO or SET", ctx.INTO(), ctx.SET());
     checkHasMutuallyExclusiveOptions("TERMINAL or FROM", ctx.TERMINAL(), ctx.FROM());
@@ -125,7 +126,8 @@ public class CICSReceiveOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
   private void checkMapMappingDev(CICSParser.Cics_receive_map_mappingdevContext ctx) {
     checkHasMandatoryOptions(ctx.FROM(), ctx, "FROM");
     if (!checkMapHasLiteral(ctx)) {
-      checkHasMandatoryOptions(ctx.INTO(), ctx, "INTO when specifying MAP param without literal");
+      checkHasExactlyOneOption(
+          "INTO or SET when specifying MAP param without literal", ctx, ctx.INTO(), ctx.SET());
     }
     if (noLengthOptionsEnabled()) checkHasMandatoryOptions(ctx.LENGTH(), ctx, "LENGTH");
   }

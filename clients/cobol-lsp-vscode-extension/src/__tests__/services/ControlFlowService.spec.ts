@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { Program } from "@code4z/analysis/lib/model/cfast";
+import { Program } from "@code4z/analysis";
 import {
   ApiResult,
   ControlFlowAnalysisService,
@@ -53,6 +53,7 @@ jest.mock("@code4z/analysis/lib/graphbuilder", () => ({
         enters: [],
         locations: [],
         diagnostics: [],
+        events: [],
       };
     }
   },
@@ -62,6 +63,7 @@ let payload = {
   graphs: [],
   locations: [],
   diagnostics: new Map(),
+  events: [],
 } as unknown;
 
 let messageType = "result";

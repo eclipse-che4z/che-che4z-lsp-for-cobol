@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
+import org.eclipse.lsp4j.Diagnostic;
 
 /** Asynchronous analysis */
 @Slf4j
@@ -46,6 +47,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   private final CopybookService copybookService;
   private final SubroutineService subroutineService;
   private final Communications communications;
+  private final SourceUnitGraph sourceUnitGraph;
 
   private final Map<String, FutureTask<CobolDocumentModel>> analysisResults =
       Collections.synchronizedMap(new HashMap<>());
@@ -81,6 +83,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     this.subroutineService = subroutineService;
     this.communications = communications;
     analysisStateListeners = new ArrayList<>();
+    this.sourceUnitGraph = sourceUnitGraph;
     this.analysisStateListeners.add(sourceUnitGraph);
   }
 
@@ -150,7 +153,6 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     ExecutorService analysisExecutor = getExecutor(uri);
     CobolDocumentModel documentModel = documentModelService.get(uri);
     if (documentModel.getLastAnalysisResult() != null) {
-      // initiate cancel on prev running analysis
       cancelRunningAnalysis(ImmutableList.of(documentModel));
     }
     FutureTask<CobolDocumentModel> futureTask =
@@ -214,6 +216,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     };
   }
 
+  /** Publishes diagnostics */
+  public void republishDiagnostics() {
+    communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+  }
+
   /**
    * IMPORTANT: 1. Never shutdown or terminate Executor service as we rely on this for
    * synchronization 2. Each uri will always have a singleThreadExecutor and should not be modified
@@ -242,6 +249,36 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   /** Trigger reanalyse of opened programs considering its triggered by IDE. */
   public void reanalyseOpenedPrograms() throws InterruptedException {
     reanalyseOpenedPrograms(SourceUnitGraph.EventSource.IDE);
+  }
+
+  /**
+   * Trigger reanalyse of passed programs based on source event (IDE or FILE_SYSTEM).
+   *
+   * @param cobolDocUri document URI to be analyzed
+   * @param invalidCopybookUris List of copybook uri which has affected this analysis
+   * @param eventSource {@link org.eclipse.lsp.cobol.lsp.SourceUnitGraph.EventSource}
+   */
+  public void reanalyseProgram(
+      String cobolDocUri,
+      Set<String> invalidCopybookUris,
+      SourceUnitGraph.EventSource eventSource) {
+    copybookService.getCopybookUsage(cobolDocUri).stream()
+        .filter(model -> Objects.nonNull(model.getUri()))
+        .filter(model -> invalidCopybookUris.contains(model.getUri()))
+        .forEach(copybookService::invalidateCache);
+    LOG.info("Copybook cache for uris {} is cleared", invalidCopybookUris);
+
+    subroutineService.invalidateCache();
+    LOG.info("subroutine cache cleared!");
+
+    CobolDocumentModel document = documentModelService.get(cobolDocUri);
+    scheduleAnalysis(
+        cobolDocUri,
+        document.getText(),
+        analysisResultsRevisions.get(document.getUri()),
+        false,
+        true,
+        eventSource);
   }
 
   /**
@@ -301,13 +338,12 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .collect(Collectors.toList());
     for (String uri : openedUris) {
       String languageId = documentModelService.get(uri).getLanguageId();
-      // TODO: update cache directly from workspace document graph
       copybookService.getCopybookUsage(uri).stream()
           .filter(model -> Objects.nonNull(model.getUri()))
           .filter(model -> model.getUri().equals(copybookUri))
           .forEach(
               copybookModel -> {
-                copybookService.invalidateCache(copybookModel.getCopybookId());
+                copybookService.invalidateCache(copybookModel);
                 if (copybookContent != null) {
                   copybookModel.setContent(copybookContent);
                   copybookService.store(
@@ -337,12 +373,10 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   public void cancelAnalysis(String uri) throws InterruptedException {
     String analysisID = makeId(uri, analysisResultsRevisions.get(uri));
     analysisResultsRevisions.remove(uri);
-    LOG.debug(
-        "[stopAnalysis] Document "
-            + uri
-            + " publish diagnostic: "
-            + documentModelService.getOpenedDiagnostic());
-    communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
+    Map<String, List<Diagnostic>> openedDiagnostic = documentModelService.getOpenedDiagnostic();
+    LOG.debug("[stopAnalysis] Document " + uri + " publish diagnostic: " + openedDiagnostic);
+    openedDiagnostic.putIfAbsent(uri, Collections.emptyList());
+    communications.publishDiagnostics(openedDiagnostic);
     if (analysisResults.containsKey(analysisID)) {
       analysisResults.get(analysisID).cancel(true);
     }
@@ -363,6 +397,14 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       if (analysisService.isCopybook(uri, doc.getText())) {
         return true;
       }
+      if (sourceUnitGraph.isUserSuppliedCopybook(uri)) {
+        return documentModelService.findMainSource(uri).stream()
+            .map(
+                documentModel ->
+                    documentModel.getLastAnalysisResult() != null
+                        && documentModel.getLastAnalysisResult() != AnalysisResult.EMPTY)
+            .reduce(Boolean.TRUE, Boolean::logicalAnd);
+      }
       return doc.getLastAnalysisResult() != null
           && doc.getLastAnalysisResult() != AnalysisResult.EMPTY;
     };
@@ -377,10 +419,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   public LspEventCancelCondition createCancelConditionOnClose(String uri) {
     return () -> {
       CobolDocumentModel doc = documentModelService.get(uri);
-      if (doc == null) {
-        return true;
-      }
-      return !doc.isOpened();
+      return doc == null;
     };
   }
 
@@ -401,5 +440,16 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     SINGLE_THREAD_EXECUTOR.execute(
         () ->
             this.analysisStateListeners.forEach(lis -> lis.notifyState(state, model, eventSource)));
+  }
+
+  /**
+   * Check if given document is copybook or not
+   *
+   * @param uri - document uri
+   * @param text - document text
+   * @return true for copybook and false otherwise
+   */
+  public boolean isCopybook(String uri, String text) {
+    return this.analysisService.isCopybook(uri, text);
   }
 }

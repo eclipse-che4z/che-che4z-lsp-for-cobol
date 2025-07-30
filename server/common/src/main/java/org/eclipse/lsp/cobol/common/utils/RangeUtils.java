@@ -110,7 +110,7 @@ public class RangeUtils {
    * @param location the locality of the wrapping node
    * @return true if position is inside the location.
    */
-  private boolean isInside(String uri, Position position, Locality location) {
+  public boolean isInside(String uri, Position position, Locality location) {
     return uri.equals(location.getUri())
         && !isBefore(position, location.getRange().getStart())
         && !isAfter(position, location.getRange().getEnd());

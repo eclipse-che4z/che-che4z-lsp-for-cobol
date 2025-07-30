@@ -17,11 +17,6 @@ import { gotoCopybookSettings } from "../../commands/OpenSettingsCommand";
 import { registerEvent } from "../../services/reporter";
 
 jest.mock("../../services/reporter");
-jest.mock("vscode", () => ({
-  commands: {
-    executeCommand: jest.fn(),
-  },
-}));
 
 test("check gotoCopybookSettings calls telemetry services and vscode execute command with right parameters.", () => {
   expect(gotoCopybookSettings).toBeTruthy();

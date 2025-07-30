@@ -694,4 +694,98 @@ suite("Integration Test Suite", function () {
     const diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
   });
+
+  test("Hover works for paragarphs", async () => {
+    await helper.updateConfig("basic.json");
+    const editor = await helper.showDocument(path.join("HOVER_PARA.CBL"));
+    await helper.sleep(1000);
+    const hoverResults_para1 = await helper.getHoverContent(
+      editor,
+      new vscode.Position(5, 10),
+    );
+    assert.strictEqual(hoverResults_para1[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hoverResults_para1[0].contents[0] as vscode.MarkdownString).value,
+      ),
+      normalizeLineEndings(`\`\`\`cobol
+       PARAG1.
+           DISPLAY 'PARAG1'.
+           PERFORM PARAG3.
+           PERFORM PARAG2.
+
+\`\`\``),
+    );
+
+    const hoverResults_perform_para2: vscode.Hover[] =
+      await helper.getHoverContent(editor, new vscode.Position(7, 22));
+    assert.strictEqual(hoverResults_perform_para2?.length, 1);
+    assert.strictEqual(hoverResults_perform_para2[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hoverResults_perform_para2[0].contents[0] as vscode.MarkdownString)
+          .value,
+      ),
+      normalizeLineEndings(`\`\`\`cobol
+       PARAG3.
+           DISPLAY 'PARAG3'.
+                                                     
+           STOP RUN.
+
+\`\`\`
+
+_NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
+    );
+
+    const hoverResults_perform_para3: vscode.Hover[] =
+      await helper.getHoverContent(editor, new vscode.Position(8, 19));
+    assert.strictEqual(hoverResults_perform_para3?.length, 1);
+    assert.strictEqual(hoverResults_perform_para3[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hoverResults_perform_para3[0].contents[0] as vscode.MarkdownString)
+          .value,
+      ),
+      normalizeLineEndings(`\`\`\`cobol
+       PARAG2.
+           DISPLAY 'PARAG2'.
+
+\`\`\`
+
+_NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
+    );
+
+    //Goto copybook
+    helper.moveCursor(editor, new vscode.Position(9, 16));
+
+    await vscode.commands.executeCommand("editor.action.revealDefinition");
+    let editor_copybook: vscode.TextEditor | undefined;
+    await helper.waitFor(() => {
+      editor_copybook = vscode.window.activeTextEditor;
+      return !!editor_copybook;
+    });
+    const hover_copybook: vscode.Hover[] = await helper.getHoverContent(
+      editor_copybook!,
+      new vscode.Position(0, 10),
+    );
+
+    assert.strictEqual(hover_copybook?.length, 1);
+    assert.strictEqual(hover_copybook[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hover_copybook[0].contents[0] as vscode.MarkdownString).value,
+      ),
+      normalizeLineEndings(`\`\`\`cobol
+       PARAG2.
+           DISPLAY 'PARAG2'.
+
+\`\`\`
+
+_NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
+    );
+  });
 });
+
+function normalizeLineEndings(str: string) {
+  return str.replace(/\r\n/g, "\n");
+}

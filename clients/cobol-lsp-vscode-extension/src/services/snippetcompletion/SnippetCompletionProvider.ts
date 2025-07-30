@@ -149,7 +149,7 @@ async function loadSnippets() {
 
 async function importDialectSnippets(snippetPath: string) {
   const dialectSnippets: Map<string, Snippet> = new Map();
-  const snippetUri = vscode.Uri.parse(snippetPath);
+  const snippetUri = vscode.Uri.file(snippetPath);
   try {
     const rawFile = await vscode.workspace.fs.readFile(snippetUri);
     const textData = new TextDecoder().decode(rawFile);

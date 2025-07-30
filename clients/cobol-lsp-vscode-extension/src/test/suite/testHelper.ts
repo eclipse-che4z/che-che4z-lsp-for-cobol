@@ -421,5 +421,24 @@ export function hasDiagnosticMatches(
   assert.ok(diagnostics.some(predicate));
 }
 
+export async function getHoverContent(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+) {
+  let hoverResults: vscode.Hover[] | undefined = [];
+  await waitFor(async () => {
+    hoverResults = await vscode.commands.executeCommand(
+      "vscode.executeHoverProvider",
+      editor.document.uri,
+      position,
+    );
+    if (hoverResults === undefined) {
+      return false;
+    }
+    return hoverResults.length > 0;
+  });
+  return hoverResults;
+}
+
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 export const asMutable = <T>(value: T): Mutable<T> => value as Mutable<T>;

@@ -14,9 +14,14 @@
 
 import * as vscode from "vscode";
 import { SnippetCompletionProvider } from "../../../services/snippetcompletion/SnippetCompletionProvider";
-import { DialectRegistry } from "../../../services/DialectRegistry";
+import {
+  DialectInfo,
+  DialectRegistry,
+} from "../../../services/DialectRegistry";
 import path = require("path");
 import { createExtensionContextMock } from "../../../__mocks__/ExtensionContext.utility";
+import { readFileResult } from "../../../__mocks__/vscode";
+import { readFile } from "fs/promises";
 
 describe("Test CompletionProvider", () => {
   const context = {
@@ -28,22 +33,30 @@ describe("Test CompletionProvider", () => {
     createExtensionContextMock(),
   );
   const SNIPPET_CBL = "SNIPPET.cbl";
-  beforeAll(() => {
-    DialectRegistry.getDialects = jest.fn().mockReturnValue([
+  const dacoSnippetPath = path.resolve(
+    __dirname,
+    "../../../../../daco-dialect-support/snippets.json",
+  );
+  const idmsSnippetPath = path.resolve(
+    __dirname,
+    "../../../../../idms-dialect-support/snippets.json",
+  );
+  beforeAll(async () => {
+    readFileResult[vscode.Uri.file(dacoSnippetPath).path] = (
+      await readFile(dacoSnippetPath)
+    ).toString();
+    readFileResult[vscode.Uri.file(idmsSnippetPath).path] = (
+      await readFile(idmsSnippetPath)
+    ).toString();
+    jest.spyOn(DialectRegistry, "getDialects").mockReturnValue([
       {
         name: "DaCo",
-        snippetPath: path.resolve(
-          __dirname,
-          "../../../../../daco-dialect-support/snippets.json",
-        ),
-      },
+        snippetPath: dacoSnippetPath,
+      } as DialectInfo,
       {
         name: "IDMS",
-        snippetPath: path.resolve(
-          __dirname,
-          "../../../../../idms-dialect-support/snippets.json",
-        ),
-      },
+        snippetPath: idmsSnippetPath,
+      } as DialectInfo,
     ]);
   });
   afterAll(() => {
@@ -78,7 +91,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(574);
+    ).toBe(575);
   });
   test("Suggest all IDMS Snippets", async () => {
     const doc = {
@@ -104,7 +117,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(505);
+    ).toBe(506);
   });
 
   test("Suggest all Cobol only Snippets", async () => {
@@ -131,7 +144,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(495);
+    ).toBe(496);
   });
 
   test("Suggest Snippets when both IDMS and DaCo is set", async () => {
@@ -158,7 +171,7 @@ describe("Test CompletionProvider", () => {
           context,
         )
       ).length,
-    ).toBe(584);
+    ).toBe(585);
   });
 
   test(" Test number of suggestions for COPY when no dialect is selected", async () => {

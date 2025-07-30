@@ -69,6 +69,7 @@ function processMessage(message: WorkerMessage): void {
         graphs: [],
         locations: [],
         diagnostics: new Map(),
+        events: [],
       },
     });
     return;
@@ -89,6 +90,7 @@ function processMessage(message: WorkerMessage): void {
         graphs: graphs,
         locations: result.locations,
         diagnostics: result.diagnostics,
+        events: result.events,
       },
     });
   } catch (error) {

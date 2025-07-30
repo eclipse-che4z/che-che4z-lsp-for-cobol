@@ -28,4 +28,8 @@ public class ParagraphNode extends CodeBlockDefinitionNode {
   public ParagraphNode(Locality location, String name, String text, Locality definition) {
     super(location, name, text, definition, NodeType.PARAGRAPH);
   }
+
+  public String getFullVariableDescription() {
+    return text;
+  }
 }
