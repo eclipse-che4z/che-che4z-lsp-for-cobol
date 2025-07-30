@@ -506,7 +506,7 @@
         "cobol-lsp.target-sql-backend-enable-processing": {
           "type": "boolean",
           "default": "true",
-          "description": "Enable SQL Processing - If disabled, will still use the target backend to determine implicit copybooks to avoid errors"
+          "description": "Enables syntactic validation of SQL statements inside EXEC SQL blocks"
         },
         "cobol-lsp.dialects": {
           "type": "array",
