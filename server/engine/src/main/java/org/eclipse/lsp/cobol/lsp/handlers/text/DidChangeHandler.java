@@ -64,7 +64,6 @@ public class DidChangeHandler {
     }
     CobolDocumentModel model = documentModelService.changeDocument(uri, text);
     if (model != null) {
-      model.update(text);
       asyncAnalysisService.scheduleAnalysis(
           model, params.getTextDocument().getVersion(), false, false, eventSource);
     }
