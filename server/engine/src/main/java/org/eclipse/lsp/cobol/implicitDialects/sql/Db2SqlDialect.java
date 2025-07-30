@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.*;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
@@ -152,7 +153,7 @@ public class Db2SqlDialect implements CobolDialect {
   }
 
   private boolean getSqlProcessingEnabled(DialectProcessingContext context) {
-    return context.getConfig().isSqlProcessingEnabled();
+    return context.getConfig().getIsSqlProcessingEnabled() == SqlProcessing.ENABLED;
   }
 
   @Override

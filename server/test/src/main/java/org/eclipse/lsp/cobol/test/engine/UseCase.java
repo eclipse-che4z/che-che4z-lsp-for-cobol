@@ -26,6 +26,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -66,7 +67,7 @@ public class UseCase {
 
   @Builder.Default boolean cicsTranslator = true;
 
-  @Builder.Default boolean isSqlProcessingEnabled = true;
+  @Builder.Default SqlProcessing isSqlProcessingEnabled = SqlProcessing.ENABLED;
 
   /** preprocessor directives mapped with preprocessor name */
   Map<String, List<String>> preprocessorsDirectives;

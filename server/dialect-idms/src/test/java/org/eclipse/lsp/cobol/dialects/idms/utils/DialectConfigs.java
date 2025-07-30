@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 
@@ -30,7 +31,7 @@ public class DialectConfigs {
         ImmutableList.of(IdmsDialect.NAME),
         true,
         false,
-        true,
+        SqlProcessing.ENABLED,
         ImmutableList.of(),
         ImmutableMap.of());
   }

@@ -34,7 +34,7 @@ public class AnalysisConfig {
   List<String> dialects;
   boolean isCicsTranslatorEnabled;
   boolean collectAstChanges;
-  boolean isSqlProcessingEnabled;
+  SqlProcessing isSqlProcessingEnabled;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();
@@ -54,7 +54,7 @@ public class AnalysisConfig {
         ImmutableList.of(),
         true,
         false,
-        true,
+        SqlProcessing.ENABLED,
         ImmutableList.of(),
         ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
@@ -66,7 +66,7 @@ public class AnalysisConfig {
         ImmutableList.of(),
         true,
         collectAstChanges,
-        true,
+        SqlProcessing.ENABLED,
         ImmutableList.of(),
         ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }

@@ -305,7 +305,7 @@ public class UseCaseEngine {
                 .subroutines(subroutineNames)
                 .cicsTranslator(analysisConfig.isCicsTranslatorEnabled())
                 .copybookProcessingMode(analysisConfig.getCopybookProcessingMode())
-                .isSqlProcessingEnabled(analysisConfig.isSqlProcessingEnabled())
+                .isSqlProcessingEnabled(analysisConfig.getIsSqlProcessingEnabled())
                 .dialects(analysisConfig.getDialects())
                 .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
