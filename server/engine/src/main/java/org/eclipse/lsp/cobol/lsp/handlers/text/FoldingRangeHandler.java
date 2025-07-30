@@ -77,9 +77,6 @@ public class FoldingRangeHandler {
 
   /**
    * Get dependency for this handler
-   *
-   *
-   *
    * @param uri
    * @return list of {@link LspEventDependency
    */
