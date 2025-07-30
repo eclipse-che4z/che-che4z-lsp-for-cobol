@@ -135,6 +135,11 @@ public class Db2SqlDialect implements CobolDialect {
             new Db2WorkingAndLinkageSectionProcessor(messageService)));
   }
 
+  @Override
+  public List<String> getSettingsSections() {
+    return ImmutableList.of(SQL_BACKEND_SETTING);
+  }
+
   private Db2SqlParser.StartRuleContext parseDB2(
       String text, String programDocumentUri, List<SyntaxError> errors) {
     Db2SqlLexer lexer = new Db2SqlLexer(CharStreams.fromString(text));
@@ -154,11 +159,6 @@ public class Db2SqlDialect implements CobolDialect {
 
   private boolean getSqlProcessingEnabled(DialectProcessingContext context) {
     return context.getConfig().getSqlProcessing() == SqlProcessing.ENABLED;
-  }
-
-  @Override
-  public List<String> getSettingsSections() {
-    return ImmutableList.of(SQL_BACKEND_SETTING);
   }
 
   /**
