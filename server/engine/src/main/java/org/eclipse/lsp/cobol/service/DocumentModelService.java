@@ -95,13 +95,15 @@ public class DocumentModelService {
    * @param uri - document uri
    * @param analysisResult - analysis result
    * @param text - updated text
+   * @return update document model
    */
   @Synchronized
-  public void processAnalysisResult(String uri, AnalysisResult analysisResult, String text) {
+  public CobolDocumentModel processAnalysisResult(
+      String uri, AnalysisResult analysisResult, String text) {
     CobolDocumentModel document = docs.get(uri);
     if (document == null) {
       LOG.warn("Can't process analysis result of " + uri);
-      return;
+      return null;
     }
     removeAllRelatedDiagnostics(document);
     updateDiagnosticRepo(uri, analysisResult.getDiagnostics());
@@ -110,6 +112,8 @@ public class DocumentModelService {
     updatedModel.setOutlineResult(
         BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
     docs.put(uri, updatedModel);
+
+    return updatedModel;
   }
 
   /**

@@ -16,19 +16,25 @@ package org.eclipse.lsp.cobol.lsp.analysis;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.SubroutineService;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.TrueDialectService;
+import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.extendedapi.Program;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.AnalysisService;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
@@ -48,6 +54,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   private final SubroutineService subroutineService;
   private final Communications communications;
   private final SourceUnitGraph sourceUnitGraph;
+
+  private final CFASTBuilder cfastBuilder;
+  private final Provider<CobolLanguageClient> clientProvider;
 
   private final Map<String, FutureTask<CobolDocumentModel>> analysisResults =
       Collections.synchronizedMap(new HashMap<>());
@@ -75,7 +84,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       AnalysisService analysisService,
       CopybookService copybookService,
       SubroutineService subroutineService,
-      Communications communications) {
+      Communications communications,
+      @Nullable CFASTBuilder cfastBuilder,
+      Provider<CobolLanguageClient> clientProvider) {
     this.dialectService = dialectService;
     this.documentModelService = documentModelService;
     this.analysisService = analysisService;
@@ -85,6 +96,8 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     analysisStateListeners = new ArrayList<>();
     this.sourceUnitGraph = sourceUnitGraph;
     this.analysisStateListeners.add(sourceUnitGraph);
+    this.cfastBuilder = cfastBuilder;
+    this.clientProvider = clientProvider;
   }
 
   /**
@@ -118,6 +131,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     FutureTask<CobolDocumentModel> futureTask =
         new FutureTask<>(
             scheduleAnalysis(documentModel, currentRevision, open, force, eventSource, id));
+
     analysisResults.put(id, futureTask);
     analysisExecutor.submit(futureTask);
     if (prevId != null && !force) {
@@ -125,6 +139,18 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
           .ifPresent(cf -> cf.cancel(true));
     }
     return futureTask;
+  }
+
+  private void postCFASTResults(String uri, AnalysisResult result) {
+    if (cfastBuilder == null) return;
+
+    List<Program> astList =
+        result.getRootNode().findPrograms().stream()
+            .map(cfastBuilder::build)
+            .flatMap(m -> m.getControlFlowAST().stream())
+            .collect(Collectors.toList());
+
+    this.clientProvider.get().cfastReady(new ExtendedApiResult(astList, uri));
   }
 
   private Callable<CobolDocumentModel> scheduleAnalysis(
@@ -153,10 +179,18 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
         notifyAllListeners(AnalysisState.STARTED, documentModel, eventSource);
         communications.notifyProgressBegin(uri);
         documentModel.setOutlineResult(null);
-        analysisService.analyzeDocument(uri, text, open, langId);
-        notifyAllListeners(AnalysisState.COMPLETED, documentModel, eventSource);
+
+        AnalysisResult result = analysisService.analyzeDocument(uri, text, open, langId);
+        CobolDocumentModel newDocumentModel = documentModel;
+
+        if (result != null) {
+          newDocumentModel = documentModelService.processAnalysisResult(uri, result, text);
+          postCFASTResults(uri, result);
+        }
+
+        notifyAllListeners(AnalysisState.COMPLETED, newDocumentModel, eventSource);
         analysisResults.remove(id);
-        return documentModel;
+        return newDocumentModel;
       } catch (
           Exception
               genericException) { // Ideally we should not do this, but a safer catch might help to
@@ -166,8 +200,10 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             genericException,
             uri,
             genericException);
-        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, documentModel, eventSource);
-        return documentModel;
+        CobolDocumentModel newDocumentModel =
+            documentModelService.processAnalysisResult(uri, AnalysisResult.EMPTY, text);
+        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, newDocumentModel, eventSource);
+        return newDocumentModel;
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
           communications.publishDiagnostics(documentModelService.getOpenedDiagnostic());
