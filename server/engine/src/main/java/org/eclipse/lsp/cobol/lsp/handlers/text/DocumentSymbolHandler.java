@@ -95,8 +95,8 @@ public class DocumentSymbolHandler {
         () -> {
           final CobolDocumentModel documentModel = documentModelService.get(uri);
           if (documentModel == null) return false;
-          return (documentModel.getOutlineResult() != null
-                  && !documentModel.getOutlineResult().isEmpty())
+          final List<?> outline = documentModel.getOutlineResult();
+          return (outline != null && !outline.isEmpty())
               || analysisService.isCopybook(uri, documentModel.getText());
         });
   }
