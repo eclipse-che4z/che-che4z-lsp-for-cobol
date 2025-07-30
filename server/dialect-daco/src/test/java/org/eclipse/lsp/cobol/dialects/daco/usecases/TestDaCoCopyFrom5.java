@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
@@ -65,7 +64,9 @@ public class TestDaCoCopyFrom5 {
         new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
             ImmutableList.of(DaCoDialect.NAME),
-            AnalysisConfigSettings.ENABLED,
+            true,
+            false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

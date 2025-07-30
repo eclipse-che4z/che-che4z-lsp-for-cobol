@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
@@ -99,7 +98,7 @@ class TestCommentLines {
             UseCase.builder()
                 .documentUri(DOCUMENT_URI)
                 .text(FLOATING_COMMENT_TEXT)
-                .analysisConfigSettings(AnalysisConfigSettings.ENABLED)
+                .cicsTranslator(true)
                 .dialects(Collections.emptyList())
                 .sqlBackend(SQLBackend.DB2_SERVER)
                 .build(),

@@ -32,7 +32,9 @@ import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 public class AnalysisConfig {
   CopybookProcessingMode copybookProcessingMode;
   List<String> dialects;
-  AnalysisConfigSettings analysisConfigSettings;
+  boolean isCicsTranslatorEnabled;
+  boolean collectAstChanges;
+  boolean isSqlProcessingEnabled;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();
@@ -50,7 +52,9 @@ public class AnalysisConfig {
     return new AnalysisConfig(
         mode,
         ImmutableList.of(),
-        AnalysisConfigSettings.ENABLED,
+        true,
+        false,
+        true,
         ImmutableList.of(),
         ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
@@ -60,22 +64,10 @@ public class AnalysisConfig {
     return new AnalysisConfig(
         mode,
         ImmutableList.of(),
-        (collectAstChanges
-            ? AnalysisConfigSettings.ENABLED_VERBOSE
-            : AnalysisConfigSettings.ENABLED),
+        true,
+        collectAstChanges,
+        true,
         ImmutableList.of(),
         ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
-  }
-
-  public boolean isCollectAstChanges() {
-    return analysisConfigSettings.collectASTChanges;
-  }
-
-  public boolean isCicsTranslatorEnabled() {
-    return analysisConfigSettings.cicsTranslatorEnabled;
-  }
-
-  public boolean isSqlProcessingEnabled() {
-    return analysisConfigSettings.sqlProcessingEnabled;
   }
 }

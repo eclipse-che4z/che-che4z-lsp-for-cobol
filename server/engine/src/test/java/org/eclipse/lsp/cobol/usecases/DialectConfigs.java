@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
@@ -31,7 +30,9 @@ public class DialectConfigs {
     return new AnalysisConfig(
         CopybookProcessingMode.DISABLED,
         ImmutableList.of("IDMS"),
-        AnalysisConfigSettings.ENABLED,
+        true,
+        false,
+        true,
         ImmutableList.of(),
         ImmutableMap.of());
   }
@@ -47,7 +48,9 @@ public class DialectConfigs {
     return new AnalysisConfig(
         CopybookProcessingMode.DISABLED,
         ImmutableList.of("DaCo", "IDMS"),
-        AnalysisConfigSettings.ENABLED,
+        true,
+        false,
+        true,
         ImmutableList.of(),
         ImmutableMap.of(
             "daco.predefined-sections",

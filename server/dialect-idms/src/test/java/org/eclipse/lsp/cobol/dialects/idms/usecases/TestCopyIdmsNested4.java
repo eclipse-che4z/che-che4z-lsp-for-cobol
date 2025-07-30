@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.dialects.idms.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
-import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -59,7 +58,9 @@ public class TestCopyIdmsNested4 {
         new AnalysisConfig(
             CopybookProcessingMode.ENABLED,
             ImmutableList.of(IdmsDialect.NAME),
-            AnalysisConfigSettings.ENABLED,
+            true,
+            false,
+            true,
             ImmutableList.of(),
             ImmutableMap.of()));
   }

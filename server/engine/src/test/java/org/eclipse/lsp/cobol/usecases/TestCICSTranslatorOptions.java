@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.eclipse.lsp.cobol.common.AnalysisConfigSettings;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -152,7 +151,7 @@ public class TestCICSTranslatorOptions {
             .sqlBackend(SQLBackend.DB2_SERVER)
             .copybookProcessingMode(ENABLED)
             .dialects(ImmutableList.of())
-            .analysisConfigSettings(AnalysisConfigSettings.ENABLED_NO_CICS)
+            .cicsTranslator(false)
             .build();
     AnalysisResult analyze = UseCaseUtils.analyze(useCase);
     Map<String, List<Diagnostic>> diagnostics = analyze.getDiagnostics();
