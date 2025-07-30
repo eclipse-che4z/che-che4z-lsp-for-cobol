@@ -34,7 +34,7 @@ public class AnalysisConfig {
   List<String> dialects;
   boolean isCicsTranslatorEnabled;
   boolean collectAstChanges;
-  SqlProcessing isSqlProcessingEnabled;
+  SqlProcessing sqlProcessing;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();

@@ -153,7 +153,7 @@ public class Db2SqlDialect implements CobolDialect {
   }
 
   private boolean getSqlProcessingEnabled(DialectProcessingContext context) {
-    return context.getConfig().getIsSqlProcessingEnabled() == SqlProcessing.ENABLED;
+    return context.getConfig().getSqlProcessing() == SqlProcessing.ENABLED;
   }
 
   @Override

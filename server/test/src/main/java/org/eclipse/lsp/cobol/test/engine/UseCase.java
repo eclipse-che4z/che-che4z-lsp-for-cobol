@@ -67,7 +67,7 @@ public class UseCase {
 
   @Builder.Default boolean cicsTranslator = true;
 
-  @Builder.Default SqlProcessing isSqlProcessingEnabled = SqlProcessing.ENABLED;
+  @Builder.Default SqlProcessing sqlProcessing = SqlProcessing.ENABLED;
 
   /** preprocessor directives mapped with preprocessor name */
   Map<String, List<String>> preprocessorsDirectives;
@@ -85,7 +85,7 @@ public class UseCase {
             dialects,
             cicsTranslator,
             false,
-            isSqlProcessingEnabled,
+            sqlProcessing,
             ImmutableList.of(),
             dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
