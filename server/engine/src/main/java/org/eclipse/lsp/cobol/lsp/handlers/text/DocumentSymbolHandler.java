@@ -103,7 +103,6 @@ public class DocumentSymbolHandler {
 
   /**
    * get cancel conditions
-   *
    * @param params
    * @return list of {@link LspEventCancelCondition
    */
