@@ -217,6 +217,10 @@ export class DialectService {
     this.handlers.set(dialectName, handler);
   }
 
+  public unregisterStartHandler(dialectName: string) {
+    this.handlers.delete(dialectName);
+  }
+
   public async resolveCopybook(
     programUri: string,
     dialectName: string,
