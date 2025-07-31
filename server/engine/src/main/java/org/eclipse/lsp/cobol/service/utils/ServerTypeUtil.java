@@ -31,13 +31,13 @@ public class ServerTypeUtil {
    * @return True, if server type is NATIVE and dialects are registered, false otherwise.
    */
   public boolean isInCompatibleServerTypeRegistered(@NonNull AnalysisConfig analysisConfig) {
+    if (!isNativeServerType()) {
+      return false;
+    }
     Set<String> activeDialects = new HashSet<>(analysisConfig.getDialects());
-    boolean hasV1Dialect =
-        analysisConfig.getDialectRegistry().stream()
-            .filter(item -> activeDialects.contains(item.getName()))
-            .anyMatch(item -> item.getProtocolVersion() == 1);
-
-    return isNativeServerType() && hasV1Dialect;
+    return analysisConfig.getDialectRegistry().stream()
+        .filter(item -> activeDialects.contains(item.getName()))
+        .anyMatch(item -> item.getProtocolVersion() == 1);
   }
 
   /**
