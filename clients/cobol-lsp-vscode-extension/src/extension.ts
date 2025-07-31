@@ -14,12 +14,12 @@
 
 import * as vscode from "vscode";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
-import {
+import type {
   __ExtensionApi,
   CopyStatementParser,
   V2DialectDetail,
 } from "@code4z/cobol-dialect-api";
-import { V2StartProcessingHandler } from "@code4z/cobol-dialect-api";
+import type { V2StartProcessingHandler } from "@code4z/cobol-dialect-api";
 import {
   isV1RuntimeDialectDetail,
   isV2RuntimeDialectDetail,
