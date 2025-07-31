@@ -172,7 +172,7 @@ async function processCopybook(
 
       const diagnostic = new vscode.Diagnostic(
         range,
-        "Copybook parameters are ivalid",
+        "Copybook parameters are invalid",
         vscode.DiagnosticSeverity.Error,
       );
       const diagArray = diagnostics.get(documentUri.toString()) ?? [];
