@@ -191,10 +191,10 @@ export class DialectService {
         }
       },
     );
-    this.addConfigWatcher("**/pgm_conf.json", () =>
+    this.addConfigWatcher(".cobolplugin/pgm_conf.json", () =>
       this.diagnosticService.clear(),
     );
-    this.addConfigWatcher("**/proc_grps.json", () =>
+    this.addConfigWatcher(".cobolplugin/proc_grps.json", () =>
       this.diagnosticService.clear(),
     );
   }
