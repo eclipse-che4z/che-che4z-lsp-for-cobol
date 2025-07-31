@@ -395,6 +395,7 @@ const registerNewDialectV2 = async (
 
   const unregisterDialect: vscode.Disposable = new vscode.Disposable(
     async () => {
+      dialectService.unregisterStartHandler(dialect.name);
       DialectRegistry.unregister(dialect.name);
       await languageClientService.invalidateConfiguration();
     },
