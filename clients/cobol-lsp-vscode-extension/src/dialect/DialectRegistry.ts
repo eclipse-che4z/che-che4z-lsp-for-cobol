@@ -15,7 +15,7 @@
 import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { SETTINGS_DIALECT } from "../constants";
-import { CopyStatementParser } from "@code4z/cobol-dialect-api";
+import type { CopyStatementParser } from "@code4z/cobol-dialect-api";
 
 export const DIALECT_REGISTRY_SECTION = "cobol-lsp.dialect.registry";
 
