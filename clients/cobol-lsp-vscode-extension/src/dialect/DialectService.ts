@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { SETTINGS_DIALECT } from "../constants";
-import {
+import type {
   IDocumentProcessingContext,
   V2StartProcessingHandler,
 } from "@code4z/cobol-dialect-api";
