@@ -18,8 +18,8 @@ import type {
   __ExtensionApi,
   CopyStatementParser,
   V2DialectDetail,
+  V2StartProcessingHandler,
 } from "@code4z/cobol-dialect-api";
-import type { V2StartProcessingHandler } from "@code4z/cobol-dialect-api";
 import {
   isV1RuntimeDialectDetail,
   isV2RuntimeDialectDetail,
