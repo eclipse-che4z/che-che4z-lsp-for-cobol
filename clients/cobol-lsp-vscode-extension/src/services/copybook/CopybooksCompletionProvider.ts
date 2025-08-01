@@ -30,7 +30,7 @@ import {
 } from "../../constants";
 import { DialectRegistry } from "../../dialect/DialectRegistry";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
-import { CopyStatementParser } from "@code4z/cobol-dialect-api";
+import type { CopyStatementParser } from "@code4z/cobol-dialect-api";
 
 const isDefaultCopyStatement: CopyStatementParser = (statement: string) => {
   const regex = /^.*\bCOPY(?:\s+"?'?)([\S]+)?$/i;
