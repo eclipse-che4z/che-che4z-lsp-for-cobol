@@ -2,9 +2,12 @@
     "pgroups": [
         {
             "name": "SAMPLE",
-            "libs": [
-                "copybook"
-            ]
+            "preprocessor": [{
+                "name": "SAMPLE",
+                    "libs": [
+                        "copybook"
+                    ]
+            }]
         }
     ]
 }

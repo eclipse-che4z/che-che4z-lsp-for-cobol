@@ -1,5 +1,5 @@
 {
     "pgms": [
-        { "program": "./*", "pgroup": "SAMPLE"}
+        { "program": "*", "pgroup": "SAMPLE"}
     ]
 }
