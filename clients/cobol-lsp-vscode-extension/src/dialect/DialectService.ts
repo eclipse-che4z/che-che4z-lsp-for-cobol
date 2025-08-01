@@ -147,12 +147,18 @@ export class DialectService {
     languageClientService: LanguageClientService,
     private outputChannel?: vscode.OutputChannel,
   ) {
-    const disposable = vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration(SETTINGS_DIALECT))
-        this.diagnosticService.clear();
-    });
+    const disposableChangeConfig = vscode.workspace.onDidChangeConfiguration(
+      (event) => {
+        if (event.affectsConfiguration(SETTINGS_DIALECT))
+          this.diagnosticService.clear();
+      },
+    );
+    context.subscriptions.push(disposableChangeConfig);
 
-    context.subscriptions.push(disposable);
+    const disposableCloseDocument = vscode.workspace.onDidCloseTextDocument(
+      (event) => this.diagnosticService.clearDialectCollection(event.uri),
+    );
+    context.subscriptions.push(disposableCloseDocument);
 
     languageClientService.addRequestHandler(
       "dialect/process",
@@ -324,10 +330,13 @@ class DialectDiagnosticService {
     });
   }
 
-  public clearDialectCollection(dialectName: string, programUri: string) {
-    const key = generateKey(dialectName, programUri);
-    const collection = this.collections.get(key);
-    collection?.clear();
+  public clearDialectCollection(programUri: vscode.Uri) {
+    const programUriKey = `:${programUri.toString()}`;
+    this.collections.forEach((value, key) => {
+      if (key.endsWith(programUriKey)) {
+        value.clear();
+      }
+    });
   }
 
   public publish(
