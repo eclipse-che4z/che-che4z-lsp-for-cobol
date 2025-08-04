@@ -47,11 +47,13 @@ public class DocumentModelService {
    * @param uri - document uri
    * @param text - document text
    * @param languageId
+   * @return document model
    */
   @Synchronized
-  public void openDocument(String uri, String text, String languageId) {
+  public CobolDocumentModel openDocument(String uri, String text, String languageId) {
     CobolDocumentModel model = docs.computeIfAbsent(uri, u -> new CobolDocumentModel(uri, text));
     Optional.ofNullable(languageId).ifPresent(model::setLanguageId);
+    return model;
   }
 
   /**
@@ -93,13 +95,15 @@ public class DocumentModelService {
    * @param uri - document uri
    * @param analysisResult - analysis result
    * @param text - updated text
+   * @return update document model
    */
   @Synchronized
-  public void processAnalysisResult(String uri, AnalysisResult analysisResult, String text) {
+  public CobolDocumentModel processAnalysisResult(
+      String uri, AnalysisResult analysisResult, String text) {
     CobolDocumentModel document = docs.get(uri);
     if (document == null) {
       LOG.warn("Can't process analysis result of " + uri);
-      return;
+      return null;
     }
     removeAllRelatedDiagnostics(document);
     updateDiagnosticRepo(uri, analysisResult.getDiagnostics());
@@ -108,6 +112,8 @@ public class DocumentModelService {
     updatedModel.setOutlineResult(
         BuildOutlineTreeFromSyntaxTree.convert(analysisResult.getRootNode(), uri));
     docs.put(uri, updatedModel);
+
+    return updatedModel;
   }
 
   /**
@@ -130,10 +136,13 @@ public class DocumentModelService {
    *
    * @param uri - document uri
    * @param text - document text
+   * @return document model associated with the uri
    */
   @Synchronized
-  public void changeDocument(String uri, String text) {
-    Optional.ofNullable(docs.get(uri)).ifPresent(d -> d.update(text));
+  public CobolDocumentModel changeDocument(String uri, String text) {
+    CobolDocumentModel model = docs.get(uri);
+    if (model != null) model.update(text);
+    return model;
   }
 
   /**

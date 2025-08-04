@@ -17,16 +17,16 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.FoldingQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp.cobol.service.DocumentServiceHelper;
 import org.eclipse.lsp4j.FoldingRange;
@@ -58,13 +58,11 @@ public class FoldingRangeHandler {
    */
   public List<FoldingRange> foldingRange(FoldingRangeRequestParams params) {
     String uri = params.getTextDocument().getUri();
-    Node rootNode =
-        documentService.isDocumentSynced(uri)
-            ? documentService.get(uri).getAnalysisResult().getRootNode()
-            : null;
-    return rootNode == null
-        ? Collections.emptyList()
-        : new ArrayList<>(DocumentServiceHelper.getFoldingRange(rootNode, uri));
+    final CobolDocumentModel documentModel = documentService.get(uri);
+    if (documentModel == null || !documentModel.isDocumentSynced()) return ImmutableList.of();
+    final AnalysisResult results = documentModel.getAnalysisResult();
+    if (results == null) return ImmutableList.of();
+    return new ArrayList<>(DocumentServiceHelper.getFoldingRange(results.getRootNode(), uri));
   }
 
   /**
@@ -96,6 +94,9 @@ public class FoldingRangeHandler {
   public List<LspEventCancelCondition> getCancelConditions(String uri) {
     return ImmutableList.of(
         asyncAnalysisService.createCancelConditionOnClose(uri),
-        () -> analysisService.isCopybook(uri, documentService.get(uri).getText()));
+        () -> {
+          final CobolDocumentModel documentModel = documentService.get(uri);
+          return documentModel == null || analysisService.isCopybook(uri, documentModel.getText());
+        });
   }
 }

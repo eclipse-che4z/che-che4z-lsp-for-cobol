@@ -20,15 +20,12 @@ import static org.mockito.Mockito.*;
 import com.google.common.collect.ImmutableList;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
 import org.eclipse.lsp.cobol.common.LanguageEngineFacade;
-import org.eclipse.lsp.cobol.common.copybook.CopybookService;
 import org.eclipse.lsp.cobol.common.model.tree.RootNode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookIdentificationService;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.settings.ConfigurationService;
-import org.eclipse.lsp.cobol.utils.MockCobolClientProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,35 +40,16 @@ class AnalysisServiceTest {
   @Mock private ConfigurationService configurationService;
   @Mock private CopybookIdentificationService copybookIdentificationService;
   @Mock private Communications communications;
-  @Mock private DocumentModelService documentService;
-  @Mock private CopybookService copybookService;
-  @Mock private CFASTBuilder cfastBuilder;
 
   @BeforeEach
   void init() {
-    service =
-        new AnalysisService(
-            engine,
-            configurationService,
-            copybookIdentificationService,
-            copybookService,
-            documentService,
-            cfastBuilder,
-            new MockCobolClientProvider());
+    service = new AnalysisService(engine, configurationService, copybookIdentificationService);
     service.setExtensionConfig(ImmutableList.of());
   }
 
   @Test
   void testIsCopybook() throws InterruptedException {
-    service =
-        new AnalysisService(
-            engine,
-            configurationService,
-            copybookIdentificationService,
-            copybookService,
-            documentService,
-            cfastBuilder,
-            new MockCobolClientProvider());
+    service = new AnalysisService(engine, configurationService, copybookIdentificationService);
 
     CompletableFuture<Boolean> booleanCompletableFuture =
         CompletableFuture.supplyAsync(() -> service.isCopybook("", ""));
@@ -91,25 +69,19 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
-    service.analyzeDocument(uri, text, true);
-    verify(documentService, times(0)).processAnalysisResult(eq(uri), any(), anyString());
+    service.analyzeDocument(uri, text, true, "");
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
   @Test
   void testAnalyzeDocument_program() throws InterruptedException {
     AnalysisResult result = mock(AnalysisResult.class);
-    when(result.getRootNode()).thenReturn(new RootNode());
 
     String uri = UUID.randomUUID().toString();
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
     when(engine.analyze(any(), any(), any(), anyString())).thenReturn(result);
-    CobolDocumentModel mockDocModel = mock(CobolDocumentModel.class);
-    when(mockDocModel.getLanguageId()).thenReturn("cobol");
-    when(documentService.get(uri)).thenReturn(mockDocModel);
-    service.analyzeDocument(uri, text, true);
-    verify(documentService, times(1)).processAnalysisResult(eq(uri), any(), anyString());
+    service.analyzeDocument(uri, text, true, "cobol");
     verify(engine, times(1)).analyze(any(), any(), any(), anyString());
   }
 
@@ -119,7 +91,7 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(true);
 
-    service.analyzeDocument(uri, text, false);
+    service.analyzeDocument(uri, text, false, "");
     verify(engine, times(0)).analyze(any(), any(), any());
   }
 
@@ -129,11 +101,8 @@ class AnalysisServiceTest {
     String text = UUID.randomUUID().toString();
     when(copybookIdentificationService.isCopybook(any(), any(), any())).thenReturn(false);
     when(engine.analyze(any(), any(), any(), anyString())).thenReturn(prepareAnalysisResult());
-    CobolDocumentModel mockDocModel = mock(CobolDocumentModel.class);
-    when(mockDocModel.getLanguageId()).thenReturn("cobol");
-    when(documentService.get(uri)).thenReturn(mockDocModel);
 
-    service.analyzeDocument(uri, text, false);
+    service.analyzeDocument(uri, text, false, "cobol");
     verify(engine, times(1)).analyze(any(), any(), any(), anyString());
   }
 

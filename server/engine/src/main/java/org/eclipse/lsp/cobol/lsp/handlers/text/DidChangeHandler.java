@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
+import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 
 /** LSP DidChange Handler */
@@ -27,12 +29,16 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 public class DidChangeHandler {
   private final AsyncAnalysisService asyncAnalysisService;
   private final SourceUnitGraph sourceUnitGraph;
+  private final DocumentModelService documentModelService;
 
   @Inject
   public DidChangeHandler(
-      AsyncAnalysisService asyncAnalysisService, SourceUnitGraph sourceUnitGraph) {
+      AsyncAnalysisService asyncAnalysisService,
+      SourceUnitGraph sourceUnitGraph,
+      DocumentModelService documentModelService) {
     this.asyncAnalysisService = asyncAnalysisService;
     this.sourceUnitGraph = sourceUnitGraph;
+    this.documentModelService = documentModelService;
   }
 
   /**
@@ -56,7 +62,10 @@ public class DidChangeHandler {
           allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
       return;
     }
-    asyncAnalysisService.scheduleAnalysis(
-        uri, text, params.getTextDocument().getVersion(), false, eventSource);
+    CobolDocumentModel model = documentModelService.changeDocument(uri, text);
+    if (model != null) {
+      asyncAnalysisService.scheduleAnalysis(
+          model, params.getTextDocument().getVersion(), false, false, eventSource);
+    }
   }
 }

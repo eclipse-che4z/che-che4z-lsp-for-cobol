@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.google.gson.JsonObject;
+import com.google.inject.Provider;
 import java.util.Set;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
 import org.eclipse.lsp.cobol.common.SubroutineService;
@@ -33,6 +34,7 @@ import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp.cobol.service.delegates.completions.Completions;
@@ -71,6 +73,8 @@ class CobolTextDocumentServiceTest {
 
   @Mock LspMessageBroker lspMessageBroker;
 
+  @Mock private Provider<CobolLanguageClient> clientProvider;
+
   private CobolTextDocumentService service;
 
   /**
@@ -90,7 +94,9 @@ class CobolTextDocumentServiceTest {
             analysisService,
             copybookService,
             subroutineService,
-            communications);
+            communications,
+            null,
+            clientProvider);
 
     CompletionHandler completionHandler =
         new CompletionHandler(asyncAnalysisService, completions, documentModelService);
@@ -111,7 +117,8 @@ class CobolTextDocumentServiceTest {
             documentModelService,
             watcherService,
             copybookService);
-    DidChangeHandler didChangeHandler = new DidChangeHandler(asyncAnalysisService, documentGraph);
+    DidChangeHandler didChangeHandler =
+        new DidChangeHandler(asyncAnalysisService, documentGraph, documentModelService);
     DefinitionHandler definitionHandler =
         new DefinitionHandler(asyncAnalysisService, documentModelService, occurrences);
     DocumentSymbolHandler documentSymbolHandler =

@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentSymbolQuery;
 import org.eclipse.lsp.cobol.service.AnalysisService;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp.cobol.service.DocumentModelService;
 import org.eclipse.lsp4j.DocumentSymbol;
 import org.eclipse.lsp4j.DocumentSymbolParams;
@@ -56,7 +57,9 @@ public class DocumentSymbolHandler {
   public List<Either<SymbolInformation, DocumentSymbol>> documentSymbol(
       DocumentSymbolParams params) {
     String uri = params.getTextDocument().getUri();
-    return createDocumentSymbols(documentModelService.get(uri).getOutlineResult());
+    final CobolDocumentModel documentModel = documentModelService.get(uri);
+    if (documentModel == null) return ImmutableList.of();
+    return createDocumentSymbols(documentModel.getOutlineResult());
   }
 
   private List<Either<SymbolInformation, DocumentSymbol>> createDocumentSymbols(
@@ -89,11 +92,13 @@ public class DocumentSymbolHandler {
     String uri = params.getTextDocument().getUri();
     return ImmutableList.of(
         asyncAnalysisService.createDependencyOn(uri),
-        () ->
-            documentModelService.get(uri) != null
-                && ((documentModelService.get(uri).getOutlineResult() != null
-                        && !documentModelService.get(uri).getOutlineResult().isEmpty())
-                    || analysisService.isCopybook(uri, documentModelService.get(uri).getText())));
+        () -> {
+          final CobolDocumentModel documentModel = documentModelService.get(uri);
+          if (documentModel == null) return false;
+          final List<?> outline = documentModel.getOutlineResult();
+          return (outline != null && !outline.isEmpty())
+              || analysisService.isCopybook(uri, documentModel.getText());
+        });
   }
 
   /**

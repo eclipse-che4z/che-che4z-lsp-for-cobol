@@ -21,6 +21,7 @@ import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidOpenNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.HandlerUtility;
+import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 
 /** LSP DidOpen Handler */
@@ -48,8 +49,9 @@ public class DidOpenHandler {
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
     }
-    asyncAnalysisService.openDocument(
-        uri, params.getTextDocument().getText(), params.getTextDocument().getLanguageId());
+    final CobolDocumentModel model =
+        asyncAnalysisService.openDocument(
+            uri, params.getTextDocument().getText(), params.getTextDocument().getLanguageId());
 
     if (this.asyncAnalysisService.isCopybook(uri, params.getTextDocument().getText())
         || this.sourceUnitGraph.isUserSuppliedCopybook(uri)) {
@@ -58,11 +60,7 @@ public class DidOpenHandler {
     }
 
     asyncAnalysisService.scheduleAnalysis(
-        uri,
-        params.getTextDocument().getText(),
-        params.getTextDocument().getVersion(),
-        true,
-        eventSource);
+        model, params.getTextDocument().getVersion(), true, false, eventSource);
   }
 
   /**
