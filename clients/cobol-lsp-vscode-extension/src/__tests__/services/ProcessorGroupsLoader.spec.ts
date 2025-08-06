@@ -167,7 +167,7 @@ describe("ProcessorGroupsLoader", () => {
         { dataset: "remote.lib.2" },
       ];
 
-      const result = transformLibs(input, [LocalPathLib, DatasetLib]);
+      const result = transformLibs(input, [LocalPathLib, DatasetLib], []);
 
       expect(result).toEqual([
         new LocalPathLib("/local/lib/1"),
