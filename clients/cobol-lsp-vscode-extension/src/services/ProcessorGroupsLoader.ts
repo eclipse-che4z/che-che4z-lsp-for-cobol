@@ -362,7 +362,7 @@ function transformPreprocessor(
   const preprocessors = asArray(input);
   const transformed = preprocessors.map((preprocessor) => {
     if (typeof preprocessor === "string") {
-      return { name: preprocessor, libs: [] };
+      return { name: preprocessor, libs: defaultLibs };
     } else {
       return {
         name: preprocessor.name ?? "",
