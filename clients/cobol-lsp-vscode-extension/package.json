@@ -94,6 +94,11 @@
         "command": "cobol-lsp.cpy-manager.reenable.failed.zowe.requests",
         "title": "Reenable failed Zowe requests",
         "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.configuration.create-sample",
+        "title": "Create sample configuration files",
+        "category": "COBOL"
       }
     ],
     "menus": {
