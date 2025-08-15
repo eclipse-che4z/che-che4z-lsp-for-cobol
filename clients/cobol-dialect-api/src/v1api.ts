@@ -37,18 +37,18 @@ export const getV1Api = async (extensionId: string): Promise<V1Api | Error> => {
       typeof api.version !== "string"
     ) {
       return new Error(
-        `Update to the latest version of COBOL Language Support to use API features`,
+        `Update to the latest version of COBOL Language Support to use API features.`,
       );
     }
     if (!("v1" in api)) {
       return new Error(
-        `Update to the latest version of COBOL Language Support to use API features`,
+        `Update to the latest version of COBOL Language Support to use API features.`,
       );
     }
     const v1 = api.v1;
     if (!isV1Api(v1)) {
       return new Error(
-        `The v1 API of COBOL Language Support (${main.id}) version ${main.packageJSON.version} does not match the expected signature`,
+        `The v1 API of COBOL Language Support (${main.id}) version ${main.packageJSON.version} does not match the expected signature.`,
       );
     }
     v1Api = {
