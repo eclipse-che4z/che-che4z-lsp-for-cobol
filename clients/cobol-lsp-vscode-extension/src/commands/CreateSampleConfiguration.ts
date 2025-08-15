@@ -34,8 +34,9 @@ const default_proc = `{
     ]
 }`;
 
-export async function createSampleConfiguration() {
-  const workspaces = vscode.workspace.workspaceFolders;
+export async function pickWorkspace(
+  workspaces = vscode.workspace.workspaceFolders,
+) {
   if (!workspaces || workspaces.length === 0) {
     await vscode.window.showErrorMessage(
       "Creating configuration files requires an opened workspace",
@@ -43,20 +44,24 @@ export async function createSampleConfiguration() {
     return;
   }
 
-  let ws;
-  if (workspaces.length === 1) ws = workspaces[0];
-  else {
-    const pickedWs = await vscode.window.showQuickPick(
-      workspaces.map((w) => ({
-        label: w.name,
-        detail: w.uri.scheme === "file" ? w.uri.fsPath : w.uri.toString(true),
-        ws: w,
-      })),
-      { title: "Select a workspace where to generate the configuration files" },
-    );
-    if (!pickedWs) return;
-    ws = pickedWs.ws;
-  }
+  if (workspaces.length === 1) return workspaces[0];
+  const pickedWs = await vscode.window.showQuickPick(
+    workspaces.map((w) => ({
+      label: w.name,
+      detail: w.uri.scheme === "file" ? w.uri.fsPath : w.uri.toString(true),
+      ws: w,
+    })),
+    { title: "Select a workspace where to generate the configuration files" },
+  );
+  return pickedWs?.ws;
+}
+
+export async function createSampleConfiguration(
+  wsp = pickWorkspace(),
+  fs = vscode.workspace.fs,
+) {
+  const ws = await wsp;
+  if (!ws) return;
 
   try {
     const folder = vscode.Uri.joinPath(ws.uri, ".cobolplugin");
@@ -65,12 +70,9 @@ export async function createSampleConfiguration() {
 
     const encoder = new TextEncoder();
 
-    await vscode.workspace.fs.createDirectory(folder);
+    await fs.createDirectory(folder);
 
-    const exists = await Promise.allSettled([
-      vscode.workspace.fs.stat(pgm),
-      vscode.workspace.fs.stat(proc),
-    ]);
+    const exists = await Promise.allSettled([fs.stat(pgm), fs.stat(proc)]);
 
     if (exists.some((x) => x.status === "fulfilled")) {
       await vscode.window.showErrorMessage(`Configuration files already exist`);
@@ -78,8 +80,8 @@ export async function createSampleConfiguration() {
     }
 
     await Promise.all([
-      vscode.workspace.fs.writeFile(pgm, encoder.encode(default_pgm)),
-      vscode.workspace.fs.writeFile(proc, encoder.encode(default_proc)),
+      fs.writeFile(pgm, encoder.encode(default_pgm)),
+      fs.writeFile(proc, encoder.encode(default_proc)),
     ]);
 
     await Promise.all(
