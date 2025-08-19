@@ -35,8 +35,7 @@ public class DialectConfigs {
         true,
         false,
         SqlProcessing.ENABLED,
-        ImmutableList.of(
-            new DialectRegistryItem("IDMS", 1, null, "", "")),
+        ImmutableList.of(new DialectRegistryItem("IDMS", 1, null, "", "")),
         ImmutableMap.of());
   }
 
