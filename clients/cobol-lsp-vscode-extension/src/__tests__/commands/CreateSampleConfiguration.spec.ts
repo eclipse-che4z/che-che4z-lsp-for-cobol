@@ -64,7 +64,9 @@ describe("Create sample configuration command", () => {
       vscode.Uri.parse("test:/.cobolplugin/proc_grps.json"),
       expect.anything(),
     );
-    expect(writeFile.mock.calls.map((x) => Array.from(x[1]))).toStrictEqual([
+    expect(
+      writeFile.mock.calls.map((x: Uint8Array[]) => Array.from(x[1])),
+    ).toStrictEqual([
       expect.arrayContaining(Array.from(new TextEncoder().encode('"pgms"'))),
       expect.arrayContaining(Array.from(new TextEncoder().encode('"pgroups"'))),
     ]);
