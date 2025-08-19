@@ -18,7 +18,6 @@ options {tokenVocab = CompilerDirectivesLexer;}
 compilerOptions: compilerOption | (compilerOption COMMACHAR compilerOptions)+;
 compilerOption
     : deprecatedCompilerOptions
-    | cicsTranslatorDirectives
     | cobolCompilerOption
     ;
 

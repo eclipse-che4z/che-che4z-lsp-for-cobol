@@ -42,7 +42,7 @@
         <guice.version>4.2.2</guice.version>
         <junit-jupiter.version>5.11.2</junit-jupiter.version>
         <logback.classic.version>1.5.18</logback.classic.version>
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <lsp4j.version>0.14.0</lsp4j.version>
         <picocli.version>4.7.5</picocli.version>
         <maven.antlr4.plugin.version>4.13.2</maven.antlr4.plugin.version>

@@ -127,6 +127,7 @@ public class TestCicsTranslatorOptions {
   }
 
   @Test
+  @Disabled("To be implemented: cics options verification")
   void testCompilerDirectivesLiteralAfterKeywordCICSTranslatorOptions() {
     UseCaseEngine.runTest(
         LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR,

@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases.cics;
+package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -39,10 +39,10 @@ class TestCicsTranslatorOptionsPosition {
   @Test
   void testTou1() {
     ExtendedDocument extDoc = new ExtendedDocument("000123 CBL CICS(DLI)\n", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
-    assertEquals("000123              ", extDoc.getCurrentText().toString());
+    assertEquals("", extDoc.getCurrentText().toString());
     assertEquals(1, result.size());
     CompilerDirectiveNode node = result.get(0);
     assertDirectiveNode("DLI", 0, 16, 19, node);
@@ -52,7 +52,7 @@ class TestCicsTranslatorOptionsPosition {
   void testTou2() {
     ExtendedDocument extDoc =
         new ExtendedDocument("000123 CBL CICS(DLI), NOADATA, CICS(DLI)\n", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals("000123 CBL            NOADATA           ", extDoc.getCurrentText().toString());
@@ -64,7 +64,7 @@ class TestCicsTranslatorOptionsPosition {
   @Test
   void testTou3() {
     ExtendedDocument extDoc = new ExtendedDocument("000123 CBL CICS(DLI), NOADATA\n", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals("000123 CBL            NOADATA", extDoc.getCurrentText().toString());
@@ -75,7 +75,7 @@ class TestCicsTranslatorOptionsPosition {
   @Test
   void testTou4() {
     ExtendedDocument extDoc = new ExtendedDocument("000123 CBL NOADATA, CICS(DLI)\n", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals("000123 CBL NOADATA           ", extDoc.getCurrentText().toString());
@@ -87,7 +87,7 @@ class TestCicsTranslatorOptionsPosition {
   void testTou5() {
     ExtendedDocument extDoc =
         new ExtendedDocument("000123 CBL NOADATA, CICS(DLI)\n" + "000123 CBL DATA, CICS(DLI)", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
@@ -104,7 +104,7 @@ class TestCicsTranslatorOptionsPosition {
         new ExtendedDocument(
             "000123 CBL NOADATA, CICS(DLI)\n" + "000124*COMMENT\n" + "000123 CBL DATA, CICS(DLI)",
             URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
@@ -118,7 +118,7 @@ class TestCicsTranslatorOptionsPosition {
   void testTou7() {
     ExtendedDocument extDoc =
         new ExtendedDocument("000123 CBL NOADATA, CICS(DLI), NOADATA, CICS(DLI)\n", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
@@ -133,7 +133,7 @@ class TestCicsTranslatorOptionsPosition {
     ExtendedDocument extDoc =
         new ExtendedDocument(
             "123456 CBL NOADATA, CICS(DLI), NOADATA, CICS(DLI)                       123456", URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
@@ -150,7 +150,7 @@ class TestCicsTranslatorOptionsPosition {
         new ExtendedDocument(
             "123456 CBL NOADATA, CICS(SPACE(10)), NOADATA, CICS(LINECOUNT(32))            123456",
             URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
@@ -168,7 +168,7 @@ class TestCicsTranslatorOptionsPosition {
             "123456 CBL NOADATA, CICS(FLAG(I,W)), NOADATA                                    "
                 + " 123456",
             URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
@@ -185,12 +185,44 @@ class TestCicsTranslatorOptionsPosition {
             "123456 PROCESS NOADATA, CICS(FLAG(I,W)), NOADATA                                "
                 + " 123456",
             URI);
-    DialectProcessingContext context = mock(DialectProcessingContext.class);
+    DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
     assertEquals(
         "123456 PROCESS NOADATA,                  NOADATA                                 123456",
         extDoc.getCurrentText().toString());
+    assertEquals(1, result.size());
+    assertDirectiveNode("FLAG(I,W)", 0, 29, 38, result.get(0));
+  }
+
+  @Test
+  void testTou12() {
+    ExtendedDocument extDoc =
+            new ExtendedDocument(
+                    "123456 PROCESS CICS('FLAG(I,W)), NOADATA",
+                    URI);
+    DialectProcessingContext context = mockContext();
+    when(context.getExtendedDocument()).thenReturn(extDoc);
+    List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
+    assertEquals(
+            "123456 PROCESS CICS('FLAG(I,W)), NOADATA",
+            extDoc.getCurrentText().toString());
+    assertEquals(1, result.size());
+    assertDirectiveNode("FLAG(I,W)", 0, 29, 38, result.get(0));
+  }
+
+  @Test
+  void testTou13() {
+    ExtendedDocument extDoc =
+            new ExtendedDocument(
+                    "123456 PROCESS CICS(\"FLAG(I,W)), NOADATA",
+                    URI);
+    DialectProcessingContext context = mockContext();
+    when(context.getExtendedDocument()).thenReturn(extDoc);
+    List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context);
+    assertEquals(
+            "123456 PROCESS CICS(\"FLAG(I,W)), NOADATA",
+            extDoc.getCurrentText().toString());
     assertEquals(1, result.size());
     assertDirectiveNode("FLAG(I,W)", 0, 29, 38, result.get(0));
   }
@@ -203,5 +235,10 @@ class TestCicsTranslatorOptionsPosition {
     assertEquals(locality, node.getLocality());
     assertEquals(CICSDialect.DIALECT_NAME, node.getDialect());
     assertEquals(text, node.getDirectiveText());
+  }
+  private static DialectProcessingContext mockContext() {
+    DialectProcessingContext ctx = mock(DialectProcessingContext.class);
+    when(ctx.getLanguageId()).thenReturn("cobol");
+    return ctx;
   }
 }

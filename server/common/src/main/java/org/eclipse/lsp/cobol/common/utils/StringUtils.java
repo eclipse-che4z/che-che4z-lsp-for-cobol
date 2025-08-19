@@ -40,18 +40,4 @@ public class StringUtils {
     char last = str.charAt(str.length() - 1);
     return (first == '\'' && last == '\'');
   }
-
-  /**
-   * Generate empty (space) string of given length
-   *
-   * @param length - length of the string
-   * @return empty string
-   */
-  public String generateEmptyString(int length) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < length; i++) {
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
 }

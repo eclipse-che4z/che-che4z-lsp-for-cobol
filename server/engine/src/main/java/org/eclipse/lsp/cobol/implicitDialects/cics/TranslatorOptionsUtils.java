@@ -18,27 +18,29 @@ import com.google.common.collect.Sets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.experimental.UtilityClass;
+
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
-import org.eclipse.lsp.cobol.common.utils.StringUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import static org.apache.commons.lang3.StringUtils.repeat;
+
 /** CICS translator options utils */
-@UtilityClass
-public class TranslatorOptionsUtils {
+public final class TranslatorOptionsUtils {
   private static final int A_B_ARIA_LEN = 72 - 7;
-  private static final int ARIA_A = 7;
+
   private static final Pattern CBL_LINE =
       Pattern.compile("^(?<prefix>\\s*(CBL|PROCESS)\\s+)(?<cbl>.*)$", Pattern.CASE_INSENSITIVE);
   private static final Pattern CBL_CICS =
       Pattern.compile(
-          ".*(?<cics>CICS\\(\"?(?<args>([^()]|\\([^()]*\"?\\))+)\\))", Pattern.CASE_INSENSITIVE);
+          ".*(?<cics>CICS\\s*\\(\"?(?<args>([^()]|\\([^()]*\"?\\))+)\\))", Pattern.CASE_INSENSITIVE);
   private static final Pattern CBL_XOPTS =
       Pattern.compile(
-          ".*(?<xopts>XOPTS\\((?<args>([^()]|\\([^()]*\\))+)\\))", Pattern.CASE_INSENSITIVE);
+          ".*(?<xopts>XOPTS?\\s*\\((?<args>([^()]|\\([^()]*\\))+)\\))", Pattern.CASE_INSENSITIVE);
   public static final HashSet<Character> DELIMITERS = Sets.newHashSet(' ', ',');
 
   /**
@@ -47,27 +49,33 @@ public class TranslatorOptionsUtils {
    * @param context is a dialect processing context
    * @return List of CICS translator options
    */
-  public List<CompilerDirectiveNode> extractCompilerDirectives(DialectProcessingContext context) {
+  public static List<CompilerDirectiveNode> extractCompilerDirectives(
+      DialectProcessingContext context) {
     String[] lines = context.getExtendedDocument().getCurrentText().toString().split("\n\r?");
     List<CompilerDirectiveNode> compilerDirectiveNodes = new ArrayList<>();
     for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
       String line = lines[lineNumber];
-      if (line.trim().length() <= ARIA_A) {
+      if (line.trim().length() <= getAriaA(context.getLanguageId())) {
         continue;
       }
       Matcher lineMatch =
-          CBL_LINE.matcher(line.substring(ARIA_A, Math.min(A_B_ARIA_LEN + ARIA_A, line.length())));
+          CBL_LINE.matcher(
+              line.substring(
+                  getAriaA(context.getLanguageId()),
+                  Math.min(A_B_ARIA_LEN + getAriaA(context.getLanguageId()), line.length())));
       if (!lineMatch.find()) {
         break;
       }
-      List<CompilerDirectiveNode> directiveNodes = new ArrayList<>();
       Range lineRange =
           new Range(new Position(lineNumber, 0), new Position(lineNumber, line.length()));
-      context
-          .getExtendedDocument()
-          .replace(
-              lineRange, replaceCicsOpts(context, lineMatch, line, lineNumber, directiveNodes));
-      compilerDirectiveNodes.addAll(directiveNodes);
+      String newText =
+          replaceCicsOpts(context, lineMatch, line, lineNumber, compilerDirectiveNodes);
+      if (newText.isEmpty()) {
+        context.getExtendedDocument().delete(lineNumber);
+      } else {
+        context.getExtendedDocument().replace(lineRange, newText);
+      }
+
     }
     return compilerDirectiveNodes;
   }
@@ -83,13 +91,13 @@ public class TranslatorOptionsUtils {
     List<String> fragments = split(cblString);
     int[] counts = new int[fragments.size()];
 
-    int shift = ARIA_A + lineMatch.start("cbl");
+    int shift = getAriaA(context.getLanguageId()) + lineMatch.start("cbl");
     for (int i = 0; i < fragments.size(); i++) {
       Matcher cicsMatcher = CBL_CICS.matcher(fragments.get(i));
       Matcher xoptsMatcher = CBL_XOPTS.matcher(fragments.get(i));
       if (cicsMatcher.find()) {
         counts[i] = 0;
-        fragments.set(i, StringUtils.generateEmptyString(fragments.get(i).length()));
+        fragments.set(i, repeat(' ', fragments.get(i).length()));
         String cicsText = cicsMatcher.group("args");
         int cicsStart = shift + cicsMatcher.start("args");
         directiveNodes.addAll(
@@ -107,10 +115,7 @@ public class TranslatorOptionsUtils {
                 lineNumber,
                 fragmentBuilder);
         fragments.set(
-            i,
-            counts[i] > 0
-                ? fragmentBuilder.toString()
-                : StringUtils.generateEmptyString(fragments.get(i).length()));
+            i, counts[i] > 0 ? fragmentBuilder.toString() : repeat(' ', fragments.get(i).length()));
       } else {
         counts[i] = 1;
       }
@@ -127,15 +132,18 @@ public class TranslatorOptionsUtils {
 
     String prefix =
         nonCicsOptionsCount > 0
-            ? line.substring(0, ARIA_A + lineMatch.start("cbl"))
-            : line.substring(0, ARIA_A + lineMatch.start("prefix"))
-                + StringUtils.generateEmptyString(lineMatch.group("prefix").length());
+            ? line.substring(0, getAriaA(context.getLanguageId()) + lineMatch.start("cbl"))
+            : line.substring(0, getAriaA(context.getLanguageId()) + lineMatch.start("prefix"))
+                + repeat(' ', lineMatch.group("prefix").length());
 
     String tail =
         line.length() - prefix.length() - result.length() > 0
             ? line.substring(prefix.length() + result.length())
             : "";
 
+    if (result.toString().trim().isEmpty()) {
+      return "";
+    }
     return prefix + result + tail;
   }
 
@@ -193,7 +201,7 @@ public class TranslatorOptionsUtils {
         continue;
       }
 
-      result.append(StringUtils.generateEmptyString(length));
+      result.append(repeat(' ', length));
       String nodeText = removeLastComma(fragments.get(i)).trim();
       directiveNodes.add(
           createNode(
@@ -283,8 +291,12 @@ public class TranslatorOptionsUtils {
         while (i < cblString.length() && DELIMITERS.contains(cblString.charAt(i))) {
           i += 1;
         }
-        result.add(cblString.substring(fragmentStart, i));
-        fragmentStart = i;
+        if (i < cblString.length() && cblString.charAt(i) != '(') {
+          result.add(cblString.substring(fragmentStart, i));
+          fragmentStart = i;
+        } else {
+          depth++;
+        }
       } else if (cblString.charAt(i) == '(') {
         depth++;
       } else if (cblString.charAt(i) == ')') {
@@ -313,5 +325,15 @@ public class TranslatorOptionsUtils {
       return fragment;
     }
     return fragment.substring(0, commaPos) + " " + fragment.substring(commaPos + 1);
+  }
+
+  private static int getAriaA(String languageId) {
+    CobolProgramLayout layout = CobolLanguageId.MAPPER.get(languageId).getLayout();
+    return layout.getSequenceLength() + layout.getIndicatorLength();
+  }
+
+  private static int getAriaABLen(String languageId) {
+    CobolProgramLayout layout = CobolLanguageId.MAPPER.get(languageId).getLayout();
+    return layout.getAreaBLength() + layout.getAreaALength();
   }
 }

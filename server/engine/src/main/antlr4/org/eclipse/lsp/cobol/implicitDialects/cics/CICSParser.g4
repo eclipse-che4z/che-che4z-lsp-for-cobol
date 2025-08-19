@@ -39,11 +39,6 @@ allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | c
 
 allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics | cics_csd;
 
-cicsTranslatorCompileDirectivedKeywords
-   : CBLCARD | COBOL2 | COBOL3 | CPSM | DLI | EDF | EXCI | FEPI | NATLANG | NOCBLCARD | NOCPSM | NODEBUG | NOEDF
-   | NOFEPI | NOLENGTH | NOLINKAGE | NOOPTIONS | NOSPIE | OPTIONS | SP | SPIE | SYSEIB
-   ;
-
 /** RECEIVE: */
 
 // Receive all
@@ -1850,7 +1845,12 @@ ABORT
  | YEAR
  | YYYYDDD
  | YYYYMMDD
- | cicsTranslatorCompileDirectivedKeywords;
+ | EXCI
+ | FEPI
+ | NATLANG
+ | NODEBUG
+ | OPTIONS
+ ;
 
 cicsLexerDefinedVariableUsageTokens:
 ABCODE
