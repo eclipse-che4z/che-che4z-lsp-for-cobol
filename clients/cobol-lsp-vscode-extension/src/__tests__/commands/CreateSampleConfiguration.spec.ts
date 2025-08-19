@@ -53,7 +53,20 @@ describe("Create sample configuration command", () => {
       writeFile,
       createDirectory,
     } as unknown as vscode.FileSystem);
-    expect(createDirectory).toHaveBeenCalled();
-    expect(writeFile).toHaveBeenCalled();
+    expect(createDirectory).toHaveBeenCalledWith(
+      vscode.Uri.parse("test:/.cobolplugin"),
+    );
+    expect(writeFile).toHaveBeenCalledWith(
+      vscode.Uri.parse("test:/.cobolplugin/pgm_conf.json"),
+      expect.anything(),
+    );
+    expect(writeFile).toHaveBeenCalledWith(
+      vscode.Uri.parse("test:/.cobolplugin/proc_grps.json"),
+      expect.anything(),
+    );
+    expect(writeFile.mock.calls.map((x) => Array.from(x[1]))).toStrictEqual([
+      expect.arrayContaining(Array.from(new TextEncoder().encode('"pgms"'))),
+      expect.arrayContaining(Array.from(new TextEncoder().encode('"pgroups"'))),
+    ]);
   });
 });
