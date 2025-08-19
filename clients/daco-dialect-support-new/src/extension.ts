@@ -13,46 +13,53 @@
  */
 
 import * as vscode from "vscode";
-import { getV1Api } from "@code4z/cobol-dialect-api";
-
-let unregisterDialect = () => {};
+import {
+  getV2Api,
+  IDocumentProcessingContext,
+} from "@code4z/cobol-dialect-api";
+import { DaCoPreprocessor } from "./engine/preprocessor";
 
 export async function activate(context: vscode.ExtensionContext) {
+  const outputChannel = vscode.window.createOutputChannel(
+    "DaCo dialect support",
+  );
+  const preprocessor = new DaCoPreprocessor();
+
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
-  const jar = vscode.Uri.joinPath(
-    extensionUri,
-    "server",
-    "jar",
-    "dialect-daco.jar",
-  );
-  const v1Api = await getV1Api(extensionId);
-  if (v1Api instanceof Error) {
-    vscode.window.showErrorMessage(v1Api.toString());
+
+  const v2Api = await getV2Api(extensionId);
+  if (v2Api instanceof Error) {
+    vscode.window.showErrorMessage(v2Api.toString());
     return;
   }
-  const unregister = await v1Api.registerDialect({
-    name: "DaCo",
-    description: "DaCo dialect support",
-    snippets,
-    jar,
-    isCopyStatement: (statement: string) => {
-      const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
-      const match = statement.match(regex);
-      if (!match) {
-        return { isCopy: false };
-      }
-      return { isCopy: true, prefix: match[1] };
+  const unregister = await v2Api.registerDialect(
+    {
+      name: "DaCo",
+      description: "DaCo dialect support",
+      snippets,
+      isCopyStatement: (statement: string) => {
+        const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
+        const match = statement.match(regex);
+        if (!match) {
+          return { isCopy: false };
+        }
+        return { isCopy: true, prefix: match[1] };
+      },
     },
-  });
+    async (
+      context: IDocumentProcessingContext,
+      programUri: vscode.Uri,
+      text: string,
+    ) => {
+      return preprocessor.execute(context, programUri, text, outputChannel);
+    },
+  );
+
   if (unregister instanceof Error) {
     vscode.window.showErrorMessage(unregister.toString());
     return;
   }
-  unregisterDialect = unregister;
-}
-
-export function deactivate() {
-  unregisterDialect();
+  context.subscriptions.push(unregister);
 }
