@@ -165,6 +165,21 @@ public class TestDataTypeLength {
           + "       01 {$*INVALID-SIMPLE-DEC3|3} PIC 99999999999999999990.\n"
           + "       PROCEDURE DIVISION.";
 
+  private static final String TEXT_SIMPLE_NUMERIC_WITH_DECIMAL2 =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-SIMPLE-DEC1} PIC P099999999999999999.\n"
+          + "       01 {$*VALID-SIMPLE-DEC2} PIC 099999999999999999P.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC1|1} PIC P0999999999999999999.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC2|2} PIC 0P999999999999999999.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC3|3} PIC 9999999P999999.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC4|4} PIC 9P000099999999990.\n"
+          + "       01 {$*INVALID-SIMPLE-DEC5|5} PIC 09P000099999990.\n"
+          + "       PROCEDURE DIVISION.";
+
   private static final String TEXT_FLOATING_POINT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST12.\n"
@@ -433,6 +448,46 @@ public class TestDataTypeLength {
                 new Range(),
                 "Numeric field 'INVALID-SIMPLE-DEC3' with length 19 exceeds maximum allowed"
                     + " length of 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testSimpleNumericWithDecimal2() {
+    UseCaseEngine.runTest(
+        TEXT_SIMPLE_NUMERIC_WITH_DECIMAL2,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC1' with length 19 exceeds maximum allowed length"
+                    + " of 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC2' with length 19 exceeds maximum allowed"
+                    + " length of 18 digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC3' has invalid picture string",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "4",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC4' has invalid picture string",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "5",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-SIMPLE-DEC5' has invalid picture string",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
