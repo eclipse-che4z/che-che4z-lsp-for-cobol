@@ -28,8 +28,9 @@ import {
   COPYBOOK_COMPLETIONS_SORT_PREFIX,
   DEFAULT_DIALECT,
 } from "../../constants";
-import { CopyStatementParser, DialectRegistry } from "../DialectRegistry";
+import { DialectRegistry } from "../../dialect/DialectRegistry";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
+import type { CopyStatementParser } from "@code4z/cobol-dialect-api";
 
 const isDefaultCopyStatement: CopyStatementParser = (statement: string) => {
   const regex = /^.*\bCOPY(?:\s+"?'?)([\S]+)?$/i;

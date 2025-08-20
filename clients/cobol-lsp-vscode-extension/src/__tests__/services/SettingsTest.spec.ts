@@ -20,7 +20,7 @@ import {
   DIALECT_REGISTRY_SECTION,
   DialectInfo,
   DialectRegistry,
-} from "../../services/DialectRegistry";
+} from "../../dialect/DialectRegistry";
 
 import { asMutable } from "../../test/suite/testHelper";
 import {
@@ -153,19 +153,19 @@ describe("SettingService lspConfigHandler", () => {
   describe("dialects registry configuration", () => {
     const dialect: DialectInfo = {
       name: "testDialect",
-      uri: vscode.Uri.file(""),
+      protocolVersion: 2,
       description: "test-dialect",
-      snippetPath: "",
       extensionId: "",
+      snippetUri: vscode.Uri.file(""),
+      isCopyStatement: undefined,
     };
 
     beforeAll(() => {
-      DialectRegistry.register(
+      DialectRegistry.registerV2(
         dialect.extensionId,
         dialect.name,
-        dialect.uri,
         dialect.description,
-        dialect.snippetPath,
+        dialect.snippetUri,
       );
     });
 

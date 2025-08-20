@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -94,6 +95,46 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           DISPLAY  {$SQLN}.\n"
           + "           DISPLAY  {$SQLD}.\n";
 
+  private static final String TEXT_BACKEND_SKIP_SQL =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-DB2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "           UPDATE DSN8C10.DEPT\n"
+          + "           SET MGRNO = MGR-NUM\n"
+          + "           WHERE DEPTNO = INT-DEPT\n"
+          + "           END-EXEC.\n";
+
+  private static final String TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-DB2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           EXEC SQL\n"
+          + "           THIS IS INVALID CODE\n"
+          + "           END-EXEC.\n";
+
+  private static final String TEXT_BACKEND_SKIP_SQL_VARIABLE_DEFINITION =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-DB2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*A} SQL TYPE IS BINARY(10).\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           MOVE 'AAAA' TO {$A}.\n"
+          + "           STOP RUN.\n";
+
+  private static final String TEXT_BACKEND_SKIP_SQL_MISSING_END_EXEC =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-DB2.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           {|err1}EXEC SQL\n";
+
   private static final String TEXT_ERR_PRG =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. HELLO-DB2.\n"
@@ -130,6 +171,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
           + "           ELSE DISPLAY \" FAIL SQLEXT = \"  {$SQLEXT}.\n";
 
   private static final String ERR_MESSAGE = "Variable %s is not defined";
+  private static final String REPORT_MISSING_END_EXEC = "Missing token END-EXEC for the EXEC block";
 
   @Test
   void test1() {
@@ -153,6 +195,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -181,6 +224,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -213,6 +257,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             ImmutableList.of(),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");
@@ -221,6 +266,92 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
         TEXT_BACKEND_DB2_STDSQL,
         ImmutableList.of(),
         ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
+  }
+
+  @Test
+  void testSkipSql1() {
+    AnalysisConfig analysisConfig =
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            SqlProcessing.DISABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+
+    UseCaseEngine.runTest(
+        TEXT_BACKEND_SKIP_SQL,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
+  }
+
+  // Test of purposefully invalid code to ascertain that disabling SQL processing truly skips
+  // everything within the
+  // EXEC block.
+  @Test
+  void testSkipSql2() {
+    AnalysisConfig analysisConfig =
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            SqlProcessing.DISABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+
+    UseCaseEngine.runTest(
+        TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
+  }
+
+  @Test
+  void testSkipSql3() {
+    AnalysisConfig analysisConfig =
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            SqlProcessing.DISABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+
+    UseCaseEngine.runTest(
+        TEXT_BACKEND_SKIP_SQL_VARIABLE_DEFINITION,
+        ImmutableList.of(),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        analysisConfig);
+  }
+
+  @Test
+  void testSkipSql4() {
+    AnalysisConfig analysisConfig =
+        new AnalysisConfig(
+            CopybookProcessingMode.ENABLED,
+            ImmutableList.of(),
+            true,
+            false,
+            SqlProcessing.DISABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
+
+    UseCaseEngine.runTest(
+        TEXT_BACKEND_SKIP_SQL_MISSING_END_EXEC,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "err1",
+            new Diagnostic(
+                new Range(), REPORT_MISSING_END_EXEC, Error, ErrorSource.PREPROCESSING.getText())),
         ImmutableList.of(),
         analysisConfig);
   }

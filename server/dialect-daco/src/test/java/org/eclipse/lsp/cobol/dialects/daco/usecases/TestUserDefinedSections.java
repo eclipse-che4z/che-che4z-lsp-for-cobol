@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.util.Map;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
@@ -84,6 +85,7 @@ class TestUserDefinedSections {
             ImmutableList.of("DaCo", "IDMS"),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             dialectConfig);
     UseCaseEngine.runTestForDiagnostics(

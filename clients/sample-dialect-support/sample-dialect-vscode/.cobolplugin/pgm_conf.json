@@ -1,0 +1,5 @@
+{
+    "pgms": [
+        { "program": "*", "pgroup": "SAMPLE"}
+    ]
+}

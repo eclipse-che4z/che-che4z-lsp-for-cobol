@@ -25,3 +25,21 @@ export const isV1RuntimeDialectDetail = (
 
   return true;
 };
+
+export const isV2RuntimeDialectDetail = (
+  dialect: unknown,
+): dialect is __ExtensionV1DialectDetail => {
+  if (dialect === null || typeof dialect !== "object") return false;
+  if (!("name" in dialect) || typeof dialect.name !== "string") return false;
+  if (!("description" in dialect) || typeof dialect.description !== "string")
+    return false;
+  if (!("snippets" in dialect) || typeof dialect.snippets !== "object")
+    return false;
+  if (
+    "isCopyStatement" in dialect &&
+    typeof dialect.isCopyStatement !== "function"
+  )
+    return false;
+
+  return true;
+};

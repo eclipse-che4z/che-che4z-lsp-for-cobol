@@ -21,10 +21,7 @@ import {
   Uri,
 } from "vscode";
 import { CopybooksCompletionProvider } from "../../../services/copybook/CopybooksCompletionProvider";
-import {
-  DialectInfo,
-  DialectRegistry,
-} from "../../../services/DialectRegistry";
+import { DialectInfo, DialectRegistry } from "../../../dialect/DialectRegistry";
 import { initializeExternalAPIs } from "../../../services/ExternalAPIsService";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
 import { MockLib } from "./CopybookMessageHandlerTest.spec";

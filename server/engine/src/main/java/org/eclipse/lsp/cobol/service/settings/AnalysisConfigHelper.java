@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.service.settings;
 
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 
 /** AnalysisConfig Helper class */
@@ -38,6 +39,7 @@ class AnalysisConfigHelper {
             entity.getDialects(),
             entity.isCicsTranslatorEnabled(),
             false,
+            SqlProcessing.ENABLED,
             entity.getDialectRegistry(),
             entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());

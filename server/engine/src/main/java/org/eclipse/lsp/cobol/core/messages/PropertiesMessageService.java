@@ -141,6 +141,7 @@ public class PropertiesMessageService implements MessageService {
     updateResourceBundle(
         new DialectRegistryItem(
             dialect,
+            1,
             createImplicitDialectUri(dialect),
             "implicit found dialects",
             "implicit-dialects"));

@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.usecases.DialectConfigs;
@@ -208,6 +209,7 @@ public abstract class FileBasedTest extends ConfigurableTest {
           ImmutableList.of("IDMS"),
           true,
           false,
+          SqlProcessing.ENABLED,
           ImmutableList.of(),
           ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
     }

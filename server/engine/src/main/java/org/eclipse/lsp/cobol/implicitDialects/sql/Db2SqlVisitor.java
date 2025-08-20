@@ -59,6 +59,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   private final DialectProcessingContext context;
   private final MessageService messageService;
   private final CopybookService copybookService;
+  private final boolean isSqlProcessingEnabled;
   private static final Pattern DOUBLE_DASH_SQL_COMMENT =
       Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
 
@@ -379,6 +380,10 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitSqlCode(Db2SqlParser.SqlCodeContext ctx) {
+    if (!isSqlProcessingEnabled) {
+      return ImmutableList.of();
+    }
+
     String sqlCode = preProcessSqlComment(ctx);
 
     List<Node> nodes =

@@ -13,7 +13,7 @@
  */
 
 import { Uri } from "vscode";
-import { DialectRegistry } from "../../services/DialectRegistry";
+import { DialectRegistry } from "../../dialect/DialectRegistry";
 
 describe("DialectRegistry test", () => {
   beforeEach(() => {
@@ -21,15 +21,21 @@ describe("DialectRegistry test", () => {
   });
 
   it("register/unregister new dialect in the registry", () => {
-    DialectRegistry.register("dialectId", "new", Uri.file("/"), "desc", "path");
+    DialectRegistry.registerV1(
+      "dialectId",
+      "new",
+      Uri.file("/"),
+      "desc",
+      "path",
+    );
     expect(DialectRegistry.getDialects().length).toBe(1);
 
     DialectRegistry.unregister("new");
     expect(DialectRegistry.getDialects().length).toBe(0);
   });
 
-  it("retrieve dialects from the registry", () => {
-    DialectRegistry.register(
+  it("retrieve dialects from the registry for v1 version", () => {
+    DialectRegistry.registerV1(
       "id",
       "dialect",
       Uri.file("jar"),
@@ -42,7 +48,25 @@ describe("DialectRegistry test", () => {
     expect(result[0].name).toBe("dialect");
     expect(result[0].description).toBe("desc");
     expect(result[0].extensionId).toBe("id");
-    expect(result[0].uri.toString()).toBe(Uri.file("jar").toString());
-    expect(result[0].snippetPath).toBe("snippetPath");
+    expect(result[0].protocolVersion).toBe(1);
+    if (result[0].protocolVersion === 1) {
+      expect(result[0].uri.toString()).toBe(Uri.file("jar").toString());
+    }
+    expect(result[0].snippetUri.toString()).toBe(
+      Uri.file("snippetPath").toString(),
+    );
+  });
+
+  it("retrieve dialects from the registry for v2 version", () => {
+    const snippets = Uri.parse("file:/snippetPath");
+    DialectRegistry.registerV2("id", "dialect", "desc", snippets);
+    const result = DialectRegistry.getDialects();
+
+    expect(result.length).toBe(1);
+    expect(result[0].name).toBe("dialect");
+    expect(result[0].description).toBe("desc");
+    expect(result[0].extensionId).toBe("id");
+    expect(result[0].protocolVersion).toBe(2);
+    expect(result[0].snippetUri.fsPath).toContain("snippetPath");
   });
 });

@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.ConfigurableTest;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCase;
@@ -257,6 +258,7 @@ class PositiveTest extends ConfigurableTest {
           ImmutableList.of("IDMS"),
           true,
           false,
+          SqlProcessing.ENABLED,
           ImmutableList.of(),
           ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
     }

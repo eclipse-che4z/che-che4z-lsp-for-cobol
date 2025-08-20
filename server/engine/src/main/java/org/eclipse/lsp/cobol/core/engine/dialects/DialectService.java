@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import static org.eclipse.lsp.cobol.common.dialects.CobolDialect.COBOL_DIALECT_JAVA_VERSION;
+import static org.eclipse.lsp.cobol.common.dialects.CobolDialect.COBOL_DIALECT_MODERN_VERSION;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
@@ -22,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
@@ -42,6 +46,8 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.CobolDialectV2;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp.cobol.implicitDialects.sql.Db2SqlDialect;
@@ -50,16 +56,16 @@ import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
 /** Dialect utility class */
+@Slf4j
 @Singleton
 public class DialectService {
   private final Map<String, CobolDialect> dialectSuppliers;
   private final DialectDiscoveryService discoveryService;
   private final CopybookService copybookService;
-
   private final PredefinedCopybookStore predefinedCopybookService;
-
   private final MessageService messageService;
   private final ErrorFinalizerService errorFinalizerService;
+  private final DialectProcessingService dialectProcessingService;
 
   @Inject
   public DialectService(
@@ -67,13 +73,15 @@ public class DialectService {
       CopybookService copybookService,
       PredefinedCopybookStore predefinedCopybookService,
       MessageService messageService,
-      ErrorFinalizerService errorFinalizerService) {
+      ErrorFinalizerService errorFinalizerService,
+      DialectProcessingService dialectProcessingService) {
     this.predefinedCopybookService = predefinedCopybookService;
     this.errorFinalizerService = errorFinalizerService;
     this.dialectSuppliers = new HashMap<>();
     this.discoveryService = discoveryService;
     this.copybookService = copybookService;
     this.messageService = messageService;
+    this.dialectProcessingService = dialectProcessingService;
 
     List<CobolDialect> dialects = discoveryService.loadDialects(copybookService, messageService);
     dialects.forEach(dialect -> dialectSuppliers.put(dialect.getName(), dialect));
@@ -321,11 +329,7 @@ public class DialectService {
             dialectSuppliers.computeIfAbsent(
                 r.getName(),
                 name ->
-                    discoveryService
-                        .loadDialects(r.getUri(), copybookService, messageService)
-                        .stream()
-                        .filter(d -> d.getName().equals(name))
-                        .findFirst()
+                    this.createCobolDialect(r)
                         .map(
                             dialect -> {
                               registerDialectCodeActions(dialect);
@@ -334,6 +338,29 @@ public class DialectService {
                             })
                         .orElse(null)));
     return changed.get();
+  }
+
+  /**
+   * Created COBOL dialect based on the dialect registry item
+   *
+   * @param registryItem - Dialect Registry item
+   * @return a new COBOL dialect object
+   */
+  private Optional<CobolDialect> createCobolDialect(DialectRegistryItem registryItem) {
+    if (registryItem.getProtocolVersion() == COBOL_DIALECT_JAVA_VERSION) {
+      return discoveryService
+          .loadDialects(registryItem.getUri(), copybookService, messageService)
+          .stream()
+          .filter(d -> d.getName().equals(registryItem.getName()))
+          .findFirst();
+    }
+
+    if (registryItem.getProtocolVersion() == COBOL_DIALECT_MODERN_VERSION) {
+      return Optional.of(new CobolDialectV2(registryItem.getName(), dialectProcessingService));
+    }
+
+    LOG.warn("Dialect {} was not found, skipped", registryItem.getName());
+    return Optional.empty();
   }
 
   private void registerDialectCodeActions(CobolDialect dialect) {

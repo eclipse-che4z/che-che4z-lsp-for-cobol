@@ -13,7 +13,7 @@
  */
 import * as vscode from "vscode";
 import { LANGUAGE_ID, SETTINGS_DIALECT } from "../../constants";
-import { DialectRegistry } from "../DialectRegistry";
+import { DialectRegistry } from "../../dialect/DialectRegistry";
 import cobolSnippets = require("./cobolSnippets.json");
 import * as t from "io-ts";
 import { isRight } from "fp-ts/Either";
@@ -135,7 +135,7 @@ async function loadSnippets() {
 
   await Promise.all(
     activeDialects.map(async (d) => {
-      const dialectSnippets = await importDialectSnippets(d.snippetPath);
+      const dialectSnippets = await importDialectSnippets(d.snippetUri);
       if (dialectSnippets) {
         dialectSnippets.forEach((snippet, key) => {
           loadedSnippets.set(key, snippet);
@@ -147,9 +147,8 @@ async function loadSnippets() {
   return loadedSnippets;
 }
 
-async function importDialectSnippets(snippetPath: string) {
+async function importDialectSnippets(snippetUri: vscode.Uri) {
   const dialectSnippets: Map<string, Snippet> = new Map();
-  const snippetUri = vscode.Uri.file(snippetPath);
   try {
     const rawFile = await vscode.workspace.fs.readFile(snippetUri);
     const textData = new TextDecoder().decode(rawFile);
@@ -161,7 +160,7 @@ async function importDialectSnippets(snippetPath: string) {
       });
     }
   } catch (error) {
-    console.error({ snippetPath, error }, "Unable to import snippet");
+    console.error({ snippetUri, error }, "Unable to import snippet");
   }
 
   return dialectSnippets;
