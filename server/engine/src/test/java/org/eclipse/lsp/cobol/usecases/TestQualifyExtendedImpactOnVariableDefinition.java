@@ -18,6 +18,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
@@ -136,6 +137,7 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
             ImmutableList.of(),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of());
     analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");

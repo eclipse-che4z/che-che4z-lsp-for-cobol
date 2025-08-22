@@ -13,9 +13,17 @@
  */
 
 import * as vscode from "vscode";
-import { __ExtensionApi } from "@code4z/cobol-dialect-api";
-import { isV1RuntimeDialectDetail } from "./dialect/utils";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
+import type {
+  __ExtensionApi,
+  CopyStatementParser,
+  V2DialectDetail,
+  V2StartProcessingHandler,
+} from "@code4z/cobol-dialect-api";
+import {
+  isV1RuntimeDialectDetail,
+  isV2RuntimeDialectDetail,
+} from "./dialect/utils";
 import {
   ANALYSIS_MODE,
   EXP_LANGUAGE_ID,
@@ -37,10 +45,7 @@ import { RunAnalysis } from "./commands/RunAnalysisCLI";
 import { clearCache } from "./commands/ClearCopybookCacheCommand";
 import { CommentAction, commentCommand } from "./commands/CommentCommand";
 import { initSmartTab, RangeTabShiftStore } from "./commands/SmartTabCommand";
-import {
-  CopyStatementParser,
-  DialectRegistry,
-} from "./services/DialectRegistry";
+import { DialectRegistry } from "./dialect/DialectRegistry";
 import { LanguageClientService } from "./services/LanguageClientService";
 import { lspConfigHandler, SettingsService } from "./services/Settings";
 import {
@@ -69,6 +74,7 @@ import {
 } from "./services/copybook/CopybookMessageHandler";
 import { invalidateConfig } from "./services/ProcessorGroupsLoader";
 import { outputChannel } from "./services/util/OutputChannel";
+import { DialectService } from "./dialect/DialectService";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -120,9 +126,15 @@ async function initialize(context: vscode.ExtensionContext) {
   );
 
   const configurationWatcher = new ConfigurationWatcher();
+  const dialectService = new DialectService(
+    context,
+    languageClientService,
+    outputChannel,
+  );
 
   return {
     configurationWatcher,
+    dialectService,
   };
 }
 
@@ -131,7 +143,7 @@ export async function activate(
 ): Promise<__ExtensionApi & __AnalysisApi> {
   await initTelemetry(context);
   DialectRegistry.clear();
-  const { configurationWatcher } = await initialize(context);
+  const { configurationWatcher, dialectService } = await initialize(context);
   initSmartTab(context);
   registerEvent(
     "log",
@@ -233,13 +245,38 @@ export async function activate(
         ) {
           throw Error("Invalid `dialect` argument" + JSON.stringify(dialect));
         }
-        return registerNewDialect(extensionId, {
+        return registerNewDialectV1(extensionId, {
           name: dialect.name,
           description: dialect.description,
           jar: vscode.Uri.parse(dialect.jar, true),
           snippets: vscode.Uri.parse(dialect.snippets, true),
           isCopyStatement: dialect.isCopyStatement,
         });
+      },
+    },
+    v2: {
+      async registerDialect(
+        extensionId: string,
+        dialect: V2DialectDetail,
+        handler: V2StartProcessingHandler,
+      ) {
+        if (
+          typeof extensionId !== "string" ||
+          !isV2RuntimeDialectDetail(dialect)
+        ) {
+          throw Error("Invalid `dialect` argument" + JSON.stringify(dialect));
+        }
+        return registerNewDialectV2(
+          extensionId,
+          {
+            name: dialect.name,
+            description: dialect.description,
+            snippets: dialect.snippets,
+            isCopyStatement: dialect.isCopyStatement,
+          },
+          handler,
+          dialectService,
+        );
       },
     },
     version: API_VERSION,
@@ -271,7 +308,7 @@ export function deactivate() {
   return languageClientService.stop();
 }
 
-export interface DialectDetail {
+export interface DialectDetailV1 {
   name: string;
   description: string;
   jar: vscode.Uri;
@@ -279,9 +316,16 @@ export interface DialectDetail {
   isCopyStatement?: CopyStatementParser;
 }
 
-const registerNewDialect = async (
+export interface DialectDetailV2 {
+  name: string;
+  description: string;
+  snippets: vscode.Uri;
+  isCopyStatement?: CopyStatementParser;
+}
+
+const registerNewDialectV1 = async (
   extensionId: string,
-  dialect: DialectDetail,
+  dialect: DialectDetailV1,
 ) => {
   outputChannel.appendLine(
     "Register new dialect: \r\n" + JSON.stringify(dialect),
@@ -296,10 +340,12 @@ const registerNewDialect = async (
   try {
     await vscode.workspace.fs.stat(dialect.snippets);
   } catch (_error) {
-    return Error(`Dialect snippets file ${dialect.jar.fsPath} does not exist`);
+    return Error(
+      `Dialect snippets file ${dialect.snippets.fsPath} does not exist`,
+    );
   }
 
-  DialectRegistry.register(
+  DialectRegistry.registerV1(
     extensionId,
     dialect.name,
     dialect.jar,
@@ -315,6 +361,45 @@ const registerNewDialect = async (
     await languageClientService.invalidateConfiguration();
   };
 
+  return unregisterDialect;
+};
+
+const registerNewDialectV2 = async (
+  extensionId: string,
+  dialect: DialectDetailV2,
+  handler: V2StartProcessingHandler,
+  dialectService: DialectService,
+) => {
+  outputChannel.appendLine(
+    "Register new dialect: \r\n" + JSON.stringify(dialect),
+  );
+
+  try {
+    await vscode.workspace.fs.stat(dialect.snippets);
+  } catch (_error) {
+    return Error(
+      `Dialect snippets file ${dialect.snippets.toString()} does not exist`,
+    );
+  }
+  DialectRegistry.registerV2(
+    extensionId,
+    dialect.name,
+    dialect.description,
+    dialect.snippets,
+    dialect.isCopyStatement,
+  );
+  dialectService.registerStartHandler(dialect.name, handler);
+
+  outputChannel.appendLine("Restart analysis");
+  await languageClientService.invalidateConfiguration();
+
+  const unregisterDialect: vscode.Disposable = new vscode.Disposable(
+    async () => {
+      dialectService.unregisterStartHandler(dialect.name);
+      DialectRegistry.unregister(dialect.name);
+      await languageClientService.invalidateConfiguration();
+    },
+  );
   return unregisterDialect;
 };
 

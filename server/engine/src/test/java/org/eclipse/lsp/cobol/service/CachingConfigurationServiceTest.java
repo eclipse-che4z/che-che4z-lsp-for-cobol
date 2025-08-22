@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
@@ -55,6 +56,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of(),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of()),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
@@ -102,6 +104,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             true,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
@@ -147,6 +150,7 @@ class CachingConfigurationServiceTest {
             ImmutableList.of("Dialect"),
             false,
             false,
+            SqlProcessing.ENABLED,
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));

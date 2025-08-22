@@ -15,23 +15,23 @@
 import { Uri } from "vscode";
 import * as vscode from "vscode";
 import { SETTINGS_DIALECT } from "../constants";
+import type { CopyStatementParser } from "@code4z/cobol-dialect-api";
 
 export const DIALECT_REGISTRY_SECTION = "cobol-lsp.dialect.registry";
 
-export type CopyStatementParser = (statement: string) => {
-  isCopy: boolean;
-  prefix?: string;
-};
+export type ProtocolVersion = 1 | 2;
 
 /**
  * Holds information about registered dialect
  */
-export type DialectInfo = {
+export type DialectInfo = (
+  | { protocolVersion: 1; uri: Uri }
+  | { protocolVersion: 2 }
+) & {
   name: string;
-  uri: Uri;
   description: string;
   extensionId: string;
-  snippetPath: string;
+  snippetUri: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 };
 
@@ -73,13 +73,13 @@ export class DialectRegistry {
   /**
    * Registers dialect in the system
    * @param name of a dialect
-   * @param path to jar file
+   * @param uri is a path to jar file
    * @param description of a dialect
    * @param extensionId is an extension id
    * @param snippets is a snippet map for a dialect
    * @param isCopyStatement function to identify and parse COPY statement of a dialect
    */
-  public static register(
+  public static registerV1(
     extensionId: string,
     name: string,
     uri: Uri,
@@ -90,9 +90,36 @@ export class DialectRegistry {
     const dialectInfo: DialectInfo = {
       name: name,
       uri: uri,
+      protocolVersion: 1,
       description: description,
       extensionId: extensionId,
-      snippetPath: snippetPath,
+      snippetUri: vscode.Uri.file(snippetPath),
+      isCopyStatement: isCopyStatement,
+    };
+    dialectInfoes.set(dialectInfo.name, dialectInfo);
+  }
+
+  /**
+   * Registers dialect in the system
+   * @param name of a dialect
+   * @param description of a dialect
+   * @param extensionId is an extension id
+   * @param snippets is a snippet map for a dialect
+   * @param isCopyStatement function to identify and parse COPY statement of a dialect
+   */
+  public static registerV2(
+    extensionId: string,
+    name: string,
+    description: string,
+    snippets: vscode.Uri,
+    isCopyStatement?: CopyStatementParser,
+  ) {
+    const dialectInfo: DialectInfo = {
+      name: name,
+      protocolVersion: 2,
+      description: description,
+      extensionId: extensionId,
+      snippetUri: snippets,
       isCopyStatement: isCopyStatement,
     };
     dialectInfoes.set(dialectInfo.name, dialectInfo);

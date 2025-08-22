@@ -21,6 +21,7 @@ import lombok.Value;
 @Value
 public class DialectRegistryItem {
   String name;
+  int protocolVersion;
   URI uri;
   String description;
   String extensionId;

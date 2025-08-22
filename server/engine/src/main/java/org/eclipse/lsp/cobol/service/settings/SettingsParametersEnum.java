@@ -33,6 +33,8 @@ public enum SettingsParametersEnum {
   LOGGING_LEVEL("logging.level.root"),
   DIALECTS("dialects"),
   CICS_TRANSLATOR_ENABLED("cics.translator"),
+  SQL_PROCESSING_ENABLED_SETTING("target-sql-backend-enable-processing"),
+  SQL_BACKEND_SETTING("target-sql-backend"),
   COMPILER_OPTIONS("compiler.options"),
   DIALECT_REGISTRY("dialect.registry"),
   COBOL_PROGRAM_LAYOUT("cobol.program.layout"),

@@ -326,9 +326,11 @@ it("Checks library configurations in preprocessor definitions overrides processo
     document,
     DEFAULT_DIALECT,
   );
+  const resultSql = await loadProcessorGroupCopybooksLibs(document, "SQL");
   const resultDaco = await loadProcessorGroupCopybooksLibs(document, "DaCo");
 
   expect(resultCobol).toStrictEqual([new LocalPathLib("/copy")]);
+  expect(resultSql).toStrictEqual([new LocalPathLib("/copy")]);
   expect(resultDaco).toStrictEqual([
     new LocalPathLib("/daco"),
     new EndevorElementLib({

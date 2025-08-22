@@ -261,6 +261,7 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
     libs: transformLibs(
       [...directoryPaths, ...dsns, ...usss],
       [LocalPathLib, DatasetLib, UssPathLib],
+      [],
     ),
   };
 }
@@ -314,10 +315,11 @@ async function readProcessorGroupsFile(
 const transformProcessorGroup =
   (libTypes: CopybookLibTypes[]) =>
   (input: ProcessorGroupDefinition): ProcessorGroup => {
+    const libs = transformLibs(input.libs, libTypes, []);
     const result: ProcessorGroup = {
       name: input.name,
-      libs: transformLibs(input.libs, libTypes),
-      preprocessors: transformPreprocessor(input.preprocessor, libTypes),
+      libs,
+      preprocessors: transformPreprocessor(input.preprocessor, libTypes, libs),
       "compiler-options": input["compiler-options"],
       "copybook-extensions": input["copybook-extensions"],
       "copybook-file-encoding": input["copybook-file-encoding"],
@@ -330,9 +332,10 @@ const transformProcessorGroup =
 export function transformLibs(
   libDefinitions: LibsDefinitions | undefined,
   libTypes: CopybookLibTypes[],
+  defaultLibs: CopybookLib[],
 ): CopybookLib[] {
   if (!libDefinitions) {
-    return [];
+    return defaultLibs;
   }
 
   const libs = [];
@@ -353,16 +356,17 @@ export function transformLibs(
 function transformPreprocessor(
   input: PreprocessorDefinition | undefined,
   libTypes: CopybookLibTypes[],
+  defaultLibs: CopybookLib[],
 ): Preprocessor[] {
   if (!input) return [];
   const preprocessors = asArray(input);
   const transformed = preprocessors.map((preprocessor) => {
     if (typeof preprocessor === "string") {
-      return { name: preprocessor, libs: [] };
+      return { name: preprocessor, libs: defaultLibs };
     } else {
       return {
         name: preprocessor.name ?? "",
-        libs: transformLibs(preprocessor.libs, libTypes),
+        libs: transformLibs(preprocessor.libs, libTypes, defaultLibs),
         "compiler-options": preprocessor["compiler-options"],
         "copybook-extensions": preprocessor["copybook-extensions"],
         "copybook-file-encoding": preprocessor["copybook-file-encoding"],

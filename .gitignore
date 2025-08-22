@@ -141,3 +141,5 @@ clients/cobol-lsp-vscode-extensiontest-report
 clients/cobol-lsp-vscode-extension/test-report.xml
 .scannerwork
 /server-delomboked
+/server/.run
+/clients/sample-dialect-support/.vscode

@@ -35,7 +35,10 @@ import {
   SETTINGS_MAXIMUM_VM_COUNT,
   PATHS_LOCAL_KEY,
 } from "../constants";
-import { DialectRegistry, DIALECT_REGISTRY_SECTION } from "./DialectRegistry";
+import {
+  DialectRegistry,
+  DIALECT_REGISTRY_SECTION,
+} from "../dialect/DialectRegistry";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,

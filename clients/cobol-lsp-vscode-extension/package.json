@@ -355,6 +355,11 @@
           ],
           "description": "The target SQL backend server which is used on the mainframe"
         },
+        "cobol-lsp.target-sql-backend-enable-processing": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Enables syntactic validation of SQL statements inside EXEC SQL blocks"
+        },
         "cobol-lsp.dialects": {
           "type": "array",
           "items": {

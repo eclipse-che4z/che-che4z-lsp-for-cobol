@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
 
 /** The class extends LSP language client with COBOL related methods. */
-public interface CobolLanguageClient extends LanguageClient {
+public interface CobolLanguageClient extends LanguageClient, DialectClientApi {
   /**
    * The cobol/resolveSubroutine request is sent from the server to the client to resolve subroutine
    * name into local file URI.

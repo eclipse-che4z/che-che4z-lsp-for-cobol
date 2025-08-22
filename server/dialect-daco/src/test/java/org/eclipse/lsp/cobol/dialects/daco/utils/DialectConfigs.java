@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
@@ -41,7 +43,10 @@ public class DialectConfigs {
         ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
         true,
         false,
-        ImmutableList.of(),
+        SqlProcessing.ENABLED,
+        ImmutableList.of(
+            new DialectRegistryItem("DaCo", 1, null, "", ""),
+            new DialectRegistryItem("IDMS", 1, null, "", "")),
         createPredefinedSectionsConfig(
             ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")));
   }
@@ -60,7 +65,10 @@ public class DialectConfigs {
         ImmutableList.of(DaCoDialect.NAME, IdmsDialect.NAME),
         true,
         false,
-        ImmutableList.of(),
+        SqlProcessing.ENABLED,
+        ImmutableList.of(
+            new DialectRegistryItem("DaCo", 1, null, "", ""),
+            new DialectRegistryItem("IDMS", 1, null, "", "")),
         createPredefinedSectionsConfig(predefinedSections));
   }
 
