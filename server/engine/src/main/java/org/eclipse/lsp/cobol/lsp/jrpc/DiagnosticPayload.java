@@ -14,12 +14,19 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
+import lombok.NonNull;
 import lombok.Value;
+import org.eclipse.lsp4j.DiagnosticRelatedInformation;
+import org.eclipse.lsp4j.Range;
 
-/** Result of the V2 dialect processing */
+/** Dialect Diagnostic Payload object is a part of the V2 dialect processing */
 @Value
-public class DialectProcessingResult {
-  DocumentReplacement[] replacements;
-  DialectCopybookInfo[] copybooks;
-  DiagnosticPayload[] diagnostics;
+public class DiagnosticPayload {
+  @NonNull String message;
+  @NonNull Range range;
+  DiagnosticRelatedInformation[] relatedInformation;
+  int severity;
+  String source;
+  int[] tags;
+  Integer errorCode;
 }

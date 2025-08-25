@@ -61,21 +61,18 @@ async function handleProcessDialect(
   programUri: vscode.Uri,
   text: string,
   outputChannel: vscode.OutputChannel,
-): Promise<Map<string, vscode.Diagnostic[]>> {
+): Promise<void> {
   const lines = text.split("\n");
   const startDate = new Date();
   outputChannel.appendLine(
     `Start processing program ${programUri}, line count: ${lines.length}`,
   );
-  const diagnostics = new Map<string, vscode.Diagnostic[]>();
   for (let i = 0; i < lines.length; i++) {
     await processCopybook(
       context,
       i,
       lines,
       programUri,
-      programUri,
-      diagnostics,
       outputChannel,
       undefined,
     );
@@ -86,7 +83,6 @@ async function handleProcessDialect(
       endDate.getTime() - startDate.getTime()
     } mills.`,
   );
-  return diagnostics;
 }
 
 function replace(
@@ -123,8 +119,6 @@ async function processCopybook(
   line: number,
   lines: string[],
   programUri: vscode.Uri,
-  documentUri: vscode.Uri,
-  diagnostics: Map<string, vscode.Diagnostic[]>,
   outputChannel: vscode.OutputChannel,
   param?: string,
 ) {
@@ -175,10 +169,7 @@ async function processCopybook(
         "Copybook parameters are invalid",
         vscode.DiagnosticSeverity.Error,
       );
-      const diagArray = diagnostics.get(documentUri.toString()) ?? [];
-      diagArray.push(diagnostic);
-      diagnostics.set(documentUri.toString(), diagArray);
-
+      context.addDiagnostic(diagnostic);
       return;
     }
 
@@ -210,8 +201,6 @@ async function processCopybook(
           i,
           copyLines,
           programUri,
-          copybookModel.uri,
-          diagnostics,
           outputChannel,
           copybookParam,
         );

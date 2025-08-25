@@ -17,33 +17,34 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Provider;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
+import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
-import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
+import org.eclipse.lsp4j.Location;
 
 /** Dialect Api Client * */
 @Slf4j
 @Singleton
 public class DialectProcessingService {
   private final Provider<CobolLanguageClient> cliendProvider;
-  private final MessageService messageService;
+  private static final int CODE_MISSING_COPYBOOK = 0;
 
   @Inject
-  public DialectProcessingService(
-      Provider<CobolLanguageClient> clientProvider, MessageService messageService) {
+  public DialectProcessingService(Provider<CobolLanguageClient> clientProvider) {
     this.cliendProvider = clientProvider;
-    this.messageService = messageService;
   }
 
   /**
@@ -71,6 +72,8 @@ public class DialectProcessingService {
                   context.getExtendedDocument().getUri(),
                   context.getExtendedDocument().toString())
               .get();
+      errorList.addAll(createErrors(context.getExtendedDocument(), null, result.getDiagnostics()));
+
       return processDocument(
           preprocessor,
           context.getExtendedDocument(),
@@ -100,7 +103,6 @@ public class DialectProcessingService {
       } catch (Exception e) {
         errorList.add(
             DialectErrorHelper.processingError(
-                messageService,
                 Locality.builder()
                     .copybookId(copybookId)
                     .uri(document.getUri())
@@ -118,6 +120,7 @@ public class DialectProcessingService {
               .cleanUpCode(copybookInfo.getUri(), copybookInfo.getText())
               .unwrap(errorList::addAll);
       ExtendedDocument copybook = new ExtendedDocument(extendedText, copybookInfo.getUri());
+      errorList.addAll(createErrors(document, copybookId, copybookInfo.getDiagnostics()));
 
       CopyNode copyNode =
           new CopyNode(
@@ -146,5 +149,30 @@ public class DialectProcessingService {
           copybookInfo.getStatementLocation().getRange(), copybook.getCurrentText());
     }
     return nodes;
+  }
+
+  private Collection<SyntaxError> createErrors(
+      ExtendedDocument document, String copybookId, DiagnosticPayload[] diagnostics) {
+    List<SyntaxError> errorList = new ArrayList<>();
+    for (DiagnosticPayload diagnostic : diagnostics) {
+      Location location = document.mapLocation(diagnostic.getRange());
+      errorList.add(
+          DialectErrorHelper.dialectError(
+              Locality.builder()
+                  .copybookId(copybookId)
+                  .uri(location.getUri())
+                  .range(location.getRange())
+                  .build(),
+              diagnostic.getMessage(),
+              getErrorCode(diagnostic.getErrorCode())));
+    }
+    return errorList;
+  }
+
+  private ErrorCode getErrorCode(Integer errorCode) {
+    if (errorCode != null && errorCode == CODE_MISSING_COPYBOOK) {
+      return ErrorCodes.MISSING_COPYBOOK;
+    }
+    return null;
   }
 }
