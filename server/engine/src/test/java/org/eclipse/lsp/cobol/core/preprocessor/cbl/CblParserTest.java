@@ -14,18 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import org.junit.jupiter.api.Disabled;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** CBL parser test */
 public class CblParserTest {
+  static final String URI = "file://document.cbl";
+
   @Test
   void testXOpts() {
-    CblLexer cblLexer = new CblLexer("      CBL XOPTS(DLI), NOADATA, XOPT(DLI)\n");
-    CblParser cblParser = new CblParser(cblLexer);
-    CblNode cbl = cblParser.cbl();
+    CblLexer cblLexer = new CblLexer(URI, "      CBL XOPTS(DLI), NOADATA, XOPT(DLI)\n", 0);
+    CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
+    CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertNode(cbl, 6, 40, 4);
     CblNode xOpt1 = cbl.getChildren().get(1);
     // XOPTS(DLI),
@@ -41,29 +46,45 @@ public class CblParserTest {
 
   @Test
   void testXOpts2() {
-  CblLexer cblLexer = new CblLexer("CBL XOPTS(FLAG(I,W))\n");
-  CblParser cblParser = new CblParser(cblLexer);
-  CblNode cbl = cblParser.cbl();
-  assertNode(cbl, 0, 20, 2);
-  CblNode xopts = cbl.getChildren().get(1);
-  // XOPTS(FLAG(I,W))
-  assertNode(xopts, 4, 20, 4);
+    CblLexer cblLexer = new CblLexer(URI, "CBL XOPTS(FLAG(I,W))\n", 0);
+    CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
+    CblNode cbl = cblParser.cbl().getChildren().get(0);
+    assertNode(cbl, 0, 20, 2);
+    CblNode xopts = cbl.getChildren().get(1);
+    // XOPTS(FLAG(I,W))
+    assertNode(xopts, 4, 20, 4);
 
-  // TODO: FLAG(I,W)
-  assertNode(xopts.getChildren().get(2), 10, 19, 6);
-}
+    // TODO: FLAG(I,W)
+    assertNode(xopts.getChildren().get(2), 10, 19, 6);
+  }
 
   @Test
   void testCics() {
-    CblLexer cblLexer = new CblLexer("CBL CICS(DLI)\n");
-    CblParser cblParser = new CblParser(cblLexer);
-    CblNode cbl = cblParser.cbl();
+    CblLexer cblLexer = new CblLexer(URI, "CBL CICS(DLI)\n", 0);
+    CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
+    CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertNode(cbl, 0, 13, 2);
     CblNode cics = cbl.getChildren().get(1);
     // CBL CICS(DLI)
+    assertEquals(CblNodeTypes.CICS_CONTAINER, cics.getType());
     assertNode(cics, 4, 13, 4);
     assertNode(cics.getChildren().get(2), 9, 12, 1);
   }
+
+  @Test
+  void testCicsSpace() {
+    CblLexer cblLexer = new CblLexer(URI, "CBL CICS(SPACE(4))\n", 0);
+    List<SyntaxError> diagnostics = new ArrayList<>();
+    CblParser cblParser = new CblParser(cblLexer, diagnostics);
+    CblNode cbl = cblParser.cbl().getChildren().get(0);
+    assertEquals(1, diagnostics.size());
+    assertNode(cbl, 0, 18, 2);
+    CblNode cics = cbl.getChildren().get(1);
+    // CICS(SPACE(4))
+    assertNode(cics, 4, 18, 4);
+    assertNode(cics.getChildren().get(2), 9, 17, 4);
+  }
+
 
   private void assertNode(CblNode node, int startPos, int end, int childrenCount) {
     assertEquals(startPos, node.getStart(), "Start pos");

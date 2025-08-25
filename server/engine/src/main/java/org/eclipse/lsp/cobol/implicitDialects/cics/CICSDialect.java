@@ -100,8 +100,8 @@ public class CICSDialect implements CobolDialect {
   }
 
   @Override
-  public List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context) {
-    return TranslatorOptionsUtils.extractCompilerDirectives(context);
+  public List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context, List<SyntaxError> diagnostics) {
+    return TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
   }
 
   private CICSParser.StartRuleContext parseCICS(

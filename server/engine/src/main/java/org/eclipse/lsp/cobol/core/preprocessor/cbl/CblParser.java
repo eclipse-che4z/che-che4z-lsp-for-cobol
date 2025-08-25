@@ -14,18 +14,22 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNode.TYPE_UNKNOWN;
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 
 /** CBL Parser */
 public class CblParser {
   private final CblLexer lexer;
+  private final List<SyntaxError> diagnostics;
 
-  public CblParser(CblLexer lexer) {
+  public CblParser(CblLexer lexer, List<SyntaxError> diagnostics) {
     this.lexer = lexer;
+    this.diagnostics = diagnostics;
   }
 
   /**
@@ -34,67 +38,173 @@ public class CblParser {
    * @return CBL node
    */
   public CblNode cbl() {
+    List<CblNode> children = new ArrayList<>();
     try {
-      List<CblNode> children = new ArrayList<CblNode>();
       children.add(or("CBL", "PROCESS"));
       while (lexer.hasMore()) {
         children.add(parseFragment());
       }
-      return new CblNode(children);
     } catch (CblDiagnosticException e) {
-      // todo stuff
-      e.printStackTrace();
-      return null;
+      diagnostics.add(e.toSyntaxError());
     }
+    return new CblNode(new CblNode(children, CBL), ROOT);
   }
 
   private CblNode parseFragment() throws CblDiagnosticException {
     CblToken first = lexer.peek();
 
     if (first.getText().equalsIgnoreCase("XOPTS") || first.getText().equalsIgnoreCase("XOPT")) {
-      return parseOpts(CblNode.TYPE_XOPTS);
+      return parseXOpts();
     }
 
     if (first.getText().equalsIgnoreCase("CICS")) {
-      return parseOpts(CblNode.TYPE_CICS);
+      return parseCics();
     }
-
-    return parseOpts();
+    return parseOption();
   }
 
   private CblNode parseCics() throws CblDiagnosticException {
-    lexer.next();
-    one("(");
-    one(")");
-    return new CblNode(0, 0);
-  }
-
-  private CblNode parseOpts() throws CblDiagnosticException {
-    return parseOpts(TYPE_UNKNOWN);
-  }
-  private CblNode parseOpts(String optType) throws CblDiagnosticException {
-    if (TYPE_UNKNOWN.equalsIgnoreCase(optType)) {
-      return parseMaybeCicsOption();
-    }
     List<CblNode> children = new ArrayList<>();
-    children.add(lexer.next());
+    children.add(one("CICS"));
+    parseCicsOptions(children, true);
+    return new CblNode(children, CICS_CONTAINER);
+  }
+
+  private CblNode parseXOpts() throws CblDiagnosticException {
+    List<CblNode> children = new ArrayList<>();
+    children.add(or("XOPT", "XOPTS"));
+    parseCicsOptions(children, false);
+    return new CblNode(children, XOPTS);
+  }
+
+  private void parseCicsOptions(List<CblNode> children, boolean force)
+      throws CblDiagnosticException {
     children.add(one("("));
-
-
     while (lexer.hasMore() && !isNext(")")) {
-      children.add(parseMaybeCicsOption());
+      List<CblNode> cicsNodeChildren = new ArrayList<>();
+      if (isNext("FLAG") || isNext("F")) {
+        cicsNodeChildren.add(or("FLAG", "F"));
+        cicsNodeChildren.add(one("("));
+        cicsNodeChildren.add(or("E", "I", "S", "U", "W"));
+        if (isNext(",")) {
+          cicsNodeChildren.add(one(","));
+          cicsNodeChildren.add(or("E", "I", "S", "U", "W"));
+        }
+        cicsNodeChildren.add(one(")"));
+        children.add(new CblNode(cicsNodeChildren, FLAG));
+      } else if (isNext("LINECOUNT") || isNext("LC")) {
+        cicsNodeChildren.add(or("LINECOUNT", "LC"));
+        cicsNodeChildren.add(one("("));
+        CblToken next = lexer.next();
+        int i = checkIntegerLiteral(next);
+        cicsNodeChildren.add(next);
+        cicsNodeChildren.add(one(")"));
+        children.add(new CblNode(cicsNodeChildren, LINECOUNT));
+        if (isLineNumberWrong(i)) {
+          semanticError(next, "LINECOUNT must be an integer between 10 and 255, or 0.");
+        }
+      } else if (isNext("SPACE")) {
+        cicsNodeChildren.add(one("SPACE"));
+        cicsNodeChildren.add(one("("));
+        CblToken next = lexer.next();
+        int i = checkIntegerLiteral(next);
+        if (i != 1 && i != 2 && i != 3) {
+          semanticError(next, "SPACE must be 1, 2 or 3.");
+        }
+        cicsNodeChildren.add(next);
+        cicsNodeChildren.add(one(")"));
+        children.add(new CblNode(cicsNodeChildren, SPACE));
+      } else if (isNext("NATLANG")) {
+        cicsNodeChildren.add(one("("));
+        cicsNodeChildren.add(or("CS", "EN", "KA"));
+        cicsNodeChildren.add(one(")"));
+        children.add(new CblNode(cicsNodeChildren, NATLANG));
+      } else {
+        try {
+          CblToken next =
+              or(
+                  "APOST",
+                  "QUOTE",
+                  "CBLCARD",
+                  "NOCBLCARD",
+                  "COBOL2",
+                  "COBOL3",
+                  "CICS",
+                  "CPSM",
+                  "NOCPSM",
+                  "DBCS",
+                  "DEBUG",
+                  "NODEBUG",
+                  "DLI",
+                  "EDF",
+                  "NOEDF",
+                  "EXCI",
+                  "FEPI",
+                  "NOFEPI",
+                  "LENGTH",
+                  "NOLENGTH",
+                  "LINKAGE",
+                  "NOLINKAGE",
+                  "NUM",
+                  "NONUM",
+                  "OPTIONS",
+                  "NOOPTIONS",
+                  "SEQ",
+                  "NOSEQ",
+                  "SP",
+                  "SPIE",
+                  "NOSPIE",
+                  "SYSEIB",
+                  "VBREF",
+                  "NOVBREF");
+          cicsNodeChildren.add(next);
+          children.add(new CblNode(cicsNodeChildren, valueOf(next.getText())));
+        } catch (CblDiagnosticException e) {
+          if (force) {
+            throw e;
+          } else {
+            children.add(e.getToken());
+            children.addAll(parseOption().getChildren());
+          }
+        }
+      }
     }
     children.add(one(")"));
     opt(",").ifPresent(children::add);
-    return new CblNode(children, optType);
   }
 
-  private CblNode parseMaybeCicsOption() {
+  private void semanticError(CblToken next, String message) {
+    diagnostics.add(new CblDiagnosticException(next, message).toSyntaxError());
+  }
+
+  private boolean isLineNumberWrong(int nnn) {
+    // nnn must be an integer between 10 and 255, or 0.
+    if (nnn == 0) {
+      return false;
+    }
+    if (nnn < 10) {
+      return true;
+    }
+    return nnn > 255;
+  }
+
+  private int checkIntegerLiteral(CblToken next) throws CblDiagnosticException {
+    try {
+      return Integer.parseInt(next.getText());
+    } catch (NumberFormatException e) {
+      throw CblDiagnosticException.expect(next, "integer");
+    }
+  }
+
+  private CblNode parseOpts() throws CblDiagnosticException {
+    return parseOption();
+  }
+
+  private CblNode parseOption() {
     List<CblNode> children = new ArrayList<>();
     int depth = 0;
     while (lexer.hasMore()) {
-      if (depth == 0
-              && (isNext(")") || isNext(","))) {
+      if (depth == 0 && (isNext(")") || isNext(","))) {
         break;
       }
       CblToken next = lexer.next();
@@ -120,7 +230,7 @@ public class CblParser {
         return token;
       }
     }
-    throw CblDiagnosticException.expect(variants);
+    throw CblDiagnosticException.expect(token, variants);
   }
 
   private Optional<CblToken> opt(String expected) {

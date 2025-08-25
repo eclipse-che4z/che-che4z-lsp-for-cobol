@@ -22,8 +22,13 @@ import java.util.regex.Pattern;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
+import org.eclipse.lsp.cobol.core.preprocessor.cbl.CblLexer;
+import org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNode;
+import org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParser;
+import org.eclipse.lsp.cobol.core.preprocessor.cbl.CicsFilter;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -37,7 +42,8 @@ public final class TranslatorOptionsUtils {
       Pattern.compile("^(?<prefix>\\s*(CBL|PROCESS)\\s+)(?<cbl>.*)$", Pattern.CASE_INSENSITIVE);
   private static final Pattern CBL_CICS =
       Pattern.compile(
-          ".*(?<cics>CICS\\s*\\(\"?(?<args>([^()]|\\([^()]*\"?\\))+)\\))", Pattern.CASE_INSENSITIVE);
+          ".*(?<cics>CICS\\s*\\(\"?(?<args>([^()]|\\([^()]*\"?\\))+)\\))",
+          Pattern.CASE_INSENSITIVE);
   private static final Pattern CBL_XOPTS =
       Pattern.compile(
           ".*(?<xopts>XOPTS?\\s*\\((?<args>([^()]|\\([^()]*\\))+)\\))", Pattern.CASE_INSENSITIVE);
@@ -47,10 +53,11 @@ public final class TranslatorOptionsUtils {
    * Extract CICS translator options from CBL lines
    *
    * @param context is a dialect processing context
+   * @param diagnostics
    * @return List of CICS translator options
    */
   public static List<CompilerDirectiveNode> extractCompilerDirectives(
-      DialectProcessingContext context) {
+      DialectProcessingContext context, List<SyntaxError> diagnostics) {
     String[] lines = context.getExtendedDocument().getCurrentText().toString().split("\n\r?");
     List<CompilerDirectiveNode> compilerDirectiveNodes = new ArrayList<>();
     for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
@@ -69,82 +76,103 @@ public final class TranslatorOptionsUtils {
       Range lineRange =
           new Range(new Position(lineNumber, 0), new Position(lineNumber, line.length()));
       String newText =
-          replaceCicsOpts(context, lineMatch, line, lineNumber, compilerDirectiveNodes);
+          replaceCicsOpts(
+              context, line, lineNumber, compilerDirectiveNodes, diagnostics);
       if (newText.isEmpty()) {
         context.getExtendedDocument().delete(lineNumber);
       } else {
         context.getExtendedDocument().replace(lineRange, newText);
       }
-
     }
     return compilerDirectiveNodes;
   }
 
   private static String replaceCicsOpts(
       DialectProcessingContext context,
-      Matcher lineMatch,
       String line,
       int lineNumber,
-      List<CompilerDirectiveNode> directiveNodes) {
-    String cblString = lineMatch.group("cbl");
+      List<CompilerDirectiveNode> directiveNodes,
+      List<SyntaxError> diagnostics) {
+    int ariaA = getAriaA(context.getLanguageId());
+    String cblString =
+        line.substring(
+                ariaA,
+            Math.min(A_B_ARIA_LEN + ariaA, line.length()));
+    CblNode cbl =
+        new CblParser(
+                new CblLexer(context.getProgramDocumentUri(), cblString, lineNumber), diagnostics)
+            .cbl();
+    String result = new CicsFilter().createFilteredLine(cbl, directiveNodes, ariaA);
+    if (!result.isEmpty()) {
+      String prefix = line.substring(0, ariaA);
+      String tail =
+              line.length() - prefix.length() - result.length() > 0
+                      ? line.substring(prefix.length() + result.length())
+                      : "";
 
-    List<String> fragments = split(cblString);
-    int[] counts = new int[fragments.size()];
-
-    int shift = getAriaA(context.getLanguageId()) + lineMatch.start("cbl");
-    for (int i = 0; i < fragments.size(); i++) {
-      Matcher cicsMatcher = CBL_CICS.matcher(fragments.get(i));
-      Matcher xoptsMatcher = CBL_XOPTS.matcher(fragments.get(i));
-      if (cicsMatcher.find()) {
-        counts[i] = 0;
-        fragments.set(i, repeat(' ', fragments.get(i).length()));
-        String cicsText = cicsMatcher.group("args");
-        int cicsStart = shift + cicsMatcher.start("args");
-        directiveNodes.addAll(
-            createCicsNodes(
-                context.getExtendedDocument().getUri(), lineNumber, cicsStart, cicsText));
-      } else if (xoptsMatcher.find()) {
-        StringBuilder fragmentBuilder = new StringBuilder();
-        counts[i] =
-            processCicsXOpts(
-                context,
-                directiveNodes,
-                xoptsMatcher,
-                fragments.get(i),
-                shift + xoptsMatcher.start("args"),
-                lineNumber,
-                fragmentBuilder);
-        fragments.set(
-            i, counts[i] > 0 ? fragmentBuilder.toString() : repeat(' ', fragments.get(i).length()));
-      } else {
-        counts[i] = 1;
-      }
-      shift += fragments.get(i).length();
+      return prefix + result + tail;
     }
+    return result;
+    /*
 
-    int nonCicsOptionsCount = sumCounts(counts);
+       List<String> fragments = split(cblString);
+       int[] counts = new int[fragments.size()];
 
-    StringBuilder result = new StringBuilder();
-    for (int i = 0; i < fragments.size(); i++) {
-      // count 1 means it's the last option
-      result.append(counts[i] > 1 ? fragments.get(i) : removeLastComma(fragments.get(i)));
-    }
+       int shift = getAriaA(context.getLanguageId()) + lineMatch.start("cbl");
+       for (int i = 0; i < fragments.size(); i++) {
+         Matcher cicsMatcher = CBL_CICS.matcher(fragments.get(i));
+         Matcher xoptsMatcher = CBL_XOPTS.matcher(fragments.get(i));
+         if (cicsMatcher.find()) {
+           counts[i] = 0;
+           fragments.set(i, repeat(' ', fragments.get(i).length()));
+           String cicsText = cicsMatcher.group("args");
+           int cicsStart = shift + cicsMatcher.start("args");
+           directiveNodes.addAll(
+               createCicsNodes(
+                   context.getExtendedDocument().getUri(), lineNumber, cicsStart, cicsText));
+         } else if (xoptsMatcher.find()) {
+           StringBuilder fragmentBuilder = new StringBuilder();
+           counts[i] =
+               processCicsXOpts(
+                   context,
+                   directiveNodes,
+                   xoptsMatcher,
+                   fragments.get(i),
+                   shift + xoptsMatcher.start("args"),
+                   lineNumber,
+                   fragmentBuilder);
+           fragments.set(
+               i, counts[i] > 0 ? fragmentBuilder.toString() : repeat(' ', fragments.get(i).length()));
+         } else {
+           counts[i] = 1;
+         }
+         shift += fragments.get(i).length();
+       }
 
-    String prefix =
-        nonCicsOptionsCount > 0
-            ? line.substring(0, getAriaA(context.getLanguageId()) + lineMatch.start("cbl"))
-            : line.substring(0, getAriaA(context.getLanguageId()) + lineMatch.start("prefix"))
-                + repeat(' ', lineMatch.group("prefix").length());
+       int nonCicsOptionsCount = sumCounts(counts);
 
-    String tail =
-        line.length() - prefix.length() - result.length() > 0
-            ? line.substring(prefix.length() + result.length())
-            : "";
+       StringBuilder result = new StringBuilder();
+       for (int i = 0; i < fragments.size(); i++) {
+         // count 1 means it's the last option
+         result.append(counts[i] > 1 ? fragments.get(i) : removeLastComma(fragments.get(i)));
+       }
 
-    if (result.toString().trim().isEmpty()) {
-      return "";
-    }
-    return prefix + result + tail;
+       String prefix =
+           nonCicsOptionsCount > 0
+               ? line.substring(0, getAriaA(context.getLanguageId()) + lineMatch.start("cbl"))
+               : line.substring(0, getAriaA(context.getLanguageId()) + lineMatch.start("prefix"))
+                   + repeat(' ', lineMatch.group("prefix").length());
+
+       String tail =
+           line.length() - prefix.length() - result.length() > 0
+               ? line.substring(prefix.length() + result.length())
+               : "";
+
+       if (result.toString().trim().isEmpty()) {
+         return "";
+       }
+       return prefix + result + tail;
+    */
   }
 
   private static int sumCounts(int[] counts) {

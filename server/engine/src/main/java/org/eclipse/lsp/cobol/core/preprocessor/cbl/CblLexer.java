@@ -16,23 +16,27 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
 import java.util.function.Predicate;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblToken.EOF;
-
 /** CBL Lexer */
 public class CblLexer {
+  private final String uri;
   private final String input;
+  private final int line;
   private final boolean full;
 
   private Integer pos = 0;
   private CblToken peeked = null;
 
-  public CblLexer(String input, boolean full) {
+  public CblLexer(String uri, String input, int line, boolean full) {
+    this.uri = uri;
     this.input = input;
+    this.line = line;
     this.full = full;
   }
 
-  public CblLexer(String input) {
+  public CblLexer(String uri, String input, int line) {
+    this.uri = uri;
     this.input = input;
+    this.line = line;
     this.full = false;
   }
 
@@ -56,7 +60,7 @@ public class CblLexer {
     int counter = pos;
     try {
       if (counter == input.length()) {
-        return EOF;
+        return CblToken.eof(uri, line);
       }
       if (Character.isWhitespace(input.charAt(counter))) {
         CblToken cblToken = consumeWhile(counter, Character::isWhitespace, CblTokenType.WHITESPACE);
@@ -67,19 +71,19 @@ public class CblLexer {
       }
       // do we actually have a token?
       if (counter == input.length()) {
-        return EOF;
+        return CblToken.eof(uri, line);
       }
       switch (input.charAt(pos)) {
         case '(':
-          return new CblToken("(", counter, ++counter, CblTokenType.PARENTHESIS_OPEN);
+          return new CblToken(uri, "(", line, counter, ++counter, CblTokenType.PARENTHESIS_OPEN);
         case ')':
-          return new CblToken(")", counter, ++counter, CblTokenType.PARENTHESIS_CLOSE);
+          return new CblToken(uri, ")", line, counter, ++counter, CblTokenType.PARENTHESIS_CLOSE);
         case ',':
-          return new CblToken(",", counter, ++counter, CblTokenType.COMMA);
+          return new CblToken(uri, ",", line, counter, ++counter, CblTokenType.COMMA);
         case '\'':
-          return new CblToken("'", counter, ++counter, CblTokenType.APOSTROPHE);
+          return new CblToken(uri, "'", line, counter, ++counter, CblTokenType.APOSTROPHE);
         case '"':
-          return new CblToken("\"", counter, ++counter, CblTokenType.QUOTE);
+          return new CblToken(uri, "\"", line, counter, ++counter, CblTokenType.QUOTE);
         default:
           CblToken cblToken =
               consumeWhile(counter, Character::isLetterOrDigit, CblTokenType.GENERAL);
@@ -108,7 +112,7 @@ public class CblLexer {
     while (counter < input.length() && until.test(input.charAt(counter))) {
       counter++;
     }
-    return new CblToken(input.substring(start, counter), start, counter, type);
+    return new CblToken(uri, input.substring(start, counter), line, start, counter, type);
   }
 
   public int getPos() {

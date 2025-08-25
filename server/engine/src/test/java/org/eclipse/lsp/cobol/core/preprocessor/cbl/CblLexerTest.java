@@ -20,25 +20,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** CBL lexer test */
 class CblLexerTest {
+  static final String URI = "file://document.cbl";
+
   @Test
   void testLexerEof() {
-    CblLexer cblLexer = new CblLexer("");
-    assertEquals(cblLexer.next(), cblLexer.next());
+    CblLexer cblLexer = new CblLexer(URI, "", 0);
     assertToken(cblLexer.next(), null, -1, -1, CblTokenType.EOF);
   }
 
   @Test
   void testLexerWhitespace() {
-    CblLexer cblLexer = new CblLexer("  ", true);
+    CblLexer cblLexer = new CblLexer(URI, "  ", 0, true);
     assertEquals("  ", cblLexer.next().getText());
-    assertEquals(CblToken.EOF, cblLexer.next());
-    CblLexer cblLexer2 = new CblLexer("  ");
-    assertEquals(CblToken.EOF, cblLexer2.next());
+    assertEquals(CblTokenType.EOF, cblLexer.next().getTokenType());
+    CblLexer cblLexer2 = new CblLexer(URI, "  ", 0);
+    assertEquals(CblTokenType.EOF, cblLexer2.next().getTokenType());
   }
 
   @Test
   void testLexerCbls() {
-    CblLexer cblLexer = new CblLexer("      CBL XOPTS(DLI), NOADATA, XOPTS(DLI)\n", true);
+    CblLexer cblLexer = new CblLexer(URI, "      CBL XOPTS(DLI), NOADATA, XOPTS(DLI)\n", 0, true);
     assertToken(cblLexer.next(), "      ", 0, 6, CblTokenType.WHITESPACE);
     assertToken(cblLexer.next(), "CBL", 6, 9, CblTokenType.GENERAL);
     assertToken(cblLexer.next(), " ", 9, 10, CblTokenType.WHITESPACE);
@@ -56,12 +57,12 @@ class CblLexerTest {
     assertToken(cblLexer.next(), "DLI", 37, 40, CblTokenType.GENERAL);
     assertToken(cblLexer.next(), ")", 40, 41, CblTokenType.PARENTHESIS_CLOSE);
     assertToken(cblLexer.next(), "\n", 41, 42, CblTokenType.WHITESPACE);
-    assertEquals(CblToken.EOF, cblLexer.next());
+    assertEquals(CblTokenType.EOF, cblLexer.next().getTokenType());
   }
 
   @Test
   void testLexerCbls2() {
-    CblLexer cblLexer = new CblLexer("      CBL XOPTS('DLI'), NOADATA, XOPTS(\"DLI\")\n");
+    CblLexer cblLexer = new CblLexer(URI, "      CBL XOPTS('DLI'), NOADATA, XOPTS(\"DLI\")\n", 0);
     assertToken(cblLexer.next(), "CBL", 6, 9, CblTokenType.GENERAL);
     assertToken(cblLexer.next(), "XOPTS", 10, 15, CblTokenType.GENERAL);
     assertToken(cblLexer.next(), "(", 15, 16, CblTokenType.PARENTHESIS_OPEN);
@@ -80,7 +81,7 @@ class CblLexerTest {
 
     assertToken(cblLexer.next(), "\"", 43, 44, CblTokenType.QUOTE);
     assertToken(cblLexer.next(), ")", 44, 45, CblTokenType.PARENTHESIS_CLOSE);
-    assertEquals(CblToken.EOF, cblLexer.next());
+    assertEquals(CblTokenType.EOF, cblLexer.next().getTokenType());
   }
 
   private static void assertToken(
@@ -89,5 +90,6 @@ class CblLexerTest {
     assertEquals(start, next.getStart());
     assertEquals(end, next.getEnd());
     assertEquals(type, next.getTokenType());
+    assertEquals(0, next.getLine());
   }
 }

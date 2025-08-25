@@ -142,9 +142,10 @@ public interface CobolDialect {
    * Returns the list of {@link CompilerDirectiveNode} specific to the dialect
    *
    * @param context is a DialectProcessingContext class with all needed data for dialect processing
+   * @param diagnostics a list of {@link SyntaxError}
    * @return a list of {@link CompilerDirectiveNode}
    */
-  default List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context) {
+  default List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context, List<SyntaxError> diagnostics) {
     return ImmutableList.of();
   }
 

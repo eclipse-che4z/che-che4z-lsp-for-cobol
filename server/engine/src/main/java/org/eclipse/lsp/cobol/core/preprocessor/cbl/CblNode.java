@@ -19,46 +19,72 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * CBL node
- */
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
+
+/** CBL node */
 @Getter
 public class CblNode {
-  public static final String TYPE_UNKNOWN = "UNKNOWN";
-  public static final String TYPE_XOPTS = "XOPTS";
-  public static final String TYPE_CICS = "CICS";
   private final List<CblNode> children;
-  private final String type;
+  private final CblNodeTypes type;
+  private final String uri;
+  private final int line;
   private final int start;
   private final int end;
 
-  public CblNode(int start, int end) {
+  public CblNode(String uri, int line, int start, int end, CblNodeTypes type) {
     this.start = start;
     this.end = end;
+    this.line = line;
+    this.uri = uri;
     this.children = new ArrayList<>();
-    this.type = TYPE_UNKNOWN;
+    this.type = type;
   }
 
   public CblNode(List<CblNode> children) {
+    this.uri = children.get(0).getUri();
+    this.line = children.get(0).getLine();
     this.start = children.get(0).getStart();
     this.end = children.get(children.size() - 1).getEnd();
     this.children = children;
-    this.type = TYPE_UNKNOWN;
+    this.type = UNKNOWN;
   }
 
-  public CblNode(List<CblNode> children, String type) {
+  public CblNode(List<CblNode> children, CblNodeTypes type) {
+    this.uri = children.get(0).getUri();
     this.start = children.get(0).getStart();
+    this.line = children.get(0).getLine();
     this.end = children.get(children.size() - 1).getEnd();
     this.children = children;
     this.type = type;
+  }
+
+  public CblNode(CblNode cblNode, CblNodeTypes cblNodeTypes) {
+    this.uri = cblNode.getUri();
+    this.start = cblNode.getStart();
+    this.end = cblNode.getEnd();
+    this.line = cblNode.getLine();
+    this.children = new ArrayList<>();
+    this.children.add(cblNode);
+    this.type = cblNodeTypes;
   }
 
   @Override
   public String toString() {
     return "CblNode{" +
             "children=" + children +
+            ", type=" + type +
+            ", uri='" + uri + '\'' +
+            ", line=" + line +
             ", start=" + start +
             ", end=" + end +
             '}';
+  }
+
+  public String getText() {
+    StringBuilder sb = new StringBuilder();
+    for(CblNode child : children) {
+      sb.append(child.getText());
+    }
+    return sb.toString();
   }
 }
