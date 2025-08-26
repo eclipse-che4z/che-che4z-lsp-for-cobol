@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Provider;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -73,7 +72,7 @@ public class DialectProcessingService {
                   context.getExtendedDocument().getUri(),
                   context.getExtendedDocument().toString())
               .get();
-      errorList.addAll(createErrors(context.getExtendedDocument(), null, result.getDiagnostics()));
+      addErrors(errorList, context.getExtendedDocument(), null, result.getDiagnostics());
 
       return processDocument(
           preprocessor,
@@ -109,7 +108,7 @@ public class DialectProcessingService {
               .cleanUpCode(copybookInfo.getUri(), copybookInfo.getText())
               .unwrap(errorList::addAll);
       ExtendedDocument copybook = new ExtendedDocument(extendedText, copybookInfo.getUri());
-      errorList.addAll(createErrors(document, copybookId, copybookInfo.getDiagnostics()));
+      addErrors(errorList, document, copybookId, copybookInfo.getDiagnostics());
 
       CopyNode copyNode =
           new CopyNode(
@@ -140,9 +139,11 @@ public class DialectProcessingService {
     return nodes;
   }
 
-  private Collection<SyntaxError> createErrors(
-      ExtendedDocument document, String copybookId, Diagnostic[] diagnostics) {
-    List<SyntaxError> errorList = new ArrayList<>();
+  private static void addErrors(
+      List<SyntaxError> errorList,
+      ExtendedDocument document,
+      String copybookId,
+      Diagnostic[] diagnostics) {
     for (Diagnostic diagnostic : diagnostics) {
       Location location = document.mapLocation(diagnostic.getRange());
       errorList.add(
@@ -156,10 +157,9 @@ public class DialectProcessingService {
               getErrorCode(diagnostic.getCode()),
               diagnostic.getRelatedInformation()));
     }
-    return errorList;
   }
 
-  private ErrorCode getErrorCode(Either<String, Integer> errorCode) {
+  private static ErrorCode getErrorCode(Either<String, Integer> errorCode) {
     return Optional.ofNullable(errorCode)
         .map(Either::getLeft)
         .map(s -> (ErrorCode) () -> s)

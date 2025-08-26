@@ -319,14 +319,10 @@ function serializeRelatedInformation(
   if (relatedInformation === undefined) {
     return undefined;
   }
-  const result: RelatedInformationPayload[] = [];
-  for (const item of relatedInformation) {
-    result.push({
-      message: item.message,
-      location: serializeLocation(item.location),
-    });
-  }
-  return result;
+  return relatedInformation?.map((item) => ({
+    message: item.message,
+    location: serializeLocation(item.location),
+  }));
 }
 
 function serializePosition(position: vscode.Position) {
