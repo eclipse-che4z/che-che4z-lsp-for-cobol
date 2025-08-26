@@ -19,13 +19,13 @@ import com.google.inject.Provider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.ErrorCode;
-import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
@@ -33,14 +33,15 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /** Dialect Api Client * */
 @Slf4j
 @Singleton
 public class DialectProcessingService {
   private final Provider<CobolLanguageClient> cliendProvider;
-  private static final int CODE_MISSING_COPYBOOK = 0;
 
   @Inject
   public DialectProcessingService(Provider<CobolLanguageClient> clientProvider) {
@@ -98,19 +99,7 @@ public class DialectProcessingService {
       String dialectName,
       String copybookId) {
     for (DocumentReplacement replacement : replacements) {
-      try {
-        document.replace(replacement.getRange(), replacement.getText());
-      } catch (Exception e) {
-        errorList.add(
-            DialectErrorHelper.processingError(
-                Locality.builder()
-                    .copybookId(copybookId)
-                    .uri(document.getUri())
-                    .range(replacement.getRange())
-                    .build(),
-                dialectName,
-                e.getMessage()));
-      }
+      document.replace(replacement.getRange(), replacement.getText());
     }
 
     List<Node> nodes = new ArrayList<>();
@@ -152,9 +141,9 @@ public class DialectProcessingService {
   }
 
   private Collection<SyntaxError> createErrors(
-      ExtendedDocument document, String copybookId, DiagnosticPayload[] diagnostics) {
+      ExtendedDocument document, String copybookId, Diagnostic[] diagnostics) {
     List<SyntaxError> errorList = new ArrayList<>();
-    for (DiagnosticPayload diagnostic : diagnostics) {
+    for (Diagnostic diagnostic : diagnostics) {
       Location location = document.mapLocation(diagnostic.getRange());
       errorList.add(
           DialectErrorHelper.dialectError(
@@ -164,15 +153,16 @@ public class DialectProcessingService {
                   .range(location.getRange())
                   .build(),
               diagnostic.getMessage(),
-              getErrorCode(diagnostic.getErrorCode())));
+              getErrorCode(diagnostic.getCode()),
+              diagnostic.getRelatedInformation()));
     }
     return errorList;
   }
 
-  private ErrorCode getErrorCode(Integer errorCode) {
-    if (errorCode != null && errorCode == CODE_MISSING_COPYBOOK) {
-      return ErrorCodes.MISSING_COPYBOOK;
-    }
-    return null;
+  private ErrorCode getErrorCode(Either<String, Integer> errorCode) {
+    return Optional.ofNullable(errorCode)
+        .map(Either::getLeft)
+        .map(s -> (ErrorCode) () -> s)
+        .orElse(null);
   }
 }

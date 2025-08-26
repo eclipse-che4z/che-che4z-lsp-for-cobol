@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.error;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -39,7 +40,7 @@ public class SyntaxError {
   @EqualsAndHashCode.Include ErrorSeverity severity;
   ErrorCode errorCode;
   @EqualsAndHashCode.Include ErrorSource errorSource;
-  @EqualsAndHashCode.Include DiagnosticRelatedInformation relatedInformation;
+  @EqualsAndHashCode.Include List<DiagnosticRelatedInformation> relatedInformation;
 
   @EqualsAndHashCode.Include
   private String matchErrorCode() {

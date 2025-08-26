@@ -20,7 +20,7 @@ let v2Api: V2Api | undefined = undefined;
 /**
  * Code for missing copybook diagnostics
  */
-export const CODE_MISSING_COPYBOOK: number = 0;
+export const CODE_MISSING_COPYBOOK: string = "missing copybook";
 
 /**
  * Retrieve Version 1 of the API

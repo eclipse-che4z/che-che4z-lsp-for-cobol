@@ -63,7 +63,7 @@ type DiagnosticPayload = {
   severity: number;
   source: string | undefined;
   tags: number[];
-  code: number | undefined;
+  code: string | undefined;
 };
 
 type RelatedInformationPayload = {
@@ -298,7 +298,7 @@ export class DialectService {
 
 function serializeDiagnostics(d: vscode.Diagnostic): DiagnosticPayload {
   let code = undefined;
-  if (typeof d.code === "number") {
+  if (typeof d.code === "string") {
     code = d.code;
   }
 
