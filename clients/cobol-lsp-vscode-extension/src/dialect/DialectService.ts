@@ -316,9 +316,6 @@ function serializeDiagnostics(d: vscode.Diagnostic): DiagnosticPayload {
 function serializeRelatedInformation(
   relatedInformation: vscode.DiagnosticRelatedInformation[] | undefined,
 ): RelatedInformationPayload[] | undefined {
-  if (relatedInformation === undefined) {
-    return undefined;
-  }
   return relatedInformation?.map((item) => ({
     message: item.message,
     location: serializeLocation(item.location),
