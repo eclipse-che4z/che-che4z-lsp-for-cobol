@@ -14,19 +14,26 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 import java.util.Optional;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.*;
+
 /** CBL Diagnostic Exception */
 public class CblDiagnosticException extends Exception {
+  private static ErrorSeverity severity;
   private final CblToken token;
 
-  CblDiagnosticException(CblToken token, String message) {
+  CblDiagnosticException(CblToken token, ErrorSeverity severity, String message) {
     super(message);
+    CblDiagnosticException.severity = severity;
     this.token = token;
   }
 
@@ -37,10 +44,9 @@ public class CblDiagnosticException extends Exception {
    * @param variants variants
    * @return CBL diagnostic exception
    */
-  public static CblDiagnosticException expect(CblToken token, String... variants) {
-    // TODO proper error message
+  public static CblDiagnosticException expect(CblToken token,  String... variants) {
     String s = "Expect one of tokens: " + String.join(", ", variants);
-    return new CblDiagnosticException(token, s);
+    return new CblDiagnosticException(token, ERROR, s);
   }
 
   /**
@@ -50,6 +56,7 @@ public class CblDiagnosticException extends Exception {
   public SyntaxError toSyntaxError() {
     SyntaxError.SyntaxErrorBuilder seb = SyntaxError.syntaxError();
     seb.errorSource(ErrorSource.PREPROCESSING);
+    seb.severity(severity);
     seb.location(
         new OriginalLocation(
             Optional.ofNullable(token).map(CblDiagnosticException::makeLocation).orElse(null),
@@ -59,7 +66,10 @@ public class CblDiagnosticException extends Exception {
   }
 
   private static Location makeLocation(CblToken cblToken) {
-    return new Location();
+    Position start = new Position(cblToken.getLine(), cblToken.getStart());
+    Position end =  new Position(cblToken.getLine(), cblToken.getEnd());
+    Range range = new Range(start, end);
+    return new Location(cblToken.getUri(), range);
   }
 
   public CblNode getToken() {

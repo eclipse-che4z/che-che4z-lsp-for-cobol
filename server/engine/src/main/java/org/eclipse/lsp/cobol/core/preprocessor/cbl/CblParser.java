@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
 import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 
 /** CBL Parser */
@@ -66,8 +67,11 @@ public class CblParser {
   private CblNode parseCics() throws CblDiagnosticException {
     List<CblNode> children = new ArrayList<>();
     children.add(one("CICS"));
-    parseCicsOptions(children, true);
-    return new CblNode(children, CICS_CONTAINER);
+    if (isNext("(")) {
+      parseCicsOptions(children, true);
+      return new CblNode(children, CICS_CONTAINER);
+    }
+    return new CblNode(children, UNKNOWN);
   }
 
   private CblNode parseXOpts() throws CblDiagnosticException {
@@ -84,9 +88,7 @@ public class CblParser {
     if (inApostrophes) {
       children.add(one("'"));
     }
-    while (lexer.hasMore()
-            && !(inApostrophes && isNext("'"))
-            && !isNext(")")) {
+    while (lexer.hasMore() && !(inApostrophes && isNext("'")) && !isNext(")")) {
       if (isNext("\"")) {
         semanticError(lexer.next(), "Invalid option string:- '\"' ignored");
       }
@@ -126,6 +128,7 @@ public class CblParser {
         nodeChildren.add(one(")"));
         children.add(new CblNode(nodeChildren, SPACE));
       } else if (isNext("NATLANG")) {
+        nodeChildren.add(one("NATLANG"));
         nodeChildren.add(one("("));
         nodeChildren.add(or("CS", "EN", "KA"));
         nodeChildren.add(one(")"));
@@ -191,7 +194,7 @@ public class CblParser {
   }
 
   private void semanticError(CblToken next, String message) {
-    diagnostics.add(new CblDiagnosticException(next, message).toSyntaxError());
+    diagnostics.add(new CblDiagnosticException(next, WARNING, message).toSyntaxError());
   }
 
   private boolean isLineNumberWrong(int nnn) {
@@ -237,7 +240,7 @@ public class CblParser {
   }
 
   private boolean isNext(String expected) {
-    return lexer.peek().getText().equalsIgnoreCase(expected);
+    return lexer.hasMore() && lexer.peek().getText().equalsIgnoreCase(expected);
   }
 
   private CblToken or(String... variants) throws CblDiagnosticException {

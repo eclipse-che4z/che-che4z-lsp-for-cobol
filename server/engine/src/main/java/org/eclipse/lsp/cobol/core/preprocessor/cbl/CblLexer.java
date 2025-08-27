@@ -73,7 +73,7 @@ public class CblLexer {
       if (counter == input.length()) {
         return CblToken.eof(uri, line);
       }
-      switch (input.charAt(pos)) {
+      switch (input.charAt(counter)) {
         case '(':
           return new CblToken(uri, "(", line, counter, ++counter, CblTokenType.PARENTHESIS_OPEN);
         case ')':
