@@ -14,11 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.directives;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -31,7 +26,6 @@ import org.eclipse.lsp.cobol.core.CompilerDirectivesParser;
 import org.eclipse.lsp.cobol.core.CompilerDirectivesParserBaseVisitor;
 import org.eclipse.lsp.cobol.core.engine.analysis.AnalysisContext;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -129,40 +123,6 @@ public class CompilerDirectivesVisitor extends CompilerDirectivesParserBaseVisit
                           .build());
             });
     return super.visitCompilableSupportedDeprecatedCompilerDirectives(ctx);
-  }
-
-  @Override
-  public Object visitCicsTranslatorOptions(
-      CompilerDirectivesParser.CicsTranslatorOptionsContext ctx) {
-    final Token t = ctx.getStart();
-    if (t != null) {
-      List<String> cicsDirectives =
-          analysisContext
-              .getPreprocessorsDirectives()
-              .computeIfAbsent(CICSDialect.DIALECT_NAME, e -> new ArrayList<>());
-      cicsDirectives.add(t.getText());
-    }
-    return super.visitCicsTranslatorOptions(ctx);
-  }
-
-  private static final Pattern CICS_DIRECTIVES_IN_LITERAL =
-      Pattern.compile("\\b(SP|LENGTH|NOLENGTH|EXCI|APOST|QUOTE)\\b", Pattern.CASE_INSENSITIVE);
-
-  @Override
-  public Object visitCicsTranslatorDirectives(
-      CompilerDirectivesParser.CicsTranslatorDirectivesContext ctx) {
-    final TerminalNode literal = ctx.LITERAL();
-    if (literal != null) {
-      List<String> cicsDirectives =
-          analysisContext
-              .getPreprocessorsDirectives()
-              .computeIfAbsent(CICSDialect.DIALECT_NAME, e -> new ArrayList<>());
-      Matcher m = CICS_DIRECTIVES_IN_LITERAL.matcher(literal.getText());
-      while (m.find()) {
-        cicsDirectives.add(m.group());
-      }
-    }
-    return super.visitCicsTranslatorDirectives(ctx);
   }
 
   @Override

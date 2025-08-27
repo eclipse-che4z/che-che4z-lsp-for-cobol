@@ -57,16 +57,15 @@ public class CicsFilter {
             reduced.add(child);
           }
           break;
-        case LINECOUNT:
-        case SPACE:
         case APOST:
         case QUOTE:
         case CBLCARD:
         case NOCBLCARD:
         case CICS:
-        case FLAG:
         case COBOL2:
+        case CO2:
         case COBOL3:
+        case CO3:
         case CPSM:
         case NOCPSM:
         case DBCS:
@@ -80,12 +79,15 @@ public class CicsFilter {
         case NOFEPI:
         case LENGTH:
         case NOLENGTH:
+        case LIN:
         case LINKAGE:
         case NOLINKAGE:
         case NATLANG:
         case NUM:
         case NONUM:
+        case OP:
         case OPTIONS:
+        case NOP:
         case NOOPTIONS:
         case SEQ:
         case NOSEQ:
@@ -95,6 +97,10 @@ public class CicsFilter {
         case SYSEIB:
         case VBREF:
         case NOVBREF:
+        case Q:
+        case LINECOUNT:
+        case SPACE:
+        case FLAG:
           CblNode lastNode = child.getChildren().get(child.getChildren().size() - 1);
           boolean endsWithComma =
               lastNode instanceof CblToken
