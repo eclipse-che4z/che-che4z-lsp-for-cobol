@@ -34,8 +34,10 @@ const rightDigits = 8;
  *
  * @param actionType RenumberAction
  */
-export async function renumberLines(actionType: RenumberAction) {
-  const activeEditor = vscode.window.activeTextEditor;
+export async function renumberLines(
+  actionType: RenumberAction,
+  activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor,
+) {
   if (!activeEditor) {
     return;
   }
@@ -51,8 +53,10 @@ export async function renumberLines(actionType: RenumberAction) {
  *
  * @param actionType RenumberAction
  */
-export async function unNumberLines(actionType: RenumberAction) {
-  const activeEditor = vscode.window.activeTextEditor;
+export async function unNumberLines(
+  actionType: RenumberAction,
+  activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor,
+) {
   if (!activeEditor) {
     return;
   }
