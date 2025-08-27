@@ -76,8 +76,7 @@ public class HandlerUtility {
     diagnostic.setMessage(err.getSuggestion());
     diagnostic.setRange(err.getLocation().getLocation().getRange());
     diagnostic.setCode(ofNullable(err.getErrorCode()).map(ErrorCode::getLabel).orElse(null));
-    diagnostic.setRelatedInformation(
-        ofNullable(err.getRelatedInformation()).map(Collections::singletonList).orElse(null));
+    diagnostic.setRelatedInformation(err.getRelatedInformation());
     return diagnostic;
   }
 }

@@ -2209,13 +2209,15 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
     void update(ProcedureSectionNode section, Token firstToken) {
       if (lastParagraphNode != null) {
         lastParagraphNode.getLocality().getRange().setEnd(lastSentensePosition);
-        lastParagraphNode.setText(extendedDocument.getBaseText(lastParagraphNode.getLocality()));
+        lastParagraphNode.setText(
+            extendedDocument.getBaseText(getLocalityInExtendedDocument(firstParagraphToken)));
         lastParagraphNode = null;
         firstParagraphToken = null;
       }
       if (lastSectionNode != null) {
         lastSectionNode.getLocality().getRange().setEnd(lastSentensePosition);
-        lastSectionNode.setText(extendedDocument.getBaseText(lastSectionNode.getLocality()));
+        lastSectionNode.setText(
+            extendedDocument.getBaseText(getLocalityInExtendedDocument(firstSectionToken)));
       }
       firstSectionToken = firstToken;
       lastSectionNode = section;

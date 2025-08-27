@@ -18,32 +18,33 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
+import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
-import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /** Dialect Api Client * */
 @Slf4j
 @Singleton
 public class DialectProcessingService {
   private final Provider<CobolLanguageClient> cliendProvider;
-  private final MessageService messageService;
 
   @Inject
-  public DialectProcessingService(
-      Provider<CobolLanguageClient> clientProvider, MessageService messageService) {
+  public DialectProcessingService(Provider<CobolLanguageClient> clientProvider) {
     this.cliendProvider = clientProvider;
-    this.messageService = messageService;
   }
 
   /**
@@ -71,6 +72,8 @@ public class DialectProcessingService {
                   context.getExtendedDocument().getUri(),
                   context.getExtendedDocument().toString())
               .get();
+      addErrors(errorList, context.getExtendedDocument(), null, result.getDiagnostics());
+
       return processDocument(
           preprocessor,
           context.getExtendedDocument(),
@@ -95,20 +98,7 @@ public class DialectProcessingService {
       String dialectName,
       String copybookId) {
     for (DocumentReplacement replacement : replacements) {
-      try {
-        document.replace(replacement.getRange(), replacement.getText());
-      } catch (Exception e) {
-        errorList.add(
-            DialectErrorHelper.processingError(
-                messageService,
-                Locality.builder()
-                    .copybookId(copybookId)
-                    .uri(document.getUri())
-                    .range(replacement.getRange())
-                    .build(),
-                dialectName,
-                e.getMessage()));
-      }
+      document.replace(replacement.getRange(), replacement.getText());
     }
 
     List<Node> nodes = new ArrayList<>();
@@ -118,6 +108,7 @@ public class DialectProcessingService {
               .cleanUpCode(copybookInfo.getUri(), copybookInfo.getText())
               .unwrap(errorList::addAll);
       ExtendedDocument copybook = new ExtendedDocument(extendedText, copybookInfo.getUri());
+      addErrors(errorList, document, copybookId, copybookInfo.getDiagnostics());
 
       CopyNode copyNode =
           new CopyNode(
@@ -146,5 +137,32 @@ public class DialectProcessingService {
           copybookInfo.getStatementLocation().getRange(), copybook.getCurrentText());
     }
     return nodes;
+  }
+
+  private static void addErrors(
+      List<SyntaxError> errorList,
+      ExtendedDocument document,
+      String copybookId,
+      Diagnostic[] diagnostics) {
+    for (Diagnostic diagnostic : diagnostics) {
+      Location location = document.mapLocation(diagnostic.getRange());
+      errorList.add(
+          DialectErrorHelper.dialectError(
+              Locality.builder()
+                  .copybookId(copybookId)
+                  .uri(location.getUri())
+                  .range(location.getRange())
+                  .build(),
+              diagnostic.getMessage(),
+              getErrorCode(diagnostic.getCode()),
+              diagnostic.getRelatedInformation()));
+    }
+  }
+
+  private static ErrorCode getErrorCode(Either<String, Integer> errorCode) {
+    return Optional.ofNullable(errorCode)
+        .map(Either::getLeft)
+        .map(s -> (ErrorCode) () -> s)
+        .orElse(null);
   }
 }

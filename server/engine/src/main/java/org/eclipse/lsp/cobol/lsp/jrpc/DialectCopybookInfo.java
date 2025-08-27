@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
 import lombok.Value;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
 /** Dialect Copybook Info object is a part of the V2 dialect processing */
@@ -27,4 +28,5 @@ public class DialectCopybookInfo {
   String text;
   DialectCopybookInfo[] copybooks;
   DocumentReplacement[] replacements;
+  Diagnostic[] diagnostics;
 }

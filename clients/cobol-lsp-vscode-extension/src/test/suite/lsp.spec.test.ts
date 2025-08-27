@@ -729,8 +729,6 @@ suite("Integration Test Suite", function () {
       normalizeLineEndings(`\`\`\`cobol
        PARAG3.
            DISPLAY 'PARAG3'.
-                                                     
-           STOP RUN.
 
 \`\`\`
 
@@ -755,6 +753,22 @@ _NOTE: other versions exist due to replac(e/ing) or multiple use of same copyboo
 _NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
     );
 
+    const hoverResults_perform_para4: vscode.Hover[] =
+      await helper.getHoverContent(editor, new vscode.Position(11, 10));
+    assert.strictEqual(hoverResults_perform_para4?.length, 1);
+    assert.strictEqual(hoverResults_perform_para4[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hoverResults_perform_para4[0].contents[0] as vscode.MarkdownString)
+          .value,
+      ),
+      normalizeLineEndings(`\`\`\`cobol
+       S010 SECTION.
+           display 'section S010'.
+
+\`\`\``),
+    );
+
     //Goto copybook
     helper.moveCursor(editor, new vscode.Position(9, 16));
 
@@ -762,7 +776,7 @@ _NOTE: other versions exist due to replac(e/ing) or multiple use of same copyboo
     let editor_copybook: vscode.TextEditor | undefined;
     await helper.waitFor(() => {
       editor_copybook = vscode.window.activeTextEditor;
-      return !!editor_copybook;
+      return !!editor_copybook && editor_copybook !== editor;
     });
     const hover_copybook: vscode.Hover[] = await helper.getHoverContent(
       editor_copybook!,

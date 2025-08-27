@@ -91,13 +91,13 @@ suite("Integration Test Suite: Copybooks", function () {
   test("TC174932/TC174933 Copybook - invalid definition and hint", async () => {
     const editor = await helper.showDocument("USERC1N2.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 4);
+    assert.strictEqual(diagnostics.length, 5);
     helper.assertRangeIsEqual(
-      diagnostics[3].range,
+      diagnostics[4].range,
       range(pos(51, 38), pos(51, 56)),
     );
     assert.strictEqual(
-      diagnostics[3].message,
+      diagnostics[4].message,
       "Variable USER-PHONE-MOBILE1 is not defined",
     );
   })

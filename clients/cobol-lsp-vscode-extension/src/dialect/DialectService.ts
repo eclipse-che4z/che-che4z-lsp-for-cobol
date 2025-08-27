@@ -13,13 +13,12 @@
  */
 
 import * as vscode from "vscode";
-import { SETTINGS_DIALECT } from "../constants";
 import type {
   IDocumentProcessingContext,
   V2StartProcessingHandler,
 } from "@code4z/cobol-dialect-api";
 import { LanguageClientService } from "../services/LanguageClientService";
-import { Location, workspace } from "vscode";
+import { Location } from "vscode";
 import {
   readFileContent,
   resolveCopybookURI,
@@ -54,6 +53,22 @@ type CopybookPayload = {
   text: string;
   replacements: DocumentReplacementPayload[];
   copybooks: CopybookPayload[];
+  diagnostics: DiagnosticPayload[];
+};
+
+type DiagnosticPayload = {
+  message: string;
+  range: RangePayload;
+  relatedInformation: RelatedInformationPayload[] | undefined;
+  severity: number;
+  source: string | undefined;
+  tags: number[];
+  code: string | undefined;
+};
+
+type RelatedInformationPayload = {
+  location: LocationPayload;
+  message: string;
 };
 
 type DocumentReplacement = {
@@ -72,6 +87,7 @@ type CopybookInfo = {
 class Context implements IDocumentProcessingContext {
   replacements: DocumentReplacement[] = [];
   children: Context[] = [];
+  diagnostics: vscode.Diagnostic[] = [];
 
   constructor(
     private dialectService: DialectService,
@@ -134,32 +150,18 @@ class Context implements IDocumentProcessingContext {
     };
     this.replacements.push(replacement);
   }
+  addDiagnostic(diagnostic: vscode.Diagnostic): void {
+    this.diagnostics.push(diagnostic);
+  }
 }
 
 export class DialectService {
   private handlers: Map<string, V2StartProcessingHandler> = new Map();
 
-  private diagnosticService: DialectDiagnosticService =
-    new DialectDiagnosticService();
-
   public constructor(
-    context: vscode.ExtensionContext,
     languageClientService: LanguageClientService,
     private outputChannel?: vscode.OutputChannel,
   ) {
-    const disposableChangeConfig = vscode.workspace.onDidChangeConfiguration(
-      (event) => {
-        if (event.affectsConfiguration(SETTINGS_DIALECT))
-          this.diagnosticService.clear();
-      },
-    );
-    context.subscriptions.push(disposableChangeConfig);
-
-    const disposableCloseDocument = vscode.workspace.onDidCloseTextDocument(
-      (event) => this.diagnosticService.clearDialectCollection(event.uri),
-    );
-    context.subscriptions.push(disposableCloseDocument);
-
     languageClientService.addRequestHandler(
       "dialect/process",
       async (dialectName: string, programUri: vscode.Uri, text: string) => {
@@ -173,12 +175,7 @@ export class DialectService {
           );
 
           try {
-            const diagnostics = await handler(context, programUri, text);
-            this.diagnosticService.publish(
-              dialectName,
-              programUri.toString(),
-              diagnostics,
-            );
+            await handler(context, programUri, text);
           } catch (e) {
             this.outputChannel?.appendLine(
               `Dialect ${dialectName} processing fails. Cause: ${JSON.stringify(e)}`,
@@ -197,23 +194,6 @@ export class DialectService {
         }
       },
     );
-    this.addConfigWatcher(".cobolplugin/pgm_conf.json", () =>
-      this.diagnosticService.clear(),
-    );
-    this.addConfigWatcher(".cobolplugin/proc_grps.json", () =>
-      this.diagnosticService.clear(),
-    );
-  }
-
-  private addConfigWatcher(path: string, func: () => void) {
-    const watcher = workspace.createFileSystemWatcher(path);
-    watcher.onDidChange((_uri) => func());
-    watcher.onDidDelete((_uri) => func());
-    watcher.onDidCreate((_uri) => func());
-  }
-
-  public clearDiagnostic() {
-    this.diagnosticService.clear();
   }
 
   public registerStartHandler(
@@ -289,6 +269,7 @@ export class DialectService {
       uri: context.copybookInfo.uri.toString(),
       text: context.copybookInfo.text,
       copybooks: copybooks,
+      diagnostics: context.diagnostics.map((d) => serializeDiagnostics(d)),
     };
   }
 
@@ -310,54 +291,35 @@ export class DialectService {
     return {
       replacements: context.replacements.map((r) => serializeReplacement(r)),
       copybooks: copybooks,
+      diagnostics: context.diagnostics.map((d) => serializeDiagnostics(d)),
     };
   }
 }
 
-function generateKey(dialectName: string, programUri: string): string {
-  return `${dialectName}:${programUri}`;
+function serializeDiagnostics(d: vscode.Diagnostic): DiagnosticPayload {
+  let code = undefined;
+  if (typeof d.code === "string") {
+    code = d.code;
+  }
+
+  return {
+    message: d.message,
+    range: serializeRange(d.range),
+    relatedInformation: serializeRelatedInformation(d.relatedInformation),
+    severity: d.severity,
+    source: d.source,
+    tags: d.tags || [],
+    code: code,
+  };
 }
 
-class DialectDiagnosticService {
-  private collections: Map<string, vscode.DiagnosticCollection> = new Map<
-    string,
-    vscode.DiagnosticCollection
-  >();
-
-  public clear() {
-    this.collections.forEach((value, __key) => {
-      value.clear();
-    });
-  }
-
-  public clearDialectCollection(programUri: vscode.Uri) {
-    const programUriKey = `:${programUri.toString()}`;
-    this.collections.forEach((value, key) => {
-      if (key.endsWith(programUriKey)) {
-        value.clear();
-      }
-    });
-  }
-
-  public publish(
-    dialectName: string,
-    programUri: string,
-    diagnostics: Map<string, vscode.Diagnostic[]>,
-  ) {
-    const key = generateKey(dialectName, programUri);
-    let collection = this.collections.get(key);
-    if (collection === undefined) {
-      collection = vscode.languages.createDiagnosticCollection(
-        `${dialectName} Dialect Diagnostics`,
-      );
-    }
-
-    collection.clear();
-    diagnostics.forEach((diag, uri) =>
-      collection.set(vscode.Uri.parse(uri), diag),
-    );
-    this.collections.set(key, collection);
-  }
+function serializeRelatedInformation(
+  relatedInformation: vscode.DiagnosticRelatedInformation[] | undefined,
+): RelatedInformationPayload[] | undefined {
+  return relatedInformation?.map((item) => ({
+    message: item.message,
+    location: serializeLocation(item.location),
+  }));
 }
 
 function serializePosition(position: vscode.Position) {

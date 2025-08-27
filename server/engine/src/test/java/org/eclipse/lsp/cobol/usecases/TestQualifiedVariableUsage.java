@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -90,6 +91,44 @@ public class TestQualifiedVariableUsage {
           + "           SET {_{$value1} IN {$key1} IN {$zl_return}|1_} TO {$value1}.\n"
           + "       END PROGRAM 'TEST'.";
 
+  public static final String CASE5 =
+      "0      IDENTIFICATION DIVISION.\n"
+          + "1      PROGRAM-ID. TESTREPL.\n"
+          + "2      DATA DIVISION.\n"
+          + "3      WORKING-STORAGE SECTION.\n"
+          + "       01  {$*MY-TEST4Z-COMPONENTS}.\n"
+          + "           02 {$*FILE-IO-PROGRAM}.\n"
+          + "                COPY {~STRUCT1}.\n"
+          + "           02 {$*QSAM-QUICK-TEST}.\n"
+          + "                COPY {~REPL}.\n"
+          + "                    10 {$*SOME} pic x.\n"
+          + "            02 {$*FILE-IO-PROGRAM1}.\n"
+          + "                COPY {~STRUCT1}.     \n"
+          + "8      PROCEDURE DIVISION.  \n"
+          + "           DISPLAY {$ABC-ID|1} . \n"
+          + "           STOP RUN.    ";
+
+  public static final String CASE6 =
+      "       Identification Division.\n"
+          + "       Program-Id. 'P11'.\n"
+          + "       Data Division.\n"
+          + "       Working-Storage Section.\n"
+          + "       01 {$*A} .\n"
+          + "           05 {$*B}.\n"
+          + "           10 {$*C}.\n"
+          + "            15 {$*D} PIC X.\n"
+          + "       01 {$*A2}.\n"
+          + "            05 {$*B}.\n"
+          + "               07 {$*X}.\n"
+          + "               10 {$*C}.\n"
+          + "               15 {$*D} PIC X.\n"
+          + "       Procedure Division.\n"
+          + "           DISPLAY {_{$D} OF {$C} OF {$B}|1_}.\n"
+          + "       End Program 'P11'.";
+  public static final String STRUCT1_CONTENT =
+      "       COPY {~REPL}.\n" + "       10 {$*TAG-STRUCT1} PIC 9.";
+  public static final String REPL_CONTENT = "\n" + "       05 {$*ABC-ID}. ";
+
   private static Stream<String> textsToTest() {
     return Stream.of(CASE1, CASE2, CASE3);
   }
@@ -111,6 +150,35 @@ public class TestQualifiedVariableUsage {
             new Diagnostic(
                 new Range(),
                 "Ambiguous reference for VALUE1",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void negativeTest_WhenAmbiguousReferenceIsInCopybook() {
+    UseCaseEngine.runTest(
+        CASE5,
+        ImmutableList.of(
+            new CobolText("STRUCT1", STRUCT1_CONTENT), new CobolText("REPL", REPL_CONTENT)),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Ambiguous reference for ABC-ID",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testAmbiguityForSimilarUsageChain() {
+    UseCaseEngine.runTest(
+        CASE6,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Ambiguous reference for D",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

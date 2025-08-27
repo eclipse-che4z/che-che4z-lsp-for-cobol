@@ -41,41 +41,22 @@ public class VariableUsageUtils {
    */
   public static List<VariableNode> findVariablesForUsage(
       Multimap<String, VariableNode> definedVariables, List<VariableUsageNode> usagePath) {
-    Collection<VariableNode> candidates = definedVariables.get(usagePath.get(0).getName());
-    List<VariableUsageNode> parents = usagePath.subList(1, usagePath.size());
-
-    Map<VariableNode, Integer> stepToMatchParentsMap = new HashMap<>();
-    for (VariableNode variable : candidates) {
-      countToMatchParents(variable, parents)
-          .ifPresent(steps -> stepToMatchParentsMap.put(variable, steps + 1));
-    }
-
-    List<VariableNode> exactHierarchyMatchedVariables = new ArrayList<>();
-    for (Map.Entry<VariableNode, Integer> entry : stepToMatchParentsMap.entrySet()) {
-      if (entry.getValue().equals(usagePath.size())) {
-        exactHierarchyMatchedVariables.add(entry.getKey());
-      }
-    }
-
-    return exactHierarchyMatchedVariables.isEmpty()
-        ? new ArrayList<>(stepToMatchParentsMap.keySet())
-        : exactHierarchyMatchedVariables;
+    if (usagePath == null || usagePath.isEmpty()) return Collections.emptyList();
+    return definedVariables.get(usagePath.get(0).getName()).stream()
+        .filter(v -> matchToParents(v, usagePath))
+        .collect(Collectors.toList());
   }
 
-  private static Optional<Integer> countToMatchParents(
-      VariableNode variable, List<VariableUsageNode> usagePath) {
-    int count = 0;
-    for (VariableUsageNode parent : usagePath) {
-      String parentName = parent.getName();
+  private static boolean matchToParents(VariableNode candidate, List<VariableUsageNode> usagePath) {
+    VariableNode parent = candidate;
+    for (int depth = 1; depth < usagePath.size(); ++depth) {
+      String nextTarget = usagePath.get(depth).getName();
       do {
-        variable = getNearestParentVariable(variable);
-        if (variable == null) {
-          return Optional.empty();
-        }
-        count++;
-      } while (!variable.getName().equals(parentName));
+        parent = getNearestParentVariable(parent);
+        if (parent == null) return false;
+      } while (!parent.getName().equalsIgnoreCase(nextTarget));
     }
-    return Optional.of(count);
+    return true;
   }
 
   private static VariableNode getNearestParentVariable(VariableNode variable) {

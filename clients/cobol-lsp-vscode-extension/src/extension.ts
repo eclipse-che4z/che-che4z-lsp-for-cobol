@@ -132,7 +132,6 @@ async function initialize(context: vscode.ExtensionContext) {
 
   const configurationWatcher = new ConfigurationWatcher();
   const dialectService = new DialectService(
-    context,
     languageClientService,
     outputChannel,
   );

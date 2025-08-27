@@ -18,6 +18,11 @@ import { type CopyStatementParser, MainExtensionId } from "./common";
 let v2Api: V2Api | undefined = undefined;
 
 /**
+ * Code for missing copybook diagnostics
+ */
+export const CODE_MISSING_COPYBOOK: string = "missing copybook";
+
+/**
  * Retrieve Version 1 of the API
  * @param id id of the extension requesting v1 API
  */
@@ -140,7 +145,7 @@ export type V2StartProcessingHandler = (
   context: IDocumentProcessingContext,
   programUri: vscode.Uri,
   text: string,
-) => Promise<Map<string, vscode.Diagnostic[]>>;
+) => Promise<void>;
 
 export interface IDocumentProcessingContext {
   resolveCopybook(
@@ -156,4 +161,5 @@ export interface IDocumentProcessingContext {
     | undefined
   >;
   replace(range: vscode.Range, text: string): void;
+  addDiagnostic(diagnostic: vscode.Diagnostic): void;
 }

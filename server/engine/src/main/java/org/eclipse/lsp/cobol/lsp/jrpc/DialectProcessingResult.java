@@ -15,10 +15,12 @@
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
 import lombok.Value;
+import org.eclipse.lsp4j.Diagnostic;
 
 /** Result of the V2 dialect processing */
 @Value
 public class DialectProcessingResult {
   DocumentReplacement[] replacements;
   DialectCopybookInfo[] copybooks;
+  Diagnostic[] diagnostics;
 }
