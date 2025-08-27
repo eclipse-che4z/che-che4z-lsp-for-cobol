@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -81,17 +82,19 @@ public final class TranslatorOptionsUtils {
       List<CompilerDirectiveNode> directiveNodes,
       List<SyntaxError> diagnostics) {
     int ariaA = getAriaA(context.getLanguageId());
-    String cblString = line.substring(ariaA, Math.min(A_B_ARIA_LEN + ariaA, line.length()));
-    CblNode cbl =
-        new CblParser(
-                new CblLexer(context.getProgramDocumentUri(), cblString, lineNumber), diagnostics)
-            .cbl();
-    String result = new CicsFilter().createFilteredLine(cbl, directiveNodes, ariaA);
+    String cblString =
+        StringUtils.repeat(" ", ariaA)
+            + line.substring(ariaA, Math.min(A_B_ARIA_LEN + ariaA, line.length()));
+    CblLexer lexer = new CblLexer(context.getProgramDocumentUri(), cblString, lineNumber);
+    CblNode cbl = new CblParser(lexer, diagnostics).cbl();
+
+    String result = new CicsFilter().createFilteredLine(cbl, directiveNodes);
     if (!result.isEmpty()) {
+      result = result.substring(ariaA);
       String prefix = line.substring(0, ariaA);
       String tail =
-          line.length() - prefix.length() - result.length() > 0
-              ? line.substring(prefix.length() + result.length())
+          line.length() - ariaA - result.length() > 0
+              ? line.substring(ariaA + result.length())
               : "";
 
       return prefix + result + tail;

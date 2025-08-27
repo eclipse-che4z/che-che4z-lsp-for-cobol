@@ -30,13 +30,12 @@ public class CicsFilter {
    * Create CBL line without understood CICS options
    * @param root - CBL AST root
    * @param directiveNodes - CICS translator options nodes sink
-   * @param ariaA - ARIA A size
    * @return new CBL line
    */
   public String createFilteredLine(
-      CblNode root, List<CompilerDirectiveNode> directiveNodes, int ariaA) {
+      CblNode root, List<CompilerDirectiveNode> directiveNodes) {
     StringBuilder sb = new StringBuilder();
-    reduce(root, directiveNodes, ariaA);
+    reduce(root, directiveNodes);
     if (root.getChildren().isEmpty()) {
       return "";
     }
@@ -44,13 +43,13 @@ public class CicsFilter {
     return sb.toString();
   }
 
-  private static void reduce(CblNode cbl, List<CompilerDirectiveNode> directiveNodes, int ariaA) {
+  private static void reduce(CblNode cbl, List<CompilerDirectiveNode> directiveNodes) {
     List<CblNode> reduced = new ArrayList<>();
     if (cbl.getChildren().isEmpty()) {
       return;
     }
     for (CblNode child : cbl.getChildren()) {
-      reduce(child, directiveNodes, ariaA);
+      reduce(child, directiveNodes);
       switch (child.getType()) {
         case CBL:
         case XOPTS:
@@ -111,8 +110,8 @@ public class CicsFilter {
                   : child.getText();
           Range range =
               new Range(
-                  new Position(child.getLine(), child.getStart() + ariaA),
-                  new Position(child.getLine(), endPos + ariaA));
+                  new Position(child.getLine(), child.getStart()),
+                  new Position(child.getLine(), endPos));
           Locality locality = Locality.builder().uri(child.getUri()).range(range).build();
           directiveNodes.add(new CompilerDirectiveNode(locality, text, CICSDialect.DIALECT_NAME));
           break;
