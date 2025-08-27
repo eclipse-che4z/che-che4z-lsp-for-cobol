@@ -14,6 +14,9 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.*;
+
+import java.util.Optional;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -21,10 +24,6 @@ import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import java.util.Optional;
-
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.*;
 
 /** CBL Diagnostic Exception */
 public class CblDiagnosticException extends Exception {
@@ -44,13 +43,14 @@ public class CblDiagnosticException extends Exception {
    * @param variants variants
    * @return CBL diagnostic exception
    */
-  public static CblDiagnosticException expect(CblToken token,  String... variants) {
+  public static CblDiagnosticException expect(CblToken token, String... variants) {
     String s = "Expect one of tokens: " + String.join(", ", variants);
     return new CblDiagnosticException(token, ERROR, s);
   }
 
   /**
    * Create syntax error from the exception
+   *
    * @return a new syntax error object
    */
   public SyntaxError toSyntaxError() {
@@ -67,7 +67,7 @@ public class CblDiagnosticException extends Exception {
 
   private static Location makeLocation(CblToken cblToken) {
     Position start = new Position(cblToken.getLine(), cblToken.getStart());
-    Position end =  new Position(cblToken.getLine(), cblToken.getEnd());
+    Position end = new Position(cblToken.getLine(), cblToken.getEnd());
     Range range = new Range(start, end);
     return new Location(cblToken.getUri(), range);
   }

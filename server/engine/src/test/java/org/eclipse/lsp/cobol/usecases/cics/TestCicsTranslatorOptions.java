@@ -136,7 +136,10 @@ public class TestCicsTranslatorOptions {
             "1",
             new Diagnostic(
                 new Range(new Position(0, 21), new Position(0, 22)),
-                "Expect one of tokens: APOST, QUOTE, CBLCARD, NOCBLCARD, COBOL2, COBOL3, CICS, CPSM, NOCPSM, DBCS, DEBUG, NODEBUG, DLI, EDF, NOEDF, EXCI, FEPI, NOFEPI, LENGTH, NOLENGTH, LINKAGE, NOLINKAGE, NUM, NONUM, OPTIONS, NOOPTIONS, SEQ, NOSEQ, SP, SPIE, NOSPIE, SYSEIB, VBREF, NOVBREF",
+                "Expect one of tokens: APOST, QUOTE, CBLCARD, NOCBLCARD, COBOL2, COBOL3, CICS,"
+                    + " CPSM, NOCPSM, DBCS, DEBUG, NODEBUG, DLI, EDF, NOEDF, EXCI, FEPI, NOFEPI,"
+                    + " LENGTH, NOLENGTH, LINKAGE, NOLINKAGE, NUM, NONUM, OPTIONS, NOOPTIONS, SEQ,"
+                    + " NOSEQ, SP, SPIE, NOSPIE, SYSEIB, VBREF, NOVBREF",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }

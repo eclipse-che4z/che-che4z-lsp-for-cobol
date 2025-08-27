@@ -145,6 +145,7 @@ public class ExtendedDocument {
     currentText.replace(updatedRange, newText, mapLocation(range));
     dirty = true;
   }
+
   public void delete(int lineNumber) {
     int deleteLine = updateLineDueToChanges(lineNumber);
     currentText.delete(deleteLine);

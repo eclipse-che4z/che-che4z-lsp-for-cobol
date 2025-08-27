@@ -50,8 +50,9 @@ public class DialectCompilerDirectiveStage implements Stage<AnalysisContext, Voi
 
     allAvailableDialect.forEach(
         dialect ->
-                dialectCompilerDirectiveNodes.addAll(dialect.getCompilerDirectives(dialectProcessingContext,
-                        context.getAccumulatedErrors())));
+            dialectCompilerDirectiveNodes.addAll(
+                dialect.getCompilerDirectives(
+                    dialectProcessingContext, context.getAccumulatedErrors())));
     context.getDialectNodes().addAll(dialectCompilerDirectiveNodes);
     List<String> opts =
         context

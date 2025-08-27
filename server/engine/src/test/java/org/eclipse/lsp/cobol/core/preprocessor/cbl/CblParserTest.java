@@ -14,13 +14,12 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.junit.jupiter.api.Test;
 
 /** CBL parser test */
 public class CblParserTest {
@@ -84,7 +83,6 @@ public class CblParserTest {
     assertNode(cics, 4, 18, 4);
     assertNode(cics.getChildren().get(2), 9, 17, 4);
   }
-
 
   private void assertNode(CblNode node, int startPos, int end, int childrenCount) {
     assertEquals(startPos, node.getStart(), "Start pos");

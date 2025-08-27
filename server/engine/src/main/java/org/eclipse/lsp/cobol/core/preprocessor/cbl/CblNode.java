@@ -14,12 +14,11 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import lombok.Getter;
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
+import lombok.Getter;
 
 /** CBL node */
 @Getter

@@ -50,8 +50,8 @@ public class VisitorUtility {
    */
   public Locality constructLocality(TerminalNode node, DialectProcessingContext context) {
     return Locality.builder()
-            .uri(context.getExtendedDocument().getUri())
-            .range(constructRange(node))
-            .build();
+        .uri(context.getExtendedDocument().getUri())
+        .range(constructRange(node))
+        .build();
   }
 }

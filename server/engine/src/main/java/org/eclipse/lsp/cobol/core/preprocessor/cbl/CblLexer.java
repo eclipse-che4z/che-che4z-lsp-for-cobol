@@ -98,12 +98,12 @@ public class CblLexer {
   }
 
   private boolean untilNext(Character character) {
-      return !Character.isWhitespace(character)
-              && '(' != character
-              && ')' != character
-              && ',' != character
-              && '\'' != character
-              && '"' != character;
+    return !Character.isWhitespace(character)
+        && '(' != character
+        && ')' != character
+        && ',' != character
+        && '\'' != character
+        && '"' != character;
   }
 
   /**

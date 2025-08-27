@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
@@ -21,19 +23,16 @@ import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /** CICS Options CBL AST Filter */
 public class CicsFilter {
   /**
    * Create CBL line without understood CICS options
+   *
    * @param root - CBL AST root
    * @param directiveNodes - CICS translator options nodes sink
    * @return new CBL line
    */
-  public String createFilteredLine(
-      CblNode root, List<CompilerDirectiveNode> directiveNodes) {
+  public String createFilteredLine(CblNode root, List<CompilerDirectiveNode> directiveNodes) {
     StringBuilder sb = new StringBuilder();
     reduce(root, directiveNodes);
     if (root.getChildren().isEmpty()) {

@@ -145,7 +145,8 @@ public interface CobolDialect {
    * @param diagnostics a list of {@link SyntaxError}
    * @return a list of {@link CompilerDirectiveNode}
    */
-  default List<CompilerDirectiveNode> getCompilerDirectives(DialectProcessingContext context, List<SyntaxError> diagnostics) {
+  default List<CompilerDirectiveNode> getCompilerDirectives(
+      DialectProcessingContext context, List<SyntaxError> diagnostics) {
     return ImmutableList.of();
   }
 

@@ -43,6 +43,7 @@ public class CblToken extends CblNode {
 
   /**
    * Get CBL token type
+   *
    * @return CBL token type
    */
   public CblTokenType getTokenType() {
@@ -75,4 +76,3 @@ public class CblToken extends CblNode {
     return new CblToken(uri, null, line, -1, -1, CblTokenType.EOF);
   }
 }
-

@@ -14,14 +14,13 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
 /** CBL Parser */
 public class CblParser {
