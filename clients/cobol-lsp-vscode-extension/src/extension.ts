@@ -75,6 +75,11 @@ import {
 import { invalidateConfig } from "./services/ProcessorGroupsLoader";
 import { outputChannel } from "./services/util/OutputChannel";
 import { DialectService } from "./dialect/DialectService";
+import {
+  RenumberAction,
+  renumberLines,
+  unNumberLines,
+} from "./commands/RenumCommand";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -520,6 +525,26 @@ function registerCommands(context: vscode.ExtensionContext) {
       () => {
         externalApis.reenableFailedRequests();
       },
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("cobol-lsp.editor.renumLeft", () =>
+      renumberLines(RenumberAction.LEFT),
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("cobol-lsp.editor.renumRight", () =>
+      renumberLines(RenumberAction.RIGHT),
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("cobol-lsp.editor.unNumberLeft", () =>
+      unNumberLines(RenumberAction.LEFT),
+    ),
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("cobol-lsp.editor.unNumberRight", () =>
+      unNumberLines(RenumberAction.RIGHT),
     ),
   );
 }

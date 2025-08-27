@@ -94,6 +94,26 @@
         "command": "cobol-lsp.cpy-manager.reenable.failed.zowe.requests",
         "title": "Reenable failed Zowe requests",
         "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.renumRight",
+        "title": "73-80",
+        "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.renumLeft",
+        "title": "Cobol",
+        "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.unNumberLeft",
+        "title": "Cobol",
+        "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.unNumberRight",
+        "title": "73-80",
+        "category": "COBOL"
       }
     ],
     "menus": {
@@ -148,8 +168,44 @@
           "title": "Open Copybooks Internal Folder",
           "category": "COBOL"
         }
+      ],
+      "editor/context": [
+        {
+          "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly",
+          "submenu": "renumSubMenu"
+        },
+        {
+          "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly",
+          "submenu": "unnumSubMenu"
+        }
+      ],
+      "renumSubMenu": [
+        {
+          "command": "cobol-lsp.editor.renumLeft"
+        },
+        {
+          "command": "cobol-lsp.editor.renumRight"
+        }
+      ],
+      "unnumSubMenu": [
+        {
+          "command": "cobol-lsp.editor.unNumberLeft"
+        },
+        {
+          "command": "cobol-lsp.editor.unNumberRight"
+        }
       ]
     },
+    "submenus": [
+      {
+        "id": "renumSubMenu",
+        "label": "Renumber Sequence Numbers"
+      },
+      {
+        "id": "unnumSubMenu",
+        "label": "Unnumber Sequence Numbers"
+      }
+    ],
     "languages": [
       {
         "id": "cobol",
