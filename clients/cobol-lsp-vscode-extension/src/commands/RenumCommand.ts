@@ -65,7 +65,7 @@ export async function unNumberLines(
     unNumber,
     activeEditor,
     actionType,
-    "Renumbering Sequential Lines...",
+    "Removing Sequential Lines...",
   );
 }
 
