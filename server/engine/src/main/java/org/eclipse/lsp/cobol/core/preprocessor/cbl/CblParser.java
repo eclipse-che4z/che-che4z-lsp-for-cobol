@@ -80,45 +80,57 @@ public class CblParser {
   private void parseCicsOptions(List<CblNode> children, boolean force)
       throws CblDiagnosticException {
     children.add(one("("));
-    while (lexer.hasMore() && !isNext(")")) {
-      List<CblNode> cicsNodeChildren = new ArrayList<>();
+    boolean inApostrophes = isNext("'");
+    if (inApostrophes) {
+      children.add(one("'"));
+    }
+    while (lexer.hasMore()
+            && !(inApostrophes && isNext("'"))
+            && !isNext(")")) {
+      if (isNext("\"")) {
+        semanticError(lexer.next(), "Invalid option string:- '\"' ignored");
+      }
+      List<CblNode> nodeChildren = new ArrayList<>();
       if (isNext("FLAG") || isNext("F")) {
-        cicsNodeChildren.add(or("FLAG", "F"));
-        cicsNodeChildren.add(one("("));
-        cicsNodeChildren.add(or("E", "I", "S", "U", "W"));
+        nodeChildren.add(or("FLAG", "F"));
+        nodeChildren.add(one("("));
+        nodeChildren.add(or("E", "I", "S", "U", "W"));
         if (isNext(",")) {
-          cicsNodeChildren.add(one(","));
-          cicsNodeChildren.add(or("E", "I", "S", "U", "W"));
+          nodeChildren.add(one(","));
+          nodeChildren.add(or("E", "I", "S", "U", "W"));
         }
-        cicsNodeChildren.add(one(")"));
-        children.add(new CblNode(cicsNodeChildren, FLAG));
+        nodeChildren.add(one(")"));
+        opt(",").ifPresent(nodeChildren::add);
+        children.add(new CblNode(nodeChildren, FLAG));
       } else if (isNext("LINECOUNT") || isNext("LC")) {
-        cicsNodeChildren.add(or("LINECOUNT", "LC"));
-        cicsNodeChildren.add(one("("));
+        nodeChildren.add(or("LINECOUNT", "LC"));
+        nodeChildren.add(one("("));
         CblToken next = lexer.next();
         int i = checkIntegerLiteral(next);
-        cicsNodeChildren.add(next);
-        cicsNodeChildren.add(one(")"));
-        children.add(new CblNode(cicsNodeChildren, LINECOUNT));
+        nodeChildren.add(next);
+        nodeChildren.add(one(")"));
+        opt(",").ifPresent(nodeChildren::add);
+        children.add(new CblNode(nodeChildren, LINECOUNT));
         if (isLineNumberWrong(i)) {
           semanticError(next, "LINECOUNT must be an integer between 10 and 255, or 0.");
         }
       } else if (isNext("SPACE")) {
-        cicsNodeChildren.add(one("SPACE"));
-        cicsNodeChildren.add(one("("));
+        nodeChildren.add(one("SPACE"));
+        nodeChildren.add(one("("));
         CblToken next = lexer.next();
         int i = checkIntegerLiteral(next);
         if (i != 1 && i != 2 && i != 3) {
           semanticError(next, "SPACE must be 1, 2 or 3.");
         }
-        cicsNodeChildren.add(next);
-        cicsNodeChildren.add(one(")"));
-        children.add(new CblNode(cicsNodeChildren, SPACE));
+        nodeChildren.add(next);
+        nodeChildren.add(one(")"));
+        children.add(new CblNode(nodeChildren, SPACE));
       } else if (isNext("NATLANG")) {
-        cicsNodeChildren.add(one("("));
-        cicsNodeChildren.add(or("CS", "EN", "KA"));
-        cicsNodeChildren.add(one(")"));
-        children.add(new CblNode(cicsNodeChildren, NATLANG));
+        nodeChildren.add(one("("));
+        nodeChildren.add(or("CS", "EN", "KA"));
+        nodeChildren.add(one(")"));
+        opt(",").ifPresent(nodeChildren::add);
+        children.add(new CblNode(nodeChildren, NATLANG));
       } else {
         try {
           CblToken next =
@@ -157,17 +169,22 @@ public class CblParser {
                   "SYSEIB",
                   "VBREF",
                   "NOVBREF");
-          cicsNodeChildren.add(next);
-          children.add(new CblNode(cicsNodeChildren, valueOf(next.getText())));
+          nodeChildren.add(next);
+          opt(",").ifPresent(nodeChildren::add);
+          children.add(new CblNode(nodeChildren, valueOf(next.getText())));
         } catch (CblDiagnosticException e) {
           if (force) {
             throw e;
           } else {
-            children.add(e.getToken());
-            children.addAll(parseOption().getChildren());
+            nodeChildren.add(e.getToken());
+            nodeChildren.addAll(parseOption().getChildren());
+            children.add(new CblNode(nodeChildren, UNKNOWN));
           }
         }
       }
+    }
+    if (inApostrophes) {
+      children.add(one("'"));
     }
     children.add(one(")"));
     opt(",").ifPresent(children::add);

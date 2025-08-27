@@ -21,8 +21,12 @@ public class CblToken extends CblNode {
   private final String text;
   private final CblTokenType tokenType;
 
-  /** CBL Token
+  /**
+   * CBL Token
+   *
+   * @param uri - document URI
    * @param text - token text
+   * @param line - token line number
    * @param start - token start position
    * @param end - token end position
    * @param type - token type
@@ -37,40 +41,38 @@ public class CblToken extends CblNode {
     return text;
   }
 
+  /**
+   * Get CBL token type
+   * @return CBL token type
+   */
   public CblTokenType getTokenType() {
     return tokenType;
   }
 
   @Override
   public String toString() {
-    return "CblToken{" +
-            "text='" + text + '\'' +
-            ", start=" + getStart() +
-            ", end=" + getEnd() +
-            ", type=" + tokenType +
-            '}';
+    return "CblToken{"
+        + "text='"
+        + text
+        + '\''
+        + ", start="
+        + getStart()
+        + ", end="
+        + getEnd()
+        + ", type="
+        + tokenType
+        + '}';
   }
 
   /**
    * Provide CBL EOF token
+   *
    * @param uri - document URI
    * @param line - line number
    * @return CBL EOF token
    */
   public static CblToken eof(String uri, int line) {
-    return new CblToken(uri, null, line,  -1, -1, CblTokenType.EOF);
+    return new CblToken(uri, null, line, -1, -1, CblTokenType.EOF);
   }
 }
 
-/** CBL Token type */
-enum CblTokenType {
-  CBL,
-  GENERAL,
-  PARENTHESIS_OPEN,
-  PARENTHESIS_CLOSE,
-  WHITESPACE,
-  COMMA,
-  QUOTE,
-  APOSTROPHE,
-  EOF
-}

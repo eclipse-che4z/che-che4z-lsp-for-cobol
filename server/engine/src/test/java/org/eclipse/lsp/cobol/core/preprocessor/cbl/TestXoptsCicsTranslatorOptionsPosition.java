@@ -59,6 +59,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
         new ExtendedDocument("000123 CBL XOPTS(DLI), NOADATA, XOPTS(DLI)\n", URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -73,6 +74,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
     ExtendedDocument extDoc = new ExtendedDocument("000123 CBL XOPTS(DLI), NOADATA\n", URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -86,6 +88,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
     ExtendedDocument extDoc = new ExtendedDocument("000123 CBL NOADATA, XOPTS(DLI)\n", URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -101,6 +104,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             "000123 CBL NOADATA, XOPTS(DLI)\n" + "000123 CBL DATA, XOPTS(DLI)", URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -120,6 +124,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -136,6 +141,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
         new ExtendedDocument("000123 CBL NOADATA, XOPTS(DLI), NOADATA, XOPTS(DLI)\n", URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -154,6 +160,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -169,10 +176,11 @@ class TestXoptsCicsTranslatorOptionsPosition {
   void test9() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL NOADATA, XOPTS(SPACE(10)), NOADATA, XOPTS(LINECOUNT(32))            123456",
+            "123456 CBL NOADATA, XOPTS(SPACE( 1)), NOADATA, XOPTS(LINECOUNT(32))            123456",
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -180,7 +188,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
         "123456 CBL NOADATA,                   NOADATA                                  123456",
         extDoc.getCurrentText().toString());
     assertEquals(2, result.size());
-    assertDirectiveNode("SPACE(10)", 0, 26, 35, result.get(0));
+    assertDirectiveNode("SPACE(1)", 0, 26, 35, result.get(0));
     assertDirectiveNode("LINECOUNT(32)", 0, 53, 66, result.get(1));
   }
 
@@ -193,6 +201,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -212,6 +221,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -233,6 +243,8 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -254,6 +266,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -276,6 +289,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -299,6 +313,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -308,7 +323,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             + " 123456",
         extDoc.getCurrentText().toString());
     assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I, W)", 1, 17, 27, result.get(0));
+    assertDirectiveNode("FLAG(I,W)", 1, 17, 27, result.get(0));
     assertDirectiveNode("DLI", 1, 33, 36, result.get(1));
   }
 
@@ -319,11 +334,12 @@ class TestXoptsCicsTranslatorOptionsPosition {
             "123456 CBL XOPTS(), NOADATA                                     123456", URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
     assertEquals(
-        "123456 CBL XOPTS(), NOADATA                                     123456",
+        "123456 CBL          NOADATA                                     123456",
         extDoc.getCurrentText().toString());
     assertTrue(result.isEmpty());
   }
@@ -337,6 +353,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
@@ -357,6 +374,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
                     URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result = TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());

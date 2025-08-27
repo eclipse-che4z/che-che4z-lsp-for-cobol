@@ -23,8 +23,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/** CBL parser test */
 public class CblParserRecoveryTest {
   static final String URI = "file://document.cbl";
+
   @Test
   void testDoubleQuotes() {
     CblLexer cblLexer = new CblLexer(URI, "      CBL XOPTS(\"DLI), NOADATA, XOPT(DLI)\n", 0);

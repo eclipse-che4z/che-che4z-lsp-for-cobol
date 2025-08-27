@@ -85,8 +85,7 @@ public class CblLexer {
         case '"':
           return new CblToken(uri, "\"", line, counter, ++counter, CblTokenType.QUOTE);
         default:
-          CblToken cblToken =
-              consumeWhile(counter, Character::isLetterOrDigit, CblTokenType.GENERAL);
+          CblToken cblToken = consumeWhile(counter, this::untilNext, CblTokenType.GENERAL);
           counter = cblToken.getEnd();
           return cblToken;
       }
@@ -96,6 +95,15 @@ public class CblLexer {
         peeked = null;
       }
     }
+  }
+
+  private boolean untilNext(Character character) {
+      return !Character.isWhitespace(character)
+              && '(' != character
+              && ')' != character
+              && ',' != character
+              && '\'' != character
+              && '"' != character;
   }
 
   /**

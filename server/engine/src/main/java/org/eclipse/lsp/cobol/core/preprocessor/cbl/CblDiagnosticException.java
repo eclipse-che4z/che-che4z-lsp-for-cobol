@@ -33,6 +33,7 @@ public class CblDiagnosticException extends Exception {
   /**
    * Expect one of variants
    *
+   * @param token token
    * @param variants variants
    * @return CBL diagnostic exception
    */
@@ -42,6 +43,10 @@ public class CblDiagnosticException extends Exception {
     return new CblDiagnosticException(token, s);
   }
 
+  /**
+   * Create syntax error from the exception
+   * @return a new syntax error object
+   */
   public SyntaxError toSyntaxError() {
     SyntaxError.SyntaxErrorBuilder seb = SyntaxError.syntaxError();
     seb.errorSource(ErrorSource.PREPROCESSING);

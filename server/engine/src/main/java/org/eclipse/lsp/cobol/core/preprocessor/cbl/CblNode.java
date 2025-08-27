@@ -70,19 +70,31 @@ public class CblNode {
 
   @Override
   public String toString() {
-    return "CblNode{" +
-            "children=" + children +
-            ", type=" + type +
-            ", uri='" + uri + '\'' +
-            ", line=" + line +
-            ", start=" + start +
-            ", end=" + end +
-            '}';
+    return "CblNode{"
+        + "children="
+        + children
+        + ", type="
+        + type
+        + ", uri='"
+        + uri
+        + '\''
+        + ", line="
+        + line
+        + ", start="
+        + start
+        + ", end="
+        + end
+        + '}';
   }
 
+  /**
+   * Creates the CBL node text
+   *
+   * @return CBL node text
+   */
   public String getText() {
     StringBuilder sb = new StringBuilder();
-    for(CblNode child : children) {
+    for (CblNode child : children) {
       sb.append(child.getText());
     }
     return sb.toString();
