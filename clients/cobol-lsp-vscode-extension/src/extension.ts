@@ -76,7 +76,8 @@ import { invalidateConfig } from "./services/ProcessorGroupsLoader";
 import { outputChannel } from "./services/util/OutputChannel";
 import { DialectService } from "./dialect/DialectService";
 import {
-  RenumberAction,
+  RENUM_LEFT,
+  RENUM_RIGHT,
   renumberLines,
   unNumberLines,
 } from "./commands/RenumCommand";
@@ -527,23 +528,31 @@ function registerCommands(context: vscode.ExtensionContext) {
     ),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.editor.renumLeft", () =>
-      renumberLines(RenumberAction.LEFT),
+    vscode.commands.registerTextEditorCommand(
+      "cobol-lsp.editor.renumLeft",
+      (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
+        renumberLines(textEditor, edit, RENUM_LEFT),
     ),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.editor.renumRight", () =>
-      renumberLines(RenumberAction.RIGHT),
+    vscode.commands.registerTextEditorCommand(
+      "cobol-lsp.editor.renumRight",
+      (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
+        renumberLines(textEditor, edit, RENUM_RIGHT),
     ),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.editor.unNumberLeft", () =>
-      unNumberLines(RenumberAction.LEFT),
+    vscode.commands.registerTextEditorCommand(
+      "cobol-lsp.editor.unNumberLeft",
+      (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
+        unNumberLines(textEditor, edit, RENUM_LEFT),
     ),
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("cobol-lsp.editor.unNumberRight", () =>
-      unNumberLines(RenumberAction.RIGHT),
+    vscode.commands.registerTextEditorCommand(
+      "cobol-lsp.editor.unNumberRight",
+      (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
+        unNumberLines(textEditor, edit, RENUM_RIGHT),
     ),
   );
 }
