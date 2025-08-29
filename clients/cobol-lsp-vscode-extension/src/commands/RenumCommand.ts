@@ -35,22 +35,29 @@ export const RENUM_RIGHT: RenumberParameters = {
 /**
  * Renumber 1-7 or 73-80 columns in active editor.
  *
- * @param activeEditor Active vscode.TextEditor
+ * @param document vscode.TextDocument
  * @param edit  vscode.TextEditorEdit
  * @param params  RenumberParameters
  */
 export function renumberLines(
-  activeEditor: vscode.TextEditor,
+  document: vscode.TextDocument,
   edit: vscode.TextEditorEdit,
   params: RenumberParameters,
 ) {
-  const lineCount = activeEditor.document.lineCount;
+  const lineCount = document.lineCount;
   if (lineCount > maxLines) return;
+  let shift = 3;
+  if (params.digits === 6) {
+    shift = 2;
+    if (lineCount > 9999) shift = 1;
+    if (lineCount > 99999) shift = 0;
+  }
+  const pad = params.digits - shift;
   for (let i = 0; i < lineCount; i++) {
-    const line = activeEditor.document.lineAt(i);
+    const line = document.lineAt(i);
     const text = line.text;
 
-    const value = getSequentialNumber(i, params.digits, lineCount);
+    const value = getSequentialNumber(i, params.digits, pad);
     const range = new vscode.Range(
       new vscode.Position(i, params.start),
       new vscode.Position(i, params.end),
@@ -60,7 +67,7 @@ export function renumberLines(
       const placeholderRange = new vscode.Position(i, text.length);
       edit.replace(placeholderRange, " ".repeat(padLength));
     }
-    if (activeEditor.document.lineAt(i).text.charAt(params.start) != "*") {
+    if (document.lineAt(i).text.charAt(params.start) != "*") {
       edit.replace(range, value);
     }
   }
@@ -68,17 +75,17 @@ export function renumberLines(
 /**
  * Remove sequential numbers at 1-7 or 73-80 columns in active editor.
  *
- * @param activeEditor Active vscode.TextEditor
+ * @param activeEditor vscode.TextDocument
  * @param edit  vscode.TextEditorEdit
  * @param params  RenumberParameters
  */
 export function unNumberLines(
-  activeEditor: vscode.TextEditor,
+  document: vscode.TextDocument,
   edit: vscode.TextEditorEdit,
   params: RenumberParameters,
 ) {
-  for (let i = 0; i < activeEditor.document.lineCount; i++) {
-    const text = activeEditor.document.lineAt(i).text;
+  for (let i = 0; i < document.lineCount; i++) {
+    const text = document.lineAt(i).text;
     if (
       text.charAt(params.start) != "*" &&
       text.substring(params.start, params.end).trim() !== ""
@@ -95,18 +102,7 @@ export function unNumberLines(
 export function getSequentialNumber(
   line: number,
   digits: number,
-  totalLineCount: number,
+  pad: number,
 ): string {
-  let ext = 3;
-  if (digits === 6) {
-    ext = 2;
-    if (totalLineCount > 9999) ext = 1;
-    if (totalLineCount > 99999) ext = 0;
-  }
-
-  let str = (line + 1).toString().padStart(digits - ext, "0");
-  if (str.length < digits) {
-    str = str.padEnd(digits, "0");
-  }
-  return str;
+  return (line + 1).toString().padStart(pad, "0").padEnd(digits, "0");
 }

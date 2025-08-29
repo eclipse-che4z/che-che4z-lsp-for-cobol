@@ -173,10 +173,6 @@
         {
           "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly",
           "submenu": "renumSubMenu"
-        },
-        {
-          "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly",
-          "submenu": "unnumSubMenu"
         }
       ],
       "renumSubMenu": [
@@ -185,9 +181,7 @@
         },
         {
           "command": "cobol-lsp.editor.renumRight"
-        }
-      ],
-      "unnumSubMenu": [
+        },
         {
           "command": "cobol-lsp.editor.unNumberLeft"
         },

@@ -531,28 +531,28 @@ function registerCommands(context: vscode.ExtensionContext) {
     vscode.commands.registerTextEditorCommand(
       "cobol-lsp.editor.renumLeft",
       (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
-        renumberLines(textEditor, edit, RENUM_LEFT),
+        renumberLines(textEditor.document, edit, RENUM_LEFT),
     ),
   );
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand(
       "cobol-lsp.editor.renumRight",
       (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
-        renumberLines(textEditor, edit, RENUM_RIGHT),
+        renumberLines(textEditor.document, edit, RENUM_RIGHT),
     ),
   );
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand(
       "cobol-lsp.editor.unNumberLeft",
       (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
-        unNumberLines(textEditor, edit, RENUM_LEFT),
+        unNumberLines(textEditor.document, edit, RENUM_LEFT),
     ),
   );
   context.subscriptions.push(
     vscode.commands.registerTextEditorCommand(
       "cobol-lsp.editor.unNumberRight",
       (textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit) =>
-        unNumberLines(textEditor, edit, RENUM_RIGHT),
+        unNumberLines(textEditor.document, edit, RENUM_RIGHT),
     ),
   );
 }
