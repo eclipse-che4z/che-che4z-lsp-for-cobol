@@ -89,7 +89,8 @@ public class CblParser {
     }
     while (lexer.hasMore() && !(inApostrophes && isNext("'")) && !isNext(")")) {
       if (isNext("\"")) {
-        semanticError(lexer.next(), "Invalid option string:- '\"' ignored");
+        // Ignore quotes
+        lexer.next();
       }
       List<CblNode> nodeChildren = new ArrayList<>();
       if (isNext("FLAG") || isNext("F")) {

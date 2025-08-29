@@ -14,13 +14,14 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import java.util.function.Predicate;
+import org.apache.commons.lang3.StringUtils;
 
 /** CBL Lexer */
 public class CblLexer {
   private final String uri;
-  private final String input;
   private final int line;
+  private final String[] segments;
+  private final int[] ranges;
   private final boolean full;
 
   private Integer pos = 0;
@@ -28,16 +29,15 @@ public class CblLexer {
 
   public CblLexer(String uri, String input, int line, boolean full) {
     this.uri = uri;
-    this.input = input;
     this.line = line;
+    this.segments = input.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
+    this.ranges = new int[segments.length + 1];
+    for (int i = 0; i < segments.length; ++i) ranges[i + 1] = ranges[i] + segments[i].length();
     this.full = full;
   }
 
   public CblLexer(String uri, String input, int line) {
-    this.uri = uri;
-    this.input = input;
-    this.line = line;
-    this.full = false;
+    this(uri, input, line, false);
   }
 
   CblToken peek() {
@@ -59,36 +59,24 @@ public class CblLexer {
   private CblToken nextToken(boolean consume) {
     int counter = pos;
     try {
-      if (counter == input.length()) {
+      if (counter >= segments.length) {
         return CblToken.eof(uri, line);
       }
-      if (Character.isWhitespace(input.charAt(counter))) {
-        CblToken cblToken = consumeWhile(counter, Character::isWhitespace, CblTokenType.WHITESPACE);
-        counter = cblToken.getEnd();
+      String segment = segments[counter];
+      if (StringUtils.isBlank(segment)) {
+        counter++;
         if (full) {
-          return cblToken;
+          return new CblToken(
+              uri, segment, line, ranges[counter - 1], ranges[counter], CblTokenType.WHITESPACE);
         }
       }
-      // do we actually have a token?
-      if (counter == input.length()) {
+      if (counter >= segments.length) {
         return CblToken.eof(uri, line);
       }
-      switch (input.charAt(counter)) {
-        case '(':
-          return new CblToken(uri, "(", line, counter, ++counter, CblTokenType.PARENTHESIS_OPEN);
-        case ')':
-          return new CblToken(uri, ")", line, counter, ++counter, CblTokenType.PARENTHESIS_CLOSE);
-        case ',':
-          return new CblToken(uri, ",", line, counter, ++counter, CblTokenType.COMMA);
-        case '\'':
-          return new CblToken(uri, "'", line, counter, ++counter, CblTokenType.APOSTROPHE);
-        case '"':
-          return new CblToken(uri, "\"", line, counter, ++counter, CblTokenType.QUOTE);
-        default:
-          CblToken cblToken = consumeWhile(counter, this::untilNext, CblTokenType.GENERAL);
-          counter = cblToken.getEnd();
-          return cblToken;
-      }
+      segment = segments[counter];
+      counter++;
+      return new CblToken(
+          uri, segment, line, ranges[counter - 1], ranges[counter], getType(segment));
     } finally {
       if (consume) {
         pos = counter;
@@ -97,13 +85,21 @@ public class CblLexer {
     }
   }
 
-  private boolean untilNext(Character character) {
-    return !Character.isWhitespace(character)
-        && '(' != character
-        && ')' != character
-        && ',' != character
-        && '\'' != character
-        && '"' != character;
+  private static CblTokenType getType(String segment) {
+    switch (segment) {
+      case "(":
+        return CblTokenType.PARENTHESIS_OPEN;
+      case ")":
+        return CblTokenType.PARENTHESIS_CLOSE;
+      case ",":
+        return CblTokenType.COMMA;
+      case "'":
+        return CblTokenType.APOSTROPHE;
+      case "\"":
+        return CblTokenType.QUOTE;
+      default:
+        return CblTokenType.GENERAL;
+    }
   }
 
   /**
@@ -113,17 +109,5 @@ public class CblLexer {
    */
   public boolean hasMore() {
     return !peek().getTokenType().equals(CblTokenType.EOF);
-  }
-
-  private CblToken consumeWhile(int start, Predicate<Character> until, CblTokenType type) {
-    int counter = start;
-    while (counter < input.length() && until.test(input.charAt(counter))) {
-      counter++;
-    }
-    return new CblToken(uri, input.substring(start, counter), line, start, counter, type);
-  }
-
-  public int getPos() {
-    return pos;
   }
 }
