@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.engine.symbols;
 
-import static org.eclipse.lsp.cobol.common.utils.RangeUtils.findNodeByPosition;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -36,6 +34,7 @@ import org.eclipse.lsp.cobol.common.symbols.CodeBlockReference;
 import org.eclipse.lsp.cobol.common.symbols.ProcedureId;
 import org.eclipse.lsp.cobol.common.symbols.SymbolTable;
 import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
+import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 
@@ -103,16 +102,19 @@ public class SymbolsRepository {
    * @param position the position to check
    * @return element at specified position
    */
-  public static Optional<DefinedAndUsedStructure> findElementByPosition(
+  public static Set<DefinedAndUsedStructure> findElementByPosition(
       String uri, AnalysisResult result, Position position) {
     if (result == null || result.getRootNode() == null) {
-      return Optional.empty();
+      return Collections.emptySet();
     }
-    Optional<Node> node = findNodeByPosition(result.getRootNode(), uri, position);
+    List<Node> allApplicableNodesByPosition =
+        RangeUtils.findAllApplicableNodesByPosition(result.getRootNode(), uri, position);
 
-    return node.filter(DefinedAndUsedStructure.class::isInstance)
+    return allApplicableNodesByPosition.stream()
+        .filter(DefinedAndUsedStructure.class::isInstance)
         .map(DefinedAndUsedStructure.class::cast)
-        .map(SymbolsRepository::constructElementsExcludingImplicits);
+        .map(SymbolsRepository::constructElementsExcludingImplicits)
+        .collect(Collectors.toSet());
   }
 
   private static DefinedAndUsedStructure constructElementsExcludingImplicits(

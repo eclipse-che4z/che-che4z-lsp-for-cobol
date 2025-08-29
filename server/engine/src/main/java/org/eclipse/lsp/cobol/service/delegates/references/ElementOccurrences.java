@@ -47,8 +47,10 @@ public class ElementOccurrences implements Occurrences {
     String uri = position.getTextDocument().getUri();
     return SymbolsRepository.findElementByPosition(
             uri, document.getLastAnalysisResult(), position.getPosition())
+        .stream()
         .map(DefinedAndUsedStructure::getDefinitions)
-        .orElse(Collections.emptyList());
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
   }
 
   private List<Location> getCopybookLocation(TextDocumentPositionParams position, String uri) {
@@ -68,17 +70,25 @@ public class ElementOccurrences implements Occurrences {
       @NonNull CobolDocumentModel document,
       @NonNull TextDocumentPositionParams position,
       @NonNull ReferenceContext refCtx) {
-    Optional<DefinedAndUsedStructure> element =
+    Set<DefinedAndUsedStructure> element =
         SymbolsRepository.findElementByPosition(
             position.getTextDocument().getUri(),
             document.getAnalysisResult(),
             position.getPosition());
-    if (!element.isPresent()) {
+    if (element.isEmpty()) {
       return Collections.emptyList();
     }
-    List<Location> references = new ArrayList<>(element.get().getUsages());
+    List<Location> references =
+        element.stream()
+            .map(DefinedAndUsedStructure::getUsages)
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
     if (refCtx.isIncludeDeclaration()) {
-      references.addAll(element.get().getDefinitions());
+      references.addAll(
+          element.stream()
+              .map(DefinedAndUsedStructure::getDefinitions)
+              .flatMap(List::stream)
+              .collect(Collectors.toList()));
     }
     return references;
   }
@@ -86,17 +96,17 @@ public class ElementOccurrences implements Occurrences {
   @Override
   public @NonNull List<DocumentHighlight> findHighlights(
       AnalysisResult analysisResult, @NonNull TextDocumentPositionParams position) {
-    Optional<DefinedAndUsedStructure> element =
-        SymbolsRepository.findElementByPosition(
-            position.getTextDocument().getUri(), analysisResult, position.getPosition());
-    return element
+    return SymbolsRepository.findElementByPosition(
+            position.getTextDocument().getUri(), analysisResult, position.getPosition())
+        .stream()
         .map(
             context ->
                 Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
                     .filter(byUri(position))
                     .map(toDocumentHighlight())
                     .collect(Collectors.toList()))
-        .orElse(Collections.emptyList());
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
   }
 
   @NonNull

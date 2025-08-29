@@ -732,7 +732,7 @@ suite("Integration Test Suite", function () {
 
 \`\`\`
 
-_NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
+_NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copybook_`),
     );
 
     const hoverResults_perform_para3: vscode.Hover[] =
@@ -750,7 +750,7 @@ _NOTE: other versions exist due to replac(e/ing) or multiple use of same copyboo
 
 \`\`\`
 
-_NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
+_NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copybook_`),
     );
 
     const hoverResults_perform_para4: vscode.Hover[] =
@@ -785,18 +785,122 @@ _NOTE: other versions exist due to replac(e/ing) or multiple use of same copyboo
 
     assert.strictEqual(hover_copybook?.length, 1);
     assert.strictEqual(hover_copybook[0].contents.length, 1);
-    assert.strictEqual(
-      normalizeLineEndings(
-        (hover_copybook[0].contents[0] as vscode.MarkdownString).value,
-      ),
-      normalizeLineEndings(`\`\`\`cobol
+    const hoverContent = (
+      hover_copybook[0].contents[0] as vscode.MarkdownString
+    ).value;
+    assert.ok(
+      hoverContent.includes(`\`\`\`cobol
+       PARAG3.
+           DISPLAY 'PARAG3'.
+
+\`\`\``),
+    );
+    assert.ok(
+      hoverContent.includes(`\`\`\`cobol
        PARAG2.
            DISPLAY 'PARAG2'.
 
-\`\`\`
-
-_NOTE: other versions exist due to replac(e/ing) or multiple use of same copybook_`),
+\`\`\``),
     );
+
+    assert.ok(
+      hoverContent.includes(
+        `_NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copybook_`,
+      ),
+    );
+  });
+
+  test("hover over copybook - in a nested structure", async () => {
+    await helper.updateConfig("basic.json");
+    const editor = await helper.showDocument("HOVER_COPYBOOK_NESTED.CBL");
+    await helper.sleep(1000);
+    const hoverResults_repl = await helper.getHoverContent(
+      editor,
+      new vscode.Position(8, 24),
+    );
+    assert.strictEqual(hoverResults_repl[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hoverResults_repl[0].contents[0] as vscode.MarkdownString).value,
+      ),
+      normalizeLineEndings(`
+\`\`\`cobol
+
+       05 ABC-ID. 
+\`\`\`
+`),
+    );
+    // go to COPYBOOK definition of STRUCT
+    helper.moveCursor(editor, new vscode.Position(11, 26));
+
+    await vscode.commands.executeCommand("editor.action.revealDefinition");
+    let editor_copybook: vscode.TextEditor | undefined;
+    await helper.waitFor(() => {
+      editor_copybook = vscode.window.activeTextEditor;
+      return !!editor_copybook && editor_copybook !== editor;
+    });
+
+    const hoverResults_var = await helper.getHoverContent(
+      editor_copybook!,
+      new vscode.Position(1, 17),
+    );
+
+    assert.strictEqual(hoverResults_var[0].contents.length, 1);
+    assert.strictEqual(
+      normalizeLineEndings(
+        (hoverResults_var[0].contents[0] as vscode.MarkdownString).value,
+      ),
+      normalizeLineEndings(`
+\`\`\`cobol
+
+       05 ABC-ID. 
+\`\`\`
+`),
+    );
+  });
+
+  test("goto/find refences in a copybook", async () => {
+    const editor = await helper.showDocument("HOVER_COPYBOOK_NESTED.CBL");
+    await helper.sleep(1000);
+
+    // see definition of `SOME` var
+    const var_locations: vscode.Location[] =
+      await vscode.commands.executeCommand(
+        "vscode.executeReferenceProvider",
+        editor.document.uri,
+        new vscode.Position(9, 26),
+      );
+    assert.strictEqual(var_locations.length, 1);
+
+    // goto STRUCT copybook
+    helper.moveCursor(editor, new vscode.Position(11, 26));
+
+    await vscode.commands.executeCommand("editor.action.revealDefinition");
+    let editor_copybook: vscode.TextEditor | undefined;
+    await helper.waitFor(() => {
+      editor_copybook = vscode.window.activeTextEditor;
+      return !!editor_copybook && editor_copybook !== editor;
+    });
+    const prevCopybookUri = editor_copybook?.document.uri;
+
+    // goto REPL1 copybook
+    helper.moveCursor(editor_copybook!, new vscode.Position(1, 16));
+    await vscode.commands.executeCommand("editor.action.revealDefinition");
+    await helper.waitFor(() => {
+      editor_copybook = vscode.window.activeTextEditor;
+      return (
+        !!editor_copybook && editor_copybook.document.uri !== prevCopybookUri
+      );
+    });
+
+    // find all refences for ABC-ID
+    // helper.moveCursor(editor_copybook!, new vscode.Position(1, 14));
+    const locations: vscode.Location[] = await vscode.commands.executeCommand(
+      "vscode.executeReferenceProvider",
+      editor_copybook!.document.uri,
+      new vscode.Position(1, 14),
+    );
+    assert.strictEqual(locations.length, 1);
   });
 });
 

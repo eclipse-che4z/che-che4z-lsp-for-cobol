@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service.delegates.hover;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -54,28 +55,46 @@ public class DefinedAndUsedStructureHoverProvider implements HoverProvider {
         Optional.ofNullable(document)
             .map(CobolDocumentModel::getAnalysisResult)
             .map(AnalysisResult::getRootNode);
-    Optional<Node> nodeOpts =
-        rootNode.flatMap(
-            root ->
-                RangeUtils.findNodeByPosition(
-                    root, position.getTextDocument().getUri(), position.getPosition()));
-    if (!nodeOpts.isPresent()) return null;
-    Node node = nodeOpts.get();
-    if (!(node instanceof DefinedAndUsedStructure)) return null;
-    List<Location> definitions = ((DefinedAndUsedStructure) node).getDefinitions();
-    if (definitions == null || definitions.isEmpty()) return null;
 
-    List<Node> nodeDefinitionLists =
+    Optional<Set<DefinedAndUsedStructure>> definedAndUsedStructures =
+        rootNode
+            .map(
+                root1 ->
+                    RangeUtils.findAllApplicableNodesByPosition(
+                        root1, position.getTextDocument().getUri(), position.getPosition()))
+            .map(
+                nodeList ->
+                    nodeList.stream()
+                        .filter(DefinedAndUsedStructure.class::isInstance)
+                        .map(DefinedAndUsedStructure.class::cast)
+                        .collect(Collectors.toSet()))
+            .filter(listOfNodes -> !listOfNodes.isEmpty());
+
+    if (!definedAndUsedStructures.isPresent() || definedAndUsedStructures.get().isEmpty()) {
+      return null;
+    }
+
+    Set<Location> defs =
+        definedAndUsedStructures.get().stream()
+            .map(DefinedAndUsedStructure::getDefinitions)
+            .flatMap(List::stream)
+            .collect(Collectors.toSet());
+
+    Set<Node> nodeDefinitionLists =
         rootNode
             .get()
             .getDepthFirstStream()
-            .filter(n -> definitions.contains(n.getLocality().toLocation()))
+            .filter(n -> defs.contains(n.getLocality().toLocation()))
             .filter(n -> !VARIABLE_DEFINITION_NODE_TYPES.contains(n.getNodeType()))
-            .collect(Collectors.toList());
-
-    Stream<Hover> hoverStream =
-        getHoverStream(
-            nodeDefinitionLists, (DefinedAndUsedStructure) node, document.getLanguageId());
+            .collect(Collectors.toSet());
+    Stream<Hover> hoverStream = Stream.empty();
+    for (DefinedAndUsedStructure definedAndUsedStructure : definedAndUsedStructures.get()) {
+      hoverStream =
+          Stream.concat(
+              hoverStream,
+              getHoverStream(
+                  nodeDefinitionLists, definedAndUsedStructure, document.getLanguageId()));
+    }
     if (nodeDefinitionLists.size() > 1) {
       hoverStream =
           Stream.concat(
@@ -84,15 +103,14 @@ public class DefinedAndUsedStructureHoverProvider implements HoverProvider {
                   new Hover(
                       new MarkupContent(
                           "text",
-                          "_NOTE: other versions exist due to replac(e/ing) or multiple use of same"
-                              + " copybook_"))));
+                          "_NOTE: multiple versions exist due to replac(e/ing) or multiple use of"
+                              + " same copybook_"))));
     }
-
     return hoverStream.reduce(HoverHandler::mergeHovers).orElse(null);
   }
 
   private static Stream<Hover> getHoverStream(
-      List<Node> nodeDefinitionLists, DefinedAndUsedStructure node, String languageId) {
+      Set<Node> nodeDefinitionLists, DefinedAndUsedStructure node, String languageId) {
     if (node instanceof Describable) {
       return Stream.of(
           new Hover(

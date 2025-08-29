@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
@@ -26,6 +27,7 @@ import org.eclipse.lsp4j.Location;
 
 /** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class ParagraphNameNode extends Node implements DefinedAndUsedStructure, Describable {
   private final String name;
   @Setter private List<Location> definitions = ImmutableList.of();

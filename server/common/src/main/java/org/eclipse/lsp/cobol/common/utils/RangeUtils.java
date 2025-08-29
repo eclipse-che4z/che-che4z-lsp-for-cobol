@@ -15,8 +15,11 @@
 
 package org.eclipse.lsp.cobol.common.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -28,7 +31,7 @@ import org.eclipse.lsp4j.Range;
 public class RangeUtils {
 
   /**
-   * Find the syntax tree node that contains the position.
+   * Find the first syntax tree node that contains the position.
    *
    * @param uri the uri of the node locality
    * @param node a root node for finding
@@ -39,18 +42,75 @@ public class RangeUtils {
     Node candidate = null;
     for (Node child : node.getChildren()) {
       if (isFromCopybook(uri, child)) {
-        candidate = child;
+        candidate = getCandidate(uri, child, candidate);
       }
 
       if (isInside(uri, position, child.getLocality())) {
-        candidate = child;
+        candidate = getCandidate(uri, child, candidate);
       }
       Optional<Node> nodeByPosition = findNodeByPosition(child, uri, position);
       if (nodeByPosition.isPresent()) {
-        return nodeByPosition;
+        return Optional.ofNullable(getCandidate(uri, nodeByPosition.get(), candidate));
       }
     }
     return candidate == null ? Optional.empty() : Optional.of(candidate);
+  }
+
+  private static Node getCandidate(String uri, Node child, Node candidate) {
+    if (candidate == null) {
+      candidate = child;
+    } else if (child.getLocality().getUri().equals(uri)
+        && RangeUtils.isInside(
+            child.getLocality().getRange(), candidate.getLocality().getRange())) {
+      candidate = child;
+    }
+    return candidate;
+  }
+
+  /**
+   * Find all the syntax tree node that contains the position. This is useful only in context of a
+   * copybook. For e.g.
+   *
+   * {@snippet :
+   * 01 A.
+   *     COPY ABC.
+   * 01 B.
+   *     COPY ABC.
+   * }
+   *
+   * Any position inside copybook ABC is present at Group Variable nodes namely A and B.
+   *
+   * @param uri the uri of the node locality
+   * @param node a root node for finding
+   * @param position a cursor position
+   * @return the found node
+   */
+  public static List<Node> findAllApplicableNodesByPosition(
+      Node node, String uri, Position position) {
+    List<Node> result = new ArrayList<>();
+    findAllApplicableNodesByPositionImpl(result, node, uri, position);
+    return result;
+  }
+
+  private static void findAllApplicableNodesByPositionImpl(
+      List<Node> result, Node node, String uri, Position position) {
+    Node candidate = null;
+    for (Node child : node.getChildren()) {
+      if (isInside(uri, position, child.getLocality())) {
+        candidate = getCandidate(uri, child, candidate);
+      }
+      findAllApplicableNodesByPositionImpl(result, child, uri, position);
+    }
+    if (candidate != null) {
+      Node finalCandidate = candidate;
+      boolean shouldAdd =
+          result.stream()
+              .map(n -> n.getNearestParent(finalCandidate::equals))
+              .noneMatch(Optional::isPresent);
+      if (shouldAdd && finalCandidate instanceof DefinedAndUsedStructure) {
+        result.add(finalCandidate);
+      }
+    }
   }
 
   private boolean isFromCopybook(String uri, Node node) {
@@ -96,10 +156,7 @@ public class RangeUtils {
     if (scope.getStart() != null && compareTo(range.getStart(), scope.getStart()) < 0) {
       return false;
     }
-    if (scope.getEnd() != null && compareTo(range.getEnd(), scope.getEnd()) > 0) {
-      return false;
-    }
-    return true;
+    return scope.getEnd() == null || compareTo(range.getEnd(), scope.getEnd()) <= 0;
   }
 
   /**
