@@ -16,7 +16,6 @@ import * as vscode from "vscode";
 export interface RenumberParameters {
   start: number;
   end: number;
-  multiplier: number;
   digits: number;
 }
 
@@ -25,13 +24,11 @@ const maxLines = 999999;
 export const RENUM_LEFT: RenumberParameters = {
   start: 0,
   end: 6,
-  multiplier: 100,
   digits: 6,
 };
 export const RENUM_RIGHT: RenumberParameters = {
   start: 72,
   end: 80,
-  multiplier: 1000,
   digits: 8,
 };
 
@@ -53,7 +50,7 @@ export function renumberLines(
     const line = activeEditor.document.lineAt(i);
     const text = line.text;
 
-    const value = getSequentialNumber(i, params.multiplier, params.digits);
+    const value = getSequentialNumber(i, params.digits, lineCount);
     const range = new vscode.Range(
       new vscode.Position(i, params.start),
       new vscode.Position(i, params.end),
@@ -97,9 +94,19 @@ export function unNumberLines(
 
 export function getSequentialNumber(
   line: number,
-  multiplier: number,
   digits: number,
+  totalLineCount: number,
 ): string {
-  const divider = line > 99999 ? 100 : line > 9999 ? 10 : 1;
-  return ((line + 1) * (multiplier / divider)).toString().padStart(digits, "0");
+  let ext = 3;
+  if (digits === 6) {
+    ext = 2;
+    if (totalLineCount > 9999) ext = 1;
+    if (totalLineCount > 99999) ext = 0;
+  }
+
+  let str = (line + 1).toString().padStart(digits - ext, "0");
+  if (str.length < digits) {
+    str = str.padEnd(digits, "0");
+  }
+  return str;
 }

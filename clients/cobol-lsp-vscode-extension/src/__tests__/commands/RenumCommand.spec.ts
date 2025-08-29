@@ -185,16 +185,22 @@ describe("Tests renumber/unnumber commmands", () => {
     unNumberLines(mockEditor, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
   });
-  it("check getSequentialNumber against digit & multiplier", () => {
-    expect(getSequentialNumber(0, 100, 6)).toEqual("000100");
+  it("check getSequentialNumber against digit 6", () => {
+    expect(getSequentialNumber(0, 6, 100)).toEqual("000100");
   });
-  it("check getSequentialNumber against line & multiplier & digit", () => {
-    expect(getSequentialNumber(4, 1000, 8)).toEqual("00005000");
+  it("check getSequentialNumber against line & digit 8", () => {
+    expect(getSequentialNumber(4, 8, 50000)).toEqual("00005000");
   });
-  it("check getSequentialNumber against line & multiplier & digit", () => {
-    expect(getSequentialNumber(1249, 1000, 8)).toEqual("01250000");
+  it("check getSequentialNumber against line 1250 & digit 8", () => {
+    expect(getSequentialNumber(1249, 8, 1265)).toEqual("01250000");
   });
   it("cheks getSequentialNumber returns properiate value when multiplication exceeds line number", () => {
-    expect(getSequentialNumber(999998, 100, 6)).toEqual("999999");
+    expect(getSequentialNumber(999998, 6, 999999)).toEqual("999999");
+  });
+  it("check getSequentialNumber against digit 6 & totalLine is more than 9999", () => {
+    expect(getSequentialNumber(0, 6, 11000)).toEqual("000010");
+  });
+  it("check getSequentialNumber against digit 6 & totalLine is more than 99999", () => {
+    expect(getSequentialNumber(0, 6, 110000)).toEqual("000001");
   });
 });
