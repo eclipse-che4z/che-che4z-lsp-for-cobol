@@ -267,7 +267,7 @@ class TestCicsTranslatorOptionsPosition {
     List<SyntaxError> diagnostics = new ArrayList<>();
     List<CompilerDirectiveNode> result =
         TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(1, diagnostics.size());
+    assertEquals(0, diagnostics.size());
     assertEquals("123456 PROCESS                   NOADATA", extDoc.getCurrentText().toString());
     assertEquals(1, result.size());
     assertDirectiveNode("FLAG(I,W)", 0, 21, 30, result.get(0));

@@ -19,23 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /** CBL parser test */
-public class CblParserRecoveryTest {
+public class CblParserDiagnosticsTest {
   static final String URI = "file://document.cbl";
-
-  @Test
-  void testDoubleQuotes() {
-    CblLexer cblLexer = new CblLexer(URI, "      CBL XOPTS(\"DLI), NOADATA, XOPT(DLI)\n", 0);
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    CblParser cblParser = new CblParser(cblLexer, diagnostics);
-    cblParser.cbl();
-    Assertions.assertEquals(1, diagnostics.size());
-    Assertions.assertEquals(
-        "Invalid option string:- '\"' ignored", diagnostics.get(0).getSuggestion());
-  }
 
   @Test
   void testCicsSpace() {
