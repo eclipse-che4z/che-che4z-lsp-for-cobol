@@ -97,22 +97,22 @@
       },
       {
         "command": "cobol-lsp.editor.renumRight",
-        "title": "73-80",
+        "title": "Renumber Columns 73-80",
         "category": "COBOL"
       },
       {
         "command": "cobol-lsp.editor.renumLeft",
-        "title": "Cobol",
+        "title": "Renumber Columns 1-8",
         "category": "COBOL"
       },
       {
         "command": "cobol-lsp.editor.unNumberLeft",
-        "title": "Cobol",
+        "title": "Unnumber Columns 1-8",
         "category": "COBOL"
       },
       {
         "command": "cobol-lsp.editor.unNumberRight",
-        "title": "73-80",
+        "title": "Unnumber Columns 73-80",
         "category": "COBOL"
       }
     ],
