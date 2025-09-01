@@ -65,36 +65,6 @@ const editMock: vscode.TextEditorEdit = {
   delete: jest.fn(),
   setEndOfLine: jest.fn(),
 };
-const mockEditor: vscode.TextEditor = {
-  document: mockDocument,
-  selection: new vscode.Selection(
-    new vscode.Position(0, 0),
-    new vscode.Position(0, 0),
-  ),
-  selections: [],
-  visibleRanges: [],
-  options: {},
-  viewColumn: 1,
-  edit: jest
-    .fn()
-    .mockImplementation(
-      (callback: (editBuilder: vscode.TextEditorEdit) => void) => {
-        const builder: vscode.TextEditorEdit = {
-          replace: replaceMock,
-          insert: jest.fn(),
-          delete: jest.fn(),
-          setEndOfLine: jest.fn(),
-        };
-        callback(builder);
-        return true;
-      },
-    ),
-  insertSnippet: jest.fn(),
-  setDecorations: jest.fn(),
-  revealRange: jest.fn(),
-  show: jest.fn(),
-  hide: jest.fn(),
-};
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -130,7 +100,7 @@ describe("Tests renumber/unnumber commmands", () => {
     );
   });
   it("Each available line has been changed", () => {
-    Object.defineProperty(mockEditor.document, "lineCount", {
+    Object.defineProperty(mockDocument, "lineCount", {
       value: 100,
       configurable: true,
     });
@@ -138,7 +108,7 @@ describe("Tests renumber/unnumber commmands", () => {
     expect(replaceMock).toHaveBeenCalledTimes(100);
   });
   it("no changes if document consists more than 999999 lines", () => {
-    Object.defineProperty(mockEditor.document, "lineCount", {
+    Object.defineProperty(mockDocument, "lineCount", {
       value: 1000000,
       configurable: true,
     });
@@ -146,11 +116,11 @@ describe("Tests renumber/unnumber commmands", () => {
     expect(replaceMock).toHaveBeenCalledTimes(0);
   });
   it("no changes if line starts with * char", () => {
-    Object.defineProperty(mockEditor.document, "lineCount", {
+    Object.defineProperty(mockDocument, "lineCount", {
       value: 1,
       configurable: true,
     });
-    mockEditor.document.lineAt = jest.fn().mockReturnValue({
+    mockDocument.lineAt = jest.fn().mockReturnValue({
       lineNumber: 0,
       text: "*DaCo",
       range: new vscode.Range(
@@ -168,7 +138,7 @@ describe("Tests renumber/unnumber commmands", () => {
     expect(replaceMock).toHaveBeenCalledTimes(0);
   });
   it("Unnumber Lines does not modify the text when there is no text at 72 to 80 colums", () => {
-    mockEditor.document.lineAt = jest.fn().mockReturnValue({
+    mockDocument.lineAt = jest.fn().mockReturnValue({
       lineNumber: 0,
       text: "000100",
       range: new vscode.Range(

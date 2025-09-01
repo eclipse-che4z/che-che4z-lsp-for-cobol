@@ -32,15 +32,22 @@ export const RENUM_RIGHT: RenumberParameters = {
   digits: 8,
 };
 
+type RenumDocument = {
+  lineCount: number;
+  lineAt: (n: number) => {
+    text: string;
+  };
+};
+
 /**
  * Renumber 1-7 or 73-80 columns in active editor.
  *
- * @param document vscode.TextDocument
+ * @param document RenumDocument
  * @param edit  vscode.TextEditorEdit
  * @param params  RenumberParameters
  */
 export function renumberLines(
-  document: vscode.TextDocument,
+  document: RenumDocument,
   edit: vscode.TextEditorEdit,
   params: RenumberParameters,
 ) {
@@ -75,12 +82,12 @@ export function renumberLines(
 /**
  * Remove sequential numbers at 1-7 or 73-80 columns in active editor.
  *
- * @param activeEditor vscode.TextDocument
+ * @param document RenumDocument
  * @param edit  vscode.TextEditorEdit
  * @param params  RenumberParameters
  */
 export function unNumberLines(
-  document: vscode.TextDocument,
+  document: RenumDocument,
   edit: vscode.TextEditorEdit,
   params: RenumberParameters,
 ) {
@@ -88,7 +95,7 @@ export function unNumberLines(
     const text = document.lineAt(i).text;
     if (
       text.charAt(params.start) != "*" &&
-      !document.lineAt(i).isEmptyOrWhitespace
+      text.substring(params.start, params.end).trim() !== ""
     ) {
       const range = new vscode.Range(
         new vscode.Position(i, params.start),
