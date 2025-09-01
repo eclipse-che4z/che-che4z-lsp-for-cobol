@@ -74,7 +74,7 @@ export function renumberLines(
       const placeholderRange = new vscode.Position(i, text.length);
       edit.replace(placeholderRange, " ".repeat(padLength));
     }
-    if (document.lineAt(i).text.charAt(params.start) != "*") {
+    if (text.charAt(params.start) != "*") {
       edit.replace(range, value);
     }
   }

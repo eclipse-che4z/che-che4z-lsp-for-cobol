@@ -107,12 +107,12 @@
       },
       {
         "command": "cobol-lsp.editor.renumLeft",
-        "title": "Renumber Columns 1-8",
+        "title": "Renumber Columns 1-6",
         "category": "COBOL"
       },
       {
         "command": "cobol-lsp.editor.unNumberLeft",
-        "title": "Unnumber Columns 1-8",
+        "title": "Unnumber Columns 1-6",
         "category": "COBOL"
       },
       {
