@@ -69,12 +69,13 @@ export function renumberLines(
       new vscode.Position(i, params.start),
       new vscode.Position(i, params.end),
     );
-    if (text.length <= params.start) {
+    const isCommentedOut = text.charAt(params.start) == "*";
+    if (text.length <= params.start && !isCommentedOut) {
       const padLength = params.start - text.length;
       const placeholderRange = new vscode.Position(i, text.length);
       edit.replace(placeholderRange, " ".repeat(padLength));
     }
-    if (text.charAt(params.start) != "*") {
+    if (!isCommentedOut) {
       edit.replace(range, value);
     }
   }
