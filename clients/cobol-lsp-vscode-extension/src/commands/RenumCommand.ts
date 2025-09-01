@@ -32,7 +32,7 @@ export const RENUM_RIGHT: RenumberParameters = {
   digits: 8,
 };
 
-type RenumDocument = {
+export type RenumDocument = {
   lineCount: number;
   lineAt: (n: number) => {
     text: string;

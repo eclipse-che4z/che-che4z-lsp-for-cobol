@@ -18,44 +18,24 @@ import {
   RENUM_LEFT,
   RENUM_RIGHT,
   renumberLines,
+  RenumDocument,
   unNumberLines,
 } from "../../commands/RenumCommand";
 
-const mockDocument: vscode.TextDocument = {
-  uri: vscode.Uri.file("/test/file.cbl"),
-  fileName: "/test/file.cbl",
-  isUntitled: false,
-  languageId: "COBOL",
-  version: 1,
-  isDirty: false,
-  isClosed: false,
-  save: jest.fn().mockResolvedValue(true),
-  eol: 1,
-  lineCount: 1,
-  lineAt: jest.fn().mockReturnValue({
-    lineNumber: 0,
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
-    range: new vscode.Range(
-      new vscode.Position(0, 0),
-      new vscode.Position(0, 11),
-    ),
-    rangeIncludingLineBreak: new vscode.Range(
-      new vscode.Position(0, 0),
-      new vscode.Position(0, 12),
-    ),
-    firstNonWhitespaceCharacterIndex: 0,
-    isEmptyOrWhitespace: false,
-  }),
-  offsetAt: jest.fn().mockReturnValue(0),
-  positionAt: jest.fn().mockReturnValue(new vscode.Position(0, 0)),
-  getText: jest.fn().mockReturnValue("Content Text"),
-  getWordRangeAtPosition: jest
-    .fn()
-    .mockReturnValue(
-      new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 5)),
-    ),
-  validateRange: jest.fn((range) => range),
-  validatePosition: jest.fn((pos) => pos),
+const mockLines: string[] = [
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
+];
+
+const mockDocument: RenumDocument = {
+  get lineCount() {
+    return mockLines.length;
+  },
+  lineAt(i) {
+    return { text: mockLines[i] };
+  },
 };
 const replaceMock = jest.fn();
 
@@ -100,12 +80,8 @@ describe("Tests renumber/unnumber commmands", () => {
     );
   });
   it("Each available line has been changed", () => {
-    Object.defineProperty(mockDocument, "lineCount", {
-      value: 100,
-      configurable: true,
-    });
     renumberLines(mockDocument, editMock, RENUM_LEFT);
-    expect(replaceMock).toHaveBeenCalledTimes(100);
+    expect(replaceMock).toHaveBeenCalledTimes(4);
   });
   it("no changes if document consists more than 999999 lines", () => {
     Object.defineProperty(mockDocument, "lineCount", {
