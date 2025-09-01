@@ -96,6 +96,11 @@
         "category": "COBOL"
       },
       {
+        "command": "cobol-lsp.configuration.create-sample",
+        "title": "Create sample configuration files",
+        "category": "COBOL"
+      },
+      {
         "command": "cobol-lsp.editor.renumRight",
         "title": "Renumber Columns 73-80",
         "category": "COBOL"

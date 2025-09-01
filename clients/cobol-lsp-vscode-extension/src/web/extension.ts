@@ -25,6 +25,7 @@ import { SubroutinesCompletionsProvider } from "../services/subroutines/Subrouti
 import { CopybooksCompletionProvider } from "../services/copybook/CopybooksCompletionProvider";
 import { initializeExternalAPIs } from "../services/ExternalAPIsService";
 import { outputChannel } from "../services/util/OutputChannel";
+import { createSampleConfiguration } from "../commands/CreateSampleConfiguration";
 
 export async function activate(context: ExtensionContext) {
   await initTelemetry(context);
@@ -52,6 +53,13 @@ export async function activate(context: ExtensionContext) {
         outputChannel.appendLine("Executing Insert Cobol Snippet command");
         await pickSnippet();
       },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "cobol-lsp.configuration.create-sample",
+      createSampleConfiguration,
     ),
   );
 

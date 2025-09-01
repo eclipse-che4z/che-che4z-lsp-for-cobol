@@ -35,6 +35,8 @@ export const findFilesResult: {
   [path: string]: URI[];
 } = {};
 
+export const showQuickPickMock = jest.fn();
+
 const workspaceFoldersMock = [
   {
     name: "workspace",
@@ -218,6 +220,7 @@ export namespace window {
     .mockImplementation((_options, task: () => void) => {
       task();
     });
+  export const showQuickPick = showQuickPickMock;
 }
 export enum StatusBarAlignment {
   Right,
