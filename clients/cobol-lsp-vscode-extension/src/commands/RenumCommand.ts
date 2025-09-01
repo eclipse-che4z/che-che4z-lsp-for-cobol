@@ -88,7 +88,7 @@ export function unNumberLines(
     const text = document.lineAt(i).text;
     if (
       text.charAt(params.start) != "*" &&
-      text.substring(params.start, params.end).trim() !== ""
+      !document.lineAt(i).isEmptyOrWhitespace
     ) {
       const range = new vscode.Range(
         new vscode.Position(i, params.start),

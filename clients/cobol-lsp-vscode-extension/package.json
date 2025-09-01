@@ -194,10 +194,6 @@
       {
         "id": "renumSubMenu",
         "label": "Renumber Sequence Numbers"
-      },
-      {
-        "id": "unnumSubMenu",
-        "label": "Unnumber Sequence Numbers"
       }
     ],
     "languages": [
