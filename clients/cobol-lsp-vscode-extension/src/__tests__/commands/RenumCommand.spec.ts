@@ -23,7 +23,7 @@ import {
 } from "../../commands/RenumCommand";
 
 const mockLines: string[] = [
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque",
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
@@ -59,10 +59,19 @@ describe("Tests renumber/unnumber commmands", () => {
       "000100",
     );
   });
-  it("Right action changes 8 digits at 72 to 80 columns", () => {
+  it("Right action changes 8 digits at 72 to 80 columns & padding applied when text length is less than column start", () => {
     renumberLines(mockDocument, editMock, RENUM_RIGHT);
-    expect(replaceMock).toHaveBeenCalledWith(
-      { end: { character: 80, line: 0 }, start: { character: 72, line: 0 } },
+    expect(replaceMock).toHaveBeenNthCalledWith(
+      1,
+      {
+        end: { character: 80, line: 0 },
+        start: { character: 64, line: 0 },
+      },
+      " ".repeat(8),
+    );
+    expect(replaceMock).toHaveBeenNthCalledWith(
+      2,
+      { end: { character: 80, line: 0 }, start: { character: 64, line: 0 } },
       "00001000",
     );
   });
@@ -76,7 +85,7 @@ describe("Tests renumber/unnumber commmands", () => {
   it("Unnumber Lines removes sequential numbers at 72 to 80 colums", () => {
     unNumberLines(mockDocument, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenCalledWith(
-      { end: { character: 80, line: 0 }, start: { character: 72, line: 0 } },
+      { end: { character: 80, line: 1 }, start: { character: 72, line: 1 } },
       "        ",
     );
   });
@@ -94,7 +103,7 @@ describe("Tests renumber/unnumber commmands", () => {
   });
   it("Unnumber Lines does not modify the text when there is no text at 72 to 80 colums", () => {
     unNumberLines(mockDocument, editMock, RENUM_RIGHT);
-    expect(replaceMock).toHaveBeenCalledTimes(4);
+    expect(replaceMock).toHaveBeenCalledTimes(3);
   });
   it("check getSequentialNumber against pad 4", () => {
     expect(getSequentialNumber(0, 6, 4)).toEqual("000100");
@@ -144,24 +153,19 @@ describe("Tests renumber/unnumber commmands", () => {
       "lines commented out doesn't modified",
     () => {
       unNumberLines(mockDocument, editMock, RENUM_RIGHT);
-      expect(replaceMock).toHaveBeenCalledTimes(4);
+      expect(replaceMock).toHaveBeenCalledTimes(3);
       expect(replaceMock).toHaveBeenNthCalledWith(
         1,
-        { end: { character: 80, line: 0 }, start: { character: 72, line: 0 } },
-        "        ",
-      );
-      expect(replaceMock).toHaveBeenNthCalledWith(
-        2,
         { end: { character: 80, line: 1 }, start: { character: 72, line: 1 } },
         "        ",
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
-        3,
+        2,
         { end: { character: 80, line: 2 }, start: { character: 72, line: 2 } },
         "        ",
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
-        4,
+        3,
         { end: { character: 80, line: 3 }, start: { character: 72, line: 3 } },
         "        ",
       );
