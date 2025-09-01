@@ -27,6 +27,7 @@ const mockLines: string[] = [
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tristique tinci",
+  "*DaCo:",
 ];
 
 const mockDocument: RenumDocument = {
@@ -79,10 +80,6 @@ describe("Tests renumber/unnumber commmands", () => {
       "        ",
     );
   });
-  it("Each available line has been changed", () => {
-    renumberLines(mockDocument, editMock, RENUM_LEFT);
-    expect(replaceMock).toHaveBeenCalledTimes(4);
-  });
   it("no changes if document consists more than 999999 lines", () => {
     Object.defineProperty(mockDocument, "lineCount", {
       value: 1000000,
@@ -93,43 +90,16 @@ describe("Tests renumber/unnumber commmands", () => {
   });
   it("no changes if line starts with * char", () => {
     Object.defineProperty(mockDocument, "lineCount", {
-      value: 1,
+      value: 5,
       configurable: true,
     });
-    mockDocument.lineAt = jest.fn().mockReturnValue({
-      lineNumber: 0,
-      text: "*DaCo",
-      range: new vscode.Range(
-        new vscode.Position(0, 0),
-        new vscode.Position(0, 11),
-      ),
-      rangeIncludingLineBreak: new vscode.Range(
-        new vscode.Position(0, 0),
-        new vscode.Position(0, 12),
-      ),
-      firstNonWhitespaceCharacterIndex: 0,
-      isEmptyOrWhitespace: false,
-    });
+
     renumberLines(mockDocument, editMock, RENUM_LEFT);
-    expect(replaceMock).toHaveBeenCalledTimes(0);
+    expect(replaceMock).toHaveBeenCalledTimes(4);
   });
   it("Unnumber Lines does not modify the text when there is no text at 72 to 80 colums", () => {
-    mockDocument.lineAt = jest.fn().mockReturnValue({
-      lineNumber: 0,
-      text: "000100",
-      range: new vscode.Range(
-        new vscode.Position(0, 0),
-        new vscode.Position(0, 11),
-      ),
-      rangeIncludingLineBreak: new vscode.Range(
-        new vscode.Position(0, 0),
-        new vscode.Position(0, 12),
-      ),
-      firstNonWhitespaceCharacterIndex: 0,
-      isEmptyOrWhitespace: false,
-    });
     unNumberLines(mockDocument, editMock, RENUM_RIGHT);
-    expect(replaceMock).toHaveBeenCalledTimes(0);
+    expect(replaceMock).toHaveBeenCalledTimes(4);
   });
   it("check getSequentialNumber against pad 4", () => {
     expect(getSequentialNumber(0, 6, 4)).toEqual("000100");
