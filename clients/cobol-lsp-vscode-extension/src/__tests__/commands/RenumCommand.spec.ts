@@ -81,11 +81,11 @@ describe("Tests renumber/unnumber commmands", () => {
     );
   });
   it("no changes if document consists more than 999999 lines", () => {
-    Object.defineProperty(mockDocument, "lineCount", {
-      value: 1000000,
-      configurable: true,
-    });
-    renumberLines(mockDocument, editMock, RENUM_LEFT);
+    const bigMock = {
+      lineCount: 1000000,
+      lineAt: (_) => ({ text: '' }),
+    };
+    renumberLines(bigMock, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
   });
   it("no changes if line starts with * char", () => {
