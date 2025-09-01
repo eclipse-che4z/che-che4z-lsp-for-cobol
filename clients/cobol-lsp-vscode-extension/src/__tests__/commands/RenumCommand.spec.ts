@@ -79,14 +79,14 @@ describe("Tests renumber/unnumber commmands", () => {
     unNumberLines(mockDocument, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledWith(
       { end: { character: 6, line: 0 }, start: { character: 0, line: 0 } },
-      "      ",
+      " ".repeat(6),
     );
   });
   it("Unnumber Lines removes sequential numbers at 72 to 80 colums", () => {
     unNumberLines(mockDocument, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenCalledWith(
       { end: { character: 80, line: 1 }, start: { character: 72, line: 1 } },
-      "        ",
+      " ".repeat(8),
     );
   });
   it("no changes if document consists more than 999999 lines", () => {
@@ -129,22 +129,22 @@ describe("Tests renumber/unnumber commmands", () => {
       expect(replaceMock).toHaveBeenNthCalledWith(
         1,
         { end: { character: 6, line: 0 }, start: { character: 0, line: 0 } },
-        "      ",
+        " ".repeat(6),
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
         2,
         { end: { character: 6, line: 1 }, start: { character: 0, line: 1 } },
-        "      ",
+        " ".repeat(6),
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
         3,
         { end: { character: 6, line: 2 }, start: { character: 0, line: 2 } },
-        "      ",
+        " ".repeat(6),
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
         4,
         { end: { character: 6, line: 3 }, start: { character: 0, line: 3 } },
-        "      ",
+        " ".repeat(6),
       );
     },
   );
@@ -157,17 +157,17 @@ describe("Tests renumber/unnumber commmands", () => {
       expect(replaceMock).toHaveBeenNthCalledWith(
         1,
         { end: { character: 80, line: 1 }, start: { character: 72, line: 1 } },
-        "        ",
+        " ".repeat(8),
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
         2,
         { end: { character: 80, line: 2 }, start: { character: 72, line: 2 } },
-        "        ",
+        " ".repeat(8),
       );
       expect(replaceMock).toHaveBeenNthCalledWith(
         3,
         { end: { character: 80, line: 3 }, start: { character: 72, line: 3 } },
-        "        ",
+        " ".repeat(8),
       );
     },
   );
