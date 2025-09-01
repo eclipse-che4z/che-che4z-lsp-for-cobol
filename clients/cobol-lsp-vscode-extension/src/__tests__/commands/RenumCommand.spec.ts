@@ -89,11 +89,6 @@ describe("Tests renumber/unnumber commmands", () => {
     expect(replaceMock).toHaveBeenCalledTimes(0);
   });
   it("no changes if line starts with * char", () => {
-    Object.defineProperty(mockDocument, "lineCount", {
-      value: 5,
-      configurable: true,
-    });
-
     renumberLines(mockDocument, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(4);
   });
