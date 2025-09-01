@@ -111,4 +111,60 @@ describe("Tests renumber/unnumber commmands", () => {
   it("check getSequentialNumber against digit 6 & totalLine is more than 9999", () => {
     expect(getSequentialNumber(0, 6, 5)).toEqual("000010");
   });
+  it(
+    "check unNumberLines against digit 6 removes numbering at all lines in 1-6 columns & " +
+      "lines commented out doesn't modified",
+    () => {
+      unNumberLines(mockDocument, editMock, RENUM_LEFT);
+      expect(replaceMock).toHaveBeenCalledTimes(4);
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        1,
+        { end: { character: 6, line: 0 }, start: { character: 0, line: 0 } },
+        "      ",
+      );
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        2,
+        { end: { character: 6, line: 1 }, start: { character: 0, line: 1 } },
+        "      ",
+      );
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        3,
+        { end: { character: 6, line: 2 }, start: { character: 0, line: 2 } },
+        "      ",
+      );
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        4,
+        { end: { character: 6, line: 3 }, start: { character: 0, line: 3 } },
+        "      ",
+      );
+    },
+  );
+  it(
+    "check unNumberLines against digit 8 removes numbering at all lines in 73-80 columns & " +
+      "lines commented out doesn't modified",
+    () => {
+      unNumberLines(mockDocument, editMock, RENUM_RIGHT);
+      expect(replaceMock).toHaveBeenCalledTimes(4);
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        1,
+        { end: { character: 80, line: 0 }, start: { character: 72, line: 0 } },
+        "        ",
+      );
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        2,
+        { end: { character: 80, line: 1 }, start: { character: 72, line: 1 } },
+        "        ",
+      );
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        3,
+        { end: { character: 80, line: 2 }, start: { character: 72, line: 2 } },
+        "        ",
+      );
+      expect(replaceMock).toHaveBeenNthCalledWith(
+        4,
+        { end: { character: 80, line: 3 }, start: { character: 72, line: 3 } },
+        "        ",
+      );
+    },
+  );
 });
