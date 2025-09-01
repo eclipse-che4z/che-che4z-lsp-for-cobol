@@ -83,7 +83,7 @@ describe("Tests renumber/unnumber commmands", () => {
   it("no changes if document consists more than 999999 lines", () => {
     const bigMock = {
       lineCount: 1000000,
-      lineAt: (_) => ({ text: '' }),
+      lineAt: (_num: number) => ({ text: "" }),
     };
     renumberLines(bigMock, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
