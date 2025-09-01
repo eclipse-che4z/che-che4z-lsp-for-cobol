@@ -51,7 +51,7 @@ public class CompilerDirectivesStage
   public StageResult<Void> run(
       AnalysisContext ctx, StageResult<List<CompilerDirectiveNode>> prevStageResult) {
     String text = ctx.getExtendedDocument().getCurrentText().toString();
-
+    CompilerDirectivesVisitor visitor = new CompilerDirectivesVisitor(ctx, messageService, null);
     String[] lines = NEW_LINE_PATTERN.split(text);
     for (int i = 0; i < lines.length; i++) {
       Matcher directivesLine = COMPILER_DIRECTIVE_LINE.matcher(lines[i]);
@@ -60,6 +60,7 @@ public class CompilerDirectivesStage
         continue;
       }
       process(
+          visitor,
           directivesLine.group("directives"),
           ctx,
           new Position(i, directivesLine.start("directives")));
@@ -67,11 +68,16 @@ public class CompilerDirectivesStage
       Range range = new Range(new Position(i, 0), new Position(i, lines[i].length()));
       ctx.getExtendedDocument().replace(range, newText);
     }
+    visitor.postProcessDirectives();
 
     return new StageResult<>(null);
   }
 
-  private void process(String directives, AnalysisContext ctx, Position startPosition) {
+  private void process(
+      CompilerDirectivesVisitor visitor,
+      String directives,
+      AnalysisContext ctx,
+      Position startPosition) {
     if (!DIALECT_FILLER_PATTERN.matcher(directives).matches()) {
       CompilerDirectivesLexer lexer =
           new CompilerDirectivesLexer(CharStreams.fromString(directives));
@@ -80,8 +86,8 @@ public class CompilerDirectivesStage
       parser.removeErrorListeners();
       parser.setErrorHandler(new CobolErrorStrategy(messageService));
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
-      new CompilerDirectivesVisitor(ctx, messageService, startPosition)
-          .visit(parser.compilerOptions());
+      visitor.setStartPosition(startPosition);
+      visitor.visit(parser.compilerOptions());
     }
   }
 
