@@ -24,6 +24,49 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
 /** CBL Parser */
 public class CblParser {
+  public static final String[] SIMPLE_CICS_OPTIONS =
+      new String[] {
+        "APOST",
+        "QUOTE",
+        "CBLCARD",
+        "NOCBLCARD",
+        "CICS",
+        "COBOL2",
+        "CO2",
+        "COBOL3",
+        "CO3",
+        "CPSM",
+        "NOCPSM",
+        "DBCS",
+        "DEBUG",
+        "NODEBUG",
+        "DLI",
+        "EDF",
+        "NOEDF",
+        "EXCI",
+        "FEPI",
+        "NOFEPI",
+        "LENGTH",
+        "NOLENGTH",
+        "LIN",
+        "LINKAGE",
+        "NOLINKAGE",
+        "NUM",
+        "NONUM",
+        "OP",
+        "OPTIONS",
+        "NOP",
+        "NOOPTIONS",
+        "Q",
+        "SEQ",
+        "NOSEQ",
+        "SP",
+        "SPIE",
+        "NOSPIE",
+        "SYSEIB",
+        "VBREF",
+        "NOVBREF"
+      };
   private final CblLexer lexer;
   private final List<SyntaxError> diagnostics;
 
@@ -83,24 +126,18 @@ public class CblParser {
   private void parseCicsOptions(List<CblNode> children, boolean force)
       throws CblDiagnosticException {
     children.add(one("("));
-    boolean inApostrophes = isNext("'");
-    if (inApostrophes) {
-      children.add(one("'"));
+    boolean inApostrophesOrQuotes = isNext("'") || isNext("\"");
+    if (inApostrophesOrQuotes) {
+      children.add(or("'", "\""));
     }
-    while (lexer.hasMore() && !(inApostrophes && isNext("'")) && !isNext(")")) {
-      if (isNext("\"")) {
-        // Ignore quotes
-        lexer.next();
-      }
+    while (lexer.hasMore()
+        && !(inApostrophesOrQuotes && (isNext("'") || isNext("\"")))
+        && !isNext(")")) {
       List<CblNode> nodeChildren = new ArrayList<>();
       if (isNext("FLAG") || isNext("F")) {
         nodeChildren.add(or("FLAG", "F"));
         nodeChildren.add(one("("));
         nodeChildren.add(or("E", "I", "S", "U", "W"));
-        if (isNext(",")) {
-          nodeChildren.add(one(","));
-          nodeChildren.add(or("E", "I", "S", "U", "W"));
-        }
         nodeChildren.add(one(")"));
         opt(",").ifPresent(nodeChildren::add);
         children.add(new CblNode(nodeChildren, FLAG));
@@ -114,7 +151,7 @@ public class CblParser {
         opt(",").ifPresent(nodeChildren::add);
         children.add(new CblNode(nodeChildren, LINECOUNT));
         if (isLineNumberWrong(i)) {
-          semanticError(next, "LINECOUNT must be an integer between 10 and 255, or 0.");
+          semanticError(next, "LINECOUNT must be an integer between 1 and 255");
         }
       } else if (isNext("SPACE")) {
         nodeChildren.add(one("SPACE"));
@@ -136,48 +173,7 @@ public class CblParser {
         children.add(new CblNode(nodeChildren, NATLANG));
       } else {
         try {
-          CblToken next =
-              or(
-                  "APOST",
-                  "QUOTE",
-                  "CBLCARD",
-                  "NOCBLCARD",
-                  "CICS",
-                  "COBOL2",
-                  "CO2",
-                  "COBOL3",
-                  "CO3",
-                  "CPSM",
-                  "NOCPSM",
-                  "DBCS",
-                  "DEBUG",
-                  "NODEBUG",
-                  "DLI",
-                  "EDF",
-                  "NOEDF",
-                  "EXCI",
-                  "FEPI",
-                  "NOFEPI",
-                  "LENGTH",
-                  "NOLENGTH",
-                  "LIN",
-                  "LINKAGE",
-                  "NOLINKAGE",
-                  "NUM",
-                  "NONUM",
-                  "OP",
-                  "OPTIONS",
-                  "NOP",
-                  "NOOPTIONS",
-                  "Q",
-                  "SEQ",
-                  "NOSEQ",
-                  "SP",
-                  "SPIE",
-                  "NOSPIE",
-                  "SYSEIB",
-                  "VBREF",
-                  "NOVBREF");
+          CblToken next = or(SIMPLE_CICS_OPTIONS);
           nodeChildren.add(next);
           opt(",").ifPresent(nodeChildren::add);
           children.add(new CblNode(nodeChildren, valueOf(next.getText())));
@@ -192,8 +188,9 @@ public class CblParser {
         }
       }
     }
-    if (inApostrophes) {
-      children.add(one("'"));
+    if (inApostrophesOrQuotes) {
+      opt("'").ifPresent(children::add);
+      opt("\"").ifPresent(children::add);
     }
     children.add(one(")"));
     opt(",").ifPresent(children::add);
@@ -204,11 +201,8 @@ public class CblParser {
   }
 
   private boolean isLineNumberWrong(int nnn) {
-    // nnn must be an integer between 10 and 255, or 0.
+    // nnn must be an integer between 1 and 255.
     if (nnn == 0) {
-      return false;
-    }
-    if (nnn < 10) {
       return true;
     }
     return nnn > 255;
@@ -220,10 +214,6 @@ public class CblParser {
     } catch (NumberFormatException e) {
       throw CblDiagnosticException.expect(next, "integer");
     }
-  }
-
-  private CblNode parseOpts() throws CblDiagnosticException {
-    return parseOption();
   }
 
   private CblNode parseOption() {

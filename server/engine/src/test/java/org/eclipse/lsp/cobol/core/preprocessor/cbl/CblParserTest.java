@@ -45,16 +45,14 @@ public class CblParserTest {
 
   @Test
   void testXOpts2() {
-    CblLexer cblLexer = new CblLexer(URI, "CBL XOPTS(FLAG(I,W))\n", 0);
+    CblLexer cblLexer = new CblLexer(URI, "CBL XOPTS(FLAG(I))\n", 0);
     CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
     CblNode cbl = cblParser.cbl().getChildren().get(0);
-    assertNode(cbl, 0, 20, 2);
+    assertNode(cbl, 0, 18, 2);
     CblNode xopts = cbl.getChildren().get(1);
-    // XOPTS(FLAG(I,W))
-    assertNode(xopts, 4, 20, 4);
-
-    // TODO: FLAG(I,W)
-    assertNode(xopts.getChildren().get(2), 10, 19, 6);
+    // XOPTS(FLAG(I))
+    assertNode(xopts, 4, 18, 4);
+    assertNode(xopts.getChildren().get(2), 10, 17, 4);
   }
 
   @Test

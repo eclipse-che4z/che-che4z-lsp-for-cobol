@@ -35,6 +35,10 @@ public class CobolProgramLayout {
     return getSourceCodeLength() + commentAreaLength;
   }
 
+  public int getAriaAStart() {
+    return getSequenceLength() + getIndicatorLength();
+  }
+
   private final Integer areaALength;
   private final Integer areaBLength;
   private final Integer commentAreaLength;

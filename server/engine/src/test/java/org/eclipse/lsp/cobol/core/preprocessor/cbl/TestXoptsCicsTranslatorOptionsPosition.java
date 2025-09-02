@@ -205,7 +205,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
   void test10() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL NOADATA, XOPTS(FLAG(I,W)), NOADATA                                    "
+            "123456 CBL NOADATA, XOPTS(FLAG(I)), NOADATA                                      "
                 + " 123456",
             URI);
     DialectProcessingContext context = mockContext();
@@ -216,18 +216,18 @@ class TestXoptsCicsTranslatorOptionsPosition {
         TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
     assertEquals(
-        "123456 CBL NOADATA,                   NOADATA                                     123456",
+        "123456 CBL NOADATA,                 NOADATA                                       123456",
         extDoc.getCurrentText().toString());
     assertEquals(1, result.size());
-    assertDirectiveNode("FLAG(I,W)", 0, 26, 35, result.get(0));
+    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
   }
 
   @Test
   void test11() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL NOADATA, XOPTS(FLAG(I,W) LC(10)), NOADATA                                  "
-                + "   123456",
+            "123456 CBL NOADATA, XOPTS(FLAG(I) LC(10)), NOADATA                                    "
+                + "     123456",
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
@@ -237,20 +237,20 @@ class TestXoptsCicsTranslatorOptionsPosition {
         TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
     assertEquals(
-        "123456 CBL NOADATA,                          NOADATA                                    "
+        "123456 CBL NOADATA,                        NOADATA                                        "
             + " 123456",
         extDoc.getCurrentText().toString());
     assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I,W)", 0, 26, 35, result.get(0));
-    assertDirectiveNode("LC(10)", 0, 36, 42, result.get(1));
+    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
+    assertDirectiveNode("LC(10)", 0, 34, 40, result.get(1));
   }
 
   @Test
   void test12() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL NOADATA, XOPTS(FLAG(I,W), DLI), NOADATA                                    "
-                + " 123456",
+            "123456 CBL NOADATA, XOPTS(FLAG(I), DLI), NOADATA                                      "
+                + "   123456",
             URI);
     DialectProcessingContext context = mockContext();
     when(context.getExtendedDocument()).thenReturn(extDoc);
@@ -261,19 +261,19 @@ class TestXoptsCicsTranslatorOptionsPosition {
         TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
     assertEquals(
-        "123456 CBL NOADATA,                        NOADATA                                    "
+        "123456 CBL NOADATA,                      NOADATA                                        "
             + " 123456",
         extDoc.getCurrentText().toString());
     assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I,W)", 0, 26, 35, result.get(0));
-    assertDirectiveNode("DLI", 0, 37, 40, result.get(1));
+    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
+    assertDirectiveNode("DLI", 0, 35, 38, result.get(1));
   }
 
   @Test
   void test13() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL NOADATA, XOPTS(FLAG(I,W), LC(12) DLI), NOADATA                             "
+            "123456 CBL NOADATA, XOPTS(FLAG(I), LC(12) DLI), NOADATA                               "
                 + "        123456",
             URI);
     DialectProcessingContext context = mockContext();
@@ -284,20 +284,20 @@ class TestXoptsCicsTranslatorOptionsPosition {
         TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
     assertEquals(
-        "123456 CBL NOADATA,                               NOADATA                                 "
+        "123456 CBL NOADATA,                             NOADATA                                   "
             + "    123456",
         extDoc.getCurrentText().toString());
     assertEquals(3, result.size());
-    assertDirectiveNode("FLAG(I,W)", 0, 26, 35, result.get(0));
-    assertDirectiveNode("LC(12)", 0, 37, 43, result.get(1));
-    assertDirectiveNode("DLI", 0, 44, 47, result.get(2));
+    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
+    assertDirectiveNode("LC(12)", 0, 35, 41, result.get(1));
+    assertDirectiveNode("DLI", 0, 42, 45, result.get(2));
   }
 
   @Test
   void test14() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL XOPTS(FLAG(I,W), LC(12) DLI), NOADATA                                    "
+            "123456 CBL XOPTS(FLAG(I), LC(12) DLI), NOADATA                                      "
                 + " 123456",
             URI);
     DialectProcessingContext context = mockContext();
@@ -308,13 +308,13 @@ class TestXoptsCicsTranslatorOptionsPosition {
         TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
     assertEquals(0, diagnostics.size());
     assertEquals(
-        "123456 CBL                               NOADATA                                    "
+        "123456 CBL                             NOADATA                                      "
             + " 123456",
         extDoc.getCurrentText().toString());
     assertEquals(3, result.size());
-    assertDirectiveNode("FLAG(I,W)", 0, 17, 26, result.get(0));
-    assertDirectiveNode("LC(12)", 0, 28, 34, result.get(1));
-    assertDirectiveNode("DLI", 0, 35, 38, result.get(2));
+    assertDirectiveNode("FLAG(I)", 0, 17, 24, result.get(0));
+    assertDirectiveNode("LC(12)", 0, 26, 32, result.get(1));
+    assertDirectiveNode("DLI", 0, 33, 36, result.get(2));
   }
 
   @Test
@@ -322,7 +322,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
     ExtendedDocument extDoc =
         new ExtendedDocument(
             "\n"
-                + "123456 CBL XOPTS(FLAG(I, W) SQL, DLI),  NOADATA                                 "
+                + "123456 CBL XOPTS(FLAG(I) SQL, DLI),  NOADATA                                    "
                 + "    123456",
             URI);
     DialectProcessingContext context = mockContext();
@@ -334,12 +334,12 @@ class TestXoptsCicsTranslatorOptionsPosition {
     assertEquals(0, diagnostics.size());
     assertEquals(
         "\n"
-            + "123456 CBL XOPTS(           SQL     ),  NOADATA                                    "
+            + "123456 CBL XOPTS(        SQL     ),  NOADATA                                       "
             + " 123456",
         extDoc.getCurrentText().toString());
     assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I,W)", 1, 17, 27, result.get(0));
-    assertDirectiveNode("DLI", 1, 33, 36, result.get(1));
+    assertDirectiveNode("FLAG(I)", 1, 17, 24, result.get(0));
+    assertDirectiveNode("DLI", 1, 30, 33, result.get(1));
   }
 
   @Test
@@ -364,7 +364,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
   void test17() {
     ExtendedDocument extDoc =
         new ExtendedDocument(
-            "123456 CBL XOPTS(FLAG(I,W), DLI)                                                    "
+            "123456 CBL XOPTS(FLAG(I), DLI)                                                      "
                 + " 123456",
             URI);
     DialectProcessingContext context = mockContext();
@@ -376,8 +376,8 @@ class TestXoptsCicsTranslatorOptionsPosition {
     assertEquals(0, diagnostics.size());
     assertEquals("", extDoc.getCurrentText().toString());
     assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I,W)", 0, 17, 26, result.get(0));
-    assertDirectiveNode("DLI", 0, 28, 31, result.get(1));
+    assertDirectiveNode("FLAG(I)", 0, 17, 24, result.get(0));
+    assertDirectiveNode("DLI", 0, 26, 29, result.get(1));
   }
 
   @Test
@@ -409,6 +409,7 @@ class TestXoptsCicsTranslatorOptionsPosition {
   private static DialectProcessingContext mockContext() {
     DialectProcessingContext ctx = mock(DialectProcessingContext.class);
     when(ctx.getLanguageId()).thenReturn("cobol");
+    when(ctx.getLayout()).thenCallRealMethod();
     return ctx;
   }
 }

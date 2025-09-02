@@ -114,7 +114,6 @@ public class TestCicsAcquireTerminal {
                 "Invalid option provided: USERDATALEN without USERDATA",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
-        "SP",
         "SP");
   }
 

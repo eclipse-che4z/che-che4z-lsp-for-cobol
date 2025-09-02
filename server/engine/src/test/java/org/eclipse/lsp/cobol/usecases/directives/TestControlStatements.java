@@ -45,6 +45,7 @@ class TestControlStatements {
         Arguments.of("CICS"),
         Arguments.of("NOCICS"),
         Arguments.of("CICS('APOST')"),
+        Arguments.of("CICS(\"APOST\")"),
         Arguments.of("CODEPAGE(1140)"),
         Arguments.of("CP(1140)"),
         Arguments.of("CURRENCY($)"),

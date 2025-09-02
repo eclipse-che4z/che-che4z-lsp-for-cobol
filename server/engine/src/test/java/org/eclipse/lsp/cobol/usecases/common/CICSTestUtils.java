@@ -62,10 +62,10 @@ public class CICSTestUtils {
     instances.replaceAll(String.join("", Collections.nCopies(12, " "))::concat);
     List<String> compilerOptionsList =
         Arrays.stream(compilerOptions)
-            .map(compilerOption -> compilerOption = "       CBL CICS('" + compilerOption + "')")
+            .map(compilerOption -> "       CBL CICS(\"" + compilerOption + "\")")
             .collect(Collectors.toList());
 
-    ArrayList<String> base = new ArrayList<String>(Arrays.asList(BASE_TEXT.split("\n")));
+    ArrayList<String> base = new ArrayList<>(Arrays.asList(BASE_TEXT.split("\n")));
     base.addAll(0, compilerOptionsList);
     base.addAll(instances);
     if (errorTags == null) base.add(END_EXEC);

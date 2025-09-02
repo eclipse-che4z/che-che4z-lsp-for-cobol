@@ -44,7 +44,11 @@ public class CblDiagnosticException extends Exception {
    * @return CBL diagnostic exception
    */
   public static CblDiagnosticException expect(CblToken token, String... variants) {
-    String s = "Expect one of tokens: " + String.join(", ", variants);
+    String s =
+        "Unexpected token: "
+            + token.getText()
+            + ". Expect one of tokens: "
+            + String.join(", ", variants);
     return new CblDiagnosticException(token, ERROR, s);
   }
 

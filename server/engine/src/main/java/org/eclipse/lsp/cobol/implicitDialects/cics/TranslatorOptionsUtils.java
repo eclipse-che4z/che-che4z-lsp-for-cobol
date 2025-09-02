@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -32,7 +31,6 @@ import org.eclipse.lsp4j.Range;
 
 /** CICS translator options utils */
 public final class TranslatorOptionsUtils {
-  private static final int A_B_ARIA_LEN = 72 - 7;
 
   private static final Pattern CBL_LINE =
       Pattern.compile("^(?<prefix>\\s*(CBL|PROCESS)\\s+)(?<cbl>.*)$", Pattern.CASE_INSENSITIVE);
@@ -48,16 +46,13 @@ public final class TranslatorOptionsUtils {
       DialectProcessingContext context, List<SyntaxError> diagnostics) {
     String[] lines = context.getExtendedDocument().getCurrentText().toString().split("\n\r?");
     List<CompilerDirectiveNode> compilerDirectiveNodes = new ArrayList<>();
+    CobolProgramLayout layout = context.getLayout();
     for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
       String line = lines[lineNumber];
-      if (line.trim().length() <= getAriaA(context.getLanguageId())) {
+      if (line.trim().length() <= layout.getAriaAStart()) {
         continue;
       }
-      Matcher lineMatch =
-          CBL_LINE.matcher(
-              line.substring(
-                  getAriaA(context.getLanguageId()),
-                  Math.min(A_B_ARIA_LEN + getAriaA(context.getLanguageId()), line.length())));
+      Matcher lineMatch = CBL_LINE.matcher(getABContent(line, layout));
       if (!lineMatch.find()) {
         break;
       }
@@ -74,16 +69,22 @@ public final class TranslatorOptionsUtils {
     return compilerDirectiveNodes;
   }
 
+  private static String getABContent(String line, CobolProgramLayout layout) {
+    return line.substring(
+        layout.getAriaAStart(),
+        Math.min(
+            layout.getAreaALength() + layout.getAreaBLength() + layout.getAriaAStart(),
+            line.length()));
+  }
+
   private static String replaceCicsOpts(
       DialectProcessingContext context,
       String line,
       int lineNumber,
       List<CompilerDirectiveNode> directiveNodes,
       List<SyntaxError> diagnostics) {
-    int ariaA = getAriaA(context.getLanguageId());
-    String cblString =
-        StringUtils.repeat(" ", ariaA)
-            + line.substring(ariaA, Math.min(A_B_ARIA_LEN + ariaA, line.length()));
+    int ariaA = context.getLayout().getAriaAStart();
+    String cblString = StringUtils.repeat(" ", ariaA) + getABContent(line, context.getLayout());
     CblLexer lexer = new CblLexer(context.getProgramDocumentUri(), cblString, lineNumber);
     CblNode cbl = new CblParser(lexer, diagnostics).cbl();
 
@@ -99,10 +100,5 @@ public final class TranslatorOptionsUtils {
       return prefix + result + tail;
     }
     return result;
-  }
-
-  private static int getAriaA(String languageId) {
-    CobolProgramLayout layout = CobolLanguageId.MAPPER.get(languageId).getLayout();
-    return layout.getSequenceLength() + layout.getIndicatorLength();
   }
 }
