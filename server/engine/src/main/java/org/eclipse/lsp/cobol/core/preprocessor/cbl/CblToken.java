@@ -50,15 +50,4 @@ public class CblToken extends CblNode {
         + getEnd()
         + '}';
   }
-
-  /**
-   * Provide CBL EOF token
-   *
-   * @param uri - document URI
-   * @param line - line number
-   * @return CBL EOF token
-   */
-  public static CblToken eof(String uri, int line) {
-    return new CblToken(uri, null, line, -1, -1);
-  }
 }

@@ -22,10 +22,7 @@ import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
-import org.eclipse.lsp.cobol.core.preprocessor.cbl.CblLexer;
-import org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNode;
-import org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParser;
-import org.eclipse.lsp.cobol.core.preprocessor.cbl.CicsFilter;
+import org.eclipse.lsp.cobol.core.preprocessor.cbl.*;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -84,9 +81,17 @@ public final class TranslatorOptionsUtils {
       List<CompilerDirectiveNode> directiveNodes,
       List<SyntaxError> diagnostics) {
     int ariaA = context.getLayout().getAriaAStart();
+    String uri = context.getProgramDocumentUri();
     String cblString = StringUtils.repeat(" ", ariaA) + getABContent(line, context.getLayout());
-    CblLexer lexer = new CblLexer(context.getProgramDocumentUri(), cblString, lineNumber);
-    CblNode cbl = new CblParser(lexer, diagnostics).cbl();
+    String[] segments = cblString.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
+    CblToken[] tokens = new CblToken[segments.length];
+    for (int i = 0; i < segments.length; ++i) {
+      int start = i == 0 ? 0 : tokens[i - 1].getEnd();
+      int end = i == 0 ? segments[i].length() : start + segments[i].length();
+      tokens[i] = new CblToken(uri, segments[i], lineNumber, start, end);
+    }
+
+    CblNode cbl = new CblParser(tokens, diagnostics).cbl();
 
     String result = new CicsFilter().createFilteredLine(cbl, directiveNodes);
     if (!result.isEmpty()) {

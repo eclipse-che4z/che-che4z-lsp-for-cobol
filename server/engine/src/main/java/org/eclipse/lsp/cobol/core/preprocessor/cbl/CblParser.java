@@ -20,6 +20,7 @@ import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 
 /** CBL Parser */
@@ -67,11 +68,12 @@ public class CblParser {
         "VBREF",
         "NOVBREF"
       };
-  private final CblLexer lexer;
   private final List<SyntaxError> diagnostics;
+  private final CblToken[] tokens;
+  private Integer pos = 0;
 
-  public CblParser(CblLexer lexer, List<SyntaxError> diagnostics) {
-    this.lexer = lexer;
+  public CblParser(CblToken[] tokens, List<SyntaxError> diagnostics) {
+    this.tokens = tokens;
     this.diagnostics = diagnostics;
   }
 
@@ -84,7 +86,7 @@ public class CblParser {
     List<CblNode> children = new ArrayList<>();
     try {
       children.add(or("CBL", "PROCESS"));
-      while (lexer.hasMore()) {
+      while (hasMore()) {
         children.add(parseFragment());
       }
     } catch (CblDiagnosticException e) {
@@ -94,7 +96,7 @@ public class CblParser {
   }
 
   private CblNode parseFragment() throws CblDiagnosticException {
-    CblToken first = lexer.peek();
+    CblToken first = peek();
 
     if (first.getText().equalsIgnoreCase("XOPTS") || first.getText().equalsIgnoreCase("XOPT")) {
       return parseXOpts();
@@ -130,9 +132,7 @@ public class CblParser {
     if (inApostrophesOrQuotes) {
       children.add(or("'", "\""));
     }
-    while (lexer.hasMore()
-        && !(inApostrophesOrQuotes && (isNext("'") || isNext("\"")))
-        && !isNext(")")) {
+    while (hasMore() && !(inApostrophesOrQuotes && (isNext("'") || isNext("\""))) && !isNext(")")) {
       List<CblNode> nodeChildren = new ArrayList<>();
       if (isNext("FLAG") || isNext("F")) {
         nodeChildren.add(or("FLAG", "F"));
@@ -144,7 +144,7 @@ public class CblParser {
       } else if (isNext("LINECOUNT") || isNext("LC")) {
         nodeChildren.add(or("LINECOUNT", "LC"));
         nodeChildren.add(one("("));
-        CblToken next = lexer.next();
+        CblToken next = next();
         int i = checkIntegerLiteral(next);
         nodeChildren.add(next);
         nodeChildren.add(one(")"));
@@ -156,7 +156,7 @@ public class CblParser {
       } else if (isNext("SPACE")) {
         nodeChildren.add(one("SPACE"));
         nodeChildren.add(one("("));
-        CblToken next = lexer.next();
+        CblToken next = next();
         int i = checkIntegerLiteral(next);
         if (i != 1 && i != 2 && i != 3) {
           semanticError(next, "SPACE must be 1, 2 or 3.");
@@ -219,11 +219,11 @@ public class CblParser {
   private CblNode parseOption() {
     List<CblNode> children = new ArrayList<>();
     int depth = 0;
-    while (lexer.hasMore()) {
+    while (hasMore()) {
       if (depth == 0 && (isNext(")") || isNext(","))) {
         break;
       }
-      CblToken next = lexer.next();
+      CblToken next = next();
       children.add(next);
       if (next.getText().equalsIgnoreCase("(")) {
         depth++;
@@ -236,11 +236,11 @@ public class CblParser {
   }
 
   private boolean isNext(String expected) {
-    return lexer.hasMore() && lexer.peek().getText().equalsIgnoreCase(expected);
+    return hasMore() && peek().getText().equalsIgnoreCase(expected);
   }
 
   private CblToken or(String... variants) throws CblDiagnosticException {
-    CblToken token = lexer.next();
+    CblToken token = next();
     for (String text : variants) {
       if (text.equalsIgnoreCase(token.getText())) {
         return token;
@@ -250,17 +250,53 @@ public class CblParser {
   }
 
   private Optional<CblToken> opt(String expected) {
-    if (!lexer.hasMore()) {
-      return Optional.empty();
-    }
-    CblToken token = lexer.peek();
-    if (token.getText().equalsIgnoreCase(expected)) {
-      return Optional.of(lexer.next());
+    if (hasMore() && peek().getText().equalsIgnoreCase(expected)) {
+      return Optional.of(next());
     }
     return Optional.empty();
   }
 
   private CblToken one(String expected) throws CblDiagnosticException {
     return or(expected);
+  }
+
+  private boolean hasMore() {
+    return peek() != null;
+  }
+
+  private CblToken peek() {
+    for (int i = pos; i < tokens.length; i++) {
+      if (StringUtils.isBlank(tokens[i].getText())) {
+        continue;
+      }
+      return tokens[i];
+    }
+    return null;
+  }
+
+  /**
+   * Get the next token.
+   *
+   * @return the next token
+   */
+  public CblToken next() {
+    int counter = pos;
+    try {
+      if (counter >= tokens.length) {
+        return null;
+      }
+      CblToken cblToken = tokens[counter];
+      if (StringUtils.isBlank(cblToken.getText())) {
+        counter++;
+      }
+      if (counter >= tokens.length) {
+        return null;
+      }
+      cblToken = tokens[counter];
+      counter++;
+      return cblToken;
+    } finally {
+      pos = counter;
+    }
   }
 }

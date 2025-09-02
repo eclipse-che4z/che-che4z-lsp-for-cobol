@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParserTest.parserFor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
@@ -27,9 +28,8 @@ public class CblParserDiagnosticsTest {
 
   @Test
   void testCicsSpace() {
-    CblLexer cblLexer = new CblLexer(URI, "CBL CICS(SPACE(4))\n", 0);
     List<SyntaxError> diagnostics = new ArrayList<>();
-    CblParser cblParser = new CblParser(cblLexer, diagnostics);
+    CblParser cblParser = parserFor("CBL CICS(SPACE(4))\n", diagnostics);
     CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertEquals(1, diagnostics.size());
     assertEquals(18, cbl.getEnd());

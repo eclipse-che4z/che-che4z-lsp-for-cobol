@@ -27,8 +27,8 @@ public class CblParserTest {
 
   @Test
   void testXOpts() {
-    CblLexer cblLexer = new CblLexer(URI, "      CBL XOPTS(DLI), NOADATA, XOPT(DLI)\n", 0);
-    CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
+    CblParser cblParser =
+        parserFor("      CBL XOPTS(DLI), NOADATA, XOPT(DLI)\n", new ArrayList<>());
     CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertNode(cbl, 6, 40, 4);
     CblNode xOpt1 = cbl.getChildren().get(1);
@@ -45,8 +45,7 @@ public class CblParserTest {
 
   @Test
   void testXOpts2() {
-    CblLexer cblLexer = new CblLexer(URI, "CBL XOPTS(FLAG(I))\n", 0);
-    CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
+    CblParser cblParser = parserFor("CBL XOPTS(FLAG(I))\n", new ArrayList<>());
     CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertNode(cbl, 0, 18, 2);
     CblNode xopts = cbl.getChildren().get(1);
@@ -57,8 +56,7 @@ public class CblParserTest {
 
   @Test
   void testCics() {
-    CblLexer cblLexer = new CblLexer(URI, "CBL CICS(DLI)\n", 0);
-    CblParser cblParser = new CblParser(cblLexer, new ArrayList<>());
+    CblParser cblParser = parserFor("CBL CICS(DLI)\n", new ArrayList<>());
     CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertNode(cbl, 0, 13, 2);
     CblNode cics = cbl.getChildren().get(1);
@@ -70,9 +68,8 @@ public class CblParserTest {
 
   @Test
   void testCicsSpace() {
-    CblLexer cblLexer = new CblLexer(URI, "CBL CICS(SPACE(4))\n", 0);
     List<SyntaxError> diagnostics = new ArrayList<>();
-    CblParser cblParser = new CblParser(cblLexer, diagnostics);
+    CblParser cblParser = parserFor("CBL CICS(SPACE(4))\n", diagnostics);
     CblNode cbl = cblParser.cbl().getChildren().get(0);
     assertEquals(1, diagnostics.size());
     assertNode(cbl, 0, 18, 2);
@@ -86,5 +83,23 @@ public class CblParserTest {
     assertEquals(startPos, node.getStart(), "Start pos");
     assertEquals(end, node.getEnd(), "End pos");
     assertEquals(childrenCount, node.getChildren().size(), "Children count");
+  }
+
+  /**
+   * Utility method to create CBL parser
+   * @param text CBL text
+   * @param diagnostics list of syntax errors
+   * @return CBL parser
+   */
+  public static CblParser parserFor(String text, List<SyntaxError> diagnostics) {
+    String[] segments = text.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
+    CblToken[] tokens = new CblToken[segments.length];
+    for (int i = 0; i < segments.length; ++i) {
+      int start = i == 0 ? 0 : tokens[i - 1].getEnd();
+      int end = i == 0 ? segments[i].length() : start + segments[i].length();
+      tokens[i] = new CblToken(URI, segments[i], 0, start, end);
+    }
+
+    return new CblParser(tokens, diagnostics);
   }
 }
