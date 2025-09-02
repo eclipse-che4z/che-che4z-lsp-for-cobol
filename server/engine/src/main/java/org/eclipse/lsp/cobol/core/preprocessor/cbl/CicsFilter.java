@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
@@ -103,8 +104,7 @@ public class CicsFilter {
         case FLAG:
           CblNode lastNode = child.getChildren().get(child.getChildren().size() - 1);
           boolean endsWithComma =
-              lastNode instanceof CblToken
-                  && ((CblToken) lastNode).getTokenType().equals(CblTokenType.COMMA);
+              lastNode instanceof CblToken && Objects.equals(lastNode.getText(), ",");
           int endPos =
               endsWithComma
                   ? child.getChildren().get(child.getChildren().size() - 2).getEnd()
@@ -138,9 +138,7 @@ public class CicsFilter {
       CblNode child = children.get(i);
       if (child instanceof CblToken) {
         sb.append(StringUtils.repeat(" ", child.getStart() - pos));
-        if (i == children.size() - 1
-            && ((CblToken) child).getTokenType() == CblTokenType.COMMA
-            && !needComma) {
+        if (i == children.size() - 1 && Objects.equals(child.getText(), ",") && !needComma) {
           sb.append(" ");
         } else {
           sb.append(child.getText());

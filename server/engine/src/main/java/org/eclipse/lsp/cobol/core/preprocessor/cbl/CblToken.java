@@ -19,7 +19,6 @@ import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.TOKEN;
 /** CBL Token */
 public class CblToken extends CblNode {
   private final String text;
-  private final CblTokenType tokenType;
 
   /**
    * CBL Token
@@ -29,25 +28,14 @@ public class CblToken extends CblNode {
    * @param line - token line number
    * @param start - token start position
    * @param end - token end position
-   * @param type - token type
    */
-  public CblToken(String uri, String text, int line, int start, int end, CblTokenType type) {
+  public CblToken(String uri, String text, int line, int start, int end) {
     super(uri, line, start, end, TOKEN);
     this.text = text;
-    this.tokenType = type;
   }
 
   public String getText() {
     return text;
-  }
-
-  /**
-   * Get CBL token type
-   *
-   * @return CBL token type
-   */
-  public CblTokenType getTokenType() {
-    return tokenType;
   }
 
   @Override
@@ -60,8 +48,6 @@ public class CblToken extends CblNode {
         + getStart()
         + ", end="
         + getEnd()
-        + ", type="
-        + tokenType
         + '}';
   }
 
@@ -73,6 +59,6 @@ public class CblToken extends CblNode {
    * @return CBL EOF token
    */
   public static CblToken eof(String uri, int line) {
-    return new CblToken(uri, null, line, -1, -1, CblTokenType.EOF);
+    return new CblToken(uri, null, line, -1, -1);
   }
 }

@@ -66,8 +66,7 @@ public class CblLexer {
       if (StringUtils.isBlank(segment)) {
         counter++;
         if (full) {
-          return new CblToken(
-              uri, segment, line, ranges[counter - 1], ranges[counter], CblTokenType.WHITESPACE);
+          return new CblToken(uri, segment, line, ranges[counter - 1], ranges[counter]);
         }
       }
       if (counter >= segments.length) {
@@ -75,30 +74,12 @@ public class CblLexer {
       }
       segment = segments[counter];
       counter++;
-      return new CblToken(
-          uri, segment, line, ranges[counter - 1], ranges[counter], getType(segment));
+      return new CblToken(uri, segment, line, ranges[counter - 1], ranges[counter]);
     } finally {
       if (consume) {
         pos = counter;
         peeked = null;
       }
-    }
-  }
-
-  private static CblTokenType getType(String segment) {
-    switch (segment) {
-      case "(":
-        return CblTokenType.PARENTHESIS_OPEN;
-      case ")":
-        return CblTokenType.PARENTHESIS_CLOSE;
-      case ",":
-        return CblTokenType.COMMA;
-      case "'":
-        return CblTokenType.APOSTROPHE;
-      case "\"":
-        return CblTokenType.QUOTE;
-      default:
-        return CblTokenType.GENERAL;
     }
   }
 
@@ -108,6 +89,6 @@ public class CblLexer {
    * @return whether there are more tokens
    */
   public boolean hasMore() {
-    return !peek().getTokenType().equals(CblTokenType.EOF);
+    return peek().getText() != null;
   }
 }
