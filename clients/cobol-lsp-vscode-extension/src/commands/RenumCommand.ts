@@ -64,19 +64,19 @@ export function renumberLines(
     const line = document.lineAt(i);
     const text = line.text;
 
+    const isCommentedOut = text.charAt(params.start) == "*";
+    if (isCommentedOut)
+      continue;
     let value = getSequentialNumber(i, params.digits, pad);
     const range = new vscode.Range(
       new vscode.Position(i, Math.min(text.length, params.start)),
       new vscode.Position(i, params.end),
     );
-    const isCommentedOut = text.charAt(params.start) == "*";
-    if (text.length <= params.start && !isCommentedOut) {
+    if (text.length <= params.start) {
       const padLength = params.start - text.length;
       value = " ".repeat(padLength).concat(value);
     }
-    if (!isCommentedOut) {
-      edit.replace(range, value);
-    }
+    edit.replace(range, value);
   }
 }
 /**
