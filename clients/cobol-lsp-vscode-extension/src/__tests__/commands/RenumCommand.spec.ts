@@ -67,12 +67,7 @@ describe("Tests renumber/unnumber commmands", () => {
         end: { character: 80, line: 0 },
         start: { character: 64, line: 0 },
       },
-      " ".repeat(8),
-    );
-    expect(replaceMock).toHaveBeenNthCalledWith(
-      2,
-      { end: { character: 80, line: 0 }, start: { character: 64, line: 0 } },
-      "00001000",
+      " ".repeat(8).concat("00001000"),
     );
   });
   it("Unnumber Lines removes sequential numbers at 0 to 6 colums", () => {

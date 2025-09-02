@@ -64,7 +64,7 @@ export function renumberLines(
     const line = document.lineAt(i);
     const text = line.text;
 
-    const value = getSequentialNumber(i, params.digits, pad);
+    let value = getSequentialNumber(i, params.digits, pad);
     const range = new vscode.Range(
       new vscode.Position(i, Math.min(text.length, params.start)),
       new vscode.Position(i, params.end),
@@ -72,7 +72,7 @@ export function renumberLines(
     const isCommentedOut = text.charAt(params.start) == "*";
     if (text.length <= params.start && !isCommentedOut) {
       const padLength = params.start - text.length;
-      edit.replace(range, " ".repeat(padLength));
+      value = " ".repeat(padLength).concat(value);
     }
     if (!isCommentedOut) {
       edit.replace(range, value);
