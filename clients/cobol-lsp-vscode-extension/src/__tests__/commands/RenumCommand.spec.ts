@@ -92,7 +92,7 @@ describe("Tests renumber/unnumber commmands", () => {
     };
     renumberLines(bigMock, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
-    expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+    expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       "Renumber sequential numbers is not possible above 999999 lines",
     );
   });

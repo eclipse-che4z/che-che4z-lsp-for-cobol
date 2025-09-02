@@ -53,7 +53,7 @@ export function renumberLines(
 ) {
   const lineCount = document.lineCount;
   if (lineCount > maxLines) {
-    vscode.window.showInformationMessage(
+    vscode.window.showErrorMessage(
       "Renumber sequential numbers is not possible above 999999 lines",
     );
     return;
