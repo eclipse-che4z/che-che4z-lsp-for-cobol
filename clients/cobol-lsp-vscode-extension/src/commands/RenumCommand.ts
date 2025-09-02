@@ -52,21 +52,19 @@ export function renumberLines(
   params: RenumberParameters,
 ) {
   const lineCount = document.lineCount;
-  if (lineCount > maxLines) return;
-  let shift = 3;
-  if (params.digits === 6) {
-    shift = 2;
-    if (lineCount > 9999) shift = 1;
-    if (lineCount > 99999) shift = 0;
+  if (lineCount > maxLines) {
+    vscode.window.showInformationMessage(
+      "Renumber sequential numbers is not possible above 999999 lines",
+    );
+    return;
   }
-  const pad = params.digits - shift;
+
   for (let i = 0; i < lineCount; i++) {
     const line = document.lineAt(i);
     const text = line.text;
-
+    const pad = calculatePadding(params.digits, lineCount);
     const isCommentedOut = text.charAt(params.start) == "*";
-    if (isCommentedOut)
-      continue;
+    if (isCommentedOut) continue;
     let value = getSequentialNumber(i, params.digits, pad);
     const range = new vscode.Range(
       new vscode.Position(i, Math.min(text.length, params.start)),
@@ -112,4 +110,14 @@ export function getSequentialNumber(
   pad: number,
 ): string {
   return (line + 1).toString().padStart(pad, "0").padEnd(digits, "0");
+}
+
+export function calculatePadding(digits: number, lineCount: number) {
+  let shift = 3;
+  if (digits === 6) {
+    shift = 2;
+    if (lineCount > 9999) shift = 1;
+    if (lineCount > 99999) shift = 0;
+  }
+  return digits - shift;
 }

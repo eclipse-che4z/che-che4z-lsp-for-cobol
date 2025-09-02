@@ -14,6 +14,7 @@
 
 import * as vscode from "vscode";
 import {
+  calculatePadding,
   getSequentialNumber,
   RENUM_LEFT,
   RENUM_RIGHT,
@@ -91,6 +92,9 @@ describe("Tests renumber/unnumber commmands", () => {
     };
     renumberLines(bigMock, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
+    expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+      "Renumber sequential numbers is not possible above 999999 lines",
+    );
   });
   it("no changes if line starts with * char", () => {
     renumberLines(mockDocument, editMock, RENUM_LEFT);
@@ -166,4 +170,18 @@ describe("Tests renumber/unnumber commmands", () => {
       );
     },
   );
+  it("check calculatePadding against digit 6 & totalLine is 10", () => {
+    expect(calculatePadding(6, 10)).toEqual(4);
+  });
+  it("check calculatePadding against digit 6 & totalLine is above 9999", () => {
+    expect(calculatePadding(6, 10000)).toEqual(5);
+  });
+  it("check calculatePadding against digit 6 & totalLine is above 99999", () => {
+    expect(calculatePadding(6, 100000)).toEqual(6);
+  });
+  it("check calculatePadding against digit 8 returns 5 always", () => {
+    expect(calculatePadding(8, 1)).toEqual(5);
+    expect(calculatePadding(8, 10000)).toEqual(5);
+    expect(calculatePadding(8, 100000)).toEqual(5);
+  });
 });
