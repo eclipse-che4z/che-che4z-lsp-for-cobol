@@ -17,23 +17,14 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParserTest.parserFor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.junit.jupiter.api.Test;
 
 /** CBL parser test */
 public class CblParserDiagnosticsTest {
-  static final String URI = "file://document.cbl";
-
   @Test
   void testCicsSpace() {
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    CblParser cblParser = parserFor("CBL CICS(SPACE(4))\n", diagnostics);
-    CblNode cbl = cblParser.cbl().getChildren().get(0);
-    assertEquals(1, diagnostics.size());
-    assertEquals(18, cbl.getEnd());
-    assertEquals(2, cbl.getChildren().size());
-    assertEquals("SPACE must be 1, 2 or 3.", diagnostics.get(0).getSuggestion());
+    CblParser cblParser = parserFor("CBL CICS(SPACE(4))\n");
+    cblParser.cbl();
+    assertEquals("SPACE must be 1, 2 or 3.", cblParser.getDiagnostics().get(0).getSuggestion());
   }
 }

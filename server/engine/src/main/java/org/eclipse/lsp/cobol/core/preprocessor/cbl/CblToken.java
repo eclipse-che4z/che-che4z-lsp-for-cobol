@@ -16,7 +16,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
 import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.TOKEN;
 
+import lombok.Getter;
+
 /** CBL Token */
+@Getter
 public class CblToken extends CblNode {
   private final String text;
 
@@ -32,10 +35,6 @@ public class CblToken extends CblNode {
   public CblToken(String uri, String text, int line, int start, int end) {
     super(uri, line, start, end, TOKEN);
     this.text = text;
-  }
-
-  public String getText() {
-    return text;
   }
 
   @Override

@@ -91,19 +91,61 @@ public final class TranslatorOptionsUtils {
       tokens[i] = new CblToken(uri, segments[i], lineNumber, start, end);
     }
 
-    CblNode cbl = new CblParser(tokens, diagnostics).cbl();
+    CblParser cblParser = new CblParser(tokens);
+    CblNode cbl = cblParser.cbl();
+    diagnostics.addAll(cblParser.getDiagnostics());
+    directiveNodes.addAll(cblParser.getDirectiveNodes());
+    if (cbl.getChildren().isEmpty()) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder();
+    serialize(cbl, sb, 0, true);
+    return formatResult(context, line, sb);
+  }
 
-    String result = new CicsFilter().createFilteredLine(cbl, directiveNodes);
+  private static String formatResult(
+      DialectProcessingContext context, String line, StringBuilder sb) {
+    String result = sb.toString();
     if (!result.isEmpty()) {
-      result = result.substring(ariaA);
-      String prefix = line.substring(0, ariaA);
+      CobolProgramLayout l = context.getLayout();
+      int codeEnd = Math.min(l.getSourceCodeLength(), line.length());
+      if (result.length() < codeEnd) {
+        result += StringUtils.repeat(" ", codeEnd - result.length());
+      }
+      result = result.substring(l.getAriaAStart());
+      String prefix = line.substring(0, l.getAriaAStart());
       String tail =
-          line.length() - ariaA - result.length() > 0
-              ? line.substring(ariaA + result.length())
+          line.length() - l.getSourceCodeLength() > 0
+              ? line.substring(l.getSourceCodeLength())
               : "";
 
       return prefix + result + tail;
     }
     return result;
+  }
+
+  private static int serialize(CblNode cbl, StringBuilder sb, int pos, boolean needComma) {
+    List<CblNode> children = cbl.getChildren();
+    long count = children.stream().filter(it -> !(it instanceof CblToken)).count();
+    for (int i = 0; i < children.size(); i++) {
+      CblNode child = children.get(i);
+      if (child instanceof CblToken) {
+        sb.append(StringUtils.repeat(" ", child.getStart() - pos));
+        if (i == children.size() - 1 && Objects.equals(child.getText(), ",") && !needComma) {
+          sb.append(" ");
+        } else {
+          sb.append(child.getText());
+        }
+        pos = child.getEnd();
+      } else {
+        count--;
+        pos = serialize(child, sb, pos, count > 0);
+      }
+    }
+    if (pos != cbl.getEnd()) {
+      sb.append(StringUtils.repeat(" ", cbl.getEnd() - pos));
+      pos = cbl.getEnd();
+    }
+    return pos;
   }
 }

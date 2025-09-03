@@ -17,11 +17,15 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
 import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
+import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
+import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** CBL Parser */
 public class CblParser {
@@ -68,13 +72,13 @@ public class CblParser {
         "VBREF",
         "NOVBREF"
       };
-  private final List<SyntaxError> diagnostics;
+  @Getter private final List<CompilerDirectiveNode> directiveNodes = new ArrayList<>();
+  @Getter private final List<SyntaxError> diagnostics = new ArrayList<>();
   private final CblToken[] tokens;
   private Integer pos = 0;
 
-  public CblParser(CblToken[] tokens, List<SyntaxError> diagnostics) {
+  public CblParser(CblToken[] tokens) {
     this.tokens = tokens;
-    this.diagnostics = diagnostics;
   }
 
   /**
@@ -87,15 +91,19 @@ public class CblParser {
     try {
       children.add(or("CBL", "PROCESS"));
       while (hasMore()) {
-        children.add(parseFragment());
+        parseFragment().ifPresent(children::add);
       }
     } catch (CblDiagnosticException e) {
       diagnostics.add(e.toSyntaxError());
     }
-    return new CblNode(new CblNode(children, CBL), ROOT);
+    CblNode result = new CblNode(new CblNode(children, CBL), ROOT);
+    if (children.size() < 2) {
+      result.getChildren().clear();
+    }
+    return result;
   }
 
-  private CblNode parseFragment() throws CblDiagnosticException {
+  private Optional<CblNode> parseFragment() throws CblDiagnosticException {
     CblToken first = peek();
 
     if (first.getText().equalsIgnoreCase("XOPTS") || first.getText().equalsIgnoreCase("XOPT")) {
@@ -105,24 +113,32 @@ public class CblParser {
     if (first.getText().equalsIgnoreCase("CICS")) {
       return parseCics();
     }
-    return parseOption();
+    return Optional.of(parseOption());
   }
 
-  private CblNode parseCics() throws CblDiagnosticException {
+  private Optional<CblNode> parseCics() throws CblDiagnosticException {
     List<CblNode> children = new ArrayList<>();
     children.add(one("CICS"));
     if (isNext("(")) {
       parseCicsOptions(children, true);
-      return new CblNode(children, CICS_CONTAINER);
+      if (children.stream().anyMatch(it -> !(it instanceof CblToken))) {
+        return Optional.of(new CblNode(children, CICS_CONTAINER));
+      } else {
+        return Optional.empty();
+      }
     }
-    return new CblNode(children, UNKNOWN);
+    return Optional.of(new CblNode(children, UNKNOWN));
   }
 
-  private CblNode parseXOpts() throws CblDiagnosticException {
+  private Optional<CblNode> parseXOpts() throws CblDiagnosticException {
     List<CblNode> children = new ArrayList<>();
     children.add(or("XOPT", "XOPTS"));
     parseCicsOptions(children, false);
-    return new CblNode(children, XOPTS);
+    if (children.stream().anyMatch(it -> !(it instanceof CblToken))) {
+      return Optional.of(new CblNode(children, XOPTS));
+    } else {
+      return Optional.empty();
+    }
   }
 
   private void parseCicsOptions(List<CblNode> children, boolean force)
@@ -140,7 +156,7 @@ public class CblParser {
         nodeChildren.add(or("E", "I", "S", "U", "W"));
         nodeChildren.add(one(")"));
         opt(",").ifPresent(nodeChildren::add);
-        children.add(new CblNode(nodeChildren, FLAG));
+        directiveNodes.add(createDirectiveNode(new CblNode(nodeChildren, FLAG)));
       } else if (isNext("LINECOUNT") || isNext("LC")) {
         nodeChildren.add(or("LINECOUNT", "LC"));
         nodeChildren.add(one("("));
@@ -149,7 +165,7 @@ public class CblParser {
         nodeChildren.add(next);
         nodeChildren.add(one(")"));
         opt(",").ifPresent(nodeChildren::add);
-        children.add(new CblNode(nodeChildren, LINECOUNT));
+        directiveNodes.add(createDirectiveNode(new CblNode(nodeChildren, LINECOUNT)));
         if (isLineNumberWrong(i)) {
           semanticError(next, "LINECOUNT must be an integer between 1 and 255");
         }
@@ -163,20 +179,22 @@ public class CblParser {
         }
         nodeChildren.add(next);
         nodeChildren.add(one(")"));
-        children.add(new CblNode(nodeChildren, SPACE));
+        //        children.add(new CblNode(nodeChildren, SPACE));
+        directiveNodes.add(createDirectiveNode(new CblNode(nodeChildren, SPACE)));
       } else if (isNext("NATLANG")) {
         nodeChildren.add(one("NATLANG"));
         nodeChildren.add(one("("));
         nodeChildren.add(or("CS", "EN", "KA"));
         nodeChildren.add(one(")"));
         opt(",").ifPresent(nodeChildren::add);
-        children.add(new CblNode(nodeChildren, NATLANG));
+        directiveNodes.add(createDirectiveNode(new CblNode(nodeChildren, NATLANG)));
       } else {
         try {
           CblToken next = or(SIMPLE_CICS_OPTIONS);
           nodeChildren.add(next);
           opt(",").ifPresent(nodeChildren::add);
-          children.add(new CblNode(nodeChildren, valueOf(next.getText())));
+          directiveNodes.add(
+              createDirectiveNode(new CblNode(nodeChildren, valueOf(next.getText()))));
         } catch (CblDiagnosticException e) {
           if (force) {
             throw e;
@@ -194,6 +212,22 @@ public class CblParser {
     }
     children.add(one(")"));
     opt(",").ifPresent(children::add);
+  }
+
+  private CompilerDirectiveNode createDirectiveNode(CblNode node) {
+    CblNode lastNode = node.getChildren().get(node.getChildren().size() - 1);
+    boolean endsWithComma = lastNode instanceof CblToken && Objects.equals(lastNode.getText(), ",");
+    int endPos =
+        endsWithComma
+            ? node.getChildren().get(node.getChildren().size() - 2).getEnd()
+            : node.getEnd();
+    String text =
+        endsWithComma ? node.getText().substring(0, node.getText().length() - 1) : node.getText();
+    Range range =
+        new Range(
+            new Position(node.getLine(), node.getStart()), new Position(node.getLine(), endPos));
+    Locality locality = Locality.builder().uri(node.getUri()).range(range).build();
+    return new CompilerDirectiveNode(locality, text, CICSDialect.DIALECT_NAME);
   }
 
   private void semanticError(CblToken next, String message) {
@@ -232,7 +266,7 @@ public class CblParser {
       }
     }
     opt(",").ifPresent(children::add);
-    return new CblNode(children);
+    return new CblNode(children, UNKNOWN);
   }
 
   private boolean isNext(String expected) {

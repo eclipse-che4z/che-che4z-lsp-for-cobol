@@ -14,8 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -37,15 +35,6 @@ public class CblNode {
     this.uri = uri;
     this.children = new ArrayList<>();
     this.type = type;
-  }
-
-  public CblNode(List<CblNode> children) {
-    this.uri = children.get(0).getUri();
-    this.line = children.get(0).getLine();
-    this.start = children.get(0).getStart();
-    this.end = children.get(children.size() - 1).getEnd();
-    this.children = children;
-    this.type = UNKNOWN;
   }
 
   public CblNode(List<CblNode> children, CblNodeTypes type) {
