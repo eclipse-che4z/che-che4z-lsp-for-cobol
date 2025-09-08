@@ -19,7 +19,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -55,11 +54,14 @@ public final class TranslatorOptionsUtils {
       if (!lineMatch.find()) {
         break;
       }
+      int character = lineMatch.start("cbl") + layout.getAriaAStart();
+      Position start = new Position(lineNumber, character);
       Range lineRange =
-          new Range(new Position(lineNumber, 0), new Position(lineNumber, line.length()));
-      String newText =
-          replaceCicsOpts(context, line, lineNumber, compilerDirectiveNodes, diagnostics);
-      if (newText.isEmpty()) {
+          new Range(
+              start,
+              new Position(lineNumber, Math.min(line.length(), layout.getSourceCodeLength())));
+      String newText = replaceCicsOpts(context, line, start, compilerDirectiveNodes, diagnostics);
+      if (isBlank(newText)) {
         context.getExtendedDocument().delete(lineNumber);
       } else {
         context.getExtendedDocument().replace(lineRange, newText);
@@ -71,39 +73,30 @@ public final class TranslatorOptionsUtils {
   private static String replaceCicsOpts(
       DialectProcessingContext context,
       String line,
-      int lineNumber,
+      Position startPos,
       List<CompilerDirectiveNode> directiveNodes,
       List<SyntaxError> diagnostics) {
     CobolProgramLayout layout = context.getLayout();
-    String cblString = StringUtils.repeat(" ", layout.getAriaAStart()) + getABContent(line, layout);
+    String cblString = getCBLContent(line, layout, startPos.getCharacter());
 
-    CblParser cblParser = new CblParser(cblString, context.getProgramDocumentUri(), lineNumber);
+    CblParser cblParser =
+        new CblParser(
+            cblString,
+            context.getProgramDocumentUri(),
+            startPos.getLine(),
+            startPos.getCharacter());
     String serialize = cblParser.extractCicsOptions();
     diagnostics.addAll(cblParser.getDiagnostics());
     directiveNodes.addAll(cblParser.getDirectiveNodes());
-    if (isBlank(serialize)) {
-      return "";
-    }
-    return formatResult(context, line, serialize);
+    return serialize;
   }
 
-  private static String formatResult(DialectProcessingContext context, String line, String result) {
-    if (!result.isEmpty()) {
-      CobolProgramLayout l = context.getLayout();
-      int codeEnd = Math.min(l.getSourceCodeLength(), line.length());
-      if (result.length() < codeEnd) {
-        result += StringUtils.repeat(" ", codeEnd - result.length());
-      }
-      result = result.substring(l.getAriaAStart());
-      String prefix = line.substring(0, l.getAriaAStart());
-      String tail =
-          line.length() - l.getSourceCodeLength() > 0
-              ? line.substring(l.getSourceCodeLength())
-              : "";
-
-      return prefix + result + tail;
-    }
-    return result;
+  private static String getCBLContent(String line, CobolProgramLayout layout, int cblColumn) {
+    return line.substring(
+        cblColumn,
+        Math.min(
+            layout.getAreaALength() + layout.getAreaBLength() + layout.getAriaAStart(),
+            line.length()));
   }
 
   private static String getABContent(String line, CobolProgramLayout layout) {

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblDiagnosticException.expect;
 
 import java.util.*;
 import lombok.Getter;
@@ -81,10 +82,11 @@ public class CblParser {
   private final int lineNumber;
   private Integer pos = 0;
 
-  public CblParser(String line, String uri, int lineNumber) {
+  public CblParser(String line, String uri, int lineNumber, int column) {
     this.uri = uri;
     this.segments = line.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
     this.ranges = new int[segments.length + 1];
+    this.ranges[0] = column;
     this.lineNumber = lineNumber;
     for (int i = 0; i < segments.length; ++i) {
       ranges[i + 1] = ranges[i] + segments[i].length();
@@ -99,7 +101,6 @@ public class CblParser {
   public String extractCicsOptions() {
     boolean empty = true;
     try {
-      or("CBL", "PROCESS");
       while (hasMore()) {
         boolean hasFragment = parseFragment();
         if (empty) {
@@ -160,55 +161,46 @@ public class CblParser {
     }
   }
 
+  private boolean nextCicsOptionCondition(String lexemeChar) {
+    if (!hasMore()) {
+      return false;
+    }
+
+    if (lexemeChar != null) {
+      if (isNext(")")) {
+        semanticError(")", lexemeChar + " expected.");
+        return false;
+      }
+      if ("'".equals(lexemeChar) && isNext("\"")) {
+        semanticError("\"", lexemeChar + " expected.");
+        return false;
+      }
+      if ("\"".equals(lexemeChar) && isNext("'")) {
+        semanticError("'", lexemeChar + " expected.");
+        return false;
+      }
+      return !isNext(lexemeChar);
+    }
+    return !isNext(")");
+  }
+
   private boolean parseCicsOptions(boolean force) throws CblDiagnosticException {
     boolean hasNonCics = false;
     int optStart = pos;
     one("(");
-    boolean inApostrophesOrQuotes = isNext("'") || isNext("\"");
-    if (inApostrophesOrQuotes) {
-      or("'", "\"");
+    String lexemeChar = isNext("'") ? "'" : isNext("\"") ? "\"" : null;
+    if (lexemeChar != null) {
+      one(lexemeChar);
     }
-    while (hasMore() && !(inApostrophesOrQuotes && (isNext("'") || isNext("\""))) && !isNext(")")) {
+    while (nextCicsOptionCondition(lexemeChar)) {
       if (isNext("FLAG") || isNext("F")) {
-        or("FLAG", "F");
-        int start = pos - 1;
-        one("(");
-        or("E", "I", "S", "U", "W");
-        one(")");
-        directiveNodes.add(createDirectiveNode(start, pos));
-        removeSegments(start, pos);
+        parseFlag();
       } else if (isNext("LINECOUNT") || isNext("LC")) {
-        or("LINECOUNT", "LC");
-        int start = pos - 1;
-        one("(");
-        String argument = next();
-        int i = checkIntegerLiteral(argument);
-        one(")");
-        directiveNodes.add(createDirectiveNode(start, pos));
-        removeSegments(start, pos);
-        if (isLineNumberWrong(i)) {
-          semanticError(argument, "LINECOUNT must be an integer between 1 and 255");
-        }
+        parseLineCount();
       } else if (isNext("SPACE")) {
-        one("SPACE");
-        int start = pos - 1;
-        one("(");
-        String next = next();
-        int i = checkIntegerLiteral(next);
-        if (i != 1 && i != 2 && i != 3) {
-          semanticError(next, "SPACE must be 1, 2 or 3.");
-        }
-        one(")");
-        directiveNodes.add(createDirectiveNode(start, pos));
-        removeSegments(start, pos);
+        parseSpace();
       } else if (isNext("NATLANG")) {
-        one("NATLANG");
-        int start = pos - 1;
-        one("(");
-        or("CS", "EN", "KA");
-        one(")");
-        directiveNodes.add(createDirectiveNode(start, pos));
-        removeSegments(start, pos);
+        parseNatlang();
       } else {
         try {
           or(SIMPLE_CICS_OPTIONS);
@@ -229,13 +221,61 @@ public class CblParser {
     if (segments[pos].equals(")")) {
       removePrevComma(optStart, pos);
     }
-    if (inApostrophesOrQuotes) {
+    if (lexemeChar != null) {
       opt("'");
       opt("\"");
     }
     one(")");
     opt(",");
     return hasNonCics;
+  }
+
+  private void parseNatlang() throws CblDiagnosticException {
+    one("NATLANG");
+    int start = pos - 1;
+    one("(");
+    or("CS", "EN", "KA");
+    one(")");
+    directiveNodes.add(createDirectiveNode(start, pos));
+    removeSegments(start, pos);
+  }
+
+  private void parseSpace() throws CblDiagnosticException {
+    one("SPACE");
+    int start = pos - 1;
+    one("(");
+    String next = next();
+    int i = checkIntegerLiteral(next);
+    if (i != 1 && i != 2 && i != 3) {
+      semanticError(next, "SPACE must be 1, 2 or 3.");
+    }
+    one(")");
+    directiveNodes.add(createDirectiveNode(start, pos));
+    removeSegments(start, pos);
+  }
+
+  private void parseLineCount() throws CblDiagnosticException {
+    or("LINECOUNT", "LC");
+    int start = pos - 1;
+    one("(");
+    String argument = next();
+    int i = checkIntegerLiteral(argument);
+    one(")");
+    directiveNodes.add(createDirectiveNode(start, pos));
+    removeSegments(start, pos);
+    if (isLineNumberWrong(i)) {
+      semanticError(argument, "LINECOUNT must be an integer between 1 and 255");
+    }
+  }
+
+  private void parseFlag() throws CblDiagnosticException {
+    or("FLAG", "F");
+    int start = pos - 1;
+    one("(");
+    or("E", "I", "S", "U", "W");
+    one(")");
+    directiveNodes.add(createDirectiveNode(start, pos));
+    removeSegments(start, pos);
   }
 
   private void removePrevComma(int from, int to) {
@@ -283,7 +323,7 @@ public class CblParser {
     try {
       return Integer.parseInt(next);
     } catch (NumberFormatException e) {
-      throw CblDiagnosticException.expect("integer", makeCurrentLocation(), "integer");
+      throw expect("integer", makeCurrentLocation(), "integer");
     }
   }
 
@@ -294,12 +334,15 @@ public class CblParser {
     return new Location(uri, range);
   }
 
-  private void parseOption() {
+  private void parseOption() throws CblDiagnosticException {
     int depth = 0;
     while (hasMore()) {
-      if (depth == 0 && (isNext(")") || isNext(","))) {
-        break;
-      }
+      if (depth == 0)
+        if (isNext(")")) {
+          throw expect(")", makeCurrentLocation());
+        } else if (isNext(",")) {
+          break;
+        }
       String next = next();
       if (next.equalsIgnoreCase("(")) {
         depth++;
@@ -321,7 +364,7 @@ public class CblParser {
         return;
       }
     }
-    throw CblDiagnosticException.expect(token, makeCurrentLocation(), variants);
+    throw expect(token, makeCurrentLocation(), variants);
   }
 
   private void opt(String expected) {
