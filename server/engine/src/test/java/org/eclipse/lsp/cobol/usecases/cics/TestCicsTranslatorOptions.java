@@ -110,7 +110,7 @@ public class TestCicsTranslatorOptions {
   }
 
   public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
-      "       CBL CICS (SP, {'EXCI'|1} \n"
+      "       CBL CICS (SP, {'EXCI'|1}{|2} \n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.  AB01FORE.\n"
           + "       ENVIRONMENT DIVISION.\n"
@@ -144,7 +144,13 @@ public class TestCicsTranslatorOptions {
                     + " NONUM, OP, OPTIONS, NOP, NOOPTIONS, Q, SEQ, NOSEQ, SP, SPIE, NOSPIE,"
                     + " SYSEIB, VBREF, NOVBREF",
                 DiagnosticSeverity.Error,
-                ErrorSource.PREPROCESSING.getText())));
+                ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(new Position(0, 28), new Position(0, 28)),
+                "No viable alternative at input CICS (    'EXCI' ",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test

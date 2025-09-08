@@ -14,7 +14,6 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParserTest.parserFor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,9 @@ import org.junit.jupiter.api.Test;
 public class CblParserDiagnosticsTest {
   @Test
   void testCicsSpace() {
-    CblParser cblParser = parserFor("CBL CICS(SPACE(4))\n");
-    cblParser.cbl();
+
+    CblParser cblParser = new CblParser("CBL CICS(SPACE(4))\n", "file://document.cbl", 0);
+    cblParser.extractCicsOptions();
     assertEquals("SPACE must be 1, 2 or 3.", cblParser.getDiagnostics().get(0).getSuggestion());
   }
 }

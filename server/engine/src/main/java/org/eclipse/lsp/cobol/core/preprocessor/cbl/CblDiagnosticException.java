@@ -43,17 +43,16 @@ public class CblDiagnosticException extends Exception {
    * @param variants variants
    * @return CBL diagnostic exception
    */
-  public static CblDiagnosticException expect(String tokenText, Location location, String... variants) {
+  public static CblDiagnosticException expect(
+      String tokenText, Location location, String... variants) {
     String s =
-        "Unexpected tokenText: "
-            + tokenText
-            + ". Expect one of tokens: "
-            + String.join(", ", variants);
+        "Unexpected token: " + tokenText + ". Expect one of tokens: " + String.join(", ", variants);
     return new CblDiagnosticException(location, tokenText, ERROR, s);
   }
 
   /**
    * Create syntax error from the exception
+   *
    * @param line line
    * @return a new syntax error object
    */
@@ -62,7 +61,7 @@ public class CblDiagnosticException extends Exception {
     seb.errorSource(ErrorSource.PREPROCESSING);
     seb.severity(severity);
     if (token != null) {
-        seb.location(new OriginalLocation(location, null));
+      seb.location(new OriginalLocation(location, null));
     }
     seb.suggestion(this.getMessage());
     return seb.build();

@@ -14,6 +14,8 @@
  */
 package org.eclipse.lsp.cobol.implicitDialects.cics;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,9 +27,6 @@ import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.core.preprocessor.cbl.*;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParser.getABContent;
 
 /** CICS translator options utils */
 public final class TranslatorOptionsUtils {
@@ -79,20 +78,16 @@ public final class TranslatorOptionsUtils {
     String cblString = StringUtils.repeat(" ", layout.getAriaAStart()) + getABContent(line, layout);
 
     CblParser cblParser = new CblParser(cblString, context.getProgramDocumentUri(), lineNumber);
-    CblNode cbl = cblParser.cbl();
+    String serialize = cblParser.extractCicsOptions();
     diagnostics.addAll(cblParser.getDiagnostics());
     directiveNodes.addAll(cblParser.getDirectiveNodes());
-    String serialize = cblParser.serialize();
     if (isBlank(serialize)) {
       return "";
     }
-    StringBuilder sb = new StringBuilder();
-//    serialize(cbl, sb, 0, true);
     return formatResult(context, line, serialize);
   }
 
-  private static String formatResult(
-      DialectProcessingContext context, String line, String result) {
+  private static String formatResult(DialectProcessingContext context, String line, String result) {
     if (!result.isEmpty()) {
       CobolProgramLayout l = context.getLayout();
       int codeEnd = Math.min(l.getSourceCodeLength(), line.length());
@@ -111,28 +106,11 @@ public final class TranslatorOptionsUtils {
     return result;
   }
 
-  private static int serialize(CblNode cbl, StringBuilder sb, int pos, boolean needComma) {
-    List<CblNode> children = cbl.getChildren();
-    long count = children.stream().filter(it -> !(it instanceof CblToken)).count();
-    for (int i = 0; i < children.size(); i++) {
-      CblNode child = children.get(i);
-      if (child instanceof CblToken) {
-        sb.append(StringUtils.repeat(" ", child.getStart() - pos));
-        if (i == children.size() - 1 && Objects.equals(child.getText(), ",") && !needComma) {
-          sb.append(" ");
-        } else {
-          sb.append(child.getText());
-        }
-        pos = child.getEnd();
-      } else {
-        count--;
-        pos = serialize(child, sb, pos, count > 0);
-      }
-    }
-    if (pos != cbl.getEnd()) {
-      sb.append(StringUtils.repeat(" ", cbl.getEnd() - pos));
-      pos = cbl.getEnd();
-    }
-    return pos;
+  private static String getABContent(String line, CobolProgramLayout layout) {
+    return line.substring(
+        layout.getAriaAStart(),
+        Math.min(
+            layout.getAreaALength() + layout.getAreaBLength() + layout.getAriaAStart(),
+            line.length()));
   }
 }

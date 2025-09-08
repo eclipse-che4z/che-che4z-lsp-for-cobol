@@ -271,6 +271,18 @@ class TestCicsTranslatorOptionsPosition {
     assertDirectiveNode("FLAG(I)", 0, 21, 28, result.get(0));
   }
 
+  @Test
+  void testTou14() {
+    ExtendedDocument extDoc = new ExtendedDocument("123456 CBL CICS (SP, 'EXCI')", URI);
+    DialectProcessingContext context = mockContext();
+    when(context.getExtendedDocument()).thenReturn(extDoc);
+    when(context.getProgramDocumentUri()).thenReturn(URI);
+    List<SyntaxError> diagnostics = new ArrayList<>();
+    TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
+    assertEquals(1, diagnostics.size());
+    assertEquals("123456 CBL CICS (    'EXCI')", extDoc.getCurrentText().toString());
+  }
+
   private static void assertDirectiveNode(
       String text, int line, int start, int end, CompilerDirectiveNode node) {
     Position startPos = new Position(line, start);

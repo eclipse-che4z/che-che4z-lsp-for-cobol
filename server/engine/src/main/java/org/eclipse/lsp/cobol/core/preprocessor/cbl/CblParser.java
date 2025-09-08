@@ -17,11 +17,9 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.WARNING;
-import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblNodeTypes.*;
 
 import java.util.*;
 import lombok.Getter;
-import org.eclipse.lsp.cobol.common.dialects.CobolProgramLayout;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
@@ -79,7 +77,6 @@ public class CblParser {
   @Getter private final List<SyntaxError> diagnostics = new ArrayList<>();
   private final String[] segments;
   private final int[] ranges;
-  private final CblToken[] tokens;
   private final String uri;
   private final int lineNumber;
   private Integer pos = 0;
@@ -89,49 +86,43 @@ public class CblParser {
     this.segments = line.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
     this.ranges = new int[segments.length + 1];
     this.lineNumber = lineNumber;
-    CblToken[] tokens = new CblToken[segments.length];
     for (int i = 0; i < segments.length; ++i) {
       ranges[i + 1] = ranges[i] + segments[i].length();
-      tokens[i] = new CblToken(uri, segments[i], lineNumber, ranges[i], ranges[i + 1]);
     }
-    this.tokens = tokens;
   }
 
   /**
-   * Parse CBL
+   * Parse CBL and produce the new CBL line without cics options
    *
-   * @return CBL node
+   * @return new CBL line
    */
-  public CblNode cbl() {
-    List<CblNode> children = new ArrayList<>();
+  public String extractCicsOptions() {
+    boolean empty = true;
     try {
-      boolean empty = true;
-      children.add(or("CBL", "PROCESS"));
+      or("CBL", "PROCESS");
       while (hasMore()) {
-        Optional<CblNode> cblNode = parseFragment();
-        cblNode.ifPresent(children::add);
+        boolean hasFragment = parseFragment();
         if (empty) {
-          empty = !cblNode.isPresent();
+          empty = !hasFragment;
         }
       }
-      if (empty) {
-        removeSegments(0, segments.length);
-      } else {
-        removePrevComma(0, segments.length);
-      }
+      removePrevComma(0, pos);
     } catch (CblDiagnosticException e) {
+      empty = false;
+      removePrevComma(0, pos - 1);
       diagnostics.add(e.toSyntaxError(lineNumber));
     }
-    CblNode result = new CblNode(new CblNode(children, CBL), ROOT);
-    if (children.size() < 2) {
-      result.getChildren().clear();
+    if (empty) {
+      removeSegments(0, segments.length);
     }
-    return result;
+    return serialize();
   }
 
-  private Optional<CblNode> parseFragment() throws CblDiagnosticException {
+  private boolean parseFragment() throws CblDiagnosticException {
     String first = peek();
-
+    if (first == null) {
+      return false;
+    }
     if (first.equalsIgnoreCase("XOPTS") || first.equalsIgnoreCase("XOPT")) {
       return parseXOpts();
     }
@@ -139,48 +130,43 @@ public class CblParser {
     if (first.equalsIgnoreCase("CICS")) {
       return parseCics();
     }
-    return Optional.of(parseOption());
+    parseOption();
+    return true;
   }
 
-  private Optional<CblNode> parseCics() throws CblDiagnosticException {
-    List<CblNode> children = new ArrayList<>();
-    children.add(one("CICS"));
+  private boolean parseCics() throws CblDiagnosticException {
+    one("CICS");
     int start = pos - 1;
     if (isNext("(")) {
-      parseCicsOptions(children, true);
-      if (children.stream().anyMatch(it -> !(it instanceof CblToken))) {
-        return Optional.of(new CblNode(children, CICS_CONTAINER));
+      if (parseCicsOptions(true)) {
+        return true;
       } else {
         removeSegments(start, pos);
-        return Optional.empty();
+        return false;
       }
     }
-    return Optional.of(new CblNode(children, UNKNOWN));
+    return true;
   }
 
-  private Optional<CblNode> parseXOpts() throws CblDiagnosticException {
-    List<CblNode> children = new ArrayList<>();
-    CblToken cblToken = or("XOPT", "XOPTS");
+  private boolean parseXOpts() throws CblDiagnosticException {
+    or("XOPT", "XOPTS");
     int start = pos - 1;
-    children.add(cblToken);
 
-    parseCicsOptions(children, false);
-    if (children.stream().anyMatch(it -> !(it instanceof CblToken))) {
-      return Optional.of(new CblNode(children, XOPTS));
+    if (parseCicsOptions(false)) {
+      return true;
     } else {
       removeSegments(start, pos);
-      return Optional.empty();
+      return false;
     }
   }
 
-  private boolean parseCicsOptions(List<CblNode> children, boolean force)
-      throws CblDiagnosticException {
+  private boolean parseCicsOptions(boolean force) throws CblDiagnosticException {
     boolean hasNonCics = false;
     int optStart = pos;
-    children.add(one("("));
+    one("(");
     boolean inApostrophesOrQuotes = isNext("'") || isNext("\"");
     if (inApostrophesOrQuotes) {
-      children.add(or("'", "\""));
+      or("'", "\"");
     }
     while (hasMore() && !(inApostrophesOrQuotes && (isNext("'") || isNext("\""))) && !isNext(")")) {
       if (isNext("FLAG") || isNext("F")) {
@@ -234,24 +220,21 @@ public class CblParser {
           if (force) {
             throw e;
           } else {
-            List<CblNode> nodeChildren = new ArrayList<>();
-            nodeChildren.add(tokens[pos - 1]);
-            nodeChildren.addAll(parseOption().getChildren());
-            children.add(new CblNode(nodeChildren, UNKNOWN));
+            parseOption();
           }
         }
       }
-      optText(",");
+      opt(",");
     }
     if (segments[pos].equals(")")) {
       removePrevComma(optStart, pos);
     }
     if (inApostrophesOrQuotes) {
-      opt("'").ifPresent(children::add);
-      opt("\"").ifPresent(children::add);
+      opt("'");
+      opt("\"");
     }
-    children.add(one(")"));
-    opt(",").ifPresent(children::add);
+    one(")");
+    opt(",");
     return hasNonCics;
   }
 
@@ -305,78 +288,51 @@ public class CblParser {
   }
 
   private Location makeCurrentLocation() {
-    Position start = new Position(lineNumber, ranges[pos]);
-    Position end = new Position(lineNumber, ranges[pos + 1]);
+    Position start = new Position(lineNumber, ranges[pos - 1]);
+    Position end = new Position(lineNumber, ranges[pos]);
     Range range = new Range(start, end);
     return new Location(uri, range);
   }
 
-  private CblNode parseOption() {
-    List<CblNode> children = new ArrayList<>();
+  private void parseOption() {
     int depth = 0;
     while (hasMore()) {
       if (depth == 0 && (isNext(")") || isNext(","))) {
         break;
       }
       String next = next();
-      children.add(tokens[pos - 1]);
       if (next.equalsIgnoreCase("(")) {
         depth++;
       } else if (next.equalsIgnoreCase(")")) {
         depth--;
       }
     }
-    opt(",").ifPresent(children::add);
-    return new CblNode(children, UNKNOWN);
+    opt(",");
   }
 
   private boolean isNext(String expected) {
     return hasMore() && peek().equalsIgnoreCase(expected);
   }
 
-  private CblToken or(String... variants) throws CblDiagnosticException {
+  private void or(String... variants) throws CblDiagnosticException {
     String token = next();
     for (String text : variants) {
       if (text.equalsIgnoreCase(token)) {
-        return tokens[pos - 1];
+        return;
       }
     }
     throw CblDiagnosticException.expect(token, makeCurrentLocation(), variants);
   }
 
-  private Optional<CblToken> opt(String expected) {
-    if (hasMore() && peek().equalsIgnoreCase(expected)) {
+  private void opt(String expected) {
+    String peek = peek();
+    if (peek != null && peek.equalsIgnoreCase(expected)) {
       next();
-      return Optional.of(tokens[pos - 1]);
     }
-    return Optional.empty();
   }
 
-  private boolean optText(String expected) {
-    if (hasMore() && peek().equalsIgnoreCase(expected)) {
-      next();
-      return true;
-    }
-    return false;
-  }
-
-  private CblToken one(String expected) throws CblDiagnosticException {
-    return or(expected);
-  }
-
-  /**
-   * Calculate the content of Area AB
-   *
-   * @param line - the line
-   * @param layout - the program layout
-   * @return the content of Area AB
-   */
-  public static String getABContent(String line, CobolProgramLayout layout) {
-    return line.substring(
-        layout.getAriaAStart(),
-        Math.min(
-            layout.getAreaALength() + layout.getAreaBLength() + layout.getAriaAStart(),
-            line.length()));
+  private void one(String expected) throws CblDiagnosticException {
+    or(expected);
   }
 
   private boolean hasMore() {
@@ -414,11 +370,7 @@ public class CblParser {
     }
   }
 
-  /**
-   * Produce the new CB line
-   * @return CBL line
-   */
-  public String serialize() {
+  private String serialize() {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < segments.length; i++) {
       if (segments[i] == null) {
