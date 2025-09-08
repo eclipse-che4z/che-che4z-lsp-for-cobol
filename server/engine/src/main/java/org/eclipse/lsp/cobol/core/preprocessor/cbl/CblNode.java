@@ -22,6 +22,7 @@ import lombok.Getter;
 @Getter
 public class CblNode {
   private final List<CblNode> children;
+  private final List<Integer> tokens = new ArrayList<>();
   private final CblNodeTypes type;
   private final String uri;
   private final int line;

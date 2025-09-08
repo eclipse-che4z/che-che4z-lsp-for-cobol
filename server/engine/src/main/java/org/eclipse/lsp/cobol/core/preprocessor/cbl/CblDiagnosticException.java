@@ -16,22 +16,21 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
 import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.*;
 
-import java.util.Optional;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
 
 /** CBL Diagnostic Exception */
 public class CblDiagnosticException extends Exception {
   private static ErrorSeverity severity;
-  private final CblToken token;
+  private final String token;
+  private final Location location;
 
-  CblDiagnosticException(CblToken token, ErrorSeverity severity, String message) {
+  CblDiagnosticException(Location location, String token, ErrorSeverity severity, String message) {
     super(message);
+    this.location = location;
     CblDiagnosticException.severity = severity;
     this.token = token;
   }
@@ -39,44 +38,33 @@ public class CblDiagnosticException extends Exception {
   /**
    * Expect one of variants
    *
-   * @param token token
+   * @param tokenText tokenText
+   * @param location location
    * @param variants variants
    * @return CBL diagnostic exception
    */
-  public static CblDiagnosticException expect(CblToken token, String... variants) {
+  public static CblDiagnosticException expect(String tokenText, Location location, String... variants) {
     String s =
-        "Unexpected token: "
-            + token.getText()
+        "Unexpected tokenText: "
+            + tokenText
             + ". Expect one of tokens: "
             + String.join(", ", variants);
-    return new CblDiagnosticException(token, ERROR, s);
+    return new CblDiagnosticException(location, tokenText, ERROR, s);
   }
 
   /**
    * Create syntax error from the exception
-   *
+   * @param line line
    * @return a new syntax error object
    */
-  public SyntaxError toSyntaxError() {
+  public SyntaxError toSyntaxError(int line) {
     SyntaxError.SyntaxErrorBuilder seb = SyntaxError.syntaxError();
     seb.errorSource(ErrorSource.PREPROCESSING);
     seb.severity(severity);
-    seb.location(
-        new OriginalLocation(
-            Optional.ofNullable(token).map(CblDiagnosticException::makeLocation).orElse(null),
-            null));
+    if (token != null) {
+        seb.location(new OriginalLocation(location, null));
+    }
     seb.suggestion(this.getMessage());
     return seb.build();
-  }
-
-  private static Location makeLocation(CblToken cblToken) {
-    Position start = new Position(cblToken.getLine(), cblToken.getStart());
-    Position end = new Position(cblToken.getLine(), cblToken.getEnd());
-    Range range = new Range(start, end);
-    return new Location(cblToken.getUri(), range);
-  }
-
-  public CblNode getToken() {
-    return token;
   }
 }

@@ -62,14 +62,6 @@ public class CblParserTest {
    * @return CBL parser
    */
   public static CblParser parserFor(String text) {
-    String[] segments = text.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
-    CblToken[] tokens = new CblToken[segments.length];
-    for (int i = 0; i < segments.length; ++i) {
-      int start = i == 0 ? 0 : tokens[i - 1].getEnd();
-      int end = i == 0 ? segments[i].length() : start + segments[i].length();
-      tokens[i] = new CblToken(URI, segments[i], 0, start, end);
-    }
-
-    return new CblParser(tokens);
+    return new CblParser(text, URI, 0);
   }
 }

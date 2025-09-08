@@ -26,6 +26,9 @@ import org.eclipse.lsp.cobol.core.preprocessor.cbl.*;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.eclipse.lsp.cobol.core.preprocessor.cbl.CblParser.getABContent;
+
 /** CICS translator options utils */
 public final class TranslatorOptionsUtils {
 
@@ -66,46 +69,30 @@ public final class TranslatorOptionsUtils {
     return compilerDirectiveNodes;
   }
 
-  private static String getABContent(String line, CobolProgramLayout layout) {
-    return line.substring(
-        layout.getAriaAStart(),
-        Math.min(
-            layout.getAreaALength() + layout.getAreaBLength() + layout.getAriaAStart(),
-            line.length()));
-  }
-
   private static String replaceCicsOpts(
       DialectProcessingContext context,
       String line,
       int lineNumber,
       List<CompilerDirectiveNode> directiveNodes,
       List<SyntaxError> diagnostics) {
-    int ariaA = context.getLayout().getAriaAStart();
-    String uri = context.getProgramDocumentUri();
-    String cblString = StringUtils.repeat(" ", ariaA) + getABContent(line, context.getLayout());
-    String[] segments = cblString.split("(?<=[(),'\"]|\\w\\b)|(?=[(),'\"]|\\b\\w+)");
-    CblToken[] tokens = new CblToken[segments.length];
-    for (int i = 0; i < segments.length; ++i) {
-      int start = i == 0 ? 0 : tokens[i - 1].getEnd();
-      int end = i == 0 ? segments[i].length() : start + segments[i].length();
-      tokens[i] = new CblToken(uri, segments[i], lineNumber, start, end);
-    }
+    CobolProgramLayout layout = context.getLayout();
+    String cblString = StringUtils.repeat(" ", layout.getAriaAStart()) + getABContent(line, layout);
 
-    CblParser cblParser = new CblParser(tokens);
+    CblParser cblParser = new CblParser(cblString, context.getProgramDocumentUri(), lineNumber);
     CblNode cbl = cblParser.cbl();
     diagnostics.addAll(cblParser.getDiagnostics());
     directiveNodes.addAll(cblParser.getDirectiveNodes());
-    if (cbl.getChildren().isEmpty()) {
+    String serialize = cblParser.serialize();
+    if (isBlank(serialize)) {
       return "";
     }
     StringBuilder sb = new StringBuilder();
-    serialize(cbl, sb, 0, true);
-    return formatResult(context, line, sb);
+//    serialize(cbl, sb, 0, true);
+    return formatResult(context, line, serialize);
   }
 
   private static String formatResult(
-      DialectProcessingContext context, String line, StringBuilder sb) {
-    String result = sb.toString();
+      DialectProcessingContext context, String line, String result) {
     if (!result.isEmpty()) {
       CobolProgramLayout l = context.getLayout();
       int codeEnd = Math.min(l.getSourceCodeLength(), line.length());
