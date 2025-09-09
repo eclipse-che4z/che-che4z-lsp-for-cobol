@@ -121,18 +121,33 @@ public class CblParser {
 
   private boolean parseFragment() throws CblDiagnosticException {
     String first = peek();
-    if (first == null) {
-      return false;
-    }
-    if (first.equalsIgnoreCase("XOPTS") || first.equalsIgnoreCase("XOPT")) {
-      return parseXOpts();
-    }
+    int start = pos;
+    try {
+      if (first == null) {
+        return false;
+      }
+      if (first.equalsIgnoreCase("XOPTS") || first.equalsIgnoreCase("XOPT")) {
+        return parseXOpts();
+      }
 
-    if (first.equalsIgnoreCase("CICS")) {
-      return parseCics();
+      if (first.equalsIgnoreCase("CICS")) {
+        return parseCics();
+      }
+      parseOption();
+    } catch (CblDiagnosticException exception) {
+      recoverAfter(",");
+      removeSegments(start, pos);
+      diagnostics.add(exception.toSyntaxError(lineNumber));
     }
-    parseOption();
     return true;
+  }
+
+  private void recoverAfter(String lexeme) {
+    while (hasMore()) {
+      if (lexeme.equalsIgnoreCase(next())) {
+        return;
+      }
+    }
   }
 
   private boolean parseCics() throws CblDiagnosticException {
@@ -339,7 +354,7 @@ public class CblParser {
     while (hasMore()) {
       if (depth == 0)
         if (isNext(")")) {
-          throw expect(")", makeCurrentLocation());
+          throw expect(next(), makeCurrentLocation());
         } else if (isNext(",")) {
           break;
         }

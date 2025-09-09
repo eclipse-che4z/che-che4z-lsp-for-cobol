@@ -153,7 +153,7 @@ class TestCicsTranslatorOptionsPosition {
   @Test
   void testTou14() {
     CblParser parser = new CblParser("CICS (SP, 'EXCI')", URI, 0, 0);
-    assertEquals("CICS (    'EXCI')", parser.extractCicsOptions());
+    assertEquals("                 ", parser.extractCicsOptions());
     assertEquals(1, parser.getDiagnostics().size());
   }
 
