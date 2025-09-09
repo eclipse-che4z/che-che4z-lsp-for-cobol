@@ -91,6 +91,15 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitEraseStoreModifyLrStatementsOptions(
+      EraseStoreModifyLrStatementsOptionsContext ctx) {
+    if (ctx.imperativeStatementCall() != null) {
+      addReplacementImperativeStatementContext(ctx.getParent(), ctx.imperativeStatementCall());
+    }
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
