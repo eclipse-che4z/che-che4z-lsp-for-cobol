@@ -369,7 +369,7 @@ enqueueNameClause
 // erase statement
 
 eraseStatement
-   : ERASE eraseStoreModifyLrStatementsOptions | ((PERMANENT | SELECTIVE | ALL) MEMBERS)
+   : ERASE eraseStoreModifyLrStatementsOptions ((PERMANENT | SELECTIVE | ALL) MEMBERS)?
    ;
 
 // find statement
