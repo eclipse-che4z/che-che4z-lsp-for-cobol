@@ -351,7 +351,7 @@ public class CblParser {
       }
     }
     if (depth > 0) {
-      expect(peek(), makeCurrentLocation(), ")");
+      throw expect(peek(), makeCurrentLocation(), ")");
     }
     opt(",");
   }

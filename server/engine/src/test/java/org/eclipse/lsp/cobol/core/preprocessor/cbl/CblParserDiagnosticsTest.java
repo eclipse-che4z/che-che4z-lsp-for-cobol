@@ -46,7 +46,7 @@ public class CblParserDiagnosticsTest {
 
   @Test
   void testParenthesis() {
-    CblParser cblParser = new CblParser("CICS(SPACE(1", "file://document.cbl", 0, 0);
+    CblParser cblParser = new CblParser("SPACE(1", "file://document.cbl", 0, 0);
     cblParser.extractCicsOptions();
     assertEquals(
         "Unexpected token: EOF. Expect one of tokens: )",
