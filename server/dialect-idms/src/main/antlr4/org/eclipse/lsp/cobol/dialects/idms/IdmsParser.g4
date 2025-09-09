@@ -369,7 +369,11 @@ enqueueNameClause
 // erase statement
 
 eraseStatement
-   : ERASE eraseStoreModifyLrStatementsOptions ((PERMANENT | SELECTIVE | ALL) MEMBERS)?
+   : ERASE  idms_db_entity_name
+     ( (PERMANENT | SELECTIVE | ALL) MEMBERS
+     | eraseStoreModifyLrStatementsOptions
+     |
+     )
    ;
 
 // find statement
@@ -660,7 +664,7 @@ idmsWaitNowaitClause
 
 // modify statement
 modifyStatement
-    : MODIFY  ((MAP modifyMapClause) | eraseStoreModifyLrStatementsOptions )
+    : MODIFY  ((MAP modifyMapClause) | idms_db_entity_name eraseStoreModifyLrStatementsOptions? )
     ;
 // modify map statement
 modifyMapClause
@@ -753,7 +757,7 @@ startpageStatement
 
 // store statement
 storeStatement
-    : STORE eraseStoreModifyLrStatementsOptions
+    : STORE idms_db_entity_name eraseStoreModifyLrStatementsOptions?
     ;
 
 // transfer statement
@@ -1201,10 +1205,12 @@ obtainLRStatement
       (WHERE booleanExpression)?
       imperativeStatementCall?
     ;
-eraseStoreModifyLrStatementsOptions:  logicalRecordName
-                                    (FROM altLogicalRecordLocation)?
-                                    (WHERE booleanExpression)?
-                                    imperativeStatementCall?;
+
+eraseStoreModifyLrStatementsOptions
+    : FROM altLogicalRecordLocation (WHERE booleanExpression)? imperativeStatementCall?
+    | WHERE booleanExpression imperativeStatementCall?
+    | imperativeStatementCall
+ ;
 
 pathStatus: {validateLength(_input.LT(1).getText(), "path-status", 16);} cobolWord;
 imperativeStatementCall: ON pathStatus;
