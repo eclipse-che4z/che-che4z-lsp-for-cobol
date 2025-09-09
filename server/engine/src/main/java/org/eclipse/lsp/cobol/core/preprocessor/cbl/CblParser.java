@@ -135,14 +135,14 @@ public class CblParser {
       }
       parseOption();
     } catch (CblDiagnosticException exception) {
-      recoverAfter(",");
+      skipAfter(",");
       removeSegments(start, pos);
       diagnostics.add(exception.toSyntaxError(lineNumber));
     }
     return true;
   }
 
-  private void recoverAfter(String lexeme) {
+  private void skipAfter(String lexeme) {
     while (hasMore()) {
       if (lexeme.equalsIgnoreCase(next())) {
         return;
@@ -352,6 +352,15 @@ public class CblParser {
   private void parseOption() throws CblDiagnosticException {
     int depth = 0;
     while (hasMore()) {
+      if ("'".equals(peek())) {
+        skipAfter("'");
+        continue;
+      }
+      if ("\"".equals(peek())) {
+        skipAfter("\"");
+        continue;
+      }
+
       if (depth == 0)
         if (isNext(")")) {
           throw expect(next(), makeCurrentLocation());
