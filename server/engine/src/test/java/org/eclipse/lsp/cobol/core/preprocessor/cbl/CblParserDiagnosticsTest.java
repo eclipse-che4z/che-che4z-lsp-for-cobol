@@ -43,4 +43,14 @@ public class CblParserDiagnosticsTest {
     assertEquals(1, cblParser.getDiagnostics().size());
     assertEquals("\" expected.", cblParser.getDiagnostics().get(0).getSuggestion());
   }
+
+  @Test
+  void testParenthesis() {
+    CblParser cblParser = new CblParser("CICS(SPACE(1", "file://document.cbl", 0, 0);
+    cblParser.extractCicsOptions();
+    assertEquals(
+        "Unexpected token: EOF. Expect one of tokens: )",
+        cblParser.getDiagnostics().get(0).getSuggestion());
+    assertEquals(1, cblParser.getDiagnostics().size());
+  }
 }

@@ -170,8 +170,8 @@ public class TestTranslatorOptionsUtils {
             .extendedDocument(
                 new ExtendedDocument(
                     "\n"
-                        + "123456 CBL XOPTS(FLAG(I) SQL, DLI),  NOADATA                                    "
-                        + "    123456",
+                        + "123456 CBL XOPTS(FLAG(I) SQL, DLI),  NOADATA                            "
+                        + "            123456",
                     URI))
             .programDocumentUri(URI)
             .languageId(CobolLanguageId.COBOL.getId())

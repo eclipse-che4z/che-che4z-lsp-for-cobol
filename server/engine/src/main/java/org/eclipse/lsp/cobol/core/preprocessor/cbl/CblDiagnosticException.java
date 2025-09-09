@@ -47,7 +47,7 @@ public class CblDiagnosticException extends Exception {
       String tokenText, Location location, String... variants) {
     String s =
         "Unexpected token: "
-            + tokenText
+            + (tokenText == null ? "EOF" : tokenText)
             + "."
             + (variants.length > 0 ? " Expect one of tokens: " + String.join(", ", variants) : "");
     return new CblDiagnosticException(location, tokenText, ERROR, s);

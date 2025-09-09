@@ -218,7 +218,7 @@ public class CblParser {
       }
       opt(",");
     }
-    if (segments[pos].equals(")")) {
+    if (isNext(")")) {
       removePrevComma(optStart, pos);
     }
     if (lexemeChar != null) {
@@ -316,7 +316,7 @@ public class CblParser {
     if (nnn == 0) {
       return true;
     }
-    return nnn > 255;
+    return nnn <= 0 || nnn > 255;
   }
 
   private int checkIntegerLiteral(String next) throws CblDiagnosticException {
@@ -349,6 +349,9 @@ public class CblParser {
       } else if (next.equalsIgnoreCase(")")) {
         depth--;
       }
+    }
+    if (depth > 0) {
+      expect(peek(), makeCurrentLocation(), ")");
     }
     opt(",");
   }
@@ -393,24 +396,14 @@ public class CblParser {
   }
 
   private String next() {
-    int counter = pos;
-    try {
-      if (counter >= segments.length) {
-        return null;
+    for (; pos < segments.length; ++pos) {
+      String segment = segments[pos];
+      if (!isBlank(segment)) {
+        ++pos;
+        return segment;
       }
-      String segment = segments[counter];
-      if (isBlank(segment)) {
-        counter++;
-      }
-      if (counter >= segments.length) {
-        return null;
-      }
-      segment = segments[counter];
-      counter++;
-      return segment;
-    } finally {
-      pos = counter;
     }
+    return null;
   }
 
   private String serialize() {
