@@ -17,16 +17,12 @@ package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
-import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CompilerDirectiveNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.CICSDialect;
-import org.eclipse.lsp.cobol.implicitDialects.cics.TranslatorOptionsUtils;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -40,303 +36,190 @@ class TestXoptsCicsTranslatorOptionsPosition {
 
   @Test
   void test1() {
-    DialectProcessingContext context = makeContext("000123 CBL XOPTS(DLI)\n");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals("", context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(1, result.size());
-    assertDirectiveNode("DLI", 0, 17, 20, result.get(0));
+    CblParser parser = new CblParser("XOPTS(DLI)", URI, 0, 0);
+    assertEquals("          ", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(1, parser.getDirectiveNodes().size());
+    assertDirectiveNode("DLI", 6, 9, parser.getDirectiveNodes().get(0));
   }
 
   @Test
   void test2() {
-    DialectProcessingContext context = makeContext("000123 CBL XOPTS(DLI), NOADATA, XOPTS(DLI)\n");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "000123 CBL             NOADATA            ",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("DLI", 0, 17, 20, result.get(0));
-    assertDirectiveNode("DLI", 0, 38, 41, result.get(1));
+    CblParser parser = new CblParser("XOPTS(DLI), NOADATA, XOPTS(DLI)", URI, 0, 0);
+    assertEquals("            NOADATA            ", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("DLI", 6, 9, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("DLI", 27, 30, parser.getDirectiveNodes().get(1));
   }
 
   @Test
   void test3() {
-    DialectProcessingContext context = makeContext("000123 CBL XOPTS(DLI), NOADATA\n");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "000123 CBL             NOADATA",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(1, result.size());
-    assertDirectiveNode("DLI", 0, 17, 20, result.get(0));
+    CblParser parser = new CblParser("XOPTS(DLI), NOADATA", URI, 0, 0);
+    assertEquals("            NOADATA", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(1, parser.getDirectiveNodes().size());
+    assertDirectiveNode("DLI", 6, 9, parser.getDirectiveNodes().get(0));
   }
 
   @Test
   void test4() {
-    DialectProcessingContext context = makeContext("000123 CBL NOADATA, XOPTS(DLI)\n");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "000123 CBL NOADATA            ",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(1, result.size());
-    assertDirectiveNode("DLI", 0, 26, 29, result.get(0));
-  }
-
-  @Test
-  void test5() {
-    DialectProcessingContext context =
-        makeContext("000123 CBL NOADATA, XOPTS(DLI)\n000123 CBL DATA, XOPTS(DLI)");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "000123 CBL NOADATA            \n" + "000123 CBL DATA            ",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("DLI", 0, 26, 29, result.get(0));
-    assertDirectiveNode("DLI", 1, 23, 26, result.get(1));
-  }
-
-  @Test
-  void test6() {
-    DialectProcessingContext context =
-        makeContext("000123 CBL NOADATA, XOPTS(DLI)\n000124*COMMENT\n000123 CBL DATA, XOPTS(DLI)");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "000123 CBL NOADATA            \n" + "000124*COMMENT\n" + "000123 CBL DATA, XOPTS(DLI)",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(1, result.size());
-    assertDirectiveNode("DLI", 0, 26, 29, result.get(0));
+    CblParser parser = new CblParser("NOADATA, XOPTS(DLI)", URI, 0, 0);
+    assertEquals("NOADATA            ", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(1, parser.getDirectiveNodes().size());
+    assertDirectiveNode("DLI", 15, 18, parser.getDirectiveNodes().get(0));
   }
 
   @Test
   void test7() {
-    DialectProcessingContext context =
-        makeContext("000123 CBL NOADATA, XOPTS(DLI), NOADATA, XOPTS(DLI)\n");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "000123 CBL NOADATA,             NOADATA            ",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("DLI", 0, 26, 29, result.get(0));
-    assertDirectiveNode("DLI", 0, 47, 50, result.get(1));
+    CblParser parser = new CblParser("NOADATA, XOPTS(DLI), NOADATA, XOPTS(DLI)", URI, 0, 0);
+    assertEquals("NOADATA,             NOADATA            ", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("DLI", 15, 18, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("DLI", 36, 39, parser.getDirectiveNodes().get(1));
   }
 
   @Test
   void test8() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL NOADATA, XOPTS(DLI), NOADATA, XOPTS(DLI)                       123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser("NOADATA, XOPTS(DLI), NOADATA, XOPTS(DLI)                       ", URI, 0, 0);
     assertEquals(
-        "123456 CBL NOADATA,             NOADATA                                   123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("DLI", 0, 26, 29, result.get(0));
-    assertDirectiveNode("DLI", 0, 47, 50, result.get(1));
+        "NOADATA,             NOADATA                                   ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("DLI", 15, 18, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("DLI", 36, 39, parser.getDirectiveNodes().get(1));
   }
 
   @Test
   void test9() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL NOADATA, XOPTS(SPACE( 1)), NOADATA, XOPTS(LINECOUNT(32))            123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser(
+            "NOADATA, XOPTS(SPACE( 1)), NOADATA, XOPTS(LINECOUNT(32))            ", URI, 0, 0);
     assertEquals(
-        "123456 CBL NOADATA,                   NOADATA                                  123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("SPACE(1)", 0, 26, 35, result.get(0));
-    assertDirectiveNode("LINECOUNT(32)", 0, 53, 66, result.get(1));
+        "NOADATA,                   NOADATA                                  ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("SPACE(1)", 15, 24, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("LINECOUNT(32)", 42, 55, parser.getDirectiveNodes().get(1));
   }
 
   @Test
   void test10() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL NOADATA, XOPTS(FLAG(I)), NOADATA                                      "
-                + " 123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser(
+            "NOADATA, XOPTS(FLAG(I)), NOADATA                                       ", URI, 0, 0);
     assertEquals(
-        "123456 CBL NOADATA,                 NOADATA                                       123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(1, result.size());
-    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
+        "NOADATA,                 NOADATA                                       ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(1, parser.getDirectiveNodes().size());
+    assertDirectiveNode("FLAG(I)", 15, 22, parser.getDirectiveNodes().get(0));
   }
 
   @Test
   void test11() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL NOADATA, XOPTS(FLAG(I) LC(10)), NOADATA                                    "
-                + "     123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser(
+            "NOADATA, XOPTS(FLAG(I) LC(10)), NOADATA                                         ",
+            URI,
+            0,
+            0);
     assertEquals(
-        "123456 CBL NOADATA,                        NOADATA                                        "
-            + " 123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
-    assertDirectiveNode("LC(10)", 0, 34, 40, result.get(1));
+        "NOADATA,                        NOADATA                                         ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("FLAG(I)", 15, 22, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("LC(10)", 23, 29, parser.getDirectiveNodes().get(1));
   }
 
   @Test
   void test12() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL NOADATA, XOPTS(FLAG(I), DLI), NOADATA                                      "
-                + "   123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser(
+            "NOADATA, XOPTS(FLAG(I), DLI), NOADATA                                         ",
+            URI,
+            0,
+            0);
     assertEquals(
-        "123456 CBL NOADATA,                      NOADATA                                        "
-            + " 123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
-    assertDirectiveNode("DLI", 0, 35, 38, result.get(1));
+        "NOADATA,                      NOADATA                                         ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("FLAG(I)", 15, 22, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("DLI", 24, 27, parser.getDirectiveNodes().get(1));
   }
 
   @Test
   void test13() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL NOADATA, XOPTS(FLAG(I), LC(12) DLI), NOADATA                               "
-                + "        123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser(
+            "NOADATA, XOPTS(FLAG(I), LC(12) DLI), NOADATA                                       ",
+            URI,
+            0,
+            0);
     assertEquals(
-        "123456 CBL NOADATA,                             NOADATA                                   "
-            + "    123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(3, result.size());
-    assertDirectiveNode("FLAG(I)", 0, 26, 33, result.get(0));
-    assertDirectiveNode("LC(12)", 0, 35, 41, result.get(1));
-    assertDirectiveNode("DLI", 0, 42, 45, result.get(2));
+        "NOADATA,                             NOADATA                                       ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(3, parser.getDirectiveNodes().size());
+    assertDirectiveNode("FLAG(I)", 15, 22, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("LC(12)", 24, 30, parser.getDirectiveNodes().get(1));
+    assertDirectiveNode("DLI", 31, 34, parser.getDirectiveNodes().get(2));
   }
 
   @Test
   void test14() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL XOPTS(FLAG(I), LC(12) DLI), NOADATA                                      "
-                + " 123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser(
+            "XOPTS(FLAG(I), LC(12) DLI), NOADATA                                       ",
+            URI,
+            0,
+            0);
     assertEquals(
-        "123456 CBL                             NOADATA                                      "
-            + " 123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(3, result.size());
-    assertDirectiveNode("FLAG(I)", 0, 17, 24, result.get(0));
-    assertDirectiveNode("LC(12)", 0, 26, 32, result.get(1));
-    assertDirectiveNode("DLI", 0, 33, 36, result.get(2));
-  }
-
-  @Test
-  void test15() {
-    DialectProcessingContext context =
-        makeContext(
-            "\n"
-                + "123456 CBL XOPTS(FLAG(I) SQL, DLI),  NOADATA                                    "
-                + "    123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals(
-        "\n"
-            + "123456 CBL XOPTS(        SQL     ),  NOADATA                                       "
-            + " 123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I)", 1, 17, 24, result.get(0));
-    assertDirectiveNode("DLI", 1, 30, 33, result.get(1));
+        "                            NOADATA                                       ",
+        parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(3, parser.getDirectiveNodes().size());
+    assertDirectiveNode("FLAG(I)", 6, 13, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("LC(12)", 15, 21, parser.getDirectiveNodes().get(1));
+    assertDirectiveNode("DLI", 22, 25, parser.getDirectiveNodes().get(2));
   }
 
   @Test
   void test16() {
-    DialectProcessingContext context =
-        makeContext("123456 CBL XOPTS(), NOADATA                                     123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
+    CblParser parser =
+        new CblParser("XOPTS(), NOADATA                                     ", URI, 0, 0);
     assertEquals(
-        "123456 CBL          NOADATA                                     123456",
-        context.getExtendedDocument().getCurrentText().toString());
-    assertTrue(result.isEmpty());
+        "         NOADATA                                     ", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertTrue(parser.getDirectiveNodes().isEmpty());
   }
 
   @Test
   void test17() {
-    DialectProcessingContext context =
-        makeContext(
-            "123456 CBL XOPTS(FLAG(I), DLI)                                                      "
-                + " 123456");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals("", context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(2, result.size());
-    assertDirectiveNode("FLAG(I)", 0, 17, 24, result.get(0));
-    assertDirectiveNode("DLI", 0, 26, 29, result.get(1));
-  }
-
-  @Test
-  void test18() {
-    DialectProcessingContext context =
-        makeContext("123456 CBL XOPT(COBOL2)\n" + "123457 CBL APOST");
-    List<SyntaxError> diagnostics = new ArrayList<>();
-    List<CompilerDirectiveNode> result =
-        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
-    assertEquals(0, diagnostics.size());
-    assertEquals("123457 CBL APOST", context.getExtendedDocument().getCurrentText().toString());
-    assertEquals(1, result.size());
-    assertDirectiveNode("COBOL2", 0, 16, 22, result.get(0));
+    CblParser parser =
+        new CblParser(
+            "XOPTS(FLAG(I), DLI)                                                       ",
+            URI,
+            0,
+            0);
+    assertEquals("", parser.extractCicsOptions().trim());
+    assertEquals(0, parser.getDiagnostics().size());
+    assertEquals(2, parser.getDirectiveNodes().size());
+    assertDirectiveNode("FLAG(I)", 6, 13, parser.getDirectiveNodes().get(0));
+    assertDirectiveNode("DLI", 15, 18, parser.getDirectiveNodes().get(1));
   }
 
   private static void assertDirectiveNode(
-      String text, int line, int start, int end, CompilerDirectiveNode node) {
-    Position startPos = new Position(line, start);
-    Position endPos = new Position(line, end);
+      String text, int start, int end, CompilerDirectiveNode node) {
+    Position startPos = new Position(0, start);
+    Position endPos = new Position(0, end);
     Locality locality = Locality.builder().uri(URI).range(new Range(startPos, endPos)).build();
     assertEquals(locality, node.getLocality());
     assertEquals(CICSDialect.DIALECT_NAME, node.getDialect());
