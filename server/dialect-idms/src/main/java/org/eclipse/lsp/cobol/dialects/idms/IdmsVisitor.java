@@ -100,6 +100,46 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitModifyStatement(ModifyStatementContext ctx) {
+    List<Node> result = new ArrayList<>();
+    if (ctx.idms_db_entity_name() != null) {
+      result.add(
+          new IgnoredVariableNode(
+              constructLocality(ctx.idms_db_entity_name()),
+              ctx.idms_db_entity_name().getText().toUpperCase()));
+    }
+    if (ctx.idms_db_entity_name() != null
+        && ctx.eraseStoreModifyLrStatementsOptions() != null
+        && ctx.eraseStoreModifyLrStatementsOptions().imperativeStatementCall() != null) {
+      addReplacementImperativeStatementContext(
+          ctx, ctx.eraseStoreModifyLrStatementsOptions().imperativeStatementCall());
+      result.addAll(
+          visitEraseStoreModifyLrStatementsOptions(ctx.eraseStoreModifyLrStatementsOptions()));
+    } else {
+      result.addAll(super.visitModifyStatement(ctx));
+    }
+    return result;
+  }
+
+  @Override
+  public List<Node> visitStoreStatement(StoreStatementContext ctx) {
+    List<Node> result = new ArrayList<>();
+    if (ctx.idms_db_entity_name() != null) {
+      result.add(
+          new IgnoredVariableNode(
+              constructLocality(ctx.idms_db_entity_name()),
+              ctx.idms_db_entity_name().getText().toUpperCase()));
+    }
+    if (ctx.idms_db_entity_name() != null
+        && ctx.eraseStoreModifyLrStatementsOptions() != null
+        && ctx.eraseStoreModifyLrStatementsOptions().imperativeStatementCall() != null) {
+      result.addAll(
+          visitEraseStoreModifyLrStatementsOptions(ctx.eraseStoreModifyLrStatementsOptions()));
+    }
+    return result;
+  }
+
+  @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
