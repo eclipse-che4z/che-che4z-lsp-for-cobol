@@ -154,16 +154,6 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     } else return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
-  //
-  //  @Override
-  //  public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
-  //    if (ctx.parent.getRuleContext().getClass() != EraseStatementContext.class) {
-  //      return addTreeNode(ctx, QualifiedReferenceNode::new);
-  //    } else {
-  //      return addTreeNode(ctx, locality -> new VariableUsageNode(getName(ctx), locality));
-  //    }
-  //  }
-
   @Override
   public List<Node> visitIdms_procedure_name(Idms_procedure_nameContext ctx) {
     return addTreeNode(ctx, QualifiedReferenceNode::new);
