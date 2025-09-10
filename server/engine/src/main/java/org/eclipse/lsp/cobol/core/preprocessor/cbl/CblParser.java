@@ -99,23 +99,21 @@ public class CblParser {
    * @return new CBL line
    */
   public String extractCicsOptions() {
-    boolean empty = true;
     try {
+      boolean empty = true;
       while (hasMore()) {
         boolean hasFragment = parseFragment();
         if (empty) {
           empty = !hasFragment;
         }
       }
-      removePrevComma(0, pos);
+      if (empty) {
+        removeSegments(0, segments.length);
+      }
     } catch (CblDiagnosticException e) {
-      empty = false;
-      removePrevComma(0, pos - 1);
       diagnostics.add(e.toSyntaxError(lineNumber));
     }
-    if (empty) {
-      removeSegments(0, segments.length);
-    }
+    removePrevComma();
     return serialize();
   }
 
@@ -231,7 +229,7 @@ public class CblParser {
       opt(",");
     }
     if (isNext(")")) {
-      removePrevComma(optStart, pos);
+      removePrevComma();
     }
     if (lexemeChar != null) {
       opt("'");
@@ -286,8 +284,8 @@ public class CblParser {
     removeSegments(start, pos);
   }
 
-  private void removePrevComma(int from, int to) {
-    for (int i = to - 1; i >= from; i--) {
+  private void removePrevComma() {
+    for (int i = pos - 1; i >= 0; i--) {
       if (segments[i] == null || isBlank(segments[i])) {
         continue;
       }
