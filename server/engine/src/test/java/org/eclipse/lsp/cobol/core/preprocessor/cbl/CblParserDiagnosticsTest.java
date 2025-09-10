@@ -66,9 +66,8 @@ public class CblParserDiagnosticsTest {
   void testParenthesis3() {
     CblParser cblParser =
         new CblParser("JAVAIOP(OUTPATH(')))))))')),CICS(SP)", "file://document.cbl", 0, 0);
-    assertEquals("                                    ", cblParser.extractCicsOptions());
-    assertEquals("Unexpected token: ).", cblParser.getDiagnostics().get(0).getSuggestion());
-    assertEquals(1, cblParser.getDiagnostics().size());
+    assertEquals("JAVAIOP(OUTPATH(')))))))'))         ", cblParser.extractCicsOptions());
+    assertEquals(0, cblParser.getDiagnostics().size());
     assertEquals(1, cblParser.getDirectiveNodes().size());
   }
 }

@@ -151,8 +151,7 @@ public class CblParser {
   }
 
   private boolean parseCics() throws CblDiagnosticException {
-    one("CICS");
-    int start = pos - 1;
+    int start = one("CICS");
     if (isNext("(")) {
       if (parseCicsOptions(true)) {
         return true;
@@ -165,8 +164,7 @@ public class CblParser {
   }
 
   private boolean parseXOpts() throws CblDiagnosticException {
-    or("XOPT", "XOPTS");
-    int start = pos - 1;
+    int start = or("XOPT", "XOPTS");
 
     if (parseCicsOptions(false)) {
       return true;
@@ -218,8 +216,7 @@ public class CblParser {
         parseNatlang();
       } else {
         try {
-          or(SIMPLE_CICS_OPTIONS);
-          int start = pos - 1;
+          int start = or(SIMPLE_CICS_OPTIONS);
           directiveNodes.add(createDirectiveNode(start, start + 1));
           removeSegments(start, start + 1);
         } catch (CblDiagnosticException e) {
@@ -246,8 +243,7 @@ public class CblParser {
   }
 
   private void parseNatlang() throws CblDiagnosticException {
-    one("NATLANG");
-    int start = pos - 1;
+    int start = one("NATLANG");
     one("(");
     or("CS", "EN", "KA");
     one(")");
@@ -256,8 +252,7 @@ public class CblParser {
   }
 
   private void parseSpace() throws CblDiagnosticException {
-    one("SPACE");
-    int start = pos - 1;
+    int start = one("SPACE");
     one("(");
     String next = next();
     int i = checkIntegerLiteral(next);
@@ -270,8 +265,7 @@ public class CblParser {
   }
 
   private void parseLineCount() throws CblDiagnosticException {
-    or("LINECOUNT", "LC");
-    int start = pos - 1;
+    int start = or("LINECOUNT", "LC");
     one("(");
     String argument = next();
     int i = checkIntegerLiteral(argument);
@@ -284,8 +278,7 @@ public class CblParser {
   }
 
   private void parseFlag() throws CblDiagnosticException {
-    or("FLAG", "F");
-    int start = pos - 1;
+    int start = or("FLAG", "F");
     one("(");
     or("E", "I", "S", "U", "W");
     one(")");
@@ -328,9 +321,6 @@ public class CblParser {
 
   private boolean isLineNumberWrong(int nnn) {
     // nnn must be an integer between 1 and 255.
-    if (nnn == 0) {
-      return true;
-    }
     return nnn <= 0 || nnn > 255;
   }
 
@@ -352,15 +342,10 @@ public class CblParser {
   private void parseOption() throws CblDiagnosticException {
     int depth = 0;
     while (hasMore()) {
-      if ("'".equals(peek())) {
-        skipAfter("'");
+      if ("'".equals(segments[pos]) || "\"".equals(segments[pos])) {
+        skipAfter(segments[pos++]);
         continue;
       }
-      if ("\"".equals(peek())) {
-        skipAfter("\"");
-        continue;
-      }
-
       if (depth == 0)
         if (isNext(")")) {
           throw expect(next(), makeCurrentLocation());
@@ -368,9 +353,9 @@ public class CblParser {
           break;
         }
       String next = next();
-      if (next.equalsIgnoreCase("(")) {
+      if ("(".equals(next)) {
         depth++;
-      } else if (next.equalsIgnoreCase(")")) {
+      } else if (")".equals(next)) {
         depth--;
       }
     }
@@ -381,28 +366,27 @@ public class CblParser {
   }
 
   private boolean isNext(String expected) {
-    return hasMore() && peek().equalsIgnoreCase(expected);
+    return expected.equalsIgnoreCase(peek());
   }
 
-  private void or(String... variants) throws CblDiagnosticException {
+  private int or(String... variants) throws CblDiagnosticException {
     String token = next();
     for (String text : variants) {
       if (text.equalsIgnoreCase(token)) {
-        return;
+        return pos - 1;
       }
     }
     throw expect(token, makeCurrentLocation(), variants);
   }
 
   private void opt(String expected) {
-    String peek = peek();
-    if (peek != null && peek.equalsIgnoreCase(expected)) {
+    if (expected.equalsIgnoreCase(peek())) {
       next();
     }
   }
 
-  private void one(String expected) throws CblDiagnosticException {
-    or(expected);
+  private int one(String expected) throws CblDiagnosticException {
+    return or(expected);
   }
 
   private boolean hasMore() {

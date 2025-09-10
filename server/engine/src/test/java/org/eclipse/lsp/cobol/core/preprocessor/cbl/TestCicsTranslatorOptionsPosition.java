@@ -157,6 +157,13 @@ class TestCicsTranslatorOptionsPosition {
     assertEquals(1, parser.getDiagnostics().size());
   }
 
+  @Test
+  void testTou15() {
+    CblParser parser = new CblParser("LINECOUNT(\"CICS (SP, 'EXCI'\")", URI, 0, 0);
+    assertEquals("LINECOUNT(\"CICS (SP, 'EXCI'\")", parser.extractCicsOptions());
+    assertEquals(0, parser.getDiagnostics().size());
+  }
+
   /**
    * Assert DirectiveNode
    *
