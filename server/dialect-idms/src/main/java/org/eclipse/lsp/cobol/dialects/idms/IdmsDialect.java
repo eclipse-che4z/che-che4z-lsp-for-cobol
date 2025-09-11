@@ -32,8 +32,6 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
-import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -305,14 +303,5 @@ public final class IdmsDialect implements CobolDialect {
     IdmsParser.StartRuleContext result = parser.startRule();
     errors.addAll(listener.getErrors());
     return result;
-  }
-
-  @Override
-  public List<ProcessorDescription> getProcessors() {
-    return ImmutableList.of(
-        new ProcessorDescription(
-            IdmsVariableNode.class,
-            ProcessingPhase.VALIDATION,
-            new IdmsVariableUsageProcessor(messageService)));
   }
 }

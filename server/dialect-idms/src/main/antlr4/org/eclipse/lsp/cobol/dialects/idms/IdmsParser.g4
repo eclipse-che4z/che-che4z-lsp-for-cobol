@@ -664,7 +664,7 @@ idmsWaitNowaitClause
 
 // modify statement
 modifyStatement
-    : MODIFY  ((MAP modifyMapClause) | idms_db_entity_name eraseStoreModifyLrStatementsOptions? )
+    : MODIFY  ((MAP modifyMapClause) | (idms_db_entity_name eraseStoreModifyLrStatementsOptions?))
     ;
 // modify map statement
 modifyMapClause

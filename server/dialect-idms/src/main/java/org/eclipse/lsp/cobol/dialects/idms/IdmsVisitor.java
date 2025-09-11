@@ -95,48 +95,27 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
       EraseStoreModifyLrStatementsOptionsContext ctx) {
     if (ctx.imperativeStatementCall() != null) {
       addReplacementImperativeStatementContext(ctx.getParent(), ctx.imperativeStatementCall());
+    } else {
+      addReplacementContext(ctx);
     }
     return visitChildren(ctx);
   }
 
   @Override
   public List<Node> visitModifyStatement(ModifyStatementContext ctx) {
-    List<Node> result = new ArrayList<>();
-    if (ctx.idms_db_entity_name() != null) {
-      result.add(
-          new IdmsVariableNode(
-              constructLocality(ctx.idms_db_entity_name()),
-              ctx.idms_db_entity_name().getText().toUpperCase()));
-    }
-    if (ctx.idms_db_entity_name() != null
-        && ctx.eraseStoreModifyLrStatementsOptions() != null
-        && ctx.eraseStoreModifyLrStatementsOptions().imperativeStatementCall() != null) {
-      addReplacementImperativeStatementContext(
-          ctx, ctx.eraseStoreModifyLrStatementsOptions().imperativeStatementCall());
-      result.addAll(
-          visitEraseStoreModifyLrStatementsOptions(ctx.eraseStoreModifyLrStatementsOptions()));
+    if (ctx.eraseStoreModifyLrStatementsOptions() != null) {
+      return visitChildren(ctx);
     } else {
-      result.addAll(super.visitModifyStatement(ctx));
+      return super.visitModifyStatement(ctx);
     }
-    return result;
   }
 
-  @Override
   public List<Node> visitStoreStatement(StoreStatementContext ctx) {
-    List<Node> result = new ArrayList<>();
-    if (ctx.idms_db_entity_name() != null) {
-      result.add(
-          new IdmsVariableNode(
-              constructLocality(ctx.idms_db_entity_name()),
-              ctx.idms_db_entity_name().getText().toUpperCase()));
+    if (ctx.eraseStoreModifyLrStatementsOptions() != null) {
+      return visitChildren(ctx);
+    } else {
+      return super.visitStoreStatement(ctx);
     }
-    if (ctx.idms_db_entity_name() != null
-        && ctx.eraseStoreModifyLrStatementsOptions() != null
-        && ctx.eraseStoreModifyLrStatementsOptions().imperativeStatementCall() != null) {
-      result.addAll(
-          visitEraseStoreModifyLrStatementsOptions(ctx.eraseStoreModifyLrStatementsOptions()));
-    }
-    return result;
   }
 
   @Override
@@ -146,12 +125,22 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
-    Class cls = ctx.parent.getClass();
-    if (cls == EraseStatementContext.class
-        || cls == ModifyStatementContext.class
-        || cls == StoreStatementContext.class) {
-      return visitChildren(ctx);
-    } else return addTreeNode(ctx, QualifiedReferenceNode::new);
+
+    if (ctx.getParent() instanceof EraseStatementContext) {
+      if (((EraseStatementContext) ctx.getParent()).eraseStoreModifyLrStatementsOptions() != null) {
+        return visitChildren(ctx);
+      }
+    } else if (ctx.getParent() instanceof StoreStatementContext) {
+      if (((StoreStatementContext) ctx.getParent()).eraseStoreModifyLrStatementsOptions() != null) {
+        return visitChildren(ctx);
+      }
+    } else if (ctx.getParent() instanceof ModifyStatementContext) {
+      if (((ModifyStatementContext) ctx.getParent()).eraseStoreModifyLrStatementsOptions()
+          != null) {
+        return visitChildren(ctx);
+      }
+    }
+    return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
