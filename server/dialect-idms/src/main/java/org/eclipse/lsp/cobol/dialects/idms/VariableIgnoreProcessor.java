@@ -27,7 +27,6 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
-/** Some Processor */
 @Slf4j
 public class VariableIgnoreProcessor implements Processor<IgnoredVariableNode> {
   private final MessageService messageService;

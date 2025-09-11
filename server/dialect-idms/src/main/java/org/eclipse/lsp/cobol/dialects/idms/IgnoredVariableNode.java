@@ -19,7 +19,6 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
-/** Some Node */
 @Getter
 public class IgnoredVariableNode extends Node {
   final String name;
