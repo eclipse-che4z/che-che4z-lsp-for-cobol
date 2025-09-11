@@ -27,16 +27,17 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 
+/** Processor for register variable usage */
 @Slf4j
-public class VariableIgnoreProcessor implements Processor<IgnoredVariableNode> {
+public class IdmsVariableUsageProcessor implements Processor<IdmsVariableNode> {
   private final MessageService messageService;
 
-  public VariableIgnoreProcessor(MessageService messageService) {
+  public IdmsVariableUsageProcessor(MessageService messageService) {
     this.messageService = messageService;
   }
 
   @Override
-  public void accept(IgnoredVariableNode ignoredVariableNode, ProcessingContext processingContext) {
+  public void accept(IdmsVariableNode ignoredVariableNode, ProcessingContext processingContext) {
 
     List<ProgramNode> programNodes =
         processingContext.getCurrentProgramNodeStack().stream()

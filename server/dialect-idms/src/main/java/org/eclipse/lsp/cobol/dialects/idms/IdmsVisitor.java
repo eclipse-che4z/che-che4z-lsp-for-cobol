@@ -104,7 +104,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     List<Node> result = new ArrayList<>();
     if (ctx.idms_db_entity_name() != null) {
       result.add(
-          new IgnoredVariableNode(
+          new IdmsVariableNode(
               constructLocality(ctx.idms_db_entity_name()),
               ctx.idms_db_entity_name().getText().toUpperCase()));
     }
@@ -126,7 +126,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     List<Node> result = new ArrayList<>();
     if (ctx.idms_db_entity_name() != null) {
       result.add(
-          new IgnoredVariableNode(
+          new IdmsVariableNode(
               constructLocality(ctx.idms_db_entity_name()),
               ctx.idms_db_entity_name().getText().toUpperCase()));
     }

@@ -311,8 +311,8 @@ public final class IdmsDialect implements CobolDialect {
   public List<ProcessorDescription> getProcessors() {
     return ImmutableList.of(
         new ProcessorDescription(
-            IgnoredVariableNode.class,
+            IdmsVariableNode.class,
             ProcessingPhase.VALIDATION,
-            new VariableIgnoreProcessor(messageService)));
+            new IdmsVariableUsageProcessor(messageService)));
   }
 }

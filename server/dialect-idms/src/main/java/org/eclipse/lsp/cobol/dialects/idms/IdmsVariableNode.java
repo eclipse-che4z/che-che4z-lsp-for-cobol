@@ -19,11 +19,12 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 
+/** Idms Variable Node. */
 @Getter
-public class IgnoredVariableNode extends Node {
+public class IdmsVariableNode extends Node {
   final String name;
 
-  protected IgnoredVariableNode(Locality location, String name) {
+  protected IdmsVariableNode(Locality location, String name) {
     super(location, NodeType.CUSTOM, IdmsDialect.NAME);
     this.name = name;
   }
