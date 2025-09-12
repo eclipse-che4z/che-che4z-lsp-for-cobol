@@ -82,12 +82,10 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitObtainLRStatement(ObtainLRStatementContext ctx) {
-    if (ctx.imperativeStatementCall() == null) {
-      addReplacementContext(ctx);
-    } else {
+    if (ctx.imperativeStatementCall() != null) {
       addReplacementImperativeStatementContext(ctx, ctx.imperativeStatementCall());
     }
-    return visitChildren(ctx);
+    return super.visitObtainLRStatement(ctx);
   }
 
   @Override

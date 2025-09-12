@@ -16,7 +16,7 @@ parser grammar IdmsParser;
 options {tokenVocab = IdmsLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? idmsRules* EOF;
-idmsRules: (idmsStatements | idmsLRStatements | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
+idmsRules: (idmsStatements | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
 
 idmsSections
    : idmsControlSection | schemaSection | mapSection
@@ -693,7 +693,7 @@ attributeList
 // obtain statement
 
 obtainStatement
-   : OBTAIN keepClause? findObtainClause
+   : OBTAIN ((keepClause? findObtainClause) | obtainLRStatement)
    ;
 
 // IDMS post statement
@@ -1196,14 +1196,12 @@ cobolCompilerDirectivesKeywords
 endClause
     : (DOT_FS | SEMICOLON_FS)
     ;
-// --------- TOLERATE LR STATEMENTS ---------------//
-idmsLRStatements: obtainLRStatement;
-// obtain LR statement toleration
+
 obtainLRStatement
-    : OBTAIN (FIRST|NEXT)? logicalRecordName
+    : (FIRST|NEXT)? logicalRecordName
       (INTO altLogicalRecordLocation)?
       (WHERE booleanExpression)?
-      imperativeStatementCall?
+       imperativeStatementCall?
     ;
 
 eraseStoreModifyLrStatementsOptions
