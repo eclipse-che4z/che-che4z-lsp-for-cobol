@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.preprocessor.cbl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +34,8 @@ public class CblParserDiagnosticsTest {
     CblParser cblParser = new CblParser("CICS('FLAG(W)\")\n", "file://document.cbl", 0, 0);
     cblParser.extractCicsOptions();
     assertEquals(1, cblParser.getDiagnostics().size());
-    assertEquals("' expected.", cblParser.getDiagnostics().get(0).getSuggestion());
+    assertEquals(
+        "Unexpected token: \". Expect token: '", cblParser.getDiagnostics().get(0).getSuggestion());
   }
 
   @Test
@@ -41,25 +43,31 @@ public class CblParserDiagnosticsTest {
     CblParser cblParser = new CblParser("CICS(\"FLAG(W)')\n", "file://document.cbl", 0, 0);
     cblParser.extractCicsOptions();
     assertEquals(1, cblParser.getDiagnostics().size());
-    assertEquals("\" expected.", cblParser.getDiagnostics().get(0).getSuggestion());
+    assertEquals(
+        "Unexpected token: '. Expect token: \"", cblParser.getDiagnostics().get(0).getSuggestion());
   }
 
   @Test
   void testParenthesis1() {
     CblParser cblParser = new CblParser("SPACE(1", "file://document.cbl", 0, 0);
     cblParser.extractCicsOptions();
-    assertEquals(
-        "Unexpected token: EOF. Expect one of tokens: )",
-        cblParser.getDiagnostics().get(0).getSuggestion());
-    assertEquals(1, cblParser.getDiagnostics().size());
+    assertTrue(cblParser.getDiagnostics().isEmpty());
   }
 
   @Test
   void testParenthesis2() {
     CblParser cblParser = new CblParser("),CICS(SP)", "file://document.cbl", 0, 0);
     cblParser.extractCicsOptions();
-    assertEquals("Unexpected token: ).", cblParser.getDiagnostics().get(0).getSuggestion());
-    assertEquals(1, cblParser.getDiagnostics().size());
+    assertTrue(cblParser.getDiagnostics().isEmpty());
+  }
+
+  @Test
+  void testParenthesis4() {
+    CblParser cblParser = new CblParser("XOPT('AR(C  SP')", "file://document.cbl", 0, 0);
+    cblParser.extractCicsOptions();
+    assertEquals(
+        "Unexpected token: EOF. Expect token: )",
+        cblParser.getDiagnostics().get(0).getSuggestion());
   }
 
   @Test

@@ -45,11 +45,11 @@ public class CblDiagnosticException extends Exception {
    */
   public static CblDiagnosticException expect(
       String tokenText, Location location, String... variants) {
-    String s =
-        "Unexpected token: "
-            + (tokenText == null ? "EOF" : tokenText)
-            + "."
-            + (variants.length > 0 ? " Expect one of tokens: " + String.join(", ", variants) : "");
+    String expStr =
+        variants.length > 1
+            ? " Expect one of tokens: " + String.join(", ", variants)
+            : variants.length == 1 ? " Expect token: " + variants[0] : "";
+    String s = "Unexpected token: " + (tokenText == null ? "EOF" : tokenText) + "." + expStr;
     return new CblDiagnosticException(location, tokenText, ERROR, s);
   }
 

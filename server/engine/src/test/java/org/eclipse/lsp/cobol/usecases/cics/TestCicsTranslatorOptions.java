@@ -142,7 +142,7 @@ public class TestCicsTranslatorOptions {
                     + " COBOL2, CO2, COBOL3, CO3, CPSM, NOCPSM, DBCS, DEBUG, NODEBUG, DLI, EDF,"
                     + " NOEDF, EXCI, FEPI, NOFEPI, LENGTH, NOLENGTH, LIN, LINKAGE, NOLINKAGE, NUM,"
                     + " NONUM, OP, OPTIONS, NOP, NOOPTIONS, Q, SEQ, NOSEQ, SP, SPIE, NOSPIE,"
-                    + " SYSEIB, VBREF, NOVBREF",
+                    + " SYSEIB, VBREF, NOVBREF, FLAG, F, LINECOUNT, LC, SPACE, NATLANG",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
   }

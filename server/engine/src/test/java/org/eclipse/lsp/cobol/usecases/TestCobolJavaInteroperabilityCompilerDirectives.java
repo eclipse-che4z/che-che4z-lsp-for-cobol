@@ -142,7 +142,7 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
           + "           GOBACK.\n";
 
   private static final String TEXT_SETTING_OUTPATH_INVALID =
-      "       CBL JAVAIOP(OP(/a/folder{|error1}'))\n"
+      "       CBL JAVAIOP(OP(/{a|error1}/folder{|error2}'))\n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
@@ -508,6 +508,12 @@ class TestCobolJavaInteroperabilityCompilerDirectives {
         ImmutableList.of(),
         ImmutableMap.of(
             "error1",
+            new Diagnostic(
+                new Range(),
+                "No viable alternative at input JAVAIOP(OP(a",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "error2",
             new Diagnostic(
                 new Range(),
                 "IGYDS1082-E A period was required.",

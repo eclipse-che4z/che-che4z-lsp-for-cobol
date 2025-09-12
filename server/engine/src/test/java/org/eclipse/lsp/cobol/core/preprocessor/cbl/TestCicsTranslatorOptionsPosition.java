@@ -145,7 +145,8 @@ class TestCicsTranslatorOptionsPosition {
     CblParser parser = new CblParser("CICS(\"FLAG(I)), NOADATA", URI, 0, 0);
     assertEquals("                NOADATA", parser.extractCicsOptions());
     assertEquals(1, parser.getDiagnostics().size());
-    assertEquals("\" expected.", parser.getDiagnostics().get(0).getSuggestion());
+    assertEquals(
+        "Unexpected token: ). Expect token: \"", parser.getDiagnostics().get(0).getSuggestion());
     assertEquals(1, parser.getDirectiveNodes().size());
     assertDirectiveNode("FLAG(I)", 0, 6, 13, parser.getDirectiveNodes().get(0));
   }
