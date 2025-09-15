@@ -1199,9 +1199,9 @@ endClause
 
 obtainLRStatement
     : OBTAIN (FIRST|NEXT)? logicalRecordName
-            (INTO altLogicalRecordLocation)?
-            (WHERE booleanExpression)?
-            imperativeStatementCall?
+      (INTO altLogicalRecordLocation)?
+      (WHERE booleanExpression)?
+      imperativeStatementCall?
     ;
 
 eraseStoreModifyLrStatementsOptions
