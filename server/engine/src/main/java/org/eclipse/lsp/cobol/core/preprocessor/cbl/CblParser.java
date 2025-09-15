@@ -219,9 +219,7 @@ public class CblParser {
       }
     }
     --pos;
-    if (isNext(")") || (lexemeChar != null && isNext(lexemeChar))) {
-      removePrevComma();
-    }
+    removePrevComma();
     if (lexemeChar != null) one(lexemeChar);
     one(")");
     opt(",");
