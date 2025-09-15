@@ -16,7 +16,7 @@ parser grammar IdmsParser;
 options {tokenVocab = IdmsLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? idmsRules* EOF;
-idmsRules: (idmsStatements | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
+idmsRules: (idmsStatements | obtainLRStatement | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
 
 idmsSections
    : idmsControlSection | schemaSection | mapSection
@@ -693,7 +693,7 @@ attributeList
 // obtain statement
 
 obtainStatement
-   : OBTAIN ((keepClause? findObtainClause) | obtainLRStatement)
+   : OBTAIN keepClause? findObtainClause
    ;
 
 // IDMS post statement
@@ -1198,10 +1198,10 @@ endClause
     ;
 
 obtainLRStatement
-    : (FIRST|NEXT)? logicalRecordName
-      (INTO altLogicalRecordLocation)?
-      (WHERE booleanExpression)?
-       imperativeStatementCall?
+    : OBTAIN (FIRST|NEXT)? logicalRecordName
+            (INTO altLogicalRecordLocation)?
+            (WHERE booleanExpression)?
+            imperativeStatementCall?
     ;
 
 eraseStoreModifyLrStatementsOptions
