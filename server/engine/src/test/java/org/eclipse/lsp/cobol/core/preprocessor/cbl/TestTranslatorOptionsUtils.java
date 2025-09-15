@@ -216,4 +216,31 @@ public class TestTranslatorOptionsUtils {
     assertDirectiveNode("FLAG(I)", 1, 18, 25, result.get(0));
     assertDirectiveNode("DLI", 1, 31, 34, result.get(1));
   }
+
+  @Test
+  void test17() {
+    DialectProcessingContext context =
+        DialectProcessingContext.builder()
+            .extendedDocument(
+                new ExtendedDocument(
+                    "\n"
+                        + "123456 CBL XOPTS(FLAG(I), DLI, SQL),  NOADATA                           "
+                        + "             123456",
+                    URI))
+            .programDocumentUri(URI)
+            .languageId(CobolLanguageId.COBOL.getId())
+            .build();
+    List<SyntaxError> diagnostics = new ArrayList<>();
+    List<CompilerDirectiveNode> result =
+        TranslatorOptionsUtils.extractCompilerDirectives(context, diagnostics);
+    assertEquals(0, diagnostics.size());
+    assertEquals(
+        "\n"
+            + "123456 CBL XOPTS(              SQL),  NOADATA                                       "
+            + " 123456",
+        context.getExtendedDocument().getCurrentText().toString());
+    assertEquals(2, result.size());
+    assertDirectiveNode("FLAG(I)", 1, 17, 24, result.get(0));
+    assertDirectiveNode("DLI", 1, 26, 29, result.get(1));
+  }
 }

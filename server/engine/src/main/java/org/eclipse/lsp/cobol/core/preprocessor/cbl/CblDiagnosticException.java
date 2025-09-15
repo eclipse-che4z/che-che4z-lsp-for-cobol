@@ -25,14 +25,12 @@ import org.eclipse.lsp4j.Location;
 /** CBL Diagnostic Exception */
 public class CblDiagnosticException extends Exception {
   private static ErrorSeverity severity;
-  private final String token;
   private final Location location;
 
-  CblDiagnosticException(Location location, String token, ErrorSeverity severity, String message) {
+  CblDiagnosticException(Location location, ErrorSeverity severity, String message) {
     super(message);
     this.location = location;
     CblDiagnosticException.severity = severity;
-    this.token = token;
   }
 
   /**
@@ -50,22 +48,19 @@ public class CblDiagnosticException extends Exception {
             ? " Expect one of tokens: " + String.join(", ", variants)
             : variants.length == 1 ? " Expect token: " + variants[0] : "";
     String s = "Unexpected token: " + (tokenText == null ? "EOF" : tokenText) + "." + expStr;
-    return new CblDiagnosticException(location, tokenText, ERROR, s);
+    return new CblDiagnosticException(location, ERROR, s);
   }
 
   /**
    * Create syntax error from the exception
    *
-   * @param line line
    * @return a new syntax error object
    */
-  public SyntaxError toSyntaxError(int line) {
+  public SyntaxError toSyntaxError() {
     SyntaxError.SyntaxErrorBuilder seb = SyntaxError.syntaxError();
     seb.errorSource(ErrorSource.PREPROCESSING);
     seb.severity(severity);
-    if (token != null) {
-      seb.location(new OriginalLocation(location, null));
-    }
+    seb.location(new OriginalLocation(location, null));
     seb.suggestion(this.getMessage());
     return seb.build();
   }

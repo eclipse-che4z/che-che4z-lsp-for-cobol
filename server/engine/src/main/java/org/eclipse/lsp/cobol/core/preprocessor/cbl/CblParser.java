@@ -114,7 +114,7 @@ public class CblParser {
         removeSegments(0, segments.length);
       }
     } catch (CblDiagnosticException e) {
-      diagnostics.add(e.toSyntaxError(lineNumber));
+      diagnostics.add(e.toSyntaxError());
     }
     removePrevComma();
     return serialize();
@@ -137,10 +137,10 @@ public class CblParser {
     } catch (CblDiagnosticException exception) {
       skipAfter(",");
       removeSegments(start, pos);
-      diagnostics.add(exception.toSyntaxError(lineNumber));
+      diagnostics.add(exception.toSyntaxError());
     }
     try {
-      parseOption();
+      parseOption(false);
     } catch (CblDiagnosticException exception) {
       skipAfter(",");
     }
@@ -210,12 +210,12 @@ public class CblParser {
         if (force) throw expect(next, makeCurrentLocation(), ALL_CICS_OPTIONS);
         cics = false;
         hasNonCics = true;
-        parseOption();
+        parseOption(true);
       }
       if (cics) {
         directiveNodes.add(createDirectiveNode(start, pos));
-        removeSegments(start, pos);
         opt(",");
+        removeSegments(start, pos);
       }
     }
     --pos;
@@ -239,7 +239,7 @@ public class CblParser {
     String next = next();
     int i = checkIntegerLiteral(next);
     if (i != 1 && i != 2 && i != 3) {
-      semanticError(next, "SPACE must be 1, 2 or 3.");
+      semanticError("SPACE must be 1, 2 or 3.");
     }
     one(")");
   }
@@ -250,7 +250,7 @@ public class CblParser {
     int i = checkIntegerLiteral(argument);
     one(")");
     if (isLineNumberWrong(i)) {
-      semanticError(argument, "LINECOUNT must be an integer between 1 and 255");
+      semanticError("LINECOUNT must be an integer between 1 and 255");
     }
   }
 
@@ -287,10 +287,9 @@ public class CblParser {
     return new CompilerDirectiveNode(locality, text.toString(), CICSDialect.DIALECT_NAME);
   }
 
-  private void semanticError(String next, String message) {
+  private void semanticError(String message) {
     diagnostics.add(
-        new CblDiagnosticException(makeCurrentLocation(), next, WARNING, message)
-            .toSyntaxError(lineNumber));
+        new CblDiagnosticException(makeCurrentLocation(), WARNING, message).toSyntaxError());
   }
 
   private boolean isLineNumberWrong(int nnn) {
@@ -313,15 +312,21 @@ public class CblParser {
     return new Location(uri, range);
   }
 
-  private void parseOption() throws CblDiagnosticException {
+  private void parseOption(boolean inXOpts) throws CblDiagnosticException {
     int depth = 0;
     while (true) {
       String next = next();
       if (next == null) break;
       else if ("'".equals(next) || "\"".equals(next)) skipAfter(next);
       else if (depth == 0) {
-        if (")".equals(next)) throw expect(next, makeCurrentLocation());
-        else if (",".equals(next)) break;
+        if (")".equals(next)) {
+          if (inXOpts) {
+            --pos;
+            break;
+          } else {
+            throw expect(next, makeCurrentLocation());
+          }
+        } else if (",".equals(next)) break;
       }
 
       if ("(".equals(next)) depth++;
