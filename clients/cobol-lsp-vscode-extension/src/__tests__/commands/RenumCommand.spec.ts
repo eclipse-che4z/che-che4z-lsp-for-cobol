@@ -15,11 +15,14 @@
 import * as vscode from "vscode";
 import {
   calculatePadding,
+  findIncompatibleLine,
   getSequentialNumber,
   RENUM_LEFT,
   RENUM_RIGHT,
   renumberLines,
+  RenumDocument,
   RenumEditor,
+  reportIncompatibleLine,
   unNumberLines,
 } from "../../commands/RenumCommand";
 
@@ -33,23 +36,18 @@ const mockNumberedLines: string[] = [
   "000200 IDENTIFICATION DIVISION.                                         00000000",
   "000300 PROGRAM-ID.    RENUM.                                            00000000",
 ];
-const mockAlienLines: string[] = [
+const mockIncompatibleLines: string[] = [
   "00*200 IDENTIFICATION DIVISION.                                         00000e00",
   "00e300 PROGRAM-ID.    RENUM.                                            00000a00",
 ];
-const pos = new vscode.Position(0, 0);
 
-const mockEditor: RenumEditor = {
-  document: {
-    get lineCount() {
-      return mockLines.length;
-    },
-    lineAt(i) {
-      return { text: mockLines[i] };
-    },
+const mockDocument: RenumDocument = {
+  get lineCount() {
+    return mockLines.length;
   },
-  revealRange: jest.fn(),
-  selection: new vscode.Selection(pos, pos),
+  lineAt(i) {
+    return { text: mockLines[i] };
+  },
 };
 const replaceMock = jest.fn();
 
@@ -59,27 +57,24 @@ const editMock: vscode.TextEditorEdit = {
   delete: jest.fn(),
   setEndOfLine: jest.fn(),
 };
-const mockNumberedEditor = {
-  document: {
-    get lineCount() {
-      return mockNumberedLines.length;
-    },
-    lineAt: (i: number) => {
-      return { text: mockNumberedLines[i] };
-    },
+const mockNumberedDocument = {
+  get lineCount() {
+    return mockNumberedLines.length;
   },
-  revealRange: jest.fn(),
-  selection: new vscode.Selection(pos, pos),
+  lineAt: (i: number) => {
+    return { text: mockNumberedLines[i] };
+  },
 };
-const mockAlienEditor = {
-  document: {
-    get lineCount() {
-      return mockAlienLines.length;
-    },
-    lineAt: (i: number) => {
-      return { text: mockAlienLines[i] };
-    },
+const mockIncompatibleDocument = {
+  get lineCount() {
+    return mockIncompatibleLines.length;
   },
+  lineAt: (i: number) => {
+    return { text: mockIncompatibleLines[i] };
+  },
+};
+const pos = new vscode.Position(0, 0);
+const mockEditor: RenumEditor = {
   revealRange: jest.fn(),
   selection: new vscode.Selection(pos, pos),
 };
@@ -89,14 +84,14 @@ beforeEach(() => {
 
 describe("Tests renumber/unnumber commmands", () => {
   it("Left action changes 6 digist at 0 to 6 columns", () => {
-    renumberLines(mockEditor, editMock, RENUM_LEFT);
+    renumberLines(mockDocument, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledWith(
       { end: { character: 6, line: 0 }, start: { character: 0, line: 0 } },
       "000100",
     );
   });
   it("Right action changes 8 digits at 72 to 80 columns & padding applied when text length is less than column start", () => {
-    renumberLines(mockEditor, editMock, RENUM_RIGHT);
+    renumberLines(mockDocument, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenNthCalledWith(
       1,
       {
@@ -107,14 +102,14 @@ describe("Tests renumber/unnumber commmands", () => {
     );
   });
   it("Unnumber Lines removes sequential numbers at 0 to 6 colums", () => {
-    unNumberLines(mockEditor, editMock, RENUM_LEFT);
+    unNumberLines(mockDocument, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledWith(
       { end: { character: 6, line: 0 }, start: { character: 0, line: 0 } },
       " ".repeat(6),
     );
   });
   it("Unnumber Lines removes sequential numbers at 72 to 80 colums", () => {
-    unNumberLines(mockNumberedEditor, editMock, RENUM_RIGHT);
+    unNumberLines(mockNumberedDocument, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenCalledWith(
       { end: { character: 80, line: 1 }, start: { character: 72, line: 1 } },
       " ".repeat(8),
@@ -122,12 +117,8 @@ describe("Tests renumber/unnumber commmands", () => {
   });
   it("no changes if document consists more than 999999 lines", () => {
     const bigMock = {
-      document: {
-        lineCount: 1000000,
-        lineAt: (_num: number) => ({ text: "" }),
-      },
-      revealRange: jest.fn(),
-      selection: new vscode.Selection(pos, pos),
+      lineCount: 1000000,
+      lineAt: (_num: number) => ({ text: "" }),
     };
     renumberLines(bigMock, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
@@ -136,11 +127,11 @@ describe("Tests renumber/unnumber commmands", () => {
     );
   });
   it("no changes if line starts with * char", () => {
-    renumberLines(mockEditor, editMock, RENUM_LEFT);
+    renumberLines(mockDocument, editMock, RENUM_LEFT);
     expect(replaceMock).toHaveBeenCalledTimes(4);
   });
   it("Unnumber Lines does not modify the text when there is no text at 72 to 80 colums", () => {
-    unNumberLines(mockEditor, editMock, RENUM_RIGHT);
+    unNumberLines(mockDocument, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenCalledTimes(0);
   });
   it("check getSequentialNumber against pad 4", () => {
@@ -162,7 +153,7 @@ describe("Tests renumber/unnumber commmands", () => {
     "check unNumberLines against digit 6 removes numbering at all lines in 1-6 columns & " +
       "lines commented out doesn't modified",
     () => {
-      unNumberLines(mockEditor, editMock, RENUM_LEFT);
+      unNumberLines(mockDocument, editMock, RENUM_LEFT);
       expect(replaceMock).toHaveBeenCalledTimes(4);
       expect(replaceMock).toHaveBeenNthCalledWith(
         1,
@@ -187,7 +178,7 @@ describe("Tests renumber/unnumber commmands", () => {
     },
   );
   it("check unNumberLines against digit 8 removes numbering at all lines in 73-80 columns & ", () => {
-    unNumberLines(mockNumberedEditor, editMock, RENUM_RIGHT);
+    unNumberLines(mockNumberedDocument, editMock, RENUM_RIGHT);
     expect(replaceMock).toHaveBeenCalledTimes(2);
     expect(replaceMock).toHaveBeenNthCalledWith(
       1,
@@ -214,13 +205,17 @@ describe("Tests renumber/unnumber commmands", () => {
     expect(calculatePadding(8, 10000)).toEqual(5);
     expect(calculatePadding(8, 100000)).toEqual(5);
   });
-  it("check renumber & unnumber cancels command when there is non digit or non empty char present in the columns", () => {
-    unNumberLines(mockAlienEditor, editMock, RENUM_LEFT);
-    renumberLines(mockAlienEditor, editMock, RENUM_LEFT);
-    unNumberLines(mockAlienEditor, editMock, RENUM_RIGHT);
-    renumberLines(mockAlienEditor, editMock, RENUM_RIGHT);
-
-    expect(replaceMock).toHaveBeenCalledTimes(0);
+  it("check any non digits or spaces returns incompatible position", () => {
+    expect(findIncompatibleLine(mockIncompatibleDocument, RENUM_LEFT)).toEqual({
+      character: 0,
+      line: 0,
+    });
+    expect(findIncompatibleLine(mockIncompatibleDocument, RENUM_RIGHT)).toEqual(
+      { character: 72, line: 0 },
+    );
+  });
+  it("check incompatible document reported at correct position", () => {
+    reportIncompatibleLine(mockEditor, pos);
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
       "Renumber/unnumber sequential numbers is not possible on non numeric lines",
       "Go to line",

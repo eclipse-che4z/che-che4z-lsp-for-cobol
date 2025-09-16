@@ -33,30 +33,29 @@ export const RENUM_RIGHT: RenumberParameters = {
   digits: 8,
 };
 
-export type RenumEditor = {
-  document: {
-    lineCount: number;
-    lineAt: (n: number) => {
-      text: string;
-    };
+export type RenumDocument = {
+  lineCount: number;
+  lineAt: (n: number) => {
+    text: string;
   };
+};
+export type RenumEditor = {
   revealRange: (range: vscode.Range) => void;
   selection: vscode.Selection;
 };
-
 /**
  * Renumber 1-7 or 73-80 columns in active editor.
  *
- * @param editor RenumEditor
+ * @param editor RenumDocument
  * @param edit  vscode.TextEditorEdit
  * @param params  RenumberParameters
  */
 export function renumberLines(
-  editor: RenumEditor,
+  document: RenumDocument,
   edit: vscode.TextEditorEdit,
   params: RenumberParameters,
 ) {
-  const lineCount = editor.document.lineCount;
+  const lineCount = document.lineCount;
   if (lineCount > maxLines) {
     vscode.window.showErrorMessage(
       "Renumber sequential numbers is not possible above 999999 lines",
@@ -64,10 +63,8 @@ export function renumberLines(
     return;
   }
 
-  if (!checkAlien(editor, params)) return;
-
   for (let i = 0; i < lineCount; i++) {
-    const line = editor.document.lineAt(i);
+    const line = document.lineAt(i);
     const text = line.text;
     const pad = calculatePadding(params.digits, lineCount);
     let value = getSequentialNumber(i, params.digits, pad);
@@ -85,19 +82,17 @@ export function renumberLines(
 /**
  * Remove sequential numbers at 1-7 or 73-80 columns in active editor.
  *
- * @param editor RenumEditor
+ * @param document RenumDocument
  * @param edit  vscode.TextEditorEdit
  * @param params  RenumberParameters
  */
 export function unNumberLines(
-  editor: RenumEditor,
+  document: RenumDocument,
   edit: vscode.TextEditorEdit,
   params: RenumberParameters,
 ) {
-  if (!checkAlien(editor, params)) return;
-
-  for (let i = 0; i < editor.document.lineCount; i++) {
-    const text = editor.document.lineAt(i).text;
+  for (let i = 0; i < document.lineCount; i++) {
+    const text = document.lineAt(i).text;
     if (text.substring(params.start, params.end).trim() !== "") {
       const range = new vscode.Range(
         new vscode.Position(i, params.start),
@@ -126,28 +121,43 @@ export function calculatePadding(digits: number, lineCount: number) {
   return digits - shift;
 }
 
-export function checkAlien(
-  editor: RenumEditor,
+export function findIncompatibleLine(
+  document: RenumDocument,
   params: RenumberParameters,
-): boolean {
-  for (let i = 0; i < editor.document.lineCount; i++) {
-    const text = editor.document.lineAt(i).text;
+): vscode.Position | undefined {
+  for (let i = 0; i < document.lineCount; i++) {
+    const text = document.lineAt(i).text;
     const res = validReg.test(text.substring(params.start, params.end));
-    if (!res) {
-      vscode.window
-        .showErrorMessage(
-          "Renumber/unnumber sequential numbers is not possible on non numeric lines",
-          "Go to line",
-        )
-        .then((selection) => {
-          if (selection === "Go to line") {
-            const pos = new vscode.Position(i, params.start);
-            editor.selection = new vscode.Selection(pos, pos);
-            editor.revealRange(new vscode.Range(pos, pos));
-          }
-        });
-      return false;
-    }
+    if (!res) return new vscode.Position(i, params.start);
   }
-  return true;
+}
+
+export function RenumHandler(
+  editor: vscode.TextEditor,
+  edit: vscode.TextEditorEdit,
+  renum: boolean,
+  param: RenumberParameters,
+) {
+  const incompatible = findIncompatibleLine(editor.document, param);
+  if (incompatible) reportIncompatibleLine(editor, incompatible);
+  else if (renum) renumberLines(editor.document, edit, param);
+  else unNumberLines(editor.document, edit, param);
+}
+
+export function reportIncompatibleLine(
+  editor: RenumEditor,
+  position: vscode.Position,
+) {
+  vscode.window
+    .showErrorMessage(
+      "Renumber/unnumber sequential numbers is not possible on non numeric lines",
+      "Go to line",
+    )
+    .then((selection) => {
+      if (selection === "Go to line") {
+        editor.selection = new vscode.Selection(position, position);
+        const range = new vscode.Range(position, position);
+        editor.revealRange(range);
+      }
+    });
 }
