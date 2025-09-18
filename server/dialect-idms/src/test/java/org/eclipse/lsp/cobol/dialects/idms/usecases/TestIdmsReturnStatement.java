@@ -67,7 +67,7 @@ class TestIdmsReturnStatement {
   private static final String TST7 =
       DEFS
           + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}\n"
-          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND' END-IF.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7);

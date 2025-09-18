@@ -33,10 +33,10 @@ class TestAbendCodeOnNextSentence {
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*ERRORSAT}.\n"
           + "            05 {$*SSC-ERRSTAT-SAVE} PIC X.\n"
-          + "            05 {$*ANY-STATUS} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
           + "            ABEND CODE {$SSC-ERRSTAT-SAVE} ON \n"
-          + "               {$ANY-STATUS} NEXT SENTENCE.\n";
+          + "               ANY-STATUS NEXT SENTENCE\n"
+          + "                END-IF.";
 
   @Test
   void test() {

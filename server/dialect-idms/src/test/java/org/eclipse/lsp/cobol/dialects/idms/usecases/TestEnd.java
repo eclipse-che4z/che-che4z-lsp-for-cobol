@@ -49,11 +49,18 @@ class TestEnd {
       "           END TRANSACTION STATISTICS WRITE INTO {$WK_INTO} LENGTH\r\n"
           + "           390.\r\n";
 
+  private static final String END_TRANSACTION_WITH_ALL_VARIABLES_ON =
+      "           MOVE 388 TO {$WK_LENGTH}.\r\n"
+          + "           END TRANSACTION STATISTICS WRITE INTO {$WK_INTO} LENGTH\r\n"
+          + "           {$WK_LENGTH}.\r\n"
+          + "           ON ANY-STATUS MOVE 1 TO {$WK_LENGTH} END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + END_LINE,
         BOILERPLATE + END_TRANSACTION,
-        BOILERPLATE + END_TRANSACTION_WITH_ALL_VARIABLES);
+        BOILERPLATE + END_TRANSACTION_WITH_ALL_VARIABLES,
+        BOILERPLATE + END_TRANSACTION_WITH_ALL_VARIABLES_ON);
   }
 
   @ParameterizedTest

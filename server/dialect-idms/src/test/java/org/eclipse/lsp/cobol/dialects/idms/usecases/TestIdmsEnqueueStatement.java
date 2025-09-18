@@ -54,13 +54,20 @@ class TestIdmsEnqueueStatement {
           + "           MOVE 8 TO {$WK-LENGTH}.  \r\n"
           + "           ENQUEUE NOWAIT NAME {$WK-NAME} LENGTH 8 NAME {$WK-NAME}\r\n"
           + "           LENGTH 8.\r\n";
+  private static final String ENQUEUE_MULTIPLE_ON =
+      "           MOVE 'TEST' TO {$WK-NAME}. \r\n"
+          + "           MOVE 8 TO {$WK-LENGTH}.  \r\n"
+          + "           ENQUEUE NOWAIT NAME {$WK-NAME} LENGTH 8 NAME {$WK-NAME}\r\n"
+          + "           LENGTH 8.\r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + ENQUEUE,
         BOILERPLATE + ENQUEUE_NAME_CLAUSE_VARIABLE,
         BOILERPLATE + ENQUEUE_NAME_CLAUSE_LITERAL,
-        BOILERPLATE + ENQUEUE_MULTIPLE);
+        BOILERPLATE + ENQUEUE_MULTIPLE,
+        BOILERPLATE + ENQUEUE_MULTIPLE_ON);
   }
 
   @ParameterizedTest

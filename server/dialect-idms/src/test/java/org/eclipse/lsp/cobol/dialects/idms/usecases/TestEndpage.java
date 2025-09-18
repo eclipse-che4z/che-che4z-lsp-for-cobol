@@ -37,9 +37,12 @@ class TestEndpage {
   private static final String ENDPAGE = "           ENDPAGE.\r\n";
 
   private static final String ENDPAGE_SESSION = "           ENDPAGE SESSION.\r\n";
+  private static final String ENDPAGE_SESSION_ON =
+      "           ENDPAGE SESSION.\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(BOILERPLATE + ENDPAGE, BOILERPLATE + ENDPAGE_SESSION);
+    return Stream.of(
+        BOILERPLATE + ENDPAGE, BOILERPLATE + ENDPAGE_SESSION, BOILERPLATE + ENDPAGE_SESSION_ON);
   }
 
   @ParameterizedTest

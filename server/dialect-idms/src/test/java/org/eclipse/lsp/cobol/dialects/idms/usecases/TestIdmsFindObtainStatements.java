@@ -92,7 +92,7 @@ class TestIdmsFindObtainStatements {
   private static final String FIND18 =
       DEFS
           + "           OBTAIN NEXT {$EMPLOYEE} WITHIN {$DEPT-EMPLOYEE} ON {$DB-END-OF-SET}\n"
-          + "                   DISPLAY 'END OF SET'.\n";
+          + "                   DISPLAY 'END OF SET' END-IF.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

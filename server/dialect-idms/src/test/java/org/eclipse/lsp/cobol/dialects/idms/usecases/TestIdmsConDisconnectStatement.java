@@ -49,8 +49,13 @@ class TestIdmsConDisconnectStatement {
   private static final String CONN1 =
       DEFS + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}.\n";
 
+  private static final String CONN1_ON =
+      DEFS
+          + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}.\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(DISC1, DISC2, CONN1);
+    return Stream.of(DISC1, DISC2, CONN1, CONN1_ON);
   }
 
   @ParameterizedTest

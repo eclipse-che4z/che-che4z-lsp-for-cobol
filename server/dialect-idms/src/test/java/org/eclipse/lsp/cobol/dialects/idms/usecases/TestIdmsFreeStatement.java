@@ -46,13 +46,17 @@ class TestIdmsFreeStatement {
   private static final String FREE_STORAGE_3 = "           FREE STORAGE FOR {$WK1}.\n";
 
   private static final String FREE_STORAGE_4 = "           FREE STORAGE FOR {$WK1} FROM {$WK2}.\n";
+  private static final String FREE_STORAGE_4_ON =
+      "           FREE STORAGE FOR {$WK1} FROM {$WK2}.\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + FREE_STORAGE_1,
         BOILERPLATE + FREE_STORAGE_2,
         BOILERPLATE + FREE_STORAGE_3,
-        BOILERPLATE + FREE_STORAGE_4);
+        BOILERPLATE + FREE_STORAGE_4,
+        BOILERPLATE + FREE_STORAGE_4_ON);
   }
 
   @ParameterizedTest

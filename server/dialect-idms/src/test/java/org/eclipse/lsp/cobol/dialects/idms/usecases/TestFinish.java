@@ -37,10 +37,12 @@ class TestFinish {
   private static final String FINISH_TASK = "           FINISH TASK.\r\n";
 
   private static final String FINISH = "           FINISH.\r\n";
+  private static final String FINISH_TASK_ON =
+      "           FINISH TASK.\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
 
-    return Stream.of(BOILERPLATE + FINISH_TASK, BOILERPLATE + FINISH);
+    return Stream.of(BOILERPLATE + FINISH_TASK, BOILERPLATE + FINISH, BOILERPLATE + FINISH_TASK_ON);
   }
 
   @ParameterizedTest

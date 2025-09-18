@@ -74,7 +74,8 @@ class TestIdmsReadStatement {
 
   private static final String READ_LINE_ON =
       "            READ LINE TERMINAL INTO {$WK_1} MAX LENGTH 30\r\n"
-          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'READ ERROR'.\r\n";
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'READ ERROR'\r\n"
+          + "           END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

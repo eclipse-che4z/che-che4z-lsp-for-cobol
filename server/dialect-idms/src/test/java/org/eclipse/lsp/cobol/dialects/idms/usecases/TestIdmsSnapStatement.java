@@ -60,12 +60,19 @@ class TestIdmsSnapStatement {
           + "            SNAP TITLE IS {$WK_TITLE} SYSTEM FROM {$WK1} LENGTH 10\r\n"
           + "            FROM {$WK3} LENGTH 10.\r\n";
 
+  private static final String SNAP_ALL_PARMS_LITERAL_ON =
+      "            MOVE '  TITLE' TO {$WK_TITLE}.\r\n"
+          + "            SNAP TITLE IS {$WK_TITLE} SYSTEM FROM {$WK1} LENGTH 10\r\n"
+          + "            FROM {$WK3} LENGTH 10.\r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + SNAP,
         BOILERPLATE + SNAP_ALL_PARMS_VARB,
         BOILERPLATE + SNAP_ALL_PARMS_VARB2,
-        BOILERPLATE + SNAP_ALL_PARMS_LITERAL);
+        BOILERPLATE + SNAP_ALL_PARMS_LITERAL,
+        BOILERPLATE + SNAP_ALL_PARMS_LITERAL_ON);
   }
 
   @ParameterizedTest

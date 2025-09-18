@@ -148,7 +148,7 @@ idmsIfStatement
     ;
 
 idmsStatements
-    : idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
+    : idmsStmtsOptTermOn endClause? imperativeStatementCall? nextSentence? | idmsStmtsMandTermOn (SEMICOLON_FS imperativeStatementCall? nextSentence? | DOT_FS)
     ;
 
 
@@ -162,10 +162,6 @@ idmsStmtsOptTermOn
 
 idmsStmtsMandTermOn
     : transferStatement
-    ;
-
-idmsOnClause
-    : ON generalIdentifier nextSentence?
     ;
 
 nextSentence
@@ -785,7 +781,7 @@ waitEventListClause
 // write IDMS
 writeIdmsStatement
    : WRITE (writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause |
-            writeThenReadClause) idmsOnClause?
+            writeThenReadClause)
    ;
 
 writeJournalClause
@@ -848,7 +844,7 @@ writeThenReadClause
 
 // read statement
 readStatement
-   : READ (readLineFromTerminalClause | readTerminalClause) idmsOnClause?
+   : READ (readLineFromTerminalClause | readTerminalClause)
    ;
 
 readTerminalClause
@@ -864,7 +860,7 @@ readLineFromTerminalClause
 
 // accept statement
 acceptStatement
-    : ACCEPT (acceptIdmsDcClause idmsOnClause? | acceptIdmsDbClause idmsOnClause?)
+    : ACCEPT (acceptIdmsDcClause  | acceptIdmsDbClause )
     ;
 
 acceptIdmsDcClause
@@ -907,7 +903,7 @@ currencyPageInfo
 // delete statement
 
 deleteStatement
-    : DELETE deleteIdmsDCStatement idmsOnClause?
+    : DELETE deleteIdmsDCStatement
     ;
 
 deleteIdmsDCStatement
@@ -937,7 +933,7 @@ deleteTableClause
 // return statment
 
 returnStatement
-    : RETURN idmsReturn idmsOnClause?
+    : RETURN idmsReturn
     ;
 
 idmsReturn
@@ -962,7 +958,7 @@ sendIdmsToClause
 // set statement
 
 setStatement
-    : SET setIdmsDcStatement idmsOnClause?
+    : SET setIdmsDcStatement
     ;
 
 setIdmsDcStatement

@@ -56,10 +56,22 @@ class TestIdmsKeepStatement {
           + "           MOVE 'TSTID' TO {$WK_ID}.\r\n"
           + "           KEEP LONGTERM {$WK_ID} UPGRADE EXCLUSIVE RETURN NOTIFICATION\r\n"
           + "           INTO {$WK_LOC}.\n";
+  private static final String KEEP_LOCK_UPGRADE_ON =
+      DEFS
+          + "           MOVE 'TSTID' TO {$WK_ID}.\r\n"
+          + "           KEEP LONGTERM {$WK_ID} UPGRADE EXCLUSIVE RETURN NOTIFICATION\r\n"
+          + "           INTO {$WK_LOC}.\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        KEEP1, KEEP2, KEEP3, KEEP_LONGTERM_RELEASE, KEEP_LONGTERM_TEST, KEEP_LOCK_UPGRADE);
+        KEEP1,
+        KEEP2,
+        KEEP3,
+        KEEP_LONGTERM_RELEASE,
+        KEEP_LONGTERM_TEST,
+        KEEP_LOCK_UPGRADE,
+        KEEP_LOCK_UPGRADE_ON);
   }
 
   @ParameterizedTest

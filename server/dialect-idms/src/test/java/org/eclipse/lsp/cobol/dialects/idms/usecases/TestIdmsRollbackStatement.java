@@ -38,9 +38,11 @@ class TestIdmsRollbackStatement {
   private static final String ROLL3 = DEFS + "           ROLLBACK TASK.\n";
 
   private static final String ROLL4 = DEFS + "           ROLLBACK TASK CONTINUE.\n";
+  private static final String ROLL4_ON =
+      DEFS + "           ROLLBACK TASK CONTINUE.\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(ROLL1, ROLL2, ROLL3, ROLL4);
+    return Stream.of(ROLL1, ROLL2, ROLL3, ROLL4, ROLL4_ON);
   }
 
   @ParameterizedTest

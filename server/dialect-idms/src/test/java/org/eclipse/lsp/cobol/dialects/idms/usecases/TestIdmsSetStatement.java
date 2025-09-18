@@ -92,7 +92,7 @@ class TestIdmsSetStatement {
   private static final String SET_TIMER_ON =
       DEFS
           + "           SET TIMER POST INTERVAL 10 EVENT {$WK_EVENT} TIMER ID {$WK_TIMER} \r\n"
-          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR'.\r\n";
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR' END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

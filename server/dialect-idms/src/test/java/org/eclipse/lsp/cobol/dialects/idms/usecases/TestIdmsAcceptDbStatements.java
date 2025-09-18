@@ -112,7 +112,8 @@ class TestIdmsAcceptDbStatements {
   private static final String TST90 =
       DEFS
           + "           ACCEPT {$DB-KEY1} FROM {$EMP_AREA} NEXT CURRENCY PAGE-INFO {$DB1} \n"
-          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'\n"
+          + "           END-IF.\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

@@ -65,6 +65,10 @@ class TestDelete {
 
   private static final String DELETE_QUEUE_NO_ID = "           DELETE QUEUE CURRENT.\r\n";
 
+  private static final String DELETE_QUEUE_NO_ID_ON =
+      "           DELETE QUEUE CURRENT.\r\n"
+          + "           ON ANY-STATUS MOVE 1 TO {$WK_QUEUEID} END-IF.\r\n";
+
   /**
    * ref - https://www.ibm.com/docs/hu/cobol-zos/4.2?topic=statements-delete-statement file-name-1 :
    * Must be defined in an FD entry in the data division and must be the name of an indexed or
@@ -123,7 +127,8 @@ class TestDelete {
         BOILERPLATE + DELETE_TABLE_ALL_PARMS_LITERAL,
         BOILERPLATE + DELETE_QUEUE_ON,
         BOILERPLATE + DELETE_SCRATCH_ON,
-        BOILERPLATE + DELETE_TABLE_ON);
+        BOILERPLATE + DELETE_TABLE_ON,
+        BOILERPLATE + DELETE_QUEUE_NO_ID_ON);
   }
 
   @ParameterizedTest

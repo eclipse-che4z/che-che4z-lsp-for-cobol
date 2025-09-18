@@ -153,7 +153,7 @@ class TestIdmsWriteClause {
 
   private static final String WRITE_JOURNAL_ON_1 =
       "            WRITE JOURNAL WAIT NOSPAN FROM {$WK1} LENGTH 8\r\n"
-          + "           ON {$ANY-ERROR-STATUS} DISPLAY 'WRITE ERROR'.\n";
+          + "           ON {$ANY-ERROR-STATUS} DISPLAY 'WRITE ERROR' END-IF.\n";
 
   private static final String WRITE_THEN_READ_ON_1 =
       "           WRITE THEN READ TERMINAL WAIT NEWPAGE FREE STORAGE FROM {$WK1}\n"

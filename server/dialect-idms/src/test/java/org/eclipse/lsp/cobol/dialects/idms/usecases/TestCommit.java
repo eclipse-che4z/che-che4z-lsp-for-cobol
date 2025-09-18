@@ -39,10 +39,15 @@ class TestCommit {
   private static final String COMMIT_TASK = "           COMMIT TASK .\r\n";
 
   private static final String COMMIT_ALL = "           COMMIT ALL .\r\n";
+  private static final String COMMIT_ALL_ON =
+      "           COMMIT ALL .\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BOILERPLATE + COMMIT_TASK_ALL, BOILERPLATE + COMMIT_TASK, BOILERPLATE + COMMIT_ALL);
+        BOILERPLATE + COMMIT_TASK_ALL,
+        BOILERPLATE + COMMIT_TASK,
+        BOILERPLATE + COMMIT_ALL,
+        BOILERPLATE + COMMIT_ALL_ON);
   }
 
   @ParameterizedTest
