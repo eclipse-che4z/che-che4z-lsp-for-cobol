@@ -26,6 +26,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 
@@ -114,6 +115,20 @@ public class ConfigHelper {
       return false;
     } else {
       return options.getAsBoolean();
+    }
+  }
+
+  /**
+   * Parse CICS translator client configurations to {@link Boolean}
+   *
+   * @param options CICS translator client configuration
+   * @return True if checked or false
+   */
+  public SqlProcessing parseSQLProcessingEnabled(JsonElement options) {
+    if (options instanceof JsonNull) {
+      return SqlProcessing.ENABLED;
+    } else {
+      return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
     }
   }
 
