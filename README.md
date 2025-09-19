@@ -152,11 +152,9 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 ## Copybook Support
 
-The COBOL Language Support extension automatically supports copybooks used in your source code that are stored in a folder in your workspace. 
+The COBOL Language Support extension supports copybooks used in your source code that are stored in local folders in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets and folders that contain copybooks used in your project in the workspace settings. 
 
-If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets that contain copybooks used in your project in the workspace settings. If you need to restrict copybook support to certain subfolders in your workspace, you can also specify local folders that contain copybooks in the workspace settings.
-
-When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder that you specify in the workspace settings and a remote location, the one in the local folder is used.
+When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
 
@@ -171,7 +169,7 @@ COBOL Language Support supports the following copybook types:
 
 ### Storing Copybooks Locally
 
-You can store your copybooks locally in folders in your workspace. Copybook support is enabled by default for the entire workspace. If you need to restrict copybook support to individual folders, specify the folder paths in your workspace extension settings.
+You can store your copybooks locally in folders in your workspace. To enable copybook support, specify the folder paths that contain copybooks in your workspace extension settings.
 
 1. Open the COBOL Language Support extension settings.
 2. Switch from **User** to **Workspace**.
