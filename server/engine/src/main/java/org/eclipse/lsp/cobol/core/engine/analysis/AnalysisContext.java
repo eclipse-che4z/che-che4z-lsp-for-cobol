@@ -62,11 +62,7 @@ public class AnalysisContext implements BenchmarkSessionProvider {
 
     final Map<String, List<String>> pd = config.getPreprocessorsDirectives();
     if (pd != null) {
-      pd.entrySet()
-          .forEach(
-              e -> {
-                preprocessorsDirectives.put(e.getKey(), new ArrayList<String>(e.getValue()));
-              });
+      pd.forEach((key, value) -> preprocessorsDirectives.put(key, new ArrayList<>(value)));
     }
   }
 

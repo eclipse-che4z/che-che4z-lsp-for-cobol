@@ -38,7 +38,7 @@ public class CompilerDirectivesStage
     implements Stage<AnalysisContext, Void, List<CompilerDirectiveNode>> {
   private static final Pattern COMPILER_DIRECTIVE_LINE =
       Pattern.compile("(?i)(\\d.{5}.*|\\s*+)\\*?(CBL|PROCESS)\\s+(?<directives>.+)");
-  private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n\r?");
+  private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\r?\n");
   private static final Pattern DIALECT_FILLER_PATTERN =
       Pattern.compile(String.format("^[%s%s]*$", "\\s", CobolDialect.FILLER));
   private final MessageService messageService;

@@ -146,6 +146,12 @@ public class ExtendedDocument {
     dirty = true;
   }
 
+  public void delete(int lineNumber) {
+    int deleteLine = updateLineDueToChanges(lineNumber);
+    currentText.delete(deleteLine);
+    dirty = true;
+  }
+
   /**
    * Replaces given range of text with a new text
    *

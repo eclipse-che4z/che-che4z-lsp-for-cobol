@@ -27,14 +27,12 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
 
 /** Stage to process dialect nodes */
 @RequiredArgsConstructor
-public class DialectCompilerDirectiveStage
-    implements Stage<AnalysisContext, List<CompilerDirectiveNode>, Void> {
+public class DialectCompilerDirectiveStage implements Stage<AnalysisContext, Void, Void> {
   private final DialectService dialectService;
 
   @Override
-  public StageResult<List<CompilerDirectiveNode>> run(
-      AnalysisContext context, StageResult<Void> prevStageResult) {
-    List<CompilerDirectiveNode> dialectCompilerDirectiveNodes = new ArrayList<>();
+  public StageResult<Void> run(AnalysisContext context, StageResult<Void> prevStageResult) {
+
     dialectService.updateDialects(context.getConfig().getDialectRegistry());
     DialectProcessingContext dialectProcessingContext =
         DialectProcessingContext.builder()
@@ -48,11 +46,20 @@ public class DialectCompilerDirectiveStage
         .map(dialectService::getDialectByName)
         .forEach(dia -> dia.ifPresent(allAvailableDialect::add));
 
-    allAvailableDialect.forEach(
-        dialect ->
-            dialectCompilerDirectiveNodes.addAll(
-                dialect.getCompilerDirectives(dialectProcessingContext)));
-    return new StageResult<>(dialectCompilerDirectiveNodes);
+    for (CobolDialect dialect : allAvailableDialect) {
+      List<CompilerDirectiveNode> compilerDirectives =
+          dialect.getCompilerDirectives(dialectProcessingContext, context.getAccumulatedErrors());
+      context.getDialectNodes().addAll(compilerDirectives);
+      List<String> opts =
+          context
+              .getPreprocessorsDirectives()
+              .computeIfAbsent(dialect.getName(), k -> new ArrayList<>());
+      for (CompilerDirectiveNode compilerDirective : compilerDirectives) {
+        opts.add(compilerDirective.getDirectiveText());
+      }
+    }
+
+    return (StageResult<Void>) StageResult.empty();
   }
 
   @Override

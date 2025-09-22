@@ -39,6 +39,8 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNameAndLocality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.dialects.idms.IdmsParser.*;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /**
  * This extension of {@link IdmsParserBaseVisitor} applies the semantic analysis based on the
@@ -79,12 +81,48 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitObtainLRStatement(ObtainLRStatementContext ctx) {
+    if (ctx.imperativeStatementCall() == null) {
+      addReplacementContext(ctx);
+    } else {
+      addReplacementImperativeStatementContext(ctx, ctx.imperativeStatementCall());
+    }
+    return visitChildren(ctx);
+  }
+
+  @Override
+  public List<Node> visitEraseStoreModifyLrStatementsOptions(
+      EraseStoreModifyLrStatementsOptionsContext ctx) {
+    if (ctx.imperativeStatementCall() != null) {
+      addReplacementImperativeStatementContext(ctx.getParent(), ctx.imperativeStatementCall());
+    } else {
+      addReplacementContext(ctx);
+    }
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<Node> visitQualifiedDataName(QualifiedDataNameContext ctx) {
     return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
   @Override
   public List<Node> visitIdms_db_entity_name(Idms_db_entity_nameContext ctx) {
+
+    if (ctx.getParent() instanceof EraseStatementContext) {
+      if (((EraseStatementContext) ctx.getParent()).eraseStoreModifyLrStatementsOptions() != null) {
+        return visitChildren(ctx);
+      }
+    } else if (ctx.getParent() instanceof StoreStatementContext) {
+      if (((StoreStatementContext) ctx.getParent()).eraseStoreModifyLrStatementsOptions() != null) {
+        return visitChildren(ctx);
+      }
+    } else if (ctx.getParent() instanceof ModifyStatementContext) {
+      if (((ModifyStatementContext) ctx.getParent()).eraseStoreModifyLrStatementsOptions()
+          != null) {
+        return visitChildren(ctx);
+      }
+    }
     return addTreeNode(ctx, QualifiedReferenceNode::new);
   }
 
@@ -194,5 +232,19 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
       newText = newText.substring(0, newText.length() - 1) + ".";
     }
     context.getExtendedDocument().replace(DialectUtils.constructRange(ctx), newText);
+  }
+
+  private void addReplacementImperativeStatementContext(
+      ParserRuleContext ctx, ImperativeStatementCallContext imperativeStatementCallContext) {
+    Range range =
+        new Range(
+            new Position(ctx.getStart().getLine() - 1, ctx.getStart().getCharPositionInLine()),
+            new Position(
+                imperativeStatementCallContext.getStart().getLine() - 1,
+                imperativeStatementCallContext.getStart().getCharPositionInLine()));
+    context.getExtendedDocument().clear(range);
+    context
+        .getExtendedDocument()
+        .replace(DialectUtils.constructRange(imperativeStatementCallContext), "IF 1 + 1 = 2");
   }
 }

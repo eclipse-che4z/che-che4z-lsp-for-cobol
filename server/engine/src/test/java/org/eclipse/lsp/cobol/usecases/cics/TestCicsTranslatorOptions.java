@@ -12,7 +12,7 @@
  *    Broadcom, Inc. - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.usecases;
+package org.eclipse.lsp.cobol.usecases.cics;
 
 import static org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode.ENABLED;
 
@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -41,7 +42,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * href="https://www.ibm.com/docs/en/cics-ts/6.1?topic=compilation-using-cics-translator">CICS
  * translator</a> for more details.
  */
-public class TestCICSTranslatorOptions {
+public class TestCicsTranslatorOptions {
   public static final String PREFIX = "       CBL XOPTS (";
   public static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
@@ -79,8 +80,10 @@ public class TestCICSTranslatorOptions {
         "LENGTH",
         "LINECOUNT(1)",
         "LINECOUNT(2)",
+        "LINECOUNT(10)",
+        "LINECOUNT(20)",
         "LINKAGE",
-        "NATLANG",
+        "NATLANG(EN)",
         "NOCBLCARD",
         "NOCPSM",
         "NODEBUG",
@@ -107,7 +110,7 @@ public class TestCICSTranslatorOptions {
   }
 
   public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
-      "       CBL CICS (SP, {'EXCI'|1}) \n"
+      "       CBL CICS (SP, {'EXCI'|1} \n"
           + "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.  AB01FORE.\n"
           + "       ENVIRONMENT DIVISION.\n"
@@ -134,10 +137,14 @@ public class TestCICSTranslatorOptions {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(),
-                "No viable alternative at input CICS (SP, 'EXCI'",
+                new Range(new Position(0, 21), new Position(0, 22)),
+                "Unexpected token: '. Expect one of tokens: APOST, QUOTE, CBLCARD, NOCBLCARD, CICS,"
+                    + " COBOL2, CO2, COBOL3, CO3, CPSM, NOCPSM, DBCS, DEBUG, NODEBUG, DLI, EDF,"
+                    + " NOEDF, EXCI, FEPI, NOFEPI, LENGTH, NOLENGTH, LIN, LINKAGE, NOLINKAGE, NUM,"
+                    + " NONUM, OP, OPTIONS, NOP, NOOPTIONS, Q, SEQ, NOSEQ, SP, SPIE, NOSPIE,"
+                    + " SYSEIB, VBREF, NOVBREF, FLAG, F, LINECOUNT, LC, SPACE, NATLANG",
                 DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+                ErrorSource.PREPROCESSING.getText())));
   }
 
   @Test

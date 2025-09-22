@@ -36,4 +36,13 @@ public class DialectProcessingContext {
   @Builder.Default List<Node> dialectNodes = new ArrayList<>();
   @Builder.Default String languageId = "cobol";
   @Builder.Default Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
+
+  /**
+   * Get the layout of the COBOL dialect
+   *
+   * @return the layout
+   */
+  public CobolProgramLayout getLayout() {
+    return CobolLanguageId.MAPPER.get(getLanguageId()).getLayout();
+  }
 }
