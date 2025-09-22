@@ -71,7 +71,7 @@ class TestIdmsReadyStatement {
   private static final String READ7_ON =
       DEFS
           + "          BIND RUN-UNIT.\n"
-          + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE.\n"
+          + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

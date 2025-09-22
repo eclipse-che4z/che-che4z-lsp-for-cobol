@@ -84,7 +84,7 @@ class TestIdmsInquireMapStatement {
           + "                             DATA TRUNCATED THEN DISPLAY 'TRUNCATION'.\n";
   private static final String TST2_ON =
       DEFS
-          + "           INQUIRE MAP {$EMPMAP} MOVE CURSOR TO {$CURROW} {$CURCOL}.\n"
+          + "           INQUIRE MAP {$EMPMAP} MOVE CURSOR TO {$CURROW} {$CURCOL}\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

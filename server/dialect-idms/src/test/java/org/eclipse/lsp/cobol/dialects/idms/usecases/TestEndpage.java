@@ -38,7 +38,7 @@ class TestEndpage {
 
   private static final String ENDPAGE_SESSION = "           ENDPAGE SESSION.\r\n";
   private static final String ENDPAGE_SESSION_ON =
-      "           ENDPAGE SESSION.\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+      "           ENDPAGE SESSION\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(

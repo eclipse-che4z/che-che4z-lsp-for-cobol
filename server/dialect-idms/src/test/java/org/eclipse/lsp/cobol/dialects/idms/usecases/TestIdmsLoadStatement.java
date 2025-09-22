@@ -65,7 +65,7 @@ class TestIdmsLoadStatement {
   private static final String LOAD_LITERALS_ERROR_ON =
       DEFS
           + "           LOAD TABLE {'TSTTABLXX'|1} INTO {$WK_1} TO {$WK_2} DICTNODE \r\n"
-          + "           {'TSTDICTXXX'|2} DICTNAME {'TSTDICTXXX'|3} LOADLIB 'TSTLOAD' NOWAIT.\n"
+          + "           {'TSTDICTXXX'|2} DICTNAME {'TSTDICTXXX'|3} LOADLIB 'TSTLOAD' NOWAIT\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

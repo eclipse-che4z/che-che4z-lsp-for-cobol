@@ -63,7 +63,7 @@ class TestAccept {
   private static final String ACCEPT_TRANSACTION_STATISTICS_LENGTH =
       "           ACCEPT TRANSACTION STATISTICS LENGTH 500.\r\n";
   private static final String ACCEPT_TRANSACTION_STATISTICS_LENGTH_ON =
-      "           ACCEPT TRANSACTION STATISTICS LENGTH 500.\n"
+      "           ACCEPT TRANSACTION STATISTICS LENGTH 500\n"
           + "           ON ANY-STATUS MOVE 1 TO ABC END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

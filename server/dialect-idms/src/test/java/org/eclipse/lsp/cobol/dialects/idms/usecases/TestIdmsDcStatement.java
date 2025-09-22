@@ -104,7 +104,7 @@ class TestIdmsDcStatement {
           + "           DC RETURN NEXT TASK CODE {$WK_TASK} NORMAL\r\n"
           + "           TIMEOUT INTERVAL 10\r\n"
           + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT\r\n"
-          + "           NAME 'TSTEVENT'.\r\n"
+          + "           NAME 'TSTEVENT'\r\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

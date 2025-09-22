@@ -43,7 +43,7 @@ class TestIdmsEraseStatement {
 
   private static final String ERAS4 = DEFS + "           ERASE {$EMPLOYEE}.\n";
   private static final String ERAS4_ON =
-      DEFS + "           ERASE {$EMPLOYEE}.\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+      DEFS + "           ERASE {$EMPLOYEE}\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(ERAS1, ERAS2, ERAS3, ERAS4, ERAS4_ON);

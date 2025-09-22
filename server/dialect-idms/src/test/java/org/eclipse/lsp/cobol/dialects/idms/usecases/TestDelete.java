@@ -66,7 +66,7 @@ class TestDelete {
   private static final String DELETE_QUEUE_NO_ID = "           DELETE QUEUE CURRENT.\r\n";
 
   private static final String DELETE_QUEUE_NO_ID_ON =
-      "           DELETE QUEUE CURRENT.\r\n"
+      "           DELETE QUEUE CURRENT\r\n"
           + "           ON ANY-STATUS MOVE 1 TO {$WK_QUEUEID} END-IF.\r\n";
 
   /**

@@ -97,7 +97,7 @@ class TestIdmsGetStatement {
 
   private static final String GET_TIME_ALL_PARMS_ON =
       DEFS
-          + "           GET TIME INTO {$WK_TIME} COMP-3 DATE INTO {$WK_DATE}.\r\n"
+          + "           GET TIME INTO {$WK_TIME} COMP-3 DATE INTO {$WK_DATE}\r\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

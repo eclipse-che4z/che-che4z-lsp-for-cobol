@@ -60,7 +60,7 @@ class TestIdmsKeepStatement {
       DEFS
           + "           MOVE 'TSTID' TO {$WK_ID}.\r\n"
           + "           KEEP LONGTERM {$WK_ID} UPGRADE EXCLUSIVE RETURN NOTIFICATION\r\n"
-          + "           INTO {$WK_LOC}.\n"
+          + "           INTO {$WK_LOC}\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

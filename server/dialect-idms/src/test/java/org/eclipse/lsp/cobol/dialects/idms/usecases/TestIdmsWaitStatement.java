@@ -60,7 +60,7 @@ class TestIdmsWaitStatement {
   private static final String WAIT_6 =
       "            WAIT LONG EVENT {$WK_ECB1} EVENT {$WK_ECB2}.\r\n";
   private static final String WAIT_6_ON =
-      "            WAIT LONG EVENT {$WK_ECB1} EVENT {$WK_ECB2}.\r\n"
+      "            WAIT LONG EVENT {$WK_ECB1} EVENT {$WK_ECB2}\r\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

@@ -60,7 +60,7 @@ class TestAttachTaskCode {
       "           ATTACH TASK CODE 'TASKCODE' PRIORITY {1XX|1}.\r\n";
 
   private static final String ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL_ON =
-      "           ATTACH TASK CODE 'TASKCODE' PRIORITY {1XX|1}.\n"
+      "           ATTACH TASK CODE 'TASKCODE' PRIORITY {1XX|1}\n"
           + "           ON ANY-STATUS MOVE 1 TO WK_TASKCODE END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

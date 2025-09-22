@@ -58,7 +58,7 @@ class TestIdmsEnqueueStatement {
       "           MOVE 'TEST' TO {$WK-NAME}. \r\n"
           + "           MOVE 8 TO {$WK-LENGTH}.  \r\n"
           + "           ENQUEUE NOWAIT NAME {$WK-NAME} LENGTH 8 NAME {$WK-NAME}\r\n"
-          + "           LENGTH 8.\r\n"
+          + "           LENGTH 8\r\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

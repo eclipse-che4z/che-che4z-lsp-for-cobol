@@ -50,7 +50,7 @@ class TestChangePriority {
   private static final String CHANGE_PRIORITY_TO_LITERAL_INVALID =
       "           CHANGE PRIORITY TO {1X3|1}.\r\n";
   private static final String CHANGE_PRIORITY_TO_LITERAL_INVALID_ON =
-      "           CHANGE PRIORITY TO {1X3|1}.\r\n"
+      "           CHANGE PRIORITY TO {1X3|1}\r\n"
           + "           ON ANY-STATUS MOVE 1 TO WK_PRIORITY END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

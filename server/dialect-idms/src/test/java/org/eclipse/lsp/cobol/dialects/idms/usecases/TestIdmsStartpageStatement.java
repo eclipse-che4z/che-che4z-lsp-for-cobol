@@ -52,7 +52,7 @@ class TestIdmsStartpageStatement {
       DEFS + "           STARTPAGE SESSION {$EMPMAPTOOLONG|1} BACKPAGE.\n";
   private static final String TST4_ON =
       DEFS
-          + "           STARTPAGE SESSION {$EMPMAPTOOLONG|1} BACKPAGE.\n"
+          + "           STARTPAGE SESSION {$EMPMAPTOOLONG|1} BACKPAGE\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

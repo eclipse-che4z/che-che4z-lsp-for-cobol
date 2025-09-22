@@ -83,7 +83,7 @@ class TestIdmsMapInStatement {
       DEFS + "           MAP IN USING {$EMPMAP} IO INPUT DATA YES.\n";
   private static final String TST10_ON =
       DEFS
-          + "           MAP IN USING {$EMPMAP} IO INPUT DATA YES.\n"
+          + "           MAP IN USING {$EMPMAP} IO INPUT DATA YES\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

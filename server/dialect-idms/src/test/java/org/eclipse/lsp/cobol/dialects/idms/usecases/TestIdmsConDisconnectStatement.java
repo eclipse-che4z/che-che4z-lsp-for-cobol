@@ -51,7 +51,7 @@ class TestIdmsConDisconnectStatement {
 
   private static final String CONN1_ON =
       DEFS
-          + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}.\n"
+          + "           CONNECT {$EMPLOYEE} TO {$OFFICE-EMPLOYEE}\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

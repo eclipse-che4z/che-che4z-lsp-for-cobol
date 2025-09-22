@@ -48,7 +48,7 @@ class TestBind {
       "            BIND TRANSACTION STATISTICS.\r\n";
 
   private static final String BIND_TRANSACTION_STATISTICS_ON =
-      "            BIND TRANSACTION STATISTICS.\r\n"
+      "            BIND TRANSACTION STATISTICS\r\n"
           + "           ON ANY-STATUS MOVE 1 TO WK_NODENAME END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

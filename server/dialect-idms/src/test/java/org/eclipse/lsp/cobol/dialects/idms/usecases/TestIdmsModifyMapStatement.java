@@ -93,7 +93,7 @@ class TestIdmsModifyMapStatement {
           + "           MODIFY MAP {$EMPMAP} FOR ALL DFLD {$MAP-FLD}({$S1}) \n"
           + "                             DFLD  {$MFLD2} OF {$MAP1} \n"
           + "                             DFLD  {$MAP-FLD}(3) \n "
-          + "                             RIGHT JUSTIFY ATTRIBUTES DETECT DARK.\n"
+          + "                             RIGHT JUSTIFY ATTRIBUTES DETECT DARK\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

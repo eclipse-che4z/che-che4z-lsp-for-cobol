@@ -79,7 +79,7 @@ class TestIdmsBindStatement {
 
   private static final String BIND13_ON =
       DEFS
-          + "           BIND PROCEDURE FOR {$ABCPROCTOOLONG|1} TO {$DB1}.\n"
+          + "           BIND PROCEDURE FOR {$ABCPROCTOOLONG|1} TO {$DB1}\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

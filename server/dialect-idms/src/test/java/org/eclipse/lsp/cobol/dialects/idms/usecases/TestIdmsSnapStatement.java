@@ -63,7 +63,7 @@ class TestIdmsSnapStatement {
   private static final String SNAP_ALL_PARMS_LITERAL_ON =
       "            MOVE '  TITLE' TO {$WK_TITLE}.\r\n"
           + "            SNAP TITLE IS {$WK_TITLE} SYSTEM FROM {$WK1} LENGTH 10\r\n"
-          + "            FROM {$WK3} LENGTH 10.\r\n"
+          + "            FROM {$WK3} LENGTH 10\r\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

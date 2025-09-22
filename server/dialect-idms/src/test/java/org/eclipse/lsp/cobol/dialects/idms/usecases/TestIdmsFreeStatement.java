@@ -47,7 +47,7 @@ class TestIdmsFreeStatement {
 
   private static final String FREE_STORAGE_4 = "           FREE STORAGE FOR {$WK1} FROM {$WK2}.\n";
   private static final String FREE_STORAGE_4_ON =
-      "           FREE STORAGE FOR {$WK1} FROM {$WK2}.\n"
+      "           FREE STORAGE FOR {$WK1} FROM {$WK2}\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

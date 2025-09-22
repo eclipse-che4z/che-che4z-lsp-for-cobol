@@ -50,7 +50,7 @@ class TestIdmsPostStatement {
 
   private static final String POST_ECBID_VARB_ON =
       "           MOVE 'ECBID' TO {$WK_ECBID}.\r\n"
-          + "           POST EVENT NAME {$WK_ECBID} CLEAR. \r\n"
+          + "           POST EVENT NAME {$WK_ECBID} CLEAR \r\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {

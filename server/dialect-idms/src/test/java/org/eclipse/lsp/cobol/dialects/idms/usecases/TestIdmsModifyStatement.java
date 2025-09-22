@@ -34,7 +34,7 @@ class TestIdmsModifyStatement {
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       MODIFY {$EMPLOYEE}.\n"
+          + "       MODIFY {$EMPLOYEE}\n"
           + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   @Test
