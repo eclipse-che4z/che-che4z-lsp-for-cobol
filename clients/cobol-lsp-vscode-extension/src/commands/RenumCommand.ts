@@ -63,10 +63,10 @@ export function renumberLines(
     return;
   }
 
+  const pad = calculatePadding(params.digits, lineCount);
   for (let i = 0; i < lineCount; i++) {
     const line = document.lineAt(i);
     const text = line.text;
-    const pad = calculatePadding(params.digits, lineCount);
     let value = getSequentialNumber(i, params.digits, pad);
     const range = new vscode.Range(
       new vscode.Position(i, Math.min(text.length, params.start)),
