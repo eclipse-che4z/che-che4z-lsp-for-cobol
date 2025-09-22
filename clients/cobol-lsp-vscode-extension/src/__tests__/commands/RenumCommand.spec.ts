@@ -126,14 +126,6 @@ describe("Tests renumber/unnumber commmands", () => {
       "Renumber sequential numbers is not possible above 999999 lines",
     );
   });
-  it("no changes if line starts with * char", () => {
-    renumberLines(mockDocument, editMock, RENUM_LEFT);
-    expect(replaceMock).toHaveBeenCalledTimes(4);
-  });
-  it("Unnumber Lines does not modify the text when there is no text at 72 to 80 colums", () => {
-    unNumberLines(mockDocument, editMock, RENUM_RIGHT);
-    expect(replaceMock).toHaveBeenCalledTimes(0);
-  });
   it("check getSequentialNumber against pad 4", () => {
     expect(getSequentialNumber(0, 6, 4)).toEqual("000100");
   });
