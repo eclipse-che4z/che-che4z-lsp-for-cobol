@@ -125,14 +125,14 @@ public class ConfigHelper {
    * @return Enabled if checked or Disabled otherwise, Enabled in the case of an invalid state
    */
   public SqlProcessing parseSQLProcessingEnabled(JsonElement options) {
-      if (!(options instanceof JsonNull)) {
-          if (options.isJsonPrimitive()) {
-              if (options.getAsJsonPrimitive().isBoolean()) {
-                  return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
-              }
-          }
+    if (!(options instanceof JsonNull)) {
+      if (options.isJsonPrimitive()) {
+        if (options.getAsJsonPrimitive().isBoolean()) {
+          return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
+        }
       }
-      return SqlProcessing.ENABLED;
+    }
+    return SqlProcessing.ENABLED;
   }
 
   /**
