@@ -125,11 +125,14 @@ public class ConfigHelper {
    * @return True if checked or false
    */
   public SqlProcessing parseSQLProcessingEnabled(JsonElement options) {
-    if (options instanceof JsonNull) {
+      if (!(options instanceof JsonNull)) {
+          if (options.isJsonPrimitive()) {
+              if (options.getAsJsonPrimitive().isBoolean()) {
+                  return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
+              }
+          }
+      }
       return SqlProcessing.ENABLED;
-    } else {
-      return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
-    }
   }
 
   /**
