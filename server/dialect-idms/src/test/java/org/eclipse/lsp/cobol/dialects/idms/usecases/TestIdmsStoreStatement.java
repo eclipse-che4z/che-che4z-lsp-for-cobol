@@ -34,8 +34,7 @@ class TestIdmsStoreStatement {
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(8).\n"
           + "       PROCEDURE DIVISION.\n"
-          + "       STORE {$EMPLOYEE}\n"
-          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+          + "       STORE {$EMPLOYEE}.\n";
 
   @Test
   void test() {
