@@ -119,10 +119,10 @@ public class ConfigHelper {
   }
 
   /**
-   * Parse CICS translator client configurations to {@link Boolean}
+   * Parse SQL Processing Enabled configurations to {@link SqlProcessing}
    *
-   * @param options CICS translator client configuration
-   * @return True if checked or false
+   * @param options SQL Processing checkbox state from configuration
+   * @return Enabled if checked or Disabled otherwise, Enabled in the case of an invalid state
    */
   public SqlProcessing parseSQLProcessingEnabled(JsonElement options) {
       if (!(options instanceof JsonNull)) {
