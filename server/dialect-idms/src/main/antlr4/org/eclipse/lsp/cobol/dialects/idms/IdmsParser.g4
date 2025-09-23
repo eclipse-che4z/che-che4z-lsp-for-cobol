@@ -148,7 +148,7 @@ idmsIfStatement
     ;
 
 idmsStatements
-    : idmsStmtsOptTermOn endClause? imperativeStatementCall? nextSentence? | idmsStmtsMandTermOn (SEMICOLON_FS imperativeStatementCall? nextSentence? | DOT_FS)
+    : idmsStmtsOptTermOn imperativeStatementCall? endClause? nextSentence? | idmsStmtsMandTermOn (SEMICOLON_FS imperativeStatementCall? nextSentence? | DOT_FS)
     ;
 
 
