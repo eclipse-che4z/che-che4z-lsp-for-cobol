@@ -222,9 +222,9 @@ jobs:
           cp ../../server/engine/target/server.jar ./server/jar
           npm run build
           xvfb-run -a npm exec c8 -- --reporter=lcovonly --allowExternal --exclude="**/test/**" --exclude=".vscode-test/**" --exclude=".vscode-test-web/**" -- npm run test:integration
-      - name: SonarCloud Scan
+      - name: SonarQube Scan
         if: github.ref == 'refs/heads/development'
-        uses: sonarsource/sonarcloud-github-action@49e6cd3b187936a73b8280d59ffd9da69df63ec9
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
