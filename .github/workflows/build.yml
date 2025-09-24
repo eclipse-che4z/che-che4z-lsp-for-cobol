@@ -265,7 +265,7 @@ jobs:
           - os: ubuntu-latest
             arch: x64
             container: alpine:3.17
-          - os: macos-13
+          - os: macos-15-intel
             arch: x64
           - os: macos-14
             arch: arm64
