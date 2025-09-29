@@ -578,17 +578,16 @@ export class ProgramListing {
       performInfo.endCycleIndex = this.instructions.length;
 
       if (performInfo.performUntilType === "UNTIL_CONDITION") {
-        this.instructions.push(
-          new ConditionEntry(
-            undefined,
-            [this.instructions.length + 1],
-            this.instructions.length + 2,
+        const initialNode = this.instructions[performInfo.position].getInitialNode();
+        this.instructions[performInfo.position] = new ConditionEntry(
+            initialNode,
+            [performInfo.position + 1],
+            this.instructions.length + 1,
             false,
             [],
-          ),
-        );
+          );
         this.instructions.push(new JumpInstruction(performInfo.position + 1));
-        this.instructions.push(new ConditionExit());
+        this.instructions.push(new ConditionExit(node));
       } else if (performInfo.performUntilType === "UNTIL_EXIT") {
         this.instructions.push(new JumpInstruction(performInfo.position + 1));
         this.instructions.push(new SimpleCobolInstruction());

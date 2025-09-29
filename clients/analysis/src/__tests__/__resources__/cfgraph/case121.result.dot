@@ -1,0 +1,5 @@
+digraph A {
+rankdir=LR;
+<perform-bug>-><MAIN-PROCESSING>;
+<MAIN-PROCESSING>-><ERROR-HANDLER>;
+}

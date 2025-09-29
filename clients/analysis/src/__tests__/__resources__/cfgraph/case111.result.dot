@@ -1,4 +1,5 @@
 digraph A {
 rankdir=LR;
 <PROG>-><PAR1>;
+<PROG>-><PAR2>;
 }
