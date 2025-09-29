@@ -138,7 +138,7 @@ export class ControlFlowGraphBuilder {
       );
       processor.run();
 
-      if (this.deadCodeSeverity) {
+      if (this.deadCodeSeverity !== undefined) {
         const deadCodeCollector = new DeadCodeCollector(this.deadCodeSeverity);
         deadCodeCollector.collectDeadCodeDiagnostics(
           listing.getInstructions(),
