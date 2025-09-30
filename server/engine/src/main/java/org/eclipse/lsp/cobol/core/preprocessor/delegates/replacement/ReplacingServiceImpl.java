@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
@@ -166,15 +165,17 @@ public class ReplacingServiceImpl implements ReplacingService {
       @NonNull ExtendedDocument extendedDocument,
       @NonNull Pair<String, String> pattern,
       @NonNull Range scope) {
-    String text = extendedDocument.toString();
-    if (StringUtils.isBlank(text)) {
-      return;
-    }
+    final int startLine = scope.getStart() == null ? 0 : scope.getStart().getLine();
+    final int endLine = scope.getEnd() == null ? Integer.MAX_VALUE : scope.getEnd().getLine();
+    String text = extendedDocument.getBaseText(startLine, endLine);
+    final List<Integer> lineMap = makeLineMap(text);
     try {
       Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
       while (matcher.find()) {
         Range range =
-            new Range(getPosition(text, matcher.start()), getPosition(text, matcher.end()));
+            new Range(
+                getPosition(lineMap, matcher.start(), startLine),
+                getPosition(lineMap, matcher.end(), startLine));
         if (RangeUtils.isInside(range, scope)) {
           extendedDocument.replace(range, pattern.getRight());
         }
@@ -185,11 +186,29 @@ public class ReplacingServiceImpl implements ReplacingService {
     }
   }
 
-  private Position getPosition(String text, int positionInFile) {
-    String prefix = text.substring(0, positionInFile);
-    int character = positionInFile - prefix.lastIndexOf("\n") - 1;
-    int line = StringUtils.countMatches(prefix, "\n");
-    return new Position(line, character);
+  List<Integer> makeLineMap(String text) {
+    final List<Integer> lineMap = new ArrayList<>();
+
+    int i = 0;
+    do {
+      lineMap.add(i);
+      i = text.indexOf('\n', i) + 1;
+    } while (i > 0);
+
+    return lineMap;
+  }
+
+  private Position getPosition(List<Integer> lineMap, int positionInFile, int lineOffset) {
+    int b = 0;
+    int e = lineMap.size();
+    while (b != e) {
+      final int m = b + (e - b) / 2;
+      if (lineMap.get(m) < positionInFile) b = m + 1;
+      else e = m;
+    }
+    final int line = e == lineMap.size() || lineMap.get(e) != positionInFile ? e - 1 : e;
+    final int character = positionInFile - lineMap.get(line);
+    return new Position(line + lineOffset, character);
   }
 
   private Function<String, Boolean> checkContainWord(String check) {
