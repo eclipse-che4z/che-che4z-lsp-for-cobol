@@ -428,6 +428,35 @@ export class CicsReturnInstruction extends SimpleCobolInstruction {
 }
 
 /**
+ * EXEC CICS ABEND instruction
+ */
+export class CicsAbendInstruction extends SimpleCobolInstruction {
+  public constructor(
+    node: CFASTNode,
+    private cancel: boolean,
+  ) {
+    super(node);
+  }
+
+  public override execute(context: VmContext): number[] {
+    this.markProcessed();
+
+    if (this.cancel) {
+      return [];
+    }
+
+    const position = context.getHandleAbendEntry();
+
+    if (position > 0) {
+      return [position + 1];
+    }
+
+    return [];
+  }
+}
+
+
+/**
  * EXEC SQL WHENEVER instruction
  */
 export class SqlWheneverInstruction extends SimpleCobolInstruction {

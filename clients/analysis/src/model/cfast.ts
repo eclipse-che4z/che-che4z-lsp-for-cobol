@@ -51,6 +51,7 @@ export type NodeType =
   | "execcics"
   | "execcicsreturn"
   | "execcicshandle"
+  | "execcicsabend"
   | "endexec"
   | "use"
   | "usefordebugging"
@@ -186,6 +187,11 @@ export type CicsHandleAbend = CFASTNode & {
   type: "execcicshandle";
   handleType: HandleAbendType;
   value: string;
+};
+
+export type CicsAbend = CFASTNode & {
+  type: "execcicsabend";
+  cancel: boolean
 };
 
 export type SqlWhenever = CFASTNode & {

@@ -29,6 +29,7 @@ import {
   XmlParse,
   ExitPerform,
   InlinePerform,
+  CicsAbend,
 } from "../model/cfast";
 import {
   CobolInstruction,
@@ -54,6 +55,7 @@ import {
   FallThruDiagnosticChecker,
   ExitParagraph,
   ConditionExit,
+  CicsAbendInstruction,
 } from "./instructions";
 import { VmContext } from "./vm";
 import { ConditionInfo, ListingUtils } from "./utils";
@@ -653,6 +655,14 @@ export class ProgramListing {
 
     if (node.type === "execcicsreturn") {
       this.instructions.push(new CicsReturnInstruction(node));
+      return;
+    }
+
+    if (node.type === "execcicsabend") {
+      const execCicsAbend = node as CicsAbend;
+      this.instructions.push(
+        new CicsAbendInstruction(node, execCicsAbend.cancel),
+      );
       return;
     }
 

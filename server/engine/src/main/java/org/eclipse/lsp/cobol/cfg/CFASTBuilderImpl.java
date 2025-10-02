@@ -145,6 +145,10 @@ public class CFASTBuilderImpl implements CFASTBuilder {
       addChild(parent, new CFASTNode(CFASTNodeType.EXEC_CICS.getValue(), convertLocation(node)));
       node.getChildren().forEach(child -> traverse(parent, child));
       addChild(parent, new CFASTNode(CFASTNodeType.END_EXEC.getValue(), convertLocation(node)));
+    } else if (node instanceof ExecCicsAbendNode) {
+      ExecCicsAbendNode execCicsAbendNode = (ExecCicsAbendNode) node;
+      Abend cFastNode = new Abend(convertLocation(node), execCicsAbendNode.isCancel());
+      addChild(parent, cFastNode);
     } else if (node instanceof ExecCicsReturnNode) {
       addChild(
           parent, new CFASTNode(CFASTNodeType.EXEC_CICS_RETURN.getValue(), convertLocation(node)));
