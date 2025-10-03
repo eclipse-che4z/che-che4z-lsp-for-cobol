@@ -30,6 +30,9 @@ class TestIdmsModifyMapStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "       DATA DIVISION.\n"
           + "       MAP SECTION.\n"
           + "           MAP {$*EMPMAP}.\n"

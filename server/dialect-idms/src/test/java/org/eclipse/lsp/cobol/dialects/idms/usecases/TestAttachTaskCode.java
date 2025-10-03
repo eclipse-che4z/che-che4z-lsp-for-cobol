@@ -36,6 +36,9 @@ class TestAttachTaskCode {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_TASKCODE} PIC X(8) SYNC.\r\n"

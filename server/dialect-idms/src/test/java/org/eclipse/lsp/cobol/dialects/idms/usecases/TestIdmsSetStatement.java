@@ -30,6 +30,9 @@ class TestIdmsSetStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PROG} PIC X(8).\n"

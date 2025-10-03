@@ -27,7 +27,7 @@ class TestAbendCodeOnNextSentence {
           + "        PROGRAM-ID. test1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE ABC.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "            IDMS-RECORDS MANUAL\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"

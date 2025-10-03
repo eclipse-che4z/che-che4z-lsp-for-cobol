@@ -29,6 +29,9 @@ class TestIdmsRollbackStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "        PROCEDURE DIVISION.\n";
 
   private static final String ROLL1 = DEFS + "           ROLLBACK.\n";
