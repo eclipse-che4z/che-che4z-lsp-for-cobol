@@ -36,8 +36,7 @@ class TestSnapStatementOnNextSentence {
           + "            05 {$*SUBSCHEMA-CTRL-END} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
           + "            SNAP FROM {$SUBSCHEMA-CTRL} TO {$SUBSCHEMA-CTRL-END} ON \n"
-          + "               ANY-STATUS NEXT SENTENCE\n"
-          + "               END-IF.";
+          + "               ANY-STATUS NEXT SENTENCE.\n";
 
   @Test
   void test() {
