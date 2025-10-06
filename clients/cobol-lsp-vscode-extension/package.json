@@ -99,6 +99,26 @@
         "command": "cobol-lsp.configuration.create-sample",
         "title": "Create sample configuration files",
         "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.renumRight",
+        "title": "Renumber Columns 73-80",
+        "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.renumLeft",
+        "title": "Renumber Columns 1-6",
+        "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.unNumberLeft",
+        "title": "Unnumber Columns 1-6",
+        "category": "COBOL"
+      },
+      {
+        "command": "cobol-lsp.editor.unNumberRight",
+        "title": "Unnumber Columns 73-80",
+        "category": "COBOL"
       }
     ],
     "menus": {
@@ -153,8 +173,34 @@
           "title": "Open Copybooks Internal Folder",
           "category": "COBOL"
         }
+      ],
+      "editor/context": [
+        {
+          "when": "editorLangId =~ /^cobol$/i && editorTextFocus && !editorReadonly",
+          "submenu": "renumSubMenu"
+        }
+      ],
+      "renumSubMenu": [
+        {
+          "command": "cobol-lsp.editor.renumLeft"
+        },
+        {
+          "command": "cobol-lsp.editor.renumRight"
+        },
+        {
+          "command": "cobol-lsp.editor.unNumberLeft"
+        },
+        {
+          "command": "cobol-lsp.editor.unNumberRight"
+        }
       ]
     },
+    "submenus": [
+      {
+        "id": "renumSubMenu",
+        "label": "Renumber Sequence Numbers"
+      }
+    ],
     "languages": [
       {
         "id": "cobol",

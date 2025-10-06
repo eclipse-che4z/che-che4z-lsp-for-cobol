@@ -26,6 +26,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 
@@ -115,6 +116,19 @@ public class ConfigHelper {
     } else {
       return options.getAsBoolean();
     }
+  }
+
+  /**
+   * Parse SQL Processing Enabled configurations to {@link SqlProcessing}
+   *
+   * @param options SQL Processing checkbox state from configuration
+   * @return Enabled if checked or Disabled otherwise, Enabled in the case of an invalid state
+   */
+  public SqlProcessing parseSQLProcessingEnabled(JsonElement options) {
+    if (options.isJsonPrimitive() && options.getAsJsonPrimitive().isBoolean()) {
+      return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
+    }
+    return SqlProcessing.ENABLED;
   }
 
   /**

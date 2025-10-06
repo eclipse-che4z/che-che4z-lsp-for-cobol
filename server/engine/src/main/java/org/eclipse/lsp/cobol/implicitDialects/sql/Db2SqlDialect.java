@@ -51,6 +51,8 @@ import org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum;
 public class Db2SqlDialect implements CobolDialect {
   public static final String DIALECT_NAME = "db2";
   public static final String SQL_BACKEND_SETTING = SettingsParametersEnum.SQL_BACKEND_SETTING.label;
+  public static final String SQL_PROCESSING_ENABLED_SETTING =
+      SettingsParametersEnum.SQL_PROCESSING_ENABLED_SETTING.label;
 
   private final CopybookService copybookService;
   private final MessageService messageService;

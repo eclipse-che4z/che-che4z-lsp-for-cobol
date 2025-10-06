@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 
 /** This interface handles the request for configurations from the client settings */
@@ -77,6 +78,7 @@ public interface ConfigurationService {
     List<String> subroutines;
     boolean cicsTranslatorEnabled;
     List<DialectRegistryItem> dialectRegistry;
+    SqlProcessing isSQLProcessingEnabled;
     List<String> compilerOptions;
     //    CobolProgramLayout layout;
     Map<String, JsonElement> dialectsSettings;
@@ -86,6 +88,7 @@ public interface ConfigurationService {
       subroutines = ImmutableList.of();
       cicsTranslatorEnabled = true;
       dialectRegistry = ImmutableList.of();
+      isSQLProcessingEnabled = SqlProcessing.ENABLED;
       compilerOptions = ImmutableList.of();
       dialectsSettings = ImmutableMap.of();
       //      layout = new CobolProgramLayout();
