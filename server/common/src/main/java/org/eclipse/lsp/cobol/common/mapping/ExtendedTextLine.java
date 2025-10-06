@@ -85,6 +85,12 @@ public class ExtendedTextLine {
     return builder.toString();
   }
 
+  public void appendString(StringBuilder sb) {
+    for (MappedCharacter character : characters) {
+      sb.append(character.getCharacter());
+    }
+  }
+
   /**
    * Removes characters from line. [start, end)
    *

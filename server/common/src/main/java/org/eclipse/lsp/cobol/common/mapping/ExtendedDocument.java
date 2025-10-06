@@ -73,6 +73,22 @@ public class ExtendedDocument {
     return sb.toString();
   }
 
+  public String getBaseText(int startLine, int endLine) {
+    endLine = Math.min(endLine, baseText.getLines().size() - 1);
+    int estimatedSize = 0;
+    for (int i = startLine; i <= endLine; i++) {
+      estimatedSize += baseText.getLines().get(i).size() + 1;
+    }
+    StringBuilder sb = new StringBuilder(estimatedSize);
+    for (int i = startLine; i <= endLine; i++) {
+      baseText.getLines().get(i).appendString(sb);
+      if (i != endLine) {
+        sb.append('\n');
+      }
+    }
+    return sb.toString();
+  }
+
   /** Commit changes */
   public void commitTransformations() {
     if (isDirty()) {
