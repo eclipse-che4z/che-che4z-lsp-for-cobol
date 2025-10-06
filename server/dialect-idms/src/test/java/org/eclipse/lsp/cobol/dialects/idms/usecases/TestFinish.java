@@ -42,7 +42,7 @@ class TestFinish {
 
   private static Stream<String> textsToTest() {
 
-    return Stream.of(BOILERPLATE + FINISH_TASK, BOILERPLATE + FINISH, BOILERPLATE + FINISH_TASK_ON);
+    return Stream.of(FINISH_TASK, FINISH, FINISH_TASK_ON).map(s -> BOILERPLATE + s);
   }
 
   @ParameterizedTest
