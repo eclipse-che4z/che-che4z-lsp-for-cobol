@@ -106,7 +106,8 @@ public enum SearchPattern {
   // ) }, Colon { : }  //NOSONAR
   // Ref - https://www.ibm.com/support/knowledgecenter/SS6SG3_6.2.0/lr/ref/rllanrul.html
   private static final Pattern NEW_LINE_PATTERN = Pattern.compile("[\\r\\n]");
-  public static final String SEPARATE_TOKEN_PATTERN = "(?<=^|[.,;]?\\s)%s(?=[,;]?\\s|\\.|$)";
+  public static final String SEPARATE_TOKEN_PATTERN =
+      "%1$s(?<=(?:^|[.,;]?\\s)%1$s)(?=[,;]?\\s|\\.|$)";
   // Patterns for the enclosures
   private static final Pattern[] COBOL_REPLACE_PATTERN_SEPARATORS = {
     Pattern.compile("^;.+;$"),

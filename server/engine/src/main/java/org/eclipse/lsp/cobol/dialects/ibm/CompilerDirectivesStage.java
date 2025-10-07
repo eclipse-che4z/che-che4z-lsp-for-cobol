@@ -82,6 +82,7 @@ public class CompilerDirectivesStage
       parser.addErrorListener(new CompilerDirectivesErrorListener(ctx, startPosition));
       new CompilerDirectivesVisitor(ctx, messageService, startPosition)
           .visit(parser.compilerOptions());
+      ctx.getExtendedDocument().commitTransformations();
     }
   }
 

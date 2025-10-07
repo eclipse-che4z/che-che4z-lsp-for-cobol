@@ -126,7 +126,10 @@ function toForwardSlashUppercase(path: string): string {
   return path.split("\\").join("/").toUpperCase();
 }
 
-export async function loadProcessorGroup(documentUri: Uri) {
+export async function loadProcessorGroup(
+  documentUri: Uri,
+  dialect = DEFAULT_DIALECT,
+) {
   let workspaceConfig = await readEndevorConfig(documentUri);
 
   if (!workspaceConfig) {
@@ -148,7 +151,7 @@ export async function loadProcessorGroup(documentUri: Uri) {
     }
   }
 
-  return readSettingConfig(DEFAULT_DIALECT);
+  return readSettingConfig(dialect);
 }
 
 async function getB4GProcessorGroupName(documentUri: Uri) {
@@ -176,7 +179,7 @@ async function loadProcessorGroupSettings<
   defaultValue: ProcessorGroupProperties[P],
   dialect: string = "COBOL",
 ) {
-  const processorGroup = await loadProcessorGroup(documentUri);
+  const processorGroup = await loadProcessorGroup(documentUri, dialect);
   if (!processorGroup) {
     return defaultValue;
   }

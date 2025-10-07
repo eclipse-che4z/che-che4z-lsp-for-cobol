@@ -49,13 +49,14 @@ public class ExtendedText {
 
   @Override
   public String toString() {
-    final StringBuilder builder = new StringBuilder();
+    int expectedSize = 0;
+    for (ExtendedTextLine line : lines) {
+      expectedSize += line.getCharacters().size() + 1;
+    }
+    final StringBuilder builder = new StringBuilder(expectedSize);
     int index = 0;
     for (ExtendedTextLine line : lines) {
-      String lineText = line.toString();
-      if (!lineText.isEmpty()) {
-        builder.append(lineText);
-      }
+      line.appendString(builder);
       if (++index != lines.size()) {
         builder.append("\n");
       }

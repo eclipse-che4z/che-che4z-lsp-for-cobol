@@ -59,6 +59,20 @@ public class TestCicsTranslatorOptions {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.";
 
+  public static final String MULTIPLE_COMPILER_DIRECTIVES =
+      "       PROCESS CICS('COBOL3,APOST,SP')\n"
+          + "       PROCESS APOST TRUNC(BIN) NOSSRANGE\n"
+          + "       Identification Division.\n"
+          + "       Program-id. TESTOP.";
+
+  public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
+      "       CBL CICS (SP, {'EXCI'|1} \n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.  AB01FORE.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.";
+
   private static Stream<String> getOptions() {
     return Stream.of(
         "APOST",
@@ -109,14 +123,6 @@ public class TestCicsTranslatorOptions {
         "VBREF");
   }
 
-  public static final String LITERAL_AFTER_KEYWORD_COMPILER_DIRECTIVE_CICS_TRANSLATOR =
-      "       CBL CICS (SP, {'EXCI'|1} \n"
-          + "       IDENTIFICATION DIVISION.\n"
-          + "       PROGRAM-ID.  AB01FORE.\n"
-          + "       ENVIRONMENT DIVISION.\n"
-          + "       DATA DIVISION.\n"
-          + "       WORKING-STORAGE SECTION.";
-
   @ParameterizedTest
   @MethodSource("getOptions")
   void testOption(String cblOption) {
@@ -145,6 +151,11 @@ public class TestCicsTranslatorOptions {
                     + " SYSEIB, VBREF, NOVBREF, FLAG, F, LINECOUNT, LC, SPACE, NATLANG",
                 DiagnosticSeverity.Error,
                 ErrorSource.PREPROCESSING.getText())));
+  }
+
+  @Test
+  void testCICSCompilerDirectivesAndCobolDirectivesInSameUnit() {
+    UseCaseEngine.runTest(MULTIPLE_COMPILER_DIRECTIVES, ImmutableList.of(), ImmutableMap.of());
   }
 
   @Test

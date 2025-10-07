@@ -67,6 +67,7 @@ jobs:
         with:
           args: "-i"
           skip-commit: true
+          release-name: v1.25.0
       - name: Print diffs
         run: git --no-pager diff --exit-code       
   zipSources:

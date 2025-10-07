@@ -34,7 +34,7 @@ COBOL Language Support for DaCo enables copybook support features of the COBOL L
     
 To enable copybook support, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. 
     
-Specify paths to your MAID copybooks in the COBOL Dialect Support for DaCo extension settings as follows:
+Specify paths to your MAID copybooks in the COBOL Language Support for DaCo extension settings as follows:
 * Specify mainframe data sets under **Daco: Paths-dsn**
 * Specify USS paths under **Daco: Paths-uss**
 * Specify local paths under **Daco: Paths-local**
