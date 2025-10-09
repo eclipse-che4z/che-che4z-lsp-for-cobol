@@ -51,7 +51,7 @@ import org.eclipse.lsp4j.Range;
 /** Provides managing copybook mapping functionality */
 @Slf4j
 @RequiredArgsConstructor
-public class CopybookPreprocessorService {
+class CopybookPreprocessorService {
   private final String programDocumentUri;
   private final GrammarPreprocessor grammarPreprocessor;
   private final ExtendedDocument currentDocument;

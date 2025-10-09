@@ -207,12 +207,21 @@ public class CopybookServiceImpl implements CopybookService {
               if (uri == null) return CompletableFuture.completedFuture(() -> {});
               return resolveFileContent
                   .getFileContent(uri)
+                  .exceptionally(
+                      ex -> {
+                        LOG.warn(
+                            "Failed to get copybook content URI: {} for program {}",
+                            copybookName.getDisplayName(),
+                            programDocumentUri,
+                            ex);
+                        return null;
+                      })
                   .thenApply(
                       (content) -> {
                         return () -> {
-                          if (content == null) return;
-                          processCopybookContent(
-                              copybookName, programDocumentUri, preprocessor, uri, content);
+                          if (content != null)
+                            processCopybookContent(
+                                copybookName, programDocumentUri, preprocessor, uri, content);
                         };
                       });
             });
