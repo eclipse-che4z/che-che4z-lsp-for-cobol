@@ -81,6 +81,16 @@ public class CopybookCache {
   }
 
   /**
+   * Copybook model in cache
+   *
+   * @param copybookId copybook name
+   * @return true if cache contains the copybook
+   */
+  public boolean has(CopybookId copybookId) {
+    return cache.getIfPresent(copybookId) != null;
+  }
+
+  /**
    * Store copybook model to cache
    *
    * @param copybookModel to store

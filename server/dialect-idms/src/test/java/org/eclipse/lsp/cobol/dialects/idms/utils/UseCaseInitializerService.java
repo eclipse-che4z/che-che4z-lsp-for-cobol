@@ -16,9 +16,9 @@ package org.eclipse.lsp.cobol.dialects.idms.utils;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;

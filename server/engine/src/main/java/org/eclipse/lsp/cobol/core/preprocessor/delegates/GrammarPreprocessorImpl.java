@@ -17,6 +17,10 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates;
 import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import lombok.NonNull;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -30,6 +34,12 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.core.CobolPreprocessor;
+import org.eclipse.lsp.cobol.core.CobolPreprocessor.CopySourceContext;
+import org.eclipse.lsp.cobol.core.CobolPreprocessor.CopyStatementContext;
+import org.eclipse.lsp.cobol.core.CobolPreprocessor.IncludeStatementContext;
+import org.eclipse.lsp.cobol.core.CobolPreprocessor.PlusplusIncludeStatementContext;
+import org.eclipse.lsp.cobol.core.CobolPreprocessor.StartRuleContext;
+import org.eclipse.lsp.cobol.core.CobolPreprocessorBaseListener;
 import org.eclipse.lsp.cobol.core.CobolPreprocessorLexer;
 import org.eclipse.lsp.cobol.core.preprocessor.CopybookHierarchy;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks.*;
@@ -91,17 +101,54 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     BufferedTokenStream tokens =
         makeTokens(context.getCurrentDocument().getCurrentText().toString());
 
-    GrammarPreprocessorListener<CopybooksRepository> listener =
-        listenerFactory.create(context, preprocessor);
+    GrammarPreprocessorListenerImpl listener = listenerFactory.create(context, preprocessor);
 
     ThreadInterruptionUtil.checkThreadInterrupted();
     CobolPreprocessor parser = new CobolPreprocessor(tokens);
     parser.removeErrorListeners();
 
+    StartRuleContext start = parser.startRule();
+
+    if (context.getCopybookProcessingMode().analyze) {
+      prefetchCopybooks(start, listener.getPrefetcher());
+    }
+
     ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(listener, parser.startRule());
+    walker.walk(listener, start);
     context.getCurrentDocument().commitTransformations();
     return listener.getResult();
+  }
+
+  private void prefetchCopybooks(
+      StartRuleContext start, Function<CopySourceContext, CompletableFuture<Runnable>> prefetcher) {
+    ArrayList<CompletableFuture<Runnable>> copybooks = new ArrayList<>();
+    ParseTreeWalker walker = new ParseTreeWalker();
+    walker.walk(
+        new CobolPreprocessorBaseListener() {
+          @Override
+          public void exitPlusplusIncludeStatement(PlusplusIncludeStatementContext ctx) {
+            copybooks.add(prefetcher.apply(ctx.copySource()));
+          }
+
+          @Override
+          public void exitCopyStatement(@NonNull CopyStatementContext ctx) {
+            copybooks.add(prefetcher.apply(ctx.copySource()));
+          }
+
+          @Override
+          public void exitIncludeStatement(@NonNull IncludeStatementContext ctx) {
+            copybooks.add(prefetcher.apply(ctx.copySource()));
+          }
+        },
+        start);
+    copybooks.removeIf(Objects::isNull);
+    CompletableFuture.allOf(copybooks.toArray(new CompletableFuture[copybooks.size()])).join();
+    try {
+      for (CompletableFuture<Runnable> r : copybooks) {
+        r.get().run();
+      }
+    } catch (InterruptedException | ExecutionException e) {
+    }
   }
 
   private static BufferedTokenStream makeTokens(String code) {

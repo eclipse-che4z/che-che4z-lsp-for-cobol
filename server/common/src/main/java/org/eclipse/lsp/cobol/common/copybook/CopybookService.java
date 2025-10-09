@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.copybook;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -45,6 +46,23 @@ public interface CopybookService {
    *     CopybookModel.
    */
   ResultWithErrors<CopybookModel> resolve(
+      @NonNull CopybookId copybookId,
+      @NonNull CopybookName copybookName,
+      @NonNull String programDocumentUri,
+      @NonNull String documentUri,
+      CleanerPreprocessor preprocessor);
+
+  /**
+   * Initiate copybook text retrieval
+   *
+   * @param copybookId - the id of the copybook to be retrieved
+   * @param copybookName - the name of the copybook to be retrieved
+   * @param programDocumentUri - the currently processing program document
+   * @param documentUri - the currently processing document that contains the copy statement
+   * @param preprocessor - Cleanup preprocessor that will be used for new copybooks or null
+   * @return Callable that adds the retrieved copybook to cache (if applicable)
+   */
+  CompletableFuture<Runnable> prefetch(
       @NonNull CopybookId copybookId,
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,

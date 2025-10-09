@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.copybooks;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ import org.eclipse.lsp4j.Range;
 /** Provides managing copybook mapping functionality */
 @Slf4j
 @RequiredArgsConstructor
-class CopybookPreprocessorService {
+public class CopybookPreprocessorService {
   private final String programDocumentUri;
   private final GrammarPreprocessor grammarPreprocessor;
   private final ExtendedDocument currentDocument;
@@ -138,6 +139,17 @@ class CopybookPreprocessorService {
       currentDocument.clear(AntlrRangeUtils.constructRange(ctx));
       errors.add(copybookErrorService.addMissingCopybook(name.getQualifiedName(), nameLocality));
     }
+  }
+
+  CompletableFuture<Runnable> prefetchCopybook(CobolPreprocessor.CopySourceContext copySource) {
+    final CopybookName copybookName = getCopybookName(copySource);
+
+    return copybookService.prefetch(
+        copybookName.toCopybookId(programDocumentUri),
+        copybookName,
+        programDocumentUri,
+        currentDocument.getUri(),
+        preprocessor);
   }
 
   private void prepareReplacements(ParserRuleContext ctx) {

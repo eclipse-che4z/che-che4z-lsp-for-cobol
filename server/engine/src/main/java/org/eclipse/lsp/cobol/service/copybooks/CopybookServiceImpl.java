@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import lombok.NonNull;
@@ -155,24 +156,66 @@ public class CopybookServiceImpl implements CopybookService {
         return CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri);
       }
 
-      CopybookModel dirtyCopybook =
-          new CopybookModel(
-              copybookName.toCopybookId(programDocumentUri),
-              copybookName,
-              copybookUri,
-              fileContent);
-      ResultWithErrors<CopybookModel> copybookModelResultWithErrors =
-          CopybookUtility.cleanupCopybook(dirtyCopybook, preprocessor);
-      copybookUsage
-          .computeIfAbsent(programDocumentUri, k -> new HashSet<>())
-          .add(copybookModelResultWithErrors.getResult());
-      preprocessCopybookErrors.put(
-          dirtyCopybook.getUri(), copybookModelResultWithErrors.getErrors());
-      return copybookModelResultWithErrors.getResult();
+      return processCopybookContent(
+          copybookName, programDocumentUri, preprocessor, copybookUri, fileContent);
     } catch (UncheckedExecutionException | ExecutionError e) {
       LOG.error("Can't resolve copybook '{}'.", copybookName, e);
       return CopybookUtility.getDefaultCopybook(copybookName, programDocumentUri);
     }
+  }
+
+  private CopybookModel processCopybookContent(
+      CopybookName copybookName,
+      String programDocumentUri,
+      CleanerPreprocessor preprocessor,
+      String copybookUri,
+      String fileContent) {
+    CopybookModel dirtyCopybook =
+        new CopybookModel(
+            copybookName.toCopybookId(programDocumentUri), copybookName, copybookUri, fileContent);
+    ResultWithErrors<CopybookModel> copybookModelResultWithErrors =
+        CopybookUtility.cleanupCopybook(dirtyCopybook, preprocessor);
+    copybookUsage
+        .computeIfAbsent(programDocumentUri, k -> new HashSet<>())
+        .add(copybookModelResultWithErrors.getResult());
+    preprocessCopybookErrors.put(dirtyCopybook.getUri(), copybookModelResultWithErrors.getErrors());
+    return copybookModelResultWithErrors.getResult();
+  }
+
+  /**
+   * @param copybookId - the id of the copybook to be retrieved
+   * @param copybookName - the name of the copybook to be retrieved
+   * @param programDocumentUri - the currently processing program document
+   * @param documentUri - the currently processing document that contains the copy statement
+   * @param preprocessor - Cleanup preprocessor that will be used for new copybooks or null
+   * @return Runnable that adds fetched copybook to cache
+   */
+  public CompletableFuture<Runnable> prefetch(
+      @NonNull CopybookId copybookId,
+      @NonNull CopybookName copybookName,
+      @NonNull String programDocumentUri,
+      @NonNull String documentUri,
+      CleanerPreprocessor preprocessor) {
+    if (copybookCache.has(copybookId)) return null;
+    return resolveCopybookUri
+        .resolveCopybookUri(
+            programDocumentUri,
+            copybookName,
+            Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL))
+        .thenCompose(
+            (uri) -> {
+              if (uri == null) return CompletableFuture.completedFuture(() -> {});
+              return resolveFileContent
+                  .getFileContent(uri)
+                  .thenApply(
+                      (content) -> {
+                        return () -> {
+                          if (content == null) return;
+                          processCopybookContent(
+                              copybookName, programDocumentUri, preprocessor, uri, content);
+                        };
+                      });
+            });
   }
 
   private CopybookModel registerForDownloading(CopybookName copybookName, String programUri) {
