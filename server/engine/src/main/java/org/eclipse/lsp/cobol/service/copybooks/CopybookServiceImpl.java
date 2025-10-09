@@ -135,10 +135,12 @@ public class CopybookServiceImpl implements CopybookService {
       CopybookName copybookName, String programDocumentUri, CleanerPreprocessor preprocessor) {
     try {
       String copybookUri =
-          resolveCopybookUri.resolveCopybookUri(
-              programDocumentUri,
-              copybookName,
-              Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL));
+          resolveCopybookUri
+              .resolveCopybookUri(
+                  programDocumentUri,
+                  copybookName,
+                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL))
+              .join();
       if (copybookUri == null) {
         ResultWithErrors<CopybookModel> predefinedCopybook =
             predefinedCopybookStoreImpl.resolve(copybookName, programDocumentUri);

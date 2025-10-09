@@ -18,6 +18,7 @@ import static com.google.inject.multibindings.Multibinder.newSetBinder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -84,7 +85,11 @@ public class UseCaseInitializerService implements UseCaseInitializer {
             bind(SubroutineService.class).to(SubroutineServiceImpl.class);
             bind(CopybookService.class).to(CopybookServiceImpl.class);
             bind(PredefinedCopybookStore.class).to(PredefinedCopybookStoreImpl.class);
-            bind(ResolveCopybookUri.class).toInstance(mock(ResolveCopybookUri.class));
+            ResolveCopybookUri resolveMock = mock(ResolveCopybookUri.class);
+            doReturn(CompletableFuture.completedFuture(null))
+                .when(resolveMock)
+                .resolveCopybookUri(any(), any(), any());
+            bind(ResolveCopybookUri.class).toInstance(resolveMock);
             bind(ResolveFileContent.class).toInstance(mock(ResolveFileContent.class));
 
             bind(WatcherService.class).to(WatcherServiceImpl.class);

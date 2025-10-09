@@ -164,7 +164,7 @@ public class UseCaseUtils {
                   new CopybookName(cobolText.getFileName(), cobolText.getDialectType());
               CopybookModel copybookModel = toCopybookModel(cobolText, useCase.documentUri);
 
-              doReturn(copybookModel.getUri())
+              doReturn(CompletableFuture.completedFuture(copybookModel.getUri()))
                   .when(resolveCopybookUri)
                   .resolveCopybookUri(
                       eq(useCase.documentUri),

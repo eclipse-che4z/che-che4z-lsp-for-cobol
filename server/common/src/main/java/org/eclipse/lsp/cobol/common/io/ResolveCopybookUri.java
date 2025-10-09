@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.common.io;
 
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 
 /** Resolves a copybook uri for a COBOL document */
@@ -26,5 +27,6 @@ public interface ResolveCopybookUri {
    * @param dialectType
    * @return returns a copybbok uri
    */
-  String resolveCopybookUri(String cobolFileUri, CopybookName copybookName, String dialectType);
+  CompletableFuture<String> resolveCopybookUri(
+      String cobolFileUri, CopybookName copybookName, String dialectType);
 }

@@ -39,7 +39,7 @@ public class NonCacheResolveCopybookUri implements ResolveCopybookUri {
    * @return
    */
   @Override
-  public String resolveCopybookUri(
+  public CompletableFuture<String> resolveCopybookUri(
       String cobolFileUri, CopybookName copybookName, String dialectType) {
     CompletableFuture<String> clientRequest =
         this.clientProvider
@@ -54,6 +54,6 @@ public class NonCacheResolveCopybookUri implements ResolveCopybookUri {
                       ex);
                   return null;
                 });
-    return clientRequest.join();
+    return clientRequest;
   }
 }
