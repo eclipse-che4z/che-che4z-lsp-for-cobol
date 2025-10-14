@@ -32,7 +32,7 @@ class TestCommit {
           + "        PROGRAM-ID. test1. \r\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        PROCEDURE DIVISION. \r\n";

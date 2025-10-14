@@ -32,7 +32,7 @@ class TestIdmsSetStatement {
           + "        PROGRAM-ID. test1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PROG} PIC X(8).\n"

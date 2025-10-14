@@ -32,7 +32,7 @@ class TestIdmsMapInStatement {
           + "        PROGRAM-ID. test1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*MFLD} PIC X(8).\n"

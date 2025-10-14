@@ -32,7 +32,7 @@ class TestDelete {
           + "        PROGRAM-ID. test1. \r\n"
           + "       ENVIRONMENT DIVISION.\r\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       INPUT-OUTPUT SECTION.\r\n"
           + "       FILE-CONTROL.\r\n"
           + "             SELECT {$SCRATCH} ASSIGN TO TEST2 \r\n"

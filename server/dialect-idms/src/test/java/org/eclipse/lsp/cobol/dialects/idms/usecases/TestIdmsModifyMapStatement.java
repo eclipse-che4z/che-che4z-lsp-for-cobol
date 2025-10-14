@@ -32,7 +32,7 @@ class TestIdmsModifyMapStatement {
           + "        PROGRAM-ID. test1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       DATA DIVISION.\n"
           + "       MAP SECTION.\n"
           + "           MAP {$*EMPMAP}.\n"

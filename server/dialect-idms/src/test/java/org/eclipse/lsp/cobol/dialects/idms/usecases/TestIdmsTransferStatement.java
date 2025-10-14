@@ -38,7 +38,7 @@ class TestIdmsTransferStatement {
           + "        PROGRAM-ID. test1. \r\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PROGRAM} PIC X(8).\r\n"
