@@ -25,7 +25,7 @@ idmsSections
 // -- copy section ----------------------------------
 
 copyIdmsStatement
-    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions endClause?
     ;
 
 copyIdmsOptions
@@ -148,7 +148,7 @@ idmsIfStatement
     ;
 
 idmsStatements
-    : idmsStmtsOptTermOn imperativeStatementCall? endClause? nextSentence? | idmsStmtsMandTermOn (SEMICOLON_FS imperativeStatementCall? nextSentence? | DOT_FS)
+    : idmsStmtsOptTermOn imperativeStatementCall?
     ;
 
 
@@ -157,11 +157,7 @@ idmsStmtsOptTermOn
      connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
      finishStatement | freeStatement | getStatement | inquireMapMoveStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
      postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | waitStatement | writeIdmsStatement |
-     readStatement | acceptStatement | deleteStatement | returnStatement | sendStatement | setStatement
-    ;
-
-idmsStmtsMandTermOn
-    : transferStatement
+     readStatement | acceptStatement | deleteStatement | returnStatement | sendStatement | setStatement | transferStatement
     ;
 
 nextSentence
@@ -1190,7 +1186,7 @@ cobolCompilerDirectivesKeywords
     ;
 
 endClause
-    : (DOT_FS | SEMICOLON_FS)
+    : DOT_FS
     ;
 
 obtainLRStatement

@@ -63,10 +63,10 @@ class TestIdmsTransferStatement {
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n";
 
   private static final String TRANSFER_ON =
-      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n"
+      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1}\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR'.\r\n";
   private static final String TRANSFER_ON_END_IF =
-      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n"
+      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1}\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR' END-IF.\r\n";
 
   private static final String TRANSFER_PGM_TOO_LONG_ERROR =
