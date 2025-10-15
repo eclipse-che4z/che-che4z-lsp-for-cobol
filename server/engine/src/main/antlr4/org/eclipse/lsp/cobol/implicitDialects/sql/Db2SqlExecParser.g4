@@ -965,7 +965,7 @@ dbs_select_optimize:OPTIMIZE FOR INTEGERLITERAL (ROWS | ROW);
 dbs_select_unpack_function_invocation: UNPACK LPARENCHAR dbs_expression RPARENCHAR DOT_FS ASTERISKCHAR AS LPARENCHAR dbs_sql_identifier db2sql_data_types (dbs_comma_separator dbs_sql_identifier db2sql_data_types)* RPARENCHAR;
 dbs_subselect: dbs_select_clause dbs_subselect_suffix; // dbs_orderby_offset_fetch;
 dbs_subselect_suffix: dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?;
-dbs_orderby_offset_fetch: dbs_orderby_clause? dbs_offset_clause? dbs_fetch_clause?;
+dbs_orderby_offset_fetch: dbs_orderby_clause? dbs_offset_fetch_clause?;
 dbs_select_clause: SELECT (ALL | DISTINCT)? ( ASTERISKCHAR | dbs_select_item (dbs_comma_separator dbs_select_item)*);
 dbs_select_item: (dbs_expressions AS? dbs_sql_identifier? | dbs_unpacked_row | dbs_alias_name DOT_FS ASTERISKCHAR);
 dbs_unpacked_row: dbs_select_unpack_function_invocation DOT_FS ASTERISKCHAR AS LPARENCHAR (dbs_generic_name db2sql_data_types)
@@ -984,6 +984,12 @@ dbs_grouping_expression: dbs_expression;
 dbs_having_clause: HAVING dbs_search_condition;
 dbs_orderby_clause: ORDER BY (INPUT SEQUENCE | ORDER OF dbs_table_designator | dbs_sort_key_expression (ASC | DESC)? (dbs_comma_separator dbs_sort_key_expression (ASC | DESC)?)*);
 dbs_offset_clause: OFFSET INTEGERLITERAL (ROW | ROWS);
+dbs_fetch_clause: FETCH (FIRST | NEXT) (PLUSCHAR? INTEGERLITERAL)? (ROW | ROWS) ONLY;
+dbs_limit_clause: LIMIT (NUMERICLITERAL {validateTokenWithRegex($NUMERICLITERAL.text, "\\d+,\\d++", "offset,limit form expected");} | INTEGERLITERAL (dbs_comma_separator INTEGERLITERAL | OFFSET INTEGERLITERAL)?);
+dbs_offset_fetch_clause: dbs_offset_clause dbs_fetch_clause?
+                       | dbs_fetch_clause
+                       | dbs_limit_clause
+                       ;
 
 dbs_fullselect: (dbs_value_clause dbs_offset_clause?)
         | dbs_full_select_base dbs_full_select_base_suffix; //TODO: remove ambiguity with dbs_subselect based on https://www.ibm.com/docs/en/db2-for-zos/13?topic=subselect-order-by-clause
@@ -1262,7 +1268,7 @@ without_or_with: (WITHOUT | WITH);
 yes_or_no: (YES | NO);
 
 dbs_select_into_suffix: INTO (target_variable_names_loop | dbs_array_variable) dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
-                                        dbs_orderby_clause? dbs_offset_clause?  dbs_fetch_clause?  (dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
+                                        dbs_orderby_clause? dbs_offset_fetch_clause?  (dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*;
 dbs_select_statement_common_table_expression: dbs_sql_identifier (LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR)? AS dbs_fullselect;
@@ -1478,7 +1484,6 @@ dbs_distinct_type: db2sql_data_types+;
 dbs_encryption_value: QUOTED_NONE | LOW | HIGH;
 dbs_explainable_sql_statement: ( dbs_allocate | dbs_alter | dbs_associate | dbs_fetch | dbs_insert | dbs_label | dbs_lock | dbs_merge | dbs_open |
  dbs_prepare | dbs_refresh | dbs_release | dbs_rename | dbs_select | dbs_truncate | dbs_select | dbs_set | dbs_delete | dbs_drop); // RE-CHECK
-dbs_fetch_clause: FETCH (FIRST | NEXT) (PLUSCHAR? INTEGERLITERAL)? (ROW | ROWS) ONLY;
 dbs_function_name: (dbs_sql_identifier DOT_FS)? dbs_sql_identifier; //must not be any of the  system-reserved keywords
 //dbs_imptkmod_param: YES | NO;
 dbs_include_data_type: dbs_alter_procedure_bit_int | dbs_alter_procedure_bit_decimal | dbs_alter_procedure_bit_float | dbs_alter_procedure_bit_decfloat | dbs_alter_procedure_bit_char | dbs_alter_procedure_bit_graphic | dbs_alter_procedure_bit_varchar | DATE | TIME | dbs_alter_procedure_bit_timestamp;

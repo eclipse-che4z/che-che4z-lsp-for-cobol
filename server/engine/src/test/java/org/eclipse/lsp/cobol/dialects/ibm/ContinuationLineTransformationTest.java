@@ -111,6 +111,18 @@ class ContinuationLineTransformationTest extends AbstractCobolLinePreprocessorTe
     assertEquals(0, errors.size());
   }
 
+  @Test
+  void testContinuationOfAlmostEmptyLine() {
+    List<String> lines = new ArrayList<>();
+
+    lines.add("000000                                                                 ");
+    lines.add("      -                                                                ");
+
+    List<SyntaxError> errors = runTransformation(reduceLines(lines));
+
+    assertEquals(0, errors.size());
+  }
+
   private List<SyntaxError> runTransformation(String text) {
     List<CobolLine> lines = convertToCobolLines(text);
     MessageService mockMessageService = mock(MessageService.class);

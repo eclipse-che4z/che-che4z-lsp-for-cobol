@@ -39,6 +39,7 @@ public enum CFASTNodeType {
   EXEC_CICS("execcics"),
   EXEC_CICS_RETURN("execcicsreturn"),
   EXEC_CICS_HANDLE("execcicshandle"),
+  EXEC_CICS_ABEND("execcicsabend"),
   EXEC_SQL("execsql"),
   EXEC_SQL_WHENEVER("execwhenever"),
   END_EXEC("endexec"),

@@ -60,4 +60,5 @@ export async function resolveCopybookURI(
       return result.value.toString();
     }
   }
+  outputChannel.error("Unable to resolve copybook", { pgLibs, copybookName });
 }

@@ -1,0 +1,7 @@
+digraph A {
+rankdir=LR;
+<PROG>-><MAIN-LOGIC>;
+<PROG>-><CLEAN-UP>;
+<MAIN-LOGIC>-><PARAGRAPH-A>;
+<PARAGRAPH-A>-><PARAGRAPH-B>;
+}

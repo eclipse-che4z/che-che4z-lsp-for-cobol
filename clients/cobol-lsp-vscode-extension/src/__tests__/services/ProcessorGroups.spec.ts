@@ -20,6 +20,7 @@ import {
 import {
   DEFAULT_DIALECT,
   ENDEVOR_PROCESSOR,
+  PATHS_LOCAL_KEY,
   SETTINGS_CPY_NDVR_DEPENDENCIES,
 } from "../../constants";
 import { DatasetLib } from "../../services/copybookLibs/DatasetLib";
@@ -221,11 +222,32 @@ describe("Processor groups", () => {
       describe("no matching pg", () => {
         beforeEach(() => {
           isEndevorElementResult = false;
+          getConfigurationResult[PATHS_LOCAL_KEY] = ["local/copybooks"];
+          getConfigurationResult[`idms.${PATHS_LOCAL_KEY}`] = [
+            "local/idms/copybooks",
+          ];
         });
         it("uses vscode setting if no matching processor group is available", async () => {
           const document = vscode.Uri.joinPath(WORKSPACE_URI, "NO_PG.cob");
           const pg = await loadProcessorGroup(document);
           expect(pg?.name).toEqual("VSCodeSettingProcessorGroup");
+          expect(pg?.libs).toEqual([new LocalPathLib("local/copybooks")]);
+        });
+      });
+
+      describe("no matching pg - idms dialect", () => {
+        beforeEach(() => {
+          isEndevorElementResult = false;
+          getConfigurationResult[PATHS_LOCAL_KEY] = ["local/copybooks"];
+          getConfigurationResult[`idms.${PATHS_LOCAL_KEY}`] = [
+            "local/idms/copybooks",
+          ];
+        });
+        it("uses vscode setting if no matching processor group is available", async () => {
+          const document = vscode.Uri.joinPath(WORKSPACE_URI, "NO_PG.cob");
+          const pg = await loadProcessorGroup(document, "IDMS");
+          expect(pg?.name).toEqual("VSCodeSettingProcessorGroup");
+          expect(pg.libs).toEqual([new LocalPathLib("local/idms/copybooks")]);
         });
       });
 

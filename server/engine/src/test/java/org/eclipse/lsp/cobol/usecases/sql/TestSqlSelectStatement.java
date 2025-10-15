@@ -166,10 +166,31 @@ class TestSqlSelectStatement {
           + "             WITH UR\n"
           + "           END-EXEC.\n";
 
+  private static final String SELECT16 =
+      TEXT
+          + "            DECLARE C1 CURSOR FOR \n"
+          + "             SELECT * FROM RMTTAB\n"
+          + "               LIMIT 1\n"
+          + "           END-EXEC.\n";
+
+  private static final String SELECT17 =
+      TEXT
+          + "            DECLARE C1 CURSOR FOR \n"
+          + "             SELECT * FROM RMTTAB\n"
+          + "               LIMIT 1,1\n"
+          + "           END-EXEC.\n";
+
+  private static final String SELECT18 =
+      TEXT
+          + "            DECLARE C1 CURSOR FOR \n"
+          + "             SELECT * FROM RMTTAB\n"
+          + "               LIMIT 1 OFFSET 1\n"
+          + "           END-EXEC.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7, SELECT8, SELECT9, SELECT10,
-        SELECT11, SELECT12, SELECT13, SELECT14, SELECT15);
+        SELECT11, SELECT12, SELECT13, SELECT14, SELECT15, SELECT16, SELECT17, SELECT18);
   }
 
   @ParameterizedTest

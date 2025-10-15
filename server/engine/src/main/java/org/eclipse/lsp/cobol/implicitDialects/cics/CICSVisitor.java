@@ -49,6 +49,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.ExecCicsAbendNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.StopNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
@@ -115,9 +116,22 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
         (ctx.allCicsRule() != null
             && ctx.allCicsRule().size() > 0
             && ctx.allCicsRule().get(0).cics_handle() != null);
+    boolean isAbend =
+        (ctx.allCicsRule() != null
+            && ctx.allCicsRule().size() > 0
+            && ctx.allCicsRule().get(0).cics_abend() != null);
 
     if (isReturn) {
       return addTreeNode(ctx, ExecCicsReturnNode::new);
+    } else if (isAbend) {
+      boolean cancel =
+          Optional.ofNullable(ctx.allCicsRule().get(0).cics_abend())
+              .map(CICSParser.Cics_abendContext::cics_abend_opts)
+              .map(CICSParser.Cics_abend_optsContext::CANCEL)
+              .filter(s -> s.size() > 0)
+              .isPresent();
+
+      return addTreeNode(ctx, locality -> new ExecCicsAbendNode(locality, cancel));
     } else if (isHandle) {
       boolean isProgram =
           Optional.ofNullable(ctx.allCicsRule().get(0).cics_handle())
