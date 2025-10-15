@@ -159,6 +159,7 @@ class TestReplaceCompilerDirective {
 
   @Test
   // Replace off works correctly inside a copybook.
+  // This test is wrong, copy statements are evaluate BEFORE the replacing clause is applied
   void testReplaceWorksCompletelyInsideACopybook() {
     UseCaseEngine.runTest(
         TEXT3,
@@ -167,6 +168,7 @@ class TestReplaceCompilerDirective {
   }
 
   @Test
+  // This test is wrong, copy statements are evaluate BEFORE the replacing clause is applied
   void testCorrectVariableDefinitionAfterReplace() {
     UseCaseEngine.runTest(
         TEXT5,
@@ -381,6 +383,34 @@ class TestReplaceCompilerDirective {
         TEXT14,
         ImmutableList.of(new CobolText("CPY1", CPY1_TEXT14), new CobolText("COPY2", COPY2_TEXT14)),
         ImmutableMap.of());
+  }
+
+  public static final String TEXT15 =
+      ""
+          + "       IDENTIFICATION DIVISION.       \n"
+          + "       PROGRAM-ID. PGMNAME.           \n"
+          + "       DATA DIVISION.                 \n"
+          + "       WORKING-STORAGE SECTION.       \n"
+          + "       01 {$*A}.                          \n"
+          + "            15 {$*TAG-RETURN-CODE} PIC S9(4). \n"
+          + "       01 {$*B}.                          \n"
+          + "            COPY {~CPY1}.             \n"
+          + "       PROCEDURE DIVISION.            \n"
+          + "               DISPLAY {$RETURN-CODE}.\n"
+          + "               EXIT PROGRAM.          \n";
+
+  public static final String CPY1_TEXT15 =
+      ""
+          + "           REPLACE ==RETURN-CODE==             \n"
+          + "                BY ==TAG-RETURN-CODE==         \n"
+          + "                   .                           \n"
+          + "           15 {$*RETURN-CODE^TAG-RETURN-CODE} PIC S9(4).\n"
+          + "           REPLACE OFF.                        \n";
+
+  @Test
+  void testReplaceInCopybook() {
+    UseCaseEngine.runTest(
+        TEXT15, ImmutableList.of(new CobolText("CPY1", CPY1_TEXT15)), ImmutableMap.of());
   }
 
   // TODO: Add use case test scenario

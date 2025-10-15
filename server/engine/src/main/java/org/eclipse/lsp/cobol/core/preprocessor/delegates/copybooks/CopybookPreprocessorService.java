@@ -238,7 +238,9 @@ class CopybookPreprocessorService {
         new PreprocessorContext(
             programDocumentUri, copybookDocument, copybookConfig, hierarchy, copybooks, languageId);
     List<SyntaxError> copybookErrors = new LinkedList<>();
-    grammarPreprocessor.preprocess(copybookContext, preprocessor).unwrap(copybookErrors::addAll);
+    grammarPreprocessor
+        .preprocess(copybookContext, preprocessor, true)
+        .unwrap(copybookErrors::addAll);
 
     errors.addAll(copybookErrors);
     List<SyntaxError> distinct = errors.stream().distinct().collect(Collectors.toList());

@@ -145,7 +145,7 @@ class CobolLanguageEngineTest {
     when(preprocessor.cleanUpCode(URI, TEXT))
         .thenReturn(new ResultWithErrors<>(new ExtendedText(TEXT, URI), ImmutableList.of()));
 
-    when(grammarPreprocessor.preprocess(any(), any()))
+    when(grammarPreprocessor.preprocess(any(), any(), any()))
         .thenReturn(new ResultWithErrors<>(new CopybooksRepository(), ImmutableList.of()));
 
     Range sourceRange = new Range(new Position(0, 7), new Position(0, 31));

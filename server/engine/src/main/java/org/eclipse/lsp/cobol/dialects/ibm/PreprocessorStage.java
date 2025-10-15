@@ -83,7 +83,9 @@ public class PreprocessorStage
             ctx.getLanguageId());
 
     CopybooksRepository copybooks =
-        grammarPreprocessor.preprocess(context, preprocessor).unwrap(preprocessorErrors::addAll);
+        grammarPreprocessor
+            .preprocess(context, preprocessor, false)
+            .unwrap(preprocessorErrors::addAll);
     extendedDocument.commitTransformations();
 
     ctx.getAccumulatedErrors().addAll(preprocessorErrors);
