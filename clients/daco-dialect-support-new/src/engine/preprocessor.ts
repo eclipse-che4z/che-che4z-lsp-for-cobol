@@ -21,7 +21,5 @@ export class DaCoPreprocessor {
     programUri: vscode.Uri,
     text: string,
     outputChannel: vscode.OutputChannel,
-  ): Promise<Map<string, vscode.Diagnostic[]>> {
-    return new Map();
-  }
+  ) {}
 }

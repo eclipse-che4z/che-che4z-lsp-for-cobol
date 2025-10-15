@@ -53,7 +53,7 @@ export async function activate(context: vscode.ExtensionContext) {
       programUri: vscode.Uri,
       text: string,
     ) => {
-      return preprocessor.execute(context, programUri, text, outputChannel);
+      preprocessor.execute(context, programUri, text, outputChannel);
     },
   );
 
