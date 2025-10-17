@@ -21,7 +21,7 @@ import {
 
 export type WorkerMessage = {
   vmCount: number;
-  severity: number;
+  severity: number | undefined;
   programs: Program[];
 };
 

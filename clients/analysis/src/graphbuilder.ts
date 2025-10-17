@@ -138,7 +138,7 @@ export class ControlFlowGraphBuilder {
       );
       processor.run();
 
-      if (this.deadCodeSeverity !== undefined) {
+      if (this.deadCodeSeverity !== undefined && !listener.vmLimitRearch) {
         const deadCodeCollector = new DeadCodeCollector(this.deadCodeSeverity);
         deadCodeCollector.collectDeadCodeDiagnostics(
           listing.getInstructions(),
@@ -156,6 +156,9 @@ export class ControlFlowGraphBuilder {
 class BuildGraphListener implements VirtualProcessorListener {
   private readonly builder: GraphBuilder;
   private readonly latestLocation: Location;
+  private _vmLimitReached = false;
+
+  public get vmLimitRearch() { return this._vmLimitReached; }
 
   public constructor(
     private program: Program,
@@ -187,6 +190,7 @@ class BuildGraphListener implements VirtualProcessorListener {
   }
 
   public maximumVMCountReached(limit: number): void {
+    this._vmLimitReached = true;
     const location = {
       uri: this.program.location.uri,
       start: { line: 1, character: 1 },
