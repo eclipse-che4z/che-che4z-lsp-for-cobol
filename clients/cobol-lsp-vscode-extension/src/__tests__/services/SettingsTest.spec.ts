@@ -52,6 +52,15 @@ describe("SettingsService evaluate variables", () => {
     SettingsService.serverRuntime();
     expect(tracking).toHaveBeenCalledWith("cobol-lsp.serverRuntime");
   });
+
+  test("Get java location settings", () => {
+    const tracking = jest.fn();
+    vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
+      get: tracking,
+    });
+    SettingsService.getJavaLocation();
+    expect(tracking).toHaveBeenCalledWith("cobol-lsp.java.executablePath");
+  });
 });
 
 test("getWorkspaceFoldersPath return an array of paths", () => {

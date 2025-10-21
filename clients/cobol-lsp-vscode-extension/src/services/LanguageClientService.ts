@@ -232,6 +232,9 @@ export class LanguageClientService {
         return Promise.resolve(result);
       };
     }
+    const location = SettingsService.getJavaLocation() ?? "";
+    const command = location.length === 0 ? "java" : location;
+
     return {
       args: [
         "-Dline.separator=\r\n",
@@ -241,7 +244,7 @@ export class LanguageClientService {
         jarPath,
         "pipeEnabled",
       ],
-      command: "java",
+      command: command,
       options: { detached: false },
     };
   }
