@@ -18,7 +18,7 @@ export function mockSpawnProcess(
   stdout: string,
   stderr: string,
   exitCode = 0,
-  error?: string,
+  error?: NodeJS.ErrnoException,
 ) {
   const stdoutStream = new PassThrough();
   const stderrStream = new PassThrough();

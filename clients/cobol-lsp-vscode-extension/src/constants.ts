@@ -30,6 +30,7 @@ export const SETTINGS_MAXIMUM_VM_COUNT: string = "cobol-lsp.maxVmCount";
 export const SERVER_PORT = "cobol-lsp.server.port";
 export const ANALYSIS_MODE = "cobol-lsp.analysis-mode";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
+export const JAVA_HOME = "cobol-lsp.java.home";
 export const DIALECT_LIBS = "cobol-lsp.dialect.libs";
 export const PATHS_LOCAL_KEY = "paths-local";
 export const PATHS_DSN = "paths-dsn";

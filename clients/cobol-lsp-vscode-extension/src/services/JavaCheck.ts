@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as cp from "child_process";
+import { SettingsService } from "./Settings";
 
 const versionPattern = new RegExp(
   '(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9]).(1|8|[0-9][0-9]).*).*',
@@ -24,18 +25,18 @@ export class JavaCheck {
   public async isJavaInstalled() {
     return new Promise((resolve, reject) => {
       let resolved = false;
-      const ls = cp.spawn("java", ["-version"]);
+      const ls = cp.spawn(SettingsService.getJavaCommand(), ["-version"]);
       ls.stderr.on("data", (data: Buffer) => {
         if (JavaCheck.isJavaVersionSupported(data.toString())) {
           resolved = true;
           resolve(resolved);
         }
       });
-      ls.on("error", (code) => {
-        if ("Error: spawn java ENOENT" === code.toString()) {
+      ls.on("error", (error: NodeJS.ErrnoException) => {
+        if (error.code === "ENOENT") {
           reject(new Error("Java 8 not found. Switching to native builds"));
         }
-        reject(code);
+        reject(error);
       });
       ls.on("close", (code: number) => {
         if (code !== 0) {

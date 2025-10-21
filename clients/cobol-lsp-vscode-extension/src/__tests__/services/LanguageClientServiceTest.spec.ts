@@ -26,6 +26,7 @@ import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 import { getErrorMessage } from "../../services/util/ErrorsUtils";
 import { registerEvent } from "../../services/reporter";
 import { outputChannel } from "../../services/util/OutputChannel";
+import { SettingsService } from "../../services/Settings";
 
 jest.mock("../../services/reporter");
 jest.mock("../../services/copybook/CopybookURI");
@@ -184,6 +185,42 @@ describe("LanguageClientService positive scenario", () => {
           "pipeEnabled",
         ],
         command: "java",
+        options: { detached: false },
+      },
+      {
+        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        middleware: {},
+        outputChannel: outputChannel,
+        synchronize: {
+          fileEvents: [undefined, undefined, undefined, undefined],
+        },
+      },
+    );
+  });
+
+  test("Test LanguageClientService starts language server with java location provided", async () => {
+    LanguageClient.prototype.start = jest
+      .fn()
+      .mockReturnValue(Promise.resolve());
+    const serverPath = join("/test", "server", "jar", "server.jar");
+    const expectedDialectPath = join("/test", "server", "jar", "dialects");
+    SettingsService.getJavaHome = jest.fn().mockReturnValue("/usr/");
+
+    expect(await languageClientService.start()).toBe(undefined);
+    expect(LanguageClient).toHaveBeenCalledTimes(1);
+    expect(LanguageClient).toHaveBeenCalledWith(
+      SERVER_ID,
+      SERVER_DESC,
+      {
+        args: [
+          "-Dline.separator=\r\n",
+          `-Ddialect.path=${expectedDialectPath}`,
+          "-Xmx768M",
+          "-jar",
+          serverPath,
+          "pipeEnabled",
+        ],
+        command: `${vscode.Uri.joinPath(vscode.Uri.file("usr"), "bin", "java").fsPath}`,
         options: { detached: false },
       },
       {
