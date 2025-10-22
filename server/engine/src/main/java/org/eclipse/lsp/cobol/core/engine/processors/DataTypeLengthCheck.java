@@ -30,6 +30,7 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
   private static final int MAX_ALPHABETIC_ALPHANUMERIC_LENGTH = 999999999;
   private static final int MAX_NATIONAL_UTF8_DBCS_LENGTH = 99999999;
   private static final int MAX_FLOATING_POINT_MANTISSA = 16;
+  private static final int MAX_ALPHANUMERIC_EDITED_REPETITION_FACTOR = 32767;
 
   private static final Pattern NUMERIC_PATTERN = Pattern.compile("(?i)9\\((\\d+)\\)");
   private static final Pattern ALPHABETIC_PATTERN = Pattern.compile("(?i)A\\((\\d+)\\)");
@@ -83,6 +84,10 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
     }
 
     if (checkSimpleDbcsPattern(node, pictureClause, context)) {
+      return;
+    }
+
+    if (checkAlphanumericEditedPattern(node, pictureClause, context)) {
       return;
     }
 
@@ -259,7 +264,7 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
       showError(context, node, "dataTypeLengthCheck.invalidPictureString", "", 0);
       return true;
     }
-    if (!pictureClause.matches("(?i)S?[09]*(V[09]*)?")
+    if (!pictureClause.matches("(?i)S?[09]*(V[09]*)?")  && !pictureClause.matches("9+\\([0-9]+\\)9*")
         && !pictureClause.matches("(?i)([0]*P[09]*|[09]*P)")) {
       return false;
     }
@@ -267,7 +272,8 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
     String numericPart =
         pictureClause.toUpperCase().startsWith("S") ? pictureClause.substring(1) : pictureClause;
 
-    int totalLength = numericPart.replace("0", "").replace("V", "").length();
+    Pattern pattern = Pattern.compile("9\\((\\d+)\\)");
+    int totalLength = calculateLength(numericPart, pattern);
 
     if (totalLength > MAX_NUMERIC_LENGTH) {
       showError(
@@ -386,6 +392,67 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
       checkDbcsUsageDisplay1(node, context);
     }
     return true;
+  }
+
+  private boolean checkAlphanumericEditedPattern(
+      VariableWithLevelNode node, String pictureClause, ProcessingContext context) {
+
+    String picWithoutRepetition = pictureClause.toUpperCase().replaceAll("\\([^)]*\\)", "");
+
+    boolean hasAlpha = picWithoutRepetition.contains("A") || picWithoutRepetition.contains("X");
+    boolean hasEditing = picWithoutRepetition.contains("B") || picWithoutRepetition.contains("0") || picWithoutRepetition.contains("/");
+
+    if (!(hasAlpha && hasEditing)) {
+      return false;
+    }
+
+    Pattern pattern = Pattern.compile("[ABX90/]\\((\\d+)\\)");
+    int totalLength = calculateLength(pictureClause, pattern);
+
+    if (totalLength > MAX_ALPHABETIC_ALPHANUMERIC_LENGTH) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxAlphanumericEditedLengthExceeded",
+          String.valueOf(totalLength),
+          MAX_ALPHABETIC_ALPHANUMERIC_LENGTH);
+    } else if (totalLength > MAX_ALPHANUMERIC_EDITED_REPETITION_FACTOR) {
+      showError(
+          context,
+          node,
+          "dataTypeLengthCheck.maxAlphanumericEditedRepetitionFactorExceeded",
+          String.valueOf(MAX_ALPHANUMERIC_EDITED_REPETITION_FACTOR), 0);
+
+    }
+
+    return true;
+  }
+
+  private int calculateLength(String numericPart, Pattern pattern) {
+    if (numericPart.contains("(")) {
+      int totalLength = 0;
+
+      Matcher matcher = pattern.matcher(numericPart);
+      int lastEnd = 0;
+
+      while (matcher.find()) {
+        String before = numericPart.substring(lastEnd, matcher.start());
+        totalLength += before.length();
+
+        int repetitions = Integer.parseInt(matcher.group(1));
+        totalLength += repetitions;
+
+        lastEnd = matcher.end();
+      }
+
+      if (lastEnd < numericPart.length()) {
+        String remaining = numericPart.substring(lastEnd);
+        totalLength += remaining.length();
+      }
+      return totalLength;
+    } else {
+      return numericPart.replace("0", "").replace("V", "").length();
+    }
   }
 
   private void checkDbcsUsageDisplay1(VariableWithLevelNode node, ProcessingContext context) {

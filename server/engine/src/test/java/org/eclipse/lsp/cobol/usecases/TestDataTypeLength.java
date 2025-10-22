@@ -65,8 +65,10 @@ public class TestDataTypeLength {
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*VALID-NUM} PIC S9(18).\n"
+          + "       01 {$*VALID-NUM1} PIC 9(5)99.\n"
           + "       01 {$*INVALID-NUM|1} PIC 99999999999999999999.\n"
           + "       01 {$*INVALID-NUM1|2} PIC S9999999999999999999.\n"
+          + "       01 {$*INVALID-NUM2|3} PIC 99999999999999999999(9)999.\n"
           + "       PROCEDURE DIVISION.";
 
   private static final String TEXT_NATIONAL =
@@ -180,6 +182,22 @@ public class TestDataTypeLength {
           + "       01 {$*INVALID-SIMPLE-DEC5|5} PIC 09P000099999990.\n"
           + "       PROCEDURE DIVISION.";
 
+  private static final String TEXT_ALPHANUMERIC_EDITED =
+          "       IDENTIFICATION DIVISION.\n"
+                  + "       PROGRAM-ID.    TEST12.\n"
+                  + "       ENVIRONMENT DIVISION.\n"
+                  + "       DATA DIVISION.\n"
+                  + "       WORKING-STORAGE SECTION.\n"
+                  + "       01 {$*VALID-B} PIC B.\n"
+                  + "       01 {$*VALID-ABA1} PIC ABA.\n"
+                  + "       01 {$*VALID-ABA2} PIC A(9)BA(9).\n"
+                  + "       01 {$*VALID-ABA3} PIC A9BA9.\n"
+                  + "       01 {$*VALID-ABA4} PIC A(9)B(18)A(9)B(18)A(9)B(18)A(9).\n"
+                  + "       01 {$*INVALID-ABA|1} PIC ABA(999999999).\n"
+                  + "       01 {$*INVALID-BA|2} PIC BA(999999998).\n"
+                  + "       01 {$*INVALID-ABA5|3} PIC A(9)B(18)A(9)B(18)A(999999999)B(18)A(9).\n"
+                  + "       PROCEDURE DIVISION.";
+
   private static final String TEXT_FLOATING_POINT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.    TEST12.\n"
@@ -273,6 +291,13 @@ public class TestDataTypeLength {
             new Diagnostic(
                 new Range(),
                 "Numeric field 'INVALID-NUM1' with length 19 exceeds maximum allowed length of 18"
+                    + " digits",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Numeric field 'INVALID-NUM2' with length 31 exceeds maximum allowed length of 18"
                     + " digits",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
@@ -490,6 +515,31 @@ public class TestDataTypeLength {
                 "Numeric field 'INVALID-SIMPLE-DEC5' has invalid picture string",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testAlphaNumericEdited() {
+    UseCaseEngine.runTest(TEXT_ALPHANUMERIC_EDITED,
+            ImmutableList.of(),
+            ImmutableMap.of(
+                    "1",
+                    new Diagnostic(
+                            new Range(),
+                            "Alphanumeric-edited field 'INVALID-ABA' with length 1000000001 exceeds maximum allowed length of 999999999 characters",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "2",
+                    new Diagnostic(
+                            new Range(),
+                            "Alphanumeric-edited field 'INVALID-BA' exceeds maximum repetition factor of 32767",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText()),
+                    "3",
+                    new Diagnostic(
+                            new Range(),
+                            "Alphanumeric-edited field 'INVALID-ABA5' with length 1000000080 exceeds maximum allowed length of 999999999 characters",
+                            DiagnosticSeverity.Error,
+                            ErrorSource.PARSING.getText())));
   }
 
   @Test
