@@ -36,6 +36,9 @@ class TestAttachTaskCode {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_TASKCODE} PIC X(8) SYNC.\r\n"
@@ -59,13 +62,18 @@ class TestAttachTaskCode {
   private static final String ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL =
       "           ATTACH TASK CODE 'TASKCODE' PRIORITY {1XX|1}.\r\n";
 
+  private static final String ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL_ON =
+      "           ATTACH TASK CODE 'TASKCODE' PRIORITY {1XX|1}\n"
+          + "           ON ANY-STATUS MOVE 1 TO WK_TASKCODE END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + ATTACH_TASK_CODE_CODE_LITERAL,
         BOILERPLATE + ATTACH_TASK_CODE_CODE_VARIABLE,
         BOILERPLATE + ATTACH_TASK_CODE_PRIORITY_VARIABLE,
         BOILERPLATE + ATTACH_TASK_CODE_PRIORITY_LITERAL,
-        BOILERPLATE + ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL);
+        BOILERPLATE + ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL,
+        BOILERPLATE + ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL_ON);
   }
 
   @ParameterizedTest

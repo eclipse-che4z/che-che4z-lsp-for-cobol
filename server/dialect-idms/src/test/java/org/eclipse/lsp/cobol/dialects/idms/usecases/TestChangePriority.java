@@ -36,6 +36,9 @@ class TestChangePriority {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PRIORITY} PIC S9(3).\r\n"
@@ -49,12 +52,16 @@ class TestChangePriority {
 
   private static final String CHANGE_PRIORITY_TO_LITERAL_INVALID =
       "           CHANGE PRIORITY TO {1X3|1}.\r\n";
+  private static final String CHANGE_PRIORITY_TO_LITERAL_INVALID_ON =
+      "           CHANGE PRIORITY TO {1X3|1}\r\n"
+          + "           ON ANY-STATUS MOVE 1 TO WK_PRIORITY END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + CHANGE_PRIORITY_TO_VARIABLE,
         BOILERPLATE + CHANGE_PRIORITY_TO_LITERAL,
-        BOILERPLATE + CHANGE_PRIORITY_TO_LITERAL_INVALID);
+        BOILERPLATE + CHANGE_PRIORITY_TO_LITERAL_INVALID,
+        BOILERPLATE + CHANGE_PRIORITY_TO_LITERAL_INVALID_ON);
   }
 
   @ParameterizedTest

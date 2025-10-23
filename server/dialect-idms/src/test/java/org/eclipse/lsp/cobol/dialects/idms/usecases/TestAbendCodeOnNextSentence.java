@@ -27,16 +27,16 @@ class TestAbendCodeOnNextSentence {
           + "        PROGRAM-ID. test1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE ABC.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "            IDMS-RECORDS MANUAL\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*ERRORSAT}.\n"
           + "            05 {$*SSC-ERRSTAT-SAVE} PIC X.\n"
-          + "            05 {$*ANY-STATUS} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
           + "            ABEND CODE {$SSC-ERRSTAT-SAVE} ON \n"
-          + "               {$ANY-STATUS} NEXT SENTENCE.\n";
+          + "               ANY-STATUS NEXT SENTENCE\n"
+          + "                END-IF.";
 
   @Test
   void test() {

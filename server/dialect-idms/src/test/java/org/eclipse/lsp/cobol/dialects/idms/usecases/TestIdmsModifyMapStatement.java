@@ -30,6 +30,9 @@ class TestIdmsModifyMapStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       DATA DIVISION.\n"
           + "       MAP SECTION.\n"
           + "           MAP {$*EMPMAP}.\n"
@@ -88,8 +91,16 @@ class TestIdmsModifyMapStatement {
           + "                             DFLD  {$MAP-FLD}(3) \n "
           + "                             RIGHT JUSTIFY ATTRIBUTES DETECT DARK.\n";
 
+  private static final String TST9_ON =
+      DEFS
+          + "           MODIFY MAP {$EMPMAP} FOR ALL DFLD {$MAP-FLD}({$S1}) \n"
+          + "                             DFLD  {$MFLD2} OF {$MAP1} \n"
+          + "                             DFLD  {$MAP-FLD}(3) \n "
+          + "                             RIGHT JUSTIFY ATTRIBUTES DETECT DARK\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST9_ON);
   }
 
   @ParameterizedTest

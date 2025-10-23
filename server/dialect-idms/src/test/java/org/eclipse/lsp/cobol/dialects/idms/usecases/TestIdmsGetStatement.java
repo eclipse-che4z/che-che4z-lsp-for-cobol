@@ -30,6 +30,9 @@ class TestIdmsGetStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*WK_NAME} PIC X(8).\n"
@@ -95,6 +98,11 @@ class TestIdmsGetStatement {
   private static final String GET_TIME_ALL_PARMS =
       DEFS + "           GET TIME INTO {$WK_TIME} COMP-3 DATE INTO {$WK_DATE}.\r\n";
 
+  private static final String GET_TIME_ALL_PARMS_ON =
+      DEFS
+          + "           GET TIME INTO {$WK_TIME} COMP-3 DATE INTO {$WK_DATE}\r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         GET1,
@@ -108,7 +116,8 @@ class TestIdmsGetStatement {
         GET_STORAGE_2,
         GET_STORAGE_WITH_ALL_PARMS,
         GET_TIME,
-        GET_TIME_ALL_PARMS);
+        GET_TIME_ALL_PARMS,
+        GET_TIME_ALL_PARMS_ON);
   }
 
   @ParameterizedTest

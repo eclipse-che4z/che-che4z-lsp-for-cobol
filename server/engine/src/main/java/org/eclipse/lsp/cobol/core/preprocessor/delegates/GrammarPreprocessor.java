@@ -28,9 +28,12 @@ public interface GrammarPreprocessor {
    *
    * @param context - preprocessor context
    * @param preprocessor - dialect specific preprocessor
+   * @param copybook - call done for copybook
    * @return extended document with copybooks and related errors
    */
   @NonNull
   ResultWithErrors<CopybooksRepository> preprocess(
-      @NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor);
+      @NonNull PreprocessorContext context,
+      @NonNull CleanerPreprocessor preprocessor,
+      Boolean copybook);
 }

@@ -28,6 +28,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
@@ -36,6 +37,7 @@ import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolsRepository;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.MarkupContent;
 
 /**
  * This completion provider returns all the defined variables as completion suggestions and their
@@ -78,7 +80,10 @@ public class VariableCompletion implements Completion {
     CompletionItem item = new CompletionItem(name);
     item.setLabel(name);
     item.setInsertText(name);
-    item.setDocumentation(it.getFullVariableDescription());
+    item.setDocumentation(
+        it.getFullVariableDescription().stream()
+            .map(MarkupContent::getValue)
+            .collect(Collectors.joining("\n")));
     if (ImplicitCodeUtils.isImplicit(it.getLocality().getUri())) {
       item.setSortText(CONSTANTS.prefix + name);
       item.setKind(Constant);

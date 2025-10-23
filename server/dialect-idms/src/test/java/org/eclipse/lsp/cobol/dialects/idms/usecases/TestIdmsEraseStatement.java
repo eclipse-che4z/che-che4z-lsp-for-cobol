@@ -30,6 +30,9 @@ class TestIdmsEraseStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPLOYEE} PIC X(8).\n"
@@ -42,9 +45,11 @@ class TestIdmsEraseStatement {
   private static final String ERAS3 = DEFS + "           ERASE {$EMPLOYEE} PERMANENT MEMBERS.\n";
 
   private static final String ERAS4 = DEFS + "           ERASE {$EMPLOYEE}.\n";
+  private static final String ERAS4_ON =
+      DEFS + "           ERASE {$EMPLOYEE}\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(ERAS1, ERAS2, ERAS3, ERAS4);
+    return Stream.of(ERAS1, ERAS2, ERAS3, ERAS4, ERAS4_ON);
   }
 
   @ParameterizedTest

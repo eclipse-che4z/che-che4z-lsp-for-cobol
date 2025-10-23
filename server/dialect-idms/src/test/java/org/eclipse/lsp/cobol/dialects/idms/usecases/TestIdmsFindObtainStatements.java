@@ -94,10 +94,15 @@ class TestIdmsFindObtainStatements {
           + "           OBTAIN NEXT {$EMPLOYEE} WITHIN {$DEPT-EMPLOYEE} ON {$DB-END-OF-SET}\n"
           + "                   DISPLAY 'END OF SET'.\n";
 
+  private static final String FIND18_ON =
+      DEFS
+          + "           OBTAIN NEXT {$EMPLOYEE} WITHIN {$DEPT-EMPLOYEE} ON {$DB-END-OF-SET}\n"
+          + "                   DISPLAY 'END OF SET' END-IF.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         FIND1, FIND2, FIND3, FIND4, FIND5, FIND6, FIND7, FIND8, FIND9, FIND10, FIND11, FIND12,
-        FIND13, FIND14, FIND15, FIND16, FIND17, FIND18);
+        FIND13, FIND14, FIND15, FIND16, FIND17, FIND18, FIND18_ON);
   }
 
   @ParameterizedTest

@@ -30,6 +30,9 @@ class TestFinish {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "        PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        PROCEDURE DIVISION. \r\n";
@@ -37,10 +40,12 @@ class TestFinish {
   private static final String FINISH_TASK = "           FINISH TASK.\r\n";
 
   private static final String FINISH = "           FINISH.\r\n";
+  private static final String FINISH_TASK_ON =
+      "           FINISH TASK\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
 
-    return Stream.of(BOILERPLATE + FINISH_TASK, BOILERPLATE + FINISH);
+    return Stream.of(FINISH_TASK, FINISH, FINISH_TASK_ON).map(s -> BOILERPLATE + s);
   }
 
   @ParameterizedTest

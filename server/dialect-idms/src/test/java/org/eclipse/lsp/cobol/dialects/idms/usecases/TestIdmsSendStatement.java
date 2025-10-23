@@ -30,6 +30,9 @@ class TestIdmsSendStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_NAME} PIC X(8).\n"
@@ -47,9 +50,14 @@ class TestIdmsSendStatement {
       DEFS
           + "           MOVE 8 TO {$WK_LENGTH}.\r\n"
           + "           SEND MESSAGE TO DEST ID 'TSTDEST' FROM {$WK_MSG} LENGTH 8.\n";
+  private static final String SEND_USER_LITERALS_ON =
+      DEFS
+          + "           MOVE 8 TO {$WK_LENGTH}.\r\n"
+          + "           SEND MESSAGE TO DEST ID 'TSTDEST' FROM {$WK_MSG} LENGTH 8\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(SEND_USER_VARIABLES, SEND_USER_LITERALS);
+    return Stream.of(SEND_USER_VARIABLES, SEND_USER_LITERALS, SEND_USER_LITERALS_ON);
   }
 
   @ParameterizedTest

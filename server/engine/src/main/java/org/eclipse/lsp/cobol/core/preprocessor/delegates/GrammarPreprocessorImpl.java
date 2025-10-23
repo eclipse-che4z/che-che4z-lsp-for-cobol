@@ -57,13 +57,16 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   @NonNull
   @Override
   public ResultWithErrors<CopybooksRepository> preprocess(
-      @NonNull PreprocessorContext context, @NonNull CleanerPreprocessor preprocessor) {
+      @NonNull PreprocessorContext context,
+      @NonNull CleanerPreprocessor preprocessor,
+      Boolean copybook) {
     List<SyntaxError> errors = new ArrayList<>();
 
     CopybooksRepository copybooksRepository =
         preprocessDirectives(context, preprocessor).unwrap(errors::addAll);
-    replace(context.getCurrentDocument(), context.getHierarchy(), context.getLanguageId())
-        .unwrap(errors::addAll);
+    if (!copybook)
+      replace(context.getCurrentDocument(), context.getHierarchy(), context.getLanguageId())
+          .unwrap(errors::addAll);
 
     return new ResultWithErrors<>(copybooksRepository, errors);
   }

@@ -15,14 +15,14 @@
 package org.eclipse.lsp.cobol.service.delegates.hover;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.AnalysisResult;
+import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.model.DefinedAndUsedStructure;
 import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.model.NodeType;
@@ -111,6 +111,7 @@ public class DefinedAndUsedStructureHoverProvider implements HoverProvider {
 
   private static Stream<Hover> getHoverStream(
       Set<Node> nodeDefinitionLists, DefinedAndUsedStructure node, String languageId) {
+    int startCharIndex = CobolLanguageId.MAPPER.get(languageId).getLayout().getAriaAStart();
     if (node instanceof Describable) {
       return Stream.of(
           new Hover(
@@ -118,7 +119,8 @@ public class DefinedAndUsedStructureHoverProvider implements HoverProvider {
                   MarkupKind.MARKDOWN,
                   String.format(
                       "```%s\n%s\n```",
-                      languageId.toLowerCase(), getHoverLines((Describable) node)))));
+                      languageId.toLowerCase(),
+                      getHoverLines((Describable) node, startCharIndex)))));
     }
     return nodeDefinitionLists.stream()
         .filter(DefinedAndUsedStructure.class::isInstance)
@@ -131,15 +133,23 @@ public class DefinedAndUsedStructureHoverProvider implements HoverProvider {
                     new MarkupContent(
                         MarkupKind.MARKDOWN,
                         String.format(
-                            "```%s\n%s\n```", languageId.toLowerCase(), getHoverLines(element)))));
+                            "```%s\n%s\n```",
+                            languageId.toLowerCase(), getHoverLines(element, startCharIndex)))));
   }
 
-  private static String getHoverLines(Describable describable) {
-    String[] lines = describable.getFormattedDisplayString().split("\\r?\\n");
-    int limit = Math.min(MAX_HOVER_LINE_COUNT, lines.length);
+  private static String getHoverLines(Describable describable, int startCharIndex) {
+    List<MarkupContent> lines = describable.getFormattedDisplayString();
+    int limit = Math.min(MAX_HOVER_LINE_COUNT, lines.size());
     StringBuilder trimmedHoverContent = new StringBuilder();
+    String prefix = StringUtils.repeat(" ", startCharIndex);
     for (int i = 0; i < limit; i++) {
-      trimmedHoverContent.append(lines[i]).append("\n");
+      if (!Objects.equals(lines.get(i).getKind(), MarkupKind.PLAINTEXT)) {
+        trimmedHoverContent
+            .append(lines.get(i).getValue().replaceAll("(?m)^", prefix))
+            .append("\n");
+      } else {
+        trimmedHoverContent.append(lines.get(i).getValue()).append("\n");
+      }
     }
     return trimmedHoverContent.toString();
   }

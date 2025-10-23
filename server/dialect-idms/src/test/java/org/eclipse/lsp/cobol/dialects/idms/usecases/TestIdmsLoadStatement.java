@@ -35,6 +35,9 @@ class TestIdmsLoadStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_TABLE} PIC X(8).\n"
@@ -62,8 +65,14 @@ class TestIdmsLoadStatement {
           + "           LOAD TABLE {'TSTTABLXX'|1} INTO {$WK_1} TO {$WK_2} DICTNODE \r\n"
           + "           {'TSTDICTXXX'|2} DICTNAME {'TSTDICTXXX'|3} LOADLIB 'TSTLOAD' NOWAIT.\n";
 
+  private static final String LOAD_LITERALS_ERROR_ON =
+      DEFS
+          + "           LOAD TABLE {'TSTTABLXX'|1} INTO {$WK_1} TO {$WK_2} DICTNODE \r\n"
+          + "           {'TSTDICTXXX'|2} DICTNAME {'TSTDICTXXX'|3} LOADLIB 'TSTLOAD' NOWAIT\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
-    return Stream.of(LOAD_LITERALS, LOAD_VARIABLES, LOAD_LITERALS_ERROR);
+    return Stream.of(LOAD_LITERALS, LOAD_VARIABLES, LOAD_LITERALS_ERROR, LOAD_LITERALS_ERROR_ON);
   }
 
   @ParameterizedTest

@@ -114,10 +114,16 @@ class TestIdmsAcceptDbStatements {
           + "           ACCEPT {$DB-KEY1} FROM {$EMP_AREA} NEXT CURRENCY PAGE-INFO {$DB1} \n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
 
+  private static final String TST90_ON =
+      DEFS
+          + "           ACCEPT {$DB-KEY1} FROM {$EMP_AREA} NEXT CURRENCY PAGE-INFO {$DB1} \n"
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'\n"
+          + "           END-IF.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST10, TST20, TST30, TST40, TST50,
-        TST60, TST70, TST80, TST90);
+        TST60, TST70, TST80, TST90, TST90_ON);
   }
 
   @ParameterizedTest

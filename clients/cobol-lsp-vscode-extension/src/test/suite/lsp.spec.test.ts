@@ -709,10 +709,10 @@ suite("Integration Test Suite", function () {
         (hoverResults_para1[0].contents[0] as vscode.MarkdownString).value,
       ),
       normalizeLineEndings(`\`\`\`cobol
-       PARAG1.
-           DISPLAY 'PARAG1'.
-           PERFORM PARAG3.
-           PERFORM PARAG2.
+              PARAG1.
+                  DISPLAY 'PARAG1'.
+                  PERFORM PARAG3.
+                  PERFORM PARAG2.
 
 \`\`\``),
     );
@@ -727,8 +727,8 @@ suite("Integration Test Suite", function () {
           .value,
       ),
       normalizeLineEndings(`\`\`\`cobol
-       PARAG3.
-           DISPLAY 'PARAG3'.
+              PARAG3.
+                  DISPLAY 'PARAG3'.
 
 \`\`\`
 
@@ -745,8 +745,8 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
           .value,
       ),
       normalizeLineEndings(`\`\`\`cobol
-       PARAG2.
-           DISPLAY 'PARAG2'.
+              PARAG2.
+                  DISPLAY 'PARAG2'.
 
 \`\`\`
 
@@ -763,8 +763,8 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
           .value,
       ),
       normalizeLineEndings(`\`\`\`cobol
-       S010 SECTION.
-           display 'section S010'.
+              S010 SECTION.
+                  display 'section S010'.
 
 \`\`\``),
     );
@@ -790,15 +790,15 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
     ).value;
     assert.ok(
       hoverContent.includes(`\`\`\`cobol
-       PARAG3.
-           DISPLAY 'PARAG3'.
+              PARAG3.
+                  DISPLAY 'PARAG3'.
 
 \`\`\``),
     );
     assert.ok(
       hoverContent.includes(`\`\`\`cobol
-       PARAG2.
-           DISPLAY 'PARAG2'.
+              PARAG2.
+                  DISPLAY 'PARAG2'.
 
 \`\`\``),
     );

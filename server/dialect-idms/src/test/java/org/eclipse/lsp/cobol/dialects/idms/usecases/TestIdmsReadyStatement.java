@@ -35,6 +35,9 @@ class TestIdmsReadyStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS BATCH-AUTOSTATUS.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*DB1} PIC X(8).\n"
@@ -68,9 +71,14 @@ class TestIdmsReadyStatement {
       DEFS
           + "          BIND RUN-UNIT.\n"
           + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE.\n";
+  private static final String READ7_ON =
+      DEFS
+          + "          BIND RUN-UNIT.\n"
+          + "          READY {$EMP-AREA-TOO-LONG|1} USAGE-MODE EXCLUSIVE UPDATE\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(READ1, READ2, READ3, READ4, READ5, READ6, READ7);
+    return Stream.of(READ1, READ2, READ3, READ4, READ5, READ6, READ7, READ7_ON);
   }
 
   @ParameterizedTest

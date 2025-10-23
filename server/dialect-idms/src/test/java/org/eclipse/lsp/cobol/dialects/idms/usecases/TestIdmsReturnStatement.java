@@ -68,9 +68,13 @@ class TestIdmsReturnStatement {
       DEFS
           + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}\n"
           + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND'.\n";
+  private static final String TST7_ON =
+      DEFS
+          + "           RETURN {$EMPDBK} FROM {$IX-EMP} USING {$INDEX-KEY} KEY INTO {$EMPL-KEY}\n"
+          + "           ON {$DB-REC-NOT-FOUND} DISPLAY 'NOT FOUND' END-IF.\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST7_ON);
   }
 
   @ParameterizedTest

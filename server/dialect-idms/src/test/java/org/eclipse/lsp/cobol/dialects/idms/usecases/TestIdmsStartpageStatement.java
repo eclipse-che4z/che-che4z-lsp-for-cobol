@@ -35,6 +35,9 @@ class TestIdmsStartpageStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*EMPMAP} PIC X(8).\n"
@@ -50,9 +53,13 @@ class TestIdmsStartpageStatement {
 
   private static final String TST4 =
       DEFS + "           STARTPAGE SESSION {$EMPMAPTOOLONG|1} BACKPAGE.\n";
+  private static final String TST4_ON =
+      DEFS
+          + "           STARTPAGE SESSION {$EMPMAPTOOLONG|1} BACKPAGE\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4);
+    return Stream.of(TST1, TST2, TST3, TST4, TST4_ON);
   }
 
   @ParameterizedTest

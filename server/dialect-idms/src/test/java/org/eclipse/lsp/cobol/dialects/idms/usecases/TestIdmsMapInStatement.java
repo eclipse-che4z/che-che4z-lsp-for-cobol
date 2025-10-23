@@ -30,6 +30,9 @@ class TestIdmsMapInStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*MFLD} PIC X(8).\n"
@@ -81,9 +84,13 @@ class TestIdmsMapInStatement {
 
   private static final String TST10 =
       DEFS + "           MAP IN USING {$EMPMAP} IO INPUT DATA YES.\n";
+  private static final String TST10_ON =
+      DEFS
+          + "           MAP IN USING {$EMPMAP} IO INPUT DATA YES\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST10);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST9, TST10, TST10_ON);
   }
 
   @ParameterizedTest

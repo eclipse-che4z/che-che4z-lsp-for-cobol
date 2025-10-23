@@ -82,21 +82,18 @@ class TestFileDescriptor {
 
   private static final String HOVER =
       "```cobol\n"
-          + "DESCRIPTION \n"
-          + "----------- \n"
-          + "FD  INFILE\n"
-          + "LABEL RECORDS ARE STANDARD\n"
-          + "DATA RECORD IS INPUTREC\n"
-          + "RECORD CONTAINS 80 CHARACTERS\n"
-          + "RECORDING MODE IS F\n"
-          + "BLOCK CONTAINS 0 RECORDS.\n"
-          + " \n"
-          + "FILE-CONTROL\n"
-          + "------------ \n"
-          + "ASSIGN TO \"C:\\INFILE.DAT\"\n"
-          + "ORGANIZATION IS LINE SEQUENTIAL\n"
-          + "ACCESS MODE IS SEQUENTIAL\n"
-          + "FILE STATUS IS IFCODE \n\n"
+          + "       FD  INFILE\n"
+          + "       LABEL RECORDS ARE STANDARD\n"
+          + "       DATA RECORD IS InputRec\n"
+          + "       RECORD CONTAINS 80 CHARACTERS\n"
+          + "       RECORDING MODE IS F\n"
+          + "       BLOCK CONTAINS 0 RECORDS.\n"
+          + "*******    FILE-CONTROL ****\n"
+          + "       ASSIGN TO \"c:\\infile.dat\"\n"
+          + "       ORGANIZATION IS LINE SEQUENTIAL\n"
+          + "       ACCESS MODE IS SEQUENTIAL\n"
+          + "       FILE STATUS IS IFCODE\n"
+          + "\n"
           + "```";
 
   private static final String NO_FILE_CONTROL_TEXT =

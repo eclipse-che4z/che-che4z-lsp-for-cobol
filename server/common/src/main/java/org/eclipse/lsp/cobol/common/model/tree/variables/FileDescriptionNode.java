@@ -14,7 +14,8 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variables;
 
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,6 +23,8 @@ import lombok.ToString;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
+import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.MarkupKind;
 
 /**
  * Class for all File Description Entry (FD) or Sort File Description (SD) Entry variables. These
@@ -50,13 +53,16 @@ public class FileDescriptionNode extends VariableNode {
 
   @Override
   protected String getVariableDisplayString() {
-    return String.format(
-        "DESCRIPTION %n----------- %n%S%n %nFILE-CONTROL%n------------ %n%S %n",
-        fileDescriptorText, fileControlClause);
+    return fileDescriptorText;
   }
 
   @Override
-  protected List<String> getChildrenDescription(String prefix) {
-    return ImmutableList.of();
+  protected List<MarkupContent> getChildrenDescription(String prefix) {
+    List<MarkupContent> result = new ArrayList<>();
+    result.add(new MarkupContent(MarkupKind.PLAINTEXT, "*******    FILE-CONTROL ****"));
+    Arrays.stream(fileControlClause.split("\\r?\\n"))
+        .map(e -> new MarkupContent(MarkupKind.MARKDOWN, e))
+        .forEach(result::add);
+    return result;
   }
 }

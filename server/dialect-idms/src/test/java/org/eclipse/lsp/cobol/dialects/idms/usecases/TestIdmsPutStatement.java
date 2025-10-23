@@ -31,6 +31,9 @@ class TestIdmsPutStatement {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_ID} PIC X(8).\n"
@@ -67,6 +70,10 @@ class TestIdmsPutStatement {
   private static final String PUT_SCRATCH_WITH_ALL_LITERAL =
       "           PUT SCRATCH AREA ID 'TESTID' FROM {$WK_AREA1} LENGTH 8\r\n  "
           + "           RECORD ID 1000 REPLACE RETURN RECORD ID INTO {$WK_RETURN}. \r\n";
+  private static final String PUT_SCRATCH_WITH_ALL_LITERAL_ON =
+      "           PUT SCRATCH AREA ID 'TESTID' FROM {$WK_AREA1} LENGTH 8\r\n  "
+          + "           RECORD ID 1000 REPLACE RETURN RECORD ID INTO {$WK_RETURN} \r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
@@ -75,7 +82,8 @@ class TestIdmsPutStatement {
         BOILERPLATE + PUT_QUEUE_WITH_ALL_LITERAL,
         BOILERPLATE + PUT_SCRATCH,
         BOILERPLATE + PUT_SCRATCH_WITH_ALL_VARB,
-        BOILERPLATE + PUT_SCRATCH_WITH_ALL_LITERAL);
+        BOILERPLATE + PUT_SCRATCH_WITH_ALL_LITERAL,
+        BOILERPLATE + PUT_SCRATCH_WITH_ALL_LITERAL_ON);
   }
 
   @ParameterizedTest

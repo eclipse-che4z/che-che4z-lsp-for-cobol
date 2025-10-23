@@ -15,7 +15,10 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +27,8 @@ import org.eclipse.lsp.cobol.common.model.Describable;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.MarkupContent;
+import org.eclipse.lsp4j.MarkupKind;
 
 /** The class represents paragraphs or section name node in COBOL grammar. */
 @Getter
@@ -49,10 +54,13 @@ public class ParagraphNameNode extends Node implements DefinedAndUsedStructure, 
   }
 
   @Override
-  public String getFormattedDisplayString() {
+  public List<MarkupContent> getFormattedDisplayString() {
     return getNearestParentByType(NodeType.PARAGRAPH)
         .map(ParagraphNode.class::cast)
         .map(ParagraphNode::getFullVariableDescription)
-        .orElse("");
+        .map(desc -> Arrays.stream(desc.split("\\r?\\n")))
+        .orElse(Stream.empty())
+        .map(line -> new MarkupContent(MarkupKind.MARKDOWN, line))
+        .collect(Collectors.toList());
   }
 }

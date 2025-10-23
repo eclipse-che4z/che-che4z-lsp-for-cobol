@@ -31,6 +31,9 @@ class TestIdmsDcStatement {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_TASK} PIC X(388) SYNC.\n"
@@ -98,6 +101,15 @@ class TestIdmsDcStatement {
           + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT\r\n"
           + "           NAME 'TSTEVENT'.\r\n";
 
+  private static final String DC_RETURN_TASK_VARB_WITH_ALL_ON =
+      "           MOVE 'TEST' TO {$WK_TASK}.\r\n "
+          + "           MOVE 'TESTPROG' TO {$WK_PROGRAM}.\r\n "
+          + "           DC RETURN NEXT TASK CODE {$WK_TASK} NORMAL\r\n"
+          + "           TIMEOUT INTERVAL 10\r\n"
+          + "           NEXT TASK INTERVAL 10 EVENT TYPE INTERNAL EVENT\r\n"
+          + "           NAME 'TSTEVENT'\r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + DC_RETURN,
@@ -108,7 +120,8 @@ class TestIdmsDcStatement {
         BOILERPLATE + DC_RETURN_TIMEOUT_ALL,
         BOILERPLATE + DC_RETURN_TIMEOUT_ALL_2,
         BOILERPLATE + DC_RETURN_TIMEOUT_ALL_3,
-        BOILERPLATE + DC_RETURN_TASK_VARB_WITH_ALL);
+        BOILERPLATE + DC_RETURN_TASK_VARB_WITH_ALL,
+        BOILERPLATE + DC_RETURN_TASK_VARB_WITH_ALL_ON);
   }
 
   @ParameterizedTest

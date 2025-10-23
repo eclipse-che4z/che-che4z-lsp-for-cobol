@@ -31,6 +31,9 @@ class TestIdmsWriteClause {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "        PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PROGRAM} PIC X(8).\r\n"
@@ -154,6 +157,9 @@ class TestIdmsWriteClause {
   private static final String WRITE_JOURNAL_ON_1 =
       "            WRITE JOURNAL WAIT NOSPAN FROM {$WK1} LENGTH 8\r\n"
           + "           ON {$ANY-ERROR-STATUS} DISPLAY 'WRITE ERROR'.\n";
+  private static final String WRITE_JOURNAL_ON_1_END_IF =
+      "            WRITE JOURNAL WAIT NOSPAN FROM {$WK1} LENGTH 8\r\n"
+          + "           ON {$ANY-ERROR-STATUS} DISPLAY 'WRITE ERROR' END-IF.\n";
 
   private static final String WRITE_THEN_READ_ON_1 =
       "           WRITE THEN READ TERMINAL WAIT NEWPAGE FREE STORAGE FROM {$WK1}\n"
@@ -163,31 +169,33 @@ class TestIdmsWriteClause {
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BOILERPLATE + WRITE_JOURNAL_1,
-        BOILERPLATE + WRITE_JOURNAL_2,
-        BOILERPLATE + WRITE_JOURNAL_3,
-        BOILERPLATE + WRITE_JOURNAL_4,
-        BOILERPLATE + WRITE_LINE_TO_TERMINAL_1,
-        BOILERPLATE + WRITE_LINE_TO_TERMINAL_2,
-        BOILERPLATE + WRITE_LINE_TO_TERMINAL_3,
-        BOILERPLATE + WRITE_LOG_1,
-        BOILERPLATE + WRITE_LOG_2,
-        BOILERPLATE + WRITE_LOG_3,
-        BOILERPLATE + WRITE_PRINTER_1,
-        BOILERPLATE + WRITE_PRINTER_2,
-        BOILERPLATE + WRITE_PRINTER_3,
-        BOILERPLATE + WRITE_PRINTER_4,
-        BOILERPLATE + WRITE_PRINTER_5,
-        BOILERPLATE + WRITE_TERMINAL_1,
-        BOILERPLATE + WRITE_TERMINAL_2,
-        BOILERPLATE + WRITE_TERMINAL_3,
-        BOILERPLATE + WRITE_TERMINAL_4,
-        BOILERPLATE + WRITE_TERMINAL_5,
-        BOILERPLATE + WRITE_THEN_READ_1,
-        BOILERPLATE + WRITE_THEN_READ_2,
-        BOILERPLATE + WRITE_THEN_READ_3,
-        BOILERPLATE + WRITE_JOURNAL_ON_1,
-        BOILERPLATE + WRITE_THEN_READ_ON_1);
+            WRITE_JOURNAL_1,
+            WRITE_JOURNAL_2,
+            WRITE_JOURNAL_3,
+            WRITE_JOURNAL_4,
+            WRITE_LINE_TO_TERMINAL_1,
+            WRITE_LINE_TO_TERMINAL_2,
+            WRITE_LINE_TO_TERMINAL_3,
+            WRITE_LOG_1,
+            WRITE_LOG_2,
+            WRITE_LOG_3,
+            WRITE_PRINTER_1,
+            WRITE_PRINTER_2,
+            WRITE_PRINTER_3,
+            WRITE_PRINTER_4,
+            WRITE_PRINTER_5,
+            WRITE_TERMINAL_1,
+            WRITE_TERMINAL_2,
+            WRITE_TERMINAL_3,
+            WRITE_TERMINAL_4,
+            WRITE_TERMINAL_5,
+            WRITE_THEN_READ_1,
+            WRITE_THEN_READ_2,
+            WRITE_THEN_READ_3,
+            WRITE_JOURNAL_ON_1,
+            WRITE_THEN_READ_ON_1,
+            WRITE_JOURNAL_ON_1_END_IF)
+        .map(s -> BOILERPLATE + s);
   }
 
   @ParameterizedTest

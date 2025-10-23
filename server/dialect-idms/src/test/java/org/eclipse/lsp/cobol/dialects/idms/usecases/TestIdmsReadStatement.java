@@ -31,6 +31,9 @@ class TestIdmsReadStatement {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_1} PIC X(80).\n"
@@ -76,16 +79,23 @@ class TestIdmsReadStatement {
       "            READ LINE TERMINAL INTO {$WK_1} MAX LENGTH 30\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'READ ERROR'.\r\n";
 
+  private static final String READ_LINE_ON_END_IF =
+      "            READ LINE TERMINAL INTO {$WK_1} MAX LENGTH 30\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'READ ERROR'\r\n"
+          + "           END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BOILERPLATE + READ_TERMINAL,
-        BOILERPLATE + READ_TERMINAL_ALL_PARMS_LITERALS,
-        BOILERPLATE + READ_TERMINAL_ALL_PARMS_VARIABLES,
-        BOILERPLATE + READ_LINE_FROM_TERMINAL,
-        BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_LITERALS,
-        BOILERPLATE + READ_LINE_FROM_TERMINAL_ALL_PARMS_VARIABLES,
-        BOILERPLATE + READ_TERMINAL_ON,
-        BOILERPLATE + READ_LINE_ON);
+            READ_TERMINAL,
+            READ_TERMINAL_ALL_PARMS_LITERALS,
+            READ_TERMINAL_ALL_PARMS_VARIABLES,
+            READ_LINE_FROM_TERMINAL,
+            READ_LINE_FROM_TERMINAL_ALL_PARMS_LITERALS,
+            READ_LINE_FROM_TERMINAL_ALL_PARMS_VARIABLES,
+            READ_TERMINAL_ON,
+            READ_LINE_ON,
+            READ_LINE_ON_END_IF)
+        .map(s -> BOILERPLATE + s);
   }
 
   @ParameterizedTest

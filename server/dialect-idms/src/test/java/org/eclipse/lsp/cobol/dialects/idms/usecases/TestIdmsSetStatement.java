@@ -30,6 +30,9 @@ class TestIdmsSetStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PROG} PIC X(8).\n"
@@ -93,6 +96,10 @@ class TestIdmsSetStatement {
       DEFS
           + "           SET TIMER POST INTERVAL 10 EVENT {$WK_EVENT} TIMER ID {$WK_TIMER} \r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR'.\r\n";
+  private static final String SET_TIMER_ON_END_IF =
+      DEFS
+          + "           SET TIMER POST INTERVAL 10 EVENT {$WK_EVENT} TIMER ID {$WK_TIMER} \r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'SET ERROR' END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
@@ -107,7 +114,8 @@ class TestIdmsSetStatement {
         SET_TIMER_START_VARIABLE_NO_PRIORITY,
         SET_ABEND_ON,
         SET_ABEND_ON_1,
-        SET_TIMER_ON);
+        SET_TIMER_ON,
+        SET_TIMER_ON_END_IF);
   }
 
   @ParameterizedTest

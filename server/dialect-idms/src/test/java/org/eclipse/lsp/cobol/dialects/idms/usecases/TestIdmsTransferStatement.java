@@ -36,6 +36,9 @@ class TestIdmsTransferStatement {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_PROGRAM} PIC X(8).\r\n"
@@ -60,21 +63,26 @@ class TestIdmsTransferStatement {
       "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n";
 
   private static final String TRANSFER_ON =
-      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1};\r\n"
+      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1}\r\n"
           + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR'.\r\n";
+  private static final String TRANSFER_ON_END_IF =
+      "           TRANSFER CONTROL TO 'TSTPROG' NORETURN USING {$WK1}\r\n"
+          + "             ON {$ANY-ERROR-STATUS} DISPLAY 'TRANSFER ERROR' END-IF.\r\n";
 
   private static final String TRANSFER_PGM_TOO_LONG_ERROR =
       "           TRANSFER CONTROL TO {'TSTPROGXXX'|1} XCTL.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BOILERPLATE + TRANSFER,
-        BOILERPLATE + TRANSFER_PARMS,
-        BOILERPLATE + TRANSFER_PARMS2,
-        BOILERPLATE + TRANSFER_USING_PARMS,
-        BOILERPLATE + TRANSFER_ALL,
-        BOILERPLATE + TRANSFER_ON,
-        BOILERPLATE + TRANSFER_PGM_TOO_LONG_ERROR);
+            TRANSFER,
+            TRANSFER_PARMS,
+            TRANSFER_PARMS2,
+            TRANSFER_USING_PARMS,
+            TRANSFER_ALL,
+            TRANSFER_ON,
+            TRANSFER_ON_END_IF,
+            TRANSFER_PGM_TOO_LONG_ERROR)
+        .map(s -> BOILERPLATE + s);
   }
 
   @ParameterizedTest

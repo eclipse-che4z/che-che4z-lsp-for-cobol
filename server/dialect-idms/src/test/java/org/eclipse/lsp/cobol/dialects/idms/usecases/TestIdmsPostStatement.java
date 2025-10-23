@@ -31,6 +31,9 @@ class TestIdmsPostStatement {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_ECB}.\n"
@@ -48,9 +51,17 @@ class TestIdmsPostStatement {
       "           MOVE 'ECBID' TO {$WK_ECBID}.\r\n"
           + "           POST EVENT NAME {$WK_ECBID} CLEAR. \r\n";
 
+  private static final String POST_ECBID_VARB_ON =
+      "           MOVE 'ECBID' TO {$WK_ECBID}.\r\n"
+          + "           POST EVENT NAME {$WK_ECBID} CLEAR \r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
-        BOILERPLATE + POST_ECB, BOILERPLATE + POST_ECBID_LITERAL, BOILERPLATE + POST_ECBID_VARB);
+        BOILERPLATE + POST_ECB,
+        BOILERPLATE + POST_ECBID_LITERAL,
+        BOILERPLATE + POST_ECBID_VARB,
+        BOILERPLATE + POST_ECBID_VARB_ON);
   }
 
   @ParameterizedTest

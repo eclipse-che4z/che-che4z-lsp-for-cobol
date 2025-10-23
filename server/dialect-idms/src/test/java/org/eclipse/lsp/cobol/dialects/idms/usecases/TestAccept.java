@@ -30,6 +30,9 @@ class TestAccept {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*ABC} PIC X(388) SYNC.\n"
@@ -62,6 +65,9 @@ class TestAccept {
 
   private static final String ACCEPT_TRANSACTION_STATISTICS_LENGTH =
       "           ACCEPT TRANSACTION STATISTICS LENGTH 500.\r\n";
+  private static final String ACCEPT_TRANSACTION_STATISTICS_LENGTH_ON =
+      "           ACCEPT TRANSACTION STATISTICS LENGTH 500\n"
+          + "           ON ANY-STATUS MOVE 1 TO ABC END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
     return Stream.of(
@@ -71,7 +77,8 @@ class TestAccept {
         BOILERPLATE + ACCEPT_IDMS_DC_SCREENSIZE,
         BOILERPLATE + ACCEPT_TRANSACTION_STATISTICS_NO_OPTIONAL_CLAUSES,
         BOILERPLATE + ACCEPT_TRANSACTION_STATISTICS_INTO_VARIABLE,
-        BOILERPLATE + ACCEPT_TRANSACTION_STATISTICS_LENGTH);
+        BOILERPLATE + ACCEPT_TRANSACTION_STATISTICS_LENGTH,
+        BOILERPLATE + ACCEPT_TRANSACTION_STATISTICS_LENGTH_ON);
   }
 
   @ParameterizedTest

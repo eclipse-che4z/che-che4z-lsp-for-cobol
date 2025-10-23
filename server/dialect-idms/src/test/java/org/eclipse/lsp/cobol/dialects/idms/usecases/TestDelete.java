@@ -31,6 +31,8 @@ class TestDelete {
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
           + "       ENVIRONMENT DIVISION.\r\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       INPUT-OUTPUT SECTION.\r\n"
           + "       FILE-CONTROL.\r\n"
           + "             SELECT {$SCRATCH} ASSIGN TO TEST2 \r\n"
@@ -64,6 +66,10 @@ class TestDelete {
       "           DELETE QUEUE ID {$WK_QUEUEID} CURRENT.\r\n";
 
   private static final String DELETE_QUEUE_NO_ID = "           DELETE QUEUE CURRENT.\r\n";
+
+  private static final String DELETE_QUEUE_NO_ID_ON =
+      "           DELETE QUEUE CURRENT\r\n"
+          + "           ON ANY-STATUS MOVE 1 TO {$WK_QUEUEID} END-IF.\r\n";
 
   /**
    * ref - https://www.ibm.com/docs/hu/cobol-zos/4.2?topic=statements-delete-statement file-name-1 :
@@ -123,7 +129,8 @@ class TestDelete {
         BOILERPLATE + DELETE_TABLE_ALL_PARMS_LITERAL,
         BOILERPLATE + DELETE_QUEUE_ON,
         BOILERPLATE + DELETE_SCRATCH_ON,
-        BOILERPLATE + DELETE_TABLE_ON);
+        BOILERPLATE + DELETE_TABLE_ON,
+        BOILERPLATE + DELETE_QUEUE_NO_ID_ON);
   }
 
   @ParameterizedTest

@@ -30,6 +30,9 @@ class TestIdmsInquireMapStatement {
   private static final String DEFS =
       "        IDENTIFICATION DIVISION.\n"
           + "        PROGRAM-ID. test1.\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
           + "       01 {$*MFLD} PIC X(8).\n"
@@ -82,9 +85,13 @@ class TestIdmsInquireMapStatement {
           + "                             DFLD  {$MFLD2} OF {$MAP1} \n "
           + "                             DFLD  {$MAP-FLD}(3) \n "
           + "                             DATA TRUNCATED THEN DISPLAY 'TRUNCATION'.\n";
+  private static final String TST2_ON =
+      DEFS
+          + "           INQUIRE MAP {$EMPMAP} MOVE CURSOR TO {$CURROW} {$CURCOL}\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8);
+    return Stream.of(TST1, TST2, TST3, TST4, TST5, TST6, TST7, TST8, TST2_ON);
   }
 
   @ParameterizedTest

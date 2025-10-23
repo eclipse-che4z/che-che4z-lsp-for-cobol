@@ -27,17 +27,16 @@ class TestSnapStatementOnNextSentence {
           + "        PROGRAM-ID. test1.\n"
           + "        ENVIRONMENT DIVISION.\n"
           + "        IDMS-CONTROL SECTION.\n"
-          + "            PROTOCOL. MODE ABC.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "            IDMS-RECORDS MANUAL\n"
           + "        DATA DIVISION.\n"
           + "        WORKING-STORAGE SECTION.\n"
           + "        01 {$*SUSCHEMA}.\n"
           + "            05 {$*SUBSCHEMA-CTRL} PIC X.\n"
           + "            05 {$*SUBSCHEMA-CTRL-END} PIC X.\n"
-          + "            05 {$*ANY-STATUS} PIC X.\n"
           + "        PROCEDURE DIVISION.\n"
           + "            SNAP FROM {$SUBSCHEMA-CTRL} TO {$SUBSCHEMA-CTRL-END} ON \n"
-          + "               {$ANY-STATUS} NEXT SENTENCE.\n";
+          + "               ANY-STATUS NEXT SENTENCE.\n";
 
   @Test
   void test() {

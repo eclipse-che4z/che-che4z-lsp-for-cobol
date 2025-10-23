@@ -82,19 +82,20 @@ class VariableHoverTest {
     assertNotNull(hover);
     MarkupContent markupContent = hover.getContents().getRight();
     assertEquals(MarkupKind.MARKDOWN, markupContent.getKind());
-    assertEquals("```cobol\n" + "01 TEST2 PIC 9.\n" + "\n" + "```", markupContent.getValue());
+    assertEquals(
+        "```cobol\n" + "       01 TEST2 PIC 9.\n" + "\n" + "```", markupContent.getValue());
   }
 
   @Test
   void getHoverForStructure() {
     String result =
         "```cobol\n"
-            + "01 TOP2.\n"
-            + "  05 MIDDLE-2.\n"
-            + "    10 LEAF-2 PIC 9.\n"
-            + "      88 COND-ITEM1 VALUE 0.\n"
-            + "      88 COND-ITEM2 VALUES 1 THRU 3\n"
-            + "                           4 THROUGH 5.\n"
+            + "       01 TOP2.\n"
+            + "         05 MIDDLE-2.\n"
+            + "           10 LEAF-2 PIC 9.\n"
+            + "             88 COND-ITEM1 VALUE 0.\n"
+            + "             88 COND-ITEM2 VALUES 1 THRU 3\n"
+            + "                                  4 THROUGH 5.\n"
             + "\n"
             + "```";
 
@@ -112,7 +113,7 @@ class VariableHoverTest {
     MarkupContent markupContent = hover.getContents().getRight();
     assertEquals(MarkupKind.MARKDOWN, markupContent.getKind());
     assertEquals(
-        "```cobol\n" + "01 ANOTHER PIC X(6) USAGE UTF-8.\n" + "\n" + "```",
+        "```cobol\n" + "       01 ANOTHER PIC X(6) USAGE UTF-8.\n" + "\n" + "```",
         markupContent.getValue());
   }
 

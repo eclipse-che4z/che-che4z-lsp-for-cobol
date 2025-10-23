@@ -84,6 +84,7 @@ class TestMapDefinition {
                     new TextDocumentIdentifier(UseCaseUtils.DOCUMENT_URI), new Position(5, 19)),
                 documentGraph);
     assertEquals(
-        new Hover(new MarkupContent(MarkupKind.MARKDOWN, "```cobol\nMAP ABCDE.\n\n```")), mapHover);
+        new Hover(new MarkupContent(MarkupKind.MARKDOWN, "```cobol\n       MAP ABCDE.\n\n```")),
+        mapHover);
   }
 }

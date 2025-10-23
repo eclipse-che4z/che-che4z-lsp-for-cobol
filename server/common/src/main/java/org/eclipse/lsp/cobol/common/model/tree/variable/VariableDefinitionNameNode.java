@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,6 +26,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.MarkupContent;
 
 /**
  * The class represents the name of variable definition.
@@ -73,10 +75,10 @@ public class VariableDefinitionNameNode extends Node
   }
 
   @Override
-  public String getFormattedDisplayString() {
+  public List<MarkupContent> getFormattedDisplayString() {
     return getNearestParentByType(NodeType.VARIABLE)
         .map(VariableNode.class::cast)
         .map(VariableNode::getFullVariableDescription)
-        .orElse("");
+        .orElse(Collections.emptyList());
   }
 }

@@ -31,6 +31,9 @@ class TestIdmsSnapStatement {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK1} PIC X(8).\r\n"
@@ -60,12 +63,19 @@ class TestIdmsSnapStatement {
           + "            SNAP TITLE IS {$WK_TITLE} SYSTEM FROM {$WK1} LENGTH 10\r\n"
           + "            FROM {$WK3} LENGTH 10.\r\n";
 
+  private static final String SNAP_ALL_PARMS_LITERAL_ON =
+      "            MOVE '  TITLE' TO {$WK_TITLE}.\r\n"
+          + "            SNAP TITLE IS {$WK_TITLE} SYSTEM FROM {$WK1} LENGTH 10\r\n"
+          + "            FROM {$WK3} LENGTH 10\r\n"
+          + "           ON ANY-STATUS GOBACK END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + SNAP,
         BOILERPLATE + SNAP_ALL_PARMS_VARB,
         BOILERPLATE + SNAP_ALL_PARMS_VARB2,
-        BOILERPLATE + SNAP_ALL_PARMS_LITERAL);
+        BOILERPLATE + SNAP_ALL_PARMS_LITERAL,
+        BOILERPLATE + SNAP_ALL_PARMS_LITERAL_ON);
   }
 
   @ParameterizedTest

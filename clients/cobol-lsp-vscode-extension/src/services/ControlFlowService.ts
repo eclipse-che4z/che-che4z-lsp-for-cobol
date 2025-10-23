@@ -138,7 +138,7 @@ export class AnalysisTask {
 
     this.worker.postMessage({
       vmCount: SettingsService.getMaxVMCount(),
-      severity: SettingsService.getUnreachableCodeSeverity()?.valueOf() || 0,
+      severity: SettingsService.getUnreachableCodeSeverity()?.valueOf(),
       programs: programs,
     });
   }

@@ -30,6 +30,9 @@ class TestBind {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "            PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        01 {$*WK_NODENAME} PIC X(8) SYNC.\r\n"
@@ -47,12 +50,17 @@ class TestBind {
   private static final String BIND_TRANSACTION_STATISTICS =
       "            BIND TRANSACTION STATISTICS.\r\n";
 
+  private static final String BIND_TRANSACTION_STATISTICS_ON =
+      "            BIND TRANSACTION STATISTICS\r\n"
+          + "           ON ANY-STATUS MOVE 1 TO WK_NODENAME END-IF.\r\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         BOILERPLATE + BIND_TASK,
         BOILERPLATE + BIND_TASK_NODENAME_VARIABLE,
         BOILERPLATE + BIND_TASK_NODENAME_LITERAL,
-        BOILERPLATE + BIND_TRANSACTION_STATISTICS);
+        BOILERPLATE + BIND_TRANSACTION_STATISTICS,
+        BOILERPLATE + BIND_TRANSACTION_STATISTICS_ON);
   }
 
   @ParameterizedTest

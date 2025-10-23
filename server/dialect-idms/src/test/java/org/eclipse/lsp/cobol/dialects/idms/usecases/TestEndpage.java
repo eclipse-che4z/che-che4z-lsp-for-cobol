@@ -30,6 +30,9 @@ class TestEndpage {
   private static final String BOILERPLATE =
       "        IDENTIFICATION DIVISION. \r\n"
           + "        PROGRAM-ID. test1. \r\n"
+          + "        ENVIRONMENT DIVISION.\n"
+          + "        IDMS-CONTROL SECTION.\n"
+          + "        PROTOCOL. MODE IS IDMS-DC.\n"
           + "        DATA DIVISION. \r\n"
           + "        WORKING-STORAGE SECTION. \r\n"
           + "        PROCEDURE DIVISION. \r\n";
@@ -37,9 +40,11 @@ class TestEndpage {
   private static final String ENDPAGE = "           ENDPAGE.\r\n";
 
   private static final String ENDPAGE_SESSION = "           ENDPAGE SESSION.\r\n";
+  private static final String ENDPAGE_SESSION_ON =
+      "           ENDPAGE SESSION\r\n" + "           ON ANY-STATUS GOBACK END-IF.\r\n";
 
   private static Stream<String> textsToTest() {
-    return Stream.of(BOILERPLATE + ENDPAGE, BOILERPLATE + ENDPAGE_SESSION);
+    return Stream.of(ENDPAGE, ENDPAGE_SESSION, ENDPAGE_SESSION_ON).map(s -> BOILERPLATE + s);
   }
 
   @ParameterizedTest

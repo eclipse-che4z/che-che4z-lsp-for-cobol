@@ -51,13 +51,13 @@ class Test88ThruHover {
           + "                              X'C0' THRU X'FF'.";
   public static final String HOVER =
       "```cobol\n"
-          + "01 EIGHT-BITS PIC X.\n"
-          + "  88 BIT-ONE VALUE IS X'80' THRU X'FF'.\n"
-          + "  88 BIT-TWO VALUES ARE X'40' THRU X'7F'\n"
-          + "                        X'C0' THRU X'FF'.\n"
-          + "  88 BIT-THREE VALUE X'80' THRU X'FF'.\n"
-          + "  88 BIT-FOUR VALUES X'40' THRU X'7F'\n"
-          + "                     X'C0' THRU X'FF'.\n\n"
+          + "       01 EIGHT-BITS PIC X.\n"
+          + "         88 BIT-ONE VALUE IS X'80' THRU X'FF'.\n"
+          + "         88 BIT-TWO VALUES ARE X'40' THRU X'7F'\n"
+          + "                               X'C0' THRU X'FF'.\n"
+          + "         88 BIT-THREE VALUE X'80' THRU X'FF'.\n"
+          + "         88 BIT-FOUR VALUES X'40' THRU X'7F'\n"
+          + "                            X'C0' THRU X'FF'.\n\n"
           + "```";
 
   @Test

@@ -25,7 +25,7 @@ idmsSections
 // -- copy section ----------------------------------
 
 copyIdmsStatement
-    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions (DOT_FS | SEMICOLON_FS)?
+    : LEVEL_NUMBER? COPY IDMS copyIdmsOptions endClause?
     ;
 
 copyIdmsOptions
@@ -148,7 +148,7 @@ idmsIfStatement
     ;
 
 idmsStatements
-    : idmsStmtsOptTermOn endClause? idmsOnClause? | idmsStmtsMandTermOn (SEMICOLON_FS idmsOnClause? | DOT_FS)
+    : idmsStmtsOptTermOn imperativeStatementCall?
     ;
 
 
@@ -157,15 +157,7 @@ idmsStmtsOptTermOn
      connectStatement | dcStatement | dequeueStatement | disconnectStatement | endStatement | endpageStatement | enqueueStatement | eraseStatement | findStatement |
      finishStatement | freeStatement | getStatement | inquireMapMoveStatement | keepStatement | loadStatement | mapStatement | modifyStatement | obtainStatement |
      postStatement | putStatement | readyStatement |rollbackStatement | snapStatement | startpageStatement | storeStatement | waitStatement | writeIdmsStatement |
-     readStatement | acceptStatement | deleteStatement | returnStatement | sendStatement | setStatement
-    ;
-
-idmsStmtsMandTermOn
-    : transferStatement
-    ;
-
-idmsOnClause
-    : ON generalIdentifier nextSentence?
+     readStatement | acceptStatement | deleteStatement | returnStatement | sendStatement | setStatement | transferStatement
     ;
 
 nextSentence
@@ -785,7 +777,7 @@ waitEventListClause
 // write IDMS
 writeIdmsStatement
    : WRITE (writeJournalClause | writeLineClause | writeLogClause | writePrinterClause | writeTerminalClause |
-            writeThenReadClause) idmsOnClause?
+            writeThenReadClause)
    ;
 
 writeJournalClause
@@ -848,7 +840,7 @@ writeThenReadClause
 
 // read statement
 readStatement
-   : READ (readLineFromTerminalClause | readTerminalClause) idmsOnClause?
+   : READ (readLineFromTerminalClause | readTerminalClause)
    ;
 
 readTerminalClause
@@ -864,7 +856,7 @@ readLineFromTerminalClause
 
 // accept statement
 acceptStatement
-    : ACCEPT (acceptIdmsDcClause idmsOnClause? | acceptIdmsDbClause idmsOnClause?)
+    : ACCEPT (acceptIdmsDcClause  | acceptIdmsDbClause )
     ;
 
 acceptIdmsDcClause
@@ -907,7 +899,7 @@ currencyPageInfo
 // delete statement
 
 deleteStatement
-    : DELETE deleteIdmsDCStatement idmsOnClause?
+    : DELETE deleteIdmsDCStatement
     ;
 
 deleteIdmsDCStatement
@@ -937,7 +929,7 @@ deleteTableClause
 // return statment
 
 returnStatement
-    : RETURN idmsReturn idmsOnClause?
+    : RETURN idmsReturn
     ;
 
 idmsReturn
@@ -962,7 +954,7 @@ sendIdmsToClause
 // set statement
 
 setStatement
-    : SET setIdmsDcStatement idmsOnClause?
+    : SET setIdmsDcStatement
     ;
 
 setIdmsDcStatement
@@ -1194,7 +1186,7 @@ cobolCompilerDirectivesKeywords
     ;
 
 endClause
-    : (DOT_FS | SEMICOLON_FS)
+    : DOT_FS
     ;
 
 obtainLRStatement
