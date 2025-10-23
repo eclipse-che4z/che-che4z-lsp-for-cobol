@@ -264,7 +264,8 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
       showError(context, node, "dataTypeLengthCheck.invalidPictureString", "", 0);
       return true;
     }
-    if (!pictureClause.matches("(?i)S?[09]*(V[09]*)?")  && !pictureClause.matches("9+\\([0-9]+\\)9*")
+    if (!pictureClause.matches("(?i)S?[09]*(V[09]*)?")
+        && !pictureClause.matches("9+\\([0-9]+\\)9*")
         && !pictureClause.matches("(?i)([0]*P[09]*|[09]*P)")) {
       return false;
     }
@@ -400,7 +401,10 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
     String picWithoutRepetition = pictureClause.toUpperCase().replaceAll("\\([^)]*\\)", "");
 
     boolean hasAlpha = picWithoutRepetition.contains("A") || picWithoutRepetition.contains("X");
-    boolean hasEditing = picWithoutRepetition.contains("B") || picWithoutRepetition.contains("0") || picWithoutRepetition.contains("/");
+    boolean hasEditing =
+        picWithoutRepetition.contains("B")
+            || picWithoutRepetition.contains("0")
+            || picWithoutRepetition.contains("/");
 
     if (!(hasAlpha && hasEditing)) {
       return false;
@@ -421,8 +425,8 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
           context,
           node,
           "dataTypeLengthCheck.maxAlphanumericEditedRepetitionFactorExceeded",
-          String.valueOf(MAX_ALPHANUMERIC_EDITED_REPETITION_FACTOR), 0);
-
+          String.valueOf(MAX_ALPHANUMERIC_EDITED_REPETITION_FACTOR),
+          0);
     }
 
     return true;

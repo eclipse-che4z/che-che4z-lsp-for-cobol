@@ -183,20 +183,20 @@ public class TestDataTypeLength {
           + "       PROCEDURE DIVISION.";
 
   private static final String TEXT_ALPHANUMERIC_EDITED =
-          "       IDENTIFICATION DIVISION.\n"
-                  + "       PROGRAM-ID.    TEST12.\n"
-                  + "       ENVIRONMENT DIVISION.\n"
-                  + "       DATA DIVISION.\n"
-                  + "       WORKING-STORAGE SECTION.\n"
-                  + "       01 {$*VALID-B} PIC B.\n"
-                  + "       01 {$*VALID-ABA1} PIC ABA.\n"
-                  + "       01 {$*VALID-ABA2} PIC A(9)BA(9).\n"
-                  + "       01 {$*VALID-ABA3} PIC A9BA9.\n"
-                  + "       01 {$*VALID-ABA4} PIC A(9)B(18)A(9)B(18)A(9)B(18)A(9).\n"
-                  + "       01 {$*INVALID-ABA|1} PIC ABA(999999999).\n"
-                  + "       01 {$*INVALID-BA|2} PIC BA(999999998).\n"
-                  + "       01 {$*INVALID-ABA5|3} PIC A(9)B(18)A(9)B(18)A(999999999)B(18)A(9).\n"
-                  + "       PROCEDURE DIVISION.";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID.    TEST12.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VALID-B} PIC B.\n"
+          + "       01 {$*VALID-ABA1} PIC ABA.\n"
+          + "       01 {$*VALID-ABA2} PIC A(9)BA(9).\n"
+          + "       01 {$*VALID-ABA3} PIC A9BA9.\n"
+          + "       01 {$*VALID-ABA4} PIC A(9)B(18)A(9)B(18)A(9)B(18)A(9).\n"
+          + "       01 {$*INVALID-ABA|1} PIC ABA(999999999).\n"
+          + "       01 {$*INVALID-BA|2} PIC BA(999999998).\n"
+          + "       01 {$*INVALID-ABA5|3} PIC A(9)B(18)A(9)B(18)A(999999999)B(18)A(9).\n"
+          + "       PROCEDURE DIVISION.";
 
   private static final String TEXT_FLOATING_POINT =
       "       IDENTIFICATION DIVISION.\n"
@@ -519,27 +519,30 @@ public class TestDataTypeLength {
 
   @Test
   void testAlphaNumericEdited() {
-    UseCaseEngine.runTest(TEXT_ALPHANUMERIC_EDITED,
-            ImmutableList.of(),
-            ImmutableMap.of(
-                    "1",
-                    new Diagnostic(
-                            new Range(),
-                            "Alphanumeric-edited field 'INVALID-ABA' with length 1000000001 exceeds maximum allowed length of 999999999 characters",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "2",
-                    new Diagnostic(
-                            new Range(),
-                            "Alphanumeric-edited field 'INVALID-BA' exceeds maximum repetition factor of 32767",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText()),
-                    "3",
-                    new Diagnostic(
-                            new Range(),
-                            "Alphanumeric-edited field 'INVALID-ABA5' with length 1000000080 exceeds maximum allowed length of 999999999 characters",
-                            DiagnosticSeverity.Error,
-                            ErrorSource.PARSING.getText())));
+    UseCaseEngine.runTest(
+        TEXT_ALPHANUMERIC_EDITED,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Alphanumeric-edited field 'INVALID-ABA' with length 1000000001 exceeds maximum"
+                    + " allowed length of 999999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Alphanumeric-edited field 'INVALID-BA' exceeds maximum repetition factor of 32767",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "Alphanumeric-edited field 'INVALID-ABA5' with length 1000000080 exceeds maximum"
+                    + " allowed length of 999999999 characters",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText())));
   }
 
   @Test
