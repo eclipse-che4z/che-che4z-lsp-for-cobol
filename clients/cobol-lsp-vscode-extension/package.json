@@ -39,6 +39,12 @@
   "main": "./dist/extension.js",
   "browser": "./dist/web/extension.js",
   "contributes": {
+    "snippets": [
+      {
+        "language": "cobol",
+        "path": "./snippets.json"
+      }
+    ],
     "commands": [
       {
         "command": "cobol-lsp.cpy-manager.goto-settings",

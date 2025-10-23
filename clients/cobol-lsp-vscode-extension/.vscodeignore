@@ -47,4 +47,5 @@
 !server/jar/server.jar
 # ** bundled dialects implementation 
 !server/jar/dialects/*
-
+# ** snippets
+!snippets.json
