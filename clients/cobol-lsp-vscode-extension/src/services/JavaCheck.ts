@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import * as cp from "child_process";
+import { SettingsService } from "./Settings";
 
 const versionPattern = new RegExp(
   '(java|openjdk) (version)? ?"?((9|[0-9][0-9])|(1|9|[0-9][0-9]).(1|8|[0-9][0-9]).*).*',
@@ -24,7 +25,10 @@ export class JavaCheck {
   public async isJavaInstalled() {
     return new Promise((resolve, reject) => {
       let resolved = false;
-      const ls = cp.spawn("java", ["-version"]);
+      const ls = cp.spawn(SettingsService.getJavaCommand(), ["-version"], {
+        shell: true,
+        env: process.env,
+      });
       ls.stderr.on("data", (data: Buffer) => {
         if (JavaCheck.isJavaVersionSupported(data.toString())) {
           resolved = true;

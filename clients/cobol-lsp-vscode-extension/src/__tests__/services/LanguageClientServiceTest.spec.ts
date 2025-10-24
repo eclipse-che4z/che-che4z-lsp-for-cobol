@@ -177,15 +177,15 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_DESC,
       {
         args: [
-          "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
+          '"-Dline.separator=\r\n"',
+          `"-Ddialect.path=${expectedDialectPath}"`,
           "-Xmx768M",
           "-jar",
           serverPath,
           "pipeEnabled",
         ],
-        command: "java",
-        options: { detached: false },
+        command: '"java"',
+        options: { detached: false, shell: true, env: process.env },
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
@@ -204,9 +204,7 @@ describe("LanguageClientService positive scenario", () => {
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
     const expectedDialectPath = join("/test", "server", "jar", "dialects");
-    SettingsService.getJavaLocation = jest
-      .fn()
-      .mockReturnValue("/usr/bin/java");
+    SettingsService.getJavaHome = jest.fn().mockReturnValue("/usr/");
 
     expect(await languageClientService.start()).toBe(undefined);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
@@ -215,15 +213,15 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_DESC,
       {
         args: [
-          "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
+          '"-Dline.separator=\r\n"',
+          `"-Ddialect.path=${expectedDialectPath}"`,
           "-Xmx768M",
           "-jar",
           serverPath,
           "pipeEnabled",
         ],
-        command: "/usr/bin/java",
-        options: { detached: false },
+        command: `"${vscode.Uri.joinPath(vscode.Uri.file("usr"), "bin", "java").fsPath}"`,
+        options: { detached: false, shell: true, env: process.env },
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],

@@ -437,10 +437,10 @@
           ],
           "description": "COBOL LS server runtime."
         },
-        "cobol-lsp.java.executablePath": {
+        "cobol-lsp.java.home": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Full path to the **Java** executable. Leave empty to use `java` from the system `PATH` or a bundled runtime if available.\n\n**Examples:**\n- Windows: `C:\\\\Program Files\\\\Java\\\\bin\\\\java.exe`\n- macOS / Linux: `/usr/bin/java`",
+          "markdownDescription": "Absolute path to the **Java Home** directory. The language server will use the `java` executable inside this directory. Leave empty to use `java` from the system `PATH`.\n\n**Examples:**\n- Windows: `C:\\Program Files\\Java\\jdk-21`\n- macOS / Linux: `/usr/lib/jvm/java-21-openjdk`",
           "tags": [
             "requiresRestart"
           ]
