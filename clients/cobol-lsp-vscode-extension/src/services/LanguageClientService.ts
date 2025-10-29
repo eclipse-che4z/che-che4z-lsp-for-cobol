@@ -232,18 +232,17 @@ export class LanguageClientService {
         return Promise.resolve(result);
       };
     }
-
     return {
       args: [
-        '"-Dline.separator=\r\n"',
-        `"-Ddialect.path=${this.dialectsPath}"`,
+        "-Dline.separator=\r\n",
+        `-Ddialect.path=${this.dialectsPath}`,
         "-Xmx768M",
         "-jar",
         jarPath,
         "pipeEnabled",
       ],
       command: SettingsService.getJavaCommand(),
-      options: { detached: false, shell: true, env: process.env },
+      options: { detached: false, windowsVerbatimArguments: true },
     };
   }
 }

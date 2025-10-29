@@ -177,15 +177,15 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_DESC,
       {
         args: [
-          '"-Dline.separator=\r\n"',
-          `"-Ddialect.path=${expectedDialectPath}"`,
+          "-Dline.separator=\r\n",
+          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-jar",
           serverPath,
           "pipeEnabled",
         ],
-        command: '"java"',
-        options: { detached: false, shell: true, env: process.env },
+        command: "java",
+        options: { detached: false, windowsVerbatimArguments: true },
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
@@ -213,15 +213,15 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_DESC,
       {
         args: [
-          '"-Dline.separator=\r\n"',
-          `"-Ddialect.path=${expectedDialectPath}"`,
+          "-Dline.separator=\r\n",
+          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-jar",
           serverPath,
           "pipeEnabled",
         ],
-        command: `"${vscode.Uri.joinPath(vscode.Uri.file("usr"), "bin", "java").fsPath}"`,
-        options: { detached: false, shell: true, env: process.env },
+        command: `${vscode.Uri.joinPath(vscode.Uri.file("usr"), "bin", "java").fsPath}`,
+        options: { detached: false, windowsVerbatimArguments: true },
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],

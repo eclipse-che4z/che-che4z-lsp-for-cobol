@@ -299,7 +299,7 @@ export class SettingsService {
       const uri = vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java");
       command = uri.fsPath;
     }
-    return `"${command}"`;
+    return command;
   }
 
   public static getCobolProgramLayout() {

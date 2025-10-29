@@ -26,8 +26,7 @@ export class JavaCheck {
     return new Promise((resolve, reject) => {
       let resolved = false;
       const ls = cp.spawn(SettingsService.getJavaCommand(), ["-version"], {
-        shell: true,
-        env: process.env,
+        windowsVerbatimArguments: true,
       });
       ls.stderr.on("data", (data: Buffer) => {
         if (JavaCheck.isJavaVersionSupported(data.toString())) {
@@ -36,7 +35,10 @@ export class JavaCheck {
         }
       });
       ls.on("error", (code) => {
-        if ("Error: spawn java ENOENT" === code.toString()) {
+        if (
+          `Error: spawn ${SettingsService.getJavaCommand()} ENOENT` ===
+          code.toString()
+        ) {
           reject(new Error("Java 8 not found. Switching to native builds"));
         }
         reject(code);
