@@ -107,7 +107,7 @@ describe("Checks Java installation", () => {
   });
 
   it("when 'error' event is emitted  - spawned", async () => {
-    mockSpawnProcess("", "", 0, "Error: spawn java ENOENT");
+    mockSpawnProcess("", "", 0, { code: "ENOENT" } as NodeJS.ErrnoException);
     const promise = javaCheck.isJavaInstalled();
 
     await expect(promise).rejects.toEqual(
@@ -116,10 +116,13 @@ describe("Checks Java installation", () => {
   });
 
   it("when 'error' event is emitted  - not be spawned", async () => {
-    mockSpawnProcess("", "", 0, "Other error");
+    const error = {
+      code: "Other error",
+    } as NodeJS.ErrnoException;
+    mockSpawnProcess("", "", 0, error);
     const promise = javaCheck.isJavaInstalled();
 
-    await expect(promise).rejects.toEqual("Other error");
+    await expect(promise).rejects.toEqual(error);
   });
 
   it("when 'close' event is emitted", async () => {

@@ -242,7 +242,7 @@ export class LanguageClientService {
         "pipeEnabled",
       ],
       command: SettingsService.getJavaCommand(),
-      options: { detached: false, windowsVerbatimArguments: true },
+      options: { detached: false },
     };
   }
 }

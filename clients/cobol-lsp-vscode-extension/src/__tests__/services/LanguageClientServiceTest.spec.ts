@@ -185,7 +185,7 @@ describe("LanguageClientService positive scenario", () => {
           "pipeEnabled",
         ],
         command: "java",
-        options: { detached: false, windowsVerbatimArguments: true },
+        options: { detached: false },
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
@@ -221,7 +221,7 @@ describe("LanguageClientService positive scenario", () => {
           "pipeEnabled",
         ],
         command: `${vscode.Uri.joinPath(vscode.Uri.file("usr"), "bin", "java").fsPath}`,
-        options: { detached: false, windowsVerbatimArguments: true },
+        options: { detached: false },
       },
       {
         documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
