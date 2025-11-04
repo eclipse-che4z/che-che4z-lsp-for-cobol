@@ -139,8 +139,7 @@ public class TestQualifyExtendedImpactOnVariableDefinition {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of(),
-            null);
+            ImmutableMap.of());
     analysisConfig.getCompilerOptions().add("QUALIFY(EXTEND)");
     UseCaseEngine.runTest(
         TEXT_PROGRAM_WITH_NO_CD,

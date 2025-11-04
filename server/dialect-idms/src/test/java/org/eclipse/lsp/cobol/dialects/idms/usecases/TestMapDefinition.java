@@ -71,8 +71,7 @@ class TestMapDefinition {
                 false,
                 SqlProcessing.ENABLED,
                 ImmutableList.of(),
-                ImmutableMap.of(),
-                null));
+                ImmutableMap.of()));
     SourceUnitGraph documentGraph = mock(SourceUnitGraph.class);
     when(documentGraph.isUserSuppliedCopybook(anyString())).thenReturn(false);
     CobolDocumentModel document = new CobolDocumentModel(UseCaseUtils.DOCUMENT_URI, TEXT, result);

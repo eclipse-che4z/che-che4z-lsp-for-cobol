@@ -197,8 +197,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER")),
-            null));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
 
   @Test
@@ -227,8 +226,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER")),
-            null));
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
 
   @Test
@@ -261,8 +259,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")),
-            null);
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");
 
     UseCaseEngine.runTest(
@@ -283,8 +280,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.DISABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")),
-            null);
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL,
@@ -307,8 +303,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.DISABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")),
-            null);
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL_INVALID_BUT_ALLOWED,
@@ -328,8 +323,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.DISABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")),
-            null);
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL_VARIABLE_DEFINITION,
@@ -349,8 +343,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             false,
             SqlProcessing.DISABLED,
             ImmutableList.of(),
-            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")),
-            null);
+            ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
     UseCaseEngine.runTest(
         TEXT_BACKEND_SKIP_SQL_MISSING_END_EXEC,

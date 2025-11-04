@@ -40,9 +40,9 @@ class AnalysisConfigHelper {
             false,
             entity.getIsSQLProcessingEnabled(),
             entity.getDialectRegistry(),
-            entity.getDialectsSettings(),
-            entity.getUnusedSeverity());
+            entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());
+    analysisConfig.getUnusedSeverity().unusedSeverity = entity.getUnusedSeverity();
     return analysisConfig;
   }
 }

@@ -77,8 +77,7 @@ public class TestCICSGeneratedRegisters {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of(),
-            null);
+            ImmutableMap.of());
 
     UseCaseEngine.runTest(
         TEXT2,

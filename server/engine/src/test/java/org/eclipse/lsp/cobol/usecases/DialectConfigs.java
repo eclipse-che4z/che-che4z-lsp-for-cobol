@@ -36,8 +36,7 @@ public class DialectConfigs {
         false,
         SqlProcessing.ENABLED,
         ImmutableList.of(new DialectRegistryItem("IDMS", 1, null, "", "")),
-        ImmutableMap.of(),
-        null);
+        ImmutableMap.of());
   }
 
   /**
@@ -61,7 +60,6 @@ public class DialectConfigs {
             "daco.predefined-sections",
             new Gson().toJsonTree(list),
             "target-sql-backend",
-            new Gson().toJsonTree(SQLBackend.DB2_SERVER)),
-        null);
+            new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
 }

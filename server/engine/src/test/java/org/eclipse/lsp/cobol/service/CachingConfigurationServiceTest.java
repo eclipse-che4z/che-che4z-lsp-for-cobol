@@ -58,8 +58,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of(),
-            null),
+            ImmutableMap.of()),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
   }
 
@@ -111,8 +110,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("dialect", predefinedParagraphs),
-            null),
+            ImmutableMap.of("dialect", predefinedParagraphs)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 
@@ -162,8 +160,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("dialect", dialectsSettings),
-            null),
+            ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 

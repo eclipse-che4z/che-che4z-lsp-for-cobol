@@ -87,8 +87,7 @@ public class UseCase {
             false,
             sqlProcessing,
             ImmutableList.of(),
-            dialectsSettings,
-            null);
+            dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
     if (preprocessorsDirectives != null)
       analysisConfig.getPreprocessorsDirectives().putAll(preprocessorsDirectives);
