@@ -39,7 +39,7 @@ public enum SettingsParametersEnum {
   DIALECT_REGISTRY("dialect.registry"),
   COBOL_PROGRAM_LAYOUT("cobol.program.layout"),
   ANALYSIS_MODE("analysis-mode"),
-  UNUSED_SEVERITY("unused-severity");
+  UNUSED_VARIABLE_SEVERITY("unused-variable-severity");
 
   public final String label;
 

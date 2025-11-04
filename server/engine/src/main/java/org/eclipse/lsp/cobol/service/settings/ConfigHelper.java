@@ -138,7 +138,7 @@ public class ConfigHelper {
    * @param options Configuration option
    * @return SeverityLevel
    */
-  public ErrorSeverity parseUnusedSeverity(JsonElement options) {
+  public ErrorSeverity parseUnusedVariableSeverity(JsonElement options) {
     if (options.isJsonPrimitive() && options.getAsJsonPrimitive().isString()) {
       try {
         return ErrorSeverity.valueOf(options.getAsString());

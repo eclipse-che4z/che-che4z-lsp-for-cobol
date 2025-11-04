@@ -81,7 +81,7 @@ public interface ConfigurationService {
     List<DialectRegistryItem> dialectRegistry;
     SqlProcessing isSQLProcessingEnabled;
     List<String> compilerOptions;
-    ErrorSeverity unusedSeverity;
+    ErrorSeverity unusedVariableSeverity;
     //    CobolProgramLayout layout;
     Map<String, JsonElement> dialectsSettings;
 
@@ -92,7 +92,7 @@ public interface ConfigurationService {
       dialectRegistry = ImmutableList.of();
       isSQLProcessingEnabled = SqlProcessing.ENABLED;
       compilerOptions = ImmutableList.of();
-      unusedSeverity = null;
+      unusedVariableSeverity = null;
       dialectsSettings = ImmutableMap.of();
       //      layout = new CobolProgramLayout();
     }

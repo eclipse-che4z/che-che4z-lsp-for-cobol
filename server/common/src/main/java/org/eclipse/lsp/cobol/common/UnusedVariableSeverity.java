@@ -19,16 +19,16 @@ import java.util.Objects;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 
 public class UnusedVariableSeverity {
-  public ErrorSeverity unusedSeverity = null;
+  public ErrorSeverity severity = null;
 
   @Override
   public boolean equals(Object obj) {
     return obj instanceof UnusedVariableSeverity
-        && Objects.equals(this.unusedSeverity, ((UnusedVariableSeverity) obj).unusedSeverity);
+        && Objects.equals(this.severity, ((UnusedVariableSeverity) obj).severity);
   }
 
   @Override
   public int hashCode() {
-    return unusedSeverity == null ? 0 : unusedSeverity.hashCode();
+    return severity == null ? 0 : severity.hashCode();
   }
 }

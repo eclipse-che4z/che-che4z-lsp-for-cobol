@@ -25,7 +25,7 @@ import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 import org.eclipse.lsp4j.DiagnosticTag;
 
-/** Check presence of a returning clause of a function */
+/** Generate diagnostics for unused variables */
 public class UnusedVariableCheck implements Processor<RootNode> {
   SymbolAccumulator symbolAccumulator;
   ErrorSeverity severity;

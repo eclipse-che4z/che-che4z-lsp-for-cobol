@@ -479,7 +479,7 @@
           "description": "Analysis mode",
           "default": "ADVANCED"
         },
-        "cobol-lsp.unused-severity": {
+        "cobol-lsp.unused-variable-severity": {
           "type": "string",
           "enum": [
             "ERROR",

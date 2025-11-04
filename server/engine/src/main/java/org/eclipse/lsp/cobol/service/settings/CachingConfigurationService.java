@@ -55,7 +55,7 @@ public class CachingConfigurationService implements ConfigurationService {
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 COMPILER_OPTIONS.label,
-                UNUSED_SEVERITY.label));
+                UNUSED_VARIABLE_SEVERITY.label));
 
     List<String> dialectsSections =
         Stream.concat(
@@ -136,7 +136,7 @@ public class CachingConfigurationService implements ConfigurationService {
         ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(3)),
         ConfigHelper.parseSQLProcessingEnabled((JsonElement) clientConfig.get(4)),
         ConfigHelper.parseCompilerOptions(clientConfig.get(5)),
-        ConfigHelper.parseUnusedSeverity((JsonElement) clientConfig.get(6)),
+        ConfigHelper.parseUnusedVariableSeverity((JsonElement) clientConfig.get(6)),
         getDialectsSettings(
             clientConfig.subList(7, 7 + dialectsSections.size()).toArray(),
             dialectsSections.toArray()));

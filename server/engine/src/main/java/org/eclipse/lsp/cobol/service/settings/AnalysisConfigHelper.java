@@ -42,7 +42,7 @@ class AnalysisConfigHelper {
             entity.getDialectRegistry(),
             entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());
-    analysisConfig.getUnusedSeverity().unusedSeverity = entity.getUnusedSeverity();
+    analysisConfig.getUnusedVariableSeverity().severity = entity.getUnusedVariableSeverity();
     return analysisConfig;
   }
 }
