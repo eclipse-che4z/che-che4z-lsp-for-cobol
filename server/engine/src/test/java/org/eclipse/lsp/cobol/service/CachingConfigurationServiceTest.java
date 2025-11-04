@@ -95,8 +95,8 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
-                UNUSED_SEVERITY.label,
                 COMPILER_OPTIONS.label,
+                UNUSED_SEVERITY.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -146,8 +146,8 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
-                UNUSED_SEVERITY.label,
                 COMPILER_OPTIONS.label,
+                UNUSED_SEVERITY.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 

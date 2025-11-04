@@ -54,8 +54,8 @@ public class CachingConfigurationService implements ConfigurationService {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
-                UNUSED_SEVERITY.label,
-                COMPILER_OPTIONS.label));
+                COMPILER_OPTIONS.label,
+                UNUSED_SEVERITY.label));
 
     List<String> dialectsSections =
         Stream.concat(
