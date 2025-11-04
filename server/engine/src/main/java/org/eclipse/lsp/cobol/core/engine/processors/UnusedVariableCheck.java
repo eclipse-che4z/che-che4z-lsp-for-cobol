@@ -57,10 +57,10 @@ public class UnusedVariableCheck implements Processor<RootNode> {
               syms.getVariablesStream()
                   .filter(VariableNode.class::isInstance)
                   .map(VariableNode.class::cast)
+                  .filter(varNode -> varNode.getUsages().isEmpty())
                   .filter(
                       varNode -> varNode.getLocality().getUri().equals(r.getLocality().getUri()))
-                  .filter(varNode -> varNode.getUsages().isEmpty())
-                  .filter(UnusedVariableCheck::isUnused)
+                  .filter(UnusedVariableCheck::shouldReport)
                   .map(
                       node ->
                           SyntaxError.syntaxError()
@@ -74,7 +74,7 @@ public class UnusedVariableCheck implements Processor<RootNode> {
             });
   }
 
-  private static boolean isUnused(VariableNode v) {
+  private static boolean shouldReport(VariableNode v) {
     if (v instanceof ElementaryItemNode) return essentiallyEmpty(v);
     if (v instanceof GroupItemNode) {
       final GroupItemNode grp = (GroupItemNode) v;
