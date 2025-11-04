@@ -170,6 +170,7 @@ public class ErrorFinalizerService {
           "cobolParser.expectSpace",
           "procedureDivisionHeaderProcess.wrongNodeLocation",
           "procedureDivisionHeaderProcess.wrongDataName",
+          "analysis.unusedVariable",
           ErrorCodes.MISSING_COPYBOOK.getLabel());
 
   @Inject

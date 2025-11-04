@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.symbols;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -38,6 +39,10 @@ public class SymbolTable {
     result.addAll(variablesGlobalsMap.values());
     result.addAll(variablesMap.values());
     return result;
+  }
+
+  public Stream<VariableNode> getVariablesStream() {
+    return Stream.concat(variablesGlobalsMap.values().stream(), variablesMap.values().stream());
   }
 
   public Collection<VariableNode> findVariables(String name) {

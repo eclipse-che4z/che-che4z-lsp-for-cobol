@@ -488,7 +488,7 @@
             "HINT",
             "NONE"
           ],
-          "description": "Unused variable severity",
+          "description": "Unused variable diagnostic severity",
           "default": "NONE"
         }
       }

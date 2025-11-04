@@ -103,7 +103,7 @@ class CachingConfigurationServiceTest {
     CachingConfigurationService configuration =
         new CachingConfigurationService(settingsService, dialectService);
 
-    AnalysisConfig expected =
+    final AnalysisConfig expected =
         new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
             ImmutableList.of("Dialect"),
