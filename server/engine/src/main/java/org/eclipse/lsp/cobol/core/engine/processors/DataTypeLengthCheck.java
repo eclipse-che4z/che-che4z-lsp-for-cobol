@@ -153,6 +153,12 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
 
     Matcher matcher = FLOATING_POINT_PATTERN.matcher(pictureClause);
     if (!matcher.matches()) {
+      context
+          .getErrors()
+          .add(
+              node.getError(
+                  MessageTemplate.of(
+                      "dataTypeLengthCheck.invalidfloatingPointPictureString", node.getName())));
       return false;
     }
 
@@ -190,7 +196,6 @@ public class DataTypeLengthCheck implements Processor<VariableWithLevelNode> {
                   MessageTemplate.of(
                       "dataTypeLengthCheck.floatingPointMantissaTooLong",
                       node.getName(),
-                      String.valueOf(mantissaLength),
                       String.valueOf(MAX_FLOATING_POINT_MANTISSA))));
     }
 

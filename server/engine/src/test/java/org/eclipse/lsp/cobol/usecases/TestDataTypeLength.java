@@ -213,6 +213,8 @@ public class TestDataTypeLength {
           + "       01 {$*INVALID-FLOAT-NO-DECIMAL|3} PIC +9(16)E-99.\n"
           + "       01 {$*INVALID-FLOAT-EXP-SIGN|4} PIC +9V9(15)E99.\n"
           + "       01 {$*INVALID-FLOAT-EXP-DIGITS|5} PIC +9V9(15)E+999.\n"
+          + "       01 {$*INVALID-FLOAT-EXP-PIC1|6} PIC  S9E.\n"
+          + "       01 {$*INVALID-FLOAT-EXP-PIC2|7} PIC  E.\n"
           + "       PROCEDURE DIVISION.";
 
   @Test
@@ -554,8 +556,8 @@ public class TestDataTypeLength {
             "1",
             new Diagnostic(
                 new Range(),
-                "Floating-point field 'INVALID-FLOAT-MANTISSA' mantissa with length 17 exceeds"
-                    + " maximum allowed length of 16 digits",
+                "Floating-point field 'INVALID-FLOAT-MANTISSA' mantissa has the number of digit"
+                    + " positions greater than 16.",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText()),
             "2",
@@ -581,6 +583,18 @@ public class TestDataTypeLength {
             new Diagnostic(
                 new Range(),
                 "Floating-point field 'INVALID-FLOAT-EXP-DIGITS' exponent must be exactly 99",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "6",
+            new Diagnostic(
+                new Range(),
+                "Floating point field 'INVALID-FLOAT-EXP-PIC1' has invalid picture string",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "7",
+            new Diagnostic(
+                new Range(),
+                "Floating point field 'INVALID-FLOAT-EXP-PIC2' has invalid picture string",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
