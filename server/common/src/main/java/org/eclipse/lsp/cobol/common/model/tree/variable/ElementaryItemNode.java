@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.common.model.tree.variable;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -32,6 +33,8 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 @EqualsAndHashCode(callSuper = true)
 public class ElementaryItemNode extends ElementaryNode {
   private final String value;
+  @Setter private boolean isDb2HostVariable;
+  @Setter private boolean isLobWithSizeVariable;
 
   public ElementaryItemNode(
       Locality location,

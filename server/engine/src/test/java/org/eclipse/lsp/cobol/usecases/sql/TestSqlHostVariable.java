@@ -150,7 +150,7 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR3`->VAR3`->VAR3-LENGTH`->VAR3-DATA} USAGE IS SQL TYPE IS CHARACTER"
           + " LARGE OBJECT (10 M).\n"
           + "       01 {$*VAR4`->VAR4`->VAR4-LENGTH`->VAR4-DATA} USAGE IS SQL TYPE IS CHAR LARGE"
-          + " OBJECT (10 G).\n"
+          + " OBJECT (1000 K).\n"
           + "       01 {$*VAR5`->VAR5`->VAR5-LENGTH`->VAR5-DATA} USAGE IS SQL TYPE IS CLOB (20).\n"
           + "       01 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS DBCLOB (30"
           + " K).\n"
@@ -199,7 +199,7 @@ public class TestSqlHostVariable {
           + "       01 {$*VAR3`->VAR3`->VAR3-LENGTH`->VAR3-DATA} USAGE IS SQL TYPE IS XML AS"
           + " CHARACTER LARGE OBJECT (10 M).\n"
           + "       01 {$*VAR4`->VAR4`->VAR4-LENGTH`->VAR4-DATA} USAGE IS SQL TYPE IS XML AS CHAR"
-          + " LARGE OBJECT (10 G).\n"
+          + " LARGE OBJECT (999999999).\n"
           + "       01 {$*VAR5`->VAR5`->VAR5-LENGTH`->VAR5-DATA} USAGE IS SQL TYPE IS XML AS CLOB"
           + " (20).\n"
           + "       01 {$*VAR6`->VAR6`->VAR6-LENGTH`->VAR6-DATA} USAGE IS SQL TYPE IS XML AS DBCLOB"
@@ -392,6 +392,45 @@ public class TestSqlHostVariable {
           + "          40 {$*VAR} USAGE IS SQL TYPE IS ROWID OCCURS 100000 {TIMES|1}.\n"
           + "        PROCEDURE DIVISION.\n"
           + "           DISPLAY {$VAR}(1).";
+
+  public static final String CLOB_MAX_SIZE_TEXT =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-CLOB-MAX`->VAR-CLOB-MAX`->VAR-CLOB-MAX-LENGTH`->VAR-CLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS CLOB ({3 G|1}).\n"
+          + "       01 {$*VAA-CLOB-MAX`->VAA-CLOB-MAX`->VAA-CLOB-MAX-LENGTH`->VAA-CLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS CHAR LARGE OBJECT ({3 G|2}).\n"
+          + "       01 {$*VAB-CLOB-MAX`->VAB-CLOB-MAX`->VAB-CLOB-MAX-LENGTH`->VAB-CLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS CHARACTER LARGE OBJECT ({3 G|3}).\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR-CLOB-MAX}.";
+
+  public static final String BLOB_MAX_SIZE_TEXT =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01 {$*VAR-BLOB-MAX`->VAR-BLOB-MAX`->VAR-BLOB-MAX-LENGTH`->VAR-BLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS BLOB ({3 G|1}).\n"
+          + "       01 {$*VAA-BLOB-MAX`->VAA-BLOB-MAX`->VAA-BLOB-MAX-LENGTH`->VAA-BLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS BINARY LARGE OBJECT ({3 G|2}).\n"
+          + "       01 {$*VAB-BLOB-MAX`->VAB-BLOB-MAX`->VAB-BLOB-MAX-LENGTH`->VAB-BLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS BLOB ({3000000000|3}).\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR-BLOB-MAX}.";
+
+  public static final String DBCLOB_MAX_SIZE_TEXT =
+      "        Identification Division.\n"
+          + "        Program-Id. 'TEST1'.\n"
+          + "        Data Division.\n"
+          + "         Working-Storage Section.\n"
+          + "       01"
+          + " {$*VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX`->VAR-DBCLOB-MAX-LENGTH`->VAR-DBCLOB-MAX-DATA}"
+          + " USAGE IS SQL TYPE IS DBCLOB ({2 G|1}).\n"
+          + "        PROCEDURE DIVISION.\n"
+          + "           DISPLAY {$VAR-DBCLOB-MAX}.";
 
   @Test
   void testSupportForResultSetLocator() {
@@ -705,5 +744,71 @@ public class TestSqlHostVariable {
   @Test
   void testLobXMLVariableArray4() {
     UseCaseEngine.runTest(LOB_XML_ARR_TEXT4, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testClobMaxSizeError() {
+    UseCaseEngine.runTest(
+        CLOB_MAX_SIZE_TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "'CLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "'CLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "'CLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
+  }
+
+  @Test
+  void testBlobMaxSizeError() {
+    UseCaseEngine.runTest(
+        BLOB_MAX_SIZE_TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "'BLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "'BLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText()),
+            "3",
+            new Diagnostic(
+                new Range(),
+                "'BLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
+  }
+
+  @Test
+  void testDbclobMaxSizeError() {
+    UseCaseEngine.runTest(
+        DBCLOB_MAX_SIZE_TEXT,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "'DBCLOB' type variable exceeds maximum length of 999999999 bytes",
+                DiagnosticSeverity.Error,
+                ErrorSource.PREPROCESSING.getText())));
   }
 }

@@ -360,6 +360,15 @@ public class TransformTreeStage
     ctx.register(v, StandAloneDataItemNode.class, variableNameCheck);
     ctx.register(v, TableDataNameNode.class, variableNameCheck);
 
+    DataTypeLengthCheck dataTypeLengthCheck = new DataTypeLengthCheck();
+    ctx.register(v, ConditionDataNameNode.class, dataTypeLengthCheck);
+    ctx.register(v, ElementaryItemNode.class, dataTypeLengthCheck);
+    ctx.register(v, GroupItemNode.class, dataTypeLengthCheck);
+    ctx.register(v, MultiTableDataNameNode.class, dataTypeLengthCheck);
+    ctx.register(v, RenameItemNode.class, dataTypeLengthCheck);
+    ctx.register(v, StandAloneDataItemNode.class, dataTypeLengthCheck);
+    ctx.register(v, TableDataNameNode.class, dataTypeLengthCheck);
+
     ctx.register(v, StatementNode.class, new StatementValidate());
 
     ctx.register(v, ElementaryNode.class, new ElementaryNodeCheck());

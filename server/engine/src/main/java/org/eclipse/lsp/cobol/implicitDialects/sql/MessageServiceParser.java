@@ -18,6 +18,8 @@ package org.eclipse.lsp.cobol.implicitDialects.sql;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.core.CobolParser;
@@ -28,6 +30,8 @@ import org.eclipse.lsp.cobol.core.CobolParser;
  * <p>Usage: options { superClass = MessageServiceParser;}
  */
 public abstract class MessageServiceParser extends Parser {
+
+  private static final Pattern PATTERN = Pattern.compile("(?i)(\\d+)\\s*([GMK])?");
 
   /**
    * @param input {@link TokenStream}
@@ -119,6 +123,53 @@ public abstract class MessageServiceParser extends Parser {
     Integer intInputValue = tryParseInt(input);
     if (intInputValue != null && !(intInputValue >= minValue && intInputValue <= maxValue)) {
       notifyError("parsers.intRangeValue", minValue.toString(), maxValue.toString());
+    }
+  }
+
+  /**
+   * Validate LOB size and throw an error if it is incorrect
+   *
+   * @param input string to check
+   * @param ctx context
+   * @param maxValue max allowed value
+   */
+  protected void validateLobSize(
+      String dataType, Db2SqlParser.LobSizeContext lobSize, Integer maxValue) {
+    Matcher matcher = PATTERN.matcher(lobSize.getText());
+    if (!matcher.matches()) return;
+
+    String numericValue = matcher.group(1);
+    String unit = matcher.group(2);
+
+    long size;
+    long scale = 1;
+
+    if (unit != null) {
+      switch (unit.toUpperCase()) {
+        case "K":
+          scale = 1024;
+          break;
+        case "M":
+          scale = 1024 * 1024;
+          break;
+        case "G":
+          scale = 1024 * 1024 * 1024;
+          break;
+        default:
+      }
+    }
+
+    try {
+      size = Integer.parseInt(numericValue);
+    } catch (NumberFormatException e) {
+      size = -1;
+    }
+    if (size < 0 || size * scale > maxValue) {
+      notifyError(
+          lobSize.getStart(),
+          "db2Parser.maxDb2HostVarLengthExceeded",
+          dataType,
+          maxValue.toString());
     }
   }
 

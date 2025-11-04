@@ -60,6 +60,7 @@ public final class VariableDefinitionNode extends Node {
   private final boolean isDynamicLength;
   private final boolean isJustified;
   private final boolean isUnBounded;
+  private final boolean isDb2HostVariable;
 
   private VariableDefinitionNode(
       Locality location,
@@ -84,7 +85,8 @@ public final class VariableDefinitionNode extends Node {
       boolean isDynamicLength,
       boolean isJustified,
       boolean isUnBounded,
-      boolean isExternal) {
+      boolean isExternal,
+      boolean isDb2HostVariable) {
     super(location, NodeType.VARIABLE_DEFINITION);
     this.level = level;
     this.variableName = variableName;
@@ -108,6 +110,7 @@ public final class VariableDefinitionNode extends Node {
     this.isJustified = isJustified;
     this.isUnBounded = isUnBounded;
     this.isExternal = isExternal;
+    this.isDb2HostVariable = isDb2HostVariable;
   }
 
   private static SyntaxError checkClauseIsSingle(
@@ -361,6 +364,7 @@ public final class VariableDefinitionNode extends Node {
     boolean isJustified;
     boolean isUnBounded;
     boolean isExternal;
+    boolean isDb2HostVariable;
 
     private Builder() {}
 
@@ -393,7 +397,8 @@ public final class VariableDefinitionNode extends Node {
           isDynamicLength,
           isJustified,
           isUnBounded,
-          isExternal);
+          isExternal,
+          isDb2HostVariable);
     }
   }
 }
