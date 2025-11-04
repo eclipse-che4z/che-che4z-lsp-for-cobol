@@ -23,6 +23,7 @@ import java.util.*;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 
 /**
  * This dto class is used to hold config data for analysis, such as supported features, dialects and
@@ -37,6 +38,7 @@ public class AnalysisConfig {
   SqlProcessing sqlProcessing;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
+  ErrorSeverity unusedSeverity;
   List<String> compilerOptions = new ArrayList<>();
   // Map preprocessors name to list of directives
   Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
@@ -56,7 +58,8 @@ public class AnalysisConfig {
         false,
         SqlProcessing.ENABLED,
         ImmutableList.of(),
-        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)),
+        null);
   }
 
   public static AnalysisConfig defaultConfig(
@@ -68,6 +71,7 @@ public class AnalysisConfig {
         collectAstChanges,
         SqlProcessing.ENABLED,
         ImmutableList.of(),
-        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+        ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)),
+        null);
   }
 }

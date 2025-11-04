@@ -62,6 +62,7 @@ public class TestMixedCopybookNavigation {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of()));
+            ImmutableMap.of(),
+            null));
   }
 }

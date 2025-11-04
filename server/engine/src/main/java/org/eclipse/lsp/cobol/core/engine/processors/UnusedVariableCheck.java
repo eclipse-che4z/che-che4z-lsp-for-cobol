@@ -28,9 +28,11 @@ import org.eclipse.lsp4j.DiagnosticTag;
 /** Check presence of a returning clause of a function */
 public class UnusedVariableCheck implements Processor<RootNode> {
   SymbolAccumulator symbolAccumulator;
+  ErrorSeverity severity;
 
-  public UnusedVariableCheck(SymbolAccumulator symbolAccumulator) {
+  public UnusedVariableCheck(SymbolAccumulator symbolAccumulator, ErrorSeverity severity) {
     this.symbolAccumulator = symbolAccumulator;
+    this.severity = severity;
   }
 
   @Override
@@ -49,7 +51,7 @@ public class UnusedVariableCheck implements Processor<RootNode> {
                       node ->
                           SyntaxError.syntaxError()
                               .errorSource(ErrorSource.PARSING)
-                              .severity(ErrorSeverity.WARNING)
+                              .severity(severity)
                               .suggestion("Unused variable")
                               .tags(ImmutableList.of(DiagnosticTag.Unnecessary))
                               .location(node.getLocality().toOriginalLocation())

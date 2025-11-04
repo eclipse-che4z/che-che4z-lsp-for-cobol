@@ -260,7 +260,8 @@ class PositiveTest extends ConfigurableTest {
           false,
           SqlProcessing.ENABLED,
           ImmutableList.of(),
-          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
+          ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)),
+          null);
     }
     return AnalysisConfig.defaultConfig(ENABLED);
   }

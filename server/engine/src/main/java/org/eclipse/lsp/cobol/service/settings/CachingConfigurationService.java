@@ -54,6 +54,7 @@ public class CachingConfigurationService implements ConfigurationService {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
+                UNUSED_SEVERITY.label,
                 COMPILER_OPTIONS.label));
 
     List<String> dialectsSections =
@@ -135,8 +136,9 @@ public class CachingConfigurationService implements ConfigurationService {
         ConfigHelper.parseDialectRegistry((JsonArray) clientConfig.get(3)),
         ConfigHelper.parseSQLProcessingEnabled((JsonElement) clientConfig.get(4)),
         ConfigHelper.parseCompilerOptions(clientConfig.get(5)),
+        ConfigHelper.parseUnusedSeverity((JsonElement) clientConfig.get(6)),
         getDialectsSettings(
-            clientConfig.subList(6, 6 + dialectsSections.size()).toArray(),
+            clientConfig.subList(7, 7 + dialectsSections.size()).toArray(),
             dialectsSections.toArray()));
   }
 

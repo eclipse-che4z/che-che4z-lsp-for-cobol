@@ -36,6 +36,7 @@ public class DialectConfigs {
         ImmutableList.of(
             new DialectRegistryItem("DaCo", 1, null, "", ""),
             new DialectRegistryItem("IDMS", 1, null, "", "")),
-        ImmutableMap.of());
+        ImmutableMap.of(),
+        null);
   }
 }

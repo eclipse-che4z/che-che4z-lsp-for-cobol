@@ -38,7 +38,8 @@ public enum SettingsParametersEnum {
   COMPILER_OPTIONS("compiler.options"),
   DIALECT_REGISTRY("dialect.registry"),
   COBOL_PROGRAM_LAYOUT("cobol.program.layout"),
-  ANALYSIS_MODE("analysis-mode");
+  ANALYSIS_MODE("analysis-mode"),
+  UNUSED_SEVERITY("unused-severity");
 
   public final String label;
 

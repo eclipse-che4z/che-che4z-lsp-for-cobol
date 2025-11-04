@@ -478,6 +478,18 @@
           ],
           "description": "Analysis mode",
           "default": "ADVANCED"
+        },
+        "cobol-lsp.unused-severity": {
+          "type": "string",
+          "enum": [
+            "ERROR",
+            "WARNING",
+            "INFO",
+            "HINT",
+            "NONE"
+          ],
+          "description": "Unused variable severity",
+          "default": "NONE"
         }
       }
     },

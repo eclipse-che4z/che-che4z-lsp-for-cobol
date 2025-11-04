@@ -87,7 +87,8 @@ class TestUserDefinedSections {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            dialectConfig);
+            dialectConfig,
+            null);
     UseCaseEngine.runTestForDiagnostics(
         TEXT_GOTO, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of(), analysisConfig);
   }

@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 
 /** This interface handles the request for configurations from the client settings */
 public interface ConfigurationService {
@@ -80,6 +81,7 @@ public interface ConfigurationService {
     List<DialectRegistryItem> dialectRegistry;
     SqlProcessing isSQLProcessingEnabled;
     List<String> compilerOptions;
+    ErrorSeverity unusedSeverity;
     //    CobolProgramLayout layout;
     Map<String, JsonElement> dialectsSettings;
 
@@ -90,6 +92,7 @@ public interface ConfigurationService {
       dialectRegistry = ImmutableList.of();
       isSQLProcessingEnabled = SqlProcessing.ENABLED;
       compilerOptions = ImmutableList.of();
+      unusedSeverity = null;
       dialectsSettings = ImmutableMap.of();
       //      layout = new CobolProgramLayout();
     }

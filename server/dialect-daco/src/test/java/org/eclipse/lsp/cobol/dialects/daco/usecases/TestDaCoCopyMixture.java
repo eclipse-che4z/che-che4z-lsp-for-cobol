@@ -93,6 +93,7 @@ public class TestDaCoCopyMixture {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of()));
+            ImmutableMap.of(),
+            null));
   }
 }

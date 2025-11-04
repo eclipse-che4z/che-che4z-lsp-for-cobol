@@ -380,7 +380,11 @@ public class TransformTreeStage
     ctx.register(v, ProcedureDivisionUsingNode.class, new LinkageArgumentsOriginCheck());
     ctx.register(v, ProcedureDivisionReturningNode.class, new LinkageArgumentsOriginCheck());
 
-    ctx.register(v, RootNode.class, new UnusedVariableCheck(symbolAccumulator));
+    if (analysisConfig.getUnusedSeverity() != null)
+      ctx.register(
+          v,
+          RootNode.class,
+          new UnusedVariableCheck(symbolAccumulator, analysisConfig.getUnusedSeverity()));
     // Implicit Dialects
     dialectService.getActiveImplicitDialects(analysisConfig).stream()
         .map(CobolDialect::getProcessors)

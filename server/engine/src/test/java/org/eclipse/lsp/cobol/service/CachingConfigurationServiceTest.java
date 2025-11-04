@@ -58,7 +58,8 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of()),
+            ImmutableMap.of(),
+            null),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
   }
 
@@ -82,6 +83,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("true"),
             new JsonArray(),
             new JsonPrimitive("true"),
+            new JsonPrimitive("NONE"),
             new JsonArray(),
             predefinedParagraphs);
 
@@ -93,6 +95,7 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
+                UNUSED_SEVERITY.label,
                 COMPILER_OPTIONS.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
@@ -108,7 +111,8 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("dialect", predefinedParagraphs)),
+            ImmutableMap.of("dialect", predefinedParagraphs),
+            null),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 
@@ -131,6 +135,7 @@ class CachingConfigurationServiceTest {
             JsonNull.INSTANCE,
             new JsonArray(),
             JsonNull.INSTANCE,
+            JsonNull.INSTANCE,
             new JsonArray(),
             dialectsSettings);
     when(settingsService.fetchConfigurations(
@@ -141,6 +146,7 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
+                UNUSED_SEVERITY.label,
                 COMPILER_OPTIONS.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
@@ -156,7 +162,8 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of("dialect", dialectsSettings)),
+            ImmutableMap.of("dialect", dialectsSettings),
+            null),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 

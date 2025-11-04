@@ -73,6 +73,7 @@ public class TestCopyIdmsNested4 {
             false,
             SqlProcessing.ENABLED,
             ImmutableList.of(),
-            ImmutableMap.of()));
+            ImmutableMap.of(),
+            null));
   }
 }

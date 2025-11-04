@@ -48,7 +48,8 @@ public class DialectConfigs {
             new DialectRegistryItem("DaCo", 1, null, "", ""),
             new DialectRegistryItem("IDMS", 1, null, "", "")),
         createPredefinedSectionsConfig(
-            ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")));
+            ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")),
+        null);
   }
 
   /**
@@ -69,7 +70,8 @@ public class DialectConfigs {
         ImmutableList.of(
             new DialectRegistryItem("DaCo", 1, null, "", ""),
             new DialectRegistryItem("IDMS", 1, null, "", "")),
-        createPredefinedSectionsConfig(predefinedSections));
+        createPredefinedSectionsConfig(predefinedSections),
+        null);
   }
 
   private Map<String, JsonElement> createPredefinedSectionsConfig(List<String> predefinedSections) {

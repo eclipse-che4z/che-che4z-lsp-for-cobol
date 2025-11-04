@@ -29,6 +29,7 @@ import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 
 /** Config helper class */
 @Slf4j
@@ -129,6 +130,22 @@ public class ConfigHelper {
       return options.getAsBoolean() ? SqlProcessing.ENABLED : SqlProcessing.DISABLED;
     }
     return SqlProcessing.ENABLED;
+  }
+
+  /**
+   * Parse Unused variable severity level
+   *
+   * @param options Configuration option
+   * @return SeverityLevel
+   */
+  public ErrorSeverity parseUnusedSeverity(JsonElement options) {
+    if (options.isJsonPrimitive() && options.getAsJsonPrimitive().isString()) {
+      try {
+        return ErrorSeverity.valueOf(options.getAsString());
+      } catch (IllegalArgumentException e) {
+      }
+    }
+    return null;
   }
 
   /**
