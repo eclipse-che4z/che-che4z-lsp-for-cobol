@@ -76,20 +76,12 @@ public class UnusedVariableCheck implements Processor<RootNode> {
 
   private static boolean shouldReport(VariableNode v) {
     if (v instanceof ElementaryItemNode) return essentiallyEmpty(v);
-    if (v instanceof GroupItemNode) {
-      final GroupItemNode grp = (GroupItemNode) v;
-      if (grp.isGlobal()) return false;
-      return essentiallyEmpty(grp);
-    }
+    if (v instanceof GroupItemNode) return essentiallyEmpty(v);
     if (v instanceof MultiTableDataNameNode) return essentiallyEmpty(v);
     if (v instanceof StandAloneDataItemNode) return true;
     if (v instanceof ConditionDataNameNode) return true;
     if (v instanceof FileDescriptionNode) return true;
-    if (v instanceof RenameItemNode) {
-      final RenameItemNode rename = (RenameItemNode) v;
-      if (rename.isGlobal()) return false;
-      return essentiallyEmpty(rename);
-    }
+    if (v instanceof RenameItemNode) return essentiallyEmpty(v);
     return false;
   }
 
