@@ -85,9 +85,9 @@ public class UnusedVariableCheck implements Processor<RootNode> {
     if (v instanceof StandAloneDataItemNode) return true;
     if (v instanceof ConditionDataNameNode) return true;
     if (v instanceof FileDescriptionNode) return true;
-    if (v instanceof RenameItemNode) { // TODO: maybe???
+    if (v instanceof RenameItemNode) {
       final RenameItemNode rename = (RenameItemNode) v;
-      if (rename.isGlobal() || !rename.isRedefines()) return false;
+      if (rename.isGlobal()) return false;
       return essentiallyEmpty(rename);
     }
     return false;
