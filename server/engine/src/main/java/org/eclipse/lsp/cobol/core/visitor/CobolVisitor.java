@@ -1284,6 +1284,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
                     && ofNullable(ctx.dataOccursClause().get(0).dataOccursTo()).isPresent()
                     && ofNullable(ctx.dataOccursClause().get(0).dataOccursTo().UNBOUNDED())
                         .isPresent())
+            .isExternal(!ctx.dataExternalClause().isEmpty())
             .build(),
         visitChildren(ctx));
   }

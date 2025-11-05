@@ -48,6 +48,7 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 @EqualsAndHashCode(callSuper = true)
 public class GroupItemNode extends VariableWithLevelNode implements UsageClause {
   private final UsageFormat usageFormat;
+  private final boolean external;
 
   public GroupItemNode(
       Locality location,
@@ -55,9 +56,11 @@ public class GroupItemNode extends VariableWithLevelNode implements UsageClause 
       String name,
       boolean global,
       boolean redefines,
-      UsageFormat usageFormat) {
+      UsageFormat usageFormat,
+      boolean external) {
     super(location, level, name, redefines, VariableType.GROUP_ITEM, global);
     this.usageFormat = usageFormat;
+    this.external = external;
   }
 
   @Override

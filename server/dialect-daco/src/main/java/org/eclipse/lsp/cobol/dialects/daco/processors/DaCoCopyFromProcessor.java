@@ -95,7 +95,8 @@ public class DaCoCopyFromProcessor implements Processor<DaCoCopyFromNode> {
               newName,
               groupItemNode.isGlobal(),
               groupItemNode.isRedefines(),
-              groupItemNode.getUsageFormat());
+              groupItemNode.getUsageFormat(),
+              groupItemNode.isExternal());
       createVariableDefinitionNameNode(node, newName).ifPresent(cloneNode::addChild);
 
       groupItemNode

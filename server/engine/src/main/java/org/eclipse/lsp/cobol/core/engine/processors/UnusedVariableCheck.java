@@ -26,6 +26,7 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.ElementaryItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.GroupItemNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.MultiTableDataNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.StandAloneDataItemNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.TableDataNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.ConditionDataNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
@@ -61,6 +62,7 @@ public class UnusedVariableCheck implements Processor<RootNode> {
                   .filter(
                       varNode -> varNode.getLocality().getUri().equals(r.getLocality().getUri()))
                   .filter(UnusedVariableCheck::shouldReport)
+                  .filter(v -> !partOfExternal(v))
                   .map(
                       node ->
                           SyntaxError.syntaxError()
@@ -76,13 +78,25 @@ public class UnusedVariableCheck implements Processor<RootNode> {
 
   private static boolean shouldReport(VariableNode v) {
     if (v instanceof ElementaryItemNode) return essentiallyEmpty(v);
-    if (v instanceof GroupItemNode) return essentiallyEmpty(v);
+    if (v instanceof GroupItemNode) return !((GroupItemNode) v).isExternal() && essentiallyEmpty(v);
     if (v instanceof MultiTableDataNameNode) return essentiallyEmpty(v);
+    if (v instanceof TableDataNameNode) return essentiallyEmpty(v);
     if (v instanceof StandAloneDataItemNode) return true;
     if (v instanceof ConditionDataNameNode) return true;
     if (v instanceof FileDescriptionNode) return true;
     if (v instanceof RenameItemNode) return essentiallyEmpty(v);
     return false;
+  }
+
+  private static boolean partOfExternal(VariableNode v) {
+    return v.getNearestParent(UnusedVariableCheck::level1GroupItemNode)
+        .map(GroupItemNode.class::cast)
+        .map(GroupItemNode::isExternal)
+        .orElse(false);
+  }
+
+  private static boolean level1GroupItemNode(Node n) {
+    return n instanceof GroupItemNode && ((GroupItemNode) n).getLevel() == 1;
   }
 
   private static boolean essentiallyEmpty(VariableNode v) {

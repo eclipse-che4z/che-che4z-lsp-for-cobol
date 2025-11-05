@@ -495,7 +495,8 @@ public class SectionNodeProcessorHelper {
               getName(definitionNode),
               definitionNode.isGlobal(),
               definitionNode.hasRedefines(),
-              definitionNode.getUsage());
+              definitionNode.getUsage(),
+              definitionNode.isExternal());
       createVariableNameNode(variable, definitionNode.getVariableName());
       return new ResultWithErrors<>(variable, ImmutableList.of());
     }

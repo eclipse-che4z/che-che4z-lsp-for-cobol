@@ -64,7 +64,7 @@ public class Db2ImplicitVariablesGenerator {
                  10 SQLSTATE  PIC X(5).
     */
     VariableNode variable =
-        new GroupItemNode(LOCALITY, 1, "SQLCA", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 1, "SQLCA", false, false, UsageFormat.UNDEFINED, false);
     addElement(variable, 5, "SQLCAID", "X(8)");
     addElement(variable, 5, "SQLCABC", "S9(9)", UsageFormat.COMP_5);
     if (compilerDirectiveMap.get(CompilerDirectiveName.STDSQL) != null
@@ -74,14 +74,14 @@ public class Db2ImplicitVariablesGenerator {
       addElement(variable, 5, "SQLCODE", "S9(9)", UsageFormat.COMP_5);
     }
     GroupItemNode sqlerrm =
-        new GroupItemNode(LOCALITY, 5, "SQLERRM", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 5, "SQLERRM", false, false, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlerrm);
     addElement(sqlerrm, 49, "SQLERRML", "S9(4)", UsageFormat.COMP_5);
     addElement(sqlerrm, 49, "SQLERRMC", "X(70)");
     addElement(variable, 5, "SQLERRP", "X(8)");
     addElement(variable, 5, "SQLERRD", "S9(9)", UsageFormat.COMP_5);
     GroupItemNode sqlwarn =
-        new GroupItemNode(LOCALITY, 5, "SQLWARN", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 5, "SQLWARN", false, false, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlwarn);
 
     addElement(sqlwarn, 10, "SQLWARN0", "X");
@@ -94,7 +94,7 @@ public class Db2ImplicitVariablesGenerator {
     addElement(sqlwarn, 10, "SQLWARN7", "X");
 
     GroupItemNode sqlext =
-        new GroupItemNode(LOCALITY, 5, "SQLEXT", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 5, "SQLEXT", false, false, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlext);
     addElement(sqlext, 10, "SQLWARN8", "X");
     addElement(sqlext, 10, "SQLWARN9", "X");
@@ -180,7 +180,7 @@ public class Db2ImplicitVariablesGenerator {
 
     */
     VariableNode variable =
-        new GroupItemNode(LOCALITY, 1, "SQLCA", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 1, "SQLCA", false, false, UsageFormat.UNDEFINED, false);
     addElement(variable, 5, "SQLCA-EYE-CATCH", "X(8)");
     variable.addChild(
         new ElementaryItemNode(
@@ -209,7 +209,8 @@ public class Db2ImplicitVariablesGenerator {
             false));
 
     GroupItemNode sqlErrInfo =
-        new GroupItemNode(LOCALITY, 5, "SQLCA-ERROR-INFO", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(
+            LOCALITY, 5, "SQLCA-ERROR-INFO", false, false, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlErrInfo);
     sqlErrInfo.addChild(
         new ElementaryItemNode(
@@ -226,7 +227,7 @@ public class Db2ImplicitVariablesGenerator {
     addElement(sqlErrInfo, 10, "SQLCA-ERR-MSG", "X(80)");
 
     GroupItemNode sqlErrMsg =
-        new GroupItemNode(LOCALITY, 5, "SQLERRM", false, true, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 5, "SQLERRM", false, true, UsageFormat.UNDEFINED, false);
     sqlErrMsg.addChild(
         new ElementaryItemNode(
             LOCALITY, 10, "SQLERRML", false, "S9(4)", null, UsageFormat.COMP, false, false, false));
@@ -242,7 +243,8 @@ public class Db2ImplicitVariablesGenerator {
     addElement(variable, 5, "SQLCA-FILLER-1", "X(2)");
 
     GroupItemNode sqlErrData =
-        new GroupItemNode(LOCALITY, 5, "SQLCA-ERROR-DATA", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(
+            LOCALITY, 5, "SQLCA-ERROR-DATA", false, false, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlErrData);
     addElement(sqlErrData, 10, "SQLCA-DSFCODE", "X(4)");
     sqlErrData.addChild(
@@ -259,7 +261,7 @@ public class Db2ImplicitVariablesGenerator {
             false));
 
     GroupItemNode sqlErrDbCode =
-        new GroupItemNode(LOCALITY, 15, "SQLCA-DBCODE", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(LOCALITY, 15, "SQLCA-DBCODE", false, false, UsageFormat.UNDEFINED, false);
     sqlErrData.addChild(sqlErrDbCode);
     addElement(sqlErrDbCode, 15, "SQLCA-DBCODE-EXT", "X(2)");
     sqlErrDbCode.addChild(
@@ -289,7 +291,8 @@ public class Db2ImplicitVariablesGenerator {
             false));
 
     GroupItemNode sqlErrMiscCode2 =
-        new GroupItemNode(LOCALITY, 10, "SQLCA-MISC-CODES-B", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(
+            LOCALITY, 10, "SQLCA-MISC-CODES-B", false, false, UsageFormat.UNDEFINED, false);
     sqlErrData.addChild(sqlErrMiscCode2);
     sqlErrMiscCode2.addChild(
         new ElementaryItemNode(
@@ -317,20 +320,23 @@ public class Db2ImplicitVariablesGenerator {
             false));
 
     GroupItemNode sqlErrMiscCode3 =
-        new GroupItemNode(LOCALITY, 10, "SQLCA-ERR-INFO-2", false, true, UsageFormat.UNDEFINED);
+        new GroupItemNode(
+            LOCALITY, 10, "SQLCA-ERR-INFO-2", false, true, UsageFormat.UNDEFINED, false);
     sqlErrData.addChild(sqlErrMiscCode3);
     addElement(sqlErrMiscCode3, 15, "SQLCA-SQLSTATE", "X(5)");
     addElement(sqlErrMiscCode3, 15, "SQLCA-FILLER-2", "X(3)");
 
     GroupItemNode sqlWarn =
-        new GroupItemNode(LOCALITY, 5, "SQLCA-WRN-AREA", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(
+            LOCALITY, 5, "SQLCA-WRN-AREA", false, false, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlWarn);
     sqlWarn.addChild(
         new TableDataNameNode(
             LOCALITY, 10, "SQLCA-WARNING", false, false, "X", null, 8, null, false, false));
 
     GroupItemNode sqlWarn2 =
-        new GroupItemNode(LOCALITY, 5, "SQLWARN REDEFINES", false, true, UsageFormat.UNDEFINED);
+        new GroupItemNode(
+            LOCALITY, 5, "SQLWARN REDEFINES", false, true, UsageFormat.UNDEFINED, false);
     variable.addChild(sqlWarn2);
     addElement(sqlWarn2, 10, "SQLWARN0", "X");
     addElement(sqlWarn2, 10, "SQLWARN1", "X");

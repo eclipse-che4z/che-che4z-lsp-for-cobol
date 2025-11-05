@@ -88,7 +88,7 @@ public class SRImplicitVariablesGenerator {
             .build();
 
     VariableNode variable =
-        new GroupItemNode(locality, 1, "DEBUG-ITEM", false, false, UsageFormat.UNDEFINED);
+        new GroupItemNode(locality, 1, "DEBUG-ITEM", false, false, UsageFormat.UNDEFINED, false);
 
     variable.addChild(
         new ElementaryItemNode(
