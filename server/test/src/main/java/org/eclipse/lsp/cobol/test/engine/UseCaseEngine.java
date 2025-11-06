@@ -310,6 +310,7 @@ public class UseCaseEngine {
                 .sqlBackend(sqlBackendSetting)
                 .dialectsSettings(analysisConfig.getDialectsSettings())
                 .compilerOptions(analysisConfig.getCompilerOptions())
+                .unusedVariableSeverity(analysisConfig.getUnusedVariableSeverity())
                 .preprocessorsDirectives(preprocessorsDirectives)
                 .build(),
             languageId);

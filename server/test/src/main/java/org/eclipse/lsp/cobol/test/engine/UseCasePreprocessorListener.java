@@ -647,6 +647,7 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
               it.getSource(),
               ofNullable(it.getCode()).map(Either::getLeft).orElse(null));
       diagnostic.setRelatedInformation(it.getRelatedInformation());
+      diagnostic.setTags(it.getTags());
       diagnostics.get(documentUri).add(diagnostic);
     };
   }

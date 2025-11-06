@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.Singular;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
+import org.eclipse.lsp.cobol.common.UnusedVariableSeverity;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.test.CobolText;
@@ -69,6 +70,8 @@ public class UseCase {
 
   @Builder.Default SqlProcessing sqlProcessing = SqlProcessing.ENABLED;
 
+  @Builder.Default UnusedVariableSeverity unusedVariableSeverity = new UnusedVariableSeverity();
+
   /** preprocessor directives mapped with preprocessor name */
   Map<String, List<String>> preprocessorsDirectives;
 
@@ -89,6 +92,7 @@ public class UseCase {
             ImmutableList.of(),
             dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);
+    analysisConfig.getUnusedVariableSeverity().severity = unusedVariableSeverity.severity;
     if (preprocessorsDirectives != null)
       analysisConfig.getPreprocessorsDirectives().putAll(preprocessorsDirectives);
     return analysisConfig;
