@@ -18,7 +18,7 @@ package org.eclipse.lsp.cobol.common;
 import java.util.Objects;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 
-public class UnusedVariableSeverity {
+public final class UnusedVariableSeverity {
   public ErrorSeverity severity = null;
 
   @Override
