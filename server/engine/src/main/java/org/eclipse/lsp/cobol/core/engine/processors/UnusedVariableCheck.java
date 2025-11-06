@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.core.engine.processors;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import org.eclipse.lsp.cobol.common.OutlineNodeNames;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
@@ -62,6 +63,7 @@ public class UnusedVariableCheck implements Processor<RootNode> {
                   .filter(
                       varNode -> varNode.getLocality().getUri().equals(r.getLocality().getUri()))
                   .filter(UnusedVariableCheck::shouldReport)
+                  .filter(v -> !OutlineNodeNames.FILLER_NAME.equals(v.getName()))
                   .filter(v -> !partOfExternal(v))
                   .map(
                       node ->
