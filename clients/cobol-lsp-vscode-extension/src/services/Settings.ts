@@ -294,12 +294,10 @@ export class SettingsService {
 
   public static getJavaCommand(): string {
     const location = (SettingsService.getJavaHome() ?? "").trim();
-    let command = "java";
     if (location) {
-      const uri = vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java");
-      command = uri.fsPath;
+      return vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java").fsPath;
     }
-    return command;
+    return "java";
   }
 
   public static getCobolProgramLayout() {
