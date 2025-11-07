@@ -295,7 +295,8 @@ export class SettingsService {
   public static getJavaCommand(): string {
     const location = (SettingsService.getJavaHome() ?? "").trim();
     if (location) {
-      return vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java").fsPath;
+      return vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java")
+        .fsPath;
     }
     return "java";
   }
