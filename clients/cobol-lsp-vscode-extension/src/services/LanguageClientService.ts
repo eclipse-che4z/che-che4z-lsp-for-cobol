@@ -190,7 +190,9 @@ export class LanguageClientService {
       this.outputChannel.appendLine(`${message}, severity: ${type}`);
       if (type === 1) {
         if (message.endsWith("couldn't create connection to server.")) {
-          vscode.window.showErrorMessage(`${this.getName()} cannot start due to errors. Please check Java Home settings`);
+          vscode.window.showErrorMessage(
+            `${this.getName()} cannot start due to errors. Please check Java Home settings`,
+          );
         } else {
           vscode.window.showErrorMessage(message);
         }
