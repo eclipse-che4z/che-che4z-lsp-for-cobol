@@ -187,7 +187,7 @@ export class LanguageClientService {
       type: number,
       message: string,
     ) => {
-      this.outputChannel.appendLine(`${message}, severity: ${type}`);
+      this.outputChannel.appendLine(`${message} Message Type: ${type}`);
       if (type === 1) {
         if (message.endsWith("couldn't create connection to server.")) {
           vscode.window.showErrorMessage(
