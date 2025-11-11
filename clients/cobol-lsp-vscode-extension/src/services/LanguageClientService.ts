@@ -167,11 +167,15 @@ export class LanguageClientService {
     return this.languageClient?.dispose();
   }
 
+  private getName(): string {
+    return "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language";
+  }
+
   private getLanguageClient() {
     if (!this.languageClient) {
       this.languageClient = new LanguageClient(
         LANGUAGE_ID,
-        "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language",
+        this.getName(),
         this.createServerOptions(this.executablePath)!,
         this.createClientOptions(),
       );
@@ -179,6 +183,19 @@ export class LanguageClientService {
         this.sendFileChangeNotification(uri),
       );
     }
+    this.languageClient["showNotificationMessage"] = (
+      type: number,
+      message: string,
+    ) => {
+      this.outputChannel.appendLine(`${message}, severity: ${type}`);
+      if (type === 1) {
+        if (message.endsWith("couldn't create connection to server.")) {
+          vscode.window.showErrorMessage(`${this.getName()} cannot start due to errors. Please check Java Home settings`);
+        } else {
+          vscode.window.showErrorMessage(message);
+        }
+      }
+    };
     return this.languageClient;
   }
 
