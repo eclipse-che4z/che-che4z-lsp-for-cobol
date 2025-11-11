@@ -152,9 +152,36 @@ export class LanguageClientService {
     }, 250);
   }
 
-  public async start() {
+  public async start(context: vscode.ExtensionContext) {
     const languageClient = this.getLanguageClient();
-    await languageClient.start();
+    try {
+      await languageClient.start();
+    } catch (error) {
+      this.outputChannel.appendLine(JSON.stringify(error));
+      if (SettingsService.serverRuntime() === "NATIVE") {
+        vscode.window.showInformationMessage(
+          "Native Server Runtime was failed to start. Try to use Java Server Runtime",
+        );
+        vscode.commands.executeCommand(
+          "workbench.action.openSettings",
+          `@ext:${context.extension.id}`,
+        );
+      } else {
+        vscode.window
+          .showWarningMessage(
+            "Both Java and Native Server Runtimes were failed to start. Try to specify Java Home and switch to JAVA Server Runtime",
+            "Settings",
+          )
+          .then((selection) => {
+            if (selection === "Settings") {
+              vscode.commands.executeCommand(
+                "workbench.action.openSettings",
+                `@ext:${context.extension.id}`,
+              );
+            }
+          });
+      }
+    }
     this.initHandlers();
   }
 
@@ -183,21 +210,6 @@ export class LanguageClientService {
         this.sendFileChangeNotification(uri),
       );
     }
-    this.languageClient["showNotificationMessage"] = (
-      type: number,
-      message: string,
-    ) => {
-      this.outputChannel.appendLine(`${message} Message Type: ${type}`);
-      if (type === 1) {
-        if (message.endsWith("couldn't create connection to server.")) {
-          vscode.window.showErrorMessage(
-            `${this.getName()} cannot start due to errors. Please check Java Home settings`,
-          );
-        } else {
-          vscode.window.showErrorMessage(message);
-        }
-      }
-    };
     return this.languageClient;
   }
 

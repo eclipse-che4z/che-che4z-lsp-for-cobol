@@ -146,7 +146,7 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  await languageClientService.start();
+  await languageClientService.start(context);
 
   // 'export' public api-surface
   return {
