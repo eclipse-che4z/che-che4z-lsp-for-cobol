@@ -29,6 +29,14 @@ This extension is not compatible with other extensions that provide COBOL suppor
 
 The COBOL Language Support extension only supports IBM Enterprise COBOL. Other versions of COBOL are not supported.
 
+Double-byte character sets and the DBCS compiler option are not supported.
+
+## Configure Server Runtime
+
+If you have Java on your workstation, COBOL Language Support uses the Java binaries in the PATH variable to run. To use a different installation of Java, open the COBOL Language Support extension settings and specify the path in the **Java Home** setting.
+
+If you do not have Java on your workstation, COBOL Language Support uses the native binary (engine.exe) to execute. If your environment does not allow engine.exe to execute, contact your system administrator to add an exception for engine.exe.
+
 ## Integration with Zowe Explorer and Explorer for Endevor
 
 Integrating COBOL Language Support with the Zowe Explorer and Explorer for Endevor extensions let you:
@@ -425,8 +433,3 @@ To enable troubleshooting logs for the LSP server, specify a value for the param
 These values are ordered from returning the least information ("ERROR"; errors only) to the most information ("ALL"; all details).
 
 To view troubleshooting logs, open the output panel and select **COBOL Language Support** from the drop-down menu.
-
-## Known Issues
-
-- If you do not have Java on your workstation, COBOL Language Support uses the native binary (engine.exe) to execute. If your environment does not allow engine.exe to execute, contact your system administrator to add an exception for engine.exe.
-- Double-byte character sets and the DBCS compiler option are not supported.
