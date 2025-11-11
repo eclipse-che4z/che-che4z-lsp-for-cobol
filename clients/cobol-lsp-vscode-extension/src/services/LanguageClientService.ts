@@ -156,8 +156,7 @@ export class LanguageClientService {
     const languageClient = this.getLanguageClient();
     try {
       await languageClient.start();
-    } catch (error) {
-      this.outputChannel.appendLine(JSON.stringify(error));
+    } catch {
       if (SettingsService.serverRuntime() === "NATIVE") {
         vscode.window.showInformationMessage(
           "Native Server Runtime was failed to start. Try to use Java Server Runtime",
@@ -168,8 +167,8 @@ export class LanguageClientService {
         );
       } else {
         vscode.window
-          .showWarningMessage(
-            "Both Java and Native Server Runtimes were failed to start. Try to specify Java Home and switch to JAVA Server Runtime",
+          .showInformationMessage(
+            "Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java 11 or later",
             "Settings",
           )
           .then((selection) => {
