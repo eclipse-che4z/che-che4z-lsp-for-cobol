@@ -34,7 +34,9 @@ describe("Checks Java version", () => {
     expect(JavaCheck.isJavaVersionSupported("java 12 2019-03-19")).toBeTruthy();
     expect(JavaCheck.isJavaVersionSupported("java 13 2019-09-17")).toBeTruthy();
     expect(JavaCheck.isJavaVersionSupported("java 14 2020-03-17")).toBeTruthy();
-    expect(JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"')).toBeTruthy();
+    expect(
+      JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"'),
+    ).toBeTruthy();
     expect(
       JavaCheck.isJavaVersionSupported(
         `java version "17.0.2" 2022-01-18 LTS\nJava(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)\n`,
