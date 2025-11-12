@@ -24,6 +24,8 @@ import { Utils } from "./util/Utils";
 import { clearProfiles } from "./util/ProfileUtils";
 import { outputChannel } from "./util/OutputChannel";
 
+export type { ExternalAPIsService };
+
 export let externalApis: ExternalAPIsService;
 const diagnosticCollection: vscode.DiagnosticCollection =
   vscode.languages.createDiagnosticCollection("External APIs Diagnostics");
@@ -54,6 +56,8 @@ export async function initializeExternalAPIs(
       if (api) externalApis.e4eAppeared(api.api);
       else outputChannel.appendLine(E4E_INCOMPATIBLE);
     });
+
+  return externalApis;
 }
 
 export function missingExtension(documentUri: vscode.Uri, message: string) {

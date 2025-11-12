@@ -35,6 +35,7 @@ import {
   SETTINGS_UNREACHABLE_CODE_SEVERITY,
   SETTINGS_MAXIMUM_VM_COUNT,
   PATHS_LOCAL_KEY,
+  ANALYSIS_MODE,
 } from "../constants";
 import {
   DialectRegistry,
@@ -248,6 +249,10 @@ export class SettingsService {
     return vscode.workspace
       .getConfiguration(SETTINGS_CPY_SECTION)
       .get("profiles");
+  }
+
+  public static getAnalysisMode(): string | undefined {
+    return vscode.workspace.getConfiguration().get(ANALYSIS_MODE);
   }
 
   /**
