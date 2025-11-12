@@ -30,7 +30,7 @@ import {
   StreamInfo,
 } from "vscode-languageclient/node";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
-import { JavaCheck } from "./JavaCheck";
+import { JavaCheck, SUPPORTED_JAVA_VERSION } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { SettingsService } from "./Settings";
 import { telemetryEvent } from "./reporter";
@@ -168,7 +168,7 @@ export class LanguageClientService {
       } else {
         vscode.window
           .showInformationMessage(
-            "Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java 11 or later",
+            `Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java ${SUPPORTED_JAVA_VERSION} or later`,
             "Settings",
           )
           .then((selection) => {

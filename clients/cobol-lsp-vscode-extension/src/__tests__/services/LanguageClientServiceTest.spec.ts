@@ -150,7 +150,7 @@ describe("LanguageClientService positive scenario", () => {
       message = getErrorMessage(error);
     }
     expect(message).toEqual(
-      "Minimum expected Java version is 8. Switching to native builds",
+      "Minimum expected Java version is 11. Switching to native builds",
     );
 
     mockProcess.mockRestore();
