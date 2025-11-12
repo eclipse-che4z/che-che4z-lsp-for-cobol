@@ -33,7 +33,7 @@ import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { SettingsService } from "./Settings";
-import { registerEvent } from "./reporter";
+import { telemetryEvent } from "./reporter";
 import { setupBridge4GitWatcher } from "./BridgeForGitLoader";
 import {
   setUpProcessorGroupConfigWatcher,
@@ -71,7 +71,7 @@ export class LanguageClientService {
 
   public enableNativeBuild() {
     this.isNativeBuildEnabled = true;
-    registerEvent(
+    telemetryEvent(
       "Native Build enabled",
       ["COBOL", "native build enabled", "settings"],
       "Native build enabled",

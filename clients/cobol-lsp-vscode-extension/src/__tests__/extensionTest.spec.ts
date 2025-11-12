@@ -20,7 +20,7 @@ import { CopybooksCodeActionProvider } from "../services/copybook/CopybooksCodeA
 import { LanguageClientService } from "../services/LanguageClientService";
 import { SnippetCompletionProvider } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { Utils } from "../services/util/Utils";
-import { registerEvent } from "../services/reporter";
+import { telemetryEvent } from "../services/reporter";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/OpenSettingsCommand");
@@ -60,7 +60,7 @@ beforeEach(() => {
 describe("Check plugin extension for cobol starts successfully.", () => {
   test("start extension", async () => {
     await activate(context);
-    expect(registerEvent).toHaveBeenCalledWith(
+    expect(telemetryEvent).toHaveBeenCalledWith(
       "log",
       ["bootstrap", "experiment-tag"],
       "Extension activation event was triggered",
@@ -114,7 +114,7 @@ describe("Check plugin extension for cobol fails.", () => {
 
   test("start fails.", async () => {
     await activate(context);
-    expect(registerEvent).toHaveBeenCalledWith(
+    expect(telemetryEvent).toHaveBeenCalledWith(
       "log",
       ["bootstrap", "experiment-tag"],
       "Extension activation event was triggered",

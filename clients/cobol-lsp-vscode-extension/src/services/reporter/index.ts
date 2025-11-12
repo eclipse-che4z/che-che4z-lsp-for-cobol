@@ -41,7 +41,7 @@ export async function initTelemetry(context: vscode.ExtensionContext) {
  * @param notes optional brief description
  * @param telemetryMeasurement optional set of numeric data with a key name
  */
-export function registerEvent(
+export function telemetryEvent(
   eventName: string,
   categories?: string[],
   notes?: string,

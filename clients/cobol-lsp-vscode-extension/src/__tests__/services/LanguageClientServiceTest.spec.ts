@@ -24,7 +24,7 @@ import { Utils } from "../../services/util/Utils";
 import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 import { getErrorMessage } from "../../services/util/ErrorsUtils";
-import { registerEvent } from "../../services/reporter";
+import { telemetryEvent } from "../../services/reporter";
 import { outputChannel } from "../../services/util/OutputChannel";
 import { SettingsService } from "../../services/Settings";
 
@@ -75,7 +75,7 @@ describe("LanguageClientService positive scenario", () => {
     jest.spyOn(fs, "existsSync").mockReturnValue(true);
     languageClientService.enableNativeBuild();
 
-    expect(registerEvent).toHaveBeenCalledWith(
+    expect(telemetryEvent).toHaveBeenCalledWith(
       "Native Build enabled",
       ["COBOL", "native build enabled", "settings"],
       "Native build enabled",

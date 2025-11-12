@@ -24,7 +24,7 @@ import * as path from "path";
 import { TelemetryEventMeasurements } from "../../../services/reporter/model";
 import {
   anonymizeContent,
-  registerEvent,
+  telemetryEvent,
   registerExceptionEvent,
   setReporter,
 } from "../../../services/reporter";
@@ -52,7 +52,7 @@ function runScenario(
   telemetryMeasurements?: TelemetryEventMeasurements,
 ) {
   if (eventType === "log") {
-    registerEvent(eventName!, categories, undefined, telemetryMeasurements);
+    telemetryEvent(eventName!, categories, undefined, telemetryMeasurements);
     expect(spySendTelemetry).toHaveBeenCalledTimes(expectedNumberOfCalls);
   } else {
     registerExceptionEvent(eventName, rootCause!, categories);

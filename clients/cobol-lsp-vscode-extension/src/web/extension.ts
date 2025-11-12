@@ -20,7 +20,7 @@ import {
 } from "../services/snippetcompletion/SnippetCompletionProvider";
 import { LANGUAGE_ID } from "../constants";
 import { initSmartTab, RangeTabShiftStore } from "../commands/SmartTabCommand";
-import { initTelemetry, registerEvent } from "../services/reporter";
+import { initTelemetry, telemetryEvent } from "../services/reporter";
 import { SubroutinesCompletionsProvider } from "../services/subroutines/SubroutinesCompletionsProvider";
 import { CopybooksCompletionProvider } from "../services/copybook/CopybooksCompletionProvider";
 import { initializeExternalAPIs } from "../services/ExternalAPIsService";
@@ -29,7 +29,7 @@ import { createSampleConfiguration } from "../commands/CreateSampleConfiguration
 
 export async function activate(context: ExtensionContext) {
   await initTelemetry(context);
-  registerEvent(
+  telemetryEvent(
     "log",
     ["bootstrap", "experiment-tag"],
     "Web extension activation event was triggered",

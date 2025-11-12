@@ -59,7 +59,7 @@ import * as path from "node:path";
 import { getErrorMessage } from "./services/util/ErrorsUtils";
 import {
   initTelemetry,
-  registerEvent,
+  telemetryEvent,
   registerExceptionEvent,
 } from "./services/reporter";
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
@@ -146,12 +146,12 @@ export async function activate(
   DialectRegistry.clear();
   const { configurationWatcher, dialectService } = await initialize(context);
   initSmartTab(context);
-  registerEvent(
+  telemetryEvent(
     "log",
     ["bootstrap", "experiment-tag"],
     "Extension activation event was triggered",
   );
-  registerEvent(
+  telemetryEvent(
     "analysis-mode",
     ["bootstrap", "analysis-mode"],
     `COBOL LS is being used in ${vscode.workspace.getConfiguration().get(ANALYSIS_MODE) as string} mode`,

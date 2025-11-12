@@ -17,7 +17,7 @@ jest.mock("../../../services/reporter");
 import * as vscode from "vscode";
 import { CopybooksCodeActionProvider } from "../../../services/copybook/CopybooksCodeActionProvider";
 import { Utils } from "../../../services/util/Utils";
-import { registerEvent } from "../../../services/reporter";
+import { telemetryEvent } from "../../../services/reporter";
 
 describe("Test Copybook code action provider", () => {
   const copybooksCodeAction = new CopybooksCodeActionProvider();
@@ -89,7 +89,7 @@ describe("Test Copybook code action provider", () => {
     expect(
       copybooksCodeAction.provideCodeActions(doc, range, context, token).length,
     ).toBe(1);
-    expect(registerEvent).toHaveBeenCalledWith(
+    expect(telemetryEvent).toHaveBeenCalledWith(
       "QuickFix for copybook activation",
       ["COBOL", "hover", "copybook", "quickfix"],
       "User try to understand the syntax error for a missing copybook",
