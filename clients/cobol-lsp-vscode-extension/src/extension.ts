@@ -113,12 +113,13 @@ export async function activate(
 
   initSmartTab(context);
 
+  // eslint-disable-next-line prefer-const
   let languageClientService: LanguageClientService | undefined;
   const externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
-    () => {
+    async () => {
       if (languageClientService) {
-        languageClientService.invalidateConfiguration();
+        await languageClientService.invalidateConfiguration();
       }
     },
   );
