@@ -84,8 +84,6 @@ interface __AnalysisApi {
 
 const API_VERSION: string = "1.0.1";
 
-let stop: () => Thenable<void> = () => Promise.resolve();
-
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
@@ -154,7 +152,6 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  stop = () => languageClientService.stop();
   await languageClientService.start();
 
   // 'export' public api-surface
@@ -216,9 +213,7 @@ export async function activate(
   };
 }
 
-export function deactivate() {
-  return stop();
-}
+export function deactivate() {}
 
 async function initializeLanguageClientService(
   context: vscode.ExtensionContext,
@@ -236,7 +231,8 @@ async function initializeLanguageClientService(
       },
     },
   );
-  // Custom client handlers
+  context.subscriptions.push(languageClientService);
+
   languageClientService.addRequestHandler(
     "cobol/resolveSubroutine",
     resolveSubroutineURI,

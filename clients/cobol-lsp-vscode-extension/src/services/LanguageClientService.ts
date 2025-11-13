@@ -163,8 +163,8 @@ export class LanguageClientService {
     this.handlers.forEach((handler) => handler(languageClient));
   }
 
-  public stop(): Thenable<void> {
-    return this.getLanguageClient()?.stop();
+  public dispose() {
+    return this.languageClient?.dispose();
   }
 
   private getLanguageClient() {
