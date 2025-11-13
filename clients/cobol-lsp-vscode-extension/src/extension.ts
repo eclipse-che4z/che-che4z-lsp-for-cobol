@@ -87,15 +87,7 @@ const API_VERSION: string = "1.0.1";
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
-  try {
-    await vscode.workspace.fs.createDirectory(context.globalStorageUri);
-  } catch (error) {
-    const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
-      error,
-    )}`;
-    outputChannel.appendLine(message);
-    throw Error(message);
-  }
+  await createExtensionFolder(context);
 
   await initTelemetry(context);
   telemetryEvent(
@@ -211,6 +203,18 @@ export async function activate(
       return analysisService.getAnalysis(documentUri);
     },
   };
+}
+
+async function createExtensionFolder(context: vscode.ExtensionContext) {
+  try {
+    await vscode.workspace.fs.createDirectory(context.globalStorageUri);
+  } catch (error) {
+    const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
+      error,
+    )}`;
+    outputChannel.appendLine(message);
+    throw Error(message);
+  }
 }
 
 async function initializeLanguageClientService(
