@@ -74,7 +74,7 @@ export function telemetryEvent(
  * @param notes optional brief description
  * @param telemetryMeasurement optional set of numeric data with a key name
  */
-export function registerExceptionEvent(
+export function telemetryExceptionEvent(
   eventName = "RuntimeException",
   rootCause: string,
   categories?: string[],

@@ -60,7 +60,7 @@ import { getErrorMessage } from "./services/util/ErrorsUtils";
 import {
   initTelemetry,
   telemetryEvent,
-  registerExceptionEvent,
+  telemetryExceptionEvent,
 } from "./services/reporter";
 import { CopybooksCompletionProvider } from "./services/copybook/CopybooksCompletionProvider";
 import { SubroutinesCompletionsProvider } from "./services/subroutines/SubroutinesCompletionsProvider";
@@ -209,7 +209,7 @@ export async function activate(
     if (err instanceof Error) {
       outputChannel.appendLine(err.toString());
       languageClientService.enableNativeBuild();
-      registerExceptionEvent(
+      telemetryExceptionEvent(
         "RuntimeException",
         err.toString(),
         ["bootstrap", "experiment-tag"],

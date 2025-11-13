@@ -21,7 +21,7 @@ import {
   UNLOCK_DOWNLOAD_QUEUE_MSG,
 } from "../../constants";
 import { hasMember } from "../util/Utils";
-import { registerExceptionEvent } from "../reporter";
+import { telemetryExceptionEvent } from "../reporter";
 import { Memoize } from "../util/Memoize";
 import { outputChannel } from "./OutputChannel";
 
@@ -95,7 +95,7 @@ async function testZoweAccess(
     outputChannel.error(
       `Unknown error while validating ZOWE profile ${profileName}: ${JSON.stringify(err)}`,
     );
-    registerExceptionEvent(
+    telemetryExceptionEvent(
       "InvalidCredentialsException",
       JSON.stringify(err),
       ["copybook", "COBOL", "invalid-credentials-check"],

@@ -27,7 +27,7 @@ import {
 import { SettingsService } from "./Settings";
 import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
-import { telemetryEvent, registerExceptionEvent } from "./reporter";
+import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -266,7 +266,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       if ("eventName" in event) {
         telemetryEvent(event.eventName, ["ccf"], event.message);
       } else {
-        registerExceptionEvent(event.errorName, event.message, ["ccf"]);
+        telemetryExceptionEvent(event.errorName, event.message, ["ccf"]);
       }
     });
 
