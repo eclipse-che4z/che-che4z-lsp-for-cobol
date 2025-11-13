@@ -256,13 +256,13 @@ describe("LanguageClientService positive scenario", () => {
     );
   });
 
-  test("Test LanguageClientService fire a stop() command on LanguageClient", async () => {
-    LanguageClient.prototype.stop = jest
+  test("Test LanguageClientService fire a dispose() command on LanguageClient", async () => {
+    LanguageClient.prototype.dispose = jest
       .fn()
       .mockReturnValue(SERVER_STOPPED_MSG);
     // start the server, before shutdown.
     await languageClientService.start();
-    const returnedValue = await languageClientService.stop();
+    const returnedValue = await languageClientService.dispose();
     expect(returnedValue).toBe(SERVER_STOPPED_MSG);
   });
 
