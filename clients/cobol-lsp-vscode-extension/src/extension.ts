@@ -213,8 +213,6 @@ export async function activate(
   };
 }
 
-export function deactivate() {}
-
 async function initializeLanguageClientService(
   context: vscode.ExtensionContext,
   externalApis: ExternalAPIsService,
