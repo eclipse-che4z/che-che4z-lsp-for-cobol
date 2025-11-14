@@ -108,8 +108,8 @@ export async function activate(
 
   const languageClientService = await initializeLanguageClientService(context, {
     executeCommand: (command, args, next) => {
-      if (command == "missing copybook" && externalApis) {
-        externalApis.clearProfiles();
+      if (command == "missing copybook") {
+        externalApis?.clearProfiles();
       }
       next(command, args);
     },
