@@ -219,6 +219,12 @@ async function createExtensionFolder(context: vscode.ExtensionContext) {
       error,
     )}`;
     outputChannel.appendLine(message);
+    telemetryExceptionEvent(
+      "GlobalStorageFolderCreationFailed",
+      message,
+      ["bootstrap", "folder-creation-failure"],
+      "The creation of `context.globalStorageUri` folder has failed",
+    );
     throw Error(message);
   }
 }
