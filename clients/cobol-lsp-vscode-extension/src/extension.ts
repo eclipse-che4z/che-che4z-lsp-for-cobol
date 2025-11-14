@@ -88,8 +88,6 @@ const API_VERSION: string = "1.0.1";
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
-  await createExtensionFolder(context);
-
   await initTelemetry(context);
   telemetryEvent(
     "log",
@@ -101,6 +99,8 @@ export async function activate(
     ["bootstrap", "analysis-mode"],
     `COBOL LS is being used in ${SettingsService.getAnalysisMode()} mode`,
   );
+
+  await createExtensionFolder(context);
 
   initSmartTab(context);
 
