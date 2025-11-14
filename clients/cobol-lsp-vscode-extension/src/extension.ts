@@ -13,6 +13,7 @@
  */
 
 import * as vscode from "vscode";
+import type { Middleware } from "vscode-languageclient";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import type {
   __ExtensionApi,
@@ -103,19 +104,24 @@ export async function activate(
 
   initSmartTab(context);
 
-  // eslint-disable-next-line prefer-const
-  let languageClientService: LanguageClientService | undefined;
-  const externalApis = await initializeExternalAPIs(
+  let externalApis: ExternalAPIsService | undefined = undefined;
+
+  const languageClientService = await initializeLanguageClientService(context, {
+    executeCommand: (command, args, next) => {
+      if (command == "missing copybook" && externalApis) {
+        externalApis.clearProfiles();
+      }
+      next(command, args);
+    },
+  });
+
+  externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
     async () => {
       if (languageClientService) {
         await languageClientService.invalidateConfiguration();
       }
     },
-  );
-  languageClientService = await initializeLanguageClientService(
-    context,
-    externalApis,
   );
 
   const analysisService = new ControlFlowAnalysisService(
@@ -219,19 +225,12 @@ async function createExtensionFolder(context: vscode.ExtensionContext) {
 
 async function initializeLanguageClientService(
   context: vscode.ExtensionContext,
-  externalApis: ExternalAPIsService,
+  middleware: Middleware,
 ) {
   const languageClientService = new LanguageClientService(
     outputChannel,
     context.globalStorageUri,
-    {
-      executeCommand: (command, args, next) => {
-        if (command == "missing copybook") {
-          externalApis.clearProfiles();
-        }
-        next(command, args);
-      },
-    },
+    middleware,
   );
   context.subscriptions.push(languageClientService);
 
