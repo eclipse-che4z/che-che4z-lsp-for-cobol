@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as os from "node:os";
 import * as vscode from "vscode";
 import type { Middleware } from "vscode-languageclient";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
@@ -77,6 +78,7 @@ import { outputChannel } from "./services/util/OutputChannel";
 import { DialectService } from "./dialect/DialectService";
 import { createSampleConfiguration } from "./commands/CreateSampleConfiguration";
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
+import { localCopybooks } from "./services/copybookLibs/LocalPathLib";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -100,20 +102,17 @@ export async function activate(
     `COBOL LS is being used in ${SettingsService.getAnalysisMode()} mode`,
   );
 
-  await createExtensionFolder(context);
+  await createExtensionStrorageFolder(context.globalStorageUri);
 
   initSmartTab(context);
 
   let externalApis: ExternalAPIsService | undefined = undefined;
 
-  const languageClientService = await initializeLanguageClientService(context, {
-    executeCommand: (command, args, next) => {
-      if (command == "missing copybook") {
-        externalApis?.clearProfiles();
-      }
-      next(command, args);
-    },
-  });
+  const languageClientService = initializeLanguageClientService(
+    context.globalStorageUri,
+    externalApis,
+  );
+  context.subscriptions.push(languageClientService);
 
   externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
@@ -146,7 +145,20 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  await languageClientService.start(context);
+  localCopybooks.registerFileChangeWatcher((uri) =>
+    languageClientService.sendFileChangeNotification(uri),
+  );
+
+  // await languageClientService.start({
+  //   kind: "JAVA",
+  //   command: SettingsService.getJavaCommand(),
+  //   jar: getJavaServerUri(context),
+  //   dialects: getJavaDialectsUri(context),
+  // });
+  await languageClientService.start({
+    kind: "NATIVE",
+    command: getNativeServerUri(context),
+  });
 
   // 'export' public api-surface
   return {
@@ -207,9 +219,9 @@ export async function activate(
   };
 }
 
-async function createExtensionFolder(context: vscode.ExtensionContext) {
+async function createExtensionStrorageFolder(extensionStroageUri: vscode.Uri) {
   try {
-    await vscode.workspace.fs.createDirectory(context.globalStorageUri);
+    await vscode.workspace.fs.createDirectory(extensionStroageUri);
   } catch (error) {
     const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
       error,
@@ -225,16 +237,26 @@ async function createExtensionFolder(context: vscode.ExtensionContext) {
   }
 }
 
-async function initializeLanguageClientService(
-  context: vscode.ExtensionContext,
-  middleware: Middleware,
+function initializeLanguageClientService(
+  globalStorageUri: vscode.Uri,
+  externalApis: ExternalAPIsService | undefined,
 ) {
+  const copybookCacheLocations = ["e4e/copybooks", "zowe/copybooks"].map(
+    (path) => vscode.Uri.joinPath(globalStorageUri, path),
+  );
+  const middleware: Middleware = {
+    executeCommand: (command, args, next) => {
+      if (command == "missing copybook") {
+        externalApis?.clearProfiles();
+      }
+      next(command, args);
+    },
+  };
   const languageClientService = new LanguageClientService(
     outputChannel,
-    context.globalStorageUri,
+    copybookCacheLocations,
     middleware,
   );
-  context.subscriptions.push(languageClientService);
 
   languageClientService.addRequestHandler(
     "cobol/resolveSubroutine",
@@ -246,25 +268,6 @@ async function initializeLanguageClientService(
   );
   languageClientService.addRequestHandler("copybook/uri", resolveCopybookURI);
   languageClientService.addRequestHandler("file/content", readFileContent);
-
-  try {
-    if (SettingsService.serverRuntime() === "NATIVE") {
-      languageClientService.enableNativeBuild();
-    } else {
-      await languageClientService.checkPrerequisites();
-    }
-  } catch (err) {
-    if (err instanceof Error) {
-      outputChannel.appendLine(err.toString());
-      languageClientService.enableNativeBuild();
-      telemetryExceptionEvent(
-        "RuntimeException",
-        err.toString(),
-        ["bootstrap", "experiment-tag"],
-        "Client has wrong Java version installed. Native builds activated.",
-      );
-    }
-  }
 
   return languageClientService;
 }
@@ -597,4 +600,51 @@ function registerCompletions(context: vscode.ExtensionContext) {
       new SubroutinesCompletionsProvider(),
     ),
   );
+}
+
+function getNativeServerUri(
+  context: vscode.ExtensionContext,
+  osType: string = os.type(),
+) {
+  let fileName: string = "server-unknown";
+  switch (osType) {
+    case "Windows_NT":
+      fileName = "engine.exe";
+      break;
+    case "Darwin":
+      fileName = "server-mac";
+      break;
+    case "Linux":
+      fileName = "server-linux";
+      break;
+  }
+
+  return vscode.Uri.joinPath(
+    context.extension.extensionUri,
+    "server",
+    "native",
+    fileName,
+  );
+}
+
+function getJavaServerUri(context: vscode.ExtensionContext) {
+  return vscode.Uri.joinPath(
+    context.extension.extensionUri,
+    "server",
+    "jar",
+    "server.jar",
+  );
+}
+
+function getJavaDialectsUri(context: vscode.ExtensionContext) {
+  return vscode.Uri.joinPath(
+    context.extension.extensionUri,
+    "server",
+    "jar",
+    "dialects",
+  );
+}
+
+function getCopybookCacheUris(context: vscode.ExtensionContext) {
+  return;
 }

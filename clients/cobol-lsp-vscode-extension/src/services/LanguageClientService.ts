@@ -12,9 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "node:fs";
 import * as net from "node:net";
-import { join } from "node:path";
 import * as vscode from "vscode";
 
 import {
@@ -27,63 +25,92 @@ import {
   LanguageClient,
   LanguageClientOptions,
   Middleware,
+  ServerOptions,
   StreamInfo,
 } from "vscode-languageclient/node";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck, SUPPORTED_JAVA_VERSION } from "./JavaCheck";
-import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { SettingsService } from "./Settings";
-import { telemetryEvent } from "./reporter";
 import { setupBridge4GitWatcher } from "./BridgeForGitLoader";
 import {
   setUpProcessorGroupConfigWatcher,
   setUpProgramConfigWatcher,
 } from "./ProcessorGroups";
-import { localCopybooks } from "./copybookLibs/LocalPathLib";
 
-const extensionId = "BroadcomMFD.cobol-language-support";
+export interface NativeServer {
+  kind: "NATIVE";
+  command: vscode.Uri;
+}
+export interface JavaServer {
+  kind: "JAVA";
+  command: string;
+  jar: vscode.Uri;
+  dialects: vscode.Uri;
+}
+export interface SocketServer {
+  kind: "SOCKET";
+  port: number;
+}
+export type Server = NativeServer | JavaServer | SocketServer;
 
 export class LanguageClientService {
-  private executablePath: string;
-  private dialectsPath: string;
   private languageClient: LanguageClient | undefined;
+  private watchers: vscode.FileSystemWatcher[];
   private handlers: Array<(languageClient: LanguageClient) => void> = [];
-  private isNativeBuildEnabled: boolean = false;
-  private executableService: NativeExecutableService;
 
   constructor(
-    private outputChannel: vscode.OutputChannel,
-    private storagePath: vscode.Uri,
-    private middleware: Middleware,
+    private readonly outputChannel: vscode.OutputChannel,
+    private readonly copybookCacheLocations: vscode.Uri[],
+    private readonly middleware: Middleware,
   ) {
-    const ext = vscode.extensions.getExtension(extensionId)!;
-    this.executablePath = join(
-      ext.extensionPath,
-      "server",
-      "jar",
-      "server.jar",
-    );
-    this.executableService = new NativeExecutableService(
-      join(ext.extensionPath, "server"),
-    );
-    this.dialectsPath = join(ext.extensionPath, "server", "jar", "dialects");
+    this.watchers = [
+      setUpProgramConfigWatcher(this.invalidateConfiguration),
+      setUpProcessorGroupConfigWatcher(this.invalidateConfiguration),
+      setupBridge4GitWatcher(),
+      ...this.copybookCacheLocations.map((uri) =>
+        vscode.workspace.createFileSystemWatcher(
+          new vscode.RelativePattern(uri, "**/*"),
+        ),
+      ),
+      vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(
+          vscode.Uri.from({ scheme: "zowe-uss", path: "/" }),
+          "**/*",
+        ),
+      ),
+      vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(
+          vscode.Uri.from({ scheme: "zowe-ds", path: "/" }),
+          "**/*",
+        ),
+      ),
+    ];
   }
 
-  public enableNativeBuild() {
-    this.isNativeBuildEnabled = true;
-    telemetryEvent(
-      "Native Build enabled",
-      ["COBOL", "native build enabled", "settings"],
-      "Native build enabled",
+  public async start(server: Server) {
+    const clientOptions = getClientOptions(
+      this.outputChannel,
+      this.middleware,
+      this.watchers,
     );
+    const serverOptions = getServerOptions(server);
+
+    const languageClient = new LanguageClient(
+      LANGUAGE_ID,
+      "COBOL Language Support",
+      serverOptions,
+      clientOptions,
+    );
+
+    this.handlers.forEach((handler) => handler(languageClient));
+
+    await languageClient.start();
+
+    this.languageClient = languageClient;
   }
 
-  public async checkPrerequisites() {
-    const version = await new JavaCheck().getInstalledJavaVersion();
-    if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
-      throw new Error("LSP server for " + LANGUAGE_ID + " not found");
-    }
-    telemetryEvent("log", ["bootstrap", "java-version"], `${version}`);
+  public dispose() {
+    return this.languageClient?.dispose();
   }
 
   public addNotificationHandler(
@@ -109,19 +136,22 @@ export class LanguageClientService {
     text: string,
     position: vscode.Position,
   ) {
-    const params = {
+    // TODO find out types for analysis retrieval and type APIs properly across extensions
+    if (!this.languageClient) {
+      return { programs: [] };
+    }
+
+    return this.languageClient.sendRequest("extended/analysis", {
       uri,
       text,
       line: position.line,
       character: position.character,
-    };
-    const languageClient = this.getLanguageClient();
-    return languageClient.sendRequest("extended/analysis", params);
+    });
   }
 
   public invalidateConfiguration = async () => {
-    const languageClient = this.getLanguageClient();
-    await languageClient.sendNotification(
+    if (!this.languageClient) return;
+    await this.languageClient.sendNotification(
       DidChangeConfigurationNotification.type,
       {
         settings: null,
@@ -133,6 +163,7 @@ export class LanguageClientService {
   private fileChangeTimer: ReturnType<typeof setTimeout> | undefined =
     undefined;
   public sendFileChangeNotification(file: vscode.Uri) {
+    if (!this.languageClient) return;
     this.fileChanges.push({
       uri: file.toString(),
       type: FileChangeType.Changed,
@@ -143,7 +174,8 @@ export class LanguageClientService {
       this.fileChangeTimer = undefined;
       this.fileChanges = [];
 
-      const languageClient = this.getLanguageClient();
+      const languageClient = this.languageClient;
+      if (!languageClient) return;
       void languageClient.sendNotification(
         DidChangeWatchedFilesNotification.type,
         {
@@ -152,123 +184,101 @@ export class LanguageClientService {
       );
     }, 250);
   }
+}
 
-  public async start(context: vscode.ExtensionContext) {
-    const languageClient = this.getLanguageClient();
-    try {
-      await languageClient.start();
-    } catch {
-      this.infoUserAboutRuntimeAbilities(context);
-    }
-    this.initHandlers();
-  }
+function getClientOptions(
+  outputChannel: vscode.OutputChannel,
+  middleware: Middleware,
+  fileEvents: vscode.FileSystemWatcher[],
+): LanguageClientOptions {
+  return {
+    middleware,
+    documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+    outputChannel,
+    synchronize: {
+      fileEvents,
+    },
+  };
+}
 
-  private infoUserAboutRuntimeAbilities(context: vscode.ExtensionContext) {
-    const message =
-      SettingsService.serverRuntime() === "NATIVE"
-        ? "Native Server Runtime failed to start. Select Java Server Runtime in the extension settings and reload VS Code"
-        : `Both Java and Native Server Runtimes failed to start. Ensure that the binaries specified in the Java Home setting are version ${SUPPORTED_JAVA_VERSION} or later`;
-    vscode.window
-      .showInformationMessage(message, "Settings")
-      .then((selection) => {
-        if (selection === "Settings") {
-          vscode.commands.executeCommand(
-            "workbench.action.openSettings",
-            `@ext:${context.extension.id}`,
-          );
-        }
-      });
-  }
-
-  private initHandlers() {
-    const languageClient = this.getLanguageClient();
-    this.handlers.forEach((handler) => handler(languageClient));
-  }
-
-  public dispose() {
-    return this.languageClient?.dispose();
-  }
-
-  private getName(): string {
-    return "LSP extension for " + LANGUAGE_ID.toUpperCase() + " language";
-  }
-
-  private getLanguageClient() {
-    if (!this.languageClient) {
-      this.languageClient = new LanguageClient(
-        LANGUAGE_ID,
-        this.getName(),
-        this.createServerOptions(this.executablePath)!,
-        this.createClientOptions(),
-      );
-      localCopybooks.registerFileChangeWatcher((uri: vscode.Uri) =>
-        this.sendFileChangeNotification(uri),
-      );
-    }
-    return this.languageClient;
-  }
-
-  private createClientOptions(): LanguageClientOptions {
-    return {
-      middleware: this.middleware,
-      documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-      outputChannel: this.outputChannel,
-      synchronize: {
-        fileEvents: [
-          setUpProgramConfigWatcher(this.invalidateConfiguration),
-          setUpProcessorGroupConfigWatcher(this.invalidateConfiguration),
-          vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(this.storagePath, "**/*"),
-          ),
-          setupBridge4GitWatcher(),
-          vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(
-              vscode.Uri.from({ scheme: "zowe-uss", path: "/" }),
-              "**/*",
-            ),
-          ),
-          vscode.workspace.createFileSystemWatcher(
-            new vscode.RelativePattern(
-              vscode.Uri.from({ scheme: "zowe-ds", path: "/" }),
-              "**/*",
-            ),
-          ),
+function getServerOptions(server: Server): ServerOptions {
+  switch (server.kind) {
+    case "JAVA":
+      return {
+        args: [
+          "-Dline.separator=\r\n",
+          `-Ddialect.path=${server.dialects.fsPath}`,
+          "-Xmx768M",
+          "-jar",
+          server.jar.fsPath,
+          "pipeEnabled",
         ],
-      },
-    };
-  }
-
-  private createServerOptions(jarPath: string) {
-    if (this.isNativeBuildEnabled) {
-      return this.executableService.getNativeLanguageClient();
-    }
-    const port = SettingsService.getLspPort();
-    if (port) {
-      // Connect to language server via socket
-      const connectionInfo = {
-        host: "localhost",
-        port,
+        command: SettingsService.getJavaCommand(),
+        options: { detached: false },
       };
+    case "NATIVE":
+      return {
+        args: [
+          "pipeEnabled",
+          "-Dline.separator=\r\n",
+          "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
+          "-DserverType=NATIVE",
+        ],
+        command: server.command.fsPath,
+        options: {
+          detached: false,
+          cwd: vscode.Uri.joinPath(server.command, "..").fsPath,
+        },
+      };
+    case "SOCKET":
       return () => {
-        const socket = net.connect(connectionInfo);
-        const result: StreamInfo = {
+        const socket = net.connect({
+          host: "localhost",
+          port: server.port,
+        });
+        const streamInfo: StreamInfo = {
           reader: socket,
           writer: socket,
         };
-        return Promise.resolve(result);
+        return Promise.resolve(streamInfo);
       };
-    }
-    return {
-      args: [
-        "-Dline.separator=\r\n",
-        `-Ddialect.path=${this.dialectsPath}`,
-        "-Xmx768M",
-        "-jar",
-        jarPath,
-        "pipeEnabled",
-      ],
-      command: SettingsService.getJavaCommand(),
-      options: { detached: false },
-    };
+    default: //Type guard
+      // eslint-disable-next-line no-case-declarations
+      const _exhaustiveCheck: never = server;
+      return _exhaustiveCheck;
   }
 }
+
+function infoUserAboutRuntimeAbilities(extensionId: string) {
+  const message =
+    SettingsService.serverRuntime() === "NATIVE"
+      ? "Native Server Runtime failed to start. Select Java Server Runtime in the extension settings and reload VS Code"
+      : `Both Java and Native Server Runtimes failed to start. Ensure that the binaries specified in the Java Home setting are version ${SUPPORTED_JAVA_VERSION} or later`;
+  vscode.window
+    .showInformationMessage(message, "Settings")
+    .then((selection) => {
+      if (selection === "Settings") {
+        vscode.commands.executeCommand(
+          "workbench.action.openSettings",
+          `@ext:${extensionId}`,
+        );
+      }
+    });
+}
+
+// async function start() {
+//   const languageClient = this.getLanguageClient();
+//   try {
+//     await languageClient.start();
+//   } catch {
+//     infoUserAboutRuntimeAbilities(extensionId);
+//   }
+// }
+
+// async function checkPrerequisites() {
+//   const version = await new JavaCheck().getInstalledJavaVersion();
+//   if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
+//     throw new Error("LSP server for " + LANGUAGE_ID + " not found");
+//   }
+//   telemetryEvent("log", ["bootstrap", "java-version"], `${version}`);
+// }
