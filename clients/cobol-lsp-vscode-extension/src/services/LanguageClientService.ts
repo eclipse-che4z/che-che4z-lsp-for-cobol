@@ -162,7 +162,7 @@ export class LanguageClientService {
     this.initHandlers();
   }
 
-  private infoUserAboutRuntimeAbilityes(context: vscode.ExtensionContext) {
+  private infoUserAboutRuntimeAbilities(context: vscode.ExtensionContext) {
     const message =
       SettingsService.serverRuntime() === "NATIVE"
         ? "Native Server Runtime was failed to start. Try to use Java Server Runtime"
