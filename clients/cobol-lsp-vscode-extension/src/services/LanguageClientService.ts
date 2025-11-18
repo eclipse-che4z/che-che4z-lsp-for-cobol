@@ -163,35 +163,20 @@ export class LanguageClientService {
   }
 
   private infoUserAboutRuntimeAbilityes(context: vscode.ExtensionContext) {
-    if (SettingsService.serverRuntime() === "NATIVE") {
-      vscode.window
-        .showInformationMessage(
-          "Native Server Runtime was failed to start. Try to use Java Server Runtime",
-          "Settings",
-        )
-        .then((selection) => {
-          if (selection === "Settings") {
-            vscode.commands.executeCommand(
-              "workbench.action.openSettings",
-              `@ext:${context.extension.id}`,
-            );
-          }
-        });
-    } else {
-      vscode.window
-        .showInformationMessage(
-          `Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java ${SUPPORTED_JAVA_VERSION} or later`,
-          "Settings",
-        )
-        .then((selection) => {
-          if (selection === "Settings") {
-            vscode.commands.executeCommand(
-              "workbench.action.openSettings",
-              `@ext:${context.extension.id}`,
-            );
-          }
-        });
-    }
+    const message =
+      SettingsService.serverRuntime() === "NATIVE"
+        ? "Native Server Runtime was failed to start. Try to use Java Server Runtime"
+        : `Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java ${SUPPORTED_JAVA_VERSION} or later`;
+    vscode.window
+      .showInformationMessage(message, "Settings")
+      .then((selection) => {
+        if (selection === "Settings") {
+          vscode.commands.executeCommand(
+            "workbench.action.openSettings",
+            `@ext:${context.extension.id}`,
+          );
+        }
+      });
   }
 
   private initHandlers() {
