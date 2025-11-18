@@ -157,7 +157,7 @@ export class LanguageClientService {
     try {
       await languageClient.start();
     } catch {
-      this.infoUserAboutRuntimeAbilityes(context);
+      this.infoUserAboutRuntimeAbilities(context);
     }
     this.initHandlers();
   }
