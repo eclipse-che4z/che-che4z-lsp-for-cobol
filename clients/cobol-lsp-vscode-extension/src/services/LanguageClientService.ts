@@ -157,31 +157,41 @@ export class LanguageClientService {
     try {
       await languageClient.start();
     } catch {
-      if (SettingsService.serverRuntime() === "NATIVE") {
-        vscode.window.showInformationMessage(
-          "Native Server Runtime was failed to start. Try to use Java Server Runtime",
-        );
-        vscode.commands.executeCommand(
-          "workbench.action.openSettings",
-          `@ext:${context.extension.id}`,
-        );
-      } else {
-        vscode.window
-          .showInformationMessage(
-            `Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java ${SUPPORTED_JAVA_VERSION} or later`,
-            "Settings",
-          )
-          .then((selection) => {
-            if (selection === "Settings") {
-              vscode.commands.executeCommand(
-                "workbench.action.openSettings",
-                `@ext:${context.extension.id}`,
-              );
-            }
-          });
-      }
+      this.infoUserAboutRuntimeAbilityes(context);
     }
     this.initHandlers();
+  }
+
+  private infoUserAboutRuntimeAbilityes(context: vscode.ExtensionContext) {
+    if (SettingsService.serverRuntime() === "NATIVE") {
+      vscode.window
+        .showInformationMessage(
+          "Native Server Runtime was failed to start. Try to use Java Server Runtime",
+          "Settings",
+        )
+        .then((selection) => {
+          if (selection === "Settings") {
+            vscode.commands.executeCommand(
+              "workbench.action.openSettings",
+              `@ext:${context.extension.id}`,
+            );
+          }
+        });
+    } else {
+      vscode.window
+        .showInformationMessage(
+          `Both Java and Native Server Runtimes were failed to start. Try to specify Java Home with Java ${SUPPORTED_JAVA_VERSION} or later`,
+          "Settings",
+        )
+        .then((selection) => {
+          if (selection === "Settings") {
+            vscode.commands.executeCommand(
+              "workbench.action.openSettings",
+              `@ext:${context.extension.id}`,
+            );
+          }
+        });
+    }
   }
 
   private initHandlers() {
