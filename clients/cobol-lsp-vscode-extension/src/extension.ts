@@ -117,11 +117,7 @@ export async function activate(
 
   externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
-    async () => {
-      if (languageClientService) {
-        await languageClientService.invalidateConfiguration();
-      }
-    },
+    languageClientService.invalidateConfiguration,
   );
 
   const analysisService = new ControlFlowAnalysisService(
