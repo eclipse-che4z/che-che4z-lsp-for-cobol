@@ -268,7 +268,7 @@ describe("LanguageClientService positive scenario", () => {
       .mockReturnValue(SERVER_STOPPED_MSG);
     // start the server, before shutdown.
     await languageClientService.start(context);
-    const returnedValue = await languageClientService.stop();
+    const returnedValue = await languageClientService.dispose();
     expect(returnedValue).toBe(SERVER_STOPPED_MSG);
   });
 
