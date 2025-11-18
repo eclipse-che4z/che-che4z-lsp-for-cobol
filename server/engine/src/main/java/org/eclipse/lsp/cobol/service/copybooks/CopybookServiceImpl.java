@@ -219,9 +219,10 @@ public class CopybookServiceImpl implements CopybookService {
                   .thenApply(
                       (content) -> {
                         return () -> {
-                          if (content != null)
-                            processCopybookContent(
-                                copybookName, programDocumentUri, preprocessor, uri, content);
+                          if (content == null) return;
+                          copybookCache.store(
+                              processCopybookContent(
+                                  copybookName, programDocumentUri, preprocessor, uri, content));
                         };
                       });
             });
