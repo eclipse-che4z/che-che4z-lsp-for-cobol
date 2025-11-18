@@ -17,7 +17,7 @@ import { SettingsService } from "./Settings";
 export const SUPPORTED_JAVA_VERSION = 11;
 
 const versionCapturer =
-  /\b(?:java|openjdk)\b(?:\s+version)?\s+"?(?:1\.)?(\d{1,2})(?:\.\d+)*[-_A-Za-z0-9]*"?/i;
+  /\b(?:java|openjdk)\b(?:\s+version)?\s+"?(?:1\.)?(\d+)/i;
 
 export class JavaCheck {
   public static isJavaVersionSupported(versionString: string) {
