@@ -244,7 +244,7 @@ suite("Integration Test Suite", function () {
     );
     assert.strictEqual(
       diagnostics[0].message,
-      "Variable CHILD1 is not defined",
+      "Variable CHILD1 does not exist in structure PARENT",
     );
     helper.assertRangeIsEqual(
       diagnostics[1].range,
@@ -252,7 +252,7 @@ suite("Integration Test Suite", function () {
     );
     assert.strictEqual(
       diagnostics[1].message,
-      "Variable CHILD2 is not defined",
+      "Variable CHILD2 does not exist in structure PARENT",
     );
   })
     .timeout(helper.TEST_TIMEOUT)
