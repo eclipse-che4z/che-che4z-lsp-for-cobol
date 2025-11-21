@@ -54,7 +54,7 @@ class TestRenamingIncludesOnlyRequiredVariable {
             "1",
             new Diagnostic(
                 new Range(),
-                "Variable VARNAME5 is not defined",
+                "Variable VARNAME5 does not exist in structure VARNAME6",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

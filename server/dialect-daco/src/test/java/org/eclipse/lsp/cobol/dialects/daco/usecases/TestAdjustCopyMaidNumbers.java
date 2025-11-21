@@ -71,7 +71,7 @@ class TestAdjustCopyMaidNumbers {
             "invalid",
             new Diagnostic(
                 new Range(),
-                "Variable NOT-ADJUSTED is not defined",
+                "Variable NOT-ADJUSTED does not exist in structure TABMAX-PW7",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),

@@ -60,7 +60,7 @@ class TestDaCoVariableUnwrapping1 {
             "1",
             new Diagnostic(
                 new Range(),
-                "Variable KMKKLS-XTT is not defined",
+                "Variable KMKKLS-XTT does not exist in structure ROOT",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())),
         ImmutableList.of(),

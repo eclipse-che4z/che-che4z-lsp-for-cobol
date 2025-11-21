@@ -40,6 +40,7 @@ import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 @Slf4j
 public class QualifiedReferenceUpdateVariableUsage implements Processor<QualifiedReferenceNode> {
   private static final String NOT_DEFINED_ERROR = "semantics.notDefined";
+  private static final String NOT_DEFINED_IN_STRUCTURE_ERROR = "semantics.notDefinedInStructure";
   private static final String AMBIGUOUS_REFERENCE_ERROR = "semantics.ambiguous";
 
   private final SymbolAccumulator symbolAccumulator;
@@ -116,13 +117,33 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
             .errorSource(ErrorSource.PARSING)
             .severity(ErrorSeverity.ERROR)
             .location(node.getLocality().toOriginalLocation())
-            .messageTemplate(
-                MessageTemplate.of(
-                    foundDefinitions.isEmpty() ? NOT_DEFINED_ERROR : AMBIGUOUS_REFERENCE_ERROR,
-                    dataName))
+            .messageTemplate(generateMessageTemplate(foundDefinitions, variableUsageChain))
             .build();
     ctx.getErrors().add(error);
     LOG.debug("Syntax error by QualifiedReferenceNode " + error.toString());
+  }
+
+  private static MessageTemplate generateMessageTemplate(List<VariableNode> foundDefinitions, List<VariableUsageNode> variableUsageChain) {
+    String base = variableUsageChain.size() == 1 ? NOT_DEFINED_ERROR : NOT_DEFINED_IN_STRUCTURE_ERROR;
+
+    return MessageTemplate.of(
+        foundDefinitions.isEmpty() ? base : AMBIGUOUS_REFERENCE_ERROR,
+        convertStructureToParams(variableUsageChain.stream().map(VariableUsageNode::getName).collect(Collectors.toList())));
+  }
+
+  private static Object[] convertStructureToParams(List<String> variableUsageNames) {
+    List<Object> params = new ArrayList<>();
+    params.add(variableUsageNames.get(0));
+    variableUsageNames.remove(0);
+
+    if (!variableUsageNames.isEmpty()) {
+      StringBuilder structure = new StringBuilder(variableUsageNames.get(0));
+      for (int i = 1; i < variableUsageNames.size(); i++) {
+        structure.append(" OF ").append(variableUsageNames.get(i));
+      }
+      params.add(structure.toString());
+    }
+    return params.toArray();
   }
 
   private static boolean isQualifyExtendedDirectiveEnabled(ProcessingContext ctx) {

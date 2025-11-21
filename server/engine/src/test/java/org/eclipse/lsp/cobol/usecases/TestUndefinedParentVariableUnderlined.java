@@ -65,7 +65,7 @@ class TestUndefinedParentVariableUnderlined {
             "1",
             new Diagnostic(
                 new Range(),
-                "Variable MAMA is not defined",
+                "Variable MAMA does not exist in structure AGE OF BORROWE",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

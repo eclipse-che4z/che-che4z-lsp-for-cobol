@@ -40,7 +40,7 @@ class TestMultiTokenError {
             "1",
             new Diagnostic(
                 new Range(),
-                "Variable FOO is not defined",
+                "Variable FOO does not exist in structure BAR",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }

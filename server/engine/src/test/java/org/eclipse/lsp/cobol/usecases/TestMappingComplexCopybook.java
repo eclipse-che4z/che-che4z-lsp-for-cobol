@@ -71,13 +71,13 @@ class TestMappingComplexCopybook {
             "1",
             new Diagnostic(
                 new Range(new Position(1, 28), new Position(1, 115)),
-                "Variable WRK-DS-05V00-O005-001 is not defined",
+                "Variable WRK-DS-05V00-O005-001 does not exist in structure WRK-XN-00050-O005F-001 OF GRP-006 OF GRP-004 OF GRP-003",
                 Error,
                 ErrorSource.PARSING.getText()),
             "2",
             new Diagnostic(
                 new Range(new Position(5, 25), new Position(9, 60)),
-                "Variable WRK-DS-05V00-O005-001 is not defined",
+                "Variable WRK-DS-05V00-O005-001 does not exist in structure WRK-XN-00050-O005F-001 OF GRP-006 OF GRP-004 OF GRP-002 OF GRP-001",
                 Error,
                 ErrorSource.PARSING.getText()),
             "3",
