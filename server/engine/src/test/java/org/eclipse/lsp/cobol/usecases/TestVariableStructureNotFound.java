@@ -26,8 +26,8 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test case checks that there is a proper semantic error when a variable in the structure was not found,
- * but global variable exists
+ * This test case checks that there is a proper semantic error when a variable in the structure was
+ * not found, but global variable exists
  */
 class TestVariableStructureNotFound {
   private static final String TEXT =

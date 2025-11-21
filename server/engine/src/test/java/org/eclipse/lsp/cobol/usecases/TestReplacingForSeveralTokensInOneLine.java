@@ -49,7 +49,8 @@ class TestReplacingForSeveralTokensInOneLine {
           + " {:TAG:-PARENT^ABCDE-PARENT}|invalidS_}";
 
   private static final String REPL_NAME = "REPL";
-  private static final String MESSAGE = "Variable ABCDE-CHILD does not exist in structure ABCDE-PARENT";
+  private static final String MESSAGE =
+      "Variable ABCDE-CHILD does not exist in structure ABCDE-PARENT";
 
   @Test
   void test() {

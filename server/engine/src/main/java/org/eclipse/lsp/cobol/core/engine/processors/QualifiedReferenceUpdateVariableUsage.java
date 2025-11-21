@@ -123,12 +123,17 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     LOG.debug("Syntax error by QualifiedReferenceNode " + error.toString());
   }
 
-  private static MessageTemplate generateMessageTemplate(List<VariableNode> foundDefinitions, List<VariableUsageNode> variableUsageChain) {
-    String base = variableUsageChain.size() == 1 ? NOT_DEFINED_ERROR : NOT_DEFINED_IN_STRUCTURE_ERROR;
+  private static MessageTemplate generateMessageTemplate(
+      List<VariableNode> foundDefinitions, List<VariableUsageNode> variableUsageChain) {
+    String base =
+        variableUsageChain.size() == 1 ? NOT_DEFINED_ERROR : NOT_DEFINED_IN_STRUCTURE_ERROR;
 
     return MessageTemplate.of(
         foundDefinitions.isEmpty() ? base : AMBIGUOUS_REFERENCE_ERROR,
-        convertStructureToParams(variableUsageChain.stream().map(VariableUsageNode::getName).collect(Collectors.toList())));
+        convertStructureToParams(
+            variableUsageChain.stream()
+                .map(VariableUsageNode::getName)
+                .collect(Collectors.toList())));
   }
 
   private static Object[] convertStructureToParams(List<String> variableUsageNames) {
