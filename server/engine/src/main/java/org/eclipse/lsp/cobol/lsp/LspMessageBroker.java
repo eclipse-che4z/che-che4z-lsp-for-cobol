@@ -52,7 +52,7 @@ public class LspMessageBroker {
    * @throws InterruptedException
    */
   public <Q> void putBack(LspQuery<Q> nextEven) throws InterruptedException {
-    LOG.debug("putBack: " + nextEven);
+    LOG.trace("putBack: " + nextEven);
     if (!eventQueue.offer(nextEven)) {
       LOG.warn("Event " + nextEven + " dropped");
     }
