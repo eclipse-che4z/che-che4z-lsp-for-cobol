@@ -14,7 +14,7 @@
 import * as cp from "child_process";
 import { SettingsService } from "./Settings";
 
-export const SUPPORTED_JAVA_VERSION = 11;
+export const SUPPORTED_JAVA_VERSION = 8;
 
 const versionCapturer =
   /\b(?:java|openjdk)\b(?:\s+version)?\s+"?(?:1\.)?(\d+)/i;
