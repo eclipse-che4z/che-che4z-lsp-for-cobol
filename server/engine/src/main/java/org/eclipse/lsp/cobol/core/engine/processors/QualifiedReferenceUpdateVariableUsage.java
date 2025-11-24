@@ -142,11 +142,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     variableUsageNames.remove(0);
 
     if (!variableUsageNames.isEmpty()) {
-      StringBuilder structure = new StringBuilder(variableUsageNames.get(0));
-      for (int i = 1; i < variableUsageNames.size(); i++) {
-        structure.append(" OF ").append(variableUsageNames.get(i));
-      }
-      params.add(structure.toString());
+      params.add(String.join(" OF ", variableUsageNames));
     }
     return params.toArray();
   }
