@@ -30,6 +30,19 @@ describe("Checks Java version", () => {
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "12.0.1" 2018-10-16'),
     ).toBeTruthy();
+    expect(
+      JavaCheck.isJavaVersionSupported('java version "1.8.0_131"'),
+    ).toBeTruthy();
+    expect(
+      JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"'),
+    ).toBeTruthy();
+    expect(
+      JavaCheck.isJavaVersionSupported('java version "1.8.0_181"'),
+    ).toBeTruthy();
+    expect(JavaCheck.isJavaVersionSupported('java version "9"')).toBeTruthy();
+    expect(
+      JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17'),
+    ).toBeTruthy();
     expect(JavaCheck.isJavaVersionSupported("java 11 2018-09-25")).toBeTruthy();
     expect(JavaCheck.isJavaVersionSupported("java 12 2019-03-19")).toBeTruthy();
     expect(JavaCheck.isJavaVersionSupported("java 13 2019-09-17")).toBeTruthy();
@@ -46,19 +59,6 @@ describe("Checks Java version", () => {
 
   it("If Java version is not supported", () => {
     expect(
-      JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17'),
-    ).toBeFalsy();
-    expect(JavaCheck.isJavaVersionSupported('java version "9"')).toBeFalsy();
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.8.0_131"'),
-    ).toBeFalsy();
-    expect(
-      JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"'),
-    ).toBeFalsy();
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.8.0_181"'),
-    ).toBeFalsy();
-    expect(
       JavaCheck.isJavaVersionSupported('java version "1.7.0_131"'),
     ).toBeFalsy();
     expect(
@@ -70,9 +70,9 @@ describe("Checks Java version", () => {
 describe("Checks Java installation", () => {
   let javaCheck: JavaCheck;
   const expectedErrMsgSupportedJavaVersion =
-    "Minimum expected Java version is 11. Switching to native builds";
+    "Minimum expected Java version is 8. Switching to native builds";
   const expectedErrMsgJavaVersionNotFound =
-    "Java 11 not found. Switching to native builds";
+    "Java 8 not found. Switching to native builds";
 
   beforeEach(() => {
     javaCheck = new JavaCheck();
