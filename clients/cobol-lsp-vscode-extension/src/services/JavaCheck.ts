@@ -24,19 +24,20 @@ export class JavaCheck {
     const match = versionCapturer.exec(versionString);
     if (match) {
       const major = Number.parseInt(match[1]);
-      return major >= SUPPORTED_JAVA_VERSION;
+      if (major >= SUPPORTED_JAVA_VERSION) return major;
     }
-    return false;
+    return undefined;
   }
 
-  public async isJavaInstalled() {
-    return new Promise((resolve, reject) => {
+  public async getInstalledJavaVersion() {
+    return new Promise<number>((resolve, reject) => {
       let resolved = false;
       const ls = cp.spawn(SettingsService.getJavaCommand(), ["-version"]);
       ls.stderr.on("data", (data: Buffer) => {
-        if (JavaCheck.isJavaVersionSupported(data.toString())) {
+        const version = JavaCheck.isJavaVersionSupported(data.toString());
+        if (version) {
           resolved = true;
-          resolve(resolved);
+          resolve(version);
         }
       });
       ls.on("error", (error: NodeJS.ErrnoException) => {

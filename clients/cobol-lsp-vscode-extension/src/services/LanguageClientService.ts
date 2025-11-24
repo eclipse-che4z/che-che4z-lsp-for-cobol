@@ -78,11 +78,12 @@ export class LanguageClientService {
     );
   }
 
-  public async checkPrerequisites(): Promise<void> {
-    await new JavaCheck().isJavaInstalled();
+  public async checkPrerequisites() {
+    const version = await new JavaCheck().getInstalledJavaVersion();
     if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
       throw new Error("LSP server for " + LANGUAGE_ID + " not found");
     }
+    telemetryEvent("log", ["bootstrap", "java-version"], `${version}`);
   }
 
   public addNotificationHandler(

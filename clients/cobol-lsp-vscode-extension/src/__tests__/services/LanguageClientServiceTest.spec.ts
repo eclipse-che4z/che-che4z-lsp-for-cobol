@@ -74,7 +74,7 @@ describe("LanguageClientService positive scenario", () => {
       vscode.Uri.file("/storagePath"),
       middleware,
     );
-    new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
+    new JavaCheck().getInstalledJavaVersion = jest.fn().mockResolvedValue(17);
   });
 
   test("Test LanguageClientService switches native flag", () => {
@@ -241,7 +241,7 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("LanguageClientService starts the language server when port is provided", async () => {
-    new JavaCheck().isJavaInstalled = jest.fn().mockResolvedValue(true);
+    new JavaCheck().getInstalledJavaVersion = jest.fn().mockResolvedValue(17);
     vscode.workspace.getConfiguration().get = jest.fn().mockReturnValue(9999);
     LanguageClient.prototype.start = jest
       .fn()

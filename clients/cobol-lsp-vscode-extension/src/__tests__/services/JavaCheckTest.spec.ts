@@ -20,41 +20,41 @@ describe("Checks Java version", () => {
   it("If Java version is supported", () => {
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"'),
-    ).toBeTruthy();
+    ).toEqual(8);
     expect(
       JavaCheck.isJavaVersionSupported('java version "1.8.0_181"'),
-    ).toBeTruthy();
+    ).toEqual(8);
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"'),
-    ).toBeTruthy();
+    ).toEqual(11);
     expect(
       JavaCheck.isJavaVersionSupported('java version "1.11.0_181"'),
-    ).toBeTruthy();
+    ).toEqual(11);
     expect(
       JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17'),
-    ).toBeTruthy();
-    expect(JavaCheck.isJavaVersionSupported('java version "9"')).toBeTruthy();
+    ).toEqual(10);
+    expect(JavaCheck.isJavaVersionSupported('java version "9"')).toEqual(9);
     expect(
       JavaCheck.isJavaVersionSupported('java version "1.8.0_131"'),
-    ).toBeTruthy();
+    ).toEqual(8);
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "11.0.1" 2018-10-16'),
-    ).toBeTruthy();
+    ).toEqual(11);
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "12.0.1" 2018-10-16'),
-    ).toBeTruthy();
-    expect(JavaCheck.isJavaVersionSupported("java 11 2018-09-25")).toBeTruthy();
-    expect(JavaCheck.isJavaVersionSupported("java 12 2019-03-19")).toBeTruthy();
-    expect(JavaCheck.isJavaVersionSupported("java 13 2019-09-17")).toBeTruthy();
-    expect(JavaCheck.isJavaVersionSupported("java 14 2020-03-17")).toBeTruthy();
+    ).toEqual(12);
+    expect(JavaCheck.isJavaVersionSupported("java 11 2018-09-25")).toEqual(11);
+    expect(JavaCheck.isJavaVersionSupported("java 12 2019-03-19")).toEqual(12);
+    expect(JavaCheck.isJavaVersionSupported("java 13 2019-09-17")).toEqual(13);
+    expect(JavaCheck.isJavaVersionSupported("java 14 2020-03-17")).toEqual(14);
     expect(
       JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"'),
-    ).toBeTruthy();
+    ).toEqual(11);
     expect(
       JavaCheck.isJavaVersionSupported(
         `java version "17.0.2" 2022-01-18 LTS\nJava(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)\n`,
       ),
-    ).toBeTruthy();
+    ).toEqual(17);
   });
 
   it("If Java version is not supported", () => {
@@ -80,8 +80,8 @@ describe("Checks Java installation", () => {
 
   it("when required version is supported", async () => {
     mockSpawnProcess("", "java 11 2018-09-25", 0);
-    const promise = javaCheck.isJavaInstalled();
-    await expect(promise).resolves.toEqual(true);
+    const promise = javaCheck.getInstalledJavaVersion();
+    await expect(promise).resolves.toBeTruthy();
   });
 
   it("should skip not relevant lines", async () => {
@@ -90,8 +90,8 @@ describe("Checks Java installation", () => {
       "Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava 11 2018-09-25",
       0,
     );
-    const promise = javaCheck.isJavaInstalled();
-    await expect(promise).resolves.toEqual(true);
+    const promise = javaCheck.getInstalledJavaVersion();
+    await expect(promise).resolves.toBeTruthy();
   });
 
   it("should skip not relevant lines and fail", async () => {
@@ -100,7 +100,7 @@ describe("Checks Java installation", () => {
       `Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava version "1.5.0_22"`,
       0,
     );
-    const promise = javaCheck.isJavaInstalled();
+    const promise = javaCheck.getInstalledJavaVersion();
     await expect(promise).rejects.toEqual(
       new Error(expectedErrMsgSupportedJavaVersion),
     );
@@ -108,7 +108,7 @@ describe("Checks Java installation", () => {
 
   it("when required version is not supported", async () => {
     mockSpawnProcess("", `java version "1.5.0_22"`, 0);
-    const promise = javaCheck.isJavaInstalled();
+    const promise = javaCheck.getInstalledJavaVersion();
     await expect(promise).rejects.toEqual(
       new Error(expectedErrMsgSupportedJavaVersion),
     );
@@ -116,7 +116,7 @@ describe("Checks Java installation", () => {
 
   it("when 'error' event is emitted  - spawned", async () => {
     mockSpawnProcess("", "", 0, { code: "ENOENT" } as NodeJS.ErrnoException);
-    const promise = javaCheck.isJavaInstalled();
+    const promise = javaCheck.getInstalledJavaVersion();
 
     await expect(promise).rejects.toEqual(
       new Error(expectedErrMsgJavaVersionNotFound),
@@ -128,14 +128,14 @@ describe("Checks Java installation", () => {
       code: "Other error",
     } as NodeJS.ErrnoException;
     mockSpawnProcess("", "", 0, error);
-    const promise = javaCheck.isJavaInstalled();
+    const promise = javaCheck.getInstalledJavaVersion();
 
     await expect(promise).rejects.toEqual(error);
   });
 
   it("when 'close' event is emitted", async () => {
     mockSpawnProcess("", "", 23);
-    const promise = javaCheck.isJavaInstalled();
+    const promise = javaCheck.getInstalledJavaVersion();
 
     await expect(promise).rejects.toEqual(
       new Error(
