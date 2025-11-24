@@ -165,8 +165,8 @@ export class LanguageClientService {
   private infoUserAboutRuntimeAbilities(context: vscode.ExtensionContext) {
     const message =
       SettingsService.serverRuntime() === "NATIVE"
-        ? "Native Server Runtime failed to start. Try to use Java Server Runtime"
-        : `Both Java and Native Server Runtimes failed to start. Try to specify Java Home with Java ${SUPPORTED_JAVA_VERSION} or later`;
+        ? "Native Server Runtime failed to start. Select Java Server Runtime in the extension settings and reload VS Code"
+        : `Both Java and Native Server Runtimes failed to start. Ensure that the binaries specified in the Java Home setting are version ${SUPPORTED_JAVA_VERSION} or later`;
     vscode.window
       .showInformationMessage(message, "Settings")
       .then((selection) => {
