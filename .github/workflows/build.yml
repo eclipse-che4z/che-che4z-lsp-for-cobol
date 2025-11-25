@@ -128,6 +128,9 @@ jobs:
           - clients/idms-dialect-support
           - clients/daco-dialect-support
     steps:      
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set Build ID
         shell: bash
         run: |
