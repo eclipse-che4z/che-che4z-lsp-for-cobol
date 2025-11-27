@@ -2,7 +2,7 @@ parser grammar DaCoParser;
 options {tokenVocab = DaCoLexer;  superClass = MessageServiceParser;}
 
 @header {
-import { MessageServiceParser } from "../../../antlr/MessageServiceParser";
+import { MessageServiceParser } from "../antlr/MessageServiceParser";
 }
 
 startRule: .*? dacoRules* EOF;
@@ -48,8 +48,8 @@ readTransactionStatement
 
 writeTransactionStatement
     : WRITE TRANSACTION (daco_task_name | INPUT)
-        (LENGTH ({this.validateIntegerRange(this._input.LT(1).text, 4, 2048);} integerLiteral | qualifiedDataName))?
-        (TO ({this.validateLength(this._input.LT(1).text, "dbu", 19);} (qualifiedDataName | integerLiteral)))?
+        (LENGTH ({this.validateIntegerRange(this.inputStream?.LT(1)?.text, 4, 2048);} integerLiteral | qualifiedDataName))?
+        (TO ({this.validateLength(this.inputStream?.LT(1)?.text, "dbu", 19);} (qualifiedDataName | integerLiteral)))?
     ;
 dfldRcu
     : DFLD IDENTIFIER ON RCU
@@ -63,7 +63,7 @@ writeReportStatementWithName
     : WRITE REPORT daco_report_name?
         FROM qualifiedDataName
         (TO qualifiedDataName)?
-        (LENGTH ({this.validateIntegerRange(this._input.LT(1).text, 80, 200);} integerLiteral))?
+        (LENGTH ({this.validateIntegerRange(this.inputStream?.LT(1)?.text, 80, 200);} integerLiteral))?
         (AFTER ((integerLiteral (LINE | LINES)) | PAGE | qualifiedDataName))?
     ;
 
@@ -78,7 +78,7 @@ autoWriteReportStatement
 
 openPacketStatement
     : OPEN PACKET daco_task_name
-           (FOR (qualifiedDataName | {this.validateExactLength(this.trimQuotes(this._input.LT(1).text), "receiver packet", 3);}
+           (FOR (qualifiedDataName | {this.validateExactLength(this.trimQuotes(this.inputStream?.LT(1)?.text), "receiver packet", 3);}
            NONNUMERICLITERAL))
            (SORT qualifiedDataName)?
            (VERSION (qualifiedDataName | integerLiteral))?
@@ -94,17 +94,17 @@ getEntityStatement
     ;
 
 getEntityNameAndDescriptionStatement
-    :  (qualifiedDataName |  {this.validateStringLengthRange(this.trimQuotes(this._input.LT(1).text), 3, 4);}
+    :  (qualifiedDataName |  {this.validateStringLengthRange(this.trimQuotes(this.inputStream?.LT(1)?.text), 3, 4);}
             NONNUMERICLITERAL)
-            (qualifiedDataName | {this.validateStringLengthRange(this.trimQuotes(this._input.LT(1).text), 3, 16);}
+            (qualifiedDataName | {this.validateStringLengthRange(this.trimQuotes(this.inputStream?.LT(1)?.text), 3, 16);}
             NONNUMERICLITERAL)
             ( ( daco_entity_role |
-                {this.validateAllowedValues(this.trimQuotes(this._input.LT(1).text),
+                {this.validateAllowedValues(this.trimQuotes(this.inputStream?.LT(1)?.text),
                   "OWNER","OWN","DESIGNER","AVG","ANALIST","ANA");} NONNUMERICLITERAL
               )
             | ( DESCRIPTION
                 ( qualifiedDataName |
-                  {this.validateExactLength(this.trimQuotes(this._input.LT(1).text), "tal", 2);} NONNUMERICLITERAL)
+                  {this.validateExactLength(this.trimQuotes(this.inputStream?.LT(1)?.text), "tal", 2);} NONNUMERICLITERAL)
               )
             )
     ;
@@ -114,7 +114,7 @@ daco_entity_role
     ;
 
 getEntityDescriptionForDomainStatement
-    : (DOM | {this.validateAllowedValues(this.trimQuotes(this._input.LT(1).text), "DOM");} NONNUMERICLITERAL)
+    : (DOM | {this.validateAllowedValues(this.trimQuotes(this.inputStream?.LT(1)?.text), "DOM");} NONNUMERICLITERAL)
       qualifiedDataName DESCRIPTION
     ;
 
@@ -123,7 +123,7 @@ getUserStatement
     ;
 
 getUserOptions
-    : (qualifiedDataName |  {this.validateExactLength(this.trimQuotes(this._input.LT(1).text),"kls", 3);}
+    : (qualifiedDataName |  {this.validateExactLength(this.trimQuotes(this.inputStream?.LT(1)?.text),"kls", 3);}
                  NONNUMERICLITERAL)
                 (qualifiedDataName | NONNUMERICLITERAL)
     ;
@@ -150,7 +150,7 @@ getItemGrsStatement
     ;
 
 getTaskStatement
-    : TASK (qualifiedDataName | {this.validateExactLength(this.trimQuotes(this._input.LT(1).text), "task name", 4);}
+    : TASK (qualifiedDataName | {this.validateExactLength(this.trimQuotes(this.inputStream?.LT(1)?.text), "task name", 4);}
                 NONNUMERICLITERAL)
     ;
 
@@ -168,7 +168,7 @@ showDMLMessageStatement
 
 showMessageStatement
     : STD? daco_message_types
-     ({this.validateExactLength(this._input.LT(1).text, "message code", 3);} integerLiteral)
+     ({this.validateExactLength(this.inputStream?.LT(1)?.text, "message code", 3);} integerLiteral)
      (qualifiedDataName | NONNUMERICLITERAL)?
      (qualifiedDataName | NONNUMERICLITERAL)?
      (qualifiedDataName | NONNUMERICLITERAL)?
@@ -179,13 +179,13 @@ showResultStatement
     ;
 
 showErrorMessageStatement
-    : MESSAGE (({this.validateExactLength(this.trimQuotes(this._input.LT(1).text), "language code", 2);} NONNUMERICLITERAL)
+    : MESSAGE (({this.validateExactLength(this.trimQuotes(this.inputStream?.LT(1)?.text), "language code", 2);} NONNUMERICLITERAL)
       | (qualifiedDataName | NONNUMERICLITERAL))?
     ;
 
 returnStatusStatement
     : RETURN daco_message_types
-      ({this.validateExactLength(this._input.LT(1).text, "message code", 3);} integerLiteral)
+      ({this.validateExactLength(this.inputStream?.LT(1)?.text, "message code", 3);} integerLiteral)
       (qualifiedDataName | NONNUMERICLITERAL)? qualifiedDataName? qualifiedDataName?
     ;
 
@@ -298,7 +298,7 @@ tableDMLStatement
 
 getTableStatement
     : GET TABLE (ANY | SEQ)
-      {this.validateExactLength(this._input.LT(1).text, "table reference", 4);} cobolWord
+      {this.validateExactLength(this.inputStream?.LT(1)?.text, "table reference", 4);} cobolWord
     ;
 
 sortTableStatement
@@ -353,12 +353,12 @@ stringNextStatement
 
 stringMatchStatement
     : MATCH daco_string_identifier daco_string_identifier
-      (qualifiedDataName | ({this.validateIntegerRange(this._input.LT(1).text, 0, 255);} numericLiteral))?
+      (qualifiedDataName | ({this.validateIntegerRange(this.inputStream?.LT(1)?.text, 0, 255);} numericLiteral))?
     ;
 
 stringCheckStatement
     : CHECK daco_string_command
-      (qualifiedDataName | ({this.validateLength(this._input.LT(1).text, "email", 55);} literal))
+      (qualifiedDataName | ({this.validateLength(this.inputStream?.LT(1)?.text, "email", 55);} literal))
     ;
 
 stringUpdateStatement
@@ -380,12 +380,12 @@ debugStatement
     ;
 
 debugStatsStatement
-    : DEBUG STATS (qualifiedDataName | ({this.validateLength(this._input.LT(1).text, "text", 32);} literal))?
+    : DEBUG STATS (qualifiedDataName | ({this.validateLength(this.inputStream?.LT(1)?.text, "text", 32);} literal))?
     ;
 
 debugFieldStatement
     : DEBUG qualifiedDataName LENGTH (qualifiedDataName | integerLiteral)
-      (COLS ({this.validateIntegerRange(this._input.LT(1).text, 0, 132);} numericLiteral))?
+      (COLS ({this.validateIntegerRange(this.inputStream?.LT(1)?.text, 0, 132);} numericLiteral))?
       (TABLE (qualifiedDataName | integerLiteral))?
       NO_POS? (HEX | DISPLAY | BOTH)?
     ;
@@ -517,16 +517,16 @@ cobolKeywords
 // DaCo Identifiers
 
 daco_task_name
-    :{this.validateExactLength(this._input.LT(1).text, "task name", 4);
-      this.validateAlphaNumericPattern(this._input.LT(1).text, "task name");
+    :{this.validateExactLength(this.inputStream?.LT(1)?.text, "task name", 4);
+      this.validateAlphaNumericPattern(this.inputStream?.LT(1)?.text, "task name");
      }
         (cobolWord | integerLiteral)
     ;
 
 daco_report_name
-    :{this.validateExactLength(this._input.LT(1).text, "report name", 5);
-      this.validateAlphaNumericPattern(this._input.LT(1).text, "report name");
-      this.validateStartsWith(this._input.LT(1).text, "R", "T");
+    :{this.validateExactLength(this.inputStream?.LT(1)?.text, "report name", 5);
+      this.validateAlphaNumericPattern(this.inputStream?.LT(1)?.text, "report name");
+      this.validateStartsWith(this.inputStream?.LT(1)?.text, "R", "T");
       }
         (cobolWord)
     ;
@@ -536,11 +536,11 @@ daco_message_types
     ;
 
 daco_file_identifier
-    : {this.validateExactLength(this._input.LT(1).text, "file reference", 4);} integerLiteral
+    : {this.validateExactLength(this.inputStream?.LT(1)?.text, "file reference", 4);} integerLiteral
     ;
 
 daco_table_name
-    : {this.validateStartsWith(this._input.LT(1).text, "TBL", "TBF"); } qualifiedDataName
+    : {this.validateStartsWith(this.inputStream?.LT(1)?.text, "TBL", "TBF"); } qualifiedDataName
     ;
 
 daco_string_command
@@ -552,8 +552,8 @@ daco_string_identifier
     ;
 
 daco_field_name
-    :{this.validateLength(this._input.LT(1).text, "field name", 12);
-      this.validateAlphaNumericPattern(this._input.LT(1).text, "field name");
+    :{this.validateLength(this.inputStream?.LT(1)?.text, "field name", 12);
+      this.validateAlphaNumericPattern(this.inputStream?.LT(1)?.text, "field name");
      }
         (cobolWord | integerLiteral)
     ;

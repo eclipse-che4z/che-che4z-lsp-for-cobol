@@ -1,4 +1,4 @@
-import { Parser } from "antlr4ts/Parser";
+import { Parser } from "antlr4ng";
 
 export abstract class MessageServiceParser extends Parser {
   private static ALPHANUMERIC: RegExp = new RegExp("[a-zA-Z0-9]+");
@@ -9,7 +9,7 @@ export abstract class MessageServiceParser extends Parser {
     param2?: string,
   ): string {
     const message = "";
-    super.notifyErrorListeners(message);
+    //super.notifyErrorListeners(message);
     return message;
   }
 
@@ -53,7 +53,10 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    * @param objectType type of the object to be passed as a message argument
    */
-  protected validateAlphaNumericPattern(input: string | undefined, objectType: string) {
+  protected validateAlphaNumericPattern(
+    input: string | undefined,
+    objectType: string,
+  ) {
     if (input != undefined && !MessageServiceParser.ALPHANUMERIC.test(input)) {
       this.notifyError("parsers.alphaNumeric", objectType);
     }
@@ -89,12 +92,12 @@ export abstract class MessageServiceParser extends Parser {
    * @param validLength expected length for this input
    */
   protected validateLengthTrimBorders(
-    input: string,
+    input: string | undefined,
     objectType: string,
     validLength: number,
   ) {
     this.validateLength(
-      input.substring(1, input.length - 1),
+      input?.substring(1, input.length - 1),
       objectType,
       validLength,
     );
@@ -108,12 +111,12 @@ export abstract class MessageServiceParser extends Parser {
    * @param error error code name
    */
   protected validateTokenWithRegex(
-    input: string,
+    input: string | undefined,
     regex: string,
     error: string,
   ) {
-    if (!input.match(regex)) {
-      this.notifyError(error, input);
+    if (!input?.match(regex)) {
+      this.notifyError(error, input ?? "");
     }
   }
 
@@ -148,10 +151,10 @@ export abstract class MessageServiceParser extends Parser {
    *
    * @param input string to check
    */
-  protected validateDb2MaxInt(input: string) {
-    let value = Number.parseInt(input);
+  protected validateDb2MaxInt(input: string | undefined) {
+    let value = Number.parseInt(input ?? "");
     if (!(value > 0 && value <= 32767)) {
-      this.notifyError("db2SqlParser.maxIntValue", input);
+      this.notifyError("db2SqlParser.maxIntValue", input ?? "");
     }
   }
 
@@ -161,7 +164,10 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    * @param startsWith arrays of allowed starting string values for Input parameter
    */
-  protected validateStartsWith(input: string | undefined, ...startsWith: string[]) {
+  protected validateStartsWith(
+    input: string | undefined,
+    ...startsWith: string[]
+  ) {
     if (input != undefined && !this.checkStartsWith(input, startsWith)) {
       this.notifyError("parsers.startsWith", startsWith.join(" or "));
     }
@@ -173,12 +179,16 @@ export abstract class MessageServiceParser extends Parser {
    *
    * @param input string to check
    */
-  protected validateTextInRange(input: string, min: number, max: number) {
-    let value = Number.parseInt(input);
+  protected validateTextInRange(
+    input: string | undefined,
+    min: number,
+    max: number,
+  ) {
+    let value = Number.parseInt(input ?? "");
     if (!(value > min && value < max)) {
       this.notifyError(
         "parsers.validValueMsg",
-        input,
+        input ?? "",
         `in range ${min + 1} to ${max - 1}`,
       );
     }
@@ -213,10 +223,10 @@ export abstract class MessageServiceParser extends Parser {
    *
    * @param input string to check
    */
-  protected validate34or16(input: string) {
-    let value = Number.parseInt(input);
+  protected validate34or16(input: string | undefined) {
+    let value = Number.parseInt(input ?? "");
     if (!(value == 34 || value == 16)) {
-      this.notifyError("parsers.validValueMsg", input, "34 or 16");
+      this.notifyError("parsers.validValueMsg", input ?? "", "34 or 16");
     }
   }
 
@@ -226,7 +236,10 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    * @param allowedValues arrays of allowed starting string values for Input parameter
    */
-  protected validateAllowedValues(input: string | undefined, ...allowedValues: string[]) {
+  protected validateAllowedValues(
+    input: string | undefined,
+    ...allowedValues: string[]
+  ) {
     if (
       input != undefined &&
       !this.checkInputInAllowedValues(input, allowedValues)
@@ -240,9 +253,9 @@ export abstract class MessageServiceParser extends Parser {
    *
    * @param input string to check
    */
-  protected validateLevel(input: string) {
+  protected validateLevel(input: string | undefined) {
     if (input !== "1" && input !== "ANY") {
-      this.notifyError("parsers.validValueMsg", input, "1 or ANY");
+      this.notifyError("parsers.validValueMsg", input ?? "", "1 or ANY");
     }
   }
 
@@ -251,7 +264,7 @@ export abstract class MessageServiceParser extends Parser {
    *
    * @param input string to trim quotes
    */
-  protected trimQuotes(input?: string): string {
+  protected trimQuotes(input: string | undefined): string {
     if (input !== undefined) {
       return input.replace(/^"(.*)"$/, "$1");
     }
@@ -263,8 +276,8 @@ export abstract class MessageServiceParser extends Parser {
    *
    * @param input string to check
    */
-  protected validateDbNames(input: string) {
-    let names = input.split("\\.");
+  protected validateDbNames(input: string | undefined) {
+    let names = (input ?? "").split("\\.");
     if (names.length > 1) {
       this.validateLength(names[0], "database name", 8);
       this.validateLength(names[1], "table space name", 8);
@@ -286,18 +299,21 @@ export abstract class MessageServiceParser extends Parser {
     return parsedValue;
   }
 
-  private checkStartsWith(input: string, startsWith: string[]): boolean {
+  private checkStartsWith(
+    input: string | undefined,
+    startsWith: string[],
+  ): boolean {
     for (let item of startsWith) {
-      if (input.startsWith(item)) return true;
+      if (input?.startsWith(item)) return true;
     }
     return false;
   }
 
   private checkInputInAllowedValues(
-    input: string,
+    input: string | undefined,
     allowedValues: string[],
   ): boolean {
-    input = input.toUpperCase();
+    input = input?.toUpperCase();
     for (let item of allowedValues) {
       if (input === item.toUpperCase()) return true;
     }
