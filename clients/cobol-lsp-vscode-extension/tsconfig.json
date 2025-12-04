@@ -15,7 +15,7 @@
 {
   "compilerOptions": {
     "types": ["node", "jest", "mocha", "assert"],
-    "target": "ES2017",
+    "target": "es2024",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
@@ -25,7 +25,7 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "strict": true,
-    "lib": ["es6", "es2020", "WebWorker"],
+    "lib": ["es6", "ES2024", "WebWorker"],
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "src",

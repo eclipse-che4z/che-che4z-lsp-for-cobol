@@ -19,6 +19,13 @@ import * as vscode from "vscode";
 // Source can be only a single level directory, with no subdirectories
 type CopybooksSource = typeof ZOWE_FOLDER | typeof E4E_FOLDER;
 
+export function getCopybookCacheUris(globalStorageUri: vscode.Uri) {
+  return [
+    [E4E_FOLDER, COPYBOOKS_FOLDER],
+    [ZOWE_FOLDER, COPYBOOKS_FOLDER],
+  ].map((folders) => vscode.Uri.joinPath(globalStorageUri, ...folders));
+}
+
 /**
  * This class is responsible to identify from which source resolve copybooks required by the server.
  */

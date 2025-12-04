@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as os from "node:os";
 import * as vscode from "vscode";
 import type { Middleware } from "vscode-languageclient";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
@@ -55,7 +54,7 @@ import {
 } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
-import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
+// import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { getErrorMessage } from "./services/util/ErrorsUtils";
 import {
@@ -78,7 +77,13 @@ import { outputChannel } from "./services/util/OutputChannel";
 import { DialectService } from "./dialect/DialectService";
 import { createSampleConfiguration } from "./commands/CreateSampleConfiguration";
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
-import { localCopybooks } from "./services/copybookLibs/LocalPathLib";
+import { getCopybookCacheUris } from "./services/copybook/CopybookURI";
+import { make } from "./services/languageClient/ServerSettings";
+import { setupBridge4GitWatcher } from "./services/BridgeForGitLoader";
+import {
+  setUpProcessorGroupConfigWatcher,
+  setUpProgramConfigWatcher,
+} from "./services/ProcessorGroups";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -116,8 +121,16 @@ export async function activate(
 
   externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
+
     languageClientService.invalidateConfiguration,
   );
+
+  // setup processor group watchers
+  setUpProgramConfigWatcher(languageClientService.invalidateConfiguration);
+  setUpProcessorGroupConfigWatcher(
+    languageClientService.invalidateConfiguration,
+  );
+  setupBridge4GitWatcher(languageClientService.invalidateConfiguration);
 
   const analysisService = new ControlFlowAnalysisService(
     outputChannel,
@@ -142,23 +155,11 @@ export async function activate(
   registerCompletions(context);
   registerEvents(context, analysisService);
 
-  const configurationWatcher = new ConfigurationWatcher();
-  configurationWatcher.watchConfigurationChanges();
+  // const configurationWatcher = new ConfigurationWatcher();
+  // configurationWatcher.watchConfigurationChanges();
 
-  localCopybooks.registerFileChangeWatcher((uri) =>
-    languageClientService.sendFileChangeNotification(uri),
-  );
-
-  // await languageClientService.start({
-  //   kind: "JAVA",
-  //   command: SettingsService.getJavaCommand(),
-  //   jar: getJavaServerUri(context),
-  //   dialects: getJavaDialectsUri(context),
-  // });
-  await languageClientService.start({
-    kind: "NATIVE",
-    command: getNativeServerUri(context),
-  });
+  const server = make(context.extensionUri); // TODO revisit this
+  await languageClientService.start(server);
 
   // 'export' public api-surface
   return {
@@ -241,9 +242,7 @@ function initializeLanguageClientService(
   globalStorageUri: vscode.Uri,
   externalApis: ExternalAPIsService | undefined,
 ) {
-  const copybookCacheLocations = ["e4e/copybooks", "zowe/copybooks"].map(
-    (path) => vscode.Uri.joinPath(globalStorageUri, path),
-  );
+  const copybookCacheLocations = getCopybookCacheUris(globalStorageUri);
   const middleware: Middleware = {
     executeCommand: (command, args, next) => {
       if (command == "missing copybook") {
@@ -600,51 +599,4 @@ function registerCompletions(context: vscode.ExtensionContext) {
       new SubroutinesCompletionsProvider(),
     ),
   );
-}
-
-function getNativeServerUri(
-  context: vscode.ExtensionContext,
-  osType: string = os.type(),
-) {
-  let fileName: string = "server-unknown";
-  switch (osType) {
-    case "Windows_NT":
-      fileName = "engine.exe";
-      break;
-    case "Darwin":
-      fileName = "server-mac";
-      break;
-    case "Linux":
-      fileName = "server-linux";
-      break;
-  }
-
-  return vscode.Uri.joinPath(
-    context.extension.extensionUri,
-    "server",
-    "native",
-    fileName,
-  );
-}
-
-function getJavaServerUri(context: vscode.ExtensionContext) {
-  return vscode.Uri.joinPath(
-    context.extension.extensionUri,
-    "server",
-    "jar",
-    "server.jar",
-  );
-}
-
-function getJavaDialectsUri(context: vscode.ExtensionContext) {
-  return vscode.Uri.joinPath(
-    context.extension.extensionUri,
-    "server",
-    "jar",
-    "dialects",
-  );
-}
-
-function getCopybookCacheUris(context: vscode.ExtensionContext) {
-  return;
 }

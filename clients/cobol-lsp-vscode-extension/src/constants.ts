@@ -91,6 +91,7 @@ export const USS = "uss";
 export const PROVIDE_PROFILE_MSG_PROC_GRUOPS =
   "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe.";
 export const FAILED_REQUESTS_LIMIT = 3;
+export const MINIMUM_JAVA_VERSION = 8;
 
 export enum PUNCH_CARD {
   SEQUENCE_AREA_END_POS = 6,

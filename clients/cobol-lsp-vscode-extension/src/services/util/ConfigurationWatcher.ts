@@ -18,48 +18,45 @@ import { SettingsService } from "../Settings";
 import { telemetryEvent } from "../reporter";
 import { clearDiagnostics } from "../ExternalAPIsService";
 
-export class ConfigurationWatcher {
-  private static async restartVsCode() {
-    const selection = await vscode.window.showInformationMessage(
-      "Reload vscode for serverRuntime settings change to take effect",
-      "Ok",
-      "Later",
-    );
-    if (typeof selection === "undefined" || selection === "Later") {
-      return;
-    }
-    if (selection === "Ok") {
-      telemetryEvent(
-        "serverRuntime modified by user",
-        ["COBOL", "serverRuntime", "settings"],
-        `Server type modified by user to ${this.getServerRuntime()}`,
-      );
-      await vscode.commands.executeCommand("workbench.action.reloadWindow");
-    }
-  }
+// export class ConfigurationWatcher {
+//   private static async restartVsCode() {
+//     const selection = await vscode.window.showInformationMessage(
+//       "Reload vscode for serverRuntime settings change to take effect",
+//       "Ok",
+//       "Later",
+//     );
+//     if (typeof selection === "undefined" || selection === "Later") {
+//       return;
+//     }
+//     if (selection === "Ok") {
+//       telemetryEvent(
+//         "serverRuntime modified by user",
+//         ["COBOL", "serverRuntime", "settings"],
+//         `Server type modified by user to ${this.getServerRuntime()}`,
+//       );
+//       await vscode.commands.executeCommand("workbench.action.reloadWindow");
+//     }
+//   }
 
-  private static getServerRuntime() {
-    return SettingsService.serverRuntime() === "NATIVE" ? "NATIVE" : "JAVA";
-  }
-  private prevRuntimeState: string;
+//   private prevRuntimeState: string;
 
-  constructor() {
-    this.prevRuntimeState = ConfigurationWatcher.getServerRuntime();
-  }
+//   constructor() {
+//     this.prevRuntimeState = ConfigurationWatcher.getServerRuntime();
+//   }
 
-  public watchConfigurationChanges() {
-    vscode.workspace.onDidChangeConfiguration(async (event) => {
-      if (event.affectsConfiguration(SERVER_RUNTIME)) {
-        await this.handleServerRuntimeConfigurationChange();
-      }
-      clearDiagnostics();
-    });
-  }
+//   public watchConfigurationChanges() {
+//     vscode.workspace.onDidChangeConfiguration(async (event) => {
+//       if (event.affectsConfiguration(SERVER_RUNTIME)) {
+//         await this.handleServerRuntimeConfigurationChange();
+//       }
+//       clearDiagnostics();
+//     });
+//   }
 
-  private async handleServerRuntimeConfigurationChange() {
-    const newServerRuntime = ConfigurationWatcher.getServerRuntime();
-    if (newServerRuntime !== this.prevRuntimeState) {
-      await ConfigurationWatcher.restartVsCode();
-    }
-  }
-}
+//   private async handleServerRuntimeConfigurationChange() {
+//     const newServerRuntime = ConfigurationWatcher.getServerRuntime();
+//     if (newServerRuntime !== this.prevRuntimeState) {
+//       await ConfigurationWatcher.restartVsCode();
+//     }
+//   }
+// }

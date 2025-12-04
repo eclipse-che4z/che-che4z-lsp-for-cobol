@@ -19,8 +19,6 @@ import {
   PATHS_USS,
   PATHS_DSN,
   SERVER_PORT,
-  SERVER_RUNTIME,
-  JAVA_HOME,
   SETTINGS_CPY_EXTENSIONS,
   SETTINGS_CPY_LOCAL_PATH,
   SETTINGS_CPY_SECTION,
@@ -282,28 +280,6 @@ export class SettingsService {
       .filter((x) => x.length > 0);
 
     return c.length === 0 ? undefined : c;
-  }
-
-  /**
-   * Gives the configured runtime from settings.
-   *
-   * @returns returns configured runtime
-   */
-  public static serverRuntime(): string | undefined {
-    return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
-  }
-
-  public static getJavaHome(): string | undefined {
-    return vscode.workspace.getConfiguration().get(JAVA_HOME);
-  }
-
-  public static getJavaCommand(): string {
-    const location = (SettingsService.getJavaHome() ?? "").trim();
-    if (location) {
-      return vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java")
-        .fsPath;
-    }
-    return "java";
   }
 
   public static getCobolProgramLayout() {

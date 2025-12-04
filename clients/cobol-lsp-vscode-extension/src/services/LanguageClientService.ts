@@ -12,9 +12,9 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as net from "node:net";
 import * as vscode from "vscode";
 
+import type { Server } from "./languageClient/ServerSettings";
 import {
   DidChangeConfigurationNotification,
   DidChangeWatchedFilesNotification,
@@ -22,51 +22,26 @@ import {
   FileEvent,
   GenericNotificationHandler,
   GenericRequestHandler,
-  LanguageClient,
+  BaseLanguageClient,
   LanguageClientOptions,
   Middleware,
-  ServerOptions,
-  StreamInfo,
-} from "vscode-languageclient/node";
+} from "vscode-languageclient";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
-import { JavaCheck, SUPPORTED_JAVA_VERSION } from "./JavaCheck";
-import { SettingsService } from "./Settings";
-import { setupBridge4GitWatcher } from "./BridgeForGitLoader";
-import {
-  setUpProcessorGroupConfigWatcher,
-  setUpProgramConfigWatcher,
-} from "./ProcessorGroups";
-
-export interface NativeServer {
-  kind: "NATIVE";
-  command: vscode.Uri;
-}
-export interface JavaServer {
-  kind: "JAVA";
-  command: string;
-  jar: vscode.Uri;
-  dialects: vscode.Uri;
-}
-export interface SocketServer {
-  kind: "SOCKET";
-  port: number;
-}
-export type Server = NativeServer | JavaServer | SocketServer;
+import { localCopybooks } from "./copybookLibs/LocalPathLib";
+import { startJavaServer } from "./languageClient/JavaServer";
+import { startNativeServer } from "./languageClient/NativeSever";
 
 export class LanguageClientService {
-  private languageClient: LanguageClient | undefined;
+  private languageClient: BaseLanguageClient | undefined;
   private watchers: vscode.FileSystemWatcher[];
-  private handlers: Array<(languageClient: LanguageClient) => void> = [];
+  private handlers: Array<(languageClient: BaseLanguageClient) => void> = [];
 
   constructor(
-    private readonly outputChannel: vscode.OutputChannel,
+    private readonly outputChannel: vscode.LogOutputChannel,
     private readonly copybookCacheLocations: vscode.Uri[],
     private readonly middleware: Middleware,
   ) {
     this.watchers = [
-      setUpProgramConfigWatcher(this.invalidateConfiguration),
-      setUpProcessorGroupConfigWatcher(this.invalidateConfiguration),
-      setupBridge4GitWatcher(),
       ...this.copybookCacheLocations.map((uri) =>
         vscode.workspace.createFileSystemWatcher(
           new vscode.RelativePattern(uri, "**/*"),
@@ -85,6 +60,9 @@ export class LanguageClientService {
         ),
       ),
     ];
+    localCopybooks.registerFileChangeWatcher((uri) =>
+      this.sendFileChangeNotification(uri),
+    );
   }
 
   public async start(server: Server) {
@@ -93,24 +71,44 @@ export class LanguageClientService {
       this.middleware,
       this.watchers,
     );
-    const serverOptions = getServerOptions(server);
-
-    const languageClient = new LanguageClient(
-      LANGUAGE_ID,
-      "COBOL Language Support",
-      serverOptions,
-      clientOptions,
-    );
-
-    this.handlers.forEach((handler) => handler(languageClient));
-
-    await languageClient.start();
-
-    this.languageClient = languageClient;
+    if (server.kind === "JAVA") {
+      const languageClient = await startJavaServer(
+        server,
+        clientOptions,
+        this.handlers,
+      );
+      if (languageClient instanceof Error) {
+        this.outputChannel.error(
+          "Failed to start java language server.",
+          languageClient,
+        );
+        return;
+      }
+      this.languageClient = languageClient;
+    }
+    if (server.kind === "NATIVE") {
+      const languageClient = await startNativeServer(
+        server,
+        clientOptions,
+        this.handlers,
+      );
+      if (languageClient instanceof Error) {
+        this.outputChannel.error(
+          "Failed to start native language server.",
+          languageClient,
+        );
+        return;
+      }
+      this.languageClient = languageClient;
+    }
   }
 
   public dispose() {
-    return this.languageClient?.dispose();
+    clearTimeout(this.fileChangeTimer);
+    this.fileChanges = [];
+    const languageClient = this.languageClient;
+    this.languageClient = undefined;
+    return languageClient?.dispose();
   }
 
   public addNotificationHandler(
@@ -162,7 +160,7 @@ export class LanguageClientService {
   private fileChanges: FileEvent[] = [];
   private fileChangeTimer: ReturnType<typeof setTimeout> | undefined =
     undefined;
-  public sendFileChangeNotification(file: vscode.Uri) {
+  private sendFileChangeNotification(file: vscode.Uri) {
     if (!this.languageClient) return;
     this.fileChanges.push({
       uri: file.toString(),
@@ -201,70 +199,22 @@ function getClientOptions(
   };
 }
 
-function getServerOptions(server: Server): ServerOptions {
-  switch (server.kind) {
-    case "JAVA":
-      return {
-        args: [
-          "-Dline.separator=\r\n",
-          `-Ddialect.path=${server.dialects.fsPath}`,
-          "-Xmx768M",
-          "-jar",
-          server.jar.fsPath,
-          "pipeEnabled",
-        ],
-        command: SettingsService.getJavaCommand(),
-        options: { detached: false },
-      };
-    case "NATIVE":
-      return {
-        args: [
-          "pipeEnabled",
-          "-Dline.separator=\r\n",
-          "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
-          "-DserverType=NATIVE",
-        ],
-        command: server.command.fsPath,
-        options: {
-          detached: false,
-          cwd: vscode.Uri.joinPath(server.command, "..").fsPath,
-        },
-      };
-    case "SOCKET":
-      return () => {
-        const socket = net.connect({
-          host: "localhost",
-          port: server.port,
-        });
-        const streamInfo: StreamInfo = {
-          reader: socket,
-          writer: socket,
-        };
-        return Promise.resolve(streamInfo);
-      };
-    default: //Type guard
-      // eslint-disable-next-line no-case-declarations
-      const _exhaustiveCheck: never = server;
-      return _exhaustiveCheck;
-  }
-}
-
-function infoUserAboutRuntimeAbilities(extensionId: string) {
-  const message =
-    SettingsService.serverRuntime() === "NATIVE"
-      ? "Native Server Runtime failed to start. Select Java Server Runtime in the extension settings and reload VS Code"
-      : `Both Java and Native Server Runtimes failed to start. Ensure that the binaries specified in the Java Home setting are version ${SUPPORTED_JAVA_VERSION} or later`;
-  vscode.window
-    .showInformationMessage(message, "Settings")
-    .then((selection) => {
-      if (selection === "Settings") {
-        vscode.commands.executeCommand(
-          "workbench.action.openSettings",
-          `@ext:${extensionId}`,
-        );
-      }
-    });
-}
+// function infoUserAboutRuntimeAbilities(extensionId: string) {
+//   const message =
+//     SettingsService.serverRuntime() === "NATIVE"
+//       ? "Native Server Runtime failed to start. Select Java Server Runtime in the extension settings and reload VS Code"
+//       : `Both Java and Native Server Runtimes failed to start. Ensure that the binaries specified in the Java Home setting are version ${SUPPORTED_JAVA_VERSION} or later`;
+//   vscode.window
+//     .showInformationMessage(message, "Settings")
+//     .then((selection) => {
+//       if (selection === "Settings") {
+//         vscode.commands.executeCommand(
+//           "workbench.action.openSettings",
+//           `@ext:${extensionId}`,
+//         );
+//       }
+//     });
+// }
 
 // async function start() {
 //   const languageClient = this.getLanguageClient();

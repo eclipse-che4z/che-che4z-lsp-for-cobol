@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
+import type * as vscode from "vscode";
 import * as t from "io-ts";
 import { isLeft } from "fp-ts/Either";
 import { PathReporter } from "io-ts/PathReporter";
@@ -78,13 +79,17 @@ async function readBridge4GitJson(b4gPath: Uri) {
   return decodeBridgeJson(bridge4GitDataJson);
 }
 
-export function setupBridge4GitWatcher(): FileSystemWatcher {
+export function setupBridge4GitWatcher(fn: () => unknown): FileSystemWatcher {
   const bridge4GitWatcher = workspace.createFileSystemWatcher(
     BRIDGE4GIT_CONFIG_FILE,
   );
-  bridge4GitWatcher.onDidChange(watcherChangeEventHandler);
-  bridge4GitWatcher.onDidCreate(watcherChangeEventHandler);
-  bridge4GitWatcher.onDidDelete(watcherChangeEventHandler);
+  const handler = (uri: vscode.Uri) => {
+    watcherChangeEventHandler(uri);
+    fn();
+  };
+  bridge4GitWatcher.onDidChange(handler);
+  bridge4GitWatcher.onDidCreate(handler);
+  bridge4GitWatcher.onDidDelete(handler);
   return bridge4GitWatcher;
 }
 
