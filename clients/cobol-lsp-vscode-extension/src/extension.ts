@@ -84,6 +84,7 @@ import {
   setUpProcessorGroupConfigWatcher,
   setUpProgramConfigWatcher,
 } from "./services/ProcessorGroups";
+import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -156,8 +157,8 @@ export async function activate(
   registerCompletions(context);
   registerEvents(context, analysisService);
 
-  // const configurationWatcher = new ConfigurationWatcher();
-  // configurationWatcher.watchConfigurationChanges();
+  const configurationWatcher = new ConfigurationWatcher();
+  configurationWatcher.watchConfigurationChanges();
 
   const serverState = make(context.extensionUri); // TODO revisit this
   await languageClientService.start(serverState);

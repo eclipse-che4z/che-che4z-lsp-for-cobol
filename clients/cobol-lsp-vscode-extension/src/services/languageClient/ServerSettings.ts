@@ -39,7 +39,7 @@ function getLspPort(): number {
  *
  * @returns returns configured runtime
  */
-function getServerRuntime(): "NATIVE" | "JAVA" {
+export function getServerRuntime(): "NATIVE" | "JAVA" {
   const runtime = vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
   return runtime === "NATIVE" ? "NATIVE" : "JAVA"; // TODO add tests to make sure default matches package.json declaration
 }
