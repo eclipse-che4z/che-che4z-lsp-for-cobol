@@ -13,7 +13,7 @@
  */
 import * as cp from "child_process";
 
-const stopLength = 80;
+const stopLength = 255;
 const versionPattern = /\b(?:java|openjdk)\b(?:\s+version)?\s+"?(?:1\.)?(\d+)/i;
 
 export function toJavaMajor(versionString: string) {
@@ -24,7 +24,7 @@ export function toJavaMajor(versionString: string) {
   }
 }
 
-export async function getJavaVersion(javaCommand: string) {
+export async function getJavaVersion(javaCommand: string = "java") {
   return new Promise<number>((resolve, reject) => {
     let text = "";
     const ls = cp.spawn(javaCommand, ["-version"]);
@@ -42,15 +42,14 @@ export async function getJavaVersion(javaCommand: string) {
       }
     });
     ls.on("close", (code: number) => {
-      const firstLine = text.split("\n")[0];
       if (code === 0) {
-        const major = toJavaMajor(firstLine);
+        const major = toJavaMajor(text);
         if (major) {
           resolve(major);
         } else {
           reject(
             new Error(
-              `Java version cannot be identified from first line "${firstLine}" retuned by Java command "${javaCommand}"`,
+              `Java version cannot be identified from the output of Java command "${javaCommand}"`,
             ),
           );
         }
