@@ -40,46 +40,39 @@ describe("Checks Java version", () => {
   });
 });
 
-describe("Checks Java installation", () => {
-  const expectedErrMsgSupportedJavaVersion =
-    "Minimum expected Java version is 8. Switching to native builds";
-  const expectedErrMsgJavaVersionNotFound =
-    "Java 8 not found. Switching to native builds";
-
-  it("when required version is supported", async () => {
+describe("Java version check", () => {
+  it("calling default command", async () => {
+    const spawn = mockSpawnProcess("", `java version "1.5.0_22"`, 0);
+    await getJavaVersion();
+    expect(spawn).toHaveBeenCalledWith("java", ["-version"]);
+  });
+  it("calling custom command", async () => {
+    const spawn = mockSpawnProcess("", `java version "1.5.0_22"`, 0);
+    await getJavaVersion("/user/defined/path/to/java");
+    expect(spawn).toHaveBeenCalledWith("/user/defined/path/to/java", [
+      "-version",
+    ]);
+  });
+  it("for version 11", async () => {
     mockSpawnProcess("", "java 11 2018-09-25", 0);
     const promise = getJavaVersion();
-    await expect(promise).resolves.toBeTruthy();
+    await expect(promise).resolves.toEqual(11);
   });
 
-  it("should skip not relevant lines", async () => {
+  it("should skip irrelevant lines", async () => {
     mockSpawnProcess(
       "",
       "Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava 11 2018-09-25",
       0,
     );
     const promise = getJavaVersion();
-    await expect(promise).resolves.toBeTruthy();
+    await expect(promise).resolves.toEqual(11);
   });
 
-  it("should skip not relevant lines and fail", async () => {
-    mockSpawnProcess(
-      "",
-      `Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava version "1.5.0_22"`,
-      0,
-    );
-    const promise = getJavaVersion();
-    await expect(promise).rejects.toEqual(
-      new Error(expectedErrMsgSupportedJavaVersion),
-    );
-  });
-
-  it("when required version is not supported", async () => {
+  it("for version 1.5", async () => {
     mockSpawnProcess("", `java version "1.5.0_22"`, 0);
     const promise = getJavaVersion();
-    await expect(promise).rejects.toEqual(
-      new Error(expectedErrMsgSupportedJavaVersion),
-    );
+    await expect(promise).resolves.toEqual(5);
   });
 
   it("when 'error' event is emitted  - spawned", async () => {
@@ -87,11 +80,11 @@ describe("Checks Java installation", () => {
     const promise = getJavaVersion();
 
     await expect(promise).rejects.toEqual(
-      new Error(expectedErrMsgJavaVersionNotFound),
+      new Error('Java command not found: "java".'),
     );
   });
 
-  it("when 'error' event is emitted  - not be spawned", async () => {
+  it("when 'error' event is emitted  - not spawned", async () => {
     const error = {
       code: "Other error",
     } as NodeJS.ErrnoException;
@@ -106,16 +99,7 @@ describe("Checks Java installation", () => {
     const promise = getJavaVersion();
 
     await expect(promise).rejects.toEqual(
-      new Error(
-        "An error occurred when checking if Java was installed. Switching to native build.",
-      ),
+      new Error('Non-zero return code 23 was returned by Java command "java".'),
     );
-  });
-
-  it("calling the correct command", async () => {
-    mockSpawnProcess("", `java version "1.5.0_22"`, 0);
-    const version = await getJavaVersion("/user/defined/path/to/java");
-    // expect that child-process spawn is called with "/user/defined/path/to/java" command
-    expect(version).toBe(false);
   });
 });
