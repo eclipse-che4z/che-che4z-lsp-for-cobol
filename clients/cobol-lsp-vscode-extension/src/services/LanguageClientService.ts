@@ -79,48 +79,38 @@ export class LanguageClientService {
       this.watchers,
     );
     if (state.port) {
-      const clientOrError = await startSocketServer(
+      const languageClient = await startSocketServer(
+        this.outputChannel,
         state.port,
         clientOptions,
         this.handlers,
       );
-      if (!(clientOrError instanceof Error)) {
-        this.languageClient = clientOrError;
+      if (languageClient) {
+        this.languageClient = languageClient;
         return;
       }
-      this.outputChannel.error(
-        `Failed to connect to language server via soket on port ${state.port}.`,
-        clientOrError,
-      );
     } else {
       if (state.preference === "JAVA") {
-        const clientOrError = await startJavaServer(
+        const languageClient = await startJavaServer(
+          this.outputChannel,
           state.java,
           clientOptions,
           this.handlers,
         );
-        if (!(clientOrError instanceof Error)) {
-          this.languageClient = clientOrError;
+        if (languageClient) {
+          this.languageClient = languageClient;
           return;
         }
-        this.outputChannel.error(
-          "Failed to start java language server.",
-          clientOrError,
-        );
       }
-      const clientOrError = await startNativeServer(
+      const languageClient = await startNativeServer(
         state.native,
         clientOptions,
         this.handlers,
       );
-      if (!(clientOrError instanceof Error)) {
-        this.languageClient = clientOrError;
+      if (languageClient) {
+        this.languageClient = languageClient;
         return;
       }
-      this.outputChannel.error(
-        "Failed to start native language server.",
-        clientOrError,
-      );
     }
     showInfo(state.preference, this.extensionId, state.port);
   }
@@ -207,7 +197,7 @@ export class LanguageClientService {
 }
 
 function getClientOptions(
-  outputChannel: vscode.OutputChannel,
+  outputChannel: vscode.LogOutputChannel,
   middleware: Middleware,
   fileEvents: vscode.FileSystemWatcher[],
 ): LanguageClientOptions {
