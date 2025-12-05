@@ -24,6 +24,8 @@ import {
   BaseLanguageClient,
   LanguageClientOptions,
   Middleware,
+  CloseAction,
+  ErrorAction,
 } from "vscode-languageclient";
 import {
   HP_LANGUAGE_ID,
@@ -36,6 +38,7 @@ import { startJavaServer } from "./languageClient/JavaServer";
 import { startNativeServer } from "./languageClient/NativeSever";
 import { ServerState } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
+import { CodeAction } from "../__mocks__/vscode";
 
 export class LanguageClientService {
   private languageClient: BaseLanguageClient | undefined;
@@ -207,6 +210,10 @@ function getClientOptions(
     outputChannel,
     synchronize: {
       fileEvents,
+    },
+    errorHandler: {
+      error: () => ({ action: ErrorAction.Shutdown }),
+      closed: () => ({ action: CloseAction.DoNotRestart }),
     },
   };
 }
