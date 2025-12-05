@@ -33,6 +33,8 @@ import {
   SETTINGS_MAXIMUM_VM_COUNT,
   PATHS_LOCAL_KEY,
   ANALYSIS_MODE,
+  JAVA_HOME,
+  SERVER_RUNTIME,
 } from "../constants";
 import {
   DialectRegistry,
@@ -271,6 +273,28 @@ export class SettingsService {
     return c.length === 0 ? undefined : c;
   }
 
+  /**
+   * Gives the configured runtime from settings.
+   *
+   * @returns returns configured runtime
+   */
+  public static getServerRuntime(): "NATIVE" | "JAVA" {
+    const runtime = vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
+    return runtime === "NATIVE" ? "NATIVE" : "JAVA"; // TODO add tests to make sure default matches package.json declaration
+  }
+
+  public static getJavaHome(): string | undefined {
+    return vscode.workspace.getConfiguration().get(JAVA_HOME);
+  }
+
+  public static getJavaCommand(): string {
+    const location = (SettingsService.getJavaHome() ?? "").trim();
+    if (location) {
+      return vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java")
+        .fsPath;
+    }
+    return "java";
+  }
   public static getCobolProgramLayout() {
     return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }

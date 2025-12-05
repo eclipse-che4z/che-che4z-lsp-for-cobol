@@ -14,10 +14,9 @@
 
 import * as vscode from "vscode";
 import { SERVER_RUNTIME } from "../../constants";
-import { SettingsService } from "../Settings";
 import { telemetryEvent } from "../reporter";
 import { clearDiagnostics } from "../ExternalAPIsService";
-import { getServerRuntime } from "../languageClient/ServerSettings";
+import { SettingsService } from "../Settings";
 
 export class ConfigurationWatcher {
   private static async restartVsCode() {
@@ -33,7 +32,7 @@ export class ConfigurationWatcher {
       telemetryEvent(
         "serverRuntime modified by user",
         ["COBOL", "serverRuntime", "settings"],
-        `Server type modified by user to ${getServerRuntime()}`,
+        `Server type modified by user to ${SettingsService.getServerRuntime()}`,
       );
       await vscode.commands.executeCommand("workbench.action.reloadWindow");
     }
@@ -42,7 +41,7 @@ export class ConfigurationWatcher {
   private prevRuntimeState: string;
 
   constructor() {
-    this.prevRuntimeState = getServerRuntime();
+    this.prevRuntimeState = SettingsService.getServerRuntime();
   }
 
   public watchConfigurationChanges() {
@@ -55,7 +54,7 @@ export class ConfigurationWatcher {
   }
 
   private async handleServerRuntimeConfigurationChange() {
-    const newServerRuntime = getServerRuntime();
+    const newServerRuntime = SettingsService.getServerRuntime();
     if (newServerRuntime !== this.prevRuntimeState) {
       await ConfigurationWatcher.restartVsCode();
     }

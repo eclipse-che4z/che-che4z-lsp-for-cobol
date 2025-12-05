@@ -38,7 +38,6 @@ import { startJavaServer } from "./languageClient/JavaServer";
 import { startNativeServer } from "./languageClient/NativeSever";
 import { ServerState } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
-import { CodeAction } from "../__mocks__/vscode";
 
 export class LanguageClientService {
   private languageClient: BaseLanguageClient | undefined;

@@ -78,7 +78,7 @@ import { DialectService } from "./dialect/DialectService";
 import { createSampleConfiguration } from "./commands/CreateSampleConfiguration";
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
 import { getCopybookCacheUris } from "./services/copybook/CopybookURI";
-import { make } from "./services/languageClient/ServerSettings";
+import { getServerState } from "./services/languageClient/ServerSettings";
 import { setupBridge4GitWatcher } from "./services/BridgeForGitLoader";
 import {
   setUpProcessorGroupConfigWatcher,
@@ -160,7 +160,7 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  const serverState = make(context.extensionUri); // TODO revisit this
+  const serverState = getServerState(context.extensionUri);
   await languageClientService.start(serverState);
 
   // 'export' public api-surface

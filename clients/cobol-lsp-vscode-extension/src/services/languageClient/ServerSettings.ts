@@ -1,12 +1,13 @@
 import * as vscode from "vscode";
 import * as os from "node:os";
-import { JAVA_HOME, SERVER_PORT, SERVER_RUNTIME } from "../../constants";
+import { SERVER_PORT } from "../../constants";
 import type { ServerState, JavaServer, NativeServer } from "./ServerTypes";
+import { SettingsService } from "../Settings";
 
-export const make = (extensionUri: vscode.Uri): ServerState => {
+export const getServerState = (extensionUri: vscode.Uri): ServerState => {
   const java: JavaServer = {
     kind: "JAVA",
-    command: getJavaCommand(),
+    command: SettingsService.getJavaCommand(),
     jar: getJavaServerUri(extensionUri),
     dialects: getJavaDialectsUri(extensionUri),
   };
@@ -17,7 +18,7 @@ export const make = (extensionUri: vscode.Uri): ServerState => {
 
   return {
     port: getLspPort(),
-    preference: getServerRuntime(),
+    preference: SettingsService.getServerRuntime(),
     java,
     native,
   };
@@ -32,28 +33,6 @@ function getLspPort(): number {
     return Number(vscode.workspace.getConfiguration().get(SERVER_PORT));
   }
   return 0;
-}
-
-/**
- * Gives the configured runtime from settings.
- *
- * @returns returns configured runtime
- */
-export function getServerRuntime(): "NATIVE" | "JAVA" {
-  const runtime = vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
-  return runtime === "NATIVE" ? "NATIVE" : "JAVA"; // TODO add tests to make sure default matches package.json declaration
-}
-
-function getJavaHome(): string | undefined {
-  return vscode.workspace.getConfiguration().get(JAVA_HOME);
-}
-
-function getJavaCommand(): string {
-  const location = (getJavaHome() ?? "").trim();
-  if (location) {
-    return vscode.Uri.joinPath(vscode.Uri.file(location), "bin", "java").fsPath;
-  }
-  return "java";
 }
 
 function getNativeServerUri(
