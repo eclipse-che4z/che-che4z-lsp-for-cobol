@@ -105,9 +105,8 @@ public class VisitorHelper {
       List<org.eclipse.lsp.cobol.core.CobolParser.DataPictureClauseContext> clauses) {
     List<String> list = new ArrayList<>(clauses.size());
     for (CobolParser.DataPictureClauseContext clause : clauses) {
-      if (clause.exception == null) {
-        list.add(clause.pictureString().getText());
-      }
+      final PictureStringContext picture = clause.pictureString();
+      if (picture != null) list.add(clause.pictureString().getText());
     }
     return list;
   }
