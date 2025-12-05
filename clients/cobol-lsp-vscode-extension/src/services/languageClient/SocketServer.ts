@@ -6,18 +6,17 @@ import {
   ServerOptions,
   StreamInfo,
 } from "vscode-languageclient/node";
-import type { SocketServer } from "./ServerSettings";
 import { LANGUAGE_ID } from "../../constants";
 
-export async function startNativeServer(
-  server: SocketServer,
+export async function startSocketServer(
+  port: number,
   clientOptions: LanguageClientOptions,
   handlers: Array<(languageClient: LanguageClient) => void> = [],
 ): Promise<LanguageClient | Error> {
   const serverOptions: ServerOptions = () => {
     const socket = net.connect({
       host: "localhost",
-      port: server.port,
+      port,
     });
     const streamInfo: StreamInfo = {
       reader: socket,
@@ -41,7 +40,7 @@ export async function startNativeServer(
     await languageClient.dispose();
     return new AggregateError(
       [e],
-      `Failed starting language client with socket server: ${JSON.stringify(server)}`,
+      `Failed starting language client with socket server at localhost:${port}`,
     );
   }
 

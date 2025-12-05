@@ -4,7 +4,7 @@ import {
   LanguageClientOptions,
   ServerOptions,
 } from "vscode-languageclient/node";
-import type { NativeServer } from "./ServerSettings";
+import type { NativeServer } from "./ServerTypes";
 import { LANGUAGE_ID } from "../../constants";
 
 export async function startNativeServer(
@@ -38,7 +38,6 @@ export async function startNativeServer(
   try {
     await languageClient.start();
   } catch (e) {
-    await languageClient.dispose();
     return new AggregateError(
       [e],
       `Failed starting language client with native server: ${JSON.stringify(server)}`,

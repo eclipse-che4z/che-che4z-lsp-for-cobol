@@ -3,7 +3,7 @@ import {
   LanguageClientOptions,
   ServerOptions,
 } from "vscode-languageclient/node";
-import type { JavaServer } from "./ServerSettings";
+import type { JavaServer } from "./ServerTypes";
 import { LANGUAGE_ID } from "../../constants";
 import { getJavaVersion } from "../JavaCheck";
 import { MINIMUM_JAVA_VERSION } from "../../constants";
@@ -52,7 +52,6 @@ export async function startJavaServer(
   try {
     await languageClient.start();
   } catch (e) {
-    await languageClient.dispose();
     return new AggregateError(
       [e],
       `Failed starting language client with java server: ${JSON.stringify(server)}`,

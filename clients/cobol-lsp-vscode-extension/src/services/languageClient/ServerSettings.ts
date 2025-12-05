@@ -1,43 +1,38 @@
 import * as vscode from "vscode";
 import * as os from "node:os";
-import { JAVA_HOME, SERVER_RUNTIME } from "../../constants";
+import { JAVA_HOME, SERVER_PORT, SERVER_RUNTIME } from "../../constants";
+import type { ServerState, JavaServer, NativeServer } from "./ServerTypes";
 
-export interface NativeServer {
-  kind: "NATIVE";
-  command: vscode.Uri;
-}
-export interface JavaServer {
-  kind: "JAVA";
-  command: string;
-  jar: vscode.Uri;
-  dialects: vscode.Uri;
-}
-export interface SocketServer {
-  kind: "SOCKET";
-  port: number;
-}
-export type Server = NativeServer | JavaServer | SocketServer;
+export const make = (extensionUri: vscode.Uri): ServerState => {
+  const java: JavaServer = {
+    kind: "JAVA",
+    command: getJavaCommand(),
+    jar: getJavaServerUri(extensionUri),
+    dialects: getJavaDialectsUri(extensionUri),
+  };
+  const native: NativeServer = {
+    kind: "NATIVE",
+    command: getNativeServerUri(extensionUri),
+  };
 
-export const make = (extensionUri: vscode.Uri): Server => {
-  const runtime = getServerRuntime();
-  switch (runtime) {
-    case "JAVA":
-      return {
-        kind: "JAVA",
-        command: getJavaCommand(),
-        jar: getJavaServerUri(extensionUri),
-        dialects: getJavaDialectsUri(extensionUri),
-      };
-    case "NATIVE":
-      return {
-        kind: "NATIVE",
-        command: getNativeServerUri(extensionUri),
-      };
-    default: //Type guard
-      const _exhaustiveCheck: never = runtime;
-      throw Error(_exhaustiveCheck);
-  }
+  return {
+    port: getLspPort(),
+    preference: getServerRuntime(),
+    java,
+    native,
+  };
 };
+
+/**
+ * Get Lsp Port from configuration
+ * @returns lsp port number
+ */
+function getLspPort(): number {
+  if (vscode.workspace.getConfiguration().get(SERVER_PORT)) {
+    return Number(vscode.workspace.getConfiguration().get(SERVER_PORT));
+  }
+  return 0;
+}
 
 /**
  * Gives the configured runtime from settings.

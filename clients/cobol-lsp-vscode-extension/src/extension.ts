@@ -114,6 +114,7 @@ export async function activate(
   let externalApis: ExternalAPIsService | undefined = undefined;
 
   const languageClientService = initializeLanguageClientService(
+    context.extension.id,
     context.globalStorageUri,
     externalApis,
   );
@@ -158,8 +159,8 @@ export async function activate(
   // const configurationWatcher = new ConfigurationWatcher();
   // configurationWatcher.watchConfigurationChanges();
 
-  const server = make(context.extensionUri); // TODO revisit this
-  await languageClientService.start(server);
+  const serverState = make(context.extensionUri); // TODO revisit this
+  await languageClientService.start(serverState);
 
   // 'export' public api-surface
   return {
@@ -239,6 +240,7 @@ async function createExtensionStrorageFolder(extensionStroageUri: vscode.Uri) {
 }
 
 function initializeLanguageClientService(
+  extensionId: string,
   globalStorageUri: vscode.Uri,
   externalApis: ExternalAPIsService | undefined,
 ) {
@@ -252,6 +254,7 @@ function initializeLanguageClientService(
     },
   };
   const languageClientService = new LanguageClientService(
+    extensionId,
     outputChannel,
     copybookCacheLocations,
     middleware,
