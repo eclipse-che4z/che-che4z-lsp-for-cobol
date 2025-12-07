@@ -12,53 +12,36 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as fs from "fs";
-import * as os from "os";
-import { join } from "path";
-import * as vscode from "vscode";
-import { Middleware, LanguageClient } from "vscode-languageclient/node";
-import { JavaCheck } from "../../services/JavaCheck";
+import type {
+  JavaServer,
+  SocketServer,
+} from "../../services/languageClient/ServerTypes";
+
 import { LanguageClientService } from "../../services/LanguageClientService";
-import { NativeExecutableService } from "../../services/nativeLanguageClient/nativeExecutableService";
-import { Utils } from "../../services/util/Utils";
-import { EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
-import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
-import { getErrorMessage } from "../../services/util/ErrorsUtils";
-import { telemetryEvent } from "../../services/reporter";
+import { LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { outputChannel } from "../../services/util/OutputChannel";
-import { SettingsService } from "../../services/Settings";
 
-jest.mock("../../services/reporter");
-jest.mock("../../services/copybook/CopybookURI");
-jest.mock("../../services/BridgeForGitLoader");
-jest.mock("../../services/ProcessorGroups");
-
-jest.mock("vscode", () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return {
-    ...jest.requireActual("../../__mocks__/vscode"),
-    extensions: {
-      getExtension: jest.fn().mockReturnValue({ extensionPath: "/test" }),
-    },
-  };
-});
+import * as vscode from "vscode";
+import * as JavaCheck from "../../services/JavaCheck";
+import { Middleware, LanguageClient } from "vscode-languageclient/node";
 
 jest.mock("vscode-languageclient/node", () => ({
   LanguageClient: jest.fn(),
+  State: { Stopped: 1 },
 }));
+LanguageClient.prototype.createDefaultErrorHandler = jest.fn();
+LanguageClient.prototype.start = jest
+  .fn()
+  .mockReturnValue(Promise.resolve({ state: 1 }));
 
-const context = {
-  extension: {
-    id: "Publisher.Extension-Name",
-  },
-} as unknown as vscode.ExtensionContext;
+const SERVER_NAME = "COBOL Language Support";
 
-Utils.getZoweExplorerAPI = jest.fn();
-let languageClientService: LanguageClientService;
-let middleware: Middleware;
-
-const SERVER_DESC = "LSP extension for COBOL language";
-const SERVER_ID = "cobol";
+const javaServer: JavaServer = {
+  kind: "JAVA",
+  command: "/test/bin/java",
+  dialects: vscode.Uri.file("/test/dialectsFolder"),
+  jar: vscode.Uri.file("/test/server/server.jar"),
+};
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -67,170 +50,45 @@ beforeEach(() => {
 
 const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
+  let languageClientService: LanguageClientService;
+  let middleware: Middleware;
+
   beforeEach(() => {
     middleware = {};
     languageClientService = new LanguageClientService(
+      "Publisher.Extension-Name",
       outputChannel,
-      vscode.Uri.file("/storagePath"),
+      [vscode.Uri.file("/storagePath")],
       middleware,
     );
-    new JavaCheck().getInstalledJavaVersion = jest.fn().mockResolvedValue(17);
-  });
 
-  test("Test LanguageClientService switches native flag", () => {
-    jest.spyOn(fs, "existsSync").mockReturnValue(true);
-    languageClientService.enableNativeBuild();
-
-    expect(telemetryEvent).toHaveBeenCalledWith(
-      "Native Build enabled",
-      ["COBOL", "native build enabled", "settings"],
-      "Native build enabled",
-    );
-    expect(languageClientService["isNativeBuildEnabled"]).toBeTruthy();
-  });
-
-  test("Test LanguageClientService checkPrerequisites passes", async () => {
-    let message: string | null = null;
-
-    const mockProcess = mockSpawnProcess(
-      "",
-      `java version "17.0.2" 2022-01-18 LTS
-      Java(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)
-      Java HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)`,
-      0,
-    );
-
-    try {
-      await languageClientService.checkPrerequisites();
-    } catch (error: unknown) {
-      if (typeof error === "string") {
-        message = error;
-      }
-    }
-    expect(message).toBeNull();
-    mockProcess.mockRestore();
-  });
-
-  test("Test LanguageClientService checkPrerequisites fails - java is not installed", async () => {
-    let message: string | null = null;
-
-    const mockProcess = mockSpawnProcess(
-      "",
-      `The operation couldn’t be completed. Unable to locate a Java Runtime.
-      Please visit http://www.java.com for information on installing Java.`,
-      1,
-    );
-
-    try {
-      await languageClientService.checkPrerequisites();
-    } catch (error) {
-      message = getErrorMessage(error);
-    }
-    expect(message).toEqual(
-      "An error occurred when checking if Java was installed. Switching to native build.",
-    );
-
-    mockProcess.mockRestore();
-  });
-
-  test("Test LanguageClientService checkPrerequisites fails - old java version", async () => {
-    let message: string | null = null;
-
-    const mockProcess = mockSpawnProcess(
-      "",
-      `java version "1.6.0_45"
-      Java(TM) SE Runtime Environment (build 1.6.0_45-b06)
-      Java HotSpot(TM) 64-Bit Server VM (build 20.45-b01, mixed mode)`,
-      0,
-    );
-
-    try {
-      await languageClientService.checkPrerequisites();
-    } catch (error: unknown) {
-      message = getErrorMessage(error);
-    }
-    expect(message).toEqual(
-      "Minimum expected Java version is 8. Switching to native builds",
-    );
-
-    mockProcess.mockRestore();
-  });
-
-  test("Test LanguageClientService retrieve analysis passes", async () => {
-    const expectedResult = { programs: [] };
-
-    LanguageClient.prototype.sendRequest = () =>
-      Promise.resolve(expectedResult);
-    expect(
-      await languageClientService.retrieveAnalysis(
-        "test",
-        "text",
-        new vscode.Position(0, 0),
-      ),
-    ).toBe(expectedResult);
+    jest.spyOn(JavaCheck, "getJavaVersion").mockResolvedValue(17);
   });
 
   test("Test LanguageClientService starts language client", async () => {
-    LanguageClient.prototype.start = jest
-      .fn()
-      .mockReturnValue(Promise.resolve());
-    const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
-    expect(await languageClientService.start(context)).toBe(undefined);
+    const expectedCommand = "/test/bin/java";
+    const expectedJarPath = "/test/server/server.jar";
+    const expectedDialectPath = "/test/dialectsFolder";
+
+    expect(await languageClientService.start([javaServer])).toBe(undefined);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
-      SERVER_ID,
-      SERVER_DESC,
+      LANGUAGE_ID,
+      SERVER_NAME,
       {
         args: [
           "-Dline.separator=\r\n",
           `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-jar",
-          serverPath,
+          expectedJarPath,
           "pipeEnabled",
         ],
-        command: "java",
+        command: expectedCommand,
         options: { detached: false },
       },
       {
-        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
-        middleware: {},
-        outputChannel: outputChannel,
-        synchronize: {
-          fileEvents: [undefined, undefined, undefined, undefined],
-        },
-      },
-    );
-  });
-
-  test("Test LanguageClientService starts language server with java location provided", async () => {
-    LanguageClient.prototype.start = jest
-      .fn()
-      .mockReturnValue(Promise.resolve());
-    const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
-    SettingsService.getJavaHome = jest.fn().mockReturnValue("/usr/");
-
-    expect(await languageClientService.start(context)).toBe(undefined);
-    expect(LanguageClient).toHaveBeenCalledTimes(1);
-    expect(LanguageClient).toHaveBeenCalledWith(
-      SERVER_ID,
-      SERVER_DESC,
-      {
-        args: [
-          "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
-          "-Xmx768M",
-          "-jar",
-          serverPath,
-          "pipeEnabled",
-        ],
-        command: `${vscode.Uri.joinPath(vscode.Uri.file("usr"), "bin", "java").fsPath}`,
-        options: { detached: false },
-      },
-      {
-        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         middleware: {},
         outputChannel: outputChannel,
         synchronize: {
@@ -241,20 +99,20 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("LanguageClientService starts the language server when port is provided", async () => {
-    new JavaCheck().getInstalledJavaVersion = jest.fn().mockResolvedValue(17);
     vscode.workspace.getConfiguration().get = jest.fn().mockReturnValue(9999);
-    LanguageClient.prototype.start = jest
-      .fn()
-      .mockReturnValue(Promise.resolve());
-    expect(await languageClientService.start(context)).toBe(undefined);
+    const socketServer: SocketServer = {
+      kind: "SOCKET",
+      port: 8192,
+    };
+    expect(await languageClientService.start([socketServer])).toBe(undefined);
     expect(LanguageClient).toHaveBeenLastCalledWith(
-      SERVER_ID,
-      SERVER_DESC,
-      expect.any(Object),
+      LANGUAGE_ID,
+      SERVER_NAME,
+      expect.any(Function),
       {
-        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         middleware: {},
-        outputChannel: outputChannel,
+        outputChannel,
         synchronize: {
           fileEvents: [undefined, undefined, undefined, undefined],
         },
@@ -262,81 +120,28 @@ describe("LanguageClientService positive scenario", () => {
     );
   });
 
+  test("Test LanguageClientService retrieve analysis passes", async () => {
+    const expectedResult = { programs: [] };
+    LanguageClient.prototype.sendRequest = () =>
+      Promise.resolve(expectedResult);
+
+    expect(await languageClientService.start([javaServer])).toBe(undefined);
+    expect(
+      await languageClientService.retrieveAnalysis(
+        "test",
+        "text",
+        new vscode.Position(0, 0),
+      ),
+    ).toBe(expectedResult);
+  });
+
   test("Test LanguageClientService fire a dispose() command on LanguageClient", async () => {
     LanguageClient.prototype.dispose = jest
       .fn()
       .mockReturnValue(SERVER_STOPPED_MSG);
     // start the server, before shutdown.
-    await languageClientService.start(context);
+    await languageClientService.start([javaServer]);
     const returnedValue = await languageClientService.dispose();
     expect(returnedValue).toBe(SERVER_STOPPED_MSG);
-  });
-
-  test("LanguageClientServer detects executable path for windows", () => {
-    const spy = jest.spyOn(os, "type");
-    spy.mockReturnValue("Windows_NT");
-    languageClientService["executableService"] = new NativeExecutableService(
-      "C:\\test",
-    );
-    const executable =
-      languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable?.command).toBe("engine.exe");
-    expect(executable?.options?.cwd).toBe(join("C:\\test", "native"));
-  });
-
-  test("LanguageClientServer detects executable path for Linux", () => {
-    const spy = jest.spyOn(os, "type");
-    spy.mockReturnValue("Linux");
-    languageClientService["executableService"] = new NativeExecutableService(
-      "/test",
-    );
-    const executable =
-      languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable?.command).toBe("./server-linux");
-    expect(executable?.options?.cwd).toBe(join("/test", "native"));
-  });
-
-  test("LanguageClientServer detects executable path for Mac", () => {
-    const spy = jest.spyOn(os, "type");
-    spy.mockReturnValue("Darwin");
-    languageClientService["executableService"] = new NativeExecutableService(
-      "/test",
-    );
-    const executable =
-      languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable?.command).toBe("./server-mac");
-    expect(executable?.options?.cwd).toBe(join("/test", "native"));
-  });
-
-  test("LanguageClientServer detects executable path for unKnown OS", () => {
-    const spy = jest.spyOn(os, "type");
-    spy.mockReturnValue("Android");
-    languageClientService["executableService"] = new NativeExecutableService(
-      "/test",
-    );
-    const executable =
-      languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable).toBeFalsy();
-  });
-});
-
-describe("LanguageClientService negative scenario.", () => {
-  test("LSP port not defined and jar path doesn't exists", async () => {
-    const mockProcess = mockSpawnProcess(
-      "",
-      `java version "17.0.2" 2022-01-18 LTS\nJava(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)\n`,
-      0,
-    );
-    jest.spyOn(fs, "existsSync").mockReturnValue(false);
-    try {
-      await new LanguageClientService(
-        outputChannel,
-        vscode.Uri.file("/storagePath"),
-        middleware,
-      ).checkPrerequisites();
-    } catch (error) {
-      expect(error).toStrictEqual(new Error("LSP server for cobol not found"));
-    }
-    mockProcess.mockRestore();
   });
 });

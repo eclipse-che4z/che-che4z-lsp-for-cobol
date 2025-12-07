@@ -1,27 +1,43 @@
 import * as vscode from "vscode";
 import * as os from "node:os";
 import { SERVER_PORT } from "../../constants";
-import type { ServerState, JavaServer, NativeServer } from "./ServerTypes";
+import type { Server } from "./ServerTypes";
 import { SettingsService } from "../Settings";
 
-export const getServerState = (extensionUri: vscode.Uri): ServerState => {
-  const java: JavaServer = {
-    kind: "JAVA",
-    command: SettingsService.getJavaCommand(),
-    jar: getJavaServerUri(extensionUri),
-    dialects: getJavaDialectsUri(extensionUri),
-  };
-  const native: NativeServer = {
-    kind: "NATIVE",
-    command: getNativeServerUri(extensionUri),
-  };
-
-  return {
-    port: getLspPort(),
-    preference: SettingsService.getServerRuntime(),
-    java,
-    native,
-  };
+export const getServers = (extensionUri: vscode.Uri): Server[] => {
+  const port = getLspPort();
+  if (port) {
+    return [
+      {
+        kind: "SOCKET",
+        port,
+      },
+    ];
+  }
+  const servers: Server[] = [];
+  {
+    const command = getJavaCommand();
+    const jar = getJavaServerUri(extensionUri);
+    const dialects = getJavaDialectsUri(extensionUri);
+    if (command && jar && dialects) {
+      servers.push({
+        kind: "JAVA",
+        command,
+        jar,
+        dialects,
+      });
+    }
+  }
+  {
+    const command = getNativeServerUri(extensionUri);
+    if (command) {
+      servers.push({
+        kind: "NATIVE",
+        command,
+      });
+    }
+  }
+  return servers;
 };
 
 /**
@@ -39,7 +55,7 @@ function getNativeServerUri(
   extensionUri: vscode.Uri,
   osType: string = os.type(),
 ) {
-  let fileName: string = "server-unknown";
+  let fileName: string;
   switch (osType) {
     case "Windows_NT":
       fileName = "engine.exe";
@@ -50,6 +66,8 @@ function getNativeServerUri(
     case "Linux":
       fileName = "server-linux";
       break;
+    default:
+      fileName = "server-unknown";
   }
 
   return vscode.Uri.joinPath(extensionUri, "server", "native", fileName);
@@ -61,4 +79,8 @@ function getJavaServerUri(extensionUri: vscode.Uri) {
 
 function getJavaDialectsUri(extensionUri: vscode.Uri) {
   return vscode.Uri.joinPath(extensionUri, "server", "jar", "dialects");
+}
+
+function getJavaCommand() {
+  return SettingsService.getJavaCommand();
 }

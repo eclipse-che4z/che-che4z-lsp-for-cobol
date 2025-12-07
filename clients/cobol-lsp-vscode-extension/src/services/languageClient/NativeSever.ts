@@ -7,9 +7,9 @@ import {
 } from "vscode-languageclient/node";
 import type { NativeServer } from "./ServerTypes";
 import { LANGUAGE_ID } from "../../constants";
-import { outputChannel } from "../util/OutputChannel";
 
 export async function startNativeServer(
+  outputChannel: vscode.LogOutputChannel,
   server: NativeServer,
   clientOptions: LanguageClientOptions,
   handlers: Array<(languageClient: LanguageClient) => void> = [],

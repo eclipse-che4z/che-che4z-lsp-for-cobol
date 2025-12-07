@@ -26,7 +26,7 @@ import {
   Middleware,
   CloseAction,
   ErrorAction,
-} from "vscode-languageclient";
+} from "vscode-languageclient/node";
 import {
   HP_LANGUAGE_ID,
   EXP_LANGUAGE_ID,
@@ -36,13 +36,16 @@ import {
 import { localCopybooks } from "./copybookLibs/LocalPathLib";
 import { startJavaServer } from "./languageClient/JavaServer";
 import { startNativeServer } from "./languageClient/NativeSever";
-import { ServerState } from "./languageClient/ServerTypes";
+import { Server } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
+import { outputChannel } from "./util/OutputChannel";
+
+type Handler = (languageClient: BaseLanguageClient) => void;
 
 export class LanguageClientService {
   private languageClient: BaseLanguageClient | undefined;
   private watchers: vscode.FileSystemWatcher[];
-  private handlers: Array<(languageClient: BaseLanguageClient) => void> = [];
+  private handlers: Handler[] = [];
 
   constructor(
     private readonly extensionId: string,
@@ -74,38 +77,20 @@ export class LanguageClientService {
     );
   }
 
-  public async start(state: ServerState) {
+  public async start(servers: Server[]) {
+    if (!servers.length) {
+      this.outputChannel.error("No server to start");
+      return;
+    }
     const clientOptions = getClientOptions(
       this.outputChannel,
       this.middleware,
       this.watchers,
     );
-    if (state.port) {
-      const languageClient = await startSocketServer(
+    for (const server of servers) {
+      const languageClient = await startServer(
         this.outputChannel,
-        state.port,
-        clientOptions,
-        this.handlers,
-      );
-      if (languageClient) {
-        this.languageClient = languageClient;
-        return;
-      }
-    } else {
-      if (state.preference === "JAVA") {
-        const languageClient = await startJavaServer(
-          this.outputChannel,
-          state.java,
-          clientOptions,
-          this.handlers,
-        );
-        if (languageClient) {
-          this.languageClient = languageClient;
-          return;
-        }
-      }
-      const languageClient = await startNativeServer(
-        state.native,
+        server,
         clientOptions,
         this.handlers,
       );
@@ -114,7 +99,7 @@ export class LanguageClientService {
         return;
       }
     }
-    showInfo(state.preference, this.extensionId, state.port);
+    void showInfo(servers, this.extensionId);
   }
 
   public dispose() {
@@ -217,25 +202,74 @@ function getClientOptions(
   };
 }
 
-function showInfo(
-  serverType: "SOCKET" | "JAVA" | "NATIVE",
-  extensionId: string,
-  port: number,
-) {
-  const message =
-    serverType === "NATIVE"
-      ? "Native Server Runtime failed to start. Select Java Server Runtime in the extension settings and reload VS Code"
-      : serverType === "JAVA"
-        ? `Both Java and Native Server Runtimes failed to start. Ensure that the Java runtime specified in the Java Home setting is version ${MINIMUM_JAVA_VERSION} or later`
-        : `Failed connecting to language server through socket on localhost:${port}`;
-  vscode.window
-    .showInformationMessage(message, "Settings")
-    .then((selection) => {
-      if (selection === "Settings") {
-        vscode.commands.executeCommand(
-          "workbench.action.openSettings",
-          `@ext:${extensionId}`,
-        );
+async function startServer(
+  outputChannel: vscode.LogOutputChannel,
+  server: Server,
+  clientOptions: LanguageClientOptions,
+  handlers: Handler[],
+): Promise<BaseLanguageClient | undefined> {
+  switch (server.kind) {
+    case "SOCKET":
+      return await startSocketServer(
+        outputChannel,
+        server.port,
+        clientOptions,
+        handlers,
+      );
+    case "JAVA":
+      return await startJavaServer(
+        outputChannel,
+        server,
+        clientOptions,
+        handlers,
+      );
+    case "NATIVE":
+      return startNativeServer(outputChannel, server, clientOptions, handlers);
+    default: {
+      const exhaustiveCheck: never = server;
+      throw new Error(exhaustiveCheck);
+    }
+  }
+}
+
+async function showInfo(failed: Server[], extensionId: string) {
+  const messages = failed.map((server) => {
+    switch (server.kind) {
+      case "SOCKET":
+        return `Failed connecting to language server through socket on localhost:${server.port}.`;
+      case "JAVA":
+        return `Java language server failed to start.`;
+      case "NATIVE":
+        return `Native language server failed to start.`;
+      default: {
+        const exhaustiveCheck: never = server;
+        throw new Error(exhaustiveCheck);
       }
-    });
+    }
+  });
+  if (failed.some((server) => server.kind == "JAVA")) {
+    messages.push(
+      `Ensure that the Java runtime specified in the Java Home setting is version ${MINIMUM_JAVA_VERSION} or later.`,
+    );
+  } else if (failed.some((server) => server.kind == "NATIVE")) {
+    messages.push(
+      "Select Java Server Runtime in the extension settings and reload VS Code.",
+    );
+  }
+  const selection = await vscode.window.showInformationMessage(
+    messages.join("\n"),
+    "Settings",
+    "Go to output",
+  );
+  switch (selection) {
+    case "Settings":
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        `@ext:${extensionId}`,
+      );
+      break;
+    case "Go to output":
+      outputChannel.show();
+      break;
+  }
 }
