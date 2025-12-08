@@ -24,23 +24,23 @@ import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test verifies that unknown currency symbols trigger diagnostic messages rather than causing
- * a null pointer exception.
+ * This test verifies that unknown PIC definitions trigger diagnostic messages rather than causing a
+ * null pointer exception. In this case below, PIC =(10)9.99-, with equal symbol.
  */
-class TestPoundSymbol {
+class TestUnexpectedPICDefinition {
 
   private static final String TEXT =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. TEST1.\n"
           + "       DATA DIVISION.\n"
           + "       WORKING-STORAGE SECTION.\n"
-          + "       01  {$*VRB|1} PIC {£|2}(10)9.99-.\n"
+          + "       01  {$*VRB|1} PIC {=|2}(10)9.99-.\n"
           + "       PROCEDURE DIVISION.\n"
           + "           STOP RUN.";
 
   private static final String MESSAGE1 =
       "A \"PICTURE\" or \"USAGE INDEX\" clause was not found for elementary item VRB";
-  private static final String MESSAGE2 = "Syntax error on '£'";
+  private static final String MESSAGE2 = "Syntax error on '='";
 
   @Test
   void test() {
