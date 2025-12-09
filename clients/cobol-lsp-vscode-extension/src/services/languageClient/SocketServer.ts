@@ -1,6 +1,5 @@
-import * as vscode from "vscode";
 import * as net from "node:net";
-
+import { outputChannel } from "../util/OutputChannel";
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -11,10 +10,9 @@ import {
 import { LANGUAGE_ID } from "../../constants";
 
 export async function startSocketServer(
-  outputChannel: vscode.LogOutputChannel,
   port: number,
   clientOptions: LanguageClientOptions,
-  handlers: Array<(languageClient: LanguageClient) => void> = [],
+  handlers: Array<(languageClient: LanguageClient) => void>,
 ): Promise<LanguageClient | undefined> {
   const serverOptions: ServerOptions = () => {
     const socket = net.connect({

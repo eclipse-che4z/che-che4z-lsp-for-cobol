@@ -1,4 +1,4 @@
-import type * as vscode from "vscode";
+import { outputChannel } from "../util/OutputChannel";
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -12,10 +12,9 @@ import { MINIMUM_JAVA_VERSION } from "../../constants";
 import { telemetryEvent } from "../reporter";
 
 export async function startJavaServer(
-  outputChannel: vscode.LogOutputChannel,
   server: JavaServer,
   clientOptions: LanguageClientOptions,
-  handlers: Array<(languageClient: LanguageClient) => void> = [],
+  handlers: Array<(languageClient: LanguageClient) => void>,
 ): Promise<LanguageClient | undefined> {
   let major: number;
   try {

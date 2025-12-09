@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { outputChannel } from "../util/OutputChannel";
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -9,10 +10,9 @@ import type { NativeServer } from "./ServerTypes";
 import { LANGUAGE_ID } from "../../constants";
 
 export async function startNativeServer(
-  outputChannel: vscode.LogOutputChannel,
   server: NativeServer,
   clientOptions: LanguageClientOptions,
-  handlers: Array<(languageClient: LanguageClient) => void> = [],
+  handlers: Array<(languageClient: LanguageClient) => void>,
 ): Promise<LanguageClient | undefined> {
   const serverOptions: ServerOptions = {
     command: server.command.fsPath,

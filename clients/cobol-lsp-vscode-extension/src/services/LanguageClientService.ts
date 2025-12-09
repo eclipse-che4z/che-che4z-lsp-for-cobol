@@ -18,12 +18,12 @@ import {
   DidChangeConfigurationNotification,
   DidChangeWatchedFilesNotification,
   FileChangeType,
-  FileEvent,
+  type FileEvent,
   GenericNotificationHandler,
   GenericRequestHandler,
-  BaseLanguageClient,
+  type LanguageClient,
   LanguageClientOptions,
-  Middleware,
+  type Middleware,
   CloseAction,
   ErrorAction,
 } from "vscode-languageclient/node";
@@ -40,10 +40,10 @@ import { Server } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
 import { outputChannel } from "./util/OutputChannel";
 
-type Handler = (languageClient: BaseLanguageClient) => void;
+type Handler = (languageClient: LanguageClient) => void;
 
 export class LanguageClientService {
-  private languageClient: BaseLanguageClient | undefined;
+  private languageClient: LanguageClient | undefined;
   private watchers: vscode.FileSystemWatcher[];
   private handlers: Handler[] = [];
 
@@ -207,24 +207,14 @@ async function startServer(
   server: Server,
   clientOptions: LanguageClientOptions,
   handlers: Handler[],
-): Promise<BaseLanguageClient | undefined> {
+): Promise<LanguageClient | undefined> {
   switch (server.kind) {
     case "SOCKET":
-      return await startSocketServer(
-        outputChannel,
-        server.port,
-        clientOptions,
-        handlers,
-      );
+      return await startSocketServer(server.port, clientOptions, handlers);
     case "JAVA":
-      return await startJavaServer(
-        outputChannel,
-        server,
-        clientOptions,
-        handlers,
-      );
+      return await startJavaServer(server, clientOptions, handlers);
     case "NATIVE":
-      return startNativeServer(outputChannel, server, clientOptions, handlers);
+      return startNativeServer(server, clientOptions, handlers);
     default: {
       const exhaustiveCheck: never = server;
       throw new Error(exhaustiveCheck);
