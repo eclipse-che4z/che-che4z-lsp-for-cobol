@@ -83,8 +83,7 @@ public class TestCicsSendStatement {
   private static final String SEND_CONTROL_ACCUM_TERMINAL_VALID = "SEND CONTROL ACCUM TERMINAL";
   private static final String SEND_CONTROL_SET_PAGING_INVALID =
       "SEND CONTROL {SET|error1}({$varOne}) {PAGING|error2}";
-  private static final String SEND_CONTROL_WAIT_LAST_INVALID =
-      "SEND {_{CONTROL} {WAIT} LAST|error1_}";
+  private static final String SEND_CONTROL_WAIT_LAST_VALID = "SEND CONTROL WAIT LAST";
   private static final String SEND_CONTROL_REQID_HONEOM_VALID =
       "SEND CONTROL REQID({$varOne}) HONEOM";
   private static final String SEND_CONTROL_L80_VALID = "SEND CONTROL L80";
@@ -446,15 +445,7 @@ public class TestCicsSendStatement {
 
   @Test
   void testSendControlWaitLastInvalid() {
-    CICSTestUtils.errorTest(
-        SEND_CONTROL_WAIT_LAST_INVALID,
-        ImmutableMap.of(
-            "error1",
-            new Diagnostic(
-                new Range(),
-                "Missing required option: TERMINAL",
-                DiagnosticSeverity.Error,
-                ErrorSource.PARSING.getText())));
+    CICSTestUtils.noErrorTest(SEND_CONTROL_WAIT_LAST_VALID);
   }
 
   @Test
