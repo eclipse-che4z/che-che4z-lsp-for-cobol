@@ -19,14 +19,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
 import org.eclipse.lsp.cobol.common.pipeline.StageResult;
@@ -65,7 +69,9 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     CobolParser.StartRuleContext tree = parser.runParser();
     context.getAccumulatedErrors().addAll(listener.getErrors());
     context.getAccumulatedErrors().addAll(getParsingError(context, parser));
-    return new StageResult<>(new ParserStageResult(parser.getTokens(), tree));
+    final CommonTokenStream tokenStream = parser.getTokens();
+    appendUnknownExecHint(context, tokenStream.getTokens());
+    return new StageResult<>(new ParserStageResult(tokenStream, tree));
   }
 
   private List<SyntaxError> getParsingError(AnalysisContext context, AstBuilder parser) {
@@ -83,6 +89,31 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
                   .build();
             })
         .collect(Collectors.toList());
+  }
+
+  private void appendUnknownExecHint(AnalysisContext context, List<Token> tokens) {
+    tokens.stream()
+        .filter(t -> t.getType() == CobolLexer.UNKNOWN_EXEC)
+        .map(t -> unknownExecMessage(context, t))
+        .forEach(context.getAccumulatedErrors()::add);
+  }
+
+  private static SyntaxError unknownExecMessage(AnalysisContext context, Token t) {
+    final boolean error = t.getChannel() == CobolLexer.HIDDEN_ERROR;
+    final ErrorSeverity severity = error ? ErrorSeverity.ERROR : ErrorSeverity.HINT;
+    final String messageTemplateName =
+        error ? "cobolParser.unknownExecBlockUnterminated" : "cobolParser.unknownExecBlock";
+
+    Location location =
+        context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(t));
+    String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
+
+    return SyntaxError.syntaxError()
+        .errorSource(ErrorSource.PARSING)
+        .severity(severity)
+        .location(new OriginalLocation(location, copybookId))
+        .messageTemplate(MessageTemplate.of(messageTemplateName))
+        .build();
   }
 
   @Override

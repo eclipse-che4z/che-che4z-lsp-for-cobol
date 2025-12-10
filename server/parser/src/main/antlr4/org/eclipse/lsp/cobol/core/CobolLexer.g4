@@ -19,7 +19,7 @@ lexer grammar CobolLexer;
     import java.util.ArrayList;
 }
 
-channels{COMMENTS, TECHNICAL}
+channels{COMMENTS, TECHNICAL, HIDDEN_ERROR}
 @lexer::members {
    boolean enableCobolSpecialSeparators = true;
    public static final List<Integer> cobolVerbTokens = new ArrayList()
@@ -869,6 +869,14 @@ DIALECT_IF: UNDERSCORECHAR I F UNDERSCORECHAR;
 // Dialect filler
 ZERO_WIDTH_SPACE: '\u200B' ('\u200B' | [ ])*;
 U_CHAR: U;
+
+fragment IGNORE_EXEC_START : ;
+
+UNKNOWN_EXEC : E X E C ' ' ~[.]*?
+            ( E N D MINUSCHAR E X E C { setChannel(HIDDEN); }
+            | '.' { setChannel(HIDDEN_ERROR); }
+            );
+
 IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
 
 // treat all the non-processed tokens as errors
