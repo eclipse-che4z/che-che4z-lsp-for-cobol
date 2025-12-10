@@ -21,6 +21,9 @@
           "include": "#exec-cics-block"
         },
         {
+          "include": "#exec-unknown-block"
+        },
+        {
           "include": "#number-constant"
         },
         {
@@ -145,6 +148,21 @@
       "endCaptures": {
         "0": {
           "name": "string.quoted.cics.cobol"
+        }
+      }
+    },
+    "exec-unknown-block": {
+      "begin": "(?i:EXEC\\s+)",
+      "beginCaptures": {
+        "0": {
+          "name": "string.quoted.single.cobol"
+        }
+      },
+      "name": "string.quoted.single.cobol",
+      "end": "(?i:END-EXEC|[.])",
+      "endCaptures": {
+        "0": {
+          "name": "string.quoted.single.cobol"
         }
       }
     },
