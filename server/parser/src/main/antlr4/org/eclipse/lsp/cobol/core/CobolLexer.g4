@@ -872,7 +872,7 @@ U_CHAR: U;
 
 fragment IGNORE_EXEC_START : ;
 
-UNKNOWN_EXEC : E X E C ' ' ~[.]*?
+UNKNOWN_EXEC : E X E C [ \n\r] ~[.]*?
             ( E N D MINUSCHAR E X E C { setChannel(HIDDEN); }
             | '.' { setChannel(HIDDEN_ERROR); }
             );

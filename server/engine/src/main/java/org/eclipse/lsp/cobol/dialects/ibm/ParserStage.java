@@ -23,7 +23,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.eclipse.lsp.cobol.AntlrRangeUtils;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -41,6 +40,8 @@ import org.eclipse.lsp.cobol.core.visitor.ParserListener;
 import org.eclipse.lsp.cobol.parser.AntlrCobolParser;
 import org.eclipse.lsp.cobol.parser.AstBuilder;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
 
 /** Parser stage */
 @RequiredArgsConstructor
@@ -70,7 +71,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     context.getAccumulatedErrors().addAll(listener.getErrors());
     context.getAccumulatedErrors().addAll(getParsingError(context, parser));
     final CommonTokenStream tokenStream = parser.getTokens();
-    appendUnknownExecHint(context, tokenStream.getTokens());
+    appendUnknownExecHint(context, tokenStream);
     return new StageResult<>(new ParserStageResult(tokenStream, tree));
   }
 
@@ -91,21 +92,22 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
         .collect(Collectors.toList());
   }
 
-  private void appendUnknownExecHint(AnalysisContext context, List<Token> tokens) {
-    tokens.stream()
+  private void appendUnknownExecHint(AnalysisContext context, CommonTokenStream tokenStream) {
+    tokenStream.getTokens().stream()
         .filter(t -> t.getType() == CobolLexer.UNKNOWN_EXEC)
-        .map(t -> unknownExecMessage(context, t))
+        .map(t -> unknownExecMessage(context, t, tokenStream))
         .forEach(context.getAccumulatedErrors()::add);
   }
 
-  private static SyntaxError unknownExecMessage(AnalysisContext context, Token t) {
+  private static SyntaxError unknownExecMessage(
+      AnalysisContext context, Token t, CommonTokenStream tokenStream) {
     final boolean error = t.getChannel() == CobolLexer.HIDDEN_ERROR;
     final ErrorSeverity severity = error ? ErrorSeverity.ERROR : ErrorSeverity.HINT;
     final String messageTemplateName =
         error ? "cobolParser.unknownExecBlockUnterminated" : "cobolParser.unknownExecBlock";
 
     Location location =
-        context.getExtendedDocument().mapLocation(AntlrRangeUtils.constructRange(t));
+        context.getExtendedDocument().mapLocation(consturctMultiLineRange(t, tokenStream));
     String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
 
     return SyntaxError.syntaxError()
@@ -114,6 +116,13 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
         .location(new OriginalLocation(location, copybookId))
         .messageTemplate(MessageTemplate.of(messageTemplateName))
         .build();
+  }
+
+  private static Range consturctMultiLineRange(Token t, CommonTokenStream tokenStream) {
+    final Token next = tokenStream.get(t.getTokenIndex() + 1); // There should be at least EOF
+    final Position start = new Position(t.getLine() - 1, t.getCharPositionInLine());
+    final Position end = new Position(next.getLine() - 1, next.getCharPositionInLine());
+    return new Range(start, end);
   }
 
   @Override
