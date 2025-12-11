@@ -872,9 +872,18 @@ U_CHAR: U;
 
 fragment IGNORE_EXEC_START : ;
 
-UNKNOWN_EXEC : E X E C [ \n\r] ~[.]*?
-            ( E N D MINUSCHAR E X E C { setChannel(HIDDEN); }
-            | '.' { setChannel(HIDDEN_ERROR); }
+UNKNOWN_EXEC : E X E C [ \n\r] (~[."']|STRINGLITERAL)*?
+            (
+                E N D MINUSCHAR E X E C
+                { setChannel(HIDDEN); }
+                |
+                '.'
+                (
+                    (~["'] | STRINGLITERAL)*? E N D MINUSCHAR E X E C
+                    { setChannel(HIDDEN); }
+                    |
+                    { setChannel(HIDDEN_ERROR); }
+                )
             );
 
 IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;

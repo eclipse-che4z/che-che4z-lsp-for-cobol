@@ -51,6 +51,22 @@ public class TestUnknownExecBlock {
           + "       {_EXEC\n"
           + "         SOMETHING END-EXEC|1_}\n";
 
+  private static final String EXEC_BLOCK_WITH_LITERAL =
+      ""
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXECOK.\n"
+          + "       DATA DIVISION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {_EXEC 'END-EXEC' END-EXEC|1_}\n";
+
+  private static final String EXEC_BLOCK_VALID_WITH_DOTS =
+      ""
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXECOK.\n"
+          + "       DATA DIVISION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "       {_EXEC YOURSQL SELECT 1 FROM MY.TABLE END-EXEC|1_}\n";
+
   @Test
   void terminatedExecBlock() {
     UseCaseEngine.runTest(
@@ -83,6 +99,34 @@ public class TestUnknownExecBlock {
   void multilineExecBlock() {
     UseCaseEngine.runTest(
         EXEC_BLOCK_MULTILINE,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Unknown EXEC block",
+                DiagnosticSeverity.Hint,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void stringLiteralInExecBlock() {
+    UseCaseEngine.runTest(
+        EXEC_BLOCK_WITH_LITERAL,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Unknown EXEC block",
+                DiagnosticSeverity.Hint,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void dotsInTerminatedExecBlock() {
+    UseCaseEngine.runTest(
+        EXEC_BLOCK_VALID_WITH_DOTS,
         ImmutableList.of(),
         ImmutableMap.of(
             "1",
