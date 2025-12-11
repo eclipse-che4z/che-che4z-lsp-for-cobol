@@ -71,7 +71,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
     context.getAccumulatedErrors().addAll(listener.getErrors());
     context.getAccumulatedErrors().addAll(getParsingError(context, parser));
     final CommonTokenStream tokenStream = parser.getTokens();
-    appendUnknownExecHint(context, tokenStream);
+    appendUnknownExecDiags(context, tokenStream);
     return new StageResult<>(new ParserStageResult(tokenStream, tree));
   }
 
@@ -92,7 +92,8 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
         .collect(Collectors.toList());
   }
 
-  private void appendUnknownExecHint(AnalysisContext context, CommonTokenStream tokenStream) {
+  private static void appendUnknownExecDiags(
+      AnalysisContext context, CommonTokenStream tokenStream) {
     tokenStream.getTokens().stream()
         .filter(ParserStage::unknownExecToken)
         .map(t -> unknownExecMessage(context, t, tokenStream))
