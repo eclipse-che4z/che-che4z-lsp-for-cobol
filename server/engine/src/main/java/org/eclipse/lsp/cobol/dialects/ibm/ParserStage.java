@@ -94,9 +94,14 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
 
   private void appendUnknownExecHint(AnalysisContext context, CommonTokenStream tokenStream) {
     tokenStream.getTokens().stream()
-        .filter(t -> t.getType() == CobolLexer.UNKNOWN_EXEC)
+        .filter(ParserStage::unknownExecToken)
         .map(t -> unknownExecMessage(context, t, tokenStream))
         .forEach(context.getAccumulatedErrors()::add);
+  }
+
+  private static boolean unknownExecToken(Token t) {
+    return t.getType() == CobolLexer.UNKNOWN_EXEC
+        && t.getChannel() != CobolLexer.DEFAULT_TOKEN_CHANNEL;
   }
 
   private static SyntaxError unknownExecMessage(
