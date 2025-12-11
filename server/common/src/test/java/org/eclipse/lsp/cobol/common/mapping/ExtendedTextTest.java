@@ -373,4 +373,51 @@ class ExtendedTextTest {
     assertEquals(
         expectedCopybook.getLines().get(2).toString(), copybook1.getLines().get(2).toString());
   }
+
+  @Test
+  void testReplaceWithMap() {
+    // Extended text contains 3 lines, last 2 lines we are going to replace, using replacement map
+    ExtendedText extendedText =
+        new ExtendedText("MOVE 1 TO A\n" + "VOID AAA THRU \n PAR OF PAR. CONTINUE.", "uri");
+    Range range = new Range(new Position(1, 0), new Position(2, 12));
+    Range statementRange = new Range(new Position(1, 0), new Position(1, 3));
+
+    // The statement map that will be using to replace actual "VOID AAA THRU \n PAR OF PAR." text
+    // The name of the token {PAR} is the same as its value (1st "PAR" token)
+    // The name of the token {SEC} is different from its actual value "PAR" (2nd "PAR" token)
+    String statementMap = "VOID {AAA} THRU \n {PAR} OF {SEC}.";
+    String replacementMap = "MOVE 1 TO {AAA}\n" + "GO TO {PAR} OF {SEC}.";
+
+    Location statementLocation = new Location("uri", statementRange);
+    Location variableLocation =
+        new Location("uri", new Range(new Position(1, 5), new Position(1, 7)));
+    Location parLocation = new Location("uri", new Range(new Position(2, 1), new Position(2, 3)));
+    Location secLocation = new Location("uri", new Range(new Position(2, 8), new Position(2, 10)));
+
+    extendedText.replace(range, statementRange, statementMap, replacementMap);
+
+    assertEquals(
+        "MOVE 1 TO A\n" + "MOVE 1 TO AAA\n" + "GO TO PAR OF PAR. CONTINUE.",
+        extendedText.toString());
+
+    // MOVE
+    Location location = extendedText.mapLocation(new Range(new Position(1, 0), new Position(1, 3)));
+    assertEquals(statementLocation.toString(), location.toString());
+
+    // GO TO
+    location = extendedText.mapLocation(new Range(new Position(2, 0), new Position(2, 5)));
+    assertEquals(statementLocation.toString(), location.toString());
+
+    // AAA
+    location = extendedText.mapLocation(new Range(new Position(1, 10), new Position(1, 13)));
+    assertEquals(variableLocation.toString(), location.toString());
+
+    // PAR before OF
+    location = extendedText.mapLocation(new Range(new Position(2, 7), new Position(2, 9)));
+    assertEquals(parLocation.toString(), location.toString());
+
+    // PAR after OF
+    location = extendedText.mapLocation(new Range(new Position(2, 13), new Position(2, 15)));
+    assertEquals(secLocation.toString(), location.toString());
+  }
 }
