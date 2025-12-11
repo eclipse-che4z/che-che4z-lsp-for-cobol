@@ -152,14 +152,24 @@
       }
     },
     "exec-unknown-block": {
-      "begin": "(?i:EXEC\\s+)",
+      "begin": "(?i:(?<=^| )EXEC(\\s+|$))",
       "beginCaptures": {
         "0": {
           "name": "string.quoted.single.cobol"
         }
       },
+      "patterns": [
+          {
+              "match": "'[^'\r\n]+'",
+              "name": "string.quoted.single.cobol"
+          },
+          {
+              "match": "\"[^\"\r\n]+\"",
+              "name": "string.quoted.single.cobol"
+          }
+      ],
       "name": "string.quoted.single.cobol",
-      "end": "(?i:END-EXEC|[.])",
+      "end": "(?<=^| )(?i:END-EXEC)(?=$| )|\\S(?<=^.{8,10}\\S*\\s*[.])",
       "endCaptures": {
         "0": {
           "name": "string.quoted.single.cobol"
