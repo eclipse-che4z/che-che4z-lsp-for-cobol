@@ -169,7 +169,7 @@
         }
       ],
       "name": "string.quoted.single.cobol",
-      "end": "(?<=^| )(?i:END-EXEC)(?=$| )|\\S(?<=^.{8,10}\\S*\\s*[.])",
+      "end": "(?<=^| )(?i:END-EXEC)(?=$| |[.])|\\S(?<=^.{8,10}\\S*\\s*[.])",
       "endCaptures": {
         "0": {
           "name": "string.quoted.single.cobol"

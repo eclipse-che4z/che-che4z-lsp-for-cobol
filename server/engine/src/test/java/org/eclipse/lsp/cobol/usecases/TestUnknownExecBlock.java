@@ -67,6 +67,16 @@ public class TestUnknownExecBlock {
           + "       PROCEDURE DIVISION.\n"
           + "       {_EXEC YOURSQL SELECT 1 FROM MY.TABLE END-EXEC|1_}\n";
 
+  private static final String EXEC_BLOCK_DOT_IN_WS =
+      ""
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. EXECOK.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "           {_EXEC GENERATE STUFF END-EXEC|1_} .\n" // tolerate this one
+          + "           {.|2}\n" // continue reporting this one
+          + "       PROCEDURE DIVISION.\n";
+
   @Test
   void terminatedExecBlock() {
     UseCaseEngine.runTest(
@@ -134,6 +144,26 @@ public class TestUnknownExecBlock {
                 new Range(),
                 "Unknown EXEC block",
                 DiagnosticSeverity.Hint,
+                ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void dotsInWorkingStorageSection() {
+    UseCaseEngine.runTest(
+        EXEC_BLOCK_DOT_IN_WS,
+        ImmutableList.of(),
+        ImmutableMap.of(
+            "1",
+            new Diagnostic(
+                new Range(),
+                "Unknown EXEC block",
+                DiagnosticSeverity.Hint,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "Syntax error on .",
+                DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
 }

@@ -21,6 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
@@ -55,6 +56,23 @@ public abstract class MessageServiceParser extends Parser {
   public void notifyError(String messageId, String... parameters) {
     String message = getMessageForParser(messageId, parameters);
     notifyListeners(message);
+  }
+
+  /**
+   * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
+   * {@link CobolParser}
+   *
+   * <p>Example: notifyError(token, "db2SqlParser.validValueMsg", input, value); would notify
+   * errorListener with the externalized messages.
+   *
+   * @param token Related token
+   * @param messageId Unique ID for each message in externalized message file.
+   * @param parameters Arguments referenced by the format specifiers in the format string in
+   *     externalized message file.
+   */
+  public void notifyError(Token token, String messageId, String... parameters) {
+    String message = getMessageForParser(messageId, parameters);
+    notifyErrorListeners(token, message, null);
   }
 
   /**

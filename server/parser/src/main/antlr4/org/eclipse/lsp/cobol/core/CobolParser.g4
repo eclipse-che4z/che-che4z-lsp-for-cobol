@@ -9,6 +9,25 @@
 parser grammar CobolParser;
 options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
 
+@members {
+  private void diagnoseUnexpectedDot(TokenStream _input, Token t) {
+    if (!(_input instanceof CommonTokenStream))
+      return;
+    CommonTokenStream stream = (CommonTokenStream)_input;
+    int index = t.getTokenIndex();
+
+    while (--index >= 0) {
+      final Token prev = stream.get(index);
+      if (prev.getType() == CobolLexer.UNKNOWN_EXEC)
+        return;
+      final int prevType = prev.getType();
+      if (prevType != CobolLexer.WS && prevType != CobolLexer.NEWLINE)
+        break;
+    }
+    notifyError(t, "ErrorStrategy.reportInputMismatch", t.getText());
+  }
+}
+
 startRule : compilationUnit EOF;
 
 compilationUnit
@@ -585,6 +604,7 @@ dataDescriptionEntry
    | dataDescriptionEntryFormat1Level77
    | dataDescriptionEntryFormat3
    | dialectDescriptionEntry
+   | d=DOT_FS { diagnoseUnexpectedDot(_input, $d); }
    ;
 
 dataDescriptionEntryFormat1
