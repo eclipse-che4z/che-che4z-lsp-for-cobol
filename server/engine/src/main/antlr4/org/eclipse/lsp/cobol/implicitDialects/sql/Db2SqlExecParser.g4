@@ -1325,7 +1325,7 @@ dbs_time_unit: (YEAR | YEARS | MONTH | MONTHS | DAY | DAYS | HOUR | HOURS | MINU
 
 dbs_array_element_specification: dbs_array_variable;
 dbs_XMLQUERY_func: XMLQUERY LPARENCHAR  dbs_xquery_expression_constant (PASSING (BY REF)? dbs_row_xquery_argument  (dbs_comma_separator dbs_row_xquery_argument)*)? (RETURNING SEQUENCE (BY REF)?)? (EMPTY ON EMPTY)? RPARENCHAR;
-dbs_xquery_expression_constant: (dbs_expression|COLONCHAR|LSQUAREBRACKET|RSQUAREBRACKET|LPARENCHAR|RPARENCHAR|SLASHCHAR|EQUALCHAR|DOLLARCHAR|POUNDCHAR)+; //TODO: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/xml/src/tpc/db2z_xpxqprologexpression.html
+dbs_xquery_expression_constant: (dbs_expression|COLONCHAR|LSQUAREBRACKET|RSQUAREBRACKET|LPARENCHAR|RPARENCHAR|SLASHCHAR|EQUALCHAR|DOLLARCHAR)+; //TODO: https://www.ibm.com/support/knowledgecenter/SSEPEK_12.0.0/xml/src/tpc/db2z_xpxqprologexpression.html
 dbs_array_constructor: ARRAY LSQUAREBRACKET (QUESTIONMARK | dbs_fullselect | (dbs_array_element_specification | NULL)
 (dbs_comma_separator (dbs_array_element_specification | NULL))*) RSQUAREBRACKET;
 
