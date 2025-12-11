@@ -44,7 +44,10 @@ class TestSqlIncludeStatementNotDefinedCorrectly {
         ImmutableMap.of(
             "1",
             new Diagnostic(
-                new Range(), "Syntax error on 'EXEC INCLUDE'", Error, ErrorSource.PARSING.getText())),
+                new Range(),
+                "Syntax error on 'EXEC INCLUDE'",
+                Error,
+                ErrorSource.PARSING.getText())),
         CobolLanguageId.COBOL);
   }
 }

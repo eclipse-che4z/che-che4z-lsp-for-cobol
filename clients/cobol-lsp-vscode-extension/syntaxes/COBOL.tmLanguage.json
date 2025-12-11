@@ -159,14 +159,14 @@
         }
       },
       "patterns": [
-          {
-              "match": "'[^'\r\n]+'",
-              "name": "string.quoted.single.cobol"
-          },
-          {
-              "match": "\"[^\"\r\n]+\"",
-              "name": "string.quoted.single.cobol"
-          }
+        {
+          "match": "'[^'\r\n]+'",
+          "name": "string.quoted.single.cobol"
+        },
+        {
+          "match": "\"[^\"\r\n]+\"",
+          "name": "string.quoted.single.cobol"
+        }
       ],
       "name": "string.quoted.single.cobol",
       "end": "(?<=^| )(?i:END-EXEC)(?=$| )|\\S(?<=^.{8,10}\\S*\\s*[.])",
