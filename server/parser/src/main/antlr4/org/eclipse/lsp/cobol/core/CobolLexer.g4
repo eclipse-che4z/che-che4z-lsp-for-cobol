@@ -848,6 +848,7 @@ COLONCHAR : ':';
 COMMACHAR : ',';
 COMMENTTAG : '*>' -> channel(COMMENTS);
 DOLLARCHAR : '$';
+POUNDCHAR : '£';
 DOUBLEMORETHANCHAR : '>>';
 
 EQUALCHAR : '=';
@@ -939,5 +940,5 @@ WS2 : [ \t\f]+ -> channel(HIDDEN);
 TEXT : ~('\n' | '\r');
 LParIntegralRPar: LPARENCHAR INTEGERLITERAL RPARENCHAR;
 fragment PICTUREPeriodAcceptables: ('0'|'9'|B|Z|CR|D B|ASTERISKCHAR|COMMACHAR|MINUSCHAR|PLUSCHAR|SLASHCHAR);
-fragment PICTURECharAcceptedMultipleTime: (A|G|N|P|U|X|DOLLARCHAR|PICTUREPeriodAcceptables);
+fragment PICTURECharAcceptedMultipleTime: (A|G|N|P|U|X|DOLLARCHAR|POUNDCHAR|PICTUREPeriodAcceptables);
 fragment PICTURECharAcceptedOneTime: (V|E|S|CR|D B);

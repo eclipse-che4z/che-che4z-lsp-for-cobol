@@ -770,6 +770,7 @@ ASTERISKCHAR : '*';
 COLONCHAR : ':';
 COMMACHAR : ',';
 DOLLARCHAR : '$';
+POUNDCHAR : '£';
 DOUBLEQUOTE : '"';
 DOT_FS : '.' EOF?;
 EQUALCHAR : '=';
