@@ -65,9 +65,10 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
     );
 
     if (member) {
-      return vscode.Uri.parse(
-        `zowe-uss:/${profile}${evaluatedPath}/${member.name}${member.extension ? member.extension : ""}`,
-      );
+      return vscode.Uri.from({
+        scheme: "zowe-uss",
+        path: `/${profile}${evaluatedPath}/${member.name}${member.extension ? member.extension : ""}`,
+      });
     }
   }
 
@@ -108,7 +109,11 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
       variables,
     );
     await vscode.workspace.fs.stat(
-      vscode.Uri.parse(`zowe-uss:/${profile}${evaluatedPath}?fetch=true`),
+      vscode.Uri.from({
+        scheme: "zowe-uss",
+        path: `/${profile}${evaluatedPath}`,
+        query: "fetch=true",
+      }),
     );
   }
 }

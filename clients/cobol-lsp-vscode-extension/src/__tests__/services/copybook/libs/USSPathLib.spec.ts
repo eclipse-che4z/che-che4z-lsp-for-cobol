@@ -44,6 +44,9 @@ describe("USS copybook lib", () => {
         ["BADEXT.txt", vscode.FileType.File],
         ["directory", vscode.FileType.Directory],
       ];
+      readDirectoryResult["/profile/remote/uss@#$/copybooks"] = [
+        ["COPYBOOK.CPY", vscode.FileType.File],
+      ];
       readDirectoryResult["/profile/remote/uss/ABCPROG/copybooks"] = [
         ["COPYBOOK.CPY", vscode.FileType.File],
       ];
@@ -62,6 +65,20 @@ describe("USS copybook lib", () => {
         expect(result).toEqual(
           vscode.Uri.parse(
             "zowe-uss:/profile/remote/uss/copybooks/COPYBOOK.CPY",
+          ),
+        );
+      });
+
+      it("@#$ in names", async () => {
+        const lib = new UssPathLib("/remote/uss@#$/copybooks", "profile");
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(
+          vscode.Uri.parse(
+            "zowe-uss:/profile/remote/uss@%23$/copybooks/COPYBOOK.CPY",
           ),
         );
       });

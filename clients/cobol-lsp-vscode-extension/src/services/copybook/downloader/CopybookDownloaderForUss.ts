@@ -48,7 +48,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
       `list USS directory ${profileName}/${dataset}`,
       async () => {
         const response = await vscode.workspace.fs.readDirectory(
-          vscode.Uri.parse(`zowe-uss:/${profileName}${dataset}`),
+          vscode.Uri.from({
+            scheme: "zowe-uss",
+            path: `/${profileName}${dataset}`,
+          }),
         );
 
         for (const file of response) {

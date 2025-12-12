@@ -35,7 +35,11 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
 
   async accessCheck(profile: string): Promise<void> {
     await vscode.workspace.fs.stat(
-      vscode.Uri.parse(`zowe-ds:/${profile}/${this.dsn}?fetch=true`),
+      vscode.Uri.from({
+        scheme: "zowe-ds",
+        path: `/${profile}/${this.dsn}`,
+        query: "fetch=true",
+      }),
     );
   }
 
@@ -58,9 +62,10 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
     );
 
     if (member) {
-      return vscode.Uri.parse(
-        `zowe-ds:/${profile}/${this.dsn}/${member.name}${member.extension ? member.extension : ""}`,
-      );
+      return vscode.Uri.from({
+        scheme: "zowe-ds",
+        path: `/${profile}/${this.dsn}/${member.name}${member.extension ? member.extension : ""}`,
+      });
     }
   }
 

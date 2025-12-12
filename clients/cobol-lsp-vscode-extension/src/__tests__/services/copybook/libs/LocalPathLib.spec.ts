@@ -43,6 +43,9 @@ describe("Local copybook library", () => {
         findFilesResult["/local/absolute/path"] = [
           vscode.Uri.file("/local/absolute/path/COPYBOOK.cpy"),
         ];
+        findFilesResult["/local/absolute@#$/path"] = [
+          vscode.Uri.file("/local/absolute@#$/path/COPYBOOK.cpy"),
+        ];
       });
 
       it("resolves local copybook uri", async () => {
@@ -55,6 +58,19 @@ describe("Local copybook library", () => {
         );
         expect(result).toEqual(
           vscode.Uri.file("/local/absolute/path/COPYBOOK.cpy"),
+        );
+      });
+
+      it("@#$ in names", async () => {
+        const lib = new LocalPathLib("/local/absolute@#$/path");
+        const document = vscode.Uri.file("/program.cbl");
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          document,
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(
+          vscode.Uri.file("/local/absolute@#$/path/COPYBOOK.cpy"),
         );
       });
     });

@@ -41,7 +41,10 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       `list dataset members ${profileName}/${dataset}`,
       async () => {
         const response = await vscode.workspace.fs.readDirectory(
-          vscode.Uri.parse(`zowe-ds:/${profileName}/${dataset}`),
+          vscode.Uri.from({
+            scheme: "zowe-ds",
+            path: `/${profileName}/${dataset}`,
+          }),
         );
         members = response.map((item) => {
           const [name, extension] = splitFilename(item[0]);

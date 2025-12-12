@@ -38,6 +38,7 @@ describe("Dataset copybook lib", () => {
   describe("resolveCopybookUri", () => {
     beforeEach(() => {
       readDirectoryResult["/profile/DATASET.WITH.COPYBOOK"] = ["COPYBOOK"];
+      readDirectoryResult["/profile/DATASET.WITH@#$.COPYBOOK"] = ["COPYBOOK"];
       readDirectoryResult["/profile/DOESNT.EXIST.DATASET"] = new FileNotFound();
     });
 
@@ -240,6 +241,22 @@ describe("Dataset copybook lib", () => {
         expect(result).toBeUndefined();
 
         expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(4);
+      });
+    });
+
+    describe("@#$ in names", () => {
+      it("copybook uri is resolved", async () => {
+        const lib = new DatasetLib("DATASET.WITH@#$.COPYBOOK", "profile");
+        const result = await lib.resolveCopybookUri(
+          "COPYBOOK",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+        expect(result).toEqual(
+          vscode.Uri.parse(
+            "zowe-ds:/profile/DATASET.WITH@%23$.COPYBOOK/COPYBOOK.cpy",
+          ),
+        );
       });
     });
   });
