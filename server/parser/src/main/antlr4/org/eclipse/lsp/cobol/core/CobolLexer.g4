@@ -872,12 +872,12 @@ U_CHAR: U;
 
 fragment IGNORE_EXEC_START : ;
 
-UNKNOWN_EXEC : E X E C
+UNKNOWN_EXEC : E X E C [ \n\r]+
         (
-            ' '+ I N C L U D E
+            I N C L U D E
             { setChannel(DEFAULT_TOKEN_CHANNEL); }
             |
-            [ \n\r] (~[."']|STRINGLITERAL)*?
+            (~[."']|STRINGLITERAL)*?
             (
                 E N D MINUSCHAR E X E C
                 { setChannel(HIDDEN); }
