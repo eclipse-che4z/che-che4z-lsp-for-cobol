@@ -702,4 +702,26 @@ class ExtendedTextTest {
 
     assertEquals("DISPLAY FOO.", extendedText.toString());
   }
+
+  @Test
+  void testReplaceWithMap_misplaced_value_separator() {
+    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
+
+    Range range = new Range(new Position(0, 0), new Position(0, 13));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    extendedText.replace(range, statementRange, "STATEMENT {FOO}", "DISPLAY | {FOO}.");
+
+    assertEquals("DISPLAY | FOO.", extendedText.toString());
+  }
+
+  @Test
+  void testReplaceWithMap_double_value_separator() {
+    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
+
+    Range range = new Range(new Position(0, 0), new Position(0, 13));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    extendedText.replace(range, statementRange, "STATEMENT {FOO}", "DISPLAY {FOO||BAR}.");
+
+    assertEquals("DISPLAY |BAR.", extendedText.toString());
+  }
 }
