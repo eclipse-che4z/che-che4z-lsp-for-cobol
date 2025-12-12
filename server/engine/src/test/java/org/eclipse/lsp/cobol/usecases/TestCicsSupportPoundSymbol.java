@@ -17,33 +17,27 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
-import org.eclipse.lsp.cobol.usecases.common.CICSTestUtils;
 import org.junit.jupiter.api.Test;
-
 
 /** This test verifies that the British Pound Symbol doesn't cause problems in CICS */
 class TestCicsSupportPoundSymbol {
 
   private static final String TEXT =
-      "       IDENTIFICATION DIVISION.\n" +
-              "       PROGRAM-ID. TEST1.\n" +
-              "       DATA DIVISION.\n" +
-              "       WORKING-STORAGE SECTION.\n" +
-              "       01 {$*VRB} PIC £(10)9.99-.\n" +
-              "       PROCEDURE DIVISION.\n" +
-              "            EXEC CICS \n" +
-              "            WRITE\n" +
-              "            OPERATOR\n" +
-              "            TEXT('POUND TESTING £')\n" +
-              "            TEXTLENGTH('POUND TESTING £')\n" +
-              "            END-EXEC.";
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. TEST1.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       01 {$*VRB} PIC £(10)9.99-.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "            EXEC CICS \n"
+          + "            WRITE\n"
+          + "            OPERATOR\n"
+          + "            TEXT('POUND TESTING £')\n"
+          + "            TEXTLENGTH('POUND TESTING £')\n"
+          + "            END-EXEC.";
 
   @Test
   void test() {
-    UseCaseEngine.runTest(
-            TEXT,
-            ImmutableList.of(),
-            ImmutableMap.of(),
-            ImmutableList.of());
+    UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of(), ImmutableList.of());
   }
 }
