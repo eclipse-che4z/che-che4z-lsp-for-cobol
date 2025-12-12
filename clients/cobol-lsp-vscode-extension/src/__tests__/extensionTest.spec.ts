@@ -30,10 +30,8 @@ jest.mock("../commands/ClearCopybookCacheCommand");
 jest.mock("../services/Settings", () => ({
   initializeSettings: jest.fn(),
   SettingsService: {
-    serverRuntime: jest
-      .fn()
-      .mockReturnValueOnce(undefined)
-      .mockReturnValue("JAVA"),
+    getServerRuntime: jest.fn().mockReturnValue("JAVA"),
+    getJavaCommand: jest.fn().mockReturnValue("java"),
     getSnippetsForCobol: jest.fn().mockReturnValue(Promise.resolve([])),
     getDialects: jest.fn().mockReturnValue([]),
     getMaxVMCount: jest.fn().mockReturnValue(-1),
@@ -50,7 +48,9 @@ jest.mock("../services/reporter");
 
 const context = {
   subscriptions: [],
-  globalStorageUri: { fsPath: "/storagePath" },
+  extensionUri: vscode.Uri.parse("file:///path/to/extension/folder"),
+  globalStorageUri: vscode.Uri.parse("file:///path/to/global/storage"),
+  extension: { id: "publisher.extension-name" },
 } as unknown as vscode.ExtensionContext;
 
 beforeEach(() => {

@@ -25,14 +25,31 @@ import * as vscode from "vscode";
 import * as JavaCheck from "../../services/JavaCheck";
 import { Middleware, LanguageClient } from "vscode-languageclient/node";
 
-jest.mock("vscode-languageclient/node", () => ({
-  LanguageClient: jest.fn(),
-  State: { Stopped: 1 },
-}));
-LanguageClient.prototype.createDefaultErrorHandler = jest.fn();
-LanguageClient.prototype.start = jest
-  .fn()
-  .mockReturnValue(Promise.resolve({ state: 1 }));
+jest.mock("vscode");
+jest.mock("vscode-languageclient/node", () => {
+  return jest.requireActual("vscode-languageclient/node");
+});
+
+jest.mock("vscode-languageclient/node", () => {
+  const originalModule = jest.requireActual("vscode-languageclient/node");
+  class LanguageClient extends jest.fn() {
+    public state: typeof originalModule.State;
+    createDefaultErrorHandler() {
+      return jest.fn();
+    }
+    start() {
+      this.state = originalModule.State.Running;
+    }
+    dispose() {}
+  }
+  jest.spyOn(LanguageClient.prototype, "dispose");
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    LanguageClient,
+  };
+});
 
 const SERVER_NAME = "COBOL Language Support";
 
@@ -66,11 +83,8 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("Test LanguageClientService starts language client", async () => {
-    const expectedCommand = "/test/bin/java";
-    const expectedJarPath = "/test/server/server.jar";
-    const expectedDialectPath = "/test/dialectsFolder";
+    await languageClientService.start([javaServer]);
 
-    expect(await languageClientService.start([javaServer])).toBe(undefined);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
       LANGUAGE_ID,
@@ -78,21 +92,22 @@ describe("LanguageClientService positive scenario", () => {
       {
         args: [
           "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
+          "-Ddialect.path=/test/dialectsFolder",
           "-Xmx768M",
           "-jar",
-          expectedJarPath,
+          "/test/server/server.jar",
           "pipeEnabled",
         ],
-        command: expectedCommand,
+        command: "/test/bin/java",
         options: { detached: false },
       },
       {
         documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        errorHandler: expect.any(Function),
         middleware: {},
         outputChannel: outputChannel,
         synchronize: {
-          fileEvents: [undefined, undefined, undefined, undefined],
+          fileEvents: [undefined, undefined, undefined, undefined, undefined],
         },
       },
     );
@@ -111,6 +126,7 @@ describe("LanguageClientService positive scenario", () => {
       expect.any(Function),
       {
         documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
         synchronize: {
@@ -121,10 +137,9 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("Test LanguageClientService retrieve analysis passes", async () => {
-    const expectedResult = { programs: [] };
+    const expectedResult = { programs: ["A", "B", "C"] };
     LanguageClient.prototype.sendRequest = () =>
       Promise.resolve(expectedResult);
-
     expect(await languageClientService.start([javaServer])).toBe(undefined);
     expect(
       await languageClientService.retrieveAnalysis(
@@ -136,12 +151,8 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("Test LanguageClientService fire a dispose() command on LanguageClient", async () => {
-    LanguageClient.prototype.dispose = jest
-      .fn()
-      .mockReturnValue(SERVER_STOPPED_MSG);
-    // start the server, before shutdown.
     await languageClientService.start([javaServer]);
     const returnedValue = await languageClientService.dispose();
-    expect(returnedValue).toBe(SERVER_STOPPED_MSG);
+    expect(LanguageClient.prototype.dispose).toHaveBeenCalled();
   });
 });

@@ -327,6 +327,15 @@ export class FileNotFound extends Error {
   }
 }
 
+export class CodeLens {}
+export class DocumentLink {}
+export class Diagnostic {}
+export class CallHierarchyItem {}
+export class TypeHierarchyItem {}
+export class SymbolInformation {}
+export class InlayHint {}
+export class CancellationError {}
+
 export const FileSystemError = {
   FileNotFound: () => {
     return new FileNotFound();

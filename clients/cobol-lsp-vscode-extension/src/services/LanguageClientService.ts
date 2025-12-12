@@ -107,7 +107,9 @@ export class LanguageClientService {
     this.fileChanges = [];
     const languageClient = this.languageClient;
     this.languageClient = undefined;
-    return languageClient?.dispose();
+    if (languageClient) {
+      return languageClient.dispose();
+    }
   }
 
   public addNotificationHandler(
