@@ -40,6 +40,7 @@ public class CICSTestUtils {
           + "       01 {$*varFour}  PIC X VALUE 'NAME_ONE'.\n"
           + "       01 {$*varFive}  PIC X VALUE 'NAME_TWO'.\n"
           + "       01 {$*varSix}   PIC X VALUE 'NAME_THREE'.\n"
+          + "       01 {$*varSeven}   PIC £(10)9.99-.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {@*SEC1} SECTION.\n"
           + "               DISPLAY \"Text: \".\n"
