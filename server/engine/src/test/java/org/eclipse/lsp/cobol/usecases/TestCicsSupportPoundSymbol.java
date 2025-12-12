@@ -30,10 +30,8 @@ class TestCicsSupportPoundSymbol {
           + "       01 {$*VRB} PIC £(10)9.99-.\n"
           + "       PROCEDURE DIVISION.\n"
           + "            EXEC CICS \n"
-          + "            WRITE\n"
-          + "            OPERATOR\n"
-          + "            TEXT('POUND TESTING £')\n"
-          + "            TEXTLENGTH('POUND TESTING £')\n"
+          + "            SEND MAP('POUND TESTING £')\n"
+          + "            MAPSET('POUND TESTING TWO £')\n"
           + "            END-EXEC.";
 
   @Test
