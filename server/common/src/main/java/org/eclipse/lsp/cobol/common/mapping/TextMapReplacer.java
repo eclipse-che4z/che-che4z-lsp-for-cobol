@@ -16,8 +16,10 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Value;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -38,6 +40,11 @@ import org.eclipse.lsp4j.Range;
  */
 @AllArgsConstructor
 class TextMapReplacer {
+  private static final char BRACE_OPEN = '{';
+  private static final char BRACE_CLOSE = '}';
+  private static final char ESCAPE_CHAR = '&';
+  private static final char VALUE_REPLACEMENT_CHAR = '|';
+
   private final ExtendedText extendedText;
 
   @Value
@@ -58,20 +65,23 @@ class TextMapReplacer {
       Range range, Range statementRange, String statementMap, String replacementMap) {
     Map<String, Token> tokens = new HashMap<>();
 
-    Location statementLocation = extendedText.mapLocation(statementRange);
-
     String[] statementMapArray = MappingHelper.split(statementMap);
-    String[] replacementMapArray = MappingHelper.split(replacementMap);
-
     for (int i = 0; i < statementMapArray.length; i++) {
       scanForTokens(tokens, statementMapArray, i, range);
     }
 
-    extendedText.replace(range, replacementMap, statementLocation);
+    Map<Range, Token> tokenReplacements = new HashMap<>();
+    String processedText =
+        scanForReplacements(range.getStart(), tokens, replacementMap, tokenReplacements);
 
-    for (int i = 0; i < replacementMapArray.length; i++) {
-      applyReplacementForLine(tokens, replacementMapArray, i, range);
-    }
+    Location statementLocation = extendedText.mapLocation(statementRange);
+    extendedText.replace(range, processedText, statementLocation);
+    tokenReplacements.forEach(
+        (r, t) -> {
+          extendedText.delete(r);
+          extendedText.insert(
+              r.getStart(), new ExtendedTextLine(t.getValue(), t.getOriginalLocation()));
+        });
   }
 
   private void scanForTokens(
@@ -83,13 +93,13 @@ class TextMapReplacer {
 
     for (int i = 0; i < statementLine.length; i++) {
       if (symbolCount % 2 == 0) {
-        if (statementLine[i] == '{') {
+        if (statementLine[i] == BRACE_OPEN) {
           symbolCount++;
         }
       } else {
-        if (statementLine[i] == '}') {
+        if (statementLine[i] == BRACE_CLOSE) {
           int line = range.getStart().getLine() + index;
-          int character = range.getStart().getCharacter() + i - symbolCount - temp.length();
+          int character = i - symbolCount - temp.length();
           Location originalLocation =
               extendedText.mapLocation(
                   new Range(
@@ -110,35 +120,76 @@ class TextMapReplacer {
     }
   }
 
-  private void applyReplacementForLine(
-      Map<String, Token> tokens, String[] replacementMapArray, int index, Range range) {
-    char[] replacementLine = replacementMapArray[index].toCharArray();
+  private String scanForReplacements(
+      Position startPosition,
+      Map<String, Token> tokens,
+      String replacementMap,
+      Map<Range, Token> tokenReplacements) {
+    StringBuilder result = new StringBuilder();
+    String[] replacementMapArray = MappingHelper.split(replacementMap);
 
-    int symbolCount = 0;
-    StringBuilder temp = new StringBuilder();
+    for (int line = 0; line < replacementMapArray.length; line++) {
+      char[] replacementLine = replacementMapArray[line].toCharArray();
+      boolean bracesOpened = false;
+      boolean escapeCharacter = false;
+      StringBuilder tokenName = new StringBuilder();
 
-    for (int i = 0; i < replacementLine.length; i++) {
-      if (symbolCount % 2 == 0) {
-        if (replacementLine[i] == '{') {
-          symbolCount++;
+      StringBuilder outputLine = new StringBuilder();
+      for (char c : replacementLine) {
+        if (c == ESCAPE_CHAR && !escapeCharacter) {
+          escapeCharacter = true;
+          continue;
         }
-      } else {
-        if (replacementLine[i] == '}') {
-          int line = range.getStart().getLine() + index;
-          int character = range.getStart().getCharacter() + i - symbolCount - temp.length();
+        if (escapeCharacter) {
+          outputLine.append(c);
+          escapeCharacter = false;
+          continue;
+        }
+        if (c == BRACE_OPEN) {
+          bracesOpened = true;
+          continue;
+        }
+        if (c == BRACE_CLOSE) {
+          bracesOpened = false;
 
-          Token token = tokens.get(temp.toString());
-          Range tokenRange =
-              new Range(
-                  new Position(line, character), new Position(line, character + temp.length() + 2));
-          extendedText.replace(tokenRange, token.getValue(), token.getOriginalLocation());
+          ImmutablePair<String, String> tokenNameAndValue =
+              getTokenNameAndValue(tokenName.toString());
 
-          symbolCount++;
-          temp = new StringBuilder();
+          Token token = tokens.get(tokenNameAndValue.getLeft());
+          if (token != null) {
+            String value =
+                Optional.ofNullable(tokenNameAndValue.getRight()).orElse(token.getValue());
+            int character = outputLine.length() + (line == 0 ? startPosition.getCharacter() : 0);
+            Range range =
+                new Range(
+                    new Position(startPosition.getLine() + line, character),
+                    new Position(startPosition.getLine() + line, character + value.length()));
+            tokenReplacements.put(range, new Token(value, token.getOriginalLocation()));
+            outputLine.append(value);
+          }
+          tokenName = new StringBuilder();
+          continue;
+        }
+        if (bracesOpened) {
+          tokenName.append(c);
         } else {
-          temp.append(replacementLine[i]);
+          outputLine.append(c);
         }
       }
+      if (line != replacementMapArray.length - 1) {
+        outputLine.append("\n");
+      }
+      result.append(outputLine);
     }
+    return result.toString();
+  }
+
+  private ImmutablePair<String, String> getTokenNameAndValue(String token) {
+    int indexOfSeparator = token.indexOf(VALUE_REPLACEMENT_CHAR);
+    if (indexOfSeparator > 0) {
+      return new ImmutablePair<>(
+          token.substring(0, indexOfSeparator), token.substring(indexOfSeparator + 1));
+    }
+    return new ImmutablePair<>(token, null);
   }
 }

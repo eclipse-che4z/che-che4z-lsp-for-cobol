@@ -43,7 +43,7 @@ class SingleLineReplaceStrategy implements ReplaceStrategy {
       extendedText.insert(
           new Position(position.getLine() + 1, 0),
           new ExtendedTextLine(newLines[newLines.length - 1], instantLocation));
-      for (int i = 1; i < newLines.length - 2; i++) {
+      for (int i = 1; i < newLines.length - 1; i++) {
         extendedText.insert(
             position.getLine() + i, new ExtendedTextLine(newLines[i], instantLocation));
       }
