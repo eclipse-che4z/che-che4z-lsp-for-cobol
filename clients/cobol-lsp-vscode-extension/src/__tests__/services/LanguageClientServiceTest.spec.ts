@@ -30,14 +30,14 @@ jest.mock("vscode-languageclient/node", () => {
   const originalModule = jest.requireActual("vscode-languageclient/node");
   class LanguageClient extends jest.fn() {
     public state = State.Stopped;
-    createDefaultErrorHandler() {
-      return jest.fn();
-    }
     start() {
       this.state = State.Running;
     }
     dispose() {
       this.state = State.Stopped;
+    }
+    createDefaultErrorHandler() {
+      return jest.fn();
     }
   }
 
