@@ -23,7 +23,7 @@ import { outputChannel } from "../../services/util/OutputChannel";
 
 import * as vscode from "vscode";
 import * as JavaCheck from "../../services/JavaCheck";
-import { Middleware, LanguageClient } from "vscode-languageclient/node";
+import { Middleware, LanguageClient, State } from "vscode-languageclient/node";
 
 jest.mock("vscode");
 jest.mock("vscode-languageclient/node", () => {
@@ -33,16 +33,15 @@ jest.mock("vscode-languageclient/node", () => {
 jest.mock("vscode-languageclient/node", () => {
   const originalModule = jest.requireActual("vscode-languageclient/node");
   class LanguageClient extends jest.fn() {
-    public state: typeof originalModule.State;
+    public state = State.Stopped;
     createDefaultErrorHandler() {
       return jest.fn();
     }
     start() {
-      this.state = originalModule.State.Running;
+      this.state = State.Running;
     }
     dispose() {}
   }
-  jest.spyOn(LanguageClient.prototype, "dispose");
 
   return {
     __esModule: true,
@@ -151,8 +150,10 @@ describe("LanguageClientService positive scenario", () => {
   });
 
   test("Test LanguageClientService fire a dispose() command on LanguageClient", async () => {
+    const spy = jest.spyOn(LanguageClient.prototype, "dispose");
     await languageClientService.start([javaServer]);
+    expect(spy).not.toHaveBeenCalled();
     const returnedValue = await languageClientService.dispose();
-    expect(LanguageClient.prototype.dispose).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 });
