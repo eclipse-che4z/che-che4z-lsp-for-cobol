@@ -20,7 +20,7 @@ import type {
 
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { outputChannel } from "../../services/util/OutputChannel";
-import { Middleware, LanguageClient, State } from "vscode-languageclient/node";
+import { LanguageClient, State } from "vscode-languageclient/node";
 
 jest.mock("vscode");
 jest.mock("vscode-languageclient/node", () => {
@@ -61,14 +61,12 @@ beforeEach(() => {
 
 describe("LanguageClientService positive scenario", () => {
   let languageClientService: LanguageClientService;
-  let middleware: Middleware;
 
   beforeEach(() => {
-    middleware = {};
     languageClientService = new LanguageClientService(
       "Publisher.Extension-Name",
       [vscode.Uri.file("/storagePath")],
-      middleware,
+      {},
     );
   });
 
