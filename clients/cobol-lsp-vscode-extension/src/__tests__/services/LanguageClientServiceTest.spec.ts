@@ -58,7 +58,6 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-const SERVER_STOPPED_MSG = "server stopped";
 describe("LanguageClientService positive scenario", () => {
   let languageClientService: LanguageClientService;
   let middleware: Middleware;
