@@ -59,7 +59,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("LanguageClientService positive scenario", () => {
+describe("LanguageClientService", () => {
   let languageClientService: LanguageClientService;
 
   beforeEach(() => {
@@ -70,7 +70,7 @@ describe("LanguageClientService positive scenario", () => {
     );
   });
 
-  test("Test LanguageClientService starts language client", async () => {
+  test("Starts java language server", async () => {
     await languageClientService.start([javaServer]);
 
     expect(LanguageClient).toHaveBeenCalledTimes(1);
@@ -99,8 +99,7 @@ describe("LanguageClientService positive scenario", () => {
     );
   });
 
-  test("LanguageClientService starts the language server when port is provided", async () => {
-    vscode.workspace.getConfiguration().get = jest.fn().mockReturnValue(9999);
+  test("Starts socket language server", async () => {
     const socketServer: SocketServer = {
       kind: "SOCKET",
       port: 8192,
@@ -120,11 +119,11 @@ describe("LanguageClientService positive scenario", () => {
     );
   });
 
-  test("Test LanguageClientService retrieve analysis passes", async () => {
+  test("Retrieve analysis passes", async () => {
     const expectedResult = { programs: ["A", "B", "C"] };
     LanguageClient.prototype.sendRequest = () =>
       Promise.resolve(expectedResult);
-    expect(await languageClientService.start([javaServer])).toBe(undefined);
+    await languageClientService.start([javaServer]);
     expect(
       await languageClientService.retrieveAnalysis(
         "test",
@@ -134,11 +133,11 @@ describe("LanguageClientService positive scenario", () => {
     ).toBe(expectedResult);
   });
 
-  test("Test LanguageClientService fire a dispose() command on LanguageClient", async () => {
+  test("Fire a .dispose() on LanguageClient", async () => {
     const spy = jest.spyOn(LanguageClient.prototype, "dispose");
     await languageClientService.start([javaServer]);
     expect(spy).not.toHaveBeenCalled();
-    const returnedValue = await languageClientService.dispose();
+    await languageClientService.dispose();
     expect(spy).toHaveBeenCalled();
   });
 });
