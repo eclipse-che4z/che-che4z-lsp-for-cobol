@@ -94,7 +94,7 @@ describe("LanguageClientService positive scenario", () => {
         errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
-        synchronize: expect.any(Object),
+        synchronize: { fileEvents: expect.any(Array) },
       },
     );
   });
@@ -115,7 +115,7 @@ describe("LanguageClientService positive scenario", () => {
         errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
-        synchronize: expect.any(Object),
+        synchronize: { fileEvents: expect.any(Array) },
       },
     );
   });
