@@ -21,11 +21,13 @@ import type {
 
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { outputChannel } from "../../services/util/OutputChannel";
-import { LanguageClient } from "vscode-languageclient/node";
+import { LanguageClient, State } from "vscode-languageclient/node";
 
 jest.mock("vscode");
 jest.mock("vscode-languageclient/node", () => {
-  const { State } = jest.requireActual("vscode-languageclient/node");
+  const originalModule = jest.requireActual<{ State: State }>(
+    "vscode-languageclient/node",
+  );
   class LanguageClient extends jest.fn() {
     public state = State.Stopped;
     start() {
@@ -41,7 +43,7 @@ jest.mock("vscode-languageclient/node", () => {
 
   return {
     __esModule: true,
-    State,
+    State: originalModule.State,
     LanguageClient,
   };
 });
@@ -91,10 +93,10 @@ describe("LanguageClientService", () => {
       },
       {
         documentSelector: ["cobol", "expcobol", "hpcobol"],
-        errorHandler: expect.any(Function),
+        errorHandler: expect.any(Function) as unknown,
         middleware: {},
         outputChannel,
-        synchronize: { fileEvents: expect.any(Array) },
+        synchronize: { fileEvents: expect.any(Array) as unknown },
       },
     );
   });
@@ -121,10 +123,10 @@ describe("LanguageClientService", () => {
       },
       {
         documentSelector: ["cobol", "expcobol", "hpcobol"],
-        errorHandler: expect.any(Function),
+        errorHandler: expect.any(Function) as unknown,
         middleware: {},
         outputChannel,
-        synchronize: { fileEvents: expect.any(Array) },
+        synchronize: { fileEvents: expect.any(Array) as unknown },
       },
     );
   });
@@ -142,10 +144,10 @@ describe("LanguageClientService", () => {
       expect.any(Function),
       {
         documentSelector: ["cobol", "expcobol", "hpcobol"],
-        errorHandler: expect.any(Function),
+        errorHandler: expect.any(Function) as unknown,
         middleware: {},
         outputChannel,
-        synchronize: { fileEvents: expect.any(Array) },
+        synchronize: { fileEvents: expect.any(Array) as unknown },
       },
     );
   });
