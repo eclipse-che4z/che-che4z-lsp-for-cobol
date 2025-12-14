@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import type {
   JavaServer,
+  NativeServer,
   SocketServer,
 } from "../../services/languageClient/ServerTypes";
 
@@ -88,6 +89,35 @@ describe("LanguageClientService", () => {
         ],
         command: "/test/bin/java",
         options: { detached: false },
+      },
+      {
+        documentSelector: ["cobol", "expcobol", "hpcobol"],
+        errorHandler: expect.any(Function),
+        middleware: {},
+        outputChannel,
+        synchronize: { fileEvents: expect.any(Array) },
+      },
+    );
+  });
+
+  test("Starts native language server", async () => {
+    const socketServer: NativeServer = {
+      kind: "NATIVE",
+      command: vscode.Uri.parse("file:///native/server/folder/executable"),
+    };
+    expect(await languageClientService.start([socketServer])).toBe(undefined);
+    expect(LanguageClient).toHaveBeenLastCalledWith(
+      "cobol",
+      "COBOL Language Support",
+      {
+        args: [
+          "pipeEnabled",
+          "-Dline.separator=\r\n",
+          "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
+          "-DserverType=NATIVE",
+        ],
+        command: "/native/server/folder/executable",
+        options: { cwd: "/native/server/folder", detached: false },
       },
       {
         documentSelector: ["cobol", "expcobol", "hpcobol"],
