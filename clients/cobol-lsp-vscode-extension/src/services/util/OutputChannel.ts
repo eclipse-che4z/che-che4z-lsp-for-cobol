@@ -13,6 +13,7 @@
  */
 
 import * as vscode from "vscode";
+import { EXTENSION_NAME } from "../../constants";
 
 export const outputChannel: vscode.LogOutputChannel =
-  vscode.window.createOutputChannel("COBOL Language Support", { log: true });
+  vscode.window.createOutputChannel(EXTENSION_NAME, { log: true });

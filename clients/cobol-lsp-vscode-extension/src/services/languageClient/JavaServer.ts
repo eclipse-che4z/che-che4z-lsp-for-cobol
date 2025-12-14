@@ -6,7 +6,7 @@ import {
   State,
 } from "vscode-languageclient/node";
 import type { JavaServer } from "./ServerTypes";
-import { LANGUAGE_ID } from "../../constants";
+import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
 import { getJavaVersion } from "../JavaCheck";
 import { MINIMUM_JAVA_VERSION } from "../../constants";
 import { telemetryEvent } from "../reporter";
@@ -49,7 +49,7 @@ export async function startJavaServer(
   };
   const languageClient = new LanguageClient(
     LANGUAGE_ID,
-    "COBOL Language Support",
+    EXTENSION_NAME,
     serverOptions,
     clientOptions,
   );

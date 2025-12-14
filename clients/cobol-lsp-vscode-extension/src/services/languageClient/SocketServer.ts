@@ -7,7 +7,7 @@ import {
   State,
   StreamInfo,
 } from "vscode-languageclient/node";
-import { LANGUAGE_ID } from "../../constants";
+import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
 
 export async function startSocketServer(
   port: number,
@@ -28,7 +28,7 @@ export async function startSocketServer(
 
   const languageClient = new LanguageClient(
     LANGUAGE_ID,
-    "COBOL Language Support",
+    EXTENSION_NAME,
     serverOptions,
     clientOptions,
   );
