@@ -21,11 +21,11 @@ import type {
 
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { outputChannel } from "../../services/util/OutputChannel";
-import { LanguageClient, State } from "vscode-languageclient/node";
+import { LanguageClient } from "vscode-languageclient/node";
 
 jest.mock("vscode");
 jest.mock("vscode-languageclient/node", () => {
-  const originalModule = jest.requireActual("vscode-languageclient/node");
+  const { State } = jest.requireActual("vscode-languageclient/node");
   class LanguageClient extends jest.fn() {
     public state = State.Stopped;
     start() {
@@ -41,7 +41,7 @@ jest.mock("vscode-languageclient/node", () => {
 
   return {
     __esModule: true,
-    ...originalModule,
+    State,
     LanguageClient,
   };
 });
