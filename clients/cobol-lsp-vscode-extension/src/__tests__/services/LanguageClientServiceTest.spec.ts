@@ -19,7 +19,6 @@ import type {
 } from "../../services/languageClient/ServerTypes";
 
 import { LanguageClientService } from "../../services/LanguageClientService";
-import { LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { outputChannel } from "../../services/util/OutputChannel";
 
 import * as JavaCheck from "../../services/JavaCheck";
@@ -47,8 +46,6 @@ jest.mock("vscode-languageclient/node", () => {
     LanguageClient,
   };
 });
-
-const SERVER_NAME = "COBOL Language Support";
 
 const javaServer: JavaServer = {
   kind: "JAVA",
@@ -82,8 +79,8 @@ describe("LanguageClientService positive scenario", () => {
 
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
-      LANGUAGE_ID,
-      SERVER_NAME,
+      "cobol",
+      "COBOL Language Support",
       {
         args: [
           "-Dline.separator=\r\n",
@@ -97,7 +94,7 @@ describe("LanguageClientService positive scenario", () => {
         options: { detached: false },
       },
       {
-        documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        documentSelector: ["cobol", "expcobol", "hpcobol"],
         errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
@@ -114,11 +111,11 @@ describe("LanguageClientService positive scenario", () => {
     };
     expect(await languageClientService.start([socketServer])).toBe(undefined);
     expect(LanguageClient).toHaveBeenLastCalledWith(
-      LANGUAGE_ID,
-      SERVER_NAME,
+      "cobol",
+      "COBOL Language Support",
       expect.any(Function),
       {
-        documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        documentSelector: ["cobol", "expcobol", "hpcobol"],
         errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
