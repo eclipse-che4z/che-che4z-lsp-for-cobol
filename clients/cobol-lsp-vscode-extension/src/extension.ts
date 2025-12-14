@@ -256,7 +256,6 @@ function initializeLanguageClientService(
   };
   const languageClientService = new LanguageClientService(
     extensionId,
-    outputChannel,
     copybookCacheLocations,
     middleware,
   );

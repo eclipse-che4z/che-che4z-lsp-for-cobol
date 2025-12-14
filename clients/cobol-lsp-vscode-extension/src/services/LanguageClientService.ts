@@ -49,7 +49,6 @@ export class LanguageClientService {
 
   constructor(
     private readonly extensionId: string,
-    private readonly outputChannel: vscode.LogOutputChannel,
     private readonly copybookCacheLocations: vscode.Uri[],
     private readonly middleware: Middleware,
   ) {
@@ -79,17 +78,12 @@ export class LanguageClientService {
 
   public async start(servers: Server[]) {
     if (!servers.length) {
-      this.outputChannel.error("No server to start");
+      outputChannel.error("No server to start");
       return;
     }
-    const clientOptions = getClientOptions(
-      this.outputChannel,
-      this.middleware,
-      this.watchers,
-    );
+    const clientOptions = getClientOptions(this.middleware, this.watchers);
     for (const server of servers) {
       const languageClient = await startServer(
-        this.outputChannel,
         server,
         clientOptions,
         this.handlers,
@@ -186,7 +180,6 @@ export class LanguageClientService {
 }
 
 function getClientOptions(
-  outputChannel: vscode.LogOutputChannel,
   middleware: Middleware,
   fileEvents: vscode.FileSystemWatcher[],
 ): LanguageClientOptions {
@@ -205,7 +198,6 @@ function getClientOptions(
 }
 
 async function startServer(
-  outputChannel: vscode.LogOutputChannel,
   server: Server,
   clientOptions: LanguageClientOptions,
   handlers: Handler[],

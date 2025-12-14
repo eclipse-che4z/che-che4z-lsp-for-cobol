@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as vscode from "vscode";
 import type {
   JavaServer,
   SocketServer,
@@ -21,7 +22,6 @@ import { LanguageClientService } from "../../services/LanguageClientService";
 import { LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID } from "../../constants";
 import { outputChannel } from "../../services/util/OutputChannel";
 
-import * as vscode from "vscode";
 import * as JavaCheck from "../../services/JavaCheck";
 import { Middleware, LanguageClient, State } from "vscode-languageclient/node";
 
@@ -71,7 +71,6 @@ describe("LanguageClientService positive scenario", () => {
     middleware = {};
     languageClientService = new LanguageClientService(
       "Publisher.Extension-Name",
-      outputChannel,
       [vscode.Uri.file("/storagePath")],
       middleware,
     );
@@ -102,7 +101,7 @@ describe("LanguageClientService positive scenario", () => {
         documentSelector: [LANGUAGE_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
         errorHandler: expect.any(Function),
         middleware: {},
-        outputChannel: outputChannel,
+        outputChannel,
         synchronize: {
           fileEvents: [undefined, undefined, undefined, undefined, undefined],
         },
