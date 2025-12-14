@@ -40,7 +40,9 @@ jest.mock("vscode-languageclient/node", () => {
     start() {
       this.state = State.Running;
     }
-    dispose() {}
+    dispose() {
+      this.state = State.Stopped;
+    }
   }
 
   return {
