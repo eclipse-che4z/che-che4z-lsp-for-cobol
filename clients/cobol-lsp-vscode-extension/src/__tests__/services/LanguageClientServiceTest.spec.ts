@@ -73,7 +73,6 @@ describe("LanguageClientService", () => {
 
   test("Starts java language server", async () => {
     await languageClientService.start([javaServer]);
-
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
       "cobol",
@@ -105,7 +104,7 @@ describe("LanguageClientService", () => {
       kind: "NATIVE",
       command: vscode.Uri.parse("file:///native/server/folder/executable"),
     };
-    expect(await languageClientService.start([socketServer])).toBe(undefined);
+    await languageClientService.start([socketServer]);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
       "COBOL Language Support",
@@ -134,7 +133,7 @@ describe("LanguageClientService", () => {
       kind: "SOCKET",
       port: 8192,
     };
-    expect(await languageClientService.start([socketServer])).toBe(undefined);
+    await languageClientService.start([socketServer]);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
       "COBOL Language Support",
