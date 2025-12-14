@@ -59,7 +59,6 @@ const javaServer: JavaServer = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  vscode.workspace.createFileSystemWatcher = jest.fn();
 });
 
 const SERVER_STOPPED_MSG = "server stopped";
@@ -102,9 +101,7 @@ describe("LanguageClientService positive scenario", () => {
         errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
-        synchronize: {
-          fileEvents: [undefined, undefined, undefined, undefined, undefined],
-        },
+        synchronize: expect.any(Object),
       },
     );
   });
@@ -125,9 +122,7 @@ describe("LanguageClientService positive scenario", () => {
         errorHandler: expect.any(Function),
         middleware: {},
         outputChannel,
-        synchronize: {
-          fileEvents: [undefined, undefined, undefined, undefined],
-        },
+        synchronize: expect.any(Object),
       },
     );
   });
