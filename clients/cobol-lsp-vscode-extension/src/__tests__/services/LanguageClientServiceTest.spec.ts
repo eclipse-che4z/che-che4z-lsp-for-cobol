@@ -105,6 +105,7 @@ describe("LanguageClientService", () => {
       command: vscode.Uri.parse("file:///native/server/folder/executable"),
     };
     await languageClientService.start([socketServer]);
+    expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
       "COBOL Language Support",
@@ -134,6 +135,7 @@ describe("LanguageClientService", () => {
       port: 8192,
     };
     await languageClientService.start([socketServer]);
+    expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
       "COBOL Language Support",
@@ -153,13 +155,12 @@ describe("LanguageClientService", () => {
     LanguageClient.prototype.sendRequest = () =>
       Promise.resolve(expectedResult);
     await languageClientService.start([javaServer]);
-    expect(
-      await languageClientService.retrieveAnalysis(
-        "test",
-        "text",
-        new vscode.Position(0, 0),
-      ),
-    ).toBe(expectedResult);
+    const analysisResult = await languageClientService.retrieveAnalysis(
+      "test",
+      "text",
+      new vscode.Position(0, 0),
+    );
+    expect(analysisResult).toBe(expectedResult);
   });
 
   test("Fire a .dispose() on LanguageClient", async () => {
