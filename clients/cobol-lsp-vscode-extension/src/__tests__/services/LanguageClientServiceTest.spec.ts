@@ -27,10 +27,6 @@ import { Middleware, LanguageClient, State } from "vscode-languageclient/node";
 
 jest.mock("vscode");
 jest.mock("vscode-languageclient/node", () => {
-  return jest.requireActual("vscode-languageclient/node");
-});
-
-jest.mock("vscode-languageclient/node", () => {
   const originalModule = jest.requireActual("vscode-languageclient/node");
   class LanguageClient extends jest.fn() {
     public state = State.Stopped;
