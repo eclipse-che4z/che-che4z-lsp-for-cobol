@@ -20,8 +20,6 @@ import type {
 
 import { LanguageClientService } from "../../services/LanguageClientService";
 import { outputChannel } from "../../services/util/OutputChannel";
-
-import * as JavaCheck from "../../services/JavaCheck";
 import { Middleware, LanguageClient, State } from "vscode-languageclient/node";
 
 jest.mock("vscode");
@@ -46,6 +44,9 @@ jest.mock("vscode-languageclient/node", () => {
     LanguageClient,
   };
 });
+jest.mock("../../services/JavaCheck", () => ({
+  getJavaVersion: jest.fn().mockResolvedValue(17),
+}));
 
 const javaServer: JavaServer = {
   kind: "JAVA",
@@ -69,8 +70,6 @@ describe("LanguageClientService positive scenario", () => {
       [vscode.Uri.file("/storagePath")],
       middleware,
     );
-
-    jest.spyOn(JavaCheck, "getJavaVersion").mockResolvedValue(17);
   });
 
   test("Test LanguageClientService starts language client", async () => {
