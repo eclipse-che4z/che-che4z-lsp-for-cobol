@@ -54,8 +54,8 @@ jest.mock("../../services/JavaCheck", () => ({
 const javaServer: JavaServer = {
   kind: "JAVA",
   command: "/test/bin/java",
-  dialects: vscode.Uri.file("/test/dialectsFolder"),
-  jar: vscode.Uri.file("/test/server/server.jar"),
+  dialects: vscode.Uri.parse("file:///test/dialectsFolder"),
+  jar: vscode.Uri.parse("file:///test/server/server.jar"),
 };
 
 beforeEach(() => {
@@ -68,7 +68,7 @@ describe("LanguageClientService", () => {
   beforeEach(() => {
     languageClientService = new LanguageClientService(
       "Publisher.Extension-Name",
-      [vscode.Uri.file("/storagePath")],
+      [vscode.Uri.parse("file:///storagePath")],
       {},
     );
   });
