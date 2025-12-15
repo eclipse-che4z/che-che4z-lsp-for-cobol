@@ -31,7 +31,7 @@ class TestCicsSupportPoundSymbol {
           + "       PROCEDURE DIVISION.\n"
           + "            EXEC CICS \n"
           + "            SEND MAP('POUND£')\n"
-          + "            MAPSET('POUNDTWO £')\n"
+          + "            MAPSET('POUND£')\n"
           + "            END-EXEC.";
 
   @Test
