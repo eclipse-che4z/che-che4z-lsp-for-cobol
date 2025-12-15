@@ -54,8 +54,8 @@ jest.mock("../../services/JavaCheck", () => ({
 const javaServer: JavaServer = {
   kind: "JAVA",
   command: "/test/bin/java",
-  dialects: vscode.Uri.parse("file:///test/dialectsFolder"),
-  jar: vscode.Uri.parse("file:///test/server/server.jar"),
+  dialects: vscode.Uri.parse("cobol:///test/dialectsFolder"),
+  jar: vscode.Uri.parse("cobol:///test/server/server.jar"),
 };
 
 beforeEach(() => {
@@ -68,7 +68,7 @@ describe("LanguageClientService", () => {
   beforeEach(() => {
     languageClientService = new LanguageClientService(
       "Publisher.Extension-Name",
-      [vscode.Uri.parse("file:///storagePath")],
+      [vscode.Uri.parse("cobol:///storagePath")],
       {},
     );
   });
@@ -104,7 +104,7 @@ describe("LanguageClientService", () => {
   test("Starts native language server", async () => {
     const nativeServer: NativeServer = {
       kind: "NATIVE",
-      command: vscode.Uri.parse("file:///native/server/folder/executable"),
+      command: vscode.Uri.parse("cobol:///native/server/folder/executable"),
     };
     await languageClientService.start([nativeServer]);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
