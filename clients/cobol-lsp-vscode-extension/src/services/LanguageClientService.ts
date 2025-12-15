@@ -194,18 +194,17 @@ function getClientOptions(
   };
 }
 
-async function startServer(
+function startServer(
   server: Server,
   clientOptions: LanguageClientOptions,
-  handlers: Handler[],
 ): Promise<LanguageClient | undefined> {
   switch (server.kind) {
     case "SOCKET":
-      return await startSocketServer(server.port, clientOptions, handlers);
+      return startSocketServer(server.port, clientOptions);
     case "JAVA":
-      return await startJavaServer(server, clientOptions, handlers);
+      return startJavaServer(server, clientOptions);
     case "NATIVE":
-      return startNativeServer(server, clientOptions, handlers);
+      return startNativeServer(server, clientOptions);
     default: {
       const exhaustiveCheck: never = server;
       throw new Error(exhaustiveCheck);
