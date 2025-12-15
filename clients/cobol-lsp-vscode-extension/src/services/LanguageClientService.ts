@@ -83,12 +83,9 @@ export class LanguageClientService {
     }
     const clientOptions = getClientOptions(this.middleware, this.watchers);
     for (const server of servers) {
-      const languageClient = await startServer(
-        server,
-        clientOptions,
-        this.handlers,
-      );
+      const languageClient = await startServer(server, clientOptions);
       if (languageClient) {
+        this.handlers.forEach((handler) => handler(languageClient));
         this.languageClient = languageClient;
         return;
       }

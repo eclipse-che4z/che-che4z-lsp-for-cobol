@@ -14,7 +14,6 @@ import { telemetryEvent } from "../reporter";
 export async function startJavaServer(
   server: JavaServer,
   clientOptions: LanguageClientOptions,
-  handlers: Array<(languageClient: LanguageClient) => void>,
 ): Promise<LanguageClient | undefined> {
   let major: number;
   try {
@@ -54,9 +53,6 @@ export async function startJavaServer(
     clientOptions,
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
-
-  handlers.forEach((handler) => handler(languageClient));
-
   outputChannel.info("Staring language client with JAVA language server");
   try {
     await languageClient.start();

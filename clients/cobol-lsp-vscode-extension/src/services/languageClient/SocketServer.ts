@@ -12,7 +12,6 @@ import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
 export async function startSocketServer(
   port: number,
   clientOptions: LanguageClientOptions,
-  handlers: Array<(languageClient: LanguageClient) => void>,
 ): Promise<LanguageClient | undefined> {
   const serverOptions: ServerOptions = () => {
     const socket = net.connect({
@@ -33,9 +32,6 @@ export async function startSocketServer(
     clientOptions,
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
-
-  handlers.forEach((handler) => handler(languageClient));
-
   outputChannel.info("Staring language client with SOCKET language server");
   try {
     await languageClient.start();

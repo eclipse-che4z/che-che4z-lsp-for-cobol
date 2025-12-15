@@ -152,6 +152,28 @@ describe("LanguageClientService", () => {
     );
   });
 
+  test("Start is called first, then handler registration", async () => {
+    const callSequence: String[] = [];
+    LanguageClient.prototype.onRequest = jest.fn().mockImplementation(() => {
+      callSequence.push("onRequest");
+    });
+    LanguageClient.prototype.onNotification = jest
+      .fn()
+      .mockImplementation(() => {
+        callSequence.push("onNotification");
+      });
+    const originalStart = LanguageClient.prototype.start;
+    LanguageClient.prototype.start = jest.fn().mockImplementation(function (
+      this: any,
+    ) {
+      originalStart.apply(this);
+      callSequence.push("start");
+    });
+    languageClientService.addRequestHandler("request/name", jest.fn());
+    languageClientService.addNotificationHandler("event/name", jest.fn());
+    await languageClientService.start([javaServer]);
+    expect(callSequence).toEqual(["start", "onRequest", "onNotification"]);
+  });
   test("Retrieve analysis passes", async () => {
     const expectedResult = { programs: ["A", "B", "C"] };
     LanguageClient.prototype.sendRequest = () =>

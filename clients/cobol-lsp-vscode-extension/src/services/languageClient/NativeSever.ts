@@ -12,7 +12,6 @@ import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
 export async function startNativeServer(
   server: NativeServer,
   clientOptions: LanguageClientOptions,
-  handlers: Array<(languageClient: LanguageClient) => void>,
 ): Promise<LanguageClient | undefined> {
   const serverOptions: ServerOptions = {
     command: server.command.fsPath,
@@ -35,9 +34,6 @@ export async function startNativeServer(
     clientOptions,
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
-
-  handlers.forEach((handler) => handler(languageClient));
-
   outputChannel.info("Staring language client with NATIVE language server");
   try {
     await languageClient.start();
