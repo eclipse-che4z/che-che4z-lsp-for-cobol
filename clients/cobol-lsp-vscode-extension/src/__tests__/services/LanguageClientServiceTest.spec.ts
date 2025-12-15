@@ -153,7 +153,7 @@ describe("LanguageClientService", () => {
   });
 
   test("Start is called first, then handler registration", async () => {
-    const callSequence: String[] = [];
+    const callSequence: string[] = [];
     LanguageClient.prototype.onRequest = jest.fn().mockImplementation(() => {
       callSequence.push("onRequest");
     });
@@ -164,10 +164,10 @@ describe("LanguageClientService", () => {
       });
     const originalStart = LanguageClient.prototype.start;
     LanguageClient.prototype.start = jest.fn().mockImplementation(function (
-      this: any,
+      this: unknown,
     ) {
-      originalStart.apply(this);
       callSequence.push("start");
+      return originalStart.apply(this);
     });
     languageClientService.addRequestHandler("request/name", jest.fn());
     languageClientService.addNotificationHandler("event/name", jest.fn());
