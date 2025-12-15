@@ -102,11 +102,11 @@ describe("LanguageClientService", () => {
   });
 
   test("Starts native language server", async () => {
-    const socketServer: NativeServer = {
+    const nativeServer: NativeServer = {
       kind: "NATIVE",
       command: vscode.Uri.parse("file:///native/server/folder/executable"),
     };
-    await languageClientService.start([socketServer]);
+    await languageClientService.start([nativeServer]);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
