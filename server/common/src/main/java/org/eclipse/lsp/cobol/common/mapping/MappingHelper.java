@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import lombok.experimental.UtilityClass;
+import org.eclipse.lsp4j.Range;
 
 /** Maping helper class */
 @UtilityClass
@@ -29,5 +30,20 @@ public class MappingHelper {
    */
   public String[] split(String text) {
     return text.split(SEPARATOR);
+  }
+
+  static void validateRange(Range range) {
+    if (range.getStart().getLine() < 0 || range.getEnd().getLine() < 0) {
+      throw new IllegalArgumentException("Invalid range");
+    }
+    if (range.getStart().getLine() > range.getEnd().getLine()) {
+      throw new IllegalArgumentException("Invalid range");
+    }
+    if (range.getStart().getCharacter() < 0 || range.getEnd().getCharacter() < 0) {
+      throw new IllegalArgumentException("Invalid range");
+    }
+    if (range.getStart().getCharacter() > range.getEnd().getCharacter()) {
+      throw new IllegalArgumentException("Invalid range");
+    }
   }
 }

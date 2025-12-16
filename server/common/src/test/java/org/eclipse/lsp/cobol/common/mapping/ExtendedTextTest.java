@@ -567,24 +567,6 @@ class ExtendedTextTest {
   }
 
   @Test
-  void testReplaceWithMap_missing_replacement_token() {
-    ExtendedText extendedText = new ExtendedText("MOVE 1 TO FOO", "uri");
-
-    Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 3));
-    extendedText.replace(range, statementRange, "MOVE 1 TO {FOO}", "DISPLAY {BAR}. DISPLAY {FOO}");
-
-    Location fooLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 12)));
-
-    assertEquals("DISPLAY . DISPLAY FOO", extendedText.toString());
-
-    // FOO
-    Location location =
-        extendedText.mapLocation(new Range(new Position(0, 18), new Position(0, 20)));
-    assertEquals(fooLocation.toString(), location.toString());
-  }
-
-  @Test
   void testReplaceWithMap_replace_value() {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
 
@@ -646,61 +628,6 @@ class ExtendedTextTest {
     // NEWVALUE
     location = extendedText.mapLocation(new Range(new Position(1, 8), new Position(0, 16)));
     assertEquals(fooLocation.toString(), location.toString());
-  }
-
-  @Test
-  void testReplaceWithMap_replace_blank() {
-    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-
-    Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
-    extendedText.replace(range, statementRange, "STATEMENT {FOO}", "{FOO|} STATEMENT");
-
-    assertEquals(" STATEMENT", extendedText.toString());
-  }
-
-  @Test
-  void testReplaceWithMap_statement_braces_open() {
-    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-
-    Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
-    extendedText.replace(range, statementRange, "STATEMENT {FOO", "DISPLAY {FOO}.");
-
-    assertEquals("DISPLAY .", extendedText.toString());
-  }
-
-  @Test
-  void testReplaceWithMap_statement_braces_close() {
-    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-
-    Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
-    extendedText.replace(range, statementRange, "STATEMENT FOO}", "DISPLAY {FOO}.");
-
-    assertEquals("DISPLAY .", extendedText.toString());
-  }
-
-  @Test
-  void testReplaceWithMap_replacement_braces_open() {
-    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-
-    Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
-    extendedText.replace(range, statementRange, "STATEMENT {FOO}", "DISPLAY {FOO. IGNORED TEXT");
-
-    assertEquals("DISPLAY ", extendedText.toString());
-  }
-
-  @Test
-  void testReplaceWithMap_replacement_braces_close() {
-    ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-
-    Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
-    extendedText.replace(range, statementRange, "STATEMENT FOO}", "DISPLAY FOO}.");
-
-    assertEquals("DISPLAY FOO.", extendedText.toString());
   }
 
   @Test

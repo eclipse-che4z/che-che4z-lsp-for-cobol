@@ -65,9 +65,17 @@ class TextMapReplacer {
       Range range, Range statementRange, String statementMap, String replacementMap) {
     Map<String, Token> tokens = new HashMap<>();
 
+    MappingHelper.validateRange(range);
+    MappingHelper.validateRange(statementRange);
+    validateMapSize(statementMap);
+    validateMapSize(replacementMap);
+
     String[] statementMapArray = MappingHelper.split(statementMap);
     for (int i = 0; i < statementMapArray.length; i++) {
       scanForTokens(tokens, statementMapArray, i, range);
+    }
+    if (tokens.isEmpty()) {
+      throw new IllegalArgumentException("Statement map must contain at least 1 token name");
     }
 
     Map<Range, Token> tokenReplacements = new HashMap<>();
@@ -85,38 +93,69 @@ class TextMapReplacer {
   }
 
   private void scanForTokens(
-      Map<String, Token> tokens, String[] statementMapArray, int index, Range range) {
-    char[] statementLine = statementMapArray[index].toCharArray();
+      Map<String, Token> tokens, String[] statementMapArray, int mapLine, Range range) {
+    char[] statementLine = statementMapArray[mapLine].toCharArray();
 
+    int bracesIndicator = 0;
     int symbolCount = 0;
     StringBuilder temp = new StringBuilder();
 
     for (int i = 0; i < statementLine.length; i++) {
-      if (symbolCount % 2 == 0) {
-        if (statementLine[i] == BRACE_OPEN) {
-          symbolCount++;
-        }
-      } else {
-        if (statementLine[i] == BRACE_CLOSE) {
-          int line = range.getStart().getLine() + index;
-          int character = i - symbolCount - temp.length();
-          Location originalLocation =
-              extendedText.mapLocation(
-                  new Range(
-                      new Position(line, character),
-                      new Position(line, character + temp.length() - 1)));
-          ExtendedTextLine extendedTextLine = extendedText.getLines().get(line);
-          String value =
-              extendedTextLine.subline(character, character + temp.length() - 1).toString();
+      int line = range.getStart().getLine() + mapLine;
 
-          tokens.put(temp.toString(), new Token(value, originalLocation));
-
-          symbolCount++;
-          temp = new StringBuilder();
-        } else {
-          temp.append(statementLine[i]);
+      if (statementLine[i] == BRACE_OPEN) {
+        if (bracesIndicator > 0) {
+          String message =
+              String.format("expected \"%s\" instead of \"%s\"", BRACE_CLOSE, BRACE_OPEN);
+          throwInvalidParameters("Statement map error", message, mapLine, i);
         }
+        bracesIndicator++;
+        symbolCount++;
+      } else if (statementLine[i] == BRACE_CLOSE) {
+        if (bracesIndicator <= 0) {
+          String message =
+              String.format("expected \"%s\" instead of \"%s\"", BRACE_OPEN, BRACE_CLOSE);
+          throwInvalidParameters("Statement map error", message, mapLine, i);
+        }
+        bracesIndicator--;
+
+        String tokenName = temp.toString();
+        int character = i - symbolCount - tokenName.length();
+
+        if (tokenName.isEmpty()) {
+          throwInvalidParameters(
+              "Statement map error", "token name cannot be empty", mapLine, i - 1);
+        }
+        if (tokens.containsKey(tokenName)) {
+          throwInvalidParameters(
+              String.format("Statement map contains duplicated token \"%s\"", tokenName),
+              mapLine,
+              i - tokenName.length());
+        }
+
+        Location originalLocation =
+            extendedText.mapLocation(
+                new Range(
+                    new Position(line, character),
+                    new Position(line, character + tokenName.length() - 1)));
+        ExtendedTextLine extendedTextLine = extendedText.getLines().get(line);
+        String value =
+            extendedTextLine.subline(character, character + tokenName.length() - 1).toString();
+
+        tokens.put(tokenName, new Token(value, originalLocation));
+
+        symbolCount++;
+        temp = new StringBuilder();
+      } else if (bracesIndicator == 1) {
+        temp.append(statementLine[i]);
       }
+    }
+    if (bracesIndicator > 0) {
+      throwInvalidParameters(
+          "Statement map error",
+          "opening brace { has no matching closing brace",
+          mapLine,
+          statementLine.length - 1);
     }
   }
 
@@ -128,14 +167,15 @@ class TextMapReplacer {
     StringBuilder result = new StringBuilder();
     String[] replacementMapArray = MappingHelper.split(replacementMap);
 
-    for (int line = 0; line < replacementMapArray.length; line++) {
-      char[] replacementLine = replacementMapArray[line].toCharArray();
-      boolean bracesOpened = false;
+    for (int mapLine = 0; mapLine < replacementMapArray.length; mapLine++) {
+      char[] replacementLine = replacementMapArray[mapLine].toCharArray();
+      int bracesIndicator = 0;
       boolean escapeCharacter = false;
       StringBuilder tokenName = new StringBuilder();
 
       StringBuilder outputLine = new StringBuilder();
-      for (char c : replacementLine) {
+      for (int i = 0; i < replacementLine.length; i++) {
+        char c = replacementLine[i];
         if (c == ESCAPE_CHAR && !escapeCharacter) {
           escapeCharacter = true;
           continue;
@@ -146,50 +186,108 @@ class TextMapReplacer {
           continue;
         }
         if (c == BRACE_OPEN) {
-          bracesOpened = true;
+          if (bracesIndicator > 0) {
+            String message =
+                String.format("expected \"%s\" instead of \"%s\"", BRACE_CLOSE, BRACE_OPEN);
+            throwInvalidParameters("Replacement map error", message, mapLine, i);
+          }
+          bracesIndicator++;
           continue;
         }
         if (c == BRACE_CLOSE) {
-          bracesOpened = false;
+          if (bracesIndicator <= 0) {
+            String message =
+                String.format("expected \"%s\" instead of \"%s\"", BRACE_OPEN, BRACE_CLOSE);
+            throwInvalidParameters("Replacement map error", message, mapLine, i);
+          }
+          bracesIndicator--;
 
           ImmutablePair<String, String> tokenNameAndValue =
-              getTokenNameAndValue(tokenName.toString());
+              getTokenNameAndValue(tokenName.toString(), mapLine, i - tokenName.length());
 
           Token token = tokens.get(tokenNameAndValue.getLeft());
-          if (token != null) {
-            String value =
-                Optional.ofNullable(tokenNameAndValue.getRight()).orElse(token.getValue());
-            int character = outputLine.length() + (line == 0 ? startPosition.getCharacter() : 0);
-            Range range =
-                new Range(
-                    new Position(startPosition.getLine() + line, character),
-                    new Position(startPosition.getLine() + line, character + value.length()));
-            tokenReplacements.put(range, new Token(value, token.getOriginalLocation()));
-            outputLine.append(value);
+
+          if (token == null) {
+            String message = String.format("token \"%s\" not found", tokenNameAndValue.getLeft());
+            throwInvalidParameters(
+                "Replacement map error", message, mapLine, i - tokenName.length());
           }
+          String value = Optional.ofNullable(tokenNameAndValue.getRight()).orElse(token.getValue());
+          int character = outputLine.length() + (mapLine == 0 ? startPosition.getCharacter() : 0);
+          Range range =
+              new Range(
+                  new Position(startPosition.getLine() + mapLine, character),
+                  new Position(startPosition.getLine() + mapLine, character + value.length()));
+          tokenReplacements.put(range, new Token(value, token.getOriginalLocation()));
+          outputLine.append(value);
+
           tokenName = new StringBuilder();
           continue;
         }
-        if (bracesOpened) {
+        if (bracesIndicator > 0) {
           tokenName.append(c);
         } else {
           outputLine.append(c);
         }
       }
-      if (line != replacementMapArray.length - 1) {
+      if (mapLine != replacementMapArray.length - 1) {
         outputLine.append("\n");
       }
       result.append(outputLine);
+      if (bracesIndicator > 0) {
+        throwInvalidParameters(
+            "Replacement map error",
+            "opening brace { has no matching closing brace",
+            mapLine,
+            replacementLine.length - 1);
+      }
     }
     return result.toString();
   }
 
-  private ImmutablePair<String, String> getTokenNameAndValue(String token) {
+  private ImmutablePair<String, String> getTokenNameAndValue(
+      String token, int line, int character) {
     int indexOfSeparator = token.indexOf(VALUE_REPLACEMENT_CHAR);
-    if (indexOfSeparator > 0) {
-      return new ImmutablePair<>(
-          token.substring(0, indexOfSeparator), token.substring(indexOfSeparator + 1));
+    if (indexOfSeparator >= 0) {
+      String name = token.substring(0, indexOfSeparator);
+      String value = token.substring(indexOfSeparator + 1);
+
+      if (value.isEmpty()) {
+        throwInvalidParameters(
+            "Replacement map error",
+            "token value cannot be empty",
+            line,
+            character + name.length() + 1);
+      }
+      int nextSeparator = value.indexOf(VALUE_REPLACEMENT_CHAR);
+      if (nextSeparator > 0) {
+        String message =
+            String.format("duplicated separator symbol \"%s\"", VALUE_REPLACEMENT_CHAR);
+        throwInvalidParameters(
+            "Replacement map error", message, line, character + nextSeparator + name.length() + 1);
+      }
+      return new ImmutablePair<>(name, value);
     }
     return new ImmutablePair<>(token, null);
+  }
+
+  private String generatePositionString(int line, int character) {
+    return String.format("Line: %d, character: %d", line, character);
+  }
+
+  private void validateMapSize(String map) {
+    if (Optional.ofNullable(map).map(String::length).orElse(0) <= 0) {
+      throw new IllegalArgumentException("Map cannot be empty");
+    }
+  }
+
+  private void throwInvalidParameters(String header, String message, int line, int character) {
+    throw new IllegalArgumentException(
+        String.format("%s: %s. %s", header, message, generatePositionString(line, character)));
+  }
+
+  private void throwInvalidParameters(String message, int line, int character) {
+    throw new IllegalArgumentException(
+        String.format("%s. %s", message, generatePositionString(line, character)));
   }
 }
