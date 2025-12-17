@@ -145,7 +145,7 @@ class TextMapReplacer {
         tokens.put(tokenName, new Token(value, originalLocation));
 
         symbolCount++;
-        temp = new StringBuilder();
+        temp.setLength(0);
       } else if (bracesIndicator == 1) {
         temp.append(statementLine[i]);
       }
