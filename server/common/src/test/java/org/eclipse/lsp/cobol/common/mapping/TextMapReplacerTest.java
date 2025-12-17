@@ -260,7 +260,8 @@ class TextMapReplacerTest {
             IllegalArgumentException.class,
             () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "STATEMENT {TOKEN}&"));
     assertEquals(
-        "Replacement map error: Dangling escape character in the input string. Line: 0, character: 17",
+        "Replacement map error: Dangling escape character in the input string. Line: 0, character:"
+            + " 17",
         exception.getMessage());
   }
 
