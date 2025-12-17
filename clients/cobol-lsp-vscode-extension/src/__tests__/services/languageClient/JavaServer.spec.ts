@@ -27,10 +27,10 @@ if (windows) {
         command: "C:\\t e s t\\bin\\java",
         args: [
           "-Dline.separator=\r\n",
-          "-Ddialect.path=C:\\t e s t\\dialects",
+          "-Ddialect.path=c:\\t e s t\\dialects",
           "-Xmx768M",
           "-jar",
-          "C:\\t e s t\\server\\server.jar",
+          "c:\\t e s t\\server\\server.jar",
           "pipeEnabled",
         ],
         options: { detached: false },
