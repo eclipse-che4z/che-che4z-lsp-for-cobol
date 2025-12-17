@@ -221,7 +221,7 @@ class TextMapReplacer {
           tokenReplacements.put(range, new Token(value, token.getOriginalLocation()));
           outputLine.append(value);
 
-          tokenName = new StringBuilder();
+          tokenWithValue.setLength(0);
           continue;
         }
         if (bracesIndicator > 0) {
