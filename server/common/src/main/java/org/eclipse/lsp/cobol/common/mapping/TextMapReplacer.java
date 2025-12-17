@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.common.mapping;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
 import lombok.Value;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -38,14 +38,12 @@ import org.eclipse.lsp4j.Range;
  * the 1st original "this" token and for the 2nd "this" token mapping will be pointing to the 2nd
  * original "this" token. All other characters will be pointed to the provided range
  */
-@AllArgsConstructor
+@UtilityClass
 class TextMapReplacer {
   private static final char BRACE_OPEN = '{';
   private static final char BRACE_CLOSE = '}';
   private static final char ESCAPE_CHAR = '&';
   private static final char VALUE_REPLACEMENT_CHAR = '|';
-
-  private final ExtendedText extendedText;
 
   @Value
   private static class Token {
@@ -56,13 +54,18 @@ class TextMapReplacer {
   /**
    * Replaces given range of text with a new text using replacement map
    *
+   * @param extendedText - the extended text object
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
    * @param statementMap - an original text map
    * @param replacementMap - a new text replacement map
    */
   public void execute(
-      Range range, Range statementRange, String statementMap, String replacementMap) {
+      ExtendedText extendedText,
+      Range range,
+      Range statementRange,
+      String statementMap,
+      String replacementMap) {
     Map<String, Token> tokens = new HashMap<>();
 
     MappingHelper.validateRange(range);
@@ -72,7 +75,12 @@ class TextMapReplacer {
 
     String[] statementMapArray = MappingHelper.split(statementMap);
     for (int i = 0; i < statementMapArray.length; i++) {
-      scanForTokens(tokens, statementMapArray[i].toCharArray(), i, range.getStart().getLine() + i);
+      scanForTokens(
+          extendedText,
+          tokens,
+          statementMapArray[i].toCharArray(),
+          i,
+          range.getStart().getLine() + i);
     }
     if (tokens.isEmpty()) {
       throw new IllegalArgumentException("Statement map must contain at least 1 token name");
@@ -93,7 +101,11 @@ class TextMapReplacer {
   }
 
   private void scanForTokens(
-      Map<String, Token> tokens, char[] statementLine, int mapLine, int line) {
+      ExtendedText extendedText,
+      Map<String, Token> tokens,
+      char[] statementLine,
+      int mapLine,
+      int line) {
     int bracesIndicator = 0;
     int symbolCount = 0;
     StringBuilder temp = new StringBuilder();

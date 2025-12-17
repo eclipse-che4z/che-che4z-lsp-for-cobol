@@ -29,7 +29,6 @@ public class ExtendedText {
   private final List<ExtendedTextLine> lines = new ArrayList<>();
   private final List<Mapper> mappers;
   private final List<ReplaceStrategy> replacers;
-  private final TextMapReplacer textMapReplacer;
   @Getter private final String uri;
 
   public ExtendedText(String text, String uri) {
@@ -46,7 +45,6 @@ public class ExtendedText {
             new OneToOneReplaceStrategy(),
             new SingleLineReplaceStrategy(),
             new MultilineReplaceStrategy());
-    this.textMapReplacer = new TextMapReplacer(this);
   }
 
   @Override
@@ -344,7 +342,7 @@ public class ExtendedText {
    */
   public void replace(
       Range range, Range statementRange, String statementMap, String replacementMap) {
-    this.textMapReplacer.execute(range, statementRange, statementMap, replacementMap);
+    TextMapReplacer.execute(this, range, statementRange, statementMap, replacementMap);
   }
 
   private MappedCharacter getCharacterAt(Position position) {

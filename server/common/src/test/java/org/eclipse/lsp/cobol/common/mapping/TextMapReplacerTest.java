@@ -25,23 +25,26 @@ import org.junit.jupiter.api.Test;
 class TextMapReplacerTest {
   @Test
   void testValidateParameters_statementMap_empty() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(extendedText, createRange(), createRange(), "", "{TOKEN}"));
     assertEquals("Map cannot be empty", exception.getMessage());
   }
 
   @Test
   void testValidateParameters_statementMap_empty_token() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{}", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{}", "{TOKEN}"));
     assertEquals(
         "Statement map error: token name cannot be empty. Line: 0, character: 0",
         exception.getMessage());
@@ -49,23 +52,27 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_statementMap_no_tokens() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "TEXT TEXT", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "TEXT TEXT", "{TOKEN}"));
     assertEquals("Statement map must contain at least 1 token name", exception.getMessage());
   }
 
   @Test
   void testValidateParameters_statementMap_duplicated_tokens() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{AAA} {AAA}", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{AAA} {AAA}", "{TOKEN}"));
     assertEquals(
         "Statement map contains duplicated token \"AAA\". Line: 0, character: 7",
         exception.getMessage());
@@ -73,12 +80,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_statementMap_leave_brace_opened() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{AAA} {AAA", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{AAA} {AAA", "{TOKEN}"));
     assertEquals(
         "Statement map error: opening brace { has no matching closing brace. Line: 0, character: 9",
         exception.getMessage());
@@ -86,12 +95,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_statementMap_brace_opened_twice_1() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{A{", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{A{", "{TOKEN}"));
     assertEquals(
         "Statement map error: expected \"}\" instead of \"{\". Line: 0, character: 2",
         exception.getMessage());
@@ -99,12 +110,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_statementMap_brace_opened_twice_2() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{{", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{{", "{TOKEN}"));
     assertEquals(
         "Statement map error: expected \"}\" instead of \"{\". Line: 0, character: 1",
         exception.getMessage());
@@ -112,12 +125,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_statementMap_brace_closed_before_opened() {
-    TextMapReplacer replacer = new TextMapReplacer(new ExtendedText("text", "uri"));
+    ExtendedText extendedText = new ExtendedText("text", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{A}B}", "{TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{A}B}", "{TOKEN}"));
     assertEquals(
         "Statement map error: expected \"{\" instead of \"}\". Line: 0, character: 4",
         exception.getMessage());
@@ -125,13 +140,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_brace_opened_twice_1() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{A{"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{A{"));
     assertEquals(
         "Replacement map error: expected \"}\" instead of \"{\". Line: 0, character: 2",
         exception.getMessage());
@@ -139,13 +155,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_brace_opened_twice_2() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{{"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{{"));
     assertEquals(
         "Replacement map error: expected \"}\" instead of \"{\". Line: 0, character: 1",
         exception.getMessage());
@@ -153,13 +170,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_brace_closed_before_opened() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{TOKEN}B}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{TOKEN}B}"));
     assertEquals(
         "Replacement map error: expected \"{\" instead of \"}\". Line: 0, character: 8",
         exception.getMessage());
@@ -167,13 +185,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_leave_brace_opened() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{TOKEN} {AAA"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{TOKEN} {AAA"));
     assertEquals(
         "Replacement map error: opening brace { has no matching closing brace. Line: 0, character: "
             + "11",
@@ -182,13 +201,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_token_not_found() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{AAA|BBB}{B}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{AAA|BBB}{B}"));
     assertEquals(
         "Replacement map error: token \"AAA\" not found. Line: 0, character: 1",
         exception.getMessage());
@@ -197,21 +217,22 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_allow_duplicate_separator() {
     ExtendedText extendedText = new ExtendedText("TOKEN in the extended text document", "uri");
-    TextMapReplacer replacer = new TextMapReplacer(extendedText);
 
-    replacer.execute(createRange(), createRange(), "{TOKEN}", "{TOKEN|BBB|CCC}");
+    TextMapReplacer.execute(
+        extendedText, createRange(), createRange(), "{TOKEN}", "{TOKEN|BBB|CCC}");
     assertEquals(extendedText.toString(), "BBB|CCC in the extended text document");
   }
 
   @Test
   void testValidateParameters_replacementMap_misplaced_separator_1() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{TOKEN|}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{TOKEN|}"));
     assertEquals(
         "Replacement map error: token value cannot be empty. Line: 0, character: 7",
         exception.getMessage());
@@ -219,13 +240,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_misplaced_separator_2() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{|TOKEN}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{|TOKEN}"));
     assertEquals(
         "Replacement map error: token \"\" not found. Line: 0, character: 1",
         exception.getMessage());
@@ -233,13 +255,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_empty_token() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{}"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "{}"));
     assertEquals(
         "Replacement map error: token \"\" not found. Line: 0, character: 1",
         exception.getMessage());
@@ -247,13 +270,14 @@ class TextMapReplacerTest {
 
   @Test
   void testValidateParameters_replacementMap_dangling_escape_character() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+    ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
 
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "STATEMENT {TOKEN}&"));
+            () ->
+                TextMapReplacer.execute(
+                    extendedText, createRange(), createRange(), "{TOKEN}", "STATEMENT {TOKEN}&"));
     assertEquals(
         "Replacement map error: Dangling escape character in the input string. Line: 0, character:"
             + " 17",
