@@ -80,7 +80,8 @@ class TextMapReplacer {
           tokens,
           statementMapArray[i].toCharArray(),
           i,
-          range.getStart().getLine() + i);
+          range.getStart().getLine() + i,
+          i == 0 ? range.getStart().getCharacter() : 0);
     }
     if (tokens.isEmpty()) {
       throw new IllegalArgumentException("Statement map must contain at least 1 token name");
@@ -105,7 +106,8 @@ class TextMapReplacer {
       Map<String, Token> tokens,
       char[] statementLine,
       int mapLine,
-      int line) {
+      int line,
+      int startCharacter) {
     int bracesIndicator = 0;
     int symbolCount = 0;
     StringBuilder temp = new StringBuilder();
@@ -128,7 +130,7 @@ class TextMapReplacer {
         bracesIndicator--;
 
         String tokenName = temp.toString();
-        int character = i - symbolCount - tokenName.length();
+        int character = i - symbolCount - tokenName.length() + startCharacter;
 
         if (tokenName.isEmpty()) {
           throwInvalidParameters(

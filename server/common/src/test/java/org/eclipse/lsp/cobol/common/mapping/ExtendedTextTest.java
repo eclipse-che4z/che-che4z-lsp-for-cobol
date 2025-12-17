@@ -398,7 +398,7 @@ class ExtendedTextTest {
     // The statement map that will be using to replace actual "VOID AAA THRU \n PAR OF PAR." text
     // The name of the token {PAR} is the same as its value (1st "PAR" token)
     // The name of the token {SEC} is different from its actual value "PAR" (2nd "PAR" token)
-    String statementMap = "     VOID {AAA} THRU \n {PAR} OF {SEC}.";
+    String statementMap = "VOID {AAA} THRU \n {PAR} OF {SEC}.";
     String replacementMap = "MOVE 1 TO {AAA}\n" + "GO TO {PAR} OF {SEC}.";
 
     Location statementLocation = new Location("uri", statementRange);
