@@ -35,7 +35,7 @@ if (windows) {
         ],
         options: { detached: false },
       },
-      { errorHandler: expect.any(Function) as any },
+      { errorHandler: expect.any(Function) as unknown },
     );
   });
 } else {
@@ -64,7 +64,7 @@ if (windows) {
         ],
         options: { detached: false },
       },
-      { errorHandler: expect.any(Function) as any },
+      { errorHandler: expect.any(Function) as unknown },
     );
   });
 }

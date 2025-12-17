@@ -6,8 +6,8 @@ export class LanguageClient extends jest.fn() {
   constructor(
     languageId: string,
     extensionName: string,
-    private serverOptions: Function | Object,
-    clientOptions: Object,
+    private serverOptions: () => void | object,
+    clientOptions: object,
   ) {
     super(languageId, extensionName, serverOptions, clientOptions);
   }
