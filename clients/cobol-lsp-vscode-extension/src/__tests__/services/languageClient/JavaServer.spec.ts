@@ -8,7 +8,6 @@ jest.mock("../../../services/JavaCheck", () => ({
 }));
 
 const windows = process.platform === "win32";
-
 if (windows) {
   test("Starts java language server", async () => {
     const javaServer: JavaServer = {
