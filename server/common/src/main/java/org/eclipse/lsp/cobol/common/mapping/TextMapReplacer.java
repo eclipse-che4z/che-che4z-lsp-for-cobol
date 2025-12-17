@@ -93,7 +93,7 @@ class TextMapReplacer {
   }
 
   private void scanForTokens(
-      Map<String, Token> tokens, String[] statementMapArray, int mapLine, Range range) {
+      Map<String, Token> tokens, char[] statementLine, int mapLine, int line) {
     char[] statementLine = statementMapArray[mapLine].toCharArray();
 
     int bracesIndicator = 0;
