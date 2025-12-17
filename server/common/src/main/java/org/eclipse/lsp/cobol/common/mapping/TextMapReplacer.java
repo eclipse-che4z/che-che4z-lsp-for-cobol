@@ -72,7 +72,7 @@ class TextMapReplacer {
 
     String[] statementMapArray = MappingHelper.split(statementMap);
     for (int i = 0; i < statementMapArray.length; i++) {
-      scanForTokens(tokens, statementMapArray, i, range);
+      scanForTokens(tokens, statementMapArray[i].toCharArray(), i, range.getStart().getLine() + i);
     }
     if (tokens.isEmpty()) {
       throw new IllegalArgumentException("Statement map must contain at least 1 token name");
@@ -94,15 +94,11 @@ class TextMapReplacer {
 
   private void scanForTokens(
       Map<String, Token> tokens, char[] statementLine, int mapLine, int line) {
-    char[] statementLine = statementMapArray[mapLine].toCharArray();
-
     int bracesIndicator = 0;
     int symbolCount = 0;
     StringBuilder temp = new StringBuilder();
 
     for (int i = 0; i < statementLine.length; i++) {
-      int line = range.getStart().getLine() + mapLine;
-
       if (statementLine[i] == BRACE_OPEN) {
         if (bracesIndicator > 0) {
           String message =
@@ -221,7 +217,7 @@ class TextMapReplacer {
           tokenReplacements.put(range, new Token(value, token.getOriginalLocation()));
           outputLine.append(value);
 
-          tokenWithValue.setLength(0);
+          tokenName.setLength(0);
           continue;
         }
         if (bracesIndicator > 0) {
@@ -238,6 +234,13 @@ class TextMapReplacer {
         throwInvalidParameters(
             "Replacement map error",
             "opening brace { has no matching closing brace",
+            mapLine,
+            replacementLine.length - 1);
+      }
+      if (escapeCharacter) {
+        throwInvalidParameters(
+            "Replacement map error",
+            "Dangling escape character in the input string",
             mapLine,
             replacementLine.length - 1);
       }

@@ -250,6 +250,20 @@ class TextMapReplacerTest {
         exception.getMessage());
   }
 
+  @Test
+  void testValidateParameters_replacementMap_dangling_escape_character() {
+    TextMapReplacer replacer =
+        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+
+    Exception exception =
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "STATEMENT {TOKEN}&"));
+    assertEquals(
+        "Replacement map error: Dangling escape character in the input string. Line: 0, character: 17",
+        exception.getMessage());
+  }
+
   private Range createRange() {
     return new Range(new Position(0, 0), new Position(0, 5));
   }
