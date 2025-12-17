@@ -160,12 +160,16 @@
       },
       "patterns": [
         {
-          "match": "'[^'\r\n]+'",
-          "name": "string.quoted.single.cobol"
+          "include": "#comment-cobol-source"
         },
         {
-          "match": "\"[^\"\r\n]+\"",
-          "name": "string.quoted.single.cobol"
+          "include": "#sequence-number-area"
+        },
+        {
+          "include": "#string-quoted-constant"
+        },
+        {
+          "include": "#string-double-quoted-constant"
         }
       ],
       "name": "string.quoted.single.cobol",
