@@ -137,7 +137,7 @@ class TextMapReplacer {
             extendedText.mapLocation(
                 new Range(
                     new Position(line, character),
-                    new Position(line, character + tokenName.length() - 1)));
+                    new Position(line, character + tokenName.length())));
         ExtendedTextLine extendedTextLine = extendedText.getLines().get(line);
         String value =
             extendedTextLine.subline(character, character + tokenName.length() - 1).toString();

@@ -379,7 +379,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 3));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
     Location location = new Location("replacement", statementRange);
     extendedText.replace(range, "DISPLAY VAR2.\nDISPLAY VAR1.\nMOVE VAR2 TO VAR1\n", location);
 
@@ -393,7 +393,7 @@ class ExtendedTextTest {
     ExtendedText extendedText =
         new ExtendedText("MOVE 1 TO A\n" + "     VOID AAA THRU \n PAR OF PAR. CONTINUE.", "uri");
     Range range = new Range(new Position(1, 5), new Position(2, 12));
-    Range statementRange = new Range(new Position(1, 5), new Position(1, 8));
+    Range statementRange = new Range(new Position(1, 5), new Position(1, 9));
 
     // The statement map that will be using to replace actual "VOID AAA THRU \n PAR OF PAR." text
     // The name of the token {PAR} is the same as its value (1st "PAR" token)
@@ -403,9 +403,9 @@ class ExtendedTextTest {
 
     Location statementLocation = new Location("uri", statementRange);
     Location variableLocation =
-        new Location("uri", new Range(new Position(1, 10), new Position(1, 12)));
-    Location parLocation = new Location("uri", new Range(new Position(2, 1), new Position(2, 3)));
-    Location secLocation = new Location("uri", new Range(new Position(2, 8), new Position(2, 10)));
+        new Location("uri", new Range(new Position(1, 10), new Position(1, 13)));
+    Location parLocation = new Location("uri", new Range(new Position(2, 1), new Position(2, 4)));
+    Location secLocation = new Location("uri", new Range(new Position(2, 8), new Position(2, 11)));
 
     extendedText.replace(range, statementRange, statementMap, replacementMap);
 
@@ -414,15 +414,15 @@ class ExtendedTextTest {
         extendedText.toString());
 
     // MOVE
-    Location location = extendedText.mapLocation(new Range(new Position(1, 5), new Position(1, 8)));
+    Location location = extendedText.mapLocation(new Range(new Position(1, 5), new Position(1, 9)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // TO
-    location = extendedText.mapLocation(new Range(new Position(1, 12), new Position(1, 13)));
+    location = extendedText.mapLocation(new Range(new Position(1, 12), new Position(1, 14)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // GO TO
-    location = extendedText.mapLocation(new Range(new Position(2, 0), new Position(2, 5)));
+    location = extendedText.mapLocation(new Range(new Position(2, 0), new Position(2, 6)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // AAA
@@ -430,11 +430,11 @@ class ExtendedTextTest {
     assertEquals(variableLocation.toString(), location.toString());
 
     // PAR before OF
-    location = extendedText.mapLocation(new Range(new Position(2, 7), new Position(2, 9)));
+    location = extendedText.mapLocation(new Range(new Position(2, 7), new Position(2, 10)));
     assertEquals(parLocation.toString(), location.toString());
 
     // PAR after OF
-    location = extendedText.mapLocation(new Range(new Position(2, 13), new Position(2, 15)));
+    location = extendedText.mapLocation(new Range(new Position(2, 13), new Position(2, 16)));
     assertEquals(secLocation.toString(), location.toString());
   }
 
@@ -443,7 +443,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 3));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
     extendedText.replace(
         range,
         statementRange,
@@ -454,9 +454,9 @@ class ExtendedTextTest {
         "DISPLAY VAR2.\n" + "DISPLAY VAR1.\n" + "MOVE VAR2 TO VAR1", extendedText.toString());
 
     Location statementLocation = new Location("uri", statementRange);
-    Location var1Location = new Location("uri", new Range(new Position(0, 5), new Position(0, 8)));
+    Location var1Location = new Location("uri", new Range(new Position(0, 5), new Position(0, 9)));
     Location var2Location =
-        new Location("uri", new Range(new Position(0, 13), new Position(0, 16)));
+        new Location("uri", new Range(new Position(0, 13), new Position(0, 17)));
 
     // line 1: DISPLAY
     Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
@@ -480,7 +480,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("STATEMENT VAR1", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
     extendedText.replace(
         range,
         statementRange,
@@ -491,7 +491,7 @@ class ExtendedTextTest {
 
     Location statementLocation = new Location("uri", statementRange);
     Location var1Location =
-        new Location("uri", new Range(new Position(0, 10), new Position(0, 13)));
+        new Location("uri", new Range(new Position(0, 10), new Position(0, 14)));
 
     // DISPLAY
     Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
@@ -515,12 +515,12 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 3));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
     extendedText.replace(
         range, statementRange, "MOVE {VAR1} TO VAR2", "DISPLAY '&{VAR1&}'. DISPLAY {VAR1}.\n");
 
     Location statementLocation = new Location("uri", statementRange);
-    Location var1Location = new Location("uri", new Range(new Position(0, 5), new Position(0, 8)));
+    Location var1Location = new Location("uri", new Range(new Position(0, 5), new Position(0, 9)));
 
     assertEquals("DISPLAY '{VAR1}'. DISPLAY VAR1.", extendedText.toString());
 
@@ -542,17 +542,17 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("MOVE 1 TO FOO", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 3));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
     extendedText.replace(range, statementRange, "MOVE 1 TO {BAR}", "DISPLAY '&&'. DISPLAY {BAR}");
 
-    Location fooLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 12)));
+    Location barLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 13)));
 
     assertEquals("DISPLAY '&'. DISPLAY FOO", extendedText.toString());
 
     // BAR
     Location location =
         extendedText.mapLocation(new Range(new Position(0, 21), new Position(0, 23)));
-    assertEquals(fooLocation.toString(), location.toString());
+    assertEquals(barLocation.toString(), location.toString());
   }
 
   @Test
@@ -560,7 +560,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("MOVE 1 TO FOO", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 18));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 3));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
     extendedText.replace(range, statementRange, "MOVE 1 TO {BAR}", "DISPLAY BAR");
 
     assertEquals("DISPLAY BAR", extendedText.toString());
@@ -571,11 +571,11 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
     extendedText.replace(range, statementRange, "STATEMENT {FOO}", "{FOO|FOOBAR} STATEMENT");
 
     Location statementLocation = new Location("uri", statementRange);
-    Location fooLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 12)));
+    Location fooLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 13)));
 
     assertEquals("FOOBAR STATEMENT", extendedText.toString());
 
@@ -597,7 +597,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
     extendedText.replace(
         range,
         statementRange,
@@ -605,7 +605,7 @@ class ExtendedTextTest {
         "{FOO|FOOBAR} STATEMENT. DISPLAY {FOO}\nDISPLAY {FOO|NEW_VALUE}");
 
     Location statementLocation = new Location("uri", statementRange);
-    Location fooLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 12)));
+    Location fooLocation = new Location("uri", new Range(new Position(0, 10), new Position(0, 13)));
 
     assertEquals("FOOBAR STATEMENT. DISPLAY FOO\nDISPLAY NEW_VALUE", extendedText.toString());
 
@@ -635,7 +635,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
     extendedText.replace(range, statementRange, "STATEMENT {FOO}", "DISPLAY | {FOO}.");
 
     assertEquals("DISPLAY | FOO.", extendedText.toString());
@@ -646,7 +646,7 @@ class ExtendedTextTest {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
-    Range statementRange = new Range(new Position(0, 0), new Position(0, 8));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
     extendedText.replace(range, statementRange, "STATEMENT {FOO}", "DISPLAY {FOO||BAR}.");
 
     assertEquals("DISPLAY |BAR.", extendedText.toString());
