@@ -195,17 +195,12 @@ class TextMapReplacerTest {
   }
 
   @Test
-  void testValidateParameters_replacementMap_duplicate_separator() {
-    TextMapReplacer replacer =
-        new TextMapReplacer(new ExtendedText("Extended text document", "uri"));
+  void testValidateParameters_replacementMap_allow_duplicate_separator() {
+    ExtendedText extendedText = new ExtendedText("TOKEN in the extended text document", "uri");
+    TextMapReplacer replacer = new TextMapReplacer(extendedText);
 
-    Exception exception =
-        assertThrowsExactly(
-            IllegalArgumentException.class,
-            () -> replacer.execute(createRange(), createRange(), "{TOKEN}", "{TOKEN|BBB|CCC}"));
-    assertEquals(
-        "Replacement map error: duplicated separator symbol \"|\". Line: 0, character: 10",
-        exception.getMessage());
+    replacer.execute(createRange(), createRange(), "{TOKEN}", "{TOKEN|BBB|CCC}");
+    assertEquals(extendedText.toString(), "BBB|CCC in the extended text document");
   }
 
   @Test
