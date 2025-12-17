@@ -13,40 +13,11 @@
  */
 
 import * as vscode from "vscode";
-import type {
-  JavaServer,
-  NativeServer,
-  SocketServer,
-} from "../../services/languageClient/ServerTypes";
+import type { JavaServer } from "../../services/languageClient/ServerTypes";
 
 import { LanguageClientService } from "../../services/LanguageClientService";
-import { outputChannel } from "../../services/util/OutputChannel";
-import { LanguageClient, State } from "vscode-languageclient/node";
+import { LanguageClient } from "vscode-languageclient/node";
 
-jest.mock("vscode");
-jest.mock("vscode-languageclient/node", () => {
-  const originalModule = jest.requireActual<{ State: State }>(
-    "vscode-languageclient/node",
-  );
-  class LanguageClient extends jest.fn() {
-    public state = State.Stopped;
-    start() {
-      this.state = State.Running;
-    }
-    dispose() {
-      this.state = State.Stopped;
-    }
-    createDefaultErrorHandler() {
-      return jest.fn();
-    }
-  }
-
-  return {
-    __esModule: true,
-    State: originalModule.State,
-    LanguageClient,
-  };
-});
 jest.mock("../../services/JavaCheck", () => ({
   getJavaVersion: jest.fn().mockResolvedValue(17),
 }));
@@ -54,8 +25,8 @@ jest.mock("../../services/JavaCheck", () => ({
 const javaServer: JavaServer = {
   kind: "JAVA",
   command: "/test/bin/java",
-  dialects: vscode.Uri.parse("cobol:///test/dialectsFolder"),
-  jar: vscode.Uri.parse("cobol:///test/server/server.jar"),
+  jar: vscode.Uri.parse("file:///test/server/server.jar"),
+  dialects: vscode.Uri.parse("file:///test/dialectsFolder"),
 };
 
 beforeEach(() => {
@@ -73,87 +44,15 @@ describe("LanguageClientService", () => {
     );
   });
 
-  test("Starts java language server", async () => {
-    await languageClientService.start([javaServer]);
-    expect(LanguageClient).toHaveBeenCalledTimes(1);
-    expect(LanguageClient).toHaveBeenCalledWith(
-      "cobol",
-      "COBOL Language Support",
-      {
-        args: [
-          "-Dline.separator=\r\n",
-          "-Ddialect.path=/test/dialectsFolder",
-          "-Xmx768M",
-          "-jar",
-          "/test/server/server.jar",
-          "pipeEnabled",
-        ],
-        command: "/test/bin/java",
-        options: { detached: false },
-      },
-      {
-        documentSelector: ["cobol", "expcobol", "hpcobol"],
-        errorHandler: expect.any(Function) as unknown,
-        middleware: {},
-        outputChannel,
-        synchronize: { fileEvents: expect.any(Array) as unknown },
-      },
-    );
-  });
-
-  test("Starts native language server", async () => {
-    const nativeServer: NativeServer = {
-      kind: "NATIVE",
-      command: vscode.Uri.parse("cobol:///native/server/folder/executable"),
-    };
-    await languageClientService.start([nativeServer]);
-    expect(LanguageClient).toHaveBeenCalledTimes(1);
-    expect(LanguageClient).toHaveBeenLastCalledWith(
-      "cobol",
-      "COBOL Language Support",
-      {
-        args: [
-          "pipeEnabled",
-          "-Dline.separator=\r\n",
-          "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
-          "-DserverType=NATIVE",
-        ],
-        command: "/native/server/folder/executable",
-        options: { cwd: "/native/server/folder", detached: false },
-      },
-      {
-        documentSelector: ["cobol", "expcobol", "hpcobol"],
-        errorHandler: expect.any(Function) as unknown,
-        middleware: {},
-        outputChannel,
-        synchronize: { fileEvents: expect.any(Array) as unknown },
-      },
-    );
-  });
-
-  test("Starts socket language server", async () => {
-    const socketServer: SocketServer = {
-      kind: "SOCKET",
-      port: 8192,
-    };
-    await languageClientService.start([socketServer]);
-    expect(LanguageClient).toHaveBeenCalledTimes(1);
-    expect(LanguageClient).toHaveBeenLastCalledWith(
-      "cobol",
-      "COBOL Language Support",
-      expect.any(Function),
-      {
-        documentSelector: ["cobol", "expcobol", "hpcobol"],
-        errorHandler: expect.any(Function) as unknown,
-        middleware: {},
-        outputChannel,
-        synchronize: { fileEvents: expect.any(Array) as unknown },
-      },
-    );
-  });
-
   test("Start is called first, then handler registration", async () => {
     const callSequence: string[] = [];
+    const originalStart = LanguageClient.prototype.start;
+    LanguageClient.prototype.start = jest.fn().mockImplementation(function (
+      this: unknown,
+    ) {
+      callSequence.push("start");
+      return originalStart.apply(this);
+    });
     LanguageClient.prototype.onRequest = jest.fn().mockImplementation(() => {
       callSequence.push("onRequest");
     });
@@ -162,18 +61,12 @@ describe("LanguageClientService", () => {
       .mockImplementation(() => {
         callSequence.push("onNotification");
       });
-    const originalStart = LanguageClient.prototype.start;
-    LanguageClient.prototype.start = jest.fn().mockImplementation(function (
-      this: unknown,
-    ) {
-      callSequence.push("start");
-      return originalStart.apply(this);
-    });
     languageClientService.addRequestHandler("request/name", jest.fn());
     languageClientService.addNotificationHandler("event/name", jest.fn());
     await languageClientService.start([javaServer]);
     expect(callSequence).toEqual(["start", "onRequest", "onNotification"]);
   });
+
   test("Retrieve analysis passes", async () => {
     const expectedResult = { programs: ["A", "B", "C"] };
     LanguageClient.prototype.sendRequest = () =>

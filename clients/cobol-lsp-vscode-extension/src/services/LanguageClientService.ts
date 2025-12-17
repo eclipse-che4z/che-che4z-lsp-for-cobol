@@ -35,7 +35,7 @@ import {
 } from "../constants";
 import { localCopybooks } from "./copybookLibs/LocalPathLib";
 import { startJavaServer } from "./languageClient/JavaServer";
-import { startNativeServer } from "./languageClient/NativeSever";
+import { startNativeServer } from "./languageClient/NativeServer";
 import { Server } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
 import { outputChannel } from "./util/OutputChannel";
