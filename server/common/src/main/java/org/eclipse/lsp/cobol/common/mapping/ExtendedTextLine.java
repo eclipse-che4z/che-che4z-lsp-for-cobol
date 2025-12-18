@@ -127,12 +127,12 @@ public class ExtendedTextLine {
    * Creates a new line objects with characters in the given range
    *
    * @param start - start position of the range
-   * @param end - end position of the range
+   * @param end - exclusive end position of the range
    * @return a new line object
    */
   ExtendedTextLine subline(int start, int end) {
     List<MappedCharacter> newCharacters =
-        characters.subList(start, end + 1).stream()
+        characters.subList(start, end).stream()
             .map(MappedCharacter::shadowCopy)
             .collect(Collectors.toList());
 

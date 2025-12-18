@@ -98,7 +98,7 @@ class ExtendedTextLineTest {
   @Test
   void testSubline() {
     ExtendedTextLine line = new ExtendedTextLine("text end", 7, "uri");
-    ExtendedTextLine subline = line.subline(2, 5);
+    ExtendedTextLine subline = line.subline(2, 6);
     assertEquals("xt e", subline.toString());
   }
 }

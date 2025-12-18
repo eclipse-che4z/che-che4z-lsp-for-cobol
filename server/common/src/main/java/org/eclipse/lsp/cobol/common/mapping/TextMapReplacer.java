@@ -29,12 +29,13 @@ import org.eclipse.lsp4j.Range;
  * Replacer of the text with the replacement map. Replacement text is also a map that contains token
  * names. The actual replacement data will be calculated using token names. And the original value
  * of the token, situated in the appropriate range. For example: text document contains the line:
- * "this and this text will be replaced" (*). The statement map can be: "{this} and {that}" (1).
- * {this} points to 1st "this" token and {that} points to the 2nd "this" token. These token names:
- * {this} and {that} now can be replaced with the replacement map. Replacement map can be: "{this}
+ * "this and this text will be replaced" (*). The statement map can be: Token 1: name: "this",
+ * range: (0, 0); (0, 4) Token 2: name: "that", range: (0, 9); (0, 13) "this" token points to 1st
+ * "this" original token and "that" points to the 2nd "this" original token. These token names:
+ * "this" and "that" now can be replaced with the replacement map. Replacement map can be: "{this}
  * and even {that} text was replaced" (2). When TextMapReplacer apply replacement using (1)
  * statement map and replacement map (2) to the document line "this and this text will be replaced"
- * the result will be: "this and even that text was replaced", so token name {that} was substituted
+ * the result will be: "this and even that text was replaced", so token name "that" was substituted
  * with actual token value "this". The mapping location for the 1st "this" token will be pointing to
  * the 1st original "this" token and for the 2nd "this" token mapping will be pointing to the 2nd
  * original "this" token. All other characters will be pointed to the provided range
@@ -105,7 +106,7 @@ class TextMapReplacer {
               extendedText.getLines().get(range.getStart().getLine());
           String value =
               extendedTextLine
-                  .subline(range.getStart().getCharacter(), range.getEnd().getCharacter() - 1)
+                  .subline(range.getStart().getCharacter(), range.getEnd().getCharacter())
                   .toString();
 
           tokens.put(tokenName, new Token(value, originalLocation));

@@ -300,7 +300,7 @@ public class ExtendedText {
    */
   public void addLineBreak(Position position) {
     ExtendedTextLine line = lines.get(position.getLine());
-    ExtendedTextLine newLine = line.subline(position.getCharacter(), line.size() - 1);
+    ExtendedTextLine newLine = line.subline(position.getCharacter(), line.size());
     line.trim(position.getCharacter());
 
     lines.add(position.getLine() + 1, newLine);
