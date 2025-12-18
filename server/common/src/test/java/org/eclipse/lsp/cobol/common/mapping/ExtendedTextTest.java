@@ -470,15 +470,15 @@ class ExtendedTextTest {
         new Location("uri", new Range(new Position(0, 13), new Position(0, 17)));
 
     // line 1: DISPLAY
-    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
+    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 7)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // line 1: VAR2
-    location = extendedText.mapLocation(new Range(new Position(0, 8), new Position(0, 11)));
+    location = extendedText.mapLocation(new Range(new Position(0, 8), new Position(0, 12)));
     assertEquals(var2Location.toString(), location.toString());
 
     // line 2: D(ISPLAY)
-    location = extendedText.mapLocation(new Range(new Position(1, 1), new Position(1, 6)));
+    location = extendedText.mapLocation(new Range(new Position(1, 1), new Position(1, 7)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // line 2: VAR1
@@ -504,7 +504,7 @@ class ExtendedTextTest {
         new Location("uri", new Range(new Position(0, 10), new Position(0, 14)));
 
     // DISPLAY
-    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
+    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 7)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // 1st VAR1
@@ -537,15 +537,15 @@ class ExtendedTextTest {
     assertEquals("DISPLAY '{VAR1}'. DISPLAY VAR1.", extendedText.toString());
 
     // DISPLAY
-    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
+    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 7)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // {VAR1}
-    location = extendedText.mapLocation(new Range(new Position(0, 9), new Position(0, 12)));
+    location = extendedText.mapLocation(new Range(new Position(0, 9), new Position(0, 15)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // VAR1
-    location = extendedText.mapLocation(new Range(new Position(0, 26), new Position(0, 29)));
+    location = extendedText.mapLocation(new Range(new Position(0, 26), new Position(0, 30)));
     assertEquals(var1Location.toString(), location.toString());
   }
 
@@ -565,7 +565,7 @@ class ExtendedTextTest {
 
     // BAR
     Location location =
-        extendedText.mapLocation(new Range(new Position(0, 21), new Position(0, 23)));
+        extendedText.mapLocation(new Range(new Position(0, 21), new Position(0, 24)));
     assertEquals(barLocation.toString(), location.toString());
   }
 
@@ -598,15 +598,15 @@ class ExtendedTextTest {
     assertEquals("FOOBAR STATEMENT", extendedText.toString());
 
     // FOOBAR
-    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 5)));
+    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
     assertEquals(fooLocation.toString(), location.toString());
 
     // FOO(BAR)
-    location = extendedText.mapLocation(new Range(new Position(0, 3), new Position(0, 5)));
+    location = extendedText.mapLocation(new Range(new Position(0, 3), new Position(0, 6)));
     assertEquals(fooLocation.toString(), location.toString());
 
     // STATEMENT
-    location = extendedText.mapLocation(new Range(new Position(0, 7), new Position(0, 15)));
+    location = extendedText.mapLocation(new Range(new Position(0, 7), new Position(0, 16)));
     assertEquals(statementLocation.toString(), location.toString());
   }
 
@@ -630,19 +630,19 @@ class ExtendedTextTest {
     assertEquals("FOOBAR STATEMENT. DISPLAY FOO\nDISPLAY NEW_VALUE", extendedText.toString());
 
     // FOOBAR
-    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 5)));
+    Location location = extendedText.mapLocation(new Range(new Position(0, 0), new Position(0, 6)));
     assertEquals(fooLocation.toString(), location.toString());
 
     // STATEMENT
-    location = extendedText.mapLocation(new Range(new Position(0, 7), new Position(0, 15)));
+    location = extendedText.mapLocation(new Range(new Position(0, 7), new Position(0, 16)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // DISPLAY
-    location = extendedText.mapLocation(new Range(new Position(0, 18), new Position(0, 23)));
+    location = extendedText.mapLocation(new Range(new Position(0, 18), new Position(0, 25)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // FOO
-    location = extendedText.mapLocation(new Range(new Position(0, 26), new Position(0, 28)));
+    location = extendedText.mapLocation(new Range(new Position(0, 26), new Position(0, 29)));
     assertEquals(fooLocation.toString(), location.toString());
 
     // NEWVALUE
