@@ -508,15 +508,15 @@ class ExtendedTextTest {
     assertEquals(statementLocation.toString(), location.toString());
 
     // 1st VAR1
-    location = extendedText.mapLocation(new Range(new Position(0, 8), new Position(0, 11)));
+    location = extendedText.mapLocation(new Range(new Position(0, 8), new Position(0, 12)));
     assertEquals(var1Location.toString(), location.toString());
 
     // 2nd VAR1
-    location = extendedText.mapLocation(new Range(new Position(0, 22), new Position(0, 25)));
+    location = extendedText.mapLocation(new Range(new Position(0, 22), new Position(0, 26)));
     assertEquals(var1Location.toString(), location.toString());
 
     // 2rd VAR1
-    location = extendedText.mapLocation(new Range(new Position(0, 38), new Position(0, 41)));
+    location = extendedText.mapLocation(new Range(new Position(0, 38), new Position(0, 42)));
     assertEquals(var1Location.toString(), location.toString());
   }
 
