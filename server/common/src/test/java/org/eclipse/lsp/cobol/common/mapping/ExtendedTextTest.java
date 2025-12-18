@@ -478,7 +478,7 @@ class ExtendedTextTest {
     assertEquals(var2Location.toString(), location.toString());
 
     // line 2: D(ISPLAY)
-    location = extendedText.mapLocation(new Range(new Position(2, 1), new Position(2, 6)));
+    location = extendedText.mapLocation(new Range(new Position(1, 1), new Position(1, 6)));
     assertEquals(statementLocation.toString(), location.toString());
 
     // line 2: VAR1
