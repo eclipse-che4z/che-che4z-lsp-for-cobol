@@ -42,7 +42,8 @@ public class MappingHelper {
     if (range.getStart().getCharacter() < 0 || range.getEnd().getCharacter() < 0) {
       throw new IllegalArgumentException("Invalid range");
     }
-    if (range.getStart().getCharacter() > range.getEnd().getCharacter()) {
+    if ((range.getStart().getLine() == range.getEnd().getLine())
+        && (range.getStart().getCharacter() > range.getEnd().getCharacter())) {
       throw new IllegalArgumentException("Invalid range");
     }
   }

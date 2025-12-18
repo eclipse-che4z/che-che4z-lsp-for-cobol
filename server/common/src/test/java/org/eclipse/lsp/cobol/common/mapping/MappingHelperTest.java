@@ -32,11 +32,16 @@ public class MappingHelperTest {
   }
 
   @Test
+  void testValidateRange_character_start_greater_character_end_same_line() {
+    MappingHelper.validateRange(new Range(new Position(0, 7), new Position(4, 2)));
+  }
+
+  @Test
   void testValidateRange_character_start_greater_character_end() {
     Exception exception =
         assertThrowsExactly(
             IllegalArgumentException.class,
-            () -> MappingHelper.validateRange(new Range(new Position(0, 7), new Position(4, 2))));
+            () -> MappingHelper.validateRange(new Range(new Position(0, 7), new Position(0, 2))));
     assertEquals("Invalid range", exception.getMessage());
   }
 
