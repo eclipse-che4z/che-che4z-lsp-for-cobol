@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -167,11 +168,11 @@ public class ExtendedDocument {
    *
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
-   * @param statementMap - an original text map
+   * @param statementMap - a map of token names and its ranges from the original text
    * @param replacementMap - a new text replacement map
    */
   public void replace(
-      Range range, Range statementRange, String statementMap, String replacementMap) {
+      Range range, Range statementRange, Map<String, Range> statementMap, String replacementMap) {
     Range updatedRange = updateRangeDueToChanges(range);
     currentText.replace(updatedRange, statementRange, statementMap, replacementMap);
     dirty = true;

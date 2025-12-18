@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.mapping;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Value;
@@ -57,36 +58,26 @@ class TextMapReplacer {
    * @param extendedText - the extended text object
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
-   * @param statementMap - an original text map
+   * @param statementMap - a map of token names and its ranges from the original text
    * @param replacementMap - a new text replacement map
    */
   public void execute(
       ExtendedText extendedText,
       Range range,
       Range statementRange,
-      String statementMap,
+      Map<String, Range> statementMap,
       String replacementMap) {
-    Map<String, Token> tokens = new HashMap<>();
 
     MappingHelper.validateRange(range);
     MappingHelper.validateRange(statementRange);
-    validateMapSize(statementMap);
     validateMapSize(replacementMap);
-
-    String[] statementMapArray = MappingHelper.split(statementMap);
-    for (int i = 0; i < statementMapArray.length; i++) {
-      scanForTokens(
-          extendedText,
-          tokens,
-          statementMapArray[i].toCharArray(),
-          i,
-          range.getStart().getLine() + i,
-          i == 0 ? range.getStart().getCharacter() : 0);
-    }
-    if (tokens.isEmpty()) {
+    validateDocumentRange(extendedText, range, "Replacing range error: ");
+    validateDocumentRange(extendedText, statementRange, "Statement range error: ");
+    if (statementMap.isEmpty()) {
       throw new IllegalArgumentException("Statement map must contain at least 1 token name");
     }
 
+    Map<String, Token> tokens = mapStatementTokens(extendedText, statementMap);
     Map<Range, Token> tokenReplacements = new HashMap<>();
     String processedText =
         scanForReplacements(range.getStart(), tokens, replacementMap, tokenReplacements);
@@ -101,72 +92,25 @@ class TextMapReplacer {
         });
   }
 
-  private void scanForTokens(
-      ExtendedText extendedText,
-      Map<String, Token> tokens,
-      char[] statementLine,
-      int mapLine,
-      int line,
-      int startCharacter) {
-    int bracesIndicator = 0;
-    int symbolCount = 0;
-    StringBuilder temp = new StringBuilder();
+  private Map<String, Token> mapStatementTokens(
+      ExtendedText extendedText, Map<String, Range> statementMap) {
+    Map<String, Token> tokens = new HashMap<>();
 
-    for (int i = 0; i < statementLine.length; i++) {
-      if (statementLine[i] == BRACE_OPEN) {
-        if (bracesIndicator > 0) {
-          String message =
-              String.format("expected \"%s\" instead of \"%s\"", BRACE_CLOSE, BRACE_OPEN);
-          throwInvalidParameters("Statement map error", message, mapLine, i);
-        }
-        bracesIndicator++;
-        symbolCount++;
-      } else if (statementLine[i] == BRACE_CLOSE) {
-        if (bracesIndicator <= 0) {
-          String message =
-              String.format("expected \"%s\" instead of \"%s\"", BRACE_OPEN, BRACE_CLOSE);
-          throwInvalidParameters("Statement map error", message, mapLine, i);
-        }
-        bracesIndicator--;
+    statementMap.forEach(
+        (tokenName, range) -> {
+          validateTokenName(extendedText, tokenName, range);
+          Location originalLocation = extendedText.mapLocation(range);
 
-        String tokenName = temp.toString();
-        int character = i - symbolCount - tokenName.length() + startCharacter;
+          ExtendedTextLine extendedTextLine =
+              extendedText.getLines().get(range.getStart().getLine());
+          String value =
+              extendedTextLine
+                  .subline(range.getStart().getCharacter(), range.getEnd().getCharacter() - 1)
+                  .toString();
 
-        if (tokenName.isEmpty()) {
-          throwInvalidParameters(
-              "Statement map error", "token name cannot be empty", mapLine, i - 1);
-        }
-        if (tokens.containsKey(tokenName)) {
-          throwInvalidParameters(
-              String.format("Statement map contains duplicated token \"%s\"", tokenName),
-              mapLine,
-              i - tokenName.length());
-        }
-
-        Location originalLocation =
-            extendedText.mapLocation(
-                new Range(
-                    new Position(line, character),
-                    new Position(line, character + tokenName.length())));
-        ExtendedTextLine extendedTextLine = extendedText.getLines().get(line);
-        String value =
-            extendedTextLine.subline(character, character + tokenName.length() - 1).toString();
-
-        tokens.put(tokenName, new Token(value, originalLocation));
-
-        symbolCount++;
-        temp.setLength(0);
-      } else if (bracesIndicator == 1) {
-        temp.append(statementLine[i]);
-      }
-    }
-    if (bracesIndicator > 0) {
-      throwInvalidParameters(
-          "Statement map error",
-          "opening brace { has no matching closing brace",
-          mapLine,
-          statementLine.length - 1);
-    }
+          tokens.put(tokenName, new Token(value, originalLocation));
+        });
+    return tokens;
   }
 
   private String scanForReplacements(
@@ -215,7 +159,7 @@ class TextMapReplacer {
         if (bracesIndicator > 0) {
           String message =
               String.format("expected \"%s\" instead of \"%s\"", BRACE_CLOSE, BRACE_OPEN);
-          throwInvalidParameters("Replacement map error", message, mapLine, i);
+          throwInvalidParameters(message, mapLine, i);
         }
         bracesIndicator++;
         continue;
@@ -224,7 +168,7 @@ class TextMapReplacer {
         if (bracesIndicator <= 0) {
           String message =
               String.format("expected \"%s\" instead of \"%s\"", BRACE_OPEN, BRACE_CLOSE);
-          throwInvalidParameters("Replacement map error", message, mapLine, i);
+          throwInvalidParameters(message, mapLine, i);
         }
         bracesIndicator--;
 
@@ -235,7 +179,7 @@ class TextMapReplacer {
 
         if (token == null) {
           String message = String.format("token \"%s\" not found", tokenNameAndValue.getLeft());
-          throwInvalidParameters("Replacement map error", message, mapLine, i - tokenName.length());
+          throwInvalidParameters(message, mapLine, i - tokenName.length());
         }
         String value = Optional.ofNullable(tokenNameAndValue.getRight()).orElse(token.getValue());
         int character = outputLine.length() + (mapLine == 0 ? startPosition.getCharacter() : 0);
@@ -257,17 +201,11 @@ class TextMapReplacer {
     }
     if (bracesIndicator > 0) {
       throwInvalidParameters(
-          "Replacement map error",
-          "opening brace { has no matching closing brace",
-          mapLine,
-          replacementLine.length - 1);
+          "opening brace { has no matching closing brace", mapLine, replacementLine.length - 1);
     }
     if (escapeCharacter) {
       throwInvalidParameters(
-          "Replacement map error",
-          "Dangling escape character in the input string",
-          mapLine,
-          replacementLine.length - 1);
+          "Dangling escape character in the input string", mapLine, replacementLine.length - 1);
     }
     return outputLine;
   }
@@ -280,11 +218,7 @@ class TextMapReplacer {
       String value = token.substring(indexOfSeparator + 1);
 
       if (value.isEmpty()) {
-        throwInvalidParameters(
-            "Replacement map error",
-            "token value cannot be empty",
-            line,
-            character + name.length() + 1);
+        throwInvalidParameters("token value cannot be empty", line, character + name.length() + 1);
       }
       return new ImmutablePair<>(name, value);
     }
@@ -301,13 +235,37 @@ class TextMapReplacer {
     }
   }
 
-  private void throwInvalidParameters(String header, String message, int line, int character) {
-    throw new IllegalArgumentException(
-        String.format("%s: %s. %s", header, message, generatePositionString(line, character)));
+  private void validateDocumentRange(ExtendedText extendedText, Range range, String entityName) {
+    List<ExtendedTextLine> lines = extendedText.getLines();
+    if (range.getStart().getLine() >= lines.size()) {
+      throw new IllegalArgumentException(entityName + "range start line out of bounds");
+    }
+    if (range.getStart().getCharacter() > lines.get(range.getStart().getLine()).size()) {
+      throw new IllegalArgumentException(entityName + "range start character out of bounds");
+    }
+    if (range.getEnd().getLine() >= lines.size()) {
+      throw new IllegalArgumentException(entityName + "range end line out of bounds");
+    }
+    if (range.getEnd().getCharacter() > lines.get(range.getEnd().getLine()).size()) {
+      throw new IllegalArgumentException(entityName + "range end character out of bounds");
+    }
+  }
+
+  private void validateTokenName(ExtendedText extendedText, String tokenName, Range range) {
+    MappingHelper.validateRange(range);
+    if (range.getStart().getLine() != range.getEnd().getLine()) {
+      throw new IllegalArgumentException("Token name " + tokenName + " must be on the same line");
+    }
+    if (tokenName.isEmpty()) {
+      throw new IllegalArgumentException("Token name cannot be empty");
+    }
+    validateDocumentRange(extendedText, range, "Token name \"" + tokenName + "\" range error: ");
   }
 
   private void throwInvalidParameters(String message, int line, int character) {
     throw new IllegalArgumentException(
-        String.format("%s. %s", message, generatePositionString(line, character)));
+        String.format(
+            "%s: %s. %s",
+            "Replacement map error", message, generatePositionString(line, character)));
   }
 }

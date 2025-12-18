@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.mapping;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.Getter;
@@ -337,11 +338,11 @@ public class ExtendedText {
    *
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
-   * @param statementMap - an original text map
+   * @param statementMap - a map of token names and its ranges from the original text
    * @param replacementMap - a new text replacement map
    */
   public void replace(
-      Range range, Range statementRange, String statementMap, String replacementMap) {
+      Range range, Range statementRange, Map<String, Range> statementMap, String replacementMap) {
     TextMapReplacer.execute(this, range, statementRange, statementMap, replacementMap);
   }
 
