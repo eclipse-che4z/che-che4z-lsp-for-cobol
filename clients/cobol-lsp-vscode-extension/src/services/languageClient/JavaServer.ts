@@ -7,33 +7,11 @@ import {
 } from "vscode-languageclient/node";
 import type { JavaServer } from "./ServerTypes";
 import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
-import { getJavaVersion } from "../JavaCheck";
-import { MINIMUM_JAVA_VERSION } from "../../constants";
-import { telemetryEvent } from "../reporter";
 
 export async function startJavaServer(
   server: JavaServer,
   clientOptions: LanguageClientOptions,
 ): Promise<LanguageClient | undefined> {
-  let major: number;
-  try {
-    major = await getJavaVersion(server.command);
-  } catch (e) {
-    outputChannel.error(`Java version check failed.`);
-    if (e instanceof Error) {
-      outputChannel.debug(e.message, e.stack);
-    } else {
-      outputChannel.debug(JSON.stringify(e));
-    }
-    return;
-  }
-  telemetryEvent("log", ["bootstrap", "java-version"], `${major}`);
-  if (major < MINIMUM_JAVA_VERSION) {
-    outputChannel.error(
-      `Unsupported Java version ${major} detected. Minimum required version is ${MINIMUM_JAVA_VERSION}.`,
-    );
-  }
-
   const serverOptions: ServerOptions = {
     command: server.command,
     args: [

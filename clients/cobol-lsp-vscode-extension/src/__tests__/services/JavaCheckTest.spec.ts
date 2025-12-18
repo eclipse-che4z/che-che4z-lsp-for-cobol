@@ -14,8 +14,8 @@
 
 import { toJavaMajor, getJavaVersion } from "../../services/JavaCheck";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
+import { outputChannel } from "../../services/util/OutputChannel";
 
-jest.mock("../../services/reporter");
 describe("Checks Java version", () => {
   it("If Java version is supported", () => {
     expect(toJavaMajor('openjdk version "1.8.0-internal"')).toEqual(8);
@@ -41,6 +41,9 @@ describe("Checks Java version", () => {
 });
 
 describe("Java version check", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
   it("calling default command", async () => {
     const spawn = mockSpawnProcess("", `java version "1.5.0_22"`, 0);
     await getJavaVersion();
@@ -55,8 +58,8 @@ describe("Java version check", () => {
   });
   it("for version 11", async () => {
     mockSpawnProcess("", "java 11 2018-09-25", 0);
-    const promise = getJavaVersion();
-    await expect(promise).resolves.toEqual(11);
+    const version = await getJavaVersion();
+    expect(version).toEqual(11);
   });
 
   it("should skip irrelevant lines", async () => {
@@ -65,41 +68,58 @@ describe("Java version check", () => {
       "Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava 11 2018-09-25",
       0,
     );
-    const promise = getJavaVersion();
-    await expect(promise).resolves.toEqual(11);
+    const version = await getJavaVersion();
+    expect(version).toEqual(11);
   });
 
   it("for version 1.5", async () => {
     mockSpawnProcess("", `java version "1.5.0_22"`, 0);
-    const promise = getJavaVersion();
-    await expect(promise).resolves.toEqual(5);
+    const version = await getJavaVersion();
+    expect(version).toEqual(5);
+  });
+
+  it("version cannot be identified", async () => {
+    const debug = outputChannel.debug as jest.Mock;
+    mockSpawnProcess("", "No version", 0);
+    const version = await getJavaVersion();
+    expect(version).toBe(undefined);
+    expect(debug).toHaveBeenCalledTimes(1);
+    expect(debug.mock.calls[0]).toEqual([
+      'Java command "java -version" did not print version information in the expected format: "No version".',
+    ]);
   });
 
   it("when 'error' event is emitted  - spawned", async () => {
     mockSpawnProcess("", "", 0, { code: "ENOENT" } as NodeJS.ErrnoException);
-    const promise = getJavaVersion();
-
-    await expect(promise).rejects.toEqual(
-      new Error('Java command not found: "java".'),
-    );
+    const version = await getJavaVersion();
+    expect(version).toBe(undefined);
+    expect(outputChannel.debug as jest.Mock).toHaveBeenCalledTimes(1);
+    expect((outputChannel.debug as jest.Mock).mock.calls[0]).toEqual([
+      'Java command "java" not found.',
+    ]);
   });
 
   it("when 'error' event is emitted  - not spawned", async () => {
-    const error = {
+    const debug = outputChannel.debug as jest.Mock;
+    mockSpawnProcess("", "", 0, {
       code: "Other error",
-    } as NodeJS.ErrnoException;
-    mockSpawnProcess("", "", 0, error);
-    const promise = getJavaVersion();
-
-    await expect(promise).rejects.toEqual(error);
+    } as NodeJS.ErrnoException);
+    const version = await getJavaVersion();
+    expect(version).toBe(undefined);
+    expect(debug).toHaveBeenCalledTimes(1);
+    expect(debug.mock.calls[0]).toEqual([
+      'Java command "java" exited with error "{"code":"Other error"}"',
+    ]);
   });
 
   it("when 'close' event is emitted", async () => {
+    const debug = outputChannel.debug as jest.Mock;
     mockSpawnProcess("", "", 23);
-    const promise = getJavaVersion();
-
-    await expect(promise).rejects.toEqual(
-      new Error('Non-zero return code 23 was returned by Java command "java".'),
-    );
+    const version = await getJavaVersion();
+    expect(version).toBe(undefined);
+    expect(debug).toHaveBeenCalledTimes(1);
+    expect(debug.mock.calls[0]).toEqual([
+      'Java command "java" returned non-zero return code 23.',
+    ]);
   });
 });

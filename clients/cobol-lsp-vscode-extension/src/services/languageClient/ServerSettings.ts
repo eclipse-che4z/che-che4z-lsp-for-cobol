@@ -1,10 +1,13 @@
 import * as vscode from "vscode";
 import * as os from "node:os";
-import { SERVER_PORT } from "../../constants";
+import { MINIMUM_JAVA_VERSION, SERVER_PORT } from "../../constants";
 import type { Server } from "./ServerTypes";
 import { SettingsService } from "../Settings";
+import { hasSupportedJava } from "../JavaCheck";
 
-export const getServers = (extensionUri: vscode.Uri): Server[] => {
+export const getServers = async (
+  extensionUri: vscode.Uri,
+): Promise<Server[]> => {
   const port = getLspPort();
   if (port) {
     return [
@@ -19,7 +22,12 @@ export const getServers = (extensionUri: vscode.Uri): Server[] => {
     const command = getJavaCommand();
     const jar = getJavaServerUri(extensionUri);
     const dialects = getJavaDialectsUri(extensionUri);
-    if (command && jar && dialects) {
+    if (
+      command &&
+      jar &&
+      dialects &&
+      (await hasSupportedJava(command, MINIMUM_JAVA_VERSION))
+    ) {
       servers.push({
         kind: "JAVA",
         command,

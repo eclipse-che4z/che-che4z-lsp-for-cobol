@@ -160,7 +160,7 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  const servers = getServers(context.extensionUri);
+  const servers = await getServers(context.extensionUri);
   await languageClientService.start(servers);
 
   // 'export' public api-surface
