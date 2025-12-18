@@ -175,5 +175,8 @@ class ElementaryNodeTest {
 
     node = getNode("PIC 99A(3)", UsageFormat.COMPUTATIONAL_5);
     assertEquals(EffectiveDataType.STRING, node.getEffectiveDataType());
+
+    node = getNode("PIC U(3)", UsageFormat.COMPUTATIONAL_5);
+    assertEquals(EffectiveDataType.STRING, node.getEffectiveDataType());
   }
 }
