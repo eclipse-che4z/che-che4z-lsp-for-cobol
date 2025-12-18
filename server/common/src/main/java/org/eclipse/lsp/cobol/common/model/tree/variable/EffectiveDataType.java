@@ -28,7 +28,7 @@ public enum EffectiveDataType {
   STRING {
     @Override
     boolean checkDataType(ElementaryNode node) {
-      return StringUtils.containsAny(node.getPicClause(), "A", "a", "X", "x");
+      return StringUtils.containsAny(node.getPicClause(), "A", "a", "X", "x", "U", "u");
     }
   },
   REAL {

@@ -156,6 +156,24 @@ public class TestXMLGenerateStatements {
           + "\n"
           + "           STOP RUN.";
 
+  public static final String TEST_UNICODE =
+      ""
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. HELLO-WORLD.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "\n"
+          + "       01  {$*REQUEST}.\n"
+          + "           06 {$*ROUTE}.\n"
+          + "               11 {$*NAME}                  PIC  X(030).\n"
+          + "               11 {$*VERSION}               PIC  9(004).\n"
+          + "       01   {$*XML-OUTPUT}.\n"
+          + "         05 {$*XML-UTF8}  PIC U BYTE-LENGTH 1000.\n"
+          + "\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           XML GENERATE {$XML-OUTPUT} FROM {$REQUEST} END-XML\n"
+          + "           STOP RUN.\n";
+
   @ParameterizedTest
   @MethodSource("textsToTest")
   @DisplayName("Parameterized - testing positive XML generate statements")
@@ -179,5 +197,10 @@ public class TestXMLGenerateStatements {
                 "Variable XML-OUT is not defined",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
+  }
+
+  @Test
+  void testUnicode() {
+    UseCaseEngine.runTest(TEST_UNICODE, ImmutableList.of(), ImmutableMap.of());
   }
 }
