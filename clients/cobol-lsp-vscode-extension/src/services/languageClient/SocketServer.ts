@@ -32,7 +32,7 @@ export async function startSocketServer(
     clientOptions,
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
-  outputChannel.info("Staring language client with SOCKET language server");
+  outputChannel.info("Staring language client with SOCKET language server.");
   try {
     await languageClient.start();
   } catch (e) {

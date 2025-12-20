@@ -31,6 +31,7 @@ import {
   FAIL_CREATE_GLOBAL_STORAGE_MSG,
   HP_LANGUAGE_ID,
   LANGUAGE_ID,
+  MINIMUM_JAVA_VERSION,
   ZOWE_FOLDER,
 } from "./constants";
 import type { ExternalAPIsService } from "./services/ExternalAPIsService";
@@ -85,6 +86,7 @@ import {
   setUpProgramConfigWatcher,
 } from "./services/ProcessorGroups";
 import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
+import { Server } from "./services/languageClient/ServerTypes";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -96,6 +98,7 @@ const API_VERSION: string = "1.0.1";
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
+  outputChannel.info("COBOL Language Support extension activating.");
   await initTelemetry(context);
   telemetryEvent(
     "log",
@@ -115,7 +118,6 @@ export async function activate(
   let externalApis: ExternalAPIsService | undefined = undefined;
 
   const languageClientService = initializeLanguageClientService(
-    context.extension.id,
     context.globalStorageUri,
     externalApis,
   );
@@ -160,8 +162,11 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  const servers = await getServers(context.extensionUri);
-  await languageClientService.start(servers);
+  const { servers, preferedRuntime } = await getServers(context.extensionUri);
+  const started = await languageClientService.start(servers);
+  if (!started) {
+    void showInitFailedMessage(preferedRuntime, servers, context.extension.id);
+  }
 
   // 'export' public api-surface
   return {
@@ -241,7 +246,6 @@ async function createExtensionStrorageFolder(extensionStroageUri: vscode.Uri) {
 }
 
 function initializeLanguageClientService(
-  extensionId: string,
   globalStorageUri: vscode.Uri,
   externalApis: ExternalAPIsService | undefined,
 ) {
@@ -255,7 +259,6 @@ function initializeLanguageClientService(
     },
   };
   const languageClientService = new LanguageClientService(
-    extensionId,
     copybookCacheLocations,
     middleware,
   );
@@ -602,4 +605,62 @@ function registerCompletions(context: vscode.ExtensionContext) {
       new SubroutinesCompletionsProvider(),
     ),
   );
+}
+
+async function showInitFailedMessage(
+  preferedRuntime: "JAVA" | "NATIVE",
+  failed: Server[],
+  extensionId: string,
+) {
+  const messages = failed.map((server) => {
+    switch (server.kind) {
+      case "SOCKET":
+        return `Failed connecting to language server through socket on localhost:${server.port}.`;
+      case "JAVA":
+        return `Java language server ${server.jar.fsPath} failed to start.`;
+      case "NATIVE":
+        return `Native language server ${server.command.fsPath} failed to start.`;
+      default: {
+        const exhaustiveCheck: never = server;
+        throw new Error(exhaustiveCheck);
+      }
+    }
+  });
+  if (failed.some((server) => server.kind == "JAVA")) {
+    const msg = `Ensure that the Java runtime specified in the Java Home setting is version ${MINIMUM_JAVA_VERSION} or later.`;
+    messages.push(msg);
+    outputChannel.info(msg);
+  } else if (failed.some((server) => server.kind == "NATIVE")) {
+    let msg =
+      "Make sure the server binary is executable and not being blocked by your security software.";
+    if (preferedRuntime == "NATIVE") {
+      msg =
+        msg +
+        'To use a Java server select Server Runtime "JAVA" in the extension settings and reload VS Code.';
+    }
+    messages.push(msg);
+    outputChannel.info(msg);
+  }
+  if (!messages.length) {
+    outputChannel.error("No COBOL language server to start.");
+    messages.push(
+      "No COBOL language server to start. Check the extension output for warnings and errors.",
+    );
+  }
+  const selection = await vscode.window.showErrorMessage(
+    messages.join("\n"),
+    "Settings",
+    "Go to output",
+  );
+  switch (selection) {
+    case "Settings":
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        `@ext:${extensionId} Server Runtime`,
+      );
+      break;
+    case "Go to output":
+      outputChannel.show();
+      break;
+  }
 }

@@ -31,7 +31,7 @@ export async function startJavaServer(
     clientOptions,
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
-  outputChannel.info("Staring language client with JAVA language server");
+  outputChannel.info("Staring language client with JAVA language server.");
   try {
     await languageClient.start();
   } catch (e) {

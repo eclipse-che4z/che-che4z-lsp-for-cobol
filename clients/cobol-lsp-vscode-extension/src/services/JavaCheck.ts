@@ -15,7 +15,7 @@ import * as cp from "child_process";
 import { outputChannel } from "./util/OutputChannel";
 import { telemetryEvent } from "./reporter";
 
-const stopLength = 255;
+const maxLength = 255;
 const versionPattern = /\b(?:java|openjdk)\b(?:\s+version)?\s+"?(?:1\.)?(\d+)/i;
 
 export function toJavaMajor(versionString: string) {
@@ -30,16 +30,18 @@ export async function getJavaVersion(
   javaCommand: string = "java",
 ): Promise<number | undefined> {
   const versionArg = "-version";
+  outputChannel.info(
+    `Checking Java version by running command "${javaCommand} ${versionArg}".`,
+  );
   return new Promise((resolve) => {
     let ls: cp.ChildProcessWithoutNullStreams;
     try {
       ls = cp.spawn(javaCommand, [versionArg]);
     } catch (e: unknown) {
-      outputChannel.debug(`Invalid arguments passed to spawn.`);
       if (e instanceof Error) {
-        outputChannel.debug(e.message, e.stack);
+        outputChannel.error(e.toString());
       } else {
-        outputChannel.debug(JSON.stringify(e));
+        outputChannel.error(JSON.stringify(e));
       }
       resolve(undefined);
       return;
@@ -47,19 +49,19 @@ export async function getJavaVersion(
     let text = "";
     let errorCode = 0;
     ls.stderr.on("data", (data: Buffer) => {
-      if (text.length < stopLength) {
+      if (text.length < maxLength) {
         text = text + data.toString();
-        text = text.substring(0, stopLength);
+        text = text.substring(0, maxLength);
       }
     });
     ls.on("error", (error: NodeJS.ErrnoException) => {
       if (error.code === "ENOENT") {
         errorCode = -1;
-        outputChannel.debug(`Java command "${javaCommand}" not found.`);
+        outputChannel.error(`Java command "${javaCommand}" not found.`);
       } else {
         errorCode = -2;
-        outputChannel.debug(
-          `Java command "${javaCommand}" exited with error "${JSON.stringify(error)}"`,
+        outputChannel.error(
+          `Java command "${javaCommand} ${versionArg}" exited with error "${JSON.stringify(error)}". Command output was: "${text}".`,
         );
       }
       resolve(undefined);
@@ -67,17 +69,20 @@ export async function getJavaVersion(
     ls.on("close", (code: number) => {
       if (errorCode == 0) {
         if (code === 0) {
+          outputChannel.info(
+            `Java command "${javaCommand} ${versionArg}" output the following string: ${text} `,
+          );
           const major = toJavaMajor(text);
           if (major) {
             resolve(major);
           } else {
-            outputChannel.debug(
-              `Java command "${javaCommand} ${versionArg}" did not print version information in the expected format: "${text}".`,
+            outputChannel.warn(
+              `Java command "${javaCommand} ${versionArg}" did not print version string in the expected format.`,
             );
           }
         } else {
-          outputChannel.debug(
-            `Java command "${javaCommand}" returned non-zero return code ${code}.`,
+          outputChannel.warn(
+            `Java command "${javaCommand}" returned non-zero return code ${code}. Command output was: "${text}".`,
           );
         }
       }
@@ -93,11 +98,11 @@ export async function hasSupportedJava(
   const major = await getJavaVersion(javaCommand);
   if (major === undefined) {
     telemetryEvent("log", ["bootstrap", "java-version"], "0");
-    outputChannel.error(`Java version check failed.`);
+    outputChannel.warn(`Java check failed.`);
     return false;
   } else if (major < minimumSupportedJavaVersion) {
     telemetryEvent("log", ["bootstrap", "java-version"], `${major}`);
-    outputChannel.error(
+    outputChannel.warn(
       `Unsupported Java version ${major} detected. Minimum required version is ${minimumSupportedJavaVersion}.`,
     );
     return false;

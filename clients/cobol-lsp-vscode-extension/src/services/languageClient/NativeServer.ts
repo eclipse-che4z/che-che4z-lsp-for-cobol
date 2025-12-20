@@ -34,16 +34,12 @@ export async function startNativeServer(
     clientOptions,
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
-  outputChannel.info("Staring language client with NATIVE language server");
+  outputChannel.info("Staring language client with NATIVE language server.");
   try {
     await languageClient.start();
-  } catch (e) {
+  } catch (_e) {
+    // language client prints actual command and error to output as info message
     outputChannel.error(`Starting language client with NATIVE server FAILED.`);
-    if (e instanceof Error) {
-      outputChannel.debug(e.message, e.stack);
-    } else {
-      outputChannel.debug(JSON.stringify(e));
-    }
     return;
   }
   if (languageClient.state === State.Stopped) {

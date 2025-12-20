@@ -27,12 +27,7 @@ import {
   CloseAction,
   ErrorAction,
 } from "vscode-languageclient/node";
-import {
-  HP_LANGUAGE_ID,
-  EXP_LANGUAGE_ID,
-  LANGUAGE_ID,
-  MINIMUM_JAVA_VERSION,
-} from "../constants";
+import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { localCopybooks } from "./copybookLibs/LocalPathLib";
 import { startJavaServer } from "./languageClient/JavaServer";
 import { startNativeServer } from "./languageClient/NativeServer";
@@ -48,7 +43,6 @@ export class LanguageClientService {
   private handlers: Handler[] = [];
 
   constructor(
-    private readonly extensionId: string,
     private readonly copybookCacheLocations: vscode.Uri[],
     private readonly middleware: Middleware,
   ) {
@@ -76,21 +70,20 @@ export class LanguageClientService {
     );
   }
 
-  public async start(servers: Server[]) {
-    if (!servers.length) {
-      outputChannel.error("No server to start");
-      return;
-    }
+  /**
+   * @returns client started successfully
+   */
+  public async start(servers: Server[]): Promise<boolean> {
     const clientOptions = getClientOptions(this.middleware, this.watchers);
     for (const server of servers) {
       const languageClient = await startServer(server, clientOptions);
       if (languageClient) {
         this.handlers.forEach((handler) => handler(languageClient));
         this.languageClient = languageClient;
-        return;
+        return true;
       }
     }
-    void showInfo(servers, this.extensionId);
+    return false;
   }
 
   public dispose() {
@@ -209,47 +202,5 @@ function startServer(
       const exhaustiveCheck: never = server;
       throw new Error(exhaustiveCheck);
     }
-  }
-}
-
-async function showInfo(failed: Server[], extensionId: string) {
-  const messages = failed.map((server) => {
-    switch (server.kind) {
-      case "SOCKET":
-        return `Failed connecting to language server through socket on localhost:${server.port}.`;
-      case "JAVA":
-        return `Java language server failed to start.`;
-      case "NATIVE":
-        return `Native language server failed to start.`;
-      default: {
-        const exhaustiveCheck: never = server;
-        throw new Error(exhaustiveCheck);
-      }
-    }
-  });
-  if (failed.some((server) => server.kind == "JAVA")) {
-    messages.push(
-      `Ensure that the Java runtime specified in the Java Home setting is version ${MINIMUM_JAVA_VERSION} or later.`,
-    );
-  } else if (failed.some((server) => server.kind == "NATIVE")) {
-    messages.push(
-      "Select Java Server Runtime in the extension settings and reload VS Code.",
-    );
-  }
-  const selection = await vscode.window.showInformationMessage(
-    messages.join("\n"),
-    "Settings",
-    "Go to output",
-  );
-  switch (selection) {
-    case "Settings":
-      vscode.commands.executeCommand(
-        "workbench.action.openSettings",
-        `@ext:${extensionId}`,
-      );
-      break;
-    case "Go to output":
-      outputChannel.show();
-      break;
   }
 }
