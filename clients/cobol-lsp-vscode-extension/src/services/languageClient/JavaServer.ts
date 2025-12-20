@@ -37,9 +37,9 @@ export async function startJavaServer(
   } catch (e) {
     outputChannel.error(`Starting language client with JAVA server FAILED.`);
     if (e instanceof Error) {
-      outputChannel.debug(e.message, e.stack);
+      outputChannel.error(e);
     } else {
-      outputChannel.debug(JSON.stringify(e));
+      outputChannel.error(JSON.stringify(e));
     }
     return;
   }

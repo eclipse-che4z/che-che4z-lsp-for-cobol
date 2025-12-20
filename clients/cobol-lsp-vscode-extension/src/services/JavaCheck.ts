@@ -39,7 +39,7 @@ export async function getJavaVersion(
       ls = cp.spawn(javaCommand, [versionArg]);
     } catch (e: unknown) {
       if (e instanceof Error) {
-        outputChannel.error(e.toString());
+        outputChannel.error(e);
       } else {
         outputChannel.error(JSON.stringify(e));
       }
