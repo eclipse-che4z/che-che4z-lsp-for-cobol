@@ -113,7 +113,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
         error ? "cobolParser.unknownExecBlockUnterminated" : "cobolParser.unknownExecBlock";
 
     Location location =
-        context.getExtendedDocument().mapLocation(consturctMultiLineRange(t, tokenStream));
+        context.getExtendedDocument().mapLocation(constructMultiLineRange(t, tokenStream));
     String copybookId = context.getCopybooksRepository().getCopybookIdByUri(location.getUri());
 
     return SyntaxError.syntaxError()
@@ -124,7 +124,7 @@ public class ParserStage implements Stage<AnalysisContext, ParserStageResult, Di
         .build();
   }
 
-  private static Range consturctMultiLineRange(Token t, CommonTokenStream tokenStream) {
+  private static Range constructMultiLineRange(Token t, CommonTokenStream tokenStream) {
     final Token next = tokenStream.get(t.getTokenIndex() + 1); // There should be at least EOF
     final Position start = new Position(t.getLine() - 1, t.getCharPositionInLine());
     final Position end = new Position(next.getLine() - 1, next.getCharPositionInLine());

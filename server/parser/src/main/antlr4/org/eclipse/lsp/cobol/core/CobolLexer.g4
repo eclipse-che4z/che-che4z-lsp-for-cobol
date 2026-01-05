@@ -870,8 +870,6 @@ DIALECT_IF: UNDERSCORECHAR I F UNDERSCORECHAR;
 ZERO_WIDTH_SPACE: '\u200B' ('\u200B' | [ ])*;
 U_CHAR: U;
 
-fragment IGNORE_EXEC_START : ;
-
 UNKNOWN_EXEC : E X E C [ \n\r]+
         (
             I N C L U D E
