@@ -677,7 +677,7 @@ class ExtendedTextTest {
   }
 
   @Test
-  void testReplaceWithMap_edge_case() {
+  void testReplaceWithMap_edge_case_1() {
     ExtendedText extendedText = new ExtendedText("STATEMENT AB", "uri");
     Map<String, Range> statementMap =
         ImmutableMap.of(
@@ -700,5 +700,30 @@ class ExtendedTextTest {
         new Location("uri", new Range(new Position(0, 10), new Position(0, 11))), locationA);
     assertEquals(
         new Location("uri", new Range(new Position(0, 11), new Position(0, 12))), locationB);
+  }
+
+  @Test
+  void testReplaceWithMap_edge_case_2() {
+    ExtendedText extendedText = new ExtendedText("STATEMENT A,B", "uri");
+    Range rangeA = new Range(new Position(0, 10), new Position(0, 11));
+    Range rangeB = new Range(new Position(0, 12), new Position(0, 13));
+
+    Map<String, Range> statementMap =
+        ImmutableMap.of(
+            "A", rangeA,
+            "B", rangeB);
+
+    Range range = new Range(new Position(0, 0), new Position(0, 13));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
+    extendedText.replace(range, statementRange, statementMap, "STATEMENT {A}{B}");
+
+    Location locationA =
+        extendedText.mapLocation(new Range(new Position(0, 10), new Position(0, 11)));
+    Location locationB =
+        extendedText.mapLocation(new Range(new Position(0, 11), new Position(0, 12)));
+
+    assertEquals("STATEMENT AB", extendedText.toString());
+    assertEquals(new Location("uri", rangeA), locationA);
+    assertEquals(new Location("uri", rangeB), locationB);
   }
 }
