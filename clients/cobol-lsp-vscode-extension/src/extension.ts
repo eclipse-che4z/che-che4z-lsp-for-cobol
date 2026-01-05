@@ -244,7 +244,10 @@ async function initializeLanguageClientService(
     "workspace/configuration",
     (r: Parameters<typeof lspConfigHandler>[0]) => lspConfigHandler(r),
   );
-  languageClientService.addRequestHandler("copybook/uri", resolveCopybookURI);
+  languageClientService.addRequestHandler(
+    "copybook/resolve",
+    resolveCopybookURI,
+  );
   languageClientService.addRequestHandler("file/content", readFileContent);
 
   try {

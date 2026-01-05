@@ -41,6 +41,9 @@ import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.io.impl.DiskBasedFileContent;
 import org.eclipse.lsp.cobol.service.io.impl.NonCacheResolveCopybookUri;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
+import org.eclipse.lsp4j.jsonrpc.ResponseErrorException;
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseError;
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseErrorCode;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -301,7 +304,13 @@ class CopybookServiceTest {
     CopybookName copybookName = new CopybookName(VALID_CPY_NAME);
     CopybookService copybookService = createCopybookService();
 
-    when(client.resolveCopybook(anyString(), anyString(), any())).thenReturn(completedFuture(null));
+    when(client.resolveCopybookUri(anyString(), anyString(), any()))
+        .thenReturn(
+            supplyAsync(
+                () -> {
+                  throw new ResponseErrorException(
+                      new ResponseError(ResponseErrorCode.InternalError, "Boom", null));
+                }));
     CopybookModel copybookModel =
         copybookService
             .resolve(
@@ -313,8 +322,7 @@ class CopybookServiceTest {
             .getResult();
 
     assertEquals(
-        new CopybookModel(
-            copybookName.toCopybookId(DOCUMENT_URI), copybookName, VALID_CPY_URI, "content"),
+        new CopybookModel(copybookName.toCopybookId(DOCUMENT_URI), copybookName, null, null),
         copybookModel);
   }
 

@@ -36,10 +36,14 @@ public class DiskBasedFileContent implements ResolveFileContent {
    */
   @Override
   public CompletableFuture<String> getFileContent(String uri) {
-    Path file = fileSystemService.getPathFromURI(uri);
-    return CompletableFuture.completedFuture(
-        fileSystemService.fileExists(file)
-            ? fileSystemService.getContentByPath(Objects.requireNonNull(file))
-            : null);
+    try {
+      final Path file = fileSystemService.getPathFromURI(uri);
+      return CompletableFuture.completedFuture(
+          fileSystemService.fileExists(file)
+              ? fileSystemService.getContentByPath(Objects.requireNonNull(file))
+              : null);
+    } catch (IllegalArgumentException e) {
+      return CompletableFuture.completedFuture(null);
+    }
   }
 }
