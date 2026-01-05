@@ -675,4 +675,21 @@ class ExtendedTextTest {
 
     assertEquals("DISPLAY |BAR.", extendedText.toString());
   }
+
+  @Test
+  void testReplaceWithMap_edge_case() {
+    ExtendedText extendedText = new ExtendedText("STATEMENT AB", "uri");
+    Map<String, Range> statementMap =
+        ImmutableMap.of(
+            "A",
+            new Range(new Position(0, 10), new Position(0, 11)),
+            "B",
+            new Range(new Position(0, 11), new Position(0, 12)));
+
+    Range range = new Range(new Position(0, 0), new Position(0, 12));
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
+    extendedText.replace(range, statementRange, statementMap, "STATEMENT {A}\nSTATEMENT {B}");
+
+    assertEquals("STATEMENT A\n" + "STATEMENT B", extendedText.toString());
+  }
 }
