@@ -690,11 +690,15 @@ class ExtendedTextTest {
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
     extendedText.replace(range, statementRange, statementMap, "STATEMENT {A}\nSTATEMENT {B}");
 
-    Location location =
+    Location locationA =
+        extendedText.mapLocation(new Range(new Position(0, 10), new Position(0, 11)));
+    Location locationB =
         extendedText.mapLocation(new Range(new Position(1, 10), new Position(1, 11)));
 
     assertEquals("STATEMENT A\n" + "STATEMENT B", extendedText.toString());
     assertEquals(
-        new Location("uri", new Range(new Position(0, 11), new Position(0, 12))), location);
+        new Location("uri", new Range(new Position(0, 10), new Position(0, 11))), locationA);
+    assertEquals(
+        new Location("uri", new Range(new Position(0, 11), new Position(0, 12))), locationB);
   }
 }
