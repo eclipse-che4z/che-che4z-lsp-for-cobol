@@ -13,16 +13,21 @@
  */
 
 import * as vscode from "vscode";
-import { getV2Api, IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
+import {
+  getV2Api,
+  IDocumentProcessingContext,
+} from "@code4z/cobol-dialect-api";
+import { TextChangerProcessor } from "./textchangers";
 
 const DIALECT_NAME = "SAMPLE";
-
 
 export async function activate(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
-  const outputChannel = vscode.window.createOutputChannel("SAMPLE Dialect Support");
+  const outputChannel = vscode.window.createOutputChannel(
+    "SAMPLE Dialect Support",
+  );
 
   const v2Api = await getV2Api(extensionId);
   if (v2Api instanceof Error) {
@@ -44,7 +49,11 @@ export async function activate(context: vscode.ExtensionContext) {
         return { isCopy: true, prefix: match[1] };
       },
     },
-    async (context: IDocumentProcessingContext, programUri: vscode.Uri, text: string) => {
+    async (
+      context: IDocumentProcessingContext,
+      programUri: vscode.Uri,
+      text: string,
+    ) => {
       return handleProcessDialect(context, programUri, text, outputChannel);
     },
   );
@@ -62,95 +71,42 @@ async function handleProcessDialect(
   text: string,
   outputChannel: vscode.OutputChannel,
 ): Promise<void> {
-  const lines = text.split("\n");
+  processDocument(context, programUri, text, outputChannel);
+}
+
+async function processDocument(
+  context: IDocumentProcessingContext,
+  documentUri: vscode.Uri,
+  text: string,
+  outputChannel: vscode.OutputChannel,
+  documentParam?: string,
+) {
   const startDate = new Date();
+  const lines = text.split("\n");
   outputChannel.appendLine(
-    `Start processing program ${programUri}, line count: ${lines.length}`,
+    `Start processing document ${documentUri}, line count: ${lines.length}`,
   );
   for (let i = 0; i < lines.length; i++) {
-    await processCopybook(
-      context,
-      i,
-      lines,
-      programUri,
-      outputChannel,
-      undefined,
-    );
+    await processDocumentLine(context, i, lines, outputChannel, documentParam);
   }
   const endDate = new Date();
   outputChannel.appendLine(
-    `Finish processing program ${programUri}. Processing time: ${
+    `Finish processing document ${documentUri}. Processing time: ${
       endDate.getTime() - startDate.getTime()
     } mills.`,
   );
 }
 
-function replace(
-  context: IDocumentProcessingContext,
-  line: number,
-  character: number,
-  text: string,
-) {
-  const range = new vscode.Range(
-    new vscode.Position(line, character),
-    new vscode.Position(line, character + text.length),
-  );
-
-  context.replace(range, text);
-}
-
-function replaceEx(
-  context: IDocumentProcessingContext,
-  line: number,
-  start: number,
-  end: number,
-  text: string,
-) {
-  const range = new vscode.Range(
-    new vscode.Position(line, start),
-    new vscode.Position(line, end),
-  );
-
-  context.replace(range, text);
-}
-
-async function processCopybook(
+async function processDocumentLine(
   context: IDocumentProcessingContext,
   line: number,
   lines: string[],
-  programUri: vscode.Uri,
   outputChannel: vscode.OutputChannel,
   param?: string,
 ) {
-  let index = lines[line].indexOf(" AA ");
-  if (index > 0) {
-    replace(context, line, index, " 01 ");
-  }
+  TextChangerProcessor.execute(context, line, lines, param);
 
-  index = lines[line].indexOf(" BB ");
-  if (index > 0) {
-    replace(context, line, index, " 05 ");
-  }
-
-  index = lines[line].indexOf(" SDATA");
-  if (index > 0) {
-    replaceEx(
-      context,
-      line,
-      index,
-      index + " SDATA".length,
-      " PIC X(9)",
-    );
-  }
-
-  if (param) {
-    index = lines[line].indexOf("XXX");
-    if (index > 0) {
-      replace(context, line, index, `${param}`);
-    }
-  }
-
-  index = lines[line].indexOf("COPY SAMPLE");
+  let index = lines[line].indexOf("COPY SAMPLE");
   if (index > 0) {
     const words = lines[line]
       .substring(index + "COPY SAMPLE".length)
@@ -190,21 +146,17 @@ async function processCopybook(
     const copybookModel = await context.resolveCopybook(
       name,
       statementRange,
-      statementRange
+      statementRange,
     );
 
     if (copybookModel) {
-      const copyLines = copybookModel.text.split("\n");
-      for (let i = 0; i < copyLines.length; i++) {
-        await processCopybook(
-          copybookModel.context,
-          i,
-          copyLines,
-          programUri,
-          outputChannel,
-          copybookParam,
-        );
-      }
+      processDocument(
+        copybookModel.context,
+        copybookModel.uri,
+        copybookModel.text,
+        outputChannel,
+        copybookParam,
+      );
     }
   }
 }

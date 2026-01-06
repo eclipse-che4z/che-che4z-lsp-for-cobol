@@ -1,13 +1,13 @@
 {
-    "pgroups": [
+  "pgroups": [
+    {
+      "name": "SAMPLE",
+      "preprocessor": [
         {
-            "name": "SAMPLE",
-            "preprocessor": [{
-                "name": "SAMPLE",
-                    "libs": [
-                        "copybook"
-                    ]
-            }]
+          "name": "SAMPLE",
+          "libs": ["copybook"]
         }
-    ]
+      ]
+    }
+  ]
 }
