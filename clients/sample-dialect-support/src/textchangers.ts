@@ -11,100 +11,50 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
+import type { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
 import * as vscode from "vscode";
 
-interface TextChanger {
-  execute(
-    context: IDocumentProcessingContext,
-    line: number,
-    lines: string[],
-    param?: string,
-  ): void;
+function makeRange(line: number, start: number, len: number) {
+  return new vscode.Range(line, start, line, start + len);
 }
 
-abstract class CommonTextChanger implements TextChanger {
-  public abstract execute(
-    context: IDocumentProcessingContext,
-    line: number,
-    lines: string[],
-    param?: string,
-  ): void;
-
-  protected replace(
-    context: IDocumentProcessingContext,
-    line: number,
-    start: number,
-    end: number,
-    text: string,
-  ): void {
-    const range = new vscode.Range(
-      new vscode.Position(line, start),
-      new vscode.Position(line, end),
-    );
-    context.replace(range, text);
-  }
+function replaceVariable(
+  original: string,
+  change: string,
+  context: IDocumentProcessingContext,
+  line: number,
+  lines: string[],
+): void {
+  const index = lines[line].indexOf(original);
+  if (index <= 0) return;
+  context.replace(makeRange(line, index, original.length), change);
 }
 
-export class VariableTextChanger extends CommonTextChanger {
-  public constructor(
-    private readonly original: string,
-    private readonly change: string,
-  ) {
-    super();
-  }
-
-  public execute(
-    context: IDocumentProcessingContext,
-    line: number,
-    lines: string[],
-    param?: string,
-  ): void {
-    let index = lines[line].indexOf(this.original);
-    if (index > 0) {
-      this.replace(
-        context,
-        line,
-        index,
-        index + this.original.length,
-        this.change,
-      );
-    }
-  }
+function replaceWithParameter(
+  context: IDocumentProcessingContext,
+  line: number,
+  lines: string[],
+  param?: string,
+): void {
+  if (!param) return;
+  const placeholder = "XXX";
+  const index = lines[line].indexOf(placeholder);
+  if (index <= 0) return;
+  context.replace(makeRange(line, index, placeholder.length), param);
 }
 
-export class ParamTextChanger extends CommonTextChanger {
-  public execute(
-    context: IDocumentProcessingContext,
-    line: number,
-    lines: string[],
-    param?: string,
-  ): void {
-    if (param) {
-      const index = lines[line].indexOf("XXX");
-      if (index > 0) {
-        this.replace(context, line, index, param.length, param);
-      }
-    }
-  }
-}
+const TEXT_CHANGERS = [
+  replaceVariable.bind(undefined, " AA ", " 01 "),
+  replaceVariable.bind(undefined, " BB ", " 05 "),
+  replaceVariable.bind(undefined, " SDATA", " PIC X(9)"),
+  replaceWithParameter,
+];
 
-export class TextChangerProcessor {
-  private static readonly TEXT_CHANGERS: TextChanger[] = [
-    new VariableTextChanger(" AA ", " 01 "),
-    new VariableTextChanger(" BB ", " 05 "),
-    new VariableTextChanger(" SDATA", " PIC X(9)"),
-    new ParamTextChanger(),
-  ];
-
-  public static execute(
-    context: IDocumentProcessingContext,
-    line: number,
-    lines: string[],
-    param?: string,
-  ) {
-    TextChangerProcessor.TEXT_CHANGERS.forEach((tc) =>
-      tc.execute(context, line, lines, param),
-    );
-  }
+export function replaceText(
+  context: IDocumentProcessingContext,
+  line: number,
+  lines: string[],
+  param?: string,
+) {
+  TEXT_CHANGERS.forEach((tc) => tc(context, line, lines, param));
 }
