@@ -17,7 +17,7 @@ import {
   getV2Api,
   IDocumentProcessingContext,
 } from "@code4z/cobol-dialect-api";
-import { TextChangerProcessor } from "./textchangers";
+import { replaceText } from "./textchangers";
 
 const DIALECT_NAME = "SAMPLE";
 
@@ -104,7 +104,7 @@ async function processDocumentLine(
   outputChannel: vscode.OutputChannel,
   param?: string,
 ) {
-  TextChangerProcessor.execute(context, line, lines, param);
+  replaceText(context, line, lines, param);
 
   let index = lines[line].indexOf("COPY SAMPLE");
   if (index > 0) {
