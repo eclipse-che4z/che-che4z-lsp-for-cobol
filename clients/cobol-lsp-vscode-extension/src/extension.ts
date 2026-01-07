@@ -161,9 +161,9 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  const servers = await getServers(context.extensionUri);
+  const { servers, preferedRuntime } = await getServers(context.extensionUri);
   const errors = await languageClientService.start(servers);
-  void showInitFailedMessages(errors, context.extension.id);
+  void showInitFailedMessages(preferedRuntime, errors, context.extension.id);
 
   // 'export' public api-surface
   return {
@@ -605,14 +605,25 @@ function registerCompletions(context: vscode.ExtensionContext) {
 }
 
 async function showInitFailedMessages(
+  preferedRuntime: "JAVA" | "NATIVE",
   errors: ServerInitError[],
   extensionId: string,
 ) {
+  if (errors.length == 1 && preferedRuntime === "NATIVE") {
+    const err = errors[0];
+    errors = [
+      new ServerInitError(
+        err.message +
+          ' To use Java language server, set Server Runtime setting to "JAVA".',
+        "Server Runtime",
+      ),
+    ];
+  }
   for (const error of errors) {
     const selection = await vscode.window.showErrorMessage(
       error.message,
-      "Settings",
       "Go to output",
+      "Settings",
     );
     switch (selection) {
       case "Settings":

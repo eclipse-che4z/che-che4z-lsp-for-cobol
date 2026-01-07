@@ -7,16 +7,19 @@ import { outputChannel } from "../util/OutputChannel";
 
 export const getServers = async (
   extensionUri: vscode.Uri,
-): Promise<Server[]> => {
+): Promise<{ preferedRuntime: "JAVA" | "NATIVE"; servers: Server[] }> => {
   const preferedRuntime = SettingsService.getServerRuntime();
   const port = getLspPort();
   if (port) {
-    return [
-      {
-        kind: "SOCKET",
-        port,
-      },
-    ];
+    return {
+      preferedRuntime,
+      servers: [
+        {
+          kind: "SOCKET",
+          port,
+        },
+      ],
+    };
   }
   const servers: Server[] = [];
   outputChannel.info(`Server Runtime setting "${preferedRuntime}" selected.`);
@@ -40,7 +43,7 @@ export const getServers = async (
       command,
     });
   }
-  return servers;
+  return { preferedRuntime, servers };
 };
 
 function getLspPort(): number {
