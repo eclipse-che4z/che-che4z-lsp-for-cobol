@@ -24,17 +24,27 @@ import { telemetryEvent } from "../services/reporter";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/OpenSettingsCommand");
-jest.mock("../services/LanguageClientService");
 jest.mock("../commands/ClearCopybookCacheCommand");
+
+jest.mock("../services/LanguageClientService", () => {
+  class LanguageClientService {
+    addRequestHandler() {}
+    addNotificationHandler() {}
+    retrieveAnalysis() {}
+    start() {
+      return [];
+    }
+  }
+  return {
+    LanguageClientService,
+  };
+});
 
 jest.mock("../services/Settings", () => ({
   initializeSettings: jest.fn(),
   SettingsService: {
     getServerRuntime: jest.fn().mockReturnValue("JAVA"),
     getJavaCommand: jest.fn().mockReturnValue("java"),
-    getSnippetsForCobol: jest.fn().mockReturnValue(Promise.resolve([])),
-    getDialects: jest.fn().mockReturnValue([]),
-    getMaxVMCount: jest.fn().mockReturnValue(-1),
     getAnalysisMode: jest.fn().mockReturnValue("ADVANCED"),
   },
 }));
@@ -99,20 +109,6 @@ describe("check exposed API's by the COBOL LS extension", () => {
 });
 
 describe("Check plugin extension for cobol fails.", () => {
-  beforeEach(() => {
-    jest.mock("../services/LanguageClientService", () => {
-      return {
-        checkPrerequisites: () => {
-          throw new Error("The error");
-        },
-        enableNativeBuild: jest.fn(),
-        addRequestHandler: jest.fn(),
-        retrieveAnalysis: jest.fn(),
-        start: jest.fn(),
-      };
-    });
-  });
-
   test("start fails.", async () => {
     await activate(context);
     expect(telemetryEvent).toHaveBeenCalledWith(

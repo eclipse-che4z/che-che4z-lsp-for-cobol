@@ -8,11 +8,12 @@ import {
   StreamInfo,
 } from "vscode-languageclient/node";
 import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
+import { ServerInitError } from "./ServerTypes";
 
 export async function startSocketServer(
   port: number,
   clientOptions: LanguageClientOptions,
-): Promise<LanguageClient | undefined> {
+): Promise<LanguageClient | ServerInitError> {
   const serverOptions: ServerOptions = () => {
     const socket = net.connect({
       host: "localhost",
@@ -33,24 +34,25 @@ export async function startSocketServer(
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
   outputChannel.info("Staring language client with SOCKET language server.");
+  const initError = `Failed connecting to language server through socket on localhost:${port}.`;
   try {
     await languageClient.start();
   } catch (e) {
+    if (e instanceof Error) {
+      outputChannel.error(e);
+    } else {
+      outputChannel.error(JSON.stringify(e));
+    }
     outputChannel.error(
       `Starting language client with SOCKET server at localhost:${port} FAILED`,
     );
-    if (e instanceof Error) {
-      outputChannel.debug(e.message, e.stack);
-    } else {
-      outputChannel.debug(JSON.stringify(e));
-    }
-    return;
+    return new ServerInitError(initError);
   }
   if (languageClient.state === State.Stopped) {
     outputChannel.error(
       `Starting language client with SOCKET server at localhost:${port} FAILED`,
     );
-    return;
+    return new ServerInitError(initError);
   }
   outputChannel.info(
     `Language client with SOCKET language server at localhost:${port} STARTED`,

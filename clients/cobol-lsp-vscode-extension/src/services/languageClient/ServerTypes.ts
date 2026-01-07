@@ -16,3 +16,12 @@ export interface JavaServer {
   dialects: vscode.Uri;
 }
 export type Server = SocketServer | JavaServer | NativeServer;
+
+export class ServerInitError extends Error {
+  constructor(
+    message: string,
+    public readonly filter?: string,
+  ) {
+    super(message);
+  }
+}

@@ -14,6 +14,7 @@
 import * as cp from "child_process";
 import { outputChannel } from "./util/OutputChannel";
 import { telemetryEvent } from "./reporter";
+import { ServerInitError } from "./languageClient/ServerTypes";
 
 const maxLength = 255;
 const versionPattern = /\b(?:java|openjdk)\b(?:\s+version)?\s+"?(?:1\.)?(\d+)/i;
@@ -28,7 +29,7 @@ export function toJavaMajor(versionString: string) {
 
 export async function getJavaVersion(
   javaCommand: string = "java",
-): Promise<number | undefined> {
+): Promise<number | Error> {
   const versionArg = "-version";
   outputChannel.info(
     `Checking Java version by running command "${javaCommand} ${versionArg}".`,
@@ -43,7 +44,9 @@ export async function getJavaVersion(
       } else {
         outputChannel.error(JSON.stringify(e));
       }
-      resolve(undefined);
+      resolve(
+        new ServerInitError(`Java command "${javaCommand}" failed to start.`),
+      );
       return;
     }
     let text = "";
@@ -57,55 +60,77 @@ export async function getJavaVersion(
     ls.on("error", (error: NodeJS.ErrnoException) => {
       if (error.code === "ENOENT") {
         errorCode = -1;
-        outputChannel.error(`Java command "${javaCommand}" not found.`);
+        const initError = new ServerInitError(
+          `Java command "${javaCommand}" not found. Install Java or use Java Home setting to point to an existing Java installation.`,
+          "Java Home",
+        );
+        outputChannel.error(initError);
+        resolve(initError);
       } else {
         errorCode = -2;
+        outputChannel.error(error);
         outputChannel.error(
-          `Java command "${javaCommand} ${versionArg}" exited with error "${JSON.stringify(error)}". Command output was: "${text}".`,
+          new Error(
+            `Java command "${javaCommand} ${versionArg}" exited with error: "${JSON.stringify(error)}". Command output was: "${text}".`,
+          ),
+        );
+        resolve(
+          new ServerInitError(
+            `Java command "${javaCommand}" failed to start. Check the extension output for more details.`,
+          ),
         );
       }
-      resolve(undefined);
     });
     ls.on("close", (code: number) => {
       if (errorCode == 0) {
         if (code === 0) {
           outputChannel.info(
-            `Java command "${javaCommand} ${versionArg}" output the following string: ${text} `,
+            `Java command "${javaCommand} ${versionArg}" output the following string: "${text}".`,
           );
           const major = toJavaMajor(text);
           if (major) {
             resolve(major);
           } else {
-            outputChannel.warn(
+            outputChannel.error(
               `Java command "${javaCommand} ${versionArg}" did not print version string in the expected format.`,
+            );
+            resolve(
+              new ServerInitError(
+                "Unable to determine Java version. Check the extension output for more details.",
+              ),
             );
           }
         } else {
-          outputChannel.warn(
+          outputChannel.error(
             `Java command "${javaCommand}" returned non-zero return code ${code}. Command output was: "${text}".`,
+          );
+          resolve(
+            new ServerInitError(
+              `Java command "${javaCommand}" returned non-zero return code ${code}. Check the extension output for more details.`,
+            ),
           );
         }
       }
-      resolve(undefined);
     });
   });
 }
 
-export async function hasSupportedJava(
+export async function checkJavaVersion(
   javaCommand: string,
   minimumSupportedJavaVersion: number,
-): Promise<boolean> {
+): Promise<ServerInitError | undefined> {
   const major = await getJavaVersion(javaCommand);
-  if (major === undefined) {
+  if (major instanceof Error) {
     telemetryEvent("log", ["bootstrap", "java-version"], "0");
-    outputChannel.warn(`Java check failed.`);
-    return false;
+    return major;
   } else if (major < minimumSupportedJavaVersion) {
     telemetryEvent("log", ["bootstrap", "java-version"], `${major}`);
-    outputChannel.warn(
-      `Unsupported Java version ${major} detected. Minimum required version is ${minimumSupportedJavaVersion}.`,
+    const error = new ServerInitError(
+      `Unsupported Java version ${major} detected. Minimum required version is ${minimumSupportedJavaVersion}. If you have an installation of a supported version of Java you can point to it by the Java Home setting.`,
+      "Java Home",
     );
-    return false;
+    outputChannel.error(error);
+    return error;
   }
-  return true;
+  return;
 }

@@ -6,13 +6,13 @@ import {
   ServerOptions,
   State,
 } from "vscode-languageclient/node";
-import type { NativeServer } from "./ServerTypes";
+import { NativeServer, ServerInitError } from "./ServerTypes";
 import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
 
 export async function startNativeServer(
   server: NativeServer,
   clientOptions: LanguageClientOptions,
-): Promise<LanguageClient | undefined> {
+): Promise<LanguageClient | ServerInitError> {
   const serverOptions: ServerOptions = {
     command: server.command.fsPath,
     args: [
@@ -35,18 +35,23 @@ export async function startNativeServer(
   );
   clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
   outputChannel.info("Staring language client with NATIVE language server.");
+  const initError = `Native language server ${server.command.fsPath} failed to start. Make sure the server binary is executable and not being blocked by your security software. To use a Java server select Server Runtime "JAVA" in the extension settings and reload VS Code.`;
   try {
     await languageClient.start();
-  } catch (_e) {
-    // language client prints actual command and error to output as info message
+  } catch (e) {
+    if (e instanceof Error) {
+      outputChannel.error(e);
+    } else {
+      outputChannel.error(JSON.stringify(e));
+    }
     outputChannel.error(`Starting language client with NATIVE server FAILED.`);
-    return;
+    return new ServerInitError(initError);
   }
   if (languageClient.state === State.Stopped) {
     outputChannel.error(
       `Starting language client with NATIVE language server FAILED.`,
     );
-    return;
+    return new ServerInitError(initError);
   }
   outputChannel.info("Language client with NATIVE language server STARTED");
 

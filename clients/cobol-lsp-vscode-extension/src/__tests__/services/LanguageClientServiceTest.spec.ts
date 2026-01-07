@@ -19,7 +19,7 @@ import { LanguageClientService } from "../../services/LanguageClientService";
 import { LanguageClient } from "vscode-languageclient/node";
 
 jest.mock("../../services/JavaCheck", () => ({
-  getJavaVersion: jest.fn().mockResolvedValue(17),
+  checkJavaVersion: jest.fn(),
 }));
 
 const javaServer: JavaServer = {
@@ -38,7 +38,6 @@ describe("LanguageClientService", () => {
 
   beforeEach(() => {
     languageClientService = new LanguageClientService(
-      "Publisher.Extension-Name",
       [vscode.Uri.parse("cobol:///storagePath")],
       {},
     );

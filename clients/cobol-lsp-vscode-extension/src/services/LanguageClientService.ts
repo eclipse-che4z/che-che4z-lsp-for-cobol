@@ -21,7 +21,7 @@ import {
   type FileEvent,
   GenericNotificationHandler,
   GenericRequestHandler,
-  type LanguageClient,
+  LanguageClient,
   LanguageClientOptions,
   type Middleware,
   CloseAction,
@@ -31,7 +31,7 @@ import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { localCopybooks } from "./copybookLibs/LocalPathLib";
 import { startJavaServer } from "./languageClient/JavaServer";
 import { startNativeServer } from "./languageClient/NativeServer";
-import { Server } from "./languageClient/ServerTypes";
+import { Server, ServerInitError } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
 import { outputChannel } from "./util/OutputChannel";
 
@@ -73,17 +73,28 @@ export class LanguageClientService {
   /**
    * @returns client started successfully
    */
-  public async start(servers: Server[]): Promise<boolean> {
+  public async start(servers: Server[]): Promise<ServerInitError[]> {
+    if (!servers.length) {
+      outputChannel.error("No COBOL language server to start.");
+      return [
+        new ServerInitError(
+          "No COBOL language server to start. Check the extension output for warnings and errors.",
+          "Server Runtime",
+        ),
+      ];
+    }
     const clientOptions = getClientOptions(this.middleware, this.watchers);
+    const errors: ServerInitError[] = [];
     for (const server of servers) {
       const languageClient = await startServer(server, clientOptions);
-      if (languageClient) {
+      if (languageClient instanceof LanguageClient) {
         this.handlers.forEach((handler) => handler(languageClient));
         this.languageClient = languageClient;
-        return true;
+        return [];
       }
+      errors.push(languageClient);
     }
-    return false;
+    return errors;
   }
 
   public dispose() {
@@ -190,7 +201,7 @@ function getClientOptions(
 function startServer(
   server: Server,
   clientOptions: LanguageClientOptions,
-): Promise<LanguageClient | undefined> {
+): Promise<LanguageClient | ServerInitError> {
   switch (server.kind) {
     case "SOCKET":
       return startSocketServer(server.port, clientOptions);

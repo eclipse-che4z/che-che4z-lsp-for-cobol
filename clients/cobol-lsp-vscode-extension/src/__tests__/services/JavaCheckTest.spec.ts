@@ -15,6 +15,7 @@
 import { toJavaMajor, getJavaVersion } from "../../services/JavaCheck";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
 import { outputChannel } from "../../services/util/OutputChannel";
+import { ServerInitError } from "../../services/languageClient/ServerTypes";
 
 describe("Checks Java version", () => {
   it("If Java version is supported", () => {
@@ -79,47 +80,78 @@ describe("Java version check", () => {
   });
 
   it("version cannot be identified", async () => {
-    const debug = outputChannel.debug as jest.Mock;
+    const info = outputChannel.info as jest.Mock;
+    const error = outputChannel.error as jest.Mock;
     mockSpawnProcess("", "No version", 0);
     const version = await getJavaVersion();
-    expect(version).toBe(undefined);
-    expect(debug).toHaveBeenCalledTimes(1);
-    expect(debug.mock.calls[0]).toEqual([
-      'Java command "java -version" did not print version information in the expected format: "No version".',
+    expect(version).toEqual(
+      new Error(
+        "Unable to determine Java version. Check the extension output for more details.",
+      ),
+    );
+    expect(info).toHaveBeenCalledTimes(2);
+    expect(info.mock.calls[0]).toEqual([
+      'Checking Java version by running command "java -version".',
+    ]);
+    expect(info.mock.calls[1]).toEqual([
+      'Java command "java -version" output the following string: "No version".',
+    ]);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]).toEqual([
+      'Java command "java -version" did not print version string in the expected format.',
     ]);
   });
 
   it("when 'error' event is emitted  - spawned", async () => {
     mockSpawnProcess("", "", 0, { code: "ENOENT" } as NodeJS.ErrnoException);
     const version = await getJavaVersion();
-    expect(version).toBe(undefined);
-    expect(outputChannel.debug as jest.Mock).toHaveBeenCalledTimes(1);
-    expect((outputChannel.debug as jest.Mock).mock.calls[0]).toEqual([
-      'Java command "java" not found.',
+    expect(version).toEqual(
+      new Error(
+        'Java command "java" not found. Install Java or use Java Home setting to point to an existing Java installation.',
+      ),
+    );
+    expect((version as ServerInitError).filter).toEqual("Java Home");
+    const logError = outputChannel.error as jest.Mock;
+    expect(logError).toHaveBeenCalledTimes(1);
+    expect(logError.mock.calls[0]).toEqual([
+      new Error(
+        'Java command "java" not found. Install Java or use Java Home setting to point to an existing Java installation.',
+      ),
     ]);
   });
 
   it("when 'error' event is emitted  - not spawned", async () => {
-    const debug = outputChannel.debug as jest.Mock;
-    mockSpawnProcess("", "", 0, {
+    const error = outputChannel.error as jest.Mock;
+    mockSpawnProcess("Standard output", "Error output", 0, {
       code: "Other error",
     } as NodeJS.ErrnoException);
     const version = await getJavaVersion();
-    expect(version).toBe(undefined);
-    expect(debug).toHaveBeenCalledTimes(1);
-    expect(debug.mock.calls[0]).toEqual([
-      'Java command "java" exited with error "{"code":"Other error"}"',
+    expect(version).toEqual(
+      new Error(
+        'Java command "java" failed to start. Check the extension output for more details.',
+      ),
+    );
+    expect(error).toHaveBeenCalledTimes(2);
+    expect(error.mock.calls[0]).toEqual([{ code: "Other error" }]);
+    expect(error.mock.calls[1]).toEqual([
+      new Error(
+        'Java command "java -version" exited with error: "{"code":"Other error"}". Command output was: "Error output".',
+      ),
     ]);
   });
 
   it("when 'close' event is emitted", async () => {
-    const debug = outputChannel.debug as jest.Mock;
+    const error = outputChannel.error as jest.Mock;
     mockSpawnProcess("", "", 23);
     const version = await getJavaVersion();
-    expect(version).toBe(undefined);
-    expect(debug).toHaveBeenCalledTimes(1);
-    expect(debug.mock.calls[0]).toEqual([
-      'Java command "java" returned non-zero return code 23.',
+    expect(version).toEqual(
+      new Error(
+        'Java command "java" returned non-zero return code 23. Check the extension output for more details.',
+      ),
+    );
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]).toEqual([
+      'Java command "java" returned non-zero return code 23. Command output was: "".',
     ]);
   });
 });

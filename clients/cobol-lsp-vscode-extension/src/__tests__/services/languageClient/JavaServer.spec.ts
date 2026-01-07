@@ -4,7 +4,7 @@ import { JavaServer } from "../../../services/languageClient/ServerTypes";
 import { startJavaServer } from "../../../services/languageClient/JavaServer";
 
 jest.mock("../../../services/JavaCheck", () => ({
-  getJavaVersion: jest.fn().mockResolvedValue(17),
+  checkJavaVersion: jest.fn(),
 }));
 
 const windows = process.platform === "win32";

@@ -1,26 +1,22 @@
 import * as vscode from "vscode";
 import * as os from "node:os";
-import { MINIMUM_JAVA_VERSION, SERVER_PORT } from "../../constants";
+import { SERVER_PORT } from "../../constants";
 import type { Server } from "./ServerTypes";
 import { SettingsService } from "../Settings";
-import { hasSupportedJava } from "../JavaCheck";
 import { outputChannel } from "../util/OutputChannel";
 
 export const getServers = async (
   extensionUri: vscode.Uri,
-): Promise<{ preferedRuntime: "JAVA" | "NATIVE"; servers: Server[] }> => {
+): Promise<Server[]> => {
   const preferedRuntime = SettingsService.getServerRuntime();
   const port = getLspPort();
   if (port) {
-    return {
-      preferedRuntime,
-      servers: [
-        {
-          kind: "SOCKET",
-          port,
-        },
-      ],
-    };
+    return [
+      {
+        kind: "SOCKET",
+        port,
+      },
+    ];
   }
   const servers: Server[] = [];
   outputChannel.info(`Server Runtime setting "${preferedRuntime}" selected.`);
@@ -28,12 +24,7 @@ export const getServers = async (
     const command = getJavaCommand();
     const jar = await getJavaServerUri(extensionUri);
     const dialects = await getJavaDialectsUri(extensionUri);
-    if (
-      command &&
-      jar &&
-      dialects &&
-      (await hasSupportedJava(command, MINIMUM_JAVA_VERSION))
-    ) {
+    if (jar && dialects) {
       servers.push({
         kind: "JAVA",
         command,
@@ -49,7 +40,7 @@ export const getServers = async (
       command,
     });
   }
-  return { preferedRuntime, servers };
+  return servers;
 };
 
 function getLspPort(): number {
