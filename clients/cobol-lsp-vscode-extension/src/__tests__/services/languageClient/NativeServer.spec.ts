@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { NativeServer } from "../../../services/languageClient/ServerTypes";
 import { startNativeServer } from "../../../services/languageClient/NativeServer";
+import { LanguageClientErrorHandler } from "../../../services/LanguageClientErrorHandler";
 
 const windows = process.platform === "win32";
 if (windows) {
@@ -11,7 +12,8 @@ if (windows) {
       command: vscode.Uri.file("C:\\t e s t\\server\\executable"),
     };
     const clientOptions = {};
-    await startNativeServer(nativeServer, clientOptions);
+    const errorHandler = {} as LanguageClientErrorHandler;
+    await startNativeServer(nativeServer, clientOptions, errorHandler);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
@@ -30,7 +32,7 @@ if (windows) {
         },
       },
       {
-        errorHandler: expect.any(Function) as unknown,
+        errorHandler,
       },
     );
   });
@@ -41,7 +43,8 @@ if (windows) {
       command: vscode.Uri.file("/t e s t/server/executable"),
     };
     const clientOptions = {};
-    await startNativeServer(nativeServer, clientOptions);
+    const errorHandler = {} as LanguageClientErrorHandler;
+    await startNativeServer(nativeServer, clientOptions, errorHandler);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenLastCalledWith(
       "cobol",
@@ -57,7 +60,7 @@ if (windows) {
         options: { cwd: "/t e s t/server", detached: false },
       },
       {
-        errorHandler: expect.any(Function) as unknown,
+        errorHandler,
       },
     );
   });

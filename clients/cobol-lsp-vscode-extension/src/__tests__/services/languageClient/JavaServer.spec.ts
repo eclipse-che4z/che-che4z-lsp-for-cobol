@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { JavaServer } from "../../../services/languageClient/ServerTypes";
 import { startJavaServer } from "../../../services/languageClient/JavaServer";
+import { LanguageClientErrorHandler } from "../../../services/LanguageClientErrorHandler";
 
 jest.mock("../../../services/JavaCheck", () => ({
   checkJavaVersion: jest.fn(),
@@ -16,8 +17,9 @@ if (windows) {
       dialects: vscode.Uri.file("C:\\t e s t\\dialects"),
       jar: vscode.Uri.file("C:\\t e s t\\server\\server.jar"),
     };
-
-    await startJavaServer(javaServer, {});
+    const clientOptions = {};
+    const errorHandler = {} as LanguageClientErrorHandler;
+    await startJavaServer(javaServer, clientOptions, errorHandler);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
       "cobol",
@@ -34,7 +36,7 @@ if (windows) {
         ],
         options: { detached: false },
       },
-      { errorHandler: expect.any(Function) as unknown },
+      { errorHandler },
     );
   });
 } else {
@@ -45,8 +47,9 @@ if (windows) {
       dialects: vscode.Uri.file("/t e s t/dialectsFolder"),
       jar: vscode.Uri.file("/t e s t/server/server.jar"),
     };
-
-    await startJavaServer(javaServer, {});
+    const clientOptions = {};
+    const errorHandler = {} as LanguageClientErrorHandler;
+    await startJavaServer(javaServer, clientOptions, errorHandler);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
       "cobol",
@@ -63,7 +66,7 @@ if (windows) {
         ],
         options: { detached: false },
       },
-      { errorHandler: expect.any(Function) as unknown },
+      { errorHandler },
     );
   });
 }

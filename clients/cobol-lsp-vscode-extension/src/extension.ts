@@ -604,7 +604,7 @@ function registerCompletions(context: vscode.ExtensionContext) {
   );
 }
 
-async function showInitFailedMessages(
+function showInitFailedMessages(
   preferedRuntime: "JAVA" | "NATIVE",
   errors: ServerInitError[],
   extensionId: string,
@@ -620,21 +620,20 @@ async function showInitFailedMessages(
     ];
   }
   for (const error of errors) {
-    const selection = await vscode.window.showErrorMessage(
-      error.message,
-      "Go to output",
-      "Settings",
-    );
-    switch (selection) {
-      case "Settings":
-        vscode.commands.executeCommand(
-          "workbench.action.openSettings",
-          `@ext:${extensionId} ${error.filter || ""}`,
-        );
-        break;
-      case "Go to output":
-        outputChannel.show();
-        break;
-    }
+    vscode.window
+      .showErrorMessage(error.message, "Settings", "Go to output")
+      .then((selection) => {
+        switch (selection) {
+          case "Settings":
+            vscode.commands.executeCommand(
+              "workbench.action.openSettings",
+              `@ext:${extensionId} ${error.filter || ""}`,
+            );
+            break;
+          case "Go to output":
+            outputChannel.show();
+            break;
+        }
+      });
   }
 }

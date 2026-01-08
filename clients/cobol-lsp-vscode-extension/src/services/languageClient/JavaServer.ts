@@ -12,10 +12,12 @@ import {
   LANGUAGE_ID,
   MINIMUM_JAVA_VERSION,
 } from "../../constants";
+import { LanguageClientErrorHandler } from "../LanguageClientErrorHandler";
 
 export async function startJavaServer(
   server: JavaServer,
   clientOptions: LanguageClientOptions,
+  errorHandler: LanguageClientErrorHandler,
 ): Promise<LanguageClient | ServerInitError> {
   const result = await checkJavaVersion(server.command, MINIMUM_JAVA_VERSION);
   if (result instanceof ServerInitError) {
@@ -37,9 +39,9 @@ export async function startJavaServer(
     LANGUAGE_ID,
     EXTENSION_NAME,
     serverOptions,
-    clientOptions,
+    { ...clientOptions, errorHandler },
   );
-  clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
+  errorHandler.defaultHandler = languageClient.createDefaultErrorHandler();
   outputChannel.info("Staring language client with JAVA language server.");
   const initError = `Java language server ${server.jar.fsPath} failed to start. Ensure that the default Java installation or Java runtime specified in the Java Home setting is version ${MINIMUM_JAVA_VERSION} or newer.`;
   try {
@@ -48,7 +50,7 @@ export async function startJavaServer(
     if (e instanceof Error) {
       outputChannel.error(e);
     } else {
-      outputChannel.error(JSON.stringify(e));
+      outputChannel.error(new Error(JSON.stringify(e)));
     }
     outputChannel.error(`Starting language client with JAVA server FAILED.`);
     return new ServerInitError(initError, "Java Home");
@@ -57,6 +59,7 @@ export async function startJavaServer(
     outputChannel.error(`Starting language client with JAVA server FAILED.`);
     return new ServerInitError(initError, "Java Home");
   }
+  errorHandler.initialized = true;
   outputChannel.info("Language client with JAVA language server STARTED");
 
   return languageClient;

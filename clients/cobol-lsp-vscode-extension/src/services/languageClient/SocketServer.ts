@@ -9,10 +9,12 @@ import {
 } from "vscode-languageclient/node";
 import { EXTENSION_NAME, LANGUAGE_ID } from "../../constants";
 import { ServerInitError } from "./ServerTypes";
+import { LanguageClientErrorHandler } from "../LanguageClientErrorHandler";
 
 export async function startSocketServer(
   port: number,
   clientOptions: LanguageClientOptions,
+  errorHandler: LanguageClientErrorHandler,
 ): Promise<LanguageClient | ServerInitError> {
   const serverOptions: ServerOptions = () => {
     const socket = net.connect({
@@ -30,9 +32,9 @@ export async function startSocketServer(
     LANGUAGE_ID,
     EXTENSION_NAME,
     serverOptions,
-    clientOptions,
+    { ...clientOptions, errorHandler },
   );
-  clientOptions.errorHandler = languageClient.createDefaultErrorHandler(0);
+  errorHandler.defaultHandler = languageClient.createDefaultErrorHandler();
   outputChannel.info("Staring language client with SOCKET language server.");
   const initError = `Failed connecting to language server through socket on localhost:${port}.`;
   try {
@@ -41,7 +43,7 @@ export async function startSocketServer(
     if (e instanceof Error) {
       outputChannel.error(e);
     } else {
-      outputChannel.error(JSON.stringify(e));
+      outputChannel.error(new Error(JSON.stringify(e)));
     }
     outputChannel.error(
       `Starting language client with SOCKET server at localhost:${port} FAILED`,
@@ -54,6 +56,7 @@ export async function startSocketServer(
     );
     return new ServerInitError(initError);
   }
+  errorHandler.initialized = true;
   outputChannel.info(
     `Language client with SOCKET language server at localhost:${port} STARTED`,
   );

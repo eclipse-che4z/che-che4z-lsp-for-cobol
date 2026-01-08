@@ -24,8 +24,6 @@ import {
   LanguageClient,
   LanguageClientOptions,
   type Middleware,
-  CloseAction,
-  ErrorAction,
 } from "vscode-languageclient/node";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { localCopybooks } from "./copybookLibs/LocalPathLib";
@@ -34,6 +32,7 @@ import { startNativeServer } from "./languageClient/NativeServer";
 import { Server, ServerInitError } from "./languageClient/ServerTypes";
 import { startSocketServer } from "./languageClient/SocketServer";
 import { outputChannel } from "./util/OutputChannel";
+import { LanguageClientErrorHandler } from "./LanguageClientErrorHandler";
 
 type Handler = (languageClient: LanguageClient) => void;
 
@@ -84,9 +83,14 @@ export class LanguageClientService {
       ];
     }
     const clientOptions = getClientOptions(this.middleware, this.watchers);
+    const errorHandler = new LanguageClientErrorHandler();
     const errors: ServerInitError[] = [];
     for (const server of servers) {
-      const languageClient = await startServer(server, clientOptions);
+      const languageClient = await startServer(
+        server,
+        clientOptions,
+        errorHandler,
+      );
       if (languageClient instanceof LanguageClient) {
         this.handlers.forEach((handler) => handler(languageClient));
         this.languageClient = languageClient;
@@ -191,24 +195,21 @@ function getClientOptions(
     synchronize: {
       fileEvents,
     },
-    errorHandler: {
-      error: () => ({ action: ErrorAction.Shutdown }),
-      closed: () => ({ action: CloseAction.DoNotRestart }),
-    },
   };
 }
 
 function startServer(
   server: Server,
   clientOptions: LanguageClientOptions,
+  errorHandler: LanguageClientErrorHandler,
 ): Promise<LanguageClient | ServerInitError> {
   switch (server.kind) {
     case "SOCKET":
-      return startSocketServer(server.port, clientOptions);
+      return startSocketServer(server.port, clientOptions, errorHandler);
     case "JAVA":
-      return startJavaServer(server, clientOptions);
+      return startJavaServer(server, clientOptions, errorHandler);
     case "NATIVE":
-      return startNativeServer(server, clientOptions);
+      return startNativeServer(server, clientOptions, errorHandler);
     default: {
       const exhaustiveCheck: never = server;
       throw new Error(exhaustiveCheck);
