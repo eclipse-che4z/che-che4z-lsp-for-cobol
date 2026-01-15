@@ -7,6 +7,8 @@
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node", "jest", "mocha"],
+    "skipLibCheck": true
   }
 }

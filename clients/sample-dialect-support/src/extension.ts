@@ -54,7 +54,12 @@ export async function activate(context: vscode.ExtensionContext) {
       programUri: vscode.Uri,
       text: string,
     ) => {
-      return handleProcessDialect(context, programUri, text, outputChannel);
+      return await handleProcessDialect(
+        context,
+        programUri,
+        text,
+        outputChannel,
+      );
     },
   );
 
@@ -71,7 +76,7 @@ async function handleProcessDialect(
   text: string,
   outputChannel: vscode.OutputChannel,
 ): Promise<void> {
-  processDocument(context, programUri, text, outputChannel);
+  await processDocument(context, programUri, text, outputChannel);
 }
 
 async function processDocument(
@@ -84,14 +89,16 @@ async function processDocument(
   const startDate = new Date();
   const lines = text.split("\n");
   outputChannel.appendLine(
-    `Start processing document ${documentUri}, line count: ${lines.length}`,
+    `Start processing document ${documentUri.toString()}, line count: ${
+      lines.length
+    }`,
   );
   for (let i = 0; i < lines.length; i++) {
     await processDocumentLine(context, i, lines, outputChannel, documentParam);
   }
   const endDate = new Date();
   outputChannel.appendLine(
-    `Finish processing document ${documentUri}. Processing time: ${
+    `Finish processing document ${documentUri.toString()}. Processing time: ${
       endDate.getTime() - startDate.getTime()
     } mills.`,
   );
@@ -106,7 +113,7 @@ async function processDocumentLine(
 ) {
   replaceText(context, line, lines, param);
 
-  let index = lines[line].indexOf("COPY SAMPLE");
+  const index = lines[line].indexOf("COPY SAMPLE");
   if (index > 0) {
     const words = lines[line]
       .substring(index + "COPY SAMPLE".length)
@@ -150,7 +157,7 @@ async function processDocumentLine(
     );
 
     if (copybookModel) {
-      processDocument(
+      await processDocument(
         copybookModel.context,
         copybookModel.uri,
         copybookModel.text,
