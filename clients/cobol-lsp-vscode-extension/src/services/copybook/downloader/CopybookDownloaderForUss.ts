@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { splitFilename } from "../../util/FSUtils";
+import { zoweSemaphore } from "../ZoweThrottling";
 import {
   MemberCacheItem,
   ZoweExplorerDownloader,
@@ -47,11 +48,13 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     await this.limitFailedRequests(
       `list USS directory ${profileName}/${dataset}`,
       async () => {
-        const response = await vscode.workspace.fs.readDirectory(
-          vscode.Uri.from({
-            scheme: "zowe-uss",
-            path: `/${profileName}${dataset}`,
-          }),
+        const response = await zoweSemaphore.locked(() =>
+          vscode.workspace.fs.readDirectory(
+            vscode.Uri.from({
+              scheme: "zowe-uss",
+              path: `/${profileName}${dataset}`,
+            }),
+          ),
         );
 
         for (const file of response) {

@@ -15,6 +15,7 @@
 import * as vscode from "vscode";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
 import { outputChannel } from "../util/OutputChannel";
+import { zoweSemaphore } from "./ZoweThrottling";
 
 export async function readFileContent(
   fileUri: string,
@@ -27,7 +28,9 @@ export async function readFileContent(
     return openFile.getText();
   }
   try {
-    const data = await vscode.workspace.fs.readFile(uri);
+    const data = await (uri.scheme.startsWith("zowe")
+      ? zoweSemaphore.locked(() => vscode.workspace.fs.readFile(uri))
+      : vscode.workspace.fs.readFile(uri));
     const content = new TextDecoder().decode(data);
     return content;
   } catch (err) {
