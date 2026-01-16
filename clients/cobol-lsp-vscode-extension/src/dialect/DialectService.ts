@@ -15,6 +15,9 @@
 import * as vscode from "vscode";
 import type {
   IDocumentProcessingContext,
+  Item,
+  ItemType,
+  Token,
   V2StartProcessingHandler,
 } from "@code4z/cobol-dialect-api";
 import { LanguageClientService } from "../services/LanguageClientService";
@@ -45,6 +48,23 @@ type DocumentReplacementPayload = {
   range: RangePayload;
 };
 
+type TokenPayload = {
+  name: string;
+  range: RangePayload;
+};
+
+type ItemPayload = {
+  tokens: TokenPayload[];
+  type?: ItemType;
+};
+
+type DocumentReplacementMapPayload = {
+  range: RangePayload;
+  statementRange: RangePayload;
+  tokenItems: ItemPayload[];
+  replacementMap: string;
+};
+
 type CopybookPayload = {
   copybookName: string;
   statementLocation: LocationPayload;
@@ -52,6 +72,7 @@ type CopybookPayload = {
   uri: string;
   text: string;
   replacements: DocumentReplacementPayload[];
+  replacementMaps: DocumentReplacementMapPayload[];
   copybooks: CopybookPayload[];
   diagnostics: DiagnosticPayload[];
 };
@@ -76,6 +97,13 @@ type DocumentReplacement = {
   text: string;
 };
 
+type DocumentReplacementMap = {
+  range: vscode.Range;
+  statementRange: vscode.Range;
+  tokenItems: Item[];
+  replacementMap: string;
+};
+
 type CopybookInfo = {
   copybookName: string;
   statementLocation: Location;
@@ -86,14 +114,15 @@ type CopybookInfo = {
 
 class Context implements IDocumentProcessingContext {
   replacements: DocumentReplacement[] = [];
+  replacementMaps: DocumentReplacementMap[] = [];
   children: Context[] = [];
   diagnostics: vscode.Diagnostic[] = [];
 
   constructor(
-    private dialectService: DialectService,
-    private dialectName: string,
-    private programUri: vscode.Uri,
-    private documentUri: vscode.Uri,
+    private readonly dialectService: DialectService,
+    private readonly dialectName: string,
+    private readonly programUri: vscode.Uri,
+    private readonly documentUri: vscode.Uri,
     public copybookInfo?: CopybookInfo,
   ) {}
 
@@ -150,17 +179,31 @@ class Context implements IDocumentProcessingContext {
     };
     this.replacements.push(replacement);
   }
+  replaceWithMap(
+    range: vscode.Range,
+    statementRange: vscode.Range,
+    tokenItems: Item[],
+    replacementMap: string,
+  ): void {
+    const replacement: DocumentReplacementMap = {
+      range: range,
+      statementRange: statementRange,
+      tokenItems: tokenItems,
+      replacementMap: replacementMap,
+    };
+    this.replacementMaps.push(replacement);
+  }
   addDiagnostic(diagnostic: vscode.Diagnostic): void {
     this.diagnostics.push(diagnostic);
   }
 }
 
 export class DialectService {
-  private handlers: Map<string, V2StartProcessingHandler> = new Map();
+  private readonly handlers: Map<string, V2StartProcessingHandler> = new Map();
 
   public constructor(
     languageClientService: LanguageClientService,
-    private outputChannel?: vscode.OutputChannel,
+    private readonly outputChannel?: vscode.OutputChannel,
   ) {
     languageClientService.addRequestHandler(
       "dialect/process",
@@ -266,6 +309,9 @@ export class DialectService {
         context.copybookInfo.statementLocation,
       ),
       replacements: context.replacements.map((r) => serializeReplacement(r)),
+      replacementMaps: context.replacementMaps.map((r) =>
+        serializeReplacementMap(r),
+      ),
       uri: context.copybookInfo.uri.toString(),
       text: context.copybookInfo.text,
       copybooks: copybooks,
@@ -290,6 +336,9 @@ export class DialectService {
 
     return {
       replacements: context.replacements.map((r) => serializeReplacement(r)),
+      replacementMaps: context.replacementMaps.map((r) =>
+        serializeReplacementMap(r),
+      ),
       copybooks: copybooks,
       diagnostics: context.diagnostics.map((d) => serializeDiagnostics(d)),
     };
@@ -349,5 +398,33 @@ function serializeReplacement(
   return {
     text: replacement.text,
     range: serializeRange(replacement.range),
+  };
+}
+
+function serializeItem(item: Item) {
+  const tokens = item.tokens.map((t) => serializeToken(t));
+  return {
+    tokens: tokens,
+    type: item.type,
+  };
+}
+
+function serializeToken(token: Token) {
+  return {
+    name: token.name,
+    range: serializeRange(token.range),
+  };
+}
+
+function serializeReplacementMap(
+  replacement: DocumentReplacementMap,
+): DocumentReplacementMapPayload {
+  const tokens = replacement.tokenItems.map((i) => serializeItem(i));
+
+  return {
+    range: serializeRange(replacement.range),
+    statementRange: serializeRange(replacement.statementRange),
+    tokenItems: tokens,
+    replacementMap: replacement.replacementMap,
   };
 }

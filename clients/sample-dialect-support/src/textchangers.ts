@@ -13,6 +13,10 @@
  */
 import type { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
 import * as vscode from "vscode";
+import {
+  replaceChangeStateStatement,
+  replaceProcessStatement,
+} from "./statements";
 
 function makeRange(line: number, start: number, len: number) {
   return new vscode.Range(line, start, line, start + len);
@@ -48,6 +52,8 @@ const TEXT_CHANGERS = [
   replaceVariable.bind(undefined, " BB ", " 05 "),
   replaceVariable.bind(undefined, " SDATA", " PIC X(9)"),
   replaceWithParameter,
+  replaceProcessStatement,
+  replaceChangeStateStatement,
 ];
 
 export function replaceText(

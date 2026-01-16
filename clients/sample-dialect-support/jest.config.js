@@ -9,5 +9,9 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
+  moduleNameMapper: {
+    "^@code4z/cobol-dialect-api$":
+      "<rootDir>/../cobol-dialect-api/src/index.ts",
+  },
   modulePathIgnorePatterns: ["<rootDir>/out", "<rootDir>/dist"],
 };
