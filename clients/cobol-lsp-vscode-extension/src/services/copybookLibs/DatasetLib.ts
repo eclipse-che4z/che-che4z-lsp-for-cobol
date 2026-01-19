@@ -18,6 +18,7 @@ import CopybookLib from "./CopybookLib";
 import { LibDefinition } from "../ProcessorGroupsLoader";
 import { externalApis } from "../ExternalAPIsService";
 import { ZoweLib } from "./ZoweLib";
+import { zoweSemaphore } from "../copybook/ZoweThrottling";
 
 export class DatasetLib extends ZoweLib implements CopybookLib {
   constructor(
@@ -34,12 +35,14 @@ export class DatasetLib extends ZoweLib implements CopybookLib {
   }
 
   async accessCheck(profile: string): Promise<void> {
-    await vscode.workspace.fs.stat(
-      vscode.Uri.from({
-        scheme: "zowe-ds",
-        path: `/${profile}/${this.dsn}`,
-        query: "fetch=true",
-      }),
+    await zoweSemaphore.locked(() =>
+      vscode.workspace.fs.stat(
+        vscode.Uri.from({
+          scheme: "zowe-ds",
+          path: `/${profile}/${this.dsn}`,
+          query: "fetch=true",
+        }),
+      ),
     );
   }
 

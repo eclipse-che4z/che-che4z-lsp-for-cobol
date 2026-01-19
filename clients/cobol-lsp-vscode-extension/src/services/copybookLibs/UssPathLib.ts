@@ -20,6 +20,7 @@ import { USS } from "../../constants";
 import * as vscode from "vscode";
 import { externalApis } from "../ExternalAPIsService";
 import { ZoweLib } from "./ZoweLib";
+import { zoweSemaphore } from "../copybook/ZoweThrottling";
 
 export class UssPathLib extends ZoweLib implements CopybookLib {
   constructor(
@@ -108,12 +109,14 @@ export class UssPathLib extends ZoweLib implements CopybookLib {
       this.uss,
       variables,
     );
-    await vscode.workspace.fs.stat(
-      vscode.Uri.from({
-        scheme: "zowe-uss",
-        path: `/${profile}${evaluatedPath}`,
-        query: "fetch=true",
-      }),
+    await zoweSemaphore.locked(() =>
+      vscode.workspace.fs.stat(
+        vscode.Uri.from({
+          scheme: "zowe-uss",
+          path: `/${profile}${evaluatedPath}`,
+          query: "fetch=true",
+        }),
+      ),
     );
   }
 }
