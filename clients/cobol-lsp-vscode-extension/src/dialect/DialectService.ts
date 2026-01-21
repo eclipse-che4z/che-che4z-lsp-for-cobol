@@ -309,9 +309,7 @@ export class DialectService {
         context.copybookInfo.statementLocation,
       ),
       replacements: context.replacements.map((r) => serializeReplacement(r)),
-      replacementMaps: context.replacementMaps.map((r) =>
-        serializeReplacementMap(r),
-      ),
+      replacementMaps: context.replacementMaps.map(serializeReplacementMap),
       uri: context.copybookInfo.uri.toString(),
       text: context.copybookInfo.text,
       copybooks: copybooks,
