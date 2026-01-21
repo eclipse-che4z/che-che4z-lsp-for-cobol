@@ -28,6 +28,7 @@ import { SettingsService } from "./Settings";
 import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
+import { getVariablesFromUri } from "./util/FSUtils";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -159,11 +160,20 @@ export class AnalysisTask {
   }
 }
 
+function extractFilename(documentUri: string) {
+  try {
+    return getVariablesFromUri(documentUri).filename;
+  } catch (_e) {
+    return "????????";
+  }
+}
+
 export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private tasks: Map<string, AnalysisTask>;
   private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
   private requestVersion: number = 1;
+  private hideProgress?: () => void = undefined;
 
   public constructor(
     private mainChannel?: vscode.OutputChannel,
@@ -172,6 +182,30 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
+  }
+
+  private setTask(documentUri: string, task: AnalysisTask) {
+    this.tasks.set(documentUri, task);
+    if (!this.hideProgress) {
+      const p = new Promise<void>((resolve) => {
+        this.hideProgress = resolve;
+      });
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Window,
+          title: `Analyzing ${extractFilename(documentUri)}`,
+        },
+        () => p,
+      );
+    }
+  }
+
+  private deleteTask(documentUri: string) {
+    this.tasks.delete(documentUri);
+    if (this.tasks.size == 0 && this.hideProgress) {
+      this.hideProgress();
+      this.hideProgress = undefined;
+    }
   }
 
   public async invalidate(documentUri: string, rejectPromise: boolean) {
@@ -237,7 +271,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       this.mainChannel,
       this.logChannel,
     );
-    this.tasks.set(documentUri, task);
+    this.setTask(documentUri, task);
   }
 
   finishTask(
@@ -281,7 +315,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       }
     });
 
-    this.tasks.delete(documentUri);
+    this.deleteTask(documentUri);
   }
 
   finishTaskWithError(
@@ -357,7 +391,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     const task = this.tasks.get(documentUri);
     if (task) {
       this.logChannel?.debug(`Stop task for the document: ${documentUri}`);
-      this.tasks.delete(documentUri);
+      this.deleteTask(documentUri);
       await task.abort();
     }
   }
