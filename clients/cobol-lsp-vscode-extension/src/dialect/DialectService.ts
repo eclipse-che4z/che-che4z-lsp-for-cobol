@@ -334,9 +334,7 @@ export class DialectService {
 
     return {
       replacements: context.replacements.map((r) => serializeReplacement(r)),
-      replacementMaps: context.replacementMaps.map((r) =>
-        serializeReplacementMap(r),
-      ),
+      replacementMaps: context.replacementMaps.map(serializeReplacementMap),
       copybooks: copybooks,
       diagnostics: context.diagnostics.map((d) => serializeDiagnostics(d)),
     };
