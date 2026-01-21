@@ -17,9 +17,9 @@ import { type CopyStatementParser, MainExtensionId } from "./common";
 
 let v2Api: V2Api | undefined = undefined;
 
-export enum ItemType {
-  VARIABLE,
-  PROCEDURE,
+export cosnt enum ItemType {
+  VARIABLE = "VARIABLE",
+  PROCEDURE = "PROCEDURE",
 }
 
 export type Token = {
