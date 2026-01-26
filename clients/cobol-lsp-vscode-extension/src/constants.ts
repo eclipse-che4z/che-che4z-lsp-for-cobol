@@ -70,6 +70,7 @@ export const COPYBOOK_EXT_ARRAY = [COPYBOOK_CPY_EXT];
 export const COPYBOOK_COMPLETIONS_SORT_PREFIX = 3;
 export const SUBROUTINE_COMPLETIONS_SORT_PREFIX = 4;
 export const EXTENSION_ID = "broadcommfd.cobol-language-support";
+export const EXTENSION_NAME = "COBOL Language Support";
 export const ZOWE_EXT_MISSING_MSG =
   "Zowe Explorer version 1.15.0 or higher is required to download copybooks from the mainframe.";
 export const INSTALL_ZOWE = "Install Zowe Explorer";
@@ -91,6 +92,7 @@ export const USS = "uss";
 export const PROVIDE_PROFILE_MSG_PROC_GRUOPS =
   "Please specify a valid Zowe Explorer profile in proc_grps.json to download copybooks from the mainframe.";
 export const FAILED_REQUESTS_LIMIT = 3;
+export const MINIMUM_JAVA_VERSION = 8;
 
 export enum PUNCH_CARD {
   SEQUENCE_AREA_END_POS = 6,

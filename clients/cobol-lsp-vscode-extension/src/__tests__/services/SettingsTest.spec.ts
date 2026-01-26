@@ -49,7 +49,7 @@ describe("SettingsService evaluate variables", () => {
     vscode.workspace.getConfiguration = jest.fn().mockReturnValue({
       get: tracking,
     });
-    SettingsService.serverRuntime();
+    SettingsService.getServerRuntime();
     expect(tracking).toHaveBeenCalledWith("cobol-lsp.serverRuntime");
   });
 

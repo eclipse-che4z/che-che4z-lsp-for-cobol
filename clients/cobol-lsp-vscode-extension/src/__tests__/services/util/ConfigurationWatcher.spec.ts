@@ -23,24 +23,21 @@ describe("Tests ConfigurationWatcher utility", () => {
   });
 
   it("Test serverRuntime value is changed, then ask to restart", async () => {
-    SettingsService.serverRuntime = jest
+    SettingsService.getServerRuntime = jest
       .fn()
-      .mockReturnValueOnce(undefined)
+      .mockReturnValueOnce("JAVA")
       .mockReturnValue("NATIVE");
     vscode.window.showInformationMessage = jest.fn().mockReturnValue("Ok");
     const configurationWatcher = new ConfigurationWatcher();
     await configurationWatcher["handleServerRuntimeConfigurationChange"]();
-    expect(vscode.commands.executeCommand).toBeCalled();
+    expect(vscode.commands.executeCommand).toHaveBeenCalled();
   });
 
-  it("Test serverRuntime is changed but value remain unchanged, then do not ask to restart", async () => {
-    SettingsService.serverRuntime = jest
-      .fn()
-      .mockReturnValueOnce(undefined)
-      .mockReturnValue("JAVA");
+  it("Test serverRuntime changed is triggered but value remain unchanged, then do not ask to restart", async () => {
+    SettingsService.getServerRuntime = jest.fn().mockReturnValue("JAVA");
     vscode.window.showInformationMessage = jest.fn().mockReturnValue("Ok");
     const configurationWatcher = new ConfigurationWatcher();
     await configurationWatcher["handleServerRuntimeConfigurationChange"]();
-    expect(vscode.commands.executeCommand).not.toBeCalled();
+    expect(vscode.commands.executeCommand).not.toHaveBeenCalled();
   });
 });

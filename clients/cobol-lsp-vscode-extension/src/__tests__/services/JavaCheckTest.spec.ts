@@ -12,135 +12,146 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { JavaCheck } from "../../services/JavaCheck";
+import { toJavaMajor, getJavaVersion } from "../../services/JavaCheck";
 import { mockSpawnProcess } from "../../__mocks__/child_process.utility";
+import { outputChannel } from "../../services/util/OutputChannel";
+import { ServerInitError } from "../../services/languageClient/ServerTypes";
 
-jest.mock("../../services/reporter");
 describe("Checks Java version", () => {
   it("If Java version is supported", () => {
+    expect(toJavaMajor('openjdk version "1.8.0-internal"')).toEqual(8);
+    expect(toJavaMajor('java version "1.8.0_181"')).toEqual(8);
+    expect(toJavaMajor('openjdk version "1.11.0-internal"')).toEqual(11);
+    expect(toJavaMajor('java version "1.11.0_181"')).toEqual(11);
+    expect(toJavaMajor('java version "10.0.1" 2018-04-17')).toEqual(10);
+    expect(toJavaMajor('java version "9"')).toEqual(9);
+    expect(toJavaMajor('java version "1.8.0_131"')).toEqual(8);
+    expect(toJavaMajor('openjdk version "11.0.1" 2018-10-16')).toEqual(11);
+    expect(toJavaMajor('openjdk version "12.0.1" 2018-10-16')).toEqual(12);
+    expect(toJavaMajor("java 11 2018-09-25")).toEqual(11);
+    expect(toJavaMajor("java 12 2019-03-19")).toEqual(12);
+    expect(toJavaMajor("java 13 2019-09-17")).toEqual(13);
+    expect(toJavaMajor("java 14 2020-03-17")).toEqual(14);
+    expect(toJavaMajor('openjdk version "1.11.0-internal"')).toEqual(11);
     expect(
-      JavaCheck.isJavaVersionSupported('openjdk version "1.8.0-internal"'),
-    ).toEqual(8);
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.8.0_181"'),
-    ).toEqual(8);
-    expect(
-      JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"'),
-    ).toEqual(11);
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.11.0_181"'),
-    ).toEqual(11);
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "10.0.1" 2018-04-17'),
-    ).toEqual(10);
-    expect(JavaCheck.isJavaVersionSupported('java version "9"')).toEqual(9);
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.8.0_131"'),
-    ).toEqual(8);
-    expect(
-      JavaCheck.isJavaVersionSupported('openjdk version "11.0.1" 2018-10-16'),
-    ).toEqual(11);
-    expect(
-      JavaCheck.isJavaVersionSupported('openjdk version "12.0.1" 2018-10-16'),
-    ).toEqual(12);
-    expect(JavaCheck.isJavaVersionSupported("java 11 2018-09-25")).toEqual(11);
-    expect(JavaCheck.isJavaVersionSupported("java 12 2019-03-19")).toEqual(12);
-    expect(JavaCheck.isJavaVersionSupported("java 13 2019-09-17")).toEqual(13);
-    expect(JavaCheck.isJavaVersionSupported("java 14 2020-03-17")).toEqual(14);
-    expect(
-      JavaCheck.isJavaVersionSupported('openjdk version "1.11.0-internal"'),
-    ).toEqual(11);
-    expect(
-      JavaCheck.isJavaVersionSupported(
+      toJavaMajor(
         `java version "17.0.2" 2022-01-18 LTS\nJava(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)\nJava HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)\n`,
       ),
     ).toEqual(17);
   });
-
-  it("If Java version is not supported", () => {
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.7.0_131"'),
-    ).toBeFalsy();
-    expect(
-      JavaCheck.isJavaVersionSupported('java version "1.5.0_22"'),
-    ).toBeFalsy();
-  });
 });
 
-describe("Checks Java installation", () => {
-  let javaCheck: JavaCheck;
-  const expectedErrMsgSupportedJavaVersion =
-    "Minimum expected Java version is 8. Switching to native builds";
-  const expectedErrMsgJavaVersionNotFound =
-    "Java 8 not found. Switching to native builds";
-
+describe("Java version check", () => {
   beforeEach(() => {
-    javaCheck = new JavaCheck();
+    jest.clearAllMocks();
   });
-
-  it("when required version is supported", async () => {
+  it("calling default command", async () => {
+    const spawn = mockSpawnProcess("", `java version "1.5.0_22"`, 0);
+    await getJavaVersion();
+    expect(spawn).toHaveBeenCalledWith("java", ["-version"]);
+  });
+  it("calling custom command", async () => {
+    const spawn = mockSpawnProcess("", `java version "1.5.0_22"`, 0);
+    await getJavaVersion("/user/defined/path/to/java");
+    expect(spawn).toHaveBeenCalledWith("/user/defined/path/to/java", [
+      "-version",
+    ]);
+  });
+  it("for version 11", async () => {
     mockSpawnProcess("", "java 11 2018-09-25", 0);
-    const promise = javaCheck.getInstalledJavaVersion();
-    await expect(promise).resolves.toBeTruthy();
+    const version = await getJavaVersion();
+    expect(version).toEqual(11);
   });
 
-  it("should skip not relevant lines", async () => {
+  it("should skip irrelevant lines", async () => {
     mockSpawnProcess(
       "",
       "Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava 11 2018-09-25",
       0,
     );
-    const promise = javaCheck.getInstalledJavaVersion();
-    await expect(promise).resolves.toBeTruthy();
+    const version = await getJavaVersion();
+    expect(version).toEqual(11);
   });
 
-  it("should skip not relevant lines and fail", async () => {
-    mockSpawnProcess(
-      "",
-      `Picked up JAVA_TOOL_OPTIONS: -Xmx2254m\njava version "1.5.0_22"`,
-      0,
-    );
-    const promise = javaCheck.getInstalledJavaVersion();
-    await expect(promise).rejects.toEqual(
-      new Error(expectedErrMsgSupportedJavaVersion),
-    );
-  });
-
-  it("when required version is not supported", async () => {
+  it("for version 1.5", async () => {
     mockSpawnProcess("", `java version "1.5.0_22"`, 0);
-    const promise = javaCheck.getInstalledJavaVersion();
-    await expect(promise).rejects.toEqual(
-      new Error(expectedErrMsgSupportedJavaVersion),
+    const version = await getJavaVersion();
+    expect(version).toEqual(5);
+  });
+
+  it("version cannot be identified", async () => {
+    const info = outputChannel.info as jest.Mock;
+    const error = outputChannel.error as jest.Mock;
+    mockSpawnProcess("", "No version", 0);
+    const version = await getJavaVersion();
+    expect(version).toEqual(
+      new Error(
+        "Unable to determine Java version. Check the extension output for more details.",
+      ),
     );
+    expect(info).toHaveBeenCalledTimes(2);
+    expect(info.mock.calls[0]).toEqual([
+      'Checking Java version by running command "java -version".',
+    ]);
+    expect(info.mock.calls[1]).toEqual([
+      'Java command "java -version" output the following string: "No version".',
+    ]);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]).toEqual([
+      'Java command "java -version" did not print version string in the expected format.',
+    ]);
   });
 
   it("when 'error' event is emitted  - spawned", async () => {
     mockSpawnProcess("", "", 0, { code: "ENOENT" } as NodeJS.ErrnoException);
-    const promise = javaCheck.getInstalledJavaVersion();
-
-    await expect(promise).rejects.toEqual(
-      new Error(expectedErrMsgJavaVersionNotFound),
+    const version = await getJavaVersion();
+    expect(version).toEqual(
+      new Error(
+        'Java command "java" not found. Install Java or use Java Home setting to point to an existing Java installation.',
+      ),
     );
+    expect((version as ServerInitError).filter).toEqual("Java Home");
+    const logError = outputChannel.error as jest.Mock;
+    expect(logError).toHaveBeenCalledTimes(1);
+    expect(logError.mock.calls[0]).toEqual([
+      new Error(
+        'Java command "java" not found. Install Java or use Java Home setting to point to an existing Java installation.',
+      ),
+    ]);
   });
 
-  it("when 'error' event is emitted  - not be spawned", async () => {
-    const error = {
+  it("when 'error' event is emitted  - not spawned", async () => {
+    const error = outputChannel.error as jest.Mock;
+    mockSpawnProcess("Standard output", "Error output", 0, {
       code: "Other error",
-    } as NodeJS.ErrnoException;
-    mockSpawnProcess("", "", 0, error);
-    const promise = javaCheck.getInstalledJavaVersion();
-
-    await expect(promise).rejects.toEqual(error);
+    } as NodeJS.ErrnoException);
+    const version = await getJavaVersion();
+    expect(version).toEqual(
+      new Error(
+        'Java command "java" failed to start. Check the extension output for more details.',
+      ),
+    );
+    expect(error).toHaveBeenCalledTimes(2);
+    expect(error.mock.calls[0]).toEqual([{ code: "Other error" }]);
+    expect(error.mock.calls[1]).toEqual([
+      new Error(
+        'Java command "java -version" exited with error: "{"code":"Other error"}". Command output was: "Error output".',
+      ),
+    ]);
   });
 
   it("when 'close' event is emitted", async () => {
+    const error = outputChannel.error as jest.Mock;
     mockSpawnProcess("", "", 23);
-    const promise = javaCheck.getInstalledJavaVersion();
-
-    await expect(promise).rejects.toEqual(
+    const version = await getJavaVersion();
+    expect(version).toEqual(
       new Error(
-        "An error occurred when checking if Java was installed. Switching to native build.",
+        'Java command "java" returned non-zero return code 23. Check the extension output for more details.',
       ),
     );
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]).toEqual([
+      'Java command "java" returned non-zero return code 23. Command output was: "".',
+    ]);
   });
 });

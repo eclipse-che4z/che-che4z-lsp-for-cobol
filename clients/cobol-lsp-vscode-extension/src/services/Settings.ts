@@ -18,9 +18,6 @@ import {
   COPYBOOK_EXTENSIONS,
   PATHS_USS,
   PATHS_DSN,
-  SERVER_PORT,
-  SERVER_RUNTIME,
-  JAVA_HOME,
   SETTINGS_CPY_EXTENSIONS,
   SETTINGS_CPY_LOCAL_PATH,
   SETTINGS_CPY_SECTION,
@@ -36,6 +33,8 @@ import {
   SETTINGS_MAXIMUM_VM_COUNT,
   PATHS_LOCAL_KEY,
   ANALYSIS_MODE,
+  JAVA_HOME,
+  SERVER_RUNTIME,
 } from "../constants";
 import {
   DialectRegistry,
@@ -205,16 +204,6 @@ export class SettingsService {
   }
 
   /**
-   * Get Lsp Port from configuration
-   * @returns lsp port number
-   */
-  public static getLspPort(): number | undefined {
-    if (vscode.workspace.getConfiguration().get(SERVER_PORT)) {
-      return Number(vscode.workspace.getConfiguration().get(SERVER_PORT));
-    }
-  }
-
-  /**
    * Get list of dsn path
    * @param documentUri is a program URI
    * @param dialectType name of the cobol dialect type
@@ -289,8 +278,9 @@ export class SettingsService {
    *
    * @returns returns configured runtime
    */
-  public static serverRuntime(): string | undefined {
-    return vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
+  public static getServerRuntime(): "NATIVE" | "JAVA" {
+    const runtime = vscode.workspace.getConfiguration().get(SERVER_RUNTIME);
+    return runtime === "NATIVE" ? "NATIVE" : "JAVA"; // TODO add tests to make sure default matches package.json declaration
   }
 
   public static getJavaHome(): string | undefined {
@@ -305,7 +295,6 @@ export class SettingsService {
     }
     return "java";
   }
-
   public static getCobolProgramLayout() {
     return vscode.workspace.getConfiguration().get(COBOL_PRGM_LAYOUT);
   }

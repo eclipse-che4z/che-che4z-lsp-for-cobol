@@ -1,3 +1,9 @@
 out
 dist/*
 !dist/note.md
+server/native/*
+!server/native/note.md
+server/jar/*
+!server/jar/note.md
+server/jar/dialects/*
+!server/jar/dialects/note.md

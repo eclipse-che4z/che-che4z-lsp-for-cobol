@@ -24,19 +24,27 @@ import { telemetryEvent } from "../services/reporter";
 
 jest.mock("../commands/SmartTabCommand");
 jest.mock("../commands/OpenSettingsCommand");
-jest.mock("../services/LanguageClientService");
 jest.mock("../commands/ClearCopybookCacheCommand");
+
+jest.mock("../services/LanguageClientService", () => {
+  class LanguageClientService {
+    addRequestHandler() {}
+    addNotificationHandler() {}
+    retrieveAnalysis() {}
+    start() {
+      return [];
+    }
+  }
+  return {
+    LanguageClientService,
+  };
+});
 
 jest.mock("../services/Settings", () => ({
   initializeSettings: jest.fn(),
   SettingsService: {
-    serverRuntime: jest
-      .fn()
-      .mockReturnValueOnce(undefined)
-      .mockReturnValue("JAVA"),
-    getSnippetsForCobol: jest.fn().mockReturnValue(Promise.resolve([])),
-    getDialects: jest.fn().mockReturnValue([]),
-    getMaxVMCount: jest.fn().mockReturnValue(-1),
+    getServerRuntime: jest.fn().mockReturnValue("JAVA"),
+    getJavaCommand: jest.fn().mockReturnValue("java"),
     getAnalysisMode: jest.fn().mockReturnValue("ADVANCED"),
   },
 }));
@@ -50,7 +58,9 @@ jest.mock("../services/reporter");
 
 const context = {
   subscriptions: [],
-  globalStorageUri: { fsPath: "/storagePath" },
+  extensionUri: vscode.Uri.parse("file:///path/to/extension/folder"),
+  globalStorageUri: vscode.Uri.parse("file:///path/to/global/storage"),
+  extension: { id: "publisher.extension-name" },
 } as unknown as vscode.ExtensionContext;
 
 beforeEach(() => {
@@ -99,20 +109,6 @@ describe("check exposed API's by the COBOL LS extension", () => {
 });
 
 describe("Check plugin extension for cobol fails.", () => {
-  beforeEach(() => {
-    jest.mock("../services/LanguageClientService", () => {
-      return {
-        checkPrerequisites: () => {
-          throw new Error("The error");
-        },
-        enableNativeBuild: jest.fn(),
-        addRequestHandler: jest.fn(),
-        retrieveAnalysis: jest.fn(),
-        start: jest.fn(),
-      };
-    });
-  });
-
   test("start fails.", async () => {
     await activate(context);
     expect(telemetryEvent).toHaveBeenCalledWith(

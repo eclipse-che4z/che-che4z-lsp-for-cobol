@@ -13,7 +13,7 @@
  */
 
 import * as vscode from "vscode";
-import type { Middleware } from "vscode-languageclient";
+import type { Middleware } from "vscode-languageclient/node";
 import { gotoCopybookSettings } from "./commands/OpenSettingsCommand";
 import type {
   __ExtensionApi,
@@ -54,7 +54,7 @@ import {
 } from "./services/snippetcompletion/SnippetCompletionProvider";
 import { resolveSubroutineURI } from "./services/util/SubroutineUtils";
 import { ServerRuntimeCodeActionProvider } from "./services/nativeLanguageClient/serverRuntimeCodeActionProvider";
-import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
+// import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
 import * as path from "node:path";
 import { getErrorMessage } from "./services/util/ErrorsUtils";
 import {
@@ -77,6 +77,15 @@ import { outputChannel } from "./services/util/OutputChannel";
 import { DialectService } from "./dialect/DialectService";
 import { createSampleConfiguration } from "./commands/CreateSampleConfiguration";
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
+import { getCopybookCacheUris } from "./services/copybook/CopybookURI";
+import { getServers } from "./services/languageClient/ServerSettings";
+import { setupBridge4GitWatcher } from "./services/BridgeForGitLoader";
+import {
+  setUpProcessorGroupConfigWatcher,
+  setUpProgramConfigWatcher,
+} from "./services/ProcessorGroups";
+import { ConfigurationWatcher } from "./services/util/ConfigurationWatcher";
+import { ServerInitError } from "./services/languageClient/ServerTypes";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -88,6 +97,7 @@ const API_VERSION: string = "1.0.1";
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<__ExtensionApi & __AnalysisApi> {
+  outputChannel.info("COBOL Language Support extension activating.");
   await initTelemetry(context);
   telemetryEvent(
     "log",
@@ -100,25 +110,30 @@ export async function activate(
     `COBOL LS is being used in ${SettingsService.getAnalysisMode()} mode`,
   );
 
-  await createExtensionFolder(context);
+  await createExtensionStrorageFolder(context.globalStorageUri);
 
   initSmartTab(context);
 
   let externalApis: ExternalAPIsService | undefined = undefined;
 
-  const languageClientService = await initializeLanguageClientService(context, {
-    executeCommand: (command, args, next) => {
-      if (command == "missing copybook") {
-        externalApis?.clearProfiles();
-      }
-      next(command, args);
-    },
-  });
+  const languageClientService = initializeLanguageClientService(
+    context.globalStorageUri,
+    externalApis,
+  );
+  context.subscriptions.push(languageClientService);
 
   externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
+
     languageClientService.invalidateConfiguration,
   );
+
+  // setup processor group watchers
+  setUpProgramConfigWatcher(languageClientService.invalidateConfiguration);
+  setUpProcessorGroupConfigWatcher(
+    languageClientService.invalidateConfiguration,
+  );
+  setupBridge4GitWatcher(languageClientService.invalidateConfiguration);
 
   const analysisService = new ControlFlowAnalysisService(
     outputChannel,
@@ -146,7 +161,9 @@ export async function activate(
   const configurationWatcher = new ConfigurationWatcher();
   configurationWatcher.watchConfigurationChanges();
 
-  await languageClientService.start(context);
+  const { servers, preferedRuntime } = await getServers(context.extensionUri);
+  const errors = await languageClientService.start(servers);
+  void showInitFailedMessages(preferedRuntime, errors, context.extension.id);
 
   // 'export' public api-surface
   return {
@@ -207,9 +224,9 @@ export async function activate(
   };
 }
 
-async function createExtensionFolder(context: vscode.ExtensionContext) {
+async function createExtensionStrorageFolder(extensionStroageUri: vscode.Uri) {
   try {
-    await vscode.workspace.fs.createDirectory(context.globalStorageUri);
+    await vscode.workspace.fs.createDirectory(extensionStroageUri);
   } catch (error) {
     const message = `${FAIL_CREATE_GLOBAL_STORAGE_MSG}: ${getErrorMessage(
       error,
@@ -225,16 +242,23 @@ async function createExtensionFolder(context: vscode.ExtensionContext) {
   }
 }
 
-async function initializeLanguageClientService(
-  context: vscode.ExtensionContext,
-  middleware: Middleware,
+function initializeLanguageClientService(
+  globalStorageUri: vscode.Uri,
+  externalApis: ExternalAPIsService | undefined,
 ) {
+  const copybookCacheLocations = getCopybookCacheUris(globalStorageUri);
+  const middleware: Middleware = {
+    executeCommand: (command, args, next) => {
+      if (command == "missing copybook") {
+        externalApis?.clearProfiles();
+      }
+      next(command, args);
+    },
+  };
   const languageClientService = new LanguageClientService(
-    outputChannel,
-    context.globalStorageUri,
+    copybookCacheLocations,
     middleware,
   );
-  context.subscriptions.push(languageClientService);
 
   languageClientService.addRequestHandler(
     "cobol/resolveSubroutine",
@@ -249,25 +273,6 @@ async function initializeLanguageClientService(
     resolveCopybookURI,
   );
   languageClientService.addRequestHandler("file/content", readFileContent);
-
-  try {
-    if (SettingsService.serverRuntime() === "NATIVE") {
-      languageClientService.enableNativeBuild();
-    } else {
-      await languageClientService.checkPrerequisites();
-    }
-  } catch (err) {
-    if (err instanceof Error) {
-      outputChannel.appendLine(err.toString());
-      languageClientService.enableNativeBuild();
-      telemetryExceptionEvent(
-        "RuntimeException",
-        err.toString(),
-        ["bootstrap", "experiment-tag"],
-        "Client has wrong Java version installed. Native builds activated.",
-      );
-    }
-  }
 
   return languageClientService;
 }
@@ -600,4 +605,38 @@ function registerCompletions(context: vscode.ExtensionContext) {
       new SubroutinesCompletionsProvider(),
     ),
   );
+}
+
+function showInitFailedMessages(
+  preferedRuntime: "JAVA" | "NATIVE",
+  errors: ServerInitError[],
+  extensionId: string,
+) {
+  if (errors.length == 1 && preferedRuntime === "NATIVE") {
+    const err = errors[0];
+    errors = [
+      new ServerInitError(
+        err.message +
+          ' To use Java language server, set Server Runtime setting to "JAVA".',
+        "Server Runtime",
+      ),
+    ];
+  }
+  for (const error of errors) {
+    vscode.window
+      .showErrorMessage(error.message, "Settings", "Go to output")
+      .then((selection) => {
+        switch (selection) {
+          case "Settings":
+            vscode.commands.executeCommand(
+              "workbench.action.openSettings",
+              `@ext:${extensionId} ${error.filter || ""}`,
+            );
+            break;
+          case "Go to output":
+            outputChannel.show();
+            break;
+        }
+      });
+  }
 }
