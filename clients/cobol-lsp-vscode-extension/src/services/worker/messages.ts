@@ -43,6 +43,10 @@ export type WorkerResultMessage =
       payload: WorkerProcessingResult;
     }
   | {
+      type: "error";
+      payload: string;
+    }
+  | {
       type: "log";
       payload: LoggerItem[];
     };

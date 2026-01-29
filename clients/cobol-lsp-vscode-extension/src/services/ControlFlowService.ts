@@ -20,6 +20,7 @@ import {
   DiagnosticRelatedInformationDto,
   DiagnosticSeverityDto,
   DiagnosticTagDto,
+  ErrorDto,
   EventDto,
   LocationDto,
   RangeDto,
@@ -58,6 +59,11 @@ interface AnalysisServiceDelegate {
     events: EventDto[],
     requestVersion: number,
   ): void;
+  finishTaskWithError(
+    documentUri: string,
+    error: ErrorDto,
+    requestVersion: number,
+  ): void;
 }
 
 type LatestResultData = {
@@ -71,7 +77,7 @@ type LatestResultData = {
     }
   | {
       resolve: (value: AnalysisResult | PromiseLike<AnalysisResult>) => void;
-      reject: (reason: string) => void;
+      reject: (reason: Error) => void;
       promise: Promise<AnalysisResult>;
     }
   | {
@@ -80,6 +86,13 @@ type LatestResultData = {
       promise: Promise<AnalysisResult>;
     }
 );
+
+function asErrorDto(message: string): ErrorDto {
+  return {
+    errorName: EVENT_ANALYSIS_ERROR,
+    message: `Error occurred during Control Flow Analysis: ${message}`,
+  };
+}
 
 export class AnalysisTask {
   private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
@@ -106,6 +119,12 @@ export class AnalysisTask {
           data.payload.events,
           this.requestVersion,
         );
+      } else if (data.type === "error") {
+        this.delegate.finishTaskWithError(
+          this.documentUri,
+          asErrorDto(data.payload),
+          this.requestVersion,
+        );
       } else if (data.type === "log") {
         for (const message of data.payload) {
           switch (message.severity) {
@@ -126,14 +145,13 @@ export class AnalysisTask {
       }
     });
     this.worker.on("error", (code) => {
-      this.mainChannel?.appendLine(
-        `Error starting Control Flow Analysis: ${code}`,
+      const error = asErrorDto(code.message);
+      this.mainChannel?.appendLine(error.message);
+      this.delegate.finishTaskWithError(
+        this.documentUri,
+        error,
+        this.requestVersion,
       );
-      const event: EventDto = {
-        eventName: EVENT_ANALYSIS_ERROR,
-        message: `Error starting Control Flow Analysis: ${code}`,
-      };
-      this.delegate.finishTask(this.documentUri, [], [], new Map(), [event], 0);
     });
 
     this.worker.postMessage({
@@ -273,6 +291,38 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks.delete(documentUri);
   }
 
+  finishTaskWithError(
+    documentUri: string,
+    error: ErrorDto,
+    requestVersion: number,
+  ): void {
+    this.logChannel?.error(`Analysis termited with error: ${error.message}`);
+    this.logChannel?.debug(
+      `Finish task with error for request version: ${requestVersion}`,
+    );
+
+    const result = this.latestResults.get(documentUri);
+    this.logChannel?.debug(
+      `Latest result request version: ${result?.requestVersion}`,
+    );
+
+    if (requestVersion === result?.requestVersion) {
+      this.logChannel?.debug(
+        `Reject promise for request version: ${result?.requestVersion}`,
+      );
+
+      result.resolved = true;
+      const err = Error(error.message);
+      if (result.reject) result.reject(err);
+      else result.promise = Promise.reject(err);
+    }
+
+    this.diagnosticService.showAllDiagnostics(documentUri, new Map());
+    telemetryExceptionEvent(error.errorName, error.message, ["ccf"]);
+
+    this.tasks.delete(documentUri);
+  }
+
   private createLatestResultEntry(
     documentUri: string,
     requestVersion: number,
@@ -304,7 +354,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     if (latestResult) {
       if (rejectPromise) {
         this.latestResults.delete(documentUri);
-        latestResult.reject?.("invalidate");
+        latestResult.reject?.(Error("invalidate"));
       } else {
         latestResult.requestVersion = 0;
       }

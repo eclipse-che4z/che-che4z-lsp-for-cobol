@@ -58,6 +58,10 @@ export class Logger implements Channel {
     });
     this.messages = sendMessagesIfNeeded(this.messages);
   }
+  flush(): void {
+    postMessage({ type: "log", payload: this.messages });
+    this.messages = [];
+  }
 }
 
 function processMessage(message: WorkerMessage): void {
@@ -81,8 +85,13 @@ function processMessage(message: WorkerMessage): void {
       message.severity,
       channel,
     );
+    channel.info("Analysis started");
+    channel.flush();
+
     const result = cfgBuilder.build(message.programs);
     const graphs = result.enters.map((e) => e.normalize());
+
+    channel.info("Analysis finished");
 
     postMessage({
       type: "result",
@@ -94,9 +103,12 @@ function processMessage(message: WorkerMessage): void {
       },
     });
   } catch (error) {
-    channel.error(`${error}`);
+    postMessage({
+      type: "error",
+      payload: String(error),
+    });
   } finally {
-    postMessage({ type: "log", payload: channel.messages });
+    channel.flush();
   }
 }
 
