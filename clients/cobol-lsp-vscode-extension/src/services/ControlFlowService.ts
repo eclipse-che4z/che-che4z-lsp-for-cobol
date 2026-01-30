@@ -137,7 +137,9 @@ export class AnalysisTask {
       }
     });
     this.worker.on("error", (error) => {
-      this.mainChannel?.appendLine(error.message);
+      this.mainChannel?.appendLine(
+        `Error occured during Control Flow Analysis: ${error}`,
+      );
       this.delegate.finishTaskWithError(
         this.documentUri,
         error,
