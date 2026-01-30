@@ -20,7 +20,6 @@ import {
   DiagnosticRelatedInformationDto,
   DiagnosticSeverityDto,
   DiagnosticTagDto,
-  ErrorDto,
   EventDto,
   LocationDto,
   RangeDto,
@@ -61,7 +60,7 @@ interface AnalysisServiceDelegate {
   ): void;
   finishTaskWithError(
     documentUri: string,
-    error: ErrorDto,
+    error: Error,
     requestVersion: number,
   ): void;
 }
@@ -86,13 +85,6 @@ type LatestResultData = {
       promise: Promise<AnalysisResult>;
     }
 );
-
-function asErrorDto(message: string): ErrorDto {
-  return {
-    errorName: EVENT_ANALYSIS_ERROR,
-    message: `Error occurred during Control Flow Analysis: ${message}`,
-  };
-}
 
 export class AnalysisTask {
   private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
@@ -122,7 +114,7 @@ export class AnalysisTask {
       } else if (data.type === "error") {
         this.delegate.finishTaskWithError(
           this.documentUri,
-          asErrorDto(data.payload),
+          Error(data.payload),
           this.requestVersion,
         );
       } else if (data.type === "log") {
@@ -144,8 +136,7 @@ export class AnalysisTask {
         }
       }
     });
-    this.worker.on("error", (code) => {
-      const error = asErrorDto(code.message);
+    this.worker.on("error", (error) => {
       this.mainChannel?.appendLine(error.message);
       this.delegate.finishTaskWithError(
         this.documentUri,
@@ -293,7 +284,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
 
   finishTaskWithError(
     documentUri: string,
-    error: ErrorDto,
+    error: Error,
     requestVersion: number,
   ): void {
     this.logChannel?.error(`Analysis termited with error: ${error.message}`);
@@ -312,13 +303,12 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       );
 
       result.resolved = true;
-      const err = Error(error.message);
-      if (result.reject) result.reject(err);
-      else result.promise = Promise.reject(err);
+      if (result.reject) result.reject(error);
+      else result.promise = Promise.reject(error);
     }
 
     this.diagnosticService.showAllDiagnostics(documentUri, new Map());
-    telemetryExceptionEvent(error.errorName, error.message, ["ccf"]);
+    telemetryExceptionEvent(EVENT_ANALYSIS_ERROR, error.message, ["ccf"]);
 
     this.tasks.delete(documentUri);
   }

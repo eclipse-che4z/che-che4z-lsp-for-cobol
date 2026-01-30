@@ -130,9 +130,7 @@ describe("ControlFlowService tests", () => {
 
     lastWorkerErrorTrigger?.(Error("boom"));
 
-    await expect(p).rejects.toThrow(
-      "Error occurred during Control Flow Analysis: boom",
-    );
+    await expect(p).rejects.toThrow("boom");
   });
 });
 
