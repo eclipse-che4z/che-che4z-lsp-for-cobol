@@ -74,9 +74,6 @@ beforeEach(() => {
   lastWorkerResultTrigger = undefined;
   lastWorkerErrorTrigger = undefined;
 });
-process.on("unhandledRejection", (reason) => {
-  console.log("REJECTION", reason);
-});
 
 jest.mock("worker_threads", () => ({
   Worker: class {
