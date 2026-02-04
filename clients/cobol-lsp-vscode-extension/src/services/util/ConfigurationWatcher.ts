@@ -13,10 +13,15 @@
  */
 
 import * as vscode from "vscode";
-import { SERVER_RUNTIME } from "../../constants";
+import {
+  SERVER_RUNTIME,
+  SETTINGS_CPY_NDVR_DEPENDENCIES,
+  SETTINGS_CPY_SECTION,
+} from "../../constants";
 import { SettingsService } from "../Settings";
 import { telemetryEvent } from "../reporter";
 import { clearDiagnostics } from "../ExternalAPIsService";
+import { clearWorkspaceConfigCache } from "../ProcessorGroupsLoader";
 
 export class ConfigurationWatcher {
   private static async restartVsCode() {
@@ -51,6 +56,13 @@ export class ConfigurationWatcher {
     vscode.workspace.onDidChangeConfiguration(async (event) => {
       if (event.affectsConfiguration(SERVER_RUNTIME)) {
         await this.handleServerRuntimeConfigurationChange();
+      }
+      if (
+        event.affectsConfiguration(
+          `${SETTINGS_CPY_SECTION}.${SETTINGS_CPY_NDVR_DEPENDENCIES}`,
+        )
+      ) {
+        clearWorkspaceConfigCache();
       }
       clearDiagnostics();
     });
