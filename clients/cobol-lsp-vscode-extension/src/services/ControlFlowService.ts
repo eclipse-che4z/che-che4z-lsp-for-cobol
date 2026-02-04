@@ -289,7 +289,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     error: Error,
     requestVersion: number,
   ): void {
-    this.logChannel?.error(`Analysis termited with error: ${error.message}`);
+    this.logChannel?.error(`Analysis terminated with error: ${error.message}`);
     this.logChannel?.debug(
       `Finish task with error for request version: ${requestVersion}`,
     );
