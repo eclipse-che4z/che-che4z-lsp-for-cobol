@@ -68,7 +68,7 @@ function createItemFromParams(
 
 function extractProcessStatementExpr(input: string): ExtractResult[] {
   const wholeRe =
-    /\bPROCESS\b[\s\S]*?\bDO\b[\s\S]*?\bWITH\b[\s\S]*?\bFROM\b[\s\S]*?(?=($|[.;]))/gi;
+    /\bPROC\b[\s\S]*?\bDO\b[\s\S]*?\bWITH\b[\s\S]*?\bFROM\b[\s\S]*?(?=($|[.;]))/gi;
 
   const results: ExtractResult[] = [];
 
@@ -82,12 +82,12 @@ function extractProcessStatementExpr(input: string): ExtractResult[] {
     const paramPatterns: Array<{ name: ParamName; re: RegExp }> = [
       {
         name: "VAR1",
-        re: new RegExp(String.raw`\bPROCESS\s+(${token})\s+OF\b`, "i"),
+        re: new RegExp(String.raw`\bPROC\s+(${token})\s+OF\b`, "i"),
       },
       {
         name: "GR1",
         re: new RegExp(
-          String.raw`\bPROCESS\s+${token}\s+OF\s+(${token})\s+BY\b`,
+          String.raw`\bPROC\s+${token}\s+OF\s+(${token})\s+BY\b`,
           "i",
         ),
       },
@@ -181,7 +181,7 @@ function applyProcessStatementResult(
   );
   const statementRange = new vscode.Range(
     new vscode.Position(line, result.matchStart),
-    new vscode.Position(line, result.matchStart + "PROCESS".length),
+    new vscode.Position(line, result.matchStart + "PROC".length),
   );
   const items: Item[] = [];
 
@@ -200,8 +200,8 @@ function applyProcessStatementResult(
   context.replaceWithMap(range, statementRange, items, replacementMap);
 }
 
-function extractChangeState(input: string): ExtractResult[] {
-  const wholeRe = /\bCHANGE\s+STATE\s+[A-Z0-9_-]+\s+OF\s+[A-Z0-9_-]+\b/gi;
+function extractFixState(input: string): ExtractResult[] {
+  const wholeRe = /\bFIX\s+STATE\s+[A-Z0-9_-]+\s+OF\s+[A-Z0-9_-]+\b/gi;
 
   const results: ExtractResult[] = [];
 
@@ -214,7 +214,7 @@ function extractChangeState(input: string): ExtractResult[] {
     const patterns: Array<{ name: ParamName; re: RegExp }> = [
       {
         name: "VAR1",
-        re: /\bCHANGE\s+STATE\s+([A-Z0-9_-]+)\s+OF\b/i,
+        re: /\bFIX\s+STATE\s+([A-Z0-9_-]+)\s+OF\b/i,
       },
       {
         name: "GR1",
@@ -255,7 +255,62 @@ function extractChangeState(input: string): ExtractResult[] {
   return results;
 }
 
-function applyChangeStateStatementResult(
+function extractAltState(input: string): ExtractResult[] {
+  const wholeRe = /\bALT\s+STATE\s+[A-Z0-9_-]+\s+OF\s+[A-Z0-9_-]+\b/gi;
+
+  const results: ExtractResult[] = [];
+
+  for (const m of input.matchAll(wholeRe)) {
+    if (m.index == null) continue;
+
+    const fullMatch = m[0];
+    const base = m.index;
+
+    const patterns: Array<{ name: ParamName; re: RegExp }> = [
+      {
+        name: "PAR1",
+        re: /\bALT\s+STATE\s+([A-Z0-9_-]+)\s+OF\b/i,
+      },
+      {
+        name: "SEC1",
+        re: /\bOF\s+([A-Z0-9_-]+)\b/i,
+      },
+    ];
+
+    const params: ExtractedParam[] = [];
+
+    for (const p of patterns) {
+      const pm = p.re.exec(fullMatch);
+      if (!pm) continue;
+
+      const value = pm[1];
+      const offsetInMatch = pm[0].indexOf(value);
+      const start = base + pm.index + offsetInMatch;
+      const end = start + value.length;
+
+      params.push({
+        name: p.name,
+        value,
+        start,
+        end,
+      });
+    }
+
+    if (params.length !== 2) continue;
+
+    params.sort((a, b) => a.start - b.start);
+    results.push({
+      matchStart: base,
+      matchEnd: base + fullMatch.length,
+      fullMatch,
+      params: params,
+    });
+  }
+
+  return results;
+}
+
+function applyFixStateStatementResult(
   context: IDocumentProcessingContext,
   result: ExtractResult,
   line: number,
@@ -266,7 +321,7 @@ function applyChangeStateStatementResult(
   );
   const statementRange = new vscode.Range(
     new vscode.Position(line, result.matchStart),
-    new vscode.Position(line, result.matchStart + "CHANGE".length),
+    new vscode.Position(line, result.matchStart + "FIX".length),
   );
   const items: Item[] = [];
 
@@ -278,12 +333,35 @@ function applyChangeStateStatementResult(
   context.replaceWithMap(range, statementRange, items, replacementMap);
 }
 
+function applyAltStateStatementResult(
+  context: IDocumentProcessingContext,
+  result: ExtractResult,
+  line: number,
+) {
+  const range = new vscode.Range(
+    new vscode.Position(line, result.matchStart),
+    new vscode.Position(line, result.matchEnd),
+  );
+  const statementRange = new vscode.Range(
+    new vscode.Position(line, result.matchStart),
+    new vscode.Position(line, result.matchStart + "ALT".length),
+  );
+  const items: Item[] = [];
+
+  items.push(
+    createItemFromParams(line, result.params, [0, 1], ItemType.PROCEDURE), // PAR1 OF SEC1
+  );
+
+  const replacementMap = "";
+  context.replaceWithMap(range, statementRange, items, replacementMap);
+}
+
 export function replaceProcessStatement(
   context: IDocumentProcessingContext,
   line: number,
   lines: string[],
 ): void {
-  //      PROCESS VAR1 OF GR1 BY VAR2 OF GR2 DO SEC1 WITH PAR1 AND PAR2 FROM SEC2, PROC
+  //      PROC VAR1 OF GR1 BY VAR2 OF GR2 DO SEC1 WITH PAR1 AND PAR2 FROM SEC2, PROC
   const results = extractProcessStatementExpr(lines[line]);
 
   for (const result of results) {
@@ -291,15 +369,28 @@ export function replaceProcessStatement(
   }
 }
 
-export function replaceChangeStateStatement(
+export function replaceFixStateStatement(
   context: IDocumentProcessingContext,
   line: number,
   lines: string[],
 ): void {
-  //      CHANGE STATE V1 OF G1
-  const results = extractChangeState(lines[line]);
+  //      FIX STATE V1 OF G1
+  const results = extractFixState(lines[line]);
 
   for (const result of results) {
-    applyChangeStateStatementResult(context, result, line);
+    applyFixStateStatementResult(context, result, line);
+  }
+}
+
+export function replaceAltStateStatement(
+  context: IDocumentProcessingContext,
+  line: number,
+  lines: string[],
+): void {
+  //      ALT STATE P1 OF S1
+  const results = extractAltState(lines[line]);
+
+  for (const result of results) {
+    applyAltStateStatementResult(context, result, line);
   }
 }

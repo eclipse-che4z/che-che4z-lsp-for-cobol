@@ -14,23 +14,14 @@
 import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
-import type { activate } from "../../extension";
-
-type RemovePromise<T> = T extends Promise<infer R> ? R : never;
-type ExtensionApi = RemovePromise<ReturnType<typeof activate>>;
+import path = require("path");
 
 suite("Integration Test Suite: Dialect specific tests", function () {
   this.timeout(helper.TEST_TIMEOUT);
-  let api: ExtensionApi["v2"];
 
   suiteSetup(async function () {
     await helper.updateConfig("sample_dialect.json");
     await helper.activate();
-    const tmp = vscode.extensions.getExtension<ExtensionApi>(
-      "BroadcomMFD.cobol-language-support",
-    )?.exports.v2;
-    assert(tmp);
-    api = tmp;
   });
 
   this.afterEach(async function () {
@@ -38,36 +29,45 @@ suite("Integration Test Suite: Dialect specific tests", function () {
     await helper.closeAllEditors();
   });
 
-  test("Register SAMPLE dialect that causes an error", async () => {
-    const dialectHolder = await api.registerDialect(
-      "BroadcomMFD.cobol-language-support",
-      {
-        name: "SAMPLE",
-        description: "SAMPLE dialect support",
-        snippets: vscode.Uri.file(""),
-        isCopyStatement: () => ({ isCopy: false }),
-      },
-      () => {
-        throw Error("Error from dialect");
-      },
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  test("Run SAMPLE dialect", async () => {
+    const extSrcPath = path.join("cobol-sample", "SAMPLE1.cbl");
+    const editor = await helper.showDocument(extSrcPath);
+
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+
+    console.warn("Diagnostics:", diagnostics);
+    assert.strictEqual(diagnostics.length, 2);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.severity, vscode.DiagnosticSeverity.Error);
+    assert.strictEqual(
+      "Variable V2 does not exist in structure G2",
+      d0.message,
     );
+    assert.strictEqual(d0.range.start.line, 25);
+    assert.strictEqual(d0.range.start.character, 28);
+    assert.strictEqual(d0.range.end.line, 25);
+    assert.strictEqual(d0.range.end.character, 30);
 
-    try {
-      const editor = await helper.showDocument("USER1.cbl");
-
-      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics.length, 1);
-      const d0 = diagnostics[0];
-      const message =
-        "SAMPLE dialect was stopped due to internal error (required for";
-      const diagMessage = d0.message.substring(0, message.length);
-
-      assert.strictEqual(d0.severity, vscode.DiagnosticSeverity.Error);
-      assert.strictEqual(message, diagMessage);
-    } finally {
-      if (dialectHolder instanceof vscode.Disposable) {
-        dialectHolder.dispose();
-      }
-    }
+    const d1 = diagnostics[1];
+    assert.strictEqual(d1.severity, vscode.DiagnosticSeverity.Error);
+    assert.strictEqual(
+      "The following paragraph is not defined: P1",
+      d1.message,
+    );
+    assert.strictEqual(d1.range.start.line, 25);
+    assert.strictEqual(d1.range.start.character, 48);
+    assert.strictEqual(d1.range.end.line, 25);
+    assert.strictEqual(d1.range.end.character, 50);
   });
 });

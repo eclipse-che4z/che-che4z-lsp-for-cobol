@@ -15,7 +15,8 @@
 import { ItemType } from "@code4z/cobol-dialect-api";
 import * as vscode from "../__mocks__/vscode";
 import {
-  replaceChangeStateStatement,
+  replaceAltStateStatement,
+  replaceFixStateStatement,
   replaceProcessStatement,
 } from "../statements";
 
@@ -31,31 +32,31 @@ describe("statements replacement functionality", () => {
     jest.clearAllMocks();
   });
 
-  it("should replace PROCESS statement", () => {
+  it("should replace PROC statement", () => {
     const lines = [
       "LINE 0",
-      "      PROCESS V1 OF G1 BY V2 OF G2 DO S1 WITH P1 AND P2 FROM S2, S3.",
+      "      PROC V1 OF G1 BY V2 OF G2 DO S1 WITH P1 AND P2 FROM S2, S3.",
     ];
     replaceProcessStatement(context, 1, lines);
 
     expect(context.replaceWithMap).toHaveBeenCalledWith(
-      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 67)),
-      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 13)),
+      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 64)),
+      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 10)),
       [
         {
           tokens: [
             {
               name: "VAR1",
               range: new vscode.Range(
-                new vscode.Position(1, 14),
-                new vscode.Position(1, 16),
+                new vscode.Position(1, 11),
+                new vscode.Position(1, 13),
               ),
             },
             {
               name: "GR1",
               range: new vscode.Range(
-                new vscode.Position(1, 20),
-                new vscode.Position(1, 22),
+                new vscode.Position(1, 17),
+                new vscode.Position(1, 19),
               ),
             },
           ],
@@ -65,15 +66,15 @@ describe("statements replacement functionality", () => {
             {
               name: "VAR2",
               range: new vscode.Range(
-                new vscode.Position(1, 26),
-                new vscode.Position(1, 28),
+                new vscode.Position(1, 23),
+                new vscode.Position(1, 25),
               ),
             },
             {
               name: "GR2",
               range: new vscode.Range(
-                new vscode.Position(1, 32),
-                new vscode.Position(1, 34),
+                new vscode.Position(1, 29),
+                new vscode.Position(1, 31),
               ),
             },
           ],
@@ -83,15 +84,15 @@ describe("statements replacement functionality", () => {
             {
               name: "PAR1",
               range: new vscode.Range(
-                new vscode.Position(1, 46),
-                new vscode.Position(1, 48),
+                new vscode.Position(1, 43),
+                new vscode.Position(1, 45),
               ),
             },
             {
               name: "SEC1",
               range: new vscode.Range(
-                new vscode.Position(1, 38),
-                new vscode.Position(1, 40),
+                new vscode.Position(1, 35),
+                new vscode.Position(1, 37),
               ),
             },
           ],
@@ -101,15 +102,15 @@ describe("statements replacement functionality", () => {
             {
               name: "PAR2",
               range: new vscode.Range(
-                new vscode.Position(1, 53),
-                new vscode.Position(1, 55),
+                new vscode.Position(1, 50),
+                new vscode.Position(1, 52),
               ),
             },
             {
               name: "SEC2",
               range: new vscode.Range(
-                new vscode.Position(1, 61),
-                new vscode.Position(1, 63),
+                new vscode.Position(1, 58),
+                new vscode.Position(1, 60),
               ),
             },
           ],
@@ -119,8 +120,8 @@ describe("statements replacement functionality", () => {
             {
               name: "PROC",
               range: new vscode.Range(
-                new vscode.Position(1, 65),
-                new vscode.Position(1, 67),
+                new vscode.Position(1, 62),
+                new vscode.Position(1, 64),
               ),
             },
           ],
@@ -132,31 +133,62 @@ describe("statements replacement functionality", () => {
     );
   });
 
-  it("should replace CHANGE STATE statement", () => {
-    const lines = ["LINE 0", "      CHANGE STATE V1 OF G1."];
-    replaceChangeStateStatement(context, 1, lines);
+  it("should replace FIX STATE statement", () => {
+    const lines = ["LINE 0", "      FIX STATE V1 OF G1."];
+    replaceFixStateStatement(context, 1, lines);
     expect(context.replaceWithMap).toHaveBeenCalledWith(
-      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 27)),
-      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 12)),
+      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 24)),
+      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 9)),
       [
         {
           tokens: [
             {
               name: "VAR1",
               range: new vscode.Range(
-                new vscode.Position(1, 19),
-                new vscode.Position(1, 21),
+                new vscode.Position(1, 16),
+                new vscode.Position(1, 18),
               ),
             },
             {
               name: "GR1",
               range: new vscode.Range(
-                new vscode.Position(1, 25),
-                new vscode.Position(1, 27),
+                new vscode.Position(1, 22),
+                new vscode.Position(1, 24),
               ),
             },
           ],
           type: ItemType.VARIABLE,
+        },
+      ],
+      "",
+    );
+  });
+
+  it("should replace ALT STATE statement", () => {
+    const lines = ["LINE 0", "      ALT STATE P1 OF S1."];
+    replaceAltStateStatement(context, 1, lines);
+    expect(context.replaceWithMap).toHaveBeenCalledWith(
+      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 24)),
+      new vscode.Range(new vscode.Position(1, 6), new vscode.Position(1, 9)),
+      [
+        {
+          tokens: [
+            {
+              name: "PAR1",
+              range: new vscode.Range(
+                new vscode.Position(1, 16),
+                new vscode.Position(1, 18),
+              ),
+            },
+            {
+              name: "SEC1",
+              range: new vscode.Range(
+                new vscode.Position(1, 22),
+                new vscode.Position(1, 24),
+              ),
+            },
+          ],
+          type: ItemType.PROCEDURE,
         },
       ],
       "",

@@ -13,11 +13,16 @@
  */
 
 import * as path from "path";
-import { runTests, downloadAndUnzipVSCode } from "@vscode/test-electron";
+import {
+  runTests,
+  downloadAndUnzipVSCode,
+  resolveCliArgsFromVSCodeExecutablePath,
+} from "@vscode/test-electron";
 import { TestOptions } from "@vscode/test-electron/out/runTest";
 import * as os from "os";
 import * as process from "process";
 import * as fs from "fs";
+import * as cp from "child_process";
 
 async function main() {
   try {
@@ -28,39 +33,67 @@ async function main() {
       path.join(__dirname, "../../../daco-dialect-support/"),
     ];
     const extensionTestsPath = path.join(__dirname, "./suite/index");
-    const userDir = os.tmpdir();
-    if (process.argv.indexOf("--native") != -1) {
+
+    // Use dedicated, unique dirs (do NOT use os.tmpdir() directly)
+    const userDataDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "vscode-test-user-"),
+    );
+    const extensionsDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "vscode-test-ext-"),
+    );
+
+    // Optional settings
+    if (process.argv.includes("--native")) {
       console.log("Running tests with native language server");
-      fs.mkdirSync(path.join(userDir, "User"));
+      fs.mkdirSync(path.join(userDataDir, "User"), { recursive: true });
       fs.writeFileSync(
-        path.join(userDir, "User", "settings.json"),
+        path.join(userDataDir, "User", "settings.json"),
         '{"cobol-lsp.serverRuntime": "NATIVE"}',
+        "utf8",
       );
     }
 
     const launchArgs = [
       path.join(__dirname, "../../../../tests/test_files/project"),
-      "--disable-extensions",
       "--disable-workspace-trust",
       "--user-data-dir",
-      userDir,
+      userDataDir,
+      "--extensions-dir",
+      extensionsDir,
+      // NOTE: do NOT use "--disable-extensions" or the installed VSIX won't load.
     ];
-    let options: TestOptions;
-    if (process.argv.length > 2 && process.argv[2] == "insiders") {
-      const vscodeExecutablePath = await downloadAndUnzipVSCode("insiders");
-      options = {
-        vscodeExecutablePath,
-        extensionDevelopmentPath,
-        extensionTestsPath,
-        launchArgs,
-      };
-    } else {
-      options = {
-        extensionDevelopmentPath,
-        extensionTestsPath,
-        launchArgs,
-      };
-    }
+
+    const channel =
+      process.argv.length > 2 && process.argv[2] === "insiders"
+        ? "insiders"
+        : "stable";
+
+    // Always use the same VS Code build for install + runTests
+    const vscodeExecutablePath = await downloadAndUnzipVSCode(channel);
+
+    // Install SAMPLE dialect extension into the SAME dirs we launch with
+    const vsixDir = path.join(__dirname, "../../../../dialects");
+    const vsix = fs.readdirSync(vsixDir).find((f) => f.endsWith(".vsix"));
+    if (!vsix) throw new Error(`No .vsix found in ${vsixDir}`);
+    const sampleDialectVsixPath = path.join(vsixDir, vsix);
+
+    assertFile(sampleDialectVsixPath, "VSIX");
+
+    installVsixCrossPlatform(
+      vscodeExecutablePath,
+      sampleDialectVsixPath,
+      userDataDir,
+      extensionsDir,
+    );
+
+    // Run tests
+    const options: TestOptions = {
+      vscodeExecutablePath,
+      extensionDevelopmentPath,
+      extensionTestsPath,
+      launchArgs,
+    };
+
     // run tests
     await runTests(options);
   } catch (error) {
@@ -68,6 +101,81 @@ async function main() {
     console.error("Tests Failed");
     process.exit(1);
   }
+}
+
+function assertFile(p: string, label: string) {
+  const st = fs.statSync(p);
+  if (!st.isFile()) {
+    throw new Error(`${label} path is not a file: ${p}`);
+  }
+}
+
+function getVSCodeRootFromExecutablePath(vscodeExecutablePath: string): string {
+  // On Windows, vscodeExecutablePath can be ...\Code.exe (file) or ...\bin\code.cmd
+  const lower = vscodeExecutablePath.toLowerCase();
+  if (process.platform === "win32" && lower.endsWith(".exe")) {
+    return path.dirname(vscodeExecutablePath);
+  }
+  // For mac/linux it's usually .../bin/code -> root is one level above "bin"
+  return path.dirname(path.dirname(vscodeExecutablePath));
+}
+
+function installVsixCrossPlatform(
+  vscodeExecutablePath: string,
+  vsixPath: string,
+  userDataDir: string,
+  extensionsDir: string,
+) {
+  // Always pass the SAME user-data-dir and extensions-dir used for launchArgs.
+  if (process.platform === "win32") {
+    // Avoid code.cmd spawnSync EINVAL on Windows: use Node-based cli.js
+    const vscodeRoot = getVSCodeRootFromExecutablePath(vscodeExecutablePath);
+
+    const candidates = [
+      path.join(vscodeRoot, "resources", "app", "out", "cli.js"),
+      path.join(vscodeRoot, "resources", "app", "out", "cli", "cli.js"),
+    ];
+
+    const cliJsPath = candidates.find((p) => fs.existsSync(p));
+    if (!cliJsPath) {
+      throw new Error(`cli.js not found. Tried:\n${candidates.join("\n")}`);
+    }
+
+    cp.execFileSync(
+      process.execPath,
+      [
+        cliJsPath,
+        "--user-data-dir",
+        userDataDir,
+        "--extensions-dir",
+        extensionsDir,
+        "--install-extension",
+        vsixPath,
+        "--force",
+      ],
+      { stdio: "inherit" },
+    );
+    return;
+  }
+
+  // mac/linux path
+  const [cliPath, ...cliArgs] =
+    resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
+
+  cp.execFileSync(
+    cliPath,
+    [
+      ...cliArgs,
+      "--user-data-dir",
+      userDataDir,
+      "--extensions-dir",
+      extensionsDir,
+      "--install-extension",
+      vsixPath,
+      "--force",
+    ],
+    { stdio: "inherit" },
+  );
 }
 
 void main();

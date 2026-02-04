@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Broadcom.
+ * Copyright (c) 2026 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -16,14 +16,14 @@ package org.eclipse.lsp.cobol.lsp.jrpc;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.eclipse.lsp4j.Diagnostic;
+import lombok.NonNull;
 
-/** Result of the V2 dialect processing */
+/**
+ * Data transport object that contains information of the replacements tokens with a type of entity
+ */
 @Data
 @NoArgsConstructor
-public class DialectProcessingResult {
-  private DocumentReplacement[] replacements;
-  private DocumentReplacementMap[] replacementMaps;
-  private DialectCopybookInfo[] copybooks;
-  private Diagnostic[] diagnostics;
+public class ReplacementTokens {
+  private @NonNull ReplacementToken[] tokens;
+  private String type;
 }

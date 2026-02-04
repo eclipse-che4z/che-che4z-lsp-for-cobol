@@ -9,9 +9,8 @@ export default [
       ecmaVersion: 8,
       globals: { ...globals.node, ...globals.jest },
       parserOptions: {
-        projectService: true,
         tsconfigRootDir: import.meta.dirname,
-        allowDefaultProject: ["*.mjs"],
+        project: ["./tsconfig.eslint.json"],
       },
     },
   },
@@ -43,6 +42,9 @@ export default [
     files: ["**/*.spec.ts"],
     rules: {
       "@typescript-eslint/unbound-method": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
     },
   },
 ];

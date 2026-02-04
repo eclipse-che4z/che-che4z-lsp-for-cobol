@@ -14,7 +14,8 @@
 import type { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
 import * as vscode from "vscode";
 import {
-  replaceChangeStateStatement,
+  replaceAltStateStatement,
+  replaceFixStateStatement,
   replaceProcessStatement,
 } from "./statements";
 
@@ -53,7 +54,8 @@ const TEXT_CHANGERS = [
   replaceVariable.bind(undefined, " SDATA", " PIC X(9)"),
   replaceWithParameter,
   replaceProcessStatement,
-  replaceChangeStateStatement,
+  replaceFixStateStatement,
+  replaceAltStateStatement,
 ];
 
 export function replaceText(

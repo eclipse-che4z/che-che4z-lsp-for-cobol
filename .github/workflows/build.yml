@@ -200,6 +200,12 @@ jobs:
         run: |
           npm ci
           npm run test
+      - name: Unit Test Sample Dialect extension
+        working-directory: clients/sample-dialect-support
+        run: |
+          npm install
+          npm run compile
+          npm run test
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -233,6 +239,13 @@ jobs:
           cp ../../server/dialect-daco/target/dialect-daco.jar ./server/jar
           npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
+      - name: Package Sample Dialect vsix
+        working-directory: clients/sample-dialect-support
+        run: |
+          npm install
+          npm run compile
+          npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
+          cp *.vsix ../../.
       - name: Upload IDMS vsix
         uses: actions/upload-artifact@v4
         with:
@@ -245,6 +258,12 @@ jobs:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
+      - name: Upload Sample Dialect vsix
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: warn
+          name: vsix-sample-dialect
+          path: 'cobol-language-support-for-sample-dialect*.vsix'
       - name: Upload COBOL LS default vsix
         uses: actions/upload-artifact@v4
         with:
@@ -253,6 +272,11 @@ jobs:
           path: |
             cobol-language-support-*.vsix
             !cobol-language-support-for-*.vsix
+      - name: Retrieve Sample dialect
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-sample-dialect
+          path: dialects
       - name: Run COBOL LS extension integration tests
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -539,6 +563,11 @@ jobs:
           unzip -j dialects-daco/*.vsix extension/dist/extension.js extension/dist/extension.js.map -d clients/daco-dialect-support/dist/
           unzip -j dialects-daco/*.vsix extension/server/jar/dialect-daco.jar -d clients/daco-dialect-support/server/jar
         shell: bash
+      - name: Retrieve Sample dialect
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-sample-dialect
+          path: dialects
       - name: Run extension unit tests
         run: npm run test
         working-directory: clients/cobol-lsp-vscode-extension

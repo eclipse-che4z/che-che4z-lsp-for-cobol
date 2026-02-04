@@ -143,3 +143,4 @@ clients/cobol-lsp-vscode-extension/test-report.xml
 /server-delomboked
 /server/.run
 /clients/sample-dialect-support/.vscode
+clients/sample-dialect-support/package-lock.json

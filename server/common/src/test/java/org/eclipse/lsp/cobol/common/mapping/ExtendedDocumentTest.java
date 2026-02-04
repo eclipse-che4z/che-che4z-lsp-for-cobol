@@ -16,6 +16,8 @@ package org.eclipse.lsp.cobol.common.mapping;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
@@ -172,5 +174,36 @@ class ExtendedDocumentTest {
     String text = document.getBaseText(locality);
 
     assertEquals("", text);
+  }
+
+  @Test
+  void testReplaceWithMap() {
+    document.insertCopybook(5, copybook);
+    Range range = new Range(new Position(5, 8), new Position(5, 26));
+    Range statementRange = new Range(new Position(5, 8), new Position(5, 17));
+    Range divisionRange = new Range(new Position(5, 18), new Position(5, 26));
+
+    Map<String, Range> statementMap = new HashMap<>();
+    statementMap.put("PROC", statementRange);
+    statementMap.put("DIV", divisionRange);
+    String replacementMap = "{DIV} {PROC}";
+    document.replace(range, statementRange, statementMap, replacementMap);
+    document.commitTransformations();
+
+    assertEquals(
+        "        IDENTIFICATION DIVISION.\n"
+            + "        PROGRAM-ID. test1.\n"
+            + "        DATA DIVISION.\n"
+            + "        WORKING-STORAGE SECTION.\n"
+            + "        COPY CPY.\n"
+            + "        COPYBOOK LINE 0\n"
+            + "        COPYBOOK LINE 1\n"
+            + "        COPYBOOK LINE 2\n"
+            + "        COPYBOOK LINE 3\n"
+            + "        DIVISION PROCEDURE.",
+        document.toString());
+
+    Location location = document.mapLocation(new Range(new Position(9, 8), new Position(9, 15)));
+    assertEquals(divisionRange, location.getRange());
   }
 }
