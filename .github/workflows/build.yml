@@ -89,6 +89,9 @@ jobs:
       - name: Install dependencies for DaCo dialect
         working-directory: clients/daco-dialect-support
         run: NODE_ENV=production npm ci
+      - name: Install dependencies for Sample dialect
+        working-directory: clients/sample-dialect-support
+        run: NODE_ENV=production npm ci
       - uses: actions/upload-artifact@v4
         with:
           name: clients-for-bd-scan
@@ -203,8 +206,7 @@ jobs:
       - name: Unit Test Sample Dialect extension
         working-directory: clients/sample-dialect-support
         run: |
-          npm install
-          npm run compile
+          npm ci
           npm run test
       - name: Unit Test COBOL LS extension
         working-directory: clients/cobol-lsp-vscode-extension
@@ -242,8 +244,7 @@ jobs:
       - name: Package Sample Dialect vsix
         working-directory: clients/sample-dialect-support
         run: |
-          npm install
-          npm run compile
+          npm ci
           npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Upload IDMS vsix
@@ -272,11 +273,6 @@ jobs:
           path: |
             cobol-language-support-*.vsix
             !cobol-language-support-for-*.vsix
-      - name: Retrieve Sample dialect
-        uses: actions/download-artifact@v4
-        with:
-          name: vsix-sample-dialect
-          path: dialects
       - name: Run COBOL LS extension integration tests
         working-directory: clients/cobol-lsp-vscode-extension
         run: |
@@ -567,7 +563,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vsix-sample-dialect
-          path: dialects
+          path: dialects-sample
+      - name: Restore Sample dist folder
+        run: |
+          unzip -j dialects-sample/*.vsix extension/dist/extension.js extension/dist/extension.js.map -d clients/sample-dialect-support/dist/
       - name: Run extension unit tests
         run: npm run test
         working-directory: clients/cobol-lsp-vscode-extension
