@@ -14,19 +14,17 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 import org.eclipse.lsp4j.Range;
 
 /**
  * Data transport object that contains information of the replacements with map for the document *
  */
-@Data
-@NoArgsConstructor
+@Value
 public class DocumentReplacementMap {
-  private @NonNull Range range;
-  private @NonNull Range statementRange;
-  private @NonNull ReplacementTokens[] tokenItems;
-  private @NonNull String replacementMap;
+  @NonNull Range range;
+  @NonNull Range statementRange;
+  @NonNull ReplacementTokens[] tokenItems;
+  @NonNull String replacementMap;
 }

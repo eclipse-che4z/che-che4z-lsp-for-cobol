@@ -14,16 +14,14 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 
 /**
  * Data transport object that contains information of the replacements tokens with a type of entity
  */
-@Data
-@NoArgsConstructor
+@Value
 public class ReplacementTokens {
-  private @NonNull ReplacementToken[] tokens;
-  private String type;
+  @NonNull ReplacementToken[] tokens;
+  String type;
 }

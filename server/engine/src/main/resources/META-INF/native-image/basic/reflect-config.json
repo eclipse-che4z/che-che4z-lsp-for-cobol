@@ -3930,71 +3930,43 @@
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.DialectProcessingResult",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacement",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacementMap",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacementMap",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.DialectCopybookInfo",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.ReplacementTokens",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.jrpc.ReplacementToken",
     "allDeclaredFields": true,
-    "methods": [
-      {
-        "name": "<init>",
-        "parameterTypes": []
-      }
-    ]
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
   }
 ]

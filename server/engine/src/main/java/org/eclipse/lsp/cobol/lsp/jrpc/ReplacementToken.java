@@ -14,15 +14,13 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 import org.eclipse.lsp4j.Range;
 
 /** Data transport object that contains information of the replacement token */
-@Data
-@NoArgsConstructor
+@Value
 public class ReplacementToken {
-  private @NonNull String name;
-  private @NonNull Range range;
+  @NonNull String name;
+  @NonNull Range range;
 }

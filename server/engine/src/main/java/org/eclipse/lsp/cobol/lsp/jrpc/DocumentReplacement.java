@@ -14,15 +14,13 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 import org.eclipse.lsp4j.Range;
 
 /** Data transport object that contains information of the replacements for the document * */
-@Data
-@NoArgsConstructor
+@Value
 public class DocumentReplacement {
-  private @NonNull Range range;
-  private @NonNull String text;
+  @NonNull Range range;
+  @NonNull String text;
 }

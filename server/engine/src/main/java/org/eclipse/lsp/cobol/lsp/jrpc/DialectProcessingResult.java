@@ -14,16 +14,14 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 import org.eclipse.lsp4j.Diagnostic;
 
 /** Result of the V2 dialect processing */
-@Data
-@NoArgsConstructor
+@Value
 public class DialectProcessingResult {
-  private DocumentReplacement[] replacements;
-  private DocumentReplacementMap[] replacementMaps;
-  private DialectCopybookInfo[] copybooks;
-  private Diagnostic[] diagnostics;
+  DocumentReplacement[] replacements;
+  DocumentReplacementMap[] replacementMaps;
+  DialectCopybookInfo[] copybooks;
+  Diagnostic[] diagnostics;
 }
