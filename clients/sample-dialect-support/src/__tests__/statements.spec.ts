@@ -12,6 +12,10 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { ItemType } from "@code4z/cobol-dialect-api";
 import * as vscode from "../__mocks__/vscode";
 import {
