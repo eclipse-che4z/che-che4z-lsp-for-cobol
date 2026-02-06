@@ -29,16 +29,6 @@ suite("Integration Test Suite: Dialect specific tests", function () {
     await helper.closeAllEditors();
   });
 
-  this.afterAll(async function () {
-    this.timeout(helper.TEST_TIMEOUT);
-    await helper.closeAllEditors();
-  });
-
-  this.afterEach(async function () {
-    this.timeout(helper.TEST_TIMEOUT);
-    await helper.closeAllEditors();
-  });
-
   test("Run SAMPLE dialect", async () => {
     const extSrcPath = path.join("cobol-sample", "SAMPLE1.cbl");
     const editor = await helper.showDocument(extSrcPath);
