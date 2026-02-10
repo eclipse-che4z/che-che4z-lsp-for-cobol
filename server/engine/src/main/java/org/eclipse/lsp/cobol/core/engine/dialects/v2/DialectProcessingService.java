@@ -176,7 +176,7 @@ public class DialectProcessingService {
         .orElse(null);
   }
 
-  private static List<Node> applyReplacements(
+  private static ArrayList<Node> applyReplacements(
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
@@ -185,7 +185,7 @@ public class DialectProcessingService {
       document.replace(replacement.getRange(), replacement.getText());
     }
 
-    List<Node> result = new ArrayList<>();
+    ArrayList<Node> result = new ArrayList<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
       Map<String, Range> statementMap = new HashMap<>();
       for (ReplacementTokens tokens : replacementMap.getTokenItems()) {
