@@ -5,5 +5,5 @@
     "noEmit": true,
     "rootDir": "."
   },
-  "exclude": ["out/**", "dist/**", "node_modules/**"]
+  "exclude": []
 }
