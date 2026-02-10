@@ -105,8 +105,7 @@ public class DialectProcessingService {
       String copybookId,
       String programUri) {
 
-    List<Node> nodes =
-        new ArrayList<>(applyReplacements(document, replacements, replacementMaps, copybookId));
+    ArrayList<Node> nodes = applyReplacements(document, replacements, replacementMaps, copybookId);
 
     for (DialectCopybookInfo copybookInfo : copybookInfos) {
       ExtendedText extendedText =
