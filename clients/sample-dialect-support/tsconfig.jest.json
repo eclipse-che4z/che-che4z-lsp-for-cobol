@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node", "jest", "mocha"]
+    "types": ["node", "jest"]
   },
   "include": [
     "src/__tests__/**/*.ts",
