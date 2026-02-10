@@ -29,7 +29,7 @@ export type Token = {
 
 export type Item = {
   tokens: Token[];
-  type?: ItemType;
+  type?: "VARIABLE" | "PROCEDURE";
 };
 
 /**
