@@ -43,6 +43,17 @@ type ExtractResult = {
   fullMatch: string;
 };
 
+type NamedGroupIndices = Record<string, [number, number]>;
+
+type IndicesWithGroups = Array<[number, number]> & {
+  groups: NamedGroupIndices;
+};
+
+interface MatchWithIndices extends RegExpMatchArray {
+  indices: IndicesWithGroups;
+  groups: Record<string, string>;
+}
+
 function rangeForParam(line: number, param: ExtractedParam): vscode.Range {
   return new vscode.Range(
     new vscode.Position(line, param.start),
@@ -66,80 +77,23 @@ function createItemFromParams(
 }
 
 function extractProcessStatementExpr(input: string): ExtractResult[] {
-  const wholeRe =
-    /\bPROC\b[\s\S]*?\bDO\b[\s\S]*?\bWITH\b[\s\S]*?\bFROM\b[\s\S]*?(?=($|[.;]))/gi;
+  const token = String.raw`[A-Z0-9_-]+`;
+
+  const re = new RegExp(
+    String.raw`\bPROC\s+(?<VAR1>${token})\s+OF\s+(?<GR1>${token})\s+BY\s+(?<VAR2>${token})\s+OF\s+(?<GR2>${token})\s+DO\s+(?<SEC1>${token})\s+WITH\s+(?<PAR1>${token})\s+AND\s+(?<PAR2>${token})\s+FROM\s+(?<SEC2>${token})\s*,\s*(?<PROC>${token})(?=($|[.;]))`,
+    "gid",
+  );
 
   const results: ExtractResult[] = [];
 
-  for (const m of input.matchAll(wholeRe)) {
+  for (const m of input.matchAll(re)) {
     if (m.index == null) continue;
 
+    const match = m as MatchWithIndices;
+
     const fullMatch = m[0];
-    const base = m.index;
-    const token = String.raw`[A-Z0-9_-]+`;
-
-    const paramPatterns: Array<{ name: ParamName; re: RegExp }> = [
-      {
-        name: "VAR1",
-        re: new RegExp(String.raw`\bPROC\s+(${token})\s+OF\b`, "i"),
-      },
-      {
-        name: "GR1",
-        re: new RegExp(
-          String.raw`\bPROC\s+${token}\s+OF\s+(${token})\s+BY\b`,
-          "i",
-        ),
-      },
-
-      {
-        name: "VAR2",
-        re: new RegExp(String.raw`\bBY\s+(${token})\s+OF\b`, "i"),
-      },
-      {
-        name: "GR2",
-        re: new RegExp(
-          String.raw`\bBY\s+${token}\s+OF\s+(${token})\s+DO\b`,
-          "i",
-        ),
-      },
-
-      {
-        name: "SEC1",
-        re: new RegExp(String.raw`\bDO\s+(${token})\s+WITH\b`, "i"),
-      },
-      {
-        name: "PAR1",
-        re: new RegExp(String.raw`\bWITH\s+(${token})\s+AND\b`, "i"),
-      },
-
-      {
-        name: "PAR2",
-        re: new RegExp(String.raw`\bAND\s+(${token})\s+FROM\b`, "i"),
-      },
-      {
-        name: "SEC2",
-        re: new RegExp(String.raw`\bFROM\s+(${token})\s*,\s*${token}\b`, "i"),
-      },
-
-      {
-        name: "PROC",
-        re: new RegExp(String.raw`\bFROM\s+${token}\s*,\s*(${token})\b`, "i"),
-      },
-    ];
 
     const params: ExtractedParam[] = [];
-
-    for (const p of paramPatterns) {
-      const pm = p.re.exec(fullMatch);
-      if (!pm) continue;
-
-      const value = pm[1];
-      const groupOffsetInMatch = pm[0].indexOf(value);
-      const start = base + pm.index + groupOffsetInMatch;
-      const end = start + value.length;
-
-      params.push({ name: p.name, value, start, end });
-    }
 
     const required: ParamName[] = [
       "VAR1",
@@ -152,16 +106,33 @@ function extractProcessStatementExpr(input: string): ExtractResult[] {
       "SEC2",
       "PROC",
     ];
-    const found = new Set(params.map((x) => x.name));
-    const ok = required.every((r) => found.has(r));
-    if (!ok) continue;
+
+    for (const name of required) {
+      const value = match.groups[name];
+      const span = match.indices.groups[name];
+      if (!value || !span) {
+        params.length = 0;
+        break;
+      }
+
+      const [startInMatch, endInMatch] = span;
+      params.push({
+        name,
+        value,
+        start: startInMatch,
+        end: endInMatch,
+      });
+    }
+
+    if (params.length !== required.length) continue;
 
     params.sort((a, b) => a.start - b.start);
+    const [matchStart, matchEnd] = match.indices[0];
 
     results.push({
-      matchStart: base,
-      matchEnd: base + fullMatch.length,
-      params: params,
+      matchStart: matchStart,
+      matchEnd: matchEnd,
+      params,
       fullMatch,
     });
   }
@@ -200,54 +171,42 @@ function applyProcessStatementResult(
 }
 
 function extractFixState(input: string): ExtractResult[] {
-  const wholeRe = /\bFIX\s+STATE\s+[A-Z0-9_-]+\s+OF\s+[A-Z0-9_-]+\b/gi;
+  const token = String.raw`[A-Z0-9_-]+`;
+
+  const re = new RegExp(
+    String.raw`\bFIX\s+STATE\s+(?<VAR1>${token})\s+OF\s+(?<GR1>${token})\b`,
+    "gid",
+  );
 
   const results: ExtractResult[] = [];
 
-  for (const m of input.matchAll(wholeRe)) {
+  for (const m of input.matchAll(re)) {
     if (m.index == null) continue;
 
-    const fullMatch = m[0];
-    const base = m.index;
+    const match = m as MatchWithIndices;
 
-    const patterns: Array<{ name: ParamName; re: RegExp }> = [
-      {
-        name: "VAR1",
-        re: /\bFIX\s+STATE\s+([A-Z0-9_-]+)\s+OF\b/i,
-      },
-      {
-        name: "GR1",
-        re: /\bOF\s+([A-Z0-9_-]+)\b/i,
-      },
+    const var1 = match.groups.VAR1;
+    const gr1 = match.groups.GR1;
+
+    const var1Span = match.indices.groups.VAR1;
+    const gr1Span = match.indices.groups.GR1;
+
+    if (!var1 || !gr1 || !var1Span || !gr1Span) continue;
+
+    const params: ExtractedParam[] = [
+      { name: "VAR1", value: var1, start: var1Span[0], end: var1Span[1] },
+      { name: "GR1", value: gr1, start: gr1Span[0], end: gr1Span[1] },
     ];
 
-    const params: ExtractedParam[] = [];
-
-    for (const p of patterns) {
-      const pm = p.re.exec(fullMatch);
-      if (!pm) continue;
-
-      const value = pm[1];
-      const offsetInMatch = pm[0].indexOf(value);
-      const start = base + pm.index + offsetInMatch;
-      const end = start + value.length;
-
-      params.push({
-        name: p.name,
-        value,
-        start,
-        end,
-      });
-    }
-
-    if (params.length !== 2) continue;
-
     params.sort((a, b) => a.start - b.start);
+
+    const [matchStart, matchEnd] = match.indices[0];
+
     results.push({
-      matchStart: base,
-      matchEnd: base + fullMatch.length,
-      fullMatch,
-      params: params,
+      matchStart,
+      matchEnd,
+      fullMatch: m[0],
+      params,
     });
   }
 
@@ -255,54 +214,42 @@ function extractFixState(input: string): ExtractResult[] {
 }
 
 function extractAltState(input: string): ExtractResult[] {
-  const wholeRe = /\bALT\s+STATE\s+[A-Z0-9_-]+\s+OF\s+[A-Z0-9_-]+\b/gi;
+  const token = String.raw`[A-Z0-9_-]+`;
+
+  const re = new RegExp(
+    String.raw`\bALT\s+STATE\s+(?<PAR1>${token})\s+OF\s+(?<SEC1>${token})\b`,
+    "gid",
+  );
 
   const results: ExtractResult[] = [];
 
-  for (const m of input.matchAll(wholeRe)) {
+  for (const m of input.matchAll(re)) {
     if (m.index == null) continue;
 
-    const fullMatch = m[0];
-    const base = m.index;
+    const match = m as MatchWithIndices;
 
-    const patterns: Array<{ name: ParamName; re: RegExp }> = [
-      {
-        name: "PAR1",
-        re: /\bALT\s+STATE\s+([A-Z0-9_-]+)\s+OF\b/i,
-      },
-      {
-        name: "SEC1",
-        re: /\bOF\s+([A-Z0-9_-]+)\b/i,
-      },
+    const par1 = match.groups.PAR1;
+    const sec1 = match.groups.SEC1;
+
+    const par1Span = match.indices.groups.PAR1;
+    const sec1Span = match.indices.groups.SEC1;
+
+    if (!par1 || !sec1 || !par1Span || !sec1Span) continue;
+
+    const params: ExtractedParam[] = [
+      { name: "PAR1", value: par1, start: par1Span[0], end: par1Span[1] },
+      { name: "SEC1", value: sec1, start: sec1Span[0], end: sec1Span[1] },
     ];
 
-    const params: ExtractedParam[] = [];
-
-    for (const p of patterns) {
-      const pm = p.re.exec(fullMatch);
-      if (!pm) continue;
-
-      const value = pm[1];
-      const offsetInMatch = pm[0].indexOf(value);
-      const start = base + pm.index + offsetInMatch;
-      const end = start + value.length;
-
-      params.push({
-        name: p.name,
-        value,
-        start,
-        end,
-      });
-    }
-
-    if (params.length !== 2) continue;
-
     params.sort((a, b) => a.start - b.start);
+
+    const [matchStart, matchEnd] = match.indices[0];
+
     results.push({
-      matchStart: base,
-      matchEnd: base + fullMatch.length,
-      fullMatch,
-      params: params,
+      matchStart,
+      matchEnd,
+      fullMatch: m[0],
+      params,
     });
   }
 
