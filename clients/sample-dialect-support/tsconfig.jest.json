@@ -4,7 +4,5 @@
     "noEmit": true,
     "types": ["node", "jest"]
   },
-  "include": [
-    "src/**/*.spec.ts",
-  ]
+  "include": ["src/**/*.spec.ts"]
 }
