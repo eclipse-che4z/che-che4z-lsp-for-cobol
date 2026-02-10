@@ -14,7 +14,6 @@
 import {
   IDocumentProcessingContext,
   Item,
-  ItemType,
   Token,
 } from "@code4z/cobol-dialect-api";
 import * as vscode from "vscode";
@@ -55,7 +54,7 @@ function createItemFromParams(
   line: number,
   params: ExtractedParam[],
   indexes: number[],
-  type?: ItemType,
+  type?: "VARIABLE" | "PROCEDURE",
 ): Item {
   const tokens: Token[] = indexes.map((i) => {
     return { name: params[i].name, range: rangeForParam(line, params[i]) };
@@ -326,7 +325,7 @@ function applyFixStateStatementResult(
   const items: Item[] = [];
 
   items.push(
-    createItemFromParams(line, result.params, [0, 1], ItemType.VARIABLE), // VAR1 OF GR1
+    createItemFromParams(line, result.params, [0, 1], "VARIABLE"), // VAR1 OF GR1
   );
 
   const replacementMap = "";
@@ -349,7 +348,7 @@ function applyAltStateStatementResult(
   const items: Item[] = [];
 
   items.push(
-    createItemFromParams(line, result.params, [0, 1], ItemType.PROCEDURE), // PAR1 OF SEC1
+    createItemFromParams(line, result.params, [0, 1], "PROCEDURE"), // PAR1 OF SEC1
   );
 
   const replacementMap = "";

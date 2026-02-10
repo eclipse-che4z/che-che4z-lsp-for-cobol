@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { ItemType } from "@code4z/cobol-dialect-api";
 import * as vscode from "../__mocks__/vscode";
 import {
   replaceAltStateStatement,
@@ -157,7 +156,7 @@ describe("statements replacement functionality", () => {
               ),
             },
           ],
-          type: ItemType.VARIABLE,
+          type: "VARIABLE",
         },
       ],
       "",
@@ -188,7 +187,7 @@ describe("statements replacement functionality", () => {
               ),
             },
           ],
-          type: ItemType.PROCEDURE,
+          type: "PROCEDURE",
         },
       ],
       "",
