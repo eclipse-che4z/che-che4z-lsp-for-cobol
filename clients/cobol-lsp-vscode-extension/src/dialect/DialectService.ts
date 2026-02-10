@@ -16,7 +16,6 @@ import * as vscode from "vscode";
 import type {
   IDocumentProcessingContext,
   Item,
-  ItemType,
   Token,
   V2StartProcessingHandler,
 } from "@code4z/cobol-dialect-api";
@@ -55,7 +54,7 @@ type TokenPayload = {
 
 type ItemPayload = {
   tokens: TokenPayload[];
-  type?: ItemType;
+  type?: "VARIABLE" | "PROCEDURE";
 };
 
 type DocumentReplacementMapPayload = {
