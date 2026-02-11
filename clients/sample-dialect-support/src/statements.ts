@@ -29,6 +29,18 @@ type ParamName =
   | "SEC2"
   | "PROC";
 
+const REQ_PARAMS_PROCESS: ParamName[] = [
+  "VAR1",
+  "GR1",
+  "VAR2",
+  "GR2",
+  "SEC1",
+  "PAR1",
+  "PAR2",
+  "SEC2",
+  "PROC",
+];
+
 type ExtractedParam = {
   name: ParamName;
   value: string;
@@ -90,30 +102,13 @@ function extractProcessStatementExpr(input: string): ExtractResult[] {
     if (m.index == null) continue;
 
     const match = m as MatchWithIndices;
-
     const fullMatch = m[0];
 
     const params: ExtractedParam[] = [];
 
-    const required: ParamName[] = [
-      "VAR1",
-      "GR1",
-      "VAR2",
-      "GR2",
-      "SEC1",
-      "PAR1",
-      "PAR2",
-      "SEC2",
-      "PROC",
-    ];
-
-    for (const name of required) {
+    for (const name of REQ_PARAMS_PROCESS) {
       const value = match.groups[name];
       const span = match.indices.groups[name];
-      if (!value || !span) {
-        params.length = 0;
-        break;
-      }
 
       const [startInMatch, endInMatch] = span;
       params.push({
@@ -123,8 +118,6 @@ function extractProcessStatementExpr(input: string): ExtractResult[] {
         end: endInMatch,
       });
     }
-
-    if (params.length !== required.length) continue;
 
     params.sort((a, b) => a.start - b.start);
     const [matchStart, matchEnd] = match.indices[0];
