@@ -184,8 +184,6 @@ function extractFixState(input: string): ExtractResult[] {
     const var1Span = match.indices.groups.VAR1;
     const gr1Span = match.indices.groups.GR1;
 
-    if (!var1 || !gr1 || !var1Span || !gr1Span) continue;
-
     const params: ExtractedParam[] = [
       { name: "VAR1", value: var1, start: var1Span[0], end: var1Span[1] },
       { name: "GR1", value: gr1, start: gr1Span[0], end: gr1Span[1] },
