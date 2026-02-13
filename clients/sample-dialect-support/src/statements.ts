@@ -101,8 +101,6 @@ function extractProcessStatementExpr(input: string): ExtractResult[] {
   const results: ExtractResult[] = [];
 
   for (const m of input.matchAll(re)) {
-    if (m.index == null) continue;
-
     const match = m as MatchWithIndices;
     const fullMatch = m[0];
 
