@@ -18,6 +18,8 @@ import {
 } from "@code4z/cobol-dialect-api";
 import * as vscode from "vscode";
 
+const MAKEDIAG_MESSAGE = "Sample dialect diagnostic (MAKEDIAG)";
+
 type ParamName =
   | "VAR1"
   | "GR1"
@@ -247,6 +249,30 @@ function extractAltState(input: string): ExtractResult[] {
   return results;
 }
 
+function extractMakeDiagStatement(input: string): ExtractResult[] {
+  const re = /\bMAKEDIAG\b/gi;
+
+  const results: ExtractResult[] = [];
+
+  for (const m of input.matchAll(re)) {
+    if (m.index == null) continue;
+
+    const matchStart = m.index;
+    const matchEnd = matchStart + m[0].length;
+
+    const params: ExtractedParam[] = [];
+
+    results.push({
+      matchStart,
+      matchEnd,
+      fullMatch: m[0],
+      params,
+    });
+  }
+
+  return results;
+}
+
 function applyFixStateStatementResult(
   context: IDocumentProcessingContext,
   result: ExtractResult,
@@ -329,5 +355,34 @@ export function replaceAltStateStatement(
 
   for (const result of results) {
     applyAltStateStatementResult(context, result, line);
+  }
+}
+
+export function replaceMakeDiagStatement(
+  context: IDocumentProcessingContext,
+  line: number,
+  lines: string[],
+): void {
+  const extracted = extractMakeDiagStatement(lines[line]);
+
+  for (const r of extracted) {
+    const len = r.matchEnd - r.matchStart;
+
+    context.replace(
+      new vscode.Range(
+        new vscode.Position(line, r.matchStart),
+        new vscode.Position(line, r.matchEnd),
+      ),
+      " ".repeat(len),
+    );
+
+    context.addDiagnostic({
+      range: new vscode.Range(
+        new vscode.Position(line, r.matchStart),
+        new vscode.Position(line, r.matchEnd),
+      ),
+      message: MAKEDIAG_MESSAGE,
+      severity: vscode.DiagnosticSeverity.Warning,
+    });
   }
 }

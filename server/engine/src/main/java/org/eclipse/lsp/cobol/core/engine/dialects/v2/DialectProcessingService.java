@@ -102,10 +102,11 @@ public class DialectProcessingService {
       DialectCopybookInfo[] copybookInfos,
       List<SyntaxError> errorList,
       String dialectName,
-      String copybookId,
+      String parentCopybookId,
       String programUri) {
 
-    ArrayList<Node> nodes = applyReplacements(document, replacements, replacementMaps, copybookId);
+    ArrayList<Node> nodes =
+        applyReplacements(document, replacements, replacementMaps, parentCopybookId);
 
     for (DialectCopybookInfo copybookInfo : copybookInfos) {
       ExtendedText extendedText =
@@ -113,13 +114,16 @@ public class DialectProcessingService {
               .cleanUpCode(copybookInfo.getUri(), copybookInfo.getText())
               .unwrap(errorList::addAll);
       ExtendedDocument copybook = new ExtendedDocument(extendedText, copybookInfo.getUri());
-      addErrors(errorList, document, copybookId, copybookInfo.getDiagnostics());
+      CopybookName copybookName = new CopybookName(copybookInfo.getCopybookName(), dialectName);
+      String copybookId = copybookName.toCopybookId(programUri).toString();
+
+      addErrors(errorList, copybook, copybookId, copybookInfo.getDiagnostics());
 
       CopyNode copyNode =
           new CopyNode(
               Locality.builder()
                   .uri(copybookInfo.getStatementLocation().getUri())
-                  .copybookId(copybookId)
+                  .copybookId(parentCopybookId)
                   .range(copybookInfo.getStatementLocation().getRange())
                   .build(),
               copybookInfo.getNameLocation(),
@@ -128,8 +132,6 @@ public class DialectProcessingService {
               copybookInfo.getUri());
 
       nodes.add(copyNode);
-
-      CopybookName copybookName = new CopybookName(copybookInfo.getCopybookName(), dialectName);
 
       nodes.addAll(
           processDocument(
@@ -140,7 +142,7 @@ public class DialectProcessingService {
               copybookInfo.getCopybooks(),
               errorList,
               dialectName,
-              copybookName.toCopybookId(programUri).toString(),
+              copybookId,
               programUri));
 
       document.insertCopybook(

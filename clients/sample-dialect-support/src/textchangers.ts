@@ -16,6 +16,7 @@ import * as vscode from "vscode";
 import {
   replaceAltStateStatement,
   replaceFixStateStatement,
+  replaceMakeDiagStatement,
   replaceProcessStatement,
 } from "./statements";
 
@@ -56,6 +57,7 @@ const TEXT_CHANGERS = [
   replaceProcessStatement,
   replaceFixStateStatement,
   replaceAltStateStatement,
+  replaceMakeDiagStatement,
 ];
 
 export function replaceText(

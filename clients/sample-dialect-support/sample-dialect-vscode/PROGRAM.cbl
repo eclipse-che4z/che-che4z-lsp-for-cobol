@@ -29,6 +29,8 @@
            ALT STATE P1 OF S1.
            COPY SAMPLE COPYS3 AAA. 
 
+           MAKEDIAG.
+
        MAINLINE-PARAGRAPH.
            MOVE "1" TO FIELD0 OF SAMP0.
            MOVE "1" TO FIELD_11_ABC.
