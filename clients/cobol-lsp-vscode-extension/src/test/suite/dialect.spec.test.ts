@@ -29,8 +29,7 @@ suite("Integration Test Suite: Dialect specific tests", function () {
   });
 
   test("Run SAMPLE dialect", async () => {
-    const extSrcPath = path.join("cobol-sample", "SAMPLE1.cbl");
-    const editor = await helper.showDocument(extSrcPath);
+    const editor = await helper.showDocument("cobol-sample/SAMPLE1.cbl");
 
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
 
