@@ -14,7 +14,6 @@
 import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
-import path = require("path");
 
 suite("Integration Test Suite: Dialect specific tests", function () {
   this.timeout(helper.TEST_TIMEOUT);
