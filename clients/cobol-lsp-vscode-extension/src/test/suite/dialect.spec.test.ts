@@ -76,8 +76,7 @@ suite("Integration Test Suite: Dialect specific tests", function () {
       "COBOL Language Support (dialect)",
     );
 
-    const extCopybookSrcPath = path.join("copy-sample", "COPY1.cpy");
-    const copybookEditor = await helper.showDocument(extCopybookSrcPath);
+    const copybookEditor = await helper.showDocument("copy-sample/COPY1.cpy");
     const copybookDiagnostics = await helper.waitForDiagnostics(
       copybookEditor.document.uri,
     );
