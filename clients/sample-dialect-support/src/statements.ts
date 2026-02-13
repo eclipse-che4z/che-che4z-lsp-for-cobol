@@ -221,8 +221,6 @@ function extractAltState(input: string): ExtractResult[] {
     const par1Span = match.indices.groups.PAR1;
     const sec1Span = match.indices.groups.SEC1;
 
-    if (!par1 || !sec1 || !par1Span || !sec1Span) continue;
-
     const params: ExtractedParam[] = [
       { name: "PAR1", value: par1, start: par1Span[0], end: par1Span[1] },
       { name: "SEC1", value: sec1, start: sec1Span[0], end: sec1Span[1] },
