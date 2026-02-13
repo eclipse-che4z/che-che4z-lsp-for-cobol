@@ -213,8 +213,6 @@ function extractAltState(input: string): ExtractResult[] {
   const results: ExtractResult[] = [];
 
   for (const m of input.matchAll(re)) {
-    if (m.index == null) continue;
-
     const match = m as MatchWithIndices;
 
     const par1 = match.groups.PAR1;
