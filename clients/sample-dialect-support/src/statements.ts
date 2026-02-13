@@ -251,9 +251,7 @@ function extractMakeDiagStatement(input: string): ExtractResult[] {
   const results: ExtractResult[] = [];
 
   for (const m of input.matchAll(re)) {
-    if (m.index == null) continue;
-
-    const matchStart = m.index;
+    const matchStart = m.index!;
     const matchEnd = matchStart + m[0].length;
 
     const params: ExtractedParam[] = [];
