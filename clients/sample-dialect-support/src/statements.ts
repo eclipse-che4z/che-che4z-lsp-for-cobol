@@ -174,8 +174,6 @@ function extractFixState(input: string): ExtractResult[] {
   const results: ExtractResult[] = [];
 
   for (const m of input.matchAll(re)) {
-    if (m.index == null) continue;
-
     const match = m as MatchWithIndices;
 
     const var1 = match.groups.VAR1;
