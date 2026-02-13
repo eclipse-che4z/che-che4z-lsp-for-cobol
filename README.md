@@ -233,6 +233,10 @@ The extension setting **Cpy-manager: Endevor-dependencies** determines how copyb
 * **ZOWE**
   * Downloads copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
 
+### Retrieving Copybooks from TAR files
+
+You can specify TAR files
+
 ### Copybook Support Features
 
 The extension includes the following copybook support features:
