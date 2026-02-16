@@ -162,7 +162,7 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in local folders in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets and folders that contain copybooks used in your project in the workspace settings. 
+The COBOL Language Support extension supports copybooks used in your source code that are stored in local folders in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets and folders that contain copybooks used in your project in the workspace settings. You can also configure COBOL Language Support to use copybooks that are stored in TAR files locally or on the mainframe.
 
 When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
 
@@ -286,7 +286,7 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
 - (Optional) **"libs":** (array)  
     - Specify local folders, mainframe data sets, USS files, and Endevor locations that contain copybooks. Specify local folders as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the copybook libraries that you specify in the extension settings.
     - Specify local folders as a string.
-    - Specify remote locations as JSON elements. Specify either the **"dataset"** or **"uss** parameter, and optionally a **"profile"**. Use one JSON element per remote location.
+    - Specify remote locations as JSON elements. Specify either the **"dataset"** or **"uss"** parameter, and optionally a **"profile"**. Use one JSON element per remote location.
         - **"dataset":** (string)
             - Specify the full DSN of a PDS that contains copybooks.
         - **"uss":** (string)
@@ -295,7 +295,7 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
             - Specify the name of a Zowe profile. If you do not include this parameter, the Zowe profile specified in the extension settings is used. 
     - Specify TAR files as JSON elements containing the following parameters. Use one JSON element per TAR file.
         - **"locationType":** (string)
-            - Specify the location of the TAR file. Allowed values are **"local"**, **"DSN"** or **"uss"**.  
+            - Specify whether the TAR file is stored locally, in a mainframe data set, or in a USS folder. The allowed values are **"local"**, **"DSN"** and **"uss"**.  
         - **"tarFileLocation":** (string)
             - Specify the path to the TAR file.
         - (Optional) **"searchPattern":** (string)
