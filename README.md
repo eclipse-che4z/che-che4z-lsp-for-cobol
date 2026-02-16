@@ -223,6 +223,19 @@ Changes you make to copybooks that you retrieve from mainframe data sets are not
 
 We recommend that you refresh your copybooks from time to time. To refresh your copybooks, press **F1** and run the command **Clear downloaded copybooks**. This command clears the global storage folder so that copybooks are downloaded again from the mainframe.
 
+### Retrieving Copybooks from TAR files
+
+You can specify TAR files that contain copybooks in the extension settings. The TAR files can be stored locally, as a PDS member, or in a USS folder. TAR files that are stored in remote locations are downloaded to a folder in the workspace. COBOL Language Support also enables you to specify individual subfolders to search within the TAR file.
+
+1. Open the COBOL Language Support extension settings.
+2. Switch from **User** to **Workspace**.
+3. Under **Cpy-manager: Paths-local**, specify paths to TAR files and prefix them with **tar:**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
+   **Example**: **tar:cpy/copy.tar::account/** specifies the **/account** subfolder of the TAR file **copy.tar** that is located in the **/cpy** subfolder of the workspace.
+4. Under **Cpy-manager: Paths-dsn**, specify paths to the TAR files in the format **tar:DSN(MEMBER)**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
+5. Under **Cpy-manager: Paths-uss**, specify paths to the TAR files and prefix them with **tar:**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
+6. Open a file or folder.  
+   Copybook support features are now enabled.
+
 ### Retrieving Copybooks from Endevor
 
 When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your VS Code global storage folder.
@@ -232,10 +245,6 @@ The extension setting **Cpy-manager: Endevor-dependencies** determines how copyb
   * Downloads copybooks from locations that are specified in the Endevor element processor group.
 * **ZOWE**
   * Downloads copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
-
-### Retrieving Copybooks from TAR files
-
-You can specify TAR files
 
 ### Copybook Support Features
 
@@ -277,13 +286,22 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
 - (Optional) **"libs":** (array)  
     - Specify local folders, mainframe data sets, USS files, and Endevor locations that contain copybooks. Specify local folders as either absolute or relative local paths. These libraries are used to search for copybooks in programs linked with this processor group, and take priority over the copybook libraries that you specify in the extension settings.
     - Specify local folders as a string.
-    - Specify remote locations as JSON elements. Use one JSON element per remote location. Specify either the **"dataset"** or **"uss"** parameter, and optionally a **"profile"**. Use one JSON element per remote location.
+    - Specify remote locations as JSON elements. Specify either the **"dataset"** or **"uss** parameter, and optionally a **"profile"**. Use one JSON element per remote location.
         - **"dataset":** (string)
             - Specify the full DSN of a PDS that contains copybooks.
         - **"uss":** (string)
             - Specify a full USS path that contains copybooks.
         - (Optional) **"profile":** (string)
             - Specify the name of a Zowe profile. If you do not include this parameter, the Zowe profile specified in the extension settings is used. 
+    - Specify TAR files as JSON elements containing the following parameters. Use one JSON element per TAR file.
+        - **"locationType":** (string)
+            - Specify the location of the TAR file. Allowed values are **"local"**, **"DSN"** or **"uss"**.  
+        - **"tarFileLocation":** (string)
+            - Specify the path to the TAR file.
+        - (Optional) **"searchPattern":** (string)
+            - Specify a path within the TAR file to index for copybooks. If you do not specify this parameter, the entire TAR file is indexed.
+        - (Optional) **"profile":** (string)
+            - Specify the name of a Zowe profile to use to download a TAR file that is stored remotely. If you do not include this parameter, the Zowe profile specified in the extension settings is used. 
     - Specify Endevor locations as JSON elements containing the following parameters. Use one JSON element per Endevor location.
         - (Optional) **"profile":** (string)
             - If you use more than one Endevor connection or inventory location, specify the name of a connection or inventory location or profile in this parameter. If you only use one Endevor connection and inventory location, you can omit this parameter.
@@ -366,11 +384,11 @@ Each element contains the following parameters:
 
 Using the example `pgm_conf.json` file above, the following `proc_grps.json` example enables the following:
 
-- Copybooks from local folders LIB1 and LIB2, with the extensions ".cpy" and ".copy", and from Endevor location PRD/2/SYS3/SUB4/COBCPY, are used with PROGRAM1. The Explorer for Endevor inventory location "inv1" is used to retrieve the dependencies from Endevor.
+- Copybooks from local folders `LIB1` and `LIB2`, with the extensions `.cpy` and `.copy`, and from Endevor location `PRD/2/SYS3/SUB4/COBCPY`, are used with PROGRAM1. The Explorer for Endevor inventory location `inv1` is used to retrieve the dependencies from Endevor.
 - The QUALIFY(EXTEND) and XMLPARSE(COMPAT) compiler options are enabled for PROGRAM1.
-- The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from local folders LIB3 and LIB4 are used with PROGRAM2.
+- The IDMS dialect is enabled for PROGRAM2, and IDMS copybooks from the `/accounts/cpy` subfolder of the TAR file `/remote/uss/idms/cpy.tar`, as well as in local folders `LIB3` and `LIB4`, are used with PROGRAM2. 
 - The DB2 SQL server is enabled for PROGRAM2. 
-- Non-IDMS copybooks from USS path /remote/uss/folder, and mainframe data set HLQ.DSN.COBCOPY, are used with PROGRAM2. The Zowe profile "prof1" is used to download the copybooks from the mainframe data set, while the default profile in the extension settings is used to download the copybooks from the USS file.
+- Non-IDMS copybooks from USS path `/remote/uss/folder`, and mainframe data set `HLQ.DSN.COBCOPY`, are used with PROGRAM2. The Zowe profile `prof1` is used to download the copybooks from the mainframe data set, while the default profile in the extension settings is used to download the copybooks from the USS file.
 
 ```
 {
@@ -401,7 +419,13 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                 {
                     "name": "IDMS",
                     "libs": [
-                        "LIB3", "LIB4"
+                        "LIB3",
+                        "LIB4",
+                        {
+                             "locationType": "uss",
+                             "tarFileLocation": "/remote/uss/idms/cpy.tar",
+                             "searchPattern": "accounts/cpy"
+                        }
                         ]
                 }, 
                 {
