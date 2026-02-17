@@ -20,6 +20,8 @@ To enable COBOL Language Support for IDMS, follow the instructions in the [COBOL
 
 ## Use Case
 
+bla
+
 ## LSP Features
 
 COBOL Language Support for IDMS enables the following LSP features:
