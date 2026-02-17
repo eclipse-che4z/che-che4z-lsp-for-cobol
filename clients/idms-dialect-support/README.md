@@ -18,10 +18,6 @@ COBOL Language Support for IDMS is an add-on for the [COBOL Language Support](ht
 
 To enable COBOL Language Support for IDMS, follow the instructions in the [COBOL Language Support](https://marketplace.visualstudio.com/items?itemName=broadcomMFD.cobol-language-support) documentation. Use the string "IDMS" to enable the IDMS dialect in your extension settings or in a processor group.
 
-## Use Case
-
-bla
-
 ## LSP Features
 
 COBOL Language Support for IDMS enables the following LSP features:
