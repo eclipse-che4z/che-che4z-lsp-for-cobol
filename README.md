@@ -148,21 +148,20 @@ Set the SQL backend server as either DB2 or Datacom to ensure you use the correc
 
 The COBOL Language Support extension supports subroutines specified in CALL statements if the called program is stored in a local folder in your workspace. The Go To Definition and Find All References functionalities, as well as autocomplete, are extended to work for names of subroutines.
 
-To enable subroutine support, specify the paths of folders containing subroutine files in your workspace extension settings.
+To enable subroutine support, specify the paths of folders containing subroutine files in the COBOL Language Support extension settings.
 
 1. Open the COBOL Language Support extension settings.
-2. Switch from **User** to **Workspace**.
-3. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
+2. Under **Subroutine-manager: Paths-local**, specify the paths of the folders containing subroutines.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - The folders are searched in the order they are listed. If two folders contain a subroutine with the same file name, the one from the folder higher on the list is used.
-4. Open a file or folder.  
+3. Open a file or folder.  
    Subroutine support features are now enabled.
 
 If you specify your subroutine folders using absolute paths or paths containing `../` or `./`, the subroutine folders are not watched for changes. You might need to resolve names of recently added files in your code manually.
 
 ## Copybook Support
 
-The COBOL Language Support extension supports copybooks used in your source code that are stored in local folders in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets and folders that contain copybooks used in your project in the workspace settings. You can also configure COBOL Language Support to use copybooks that are stored in TAR files locally or on the mainframe.
+The COBOL Language Support extension supports copybooks used in your source code that are stored in local folders in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to automatically download them from the mainframe to your workspace. You specify the data sets and folders that contain copybooks used in your project in the extension settings. You can also configure COBOL Language Support to use copybooks that are stored in TAR files locally or on the mainframe.
 
 When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
 
@@ -182,8 +181,7 @@ COBOL Language Support supports the following copybook types:
 You can store your copybooks locally in folders in your workspace. To enable copybook support, specify the folder paths that contain copybooks in your workspace extension settings.
 
 1. Open the COBOL Language Support extension settings.
-2. Switch from **User** to **Workspace**.
-3. Specify the paths of the folders containing copybooks under **Cpy-manager: Paths-local**.
+2. Specify the paths of the folders containing copybooks under **Cpy-manager: Paths-local**.
    - **Tip:** We recommend that you specify relative paths from the workspace root. To obtain the relative path of a folder in your workspace, right-click it in the folder tree and select **Copy Relative Path**.
    - You can use [Glob](https://www.npmjs.com/package/glob) wildcards, such as * to substitute one whole level of the path. For example, specifying the path `*/copybooks` searches all subfolders named "copybooks" in  subfolders of your workspace root, while the path `copybooks/*` searches all subfolders one level below the `copybooks` folder in the workspace root. For more information on available wildcards, see the [Glob Primer](https://www.npmjs.com/package/glob#Glob-Primer).
    - You can also use the following VS Code predefined variables:
@@ -193,8 +191,8 @@ You can store your copybooks locally in folders in your workspace. To enable cop
      - **${workspaceFolder}**
      - For more information, see the [VS Code documentation](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables).
    - The folders are searched in the order they are listed, or in alphabetical order if multiple paths are indexed by a wildcard. If two folders contain a copybook with the same file name, the one from the folder higher on the list is used.
-4. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
-5. Open a file or folder.  
+3. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
+4. Open a file or folder.  
    Copybook support features are now enabled.
 
 If you specify your copybook folders using absolute paths or paths containing `../` or `./`, the copybook folders are not watched for changes. You might need to resolve names of recently added copybooks in your code manually.
@@ -207,13 +205,12 @@ You can also set up automatic copybook retrieval from the mainframe to download 
 
 1. Ensure that you have a [Zowe Explorer profile](https://docs.zowe.org/stable/user-guide/ze-profiles/) configured, with credentials and a connection URL defined.
 2. Open the COBOL Language Support extension settings.
-3. Switch from **User** to **Workspace**.
-4. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
-5. Under **Cpy-manager: Paths-uss**, list absolute paths of directories on USS subsystems to search for copybooks. The directories are searched in the order they are listed, so if two directories contain a copybook with the same member name, the one from the directory higher on the list is downloaded. If copybooks with the same name are found in both a mainframe data set and a USS directory, the one from the mainframe data set is downloaded.
-6. Under **Cpy-manager: Profiles**, enter the name of your Zowe Explorer profile.
-7. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
-8. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks. COBOL Language Support converts copybooks that it downloads from the mainframe from the specified encoding to UTF-8.
-9. Open a file or folder.  
+3. Under **Cpy-manager: Paths-dsn**, list the names of any number of partitioned data sets on the mainframe to search for copybooks. The data sets are searched in the order they are listed, so if two data sets contain a copybook with the same member name, the one from the data set higher on the list is downloaded.
+4. Under **Cpy-manager: Paths-uss**, list absolute paths of directories on USS subsystems to search for copybooks. The directories are searched in the order they are listed, so if two directories contain a copybook with the same member name, the one from the directory higher on the list is downloaded. If copybooks with the same name are found in both a mainframe data set and a USS directory, the one from the mainframe data set is downloaded.
+5. Under **Cpy-manager: Profiles**, enter the name of your Zowe Explorer profile.
+6. (Optional) Under **Cpy-manager: Copybook-extensions**, specify the file extensions used for your copybooks. The default supported file extensions are `.cpy` and `.copy`.
+7. (Optional) Under **Cpy-manager: Copybook-file-encoding**, specify the file encoding used in your copybooks. COBOL Language Support converts copybooks that it downloads from the mainframe from the specified encoding to UTF-8.
+8. Open a file or folder.  
    All copybooks used in the program which are not stored locally are downloaded from the mainframe data sets and USS directories that you specified in steps 4 and 5.  
    Copybook support features are now enabled.
 
@@ -225,15 +222,14 @@ We recommend that you refresh your copybooks from time to time. To refresh your 
 
 ### Retrieving Copybooks from TAR files
 
-You can specify TAR files that contain copybooks in the extension settings. The TAR files can be stored locally, as a PDS member, or in a USS folder. TAR files that are stored in remote locations are downloaded to a folder in the workspace. COBOL Language Support also enables you to specify individual subfolders to search within the TAR file.
+You can specify TAR files that contain copybooks in the extension settings. The TAR files can be stored locally, or retrieved from PDS members and USS folders. COBOL Language Support also enables you to specify individual subfolders to search within the TAR file.
 
 1. Open the COBOL Language Support extension settings.
-2. Switch from **User** to **Workspace**.
-3. Under **Cpy-manager: Paths-local**, specify paths to TAR files and prefix them with **tar:**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
+2. Under **Cpy-manager: Paths-local**, specify paths to TAR files and prefix them with **tar:**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
    **Example**: **tar:cpy/copy.tar::account/** specifies the **/account** subfolder of the TAR file **copy.tar** that is located in the **/cpy** subfolder of the workspace.
-4. Under **Cpy-manager: Paths-dsn**, specify paths to the TAR files in the format **tar:DSN(MEMBER)**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
-5. Under **Cpy-manager: Paths-uss**, specify paths to the TAR files and prefix them with **tar:**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
-6. Open a file or folder.  
+3. Under **Cpy-manager: Paths-dsn**, specify paths to the TAR files in the format **tar:DSN(MEMBER)**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
+4. Under **Cpy-manager: Paths-uss**, specify paths to the TAR files and prefix them with **tar:**. To specify a path within the TAR file to index, add **::*path/*** after the TAR file location. If you do not specify a path, the entire TAR file is indexed. 
+5. Open a file or folder.  
    Copybook support features are now enabled.
 
 ### Retrieving Copybooks from Endevor
