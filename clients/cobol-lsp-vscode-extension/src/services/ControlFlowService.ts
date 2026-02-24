@@ -29,7 +29,7 @@ import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
 import { getVariablesFromUri } from "./util/FSUtils";
-import { ANALYSIS_LIMIT_ERROR } from "../constants";
+import { ANALYSIS_LIMIT_REASON } from "../constants";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -48,7 +48,7 @@ export type ApiResult = {
 type IncompleteReason = {
   code: string;
   message: string;
-}
+};
 
 export type AnalysisResult = {
   documentUri: string;
@@ -304,11 +304,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       );
 
       result.resolved = true;
-      const resultObject: AnalysisResult = {
+      const resultObject = {
         documentUri: documentUri,
         graphs: graphs,
         locations: locations,
-        incomplete: this.getMessage(events),
+        incomplete: getIncompleteReason(events),
       };
       if (result.resolve) result.resolve(resultObject);
       else result.promise = Promise.resolve(resultObject);
@@ -324,21 +324,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     });
 
     this.deleteTask(documentUri);
-  }
-
-  getIncompleteReason(events: EventDto[]): IncompleteReason | undefined {
-    if (
-      events.some(
-        (event) =>
-          "eventName" in event && event.eventName === ANALYSIS_LIMIT_ERROR.eventName,
-      )
-    ) {
-      return {
-        code: ANALYSIS_LIMIT_ERROR.code,
-        message: ANALYSIS_LIMIT_ERROR.content
-      }
-    }
-    return undefined;
   }
 
   finishTaskWithError(
@@ -456,6 +441,21 @@ const severityTranslation: vscode.DiagnosticSeverity[] = [
   vscode.DiagnosticSeverity.Information,
   vscode.DiagnosticSeverity.Hint,
 ];
+
+function getIncompleteReason(events: EventDto[]): IncompleteReason | undefined {
+  if (
+    events.some(
+      (event) =>
+        "eventName" in event && event.eventName === ANALYSIS_LIMIT_REASON.event,
+    )
+  ) {
+    return {
+      code: ANALYSIS_LIMIT_REASON.code,
+      message: ANALYSIS_LIMIT_REASON.message,
+    };
+  }
+  return undefined;
+}
 
 function asRange(r: RangeDto): vscode.Range {
   return new vscode.Range(
