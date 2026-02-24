@@ -326,7 +326,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.deleteTask(documentUri);
   }
 
-  getMessage(events: EventDto[]): IncompleteReason | undefined {
+  getIncompleteReason(events: EventDto[]): IncompleteReason | undefined {
     if (
       events.some(
         (event) =>
