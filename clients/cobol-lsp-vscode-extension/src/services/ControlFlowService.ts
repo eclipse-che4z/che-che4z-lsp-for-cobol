@@ -29,6 +29,7 @@ import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
 import { getVariablesFromUri } from "./util/FSUtils";
+import { ANALYSIS_LIMIT_ERROR } from "../constants";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -44,10 +45,16 @@ export type ApiResult = {
   documentUri: string;
 };
 
+type IncompleteReason = {
+  code: string;
+  message: string;
+}
+
 export type AnalysisResult = {
   documentUri: string;
   graphs: GraphDTO[];
   locations: string[];
+  incomplete?: IncompleteReason;
 };
 
 interface AnalysisServiceDelegate {
@@ -297,10 +304,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       );
 
       result.resolved = true;
-      const resultObject = {
+      const resultObject: AnalysisResult = {
         documentUri: documentUri,
         graphs: graphs,
         locations: locations,
+        incomplete: this.getMessage(events),
       };
       if (result.resolve) result.resolve(resultObject);
       else result.promise = Promise.resolve(resultObject);
@@ -316,6 +324,21 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     });
 
     this.deleteTask(documentUri);
+  }
+
+  getMessage(events: EventDto[]): IncompleteReason | undefined {
+    if (
+      events.some(
+        (event) =>
+          "eventName" in event && event.eventName === ANALYSIS_LIMIT_ERROR.eventName,
+      )
+    ) {
+      return {
+        code: ANALYSIS_LIMIT_ERROR.code,
+        message: ANALYSIS_LIMIT_ERROR.content
+      }
+    }
+    return undefined;
   }
 
   finishTaskWithError(
