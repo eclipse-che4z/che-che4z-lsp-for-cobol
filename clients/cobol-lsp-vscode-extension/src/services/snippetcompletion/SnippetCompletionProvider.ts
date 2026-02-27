@@ -129,8 +129,8 @@ function createCompletionItem(
  * Return map of all predefined snippets and snippets
  * for all active dialects from JSON files provided by dialects
  */
-async function loadSnippets() {
-  const loadedSnippets = new Map(Object.entries(predefinedSnippets));
+async function loadSnippets(entries = {}): Promise<Map<string, Snippet>> {
+  const loadedSnippets: Map<string, Snippet> = new Map(Object.entries(entries));
   const activeDialects = DialectRegistry.getActiveDialects();
 
   await Promise.all(
@@ -218,7 +218,7 @@ export async function pickSnippet() {
     const editor = vscode.window.activeTextEditor;
     type ItemType = { snippet: Snippet } & vscode.QuickPickItem;
     const snippetList: ItemType[] = [];
-    const snippets = await loadSnippets();
+    const snippets = await loadSnippets(predefinedSnippets);
     const input = vscode.window.createQuickPick<ItemType>();
     input.matchOnDetail = true;
     input.matchOnDescription = true;
