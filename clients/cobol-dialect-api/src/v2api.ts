@@ -17,6 +17,17 @@ import { type CopyStatementParser, MainExtensionId } from "./common";
 
 let v2Api: V2Api | undefined = undefined;
 
+
+export type Token = {
+  name: string;
+  range: vscode.Range;
+};
+
+export type Item = {
+  tokens: Token[];
+  type?: "VARIABLE" | "PROCEDURE";
+};
+
 /**
  * Code for missing copybook diagnostics
  */
@@ -161,5 +172,11 @@ export interface IDocumentProcessingContext {
     | undefined
   >;
   replace(range: vscode.Range, text: string): void;
+  replaceWithMap(
+    range: vscode.Range,
+    statementRange: vscode.Range,
+    tokenItems: Item[],
+    replacementMap: string,
+  ): void;
   addDiagnostic(diagnostic: vscode.Diagnostic): void;
 }

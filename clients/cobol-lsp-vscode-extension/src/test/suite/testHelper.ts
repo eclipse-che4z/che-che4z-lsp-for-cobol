@@ -40,6 +40,12 @@ export async function activate() {
   if (daco && !daco.isActive) {
     await daco.activate();
   }
+  const sample = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-sample-dialect",
+  )!;
+  if (sample && !sample.isActive) {
+    await sample.activate();
+  }
 }
 
 export function getWorkspacePath(): string {

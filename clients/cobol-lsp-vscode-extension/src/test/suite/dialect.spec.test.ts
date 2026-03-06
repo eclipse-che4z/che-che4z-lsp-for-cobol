@@ -14,23 +14,13 @@
 import * as assert from "assert";
 import * as helper from "./testHelper";
 import * as vscode from "vscode";
-import type { activate } from "../../extension";
-
-type RemovePromise<T> = T extends Promise<infer R> ? R : never;
-type ExtensionApi = RemovePromise<ReturnType<typeof activate>>;
 
 suite("Integration Test Suite: Dialect specific tests", function () {
   this.timeout(helper.TEST_TIMEOUT);
-  let api: ExtensionApi["v2"];
 
   suiteSetup(async function () {
     await helper.updateConfig("sample_dialect.json");
     await helper.activate();
-    const tmp = vscode.extensions.getExtension<ExtensionApi>(
-      "BroadcomMFD.cobol-language-support",
-    )?.exports.v2;
-    assert(tmp);
-    api = tmp;
   });
 
   this.afterEach(async function () {
@@ -38,36 +28,91 @@ suite("Integration Test Suite: Dialect specific tests", function () {
     await helper.closeAllEditors();
   });
 
-  test("Register SAMPLE dialect that causes an error", async () => {
-    const dialectHolder = await api.registerDialect(
-      "BroadcomMFD.cobol-language-support",
-      {
-        name: "SAMPLE",
-        description: "SAMPLE dialect support",
-        snippets: vscode.Uri.file(""),
-        isCopyStatement: () => ({ isCopy: false }),
-      },
-      () => {
-        throw Error("Error from dialect");
-      },
+  test("Run SAMPLE dialect", async () => {
+    const editor = await helper.showDocument("cobol-sample/SAMPLE1.cbl");
+
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 4);
+
+    checkDiagnostic(
+      diagnostics,
+      "Errors inside the copybook",
+      24,
+      11,
+      24,
+      33,
+      "COBOL Language Support (copybook)",
     );
 
-    try {
-      const editor = await helper.showDocument("USER1.cbl");
+    checkDiagnostic(
+      diagnostics,
+      "Variable V2 does not exist in structure G2",
+      25,
+      28,
+      25,
+      30,
+      "COBOL Language Support (parsing)",
+    );
 
-      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-      assert.strictEqual(diagnostics.length, 1);
-      const d0 = diagnostics[0];
-      const message =
-        "SAMPLE dialect was stopped due to internal error (required for";
-      const diagMessage = d0.message.substring(0, message.length);
+    checkDiagnostic(
+      diagnostics,
+      "The following paragraph is not defined: P1",
+      25,
+      48,
+      25,
+      50,
+      "COBOL Language Support (parsing)",
+    );
 
-      assert.strictEqual(d0.severity, vscode.DiagnosticSeverity.Error);
-      assert.strictEqual(message, diagMessage);
-    } finally {
-      if (dialectHolder instanceof vscode.Disposable) {
-        dialectHolder.dispose();
-      }
-    }
+    checkDiagnostic(
+      diagnostics,
+      "Sample dialect diagnostic (MAKEDIAG)",
+      26,
+      11,
+      26,
+      19,
+      "COBOL Language Support (dialect)",
+    );
+
+    const copybookEditor = await helper.showDocument("copy-sample/COPY1.cpy");
+    const copybookDiagnostics = await helper.waitForDiagnostics(
+      copybookEditor.document.uri,
+    );
+    helper.printAllDiagnostics(copybookDiagnostics);
+
+    assert.strictEqual(copybookDiagnostics.length, 1);
+
+    checkDiagnostic(
+      copybookDiagnostics,
+      "Sample dialect diagnostic (MAKEDIAG)",
+      1,
+      11,
+      1,
+      19,
+      "COBOL Language Support (dialect)",
+    );
   });
 });
+
+function checkDiagnostic(
+  diagnostics: vscode.Diagnostic[],
+  message: string,
+  startLine: number,
+  startCharacter: number,
+  endLine: number,
+  endCharacter: number,
+  source: string,
+) {
+  const diagnostic = diagnostics.find(
+    (diag) =>
+      diag.message === message &&
+      diag.source === source &&
+      diag.range.start.line === startLine &&
+      diag.range.start.character === startCharacter &&
+      diag.range.end.line === endLine &&
+      diag.range.end.character === endCharacter,
+  );
+  assert.ok(diagnostic, `Diagnostic with message "${message}" not found.`);
+}

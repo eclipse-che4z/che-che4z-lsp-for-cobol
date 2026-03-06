@@ -8,7 +8,14 @@
     "rootDir": "src",
     "strict": true,
     "resolveJsonModule": true,
-    "types": ["node", "jest", "mocha"],
+    "types": ["node"],
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/__tests__/**",
+    "src/test/**"
+  ]
 }

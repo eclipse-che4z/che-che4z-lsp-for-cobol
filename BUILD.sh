@@ -65,5 +65,11 @@ npm ci
 npm run build:web
 cd -
 
+# Build Sample LS extension
+cd clients/sample-dialect-support
+npm ci
+npm run package
+cd -
+
 # Done
 echo "Done building COBOL LS"

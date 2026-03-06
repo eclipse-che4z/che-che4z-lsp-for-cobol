@@ -3926,5 +3926,54 @@
   {
     "name": "org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
     "allDeclaredFields": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DialectProcessingResult",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacement",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacementMap",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacementMap",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DialectCopybookInfo",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.ReplacementTokens",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.ReplacementToken",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
   }
 ]

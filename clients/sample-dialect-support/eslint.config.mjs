@@ -9,9 +9,8 @@ export default [
       ecmaVersion: 8,
       globals: { ...globals.node, ...globals.jest },
       parserOptions: {
-        projectService: true,
         tsconfigRootDir: import.meta.dirname,
-        allowDefaultProject: ["*.mjs"],
+        project: ["./tsconfig.eslint.json"],
       },
     },
   },

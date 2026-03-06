@@ -41,14 +41,14 @@ import org.eclipse.lsp4j.Range;
  * original "this" token. All other characters will be pointed to the provided range
  */
 @UtilityClass
-class TextMapReplacer {
+public class TextMapReplacer {
   private static final char BRACE_OPEN = '{';
   private static final char BRACE_CLOSE = '}';
   private static final char ESCAPE_CHAR = '&';
   private static final char VALUE_REPLACEMENT_CHAR = '|';
 
   @Value
-  private static class Token {
+  public static class Token {
     String value;
     Location originalLocation;
   }
@@ -61,8 +61,9 @@ class TextMapReplacer {
    * @param statementRange - a statement range within the text range
    * @param statementMap - a map of token names and its ranges from the original text
    * @param replacementMap - a new text replacement map
+   * @return a HashMap of mapped tokens
    */
-  public void execute(
+  public Map<String, Token> execute(
       ExtendedText extendedText,
       Range range,
       Range statementRange,
@@ -91,6 +92,7 @@ class TextMapReplacer {
           extendedText.insert(
               r.getStart(), new ExtendedTextLine(t.getValue(), t.getOriginalLocation()));
         });
+    return tokens;
   }
 
   private Map<String, Token> mapStatementTokens(

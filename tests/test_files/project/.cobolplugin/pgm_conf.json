@@ -5,6 +5,10 @@
             "pgroup": "VANILA"
         },
         {
+            "program": "cobol-sample/*",
+            "pgroup": "SAMPLE"
+        },
+        {
             "program": "cobol-idms/*",
             "pgroup": "IDMS"
         },

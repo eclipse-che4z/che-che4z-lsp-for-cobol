@@ -7,6 +7,21 @@
             ]
         },
         {
+            "name": "SAMPLE",
+            "preprocessor": [
+                {
+                    "name": "SAMPLE",
+                    "libs": [
+                        "copy-sample/${fileBasenameNoExtension}",
+                        "copy-sample"
+                    ]
+                }
+            ],
+            "libs": [
+                "copy-sample"
+            ]
+        },
+        {
             "name": "IDMS",
             "preprocessor": [
                 {

@@ -340,10 +340,11 @@ public class ExtendedText {
    * @param statementRange - a statement range within the text range
    * @param statementMap - a map of token names and its ranges from the original text
    * @param replacementMap - a new text replacement map
+   * @return a HashMap of mapped tokens
    */
-  public void replace(
+  public Map<String, TextMapReplacer.Token> replace(
       Range range, Range statementRange, Map<String, Range> statementMap, String replacementMap) {
-    TextMapReplacer.execute(this, range, statementRange, statementMap, replacementMap);
+    return TextMapReplacer.execute(this, range, statementRange, statementMap, replacementMap);
   }
 
   private MappedCharacter getCharacterAt(Position position) {

@@ -19,7 +19,7 @@
     </modules>
 
     <properties>
-        <dialect.api.version>1.0.16</dialect.api.version>
+        <dialect.api.version>1.0.17</dialect.api.version>
         <maven.compiler.release>8</maven.compiler.release>
         <commons.text.version>1.14.0</commons.text.version>
     </properties>
