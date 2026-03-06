@@ -1,0 +1,37 @@
+# *
+# * Copyright (c) 2023 Broadcom.
+# * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+# *
+# * This program and the accompanying materials are made
+# * available under the terms of the Eclipse Public License 2.0
+# * which is available at https://www.eclipse.org/legal/epl-2.0/
+# *
+# * SPDX-License-Identifier: EPL-2.0
+# *
+# * Contributors:
+# *   Broadcom, Inc. - initial API and implementation
+# *
+
+# Ignore everything
+*
+**/*
+../**/*
+
+# Add what we actually want
+
+# * extension metadata
+!LICENSE
+!README.md
+!CHANGELOG.md
+!resources/logo.png
+!package.json
+# * bundled extension code
+!dist/extension.js
+!dist/extension.js.map
+# ** dialect snippets
+!snippets.json
+# ** dialect implementation
+!server/jar/dialect-daco.jar
+# * include coloring syntax
+!syntaxes/daco.injection.json
+
