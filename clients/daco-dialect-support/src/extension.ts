@@ -13,11 +13,51 @@
  */
 
 import * as vscode from "vscode";
-import { getV1Api } from "@code4z/cobol-dialect-api";
+import {
+  getV1Api,
+  getV2Api,
+  IDocumentProcessingContext,
+} from "@code4z/cobol-dialect-api";
+import { DaCoPreprocessor } from "./engine/preprocessor";
 
 let unregisterDialect = () => {};
+const isCopyStatement = (statement: string) => {
+  const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
+  const match = statement.match(regex);
+  if (!match) {
+    return { isCopy: false };
+  }
+  return { isCopy: true, prefix: match[1] };
+};
+
+const DIALECT_NAME = "DaCo";
+const DESCRIPTION = "DaCo dialect support";
 
 export async function activate(context: vscode.ExtensionContext) {
+  const config = vscode.workspace.getConfiguration();
+  const version = config.get<string>("dialect.api.version", "legacy");
+
+  if (version !== "legacy" && version !== "new") {
+    vscode.window.showErrorMessage(
+      `Invalid API version: '${version}'. Expected 'legacy' or 'new'.`,
+    );
+    return;
+  }
+
+  if (version === "legacy") {
+    v1Api(context);
+  } else {
+    v2Api(context);
+  }
+}
+
+export function deactivate() {
+  if (unregisterDialect) {
+    unregisterDialect();
+  }
+}
+
+async function v1Api(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
@@ -33,18 +73,11 @@ export async function activate(context: vscode.ExtensionContext) {
     return;
   }
   const unregister = await v1Api.registerDialect({
-    name: "DaCo",
-    description: "DaCo dialect support",
+    name: DIALECT_NAME,
+    description: DESCRIPTION,
     snippets,
     jar,
-    isCopyStatement: (statement: string) => {
-      const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
-      const match = statement.match(regex);
-      if (!match) {
-        return { isCopy: false };
-      }
-      return { isCopy: true, prefix: match[1] };
-    },
+    isCopyStatement: isCopyStatement,
   });
   if (unregister instanceof Error) {
     vscode.window.showErrorMessage(unregister.toString());
@@ -53,6 +86,38 @@ export async function activate(context: vscode.ExtensionContext) {
   unregisterDialect = unregister;
 }
 
-export function deactivate() {
-  unregisterDialect();
+async function v2Api(context: vscode.ExtensionContext) {
+  const outputChannel = vscode.window.createOutputChannel(DESCRIPTION);
+  const preprocessor = new DaCoPreprocessor();
+
+  const extensionId = context.extension.id;
+  const extensionUri = context.extensionUri;
+  const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
+
+  const v2Api = await getV2Api(extensionId);
+  if (v2Api instanceof Error) {
+    vscode.window.showErrorMessage(v2Api.toString());
+    return;
+  }
+  const unregister = await v2Api.registerDialect(
+    {
+      name: DIALECT_NAME,
+      description: DESCRIPTION,
+      snippets,
+      isCopyStatement: isCopyStatement,
+    },
+    async (
+      context: IDocumentProcessingContext,
+      programUri: vscode.Uri,
+      text: string,
+    ) => {
+      preprocessor.execute(context, programUri, text, outputChannel);
+    },
+  );
+
+  if (unregister instanceof Error) {
+    vscode.window.showErrorMessage(unregister.toString());
+    return;
+  }
+  context.subscriptions.push(unregister);
 }
