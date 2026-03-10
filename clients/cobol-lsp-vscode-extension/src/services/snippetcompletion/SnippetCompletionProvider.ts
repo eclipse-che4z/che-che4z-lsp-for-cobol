@@ -129,7 +129,9 @@ function createCompletionItem(
  * Return map of all predefined snippets and snippets
  * for all active dialects from JSON files provided by dialects
  */
-async function loadSnippets(entries: Record<string, Snippet> = {}): Promise<Map<string, Snippet>> {
+async function loadSnippets(
+  entries: Record<string, Snippet> = {},
+): Promise<Map<string, Snippet>> {
   const loadedSnippets = new Map(Object.entries(entries));
   const activeDialects = DialectRegistry.getActiveDialects();
 
