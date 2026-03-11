@@ -13,5 +13,6 @@
     "cobol-lsp.maxVmCount": -1,
     "files.associations": {
       "**/copybook-analysis/**": "cobol"
-    }
+    },
+    "dialect.api.version": "new"
 }
