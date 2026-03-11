@@ -122,6 +122,7 @@ export async function activate(
     executeCommand: (command, args, next) => {
       if (command == "missing copybook") {
         externalApis?.clearProfiles();
+        externalApis?.clearCache();
       }
       next(command, args);
     },
@@ -132,6 +133,7 @@ export async function activate(
     languageClientService.invalidateConfiguration,
     tarCache,
   );
+  context.subscriptions.push(externalApis);
 
   const analysisService = new ControlFlowAnalysisService(
     outputChannel,

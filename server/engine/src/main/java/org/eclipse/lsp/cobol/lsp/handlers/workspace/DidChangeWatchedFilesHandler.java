@@ -17,11 +17,9 @@ package org.eclipse.lsp.cobol.lsp.handlers.workspace;
 import com.google.inject.Inject;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,8 +28,9 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.UserInterruptException;
 import org.eclipse.lsp.cobol.lsp.DisposableLSPStateService;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
@@ -69,17 +68,25 @@ public class DidChangeWatchedFilesHandler {
   public void didChangeWatchedFiles(@NonNull DidChangeWatchedFilesParams params) {
     if (lspStateService.isServerShutdown()) return;
 
-    Set<FileEvent> relevantChanges = filterRelevantChanges(params.getChanges());
+    List<FileEvent> relevantChanges = filterRelevantChanges(params.getChanges());
     if (relevantChanges.isEmpty()) return;
 
-    logFileChanges(relevantChanges);
+    logFileChanges(relevantChanges.stream().map(FileEvent::getUri).collect(Collectors.toSet()));
     processFileEvents(relevantChanges);
   }
 
-  private Set<FileEvent> filterRelevantChanges(List<FileEvent> changes) {
+  private List<FileEvent> filterRelevantChanges(List<FileEvent> changes) {
     return changes.stream()
         .filter(this::isRelevantFileChange)
-        .collect(Collectors.toCollection(HashSet::new));
+        .filter(
+            event -> {
+              final boolean inEditor = isOpenInEditor(event.getUri());
+              if (inEditor) {
+                LOG.debug("Ignoring change for open file: {}", event.getUri());
+              }
+              return !inEditor;
+            })
+        .collect(Collectors.toList());
   }
 
   private boolean isRelevantFileChange(FileEvent change) {
@@ -96,84 +103,67 @@ public class DidChangeWatchedFilesHandler {
     return uri.startsWith(VSCODE_SCHEME_PREFIX);
   }
 
-  private void logFileChanges(Set<FileEvent> changes) {
-    LOG.info(
-        "[File change event]: {}",
-        changes.stream().map(FileEvent::getUri).collect(Collectors.joining(", ")));
+  private void logFileChanges(Set<String> changes) {
+    LOG.info("[File change event]: {}", changes.stream().collect(Collectors.joining(", ")));
   }
 
-  private void processFileEvents(Set<FileEvent> changes) {
-    Set<ChangeEvent> changeEvents =
-        changes.stream().map(this::mapFileEventToChangeEvent).collect(Collectors.toSet());
-
-    boolean hasNullEvent = changeEvents.stream().anyMatch(Objects::isNull);
-    boolean hasDirectoryEvent =
-        changeEvents.stream().filter(Objects::nonNull).anyMatch(ChangeEvent::isDirectory);
-    if (hasDirectoryEvent || hasNullEvent) {
+  private void processFileEvents(List<FileEvent> changes) {
+    if (changes.stream().anyMatch(DidChangeWatchedFilesHandler::isCreateOrDelete)) {
       analyzeAllOpenedDocuments();
-    } else {
-      Map<String, Set<String>> cobolSourceToCopybookUris =
-          changeEvents.stream()
-              .filter(e -> !e.shouldIgnore)
-              .flatMap(
-                  e ->
-                      e.getAffectedUris().stream()
-                          .map(val -> new AbstractMap.SimpleEntry<>(val, e.getUri())))
-              .collect(
-                  Collectors.groupingBy(
-                      Map.Entry::getKey,
-                      Collectors.mapping(Map.Entry::getValue, Collectors.toSet())));
-
-      cobolSourceToCopybookUris.forEach(
-          (cobolDocUri, copybookUris) -> {
-            if (!sourceUnitGraph.isFileOpened(cobolDocUri)) {
-              asyncAnalysisService.reanalyseProgram(cobolDocUri, copybookUris);
-            }
-          });
+      return;
     }
+
+    final List<Pair<FileEvent, URI>> data =
+        changes.stream()
+            .map(event -> ImmutablePair.of(event, toUri(event)))
+            .filter(p -> p.getRight() != null)
+            .collect(Collectors.toList());
+
+    if (data.stream()
+        .map(p -> p.getRight())
+        .anyMatch(DidChangeWatchedFilesHandler::isDirectoryUri)) {
+      analyzeAllOpenedDocuments();
+      return;
+    }
+
+    Set<ChangeEvent> changeEvents =
+        data.stream()
+            .map(p -> getEffectedSourceChangeEvent(p.getLeft().getUri()))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    Map<String, Set<String>> cobolSourceToCopybookUris =
+        changeEvents.stream()
+            .flatMap(
+                e ->
+                    e.getAffectedUris().stream()
+                        .map(val -> new AbstractMap.SimpleEntry<>(val, e.getUri())))
+            .collect(
+                Collectors.groupingBy(
+                    Map.Entry::getKey,
+                    Collectors.mapping(Map.Entry::getValue, Collectors.toSet())));
+
+    cobolSourceToCopybookUris.forEach(
+        (cobolDocUri, copybookUris) -> {
+          asyncAnalysisService.reanalyseProgram(cobolDocUri, copybookUris);
+        });
   }
 
-  private ChangeEvent mapFileEventToChangeEvent(FileEvent event) {
+  private static boolean isCreateOrDelete(FileEvent event) {
+    return event.getType() == FileChangeType.Deleted || event.getType() == FileChangeType.Created;
+  }
+
+  private static URI toUri(FileEvent event) {
     try {
-      URI uri = URI.create(event.getUri());
-      if (FILE_SCHEME.equals(uri.getScheme())) {
-        return getLocalFileSystemChange(event, uri);
-      } else {
-        return getEffectedSourceChangeEvent(event.getUri());
-      }
+      return URI.create(event.getUri());
     } catch (IllegalArgumentException e) {
       LOG.error("Invalid URI in FileEvent:{}, error:{}", event.getUri(), e.getMessage());
       return null;
     }
   }
 
-  private ChangeEvent getLocalFileSystemChange(FileEvent event, URI uri) {
-    try {
-      Path path = getEffectivePath(event, uri);
-      String fileUri = path.toUri().toString();
-
-      if (isOpenInEditor(fileUri)) {
-        LOG.debug("Ignoring change for open file: {}", fileUri);
-        ChangeEvent changeEvent = new ChangeEvent(uri.getPath(), false);
-        changeEvent.setShouldIgnore(true);
-        return changeEvent;
-      }
-
-      if (Files.isDirectory(path)) {
-        return new ChangeEvent(uri.getPath(), true);
-      } else {
-        return getEffectedSourceChangeEvent(fileUri);
-      }
-    } catch (Exception e) {
-      LOG.error(
-          "Error handling local file system change:{}, for uri {}", e.getMessage(), event.getUri());
-      return null;
-    }
-  }
-
-  private Path getEffectivePath(FileEvent event, URI uri) {
-    Path path = Paths.get(uri);
-    return event.getType() == FileChangeType.Deleted ? path.getParent() : path;
+  private static boolean isDirectoryUri(URI uri) {
+    return FILE_SCHEME.equals(uri.getScheme()) && Files.isDirectory(Paths.get(uri));
   }
 
   private boolean isOpenInEditor(String uri) {
@@ -183,9 +173,7 @@ public class DidChangeWatchedFilesHandler {
   private ChangeEvent getEffectedSourceChangeEvent(String uri) {
     List<String> associatedUris = sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
     if (associatedUris.isEmpty()) {
-      ChangeEvent event = new ChangeEvent(uri, associatedUris);
-      event.setShouldIgnore(true);
-      return event;
+      return null;
     }
     return new ChangeEvent(uri, associatedUris);
   }
@@ -205,7 +193,6 @@ public class DidChangeWatchedFilesHandler {
     private final String uri;
     private final boolean isDirectory;
     private final List<String> affectedUris;
-    @Setter private boolean shouldIgnore;
 
     private ChangeEvent(String uri, boolean isDirectory) {
       this(uri, isDirectory, Collections.emptyList());
@@ -219,7 +206,6 @@ public class DidChangeWatchedFilesHandler {
       this.uri = uri;
       this.isDirectory = isDirectory;
       this.affectedUris = affectedUris;
-      this.shouldIgnore = false;
     }
   }
 }

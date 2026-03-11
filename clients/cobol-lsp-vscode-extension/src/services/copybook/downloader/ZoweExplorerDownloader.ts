@@ -20,6 +20,8 @@ export interface MemberCacheItem {
   extension?: string;
 }
 
+const extractPartialId = /\/([^/]+)\/(.*)\/[^/]+/;
+
 export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
     new Map();
@@ -35,6 +37,19 @@ export abstract class ZoweExplorerDownloader {
    */
   public clearMemberListCache() {
     this.memberListCache.clear();
+  }
+
+  public fsChanged(uri: vscode.Uri) {
+    const m = extractPartialId.exec(uri.path);
+    if (!m) return;
+
+    const profile = m[1];
+    const partialPath = m[2];
+    const partialKey = `${profile}|${partialPath}`;
+
+    [...this.memberListCache.keys()]
+      .filter((x) => x.startsWith(partialKey))
+      .forEach((k) => this.memberListCache.delete(k));
   }
 
   public reenableFailedRequests() {
