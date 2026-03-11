@@ -83,6 +83,18 @@
             "S999"
           ],
           "uniqueItems": true
+        },
+        "dialect.api.version": {
+          "type": "string",
+          "default": "legacy",
+          "enum": [
+            "legacy",
+            "new"
+          ],
+          "description": "Internal setting. Controls Dialect API implementation version.",
+          "tags": [
+            "internal"
+          ]
         }
       }
     }
