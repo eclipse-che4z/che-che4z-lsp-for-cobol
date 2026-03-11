@@ -36,13 +36,6 @@ const DIALECT_API_VERSION_CONFIG = "dialect.api.version";
 
 export async function activate(context: vscode.ExtensionContext) {
   updateApiVersion(context);
-
-  const disposable = vscode.workspace.onDidChangeConfiguration((e) => {
-    if (e.affectsConfiguration(DIALECT_API_VERSION_CONFIG)) {
-      updateApiVersion(context);
-    }
-  });
-  context.subscriptions.push(disposable);
 }
 
 export function deactivate() {
