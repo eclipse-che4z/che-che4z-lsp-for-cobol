@@ -46,9 +46,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  if (unregisterDialect) {
     unregisterDialect();
-  }
 }
 
 async function updateApiVersion(context: vscode.ExtensionContext) {
@@ -63,9 +61,7 @@ async function updateApiVersion(context: vscode.ExtensionContext) {
     return;
   }
 
-  if (unregisterDialect) {
-    unregisterDialect();
-  }
+  unregisterDialect();
 
   if (version === "legacy") {
     v1Api(context);
