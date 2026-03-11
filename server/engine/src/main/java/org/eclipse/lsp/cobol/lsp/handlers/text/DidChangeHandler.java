@@ -45,10 +45,8 @@ public class DidChangeHandler {
    * Handle LSP didChange event.
    *
    * @param params DidChangeTextDocumentParams.
-   * @param eventSource
    */
-  public void didChange(
-      DidChangeTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
+  public void didChange(DidChangeTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
@@ -59,13 +57,13 @@ public class DidChangeHandler {
       List<String> allAssociatedFilesForACopybook =
           sourceUnitGraph.getAllAssociatedFilesForACopybook(uri);
       asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-          allAssociatedFilesForACopybook, uri, text, SourceUnitGraph.EventSource.IDE);
+          allAssociatedFilesForACopybook, uri, text);
       return;
     }
     CobolDocumentModel model = documentModelService.changeDocument(uri, text);
     if (model != null) {
       asyncAnalysisService.scheduleAnalysis(
-          model, params.getTextDocument().getVersion(), false, false, eventSource);
+          model, params.getTextDocument().getVersion(), false, false);
     }
   }
 }

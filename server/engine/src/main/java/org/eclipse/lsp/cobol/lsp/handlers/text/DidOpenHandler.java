@@ -42,9 +42,8 @@ public class DidOpenHandler {
    * Handle didOpen LSP request.
    *
    * @param params didOpen parameters.
-   * @param eventSource
    */
-  public void didOpen(DidOpenTextDocumentParams params, SourceUnitGraph.EventSource eventSource) {
+  public void didOpen(DidOpenTextDocumentParams params) {
     String uri = params.getTextDocument().getUri();
     if (!HandlerUtility.isUriSupported(uri)) {
       return;
@@ -60,7 +59,7 @@ public class DidOpenHandler {
     }
 
     asyncAnalysisService.scheduleAnalysis(
-        model, params.getTextDocument().getVersion(), true, false, eventSource);
+        model, params.getTextDocument().getVersion(), true, false);
   }
 
   /**

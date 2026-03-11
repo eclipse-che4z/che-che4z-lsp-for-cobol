@@ -62,41 +62,40 @@ public class SourceUnitGraph implements AnalysisStateListener {
   }
 
   @Override
-  public void notifyState(AnalysisState state, CobolDocumentModel model, EventSource eventSource) {
+  public void notifyState(AnalysisState state, CobolDocumentModel model) {
     switch (state) {
       case SKIPPED:
       case STARTED:
       case ANALYSING:
       case SCHEDULED:
-        updateDocumentGraphUponSchedule(model, eventSource);
+        updateDocumentGraphUponSchedule(model);
         break;
       case COMPLETED:
-        updateDocumentGraphUponCompletion(model, eventSource);
+        updateDocumentGraphUponCompletion(model);
         break;
       case EXCEPTIONALLY_FINISHED:
       default:
     }
   }
 
-  private void updateDocumentGraphUponSchedule(CobolDocumentModel model, EventSource eventSource) {
-    updateGraphNodes(model, eventSource);
+  private void updateDocumentGraphUponSchedule(CobolDocumentModel model) {
+    updateGraphNodes(model);
   }
 
   private String getContent(CobolDocumentModel model) {
     return Optional.ofNullable(model.getText()).orElseGet(() -> getContent(model.getUri()));
   }
 
-  private synchronized void updateDocumentGraphUponCompletion(
-      CobolDocumentModel model, EventSource eventSource) {
-    updateGraphNodes(model, eventSource);
+  private synchronized void updateDocumentGraphUponCompletion(CobolDocumentModel model) {
+    updateGraphNodes(model);
     invalidateGraphLinks(model.getUri());
     if (isUserSuppliedCopybook(model.getUri()) || model.getAnalysisResult() == null) {
       return;
     }
-    updateGraphLink(model, eventSource);
+    updateGraphLink(model);
   }
 
-  private void updateGraphLink(CobolDocumentModel model, EventSource eventSource) {
+  private void updateGraphLink(CobolDocumentModel model) {
     List<CopyNode> copyNodes =
         model
             .getAnalysisResult()
@@ -108,7 +107,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
     List<NodeV> references = new ArrayList<>();
     for (CopyNode copyNode : copyNodes) {
       String parentUri = copyNode.getLocality().getUri();
-      NodeV copyNodeV = getNode(copyNode, eventSource);
+      NodeV copyNodeV = getNode(copyNode);
       if (!copyNodeV.isDirty) {
         objectRef.computeIfPresent(
             copyNode.getUri(),
@@ -171,13 +170,12 @@ public class SourceUnitGraph implements AnalysisStateListener {
         .anyMatch(copyUri -> copyUri.equals(uri));
   }
 
-  private void updateGraphNodes(CobolDocumentModel model, EventSource eventSource) {
+  private void updateGraphNodes(CobolDocumentModel model) {
     Location location = new Location();
     location.setUri(model.getUri());
     NodeV defaultNodeForModel =
         new NodeV(
             model.getUri(),
-            eventSource,
             Sets.newConcurrentHashSet(Sets.newHashSet(location)),
             false,
             false,
@@ -188,7 +186,6 @@ public class SourceUnitGraph implements AnalysisStateListener {
         (uri, node) -> {
           if (node == null) return defaultNodeForModel;
           node.setOpenInIde(true);
-          node.setLastUpdatedBy(eventSource);
           node.setContent(model.getText());
           return node;
         });
@@ -219,7 +216,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
     }
   }
 
-  private NodeV getNode(CopyNode copyNode, EventSource eventSource) {
+  private NodeV getNode(CopyNode copyNode) {
     String content = null;
     String uri = null;
     boolean isDirty = true;
@@ -230,7 +227,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
       uri = copyNode.getUri();
       isDirty = false;
     }
-    return new NodeV(uri, eventSource, references, true, isDirty, content, false);
+    return new NodeV(uri, references, true, isDirty, content, false);
   }
 
   /**
@@ -391,17 +388,10 @@ public class SourceUnitGraph implements AnalysisStateListener {
   @Getter
   public class NodeV {
     @EqualsAndHashCode.Include private String uri;
-    @Setter private EventSource lastUpdatedBy;
     @Setter private Set<Location> referencedLocation;
     private boolean isCopybook;
     @Setter private boolean isDirty;
     @Setter private String content;
     @Setter private boolean isOpenInIde;
-  }
-
-  /** Represent different source for event for the LSP server */
-  public enum EventSource {
-    FILE_SYSTEM,
-    IDE
   }
 }

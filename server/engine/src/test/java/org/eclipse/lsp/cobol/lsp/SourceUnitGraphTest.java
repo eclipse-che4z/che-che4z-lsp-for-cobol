@@ -51,9 +51,7 @@ class SourceUnitGraphTest {
     String initialDocumentText = "sample text for test";
     String updatedContent = "Updated content";
     sourceUnitGraph.notifyState(
-        AnalysisState.STARTED,
-        new CobolDocumentModel(URI, initialDocumentText),
-        SourceUnitGraph.EventSource.FILE_SYSTEM);
+        AnalysisState.STARTED, new CobolDocumentModel(URI, initialDocumentText));
 
     assertEquals(initialDocumentText, sourceUnitGraph.getContent(URI));
     assertTrue(sourceUnitGraph.isFileOpened(URI));
@@ -95,8 +93,7 @@ class SourceUnitGraphTest {
     when(rootNode.getDepthFirstStream()).thenReturn(Stream.of(copyNode1, copyNode2, copyNode3));
     AnalysisResult analysisResult = AnalysisResult.builder().rootNode(rootNode).build();
     CobolDocumentModel model = new CobolDocumentModel(URI, "text", analysisResult);
-    sourceUnitGraph.notifyState(
-        AnalysisState.COMPLETED, model, SourceUnitGraph.EventSource.FILE_SYSTEM);
+    sourceUnitGraph.notifyState(AnalysisState.COMPLETED, model);
 
     assertEquals("some dummy text", sourceUnitGraph.getCopyNodeContent(copyNode3));
     assertTrue(sourceUnitGraph.isUserSuppliedCopybook(copy1Uri));

@@ -127,8 +127,7 @@ public class DidChangeWatchedFilesHandler {
       cobolSourceToCopybookUris.forEach(
           (cobolDocUri, copybookUris) -> {
             if (!sourceUnitGraph.isFileOpened(cobolDocUri)) {
-              asyncAnalysisService.reanalyseProgram(
-                  cobolDocUri, copybookUris, SourceUnitGraph.EventSource.FILE_SYSTEM);
+              asyncAnalysisService.reanalyseProgram(cobolDocUri, copybookUris);
             }
           });
     }
@@ -193,7 +192,7 @@ public class DidChangeWatchedFilesHandler {
 
   private void analyzeAllOpenedDocuments() {
     try {
-      asyncAnalysisService.reanalyseOpenedPrograms(SourceUnitGraph.EventSource.FILE_SYSTEM);
+      asyncAnalysisService.reanalyseOpenedPrograms();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new UserInterruptException("Analysis interrupted", e);

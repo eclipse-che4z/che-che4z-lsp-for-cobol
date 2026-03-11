@@ -88,7 +88,6 @@ class AsyncAnalysisServiceTest {
       throw new RuntimeException(e);
     }
     List<String> uris = Stream.of("URI1", "URI2").collect(Collectors.toList());
-    SourceUnitGraph.EventSource eventSource = mock(SourceUnitGraph.EventSource.class);
     CobolDocumentModel cobolDocumentModel = mock(CobolDocumentModel.class);
     when(cobolDocumentModel.getUri()).thenReturn("URI1");
     when(cobolDocumentModel.getText()).thenReturn("code");
@@ -97,7 +96,7 @@ class AsyncAnalysisServiceTest {
     when(analysisService.isCopybook(anyString(), anyString())).thenReturn(false);
     analysisResultsRevisionsMock.put(cobolDocumentModel.getUri(), 1);
     asyncAnalysisService.reanalyseCopybooksAssociatedPrograms(
-        uris, "copybookUri", "copybookContent", eventSource);
+        uris, "copybookUri", "copybookContent");
 
     verify(cobolDocumentModel, times(2)).getText();
   }

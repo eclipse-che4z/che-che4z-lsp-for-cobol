@@ -107,21 +107,16 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param currentRevision the document currentRevision
    * @param open Is document just opened, or it's reanalyse request
    * @param force forcefully schedule the analysis
-   * @param eventSource source of the event
    * @return document model with analysis result
    */
   public synchronized FutureTask<CobolDocumentModel> scheduleAnalysis(
-      CobolDocumentModel documentModel,
-      Integer currentRevision,
-      boolean open,
-      boolean force,
-      SourceUnitGraph.EventSource eventSource) {
+      CobolDocumentModel documentModel, Integer currentRevision, boolean open, boolean force) {
     final String uri = documentModel.getUri();
-    notifyAllListeners(AnalysisState.SCHEDULED, documentModel, eventSource);
+    notifyAllListeners(AnalysisState.SCHEDULED, documentModel);
     String id = makeId(uri, currentRevision);
     Integer prevId = analysisResultsRevisions.put(uri, currentRevision);
     if (currentRevision.equals(prevId) && !force) {
-      notifyAllListeners(AnalysisState.SKIPPED, documentModel, eventSource);
+      notifyAllListeners(AnalysisState.SKIPPED, documentModel);
       return analysisResults.get(id);
     }
     ExecutorService analysisExecutor = getExecutor(uri);
@@ -129,8 +124,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       cancelRunningAnalysis(ImmutableList.of(documentModel));
     }
     FutureTask<CobolDocumentModel> futureTask =
-        new FutureTask<>(
-            scheduleAnalysis(documentModel, currentRevision, open, force, eventSource, id));
+        new FutureTask<>(scheduleAnalysis(documentModel, currentRevision, open, force, id));
 
     analysisResults.put(id, futureTask);
     analysisExecutor.submit(futureTask);
@@ -158,14 +152,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       Integer currentRevision,
       boolean open,
       boolean force,
-      SourceUnitGraph.EventSource eventSource,
       String id) {
     final String uri = documentModel.getUri();
     final String text = documentModel.getText();
     final String langId = documentModel.getLanguageId();
     return () -> {
       if (currentRevision < analysisResultsRevisions.get(uri) && !force) {
-        notifyAllListeners(AnalysisState.SKIPPED, documentModel, eventSource);
+        notifyAllListeners(AnalysisState.SKIPPED, documentModel);
         LOG.debug(
             "[scheduleAnalysis] skip revision: "
                 + currentRevision
@@ -176,7 +169,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
       LOG.debug("[scheduleAnalysis] waiting for previous analysis of {} to finish", uri);
       try {
         LOG.debug("[scheduleAnalysis] Start analysis: " + uri);
-        notifyAllListeners(AnalysisState.STARTED, documentModel, eventSource);
+        notifyAllListeners(AnalysisState.STARTED, documentModel);
         communications.notifyProgressBegin(uri);
         documentModel.setOutlineResult(null);
 
@@ -188,7 +181,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
           postCFASTResults(uri, result);
         }
 
-        notifyAllListeners(AnalysisState.COMPLETED, newDocumentModel, eventSource);
+        notifyAllListeners(AnalysisState.COMPLETED, newDocumentModel);
         analysisResults.remove(id);
         return newDocumentModel;
       } catch (
@@ -202,7 +195,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             genericException);
         CobolDocumentModel newDocumentModel =
             documentModelService.processAnalysisResult(uri, AnalysisResult.EMPTY, text);
-        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, newDocumentModel, eventSource);
+        notifyAllListeners(AnalysisState.EXCEPTIONALLY_FINISHED, newDocumentModel);
         return newDocumentModel;
       } finally {
         if (Objects.equals(analysisResultsRevisions.get(uri), currentRevision) || force) {
@@ -243,22 +236,13 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     return revision + "#" + uri;
   }
 
-  /** Trigger reanalyse of opened programs considering its triggered by IDE. */
-  public void reanalyseOpenedPrograms() throws InterruptedException {
-    reanalyseOpenedPrograms(SourceUnitGraph.EventSource.IDE);
-  }
-
   /**
    * Trigger reanalyse of passed programs based on source event (IDE or FILE_SYSTEM).
    *
    * @param cobolDocUri document URI to be analyzed
    * @param invalidCopybookUris List of copybook uri which has affected this analysis
-   * @param eventSource {@link org.eclipse.lsp.cobol.lsp.SourceUnitGraph.EventSource}
    */
-  public void reanalyseProgram(
-      String cobolDocUri,
-      Set<String> invalidCopybookUris,
-      SourceUnitGraph.EventSource eventSource) {
+  public void reanalyseProgram(String cobolDocUri, Set<String> invalidCopybookUris) {
     copybookService.getCopybookUsage(cobolDocUri).stream()
         .filter(model -> Objects.nonNull(model.getUri()))
         .filter(model -> invalidCopybookUris.contains(model.getUri()))
@@ -270,17 +254,11 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
 
     CobolDocumentModel document = documentModelService.get(cobolDocUri);
     if (document != null)
-      scheduleAnalysis(
-          document, analysisResultsRevisions.get(document.getUri()), false, true, eventSource);
+      scheduleAnalysis(document, analysisResultsRevisions.get(document.getUri()), false, true);
   }
 
-  /**
-   * Trigger reanalyse of opened programs based on source event (IDE or FILE_SYSTEM).
-   *
-   * @param eventSource {@link org.eclipse.lsp.cobol.lsp.SourceUnitGraph.EventSource}
-   */
-  public void reanalyseOpenedPrograms(SourceUnitGraph.EventSource eventSource)
-      throws InterruptedException {
+  /** Trigger reanalyse of opened programs based on source event (IDE or FILE_SYSTEM). */
+  public void reanalyseOpenedPrograms() throws InterruptedException {
     List<CobolDocumentModel> openDocuments =
         documentModelService.getAllOpened().stream()
             .filter(d -> !analysisService.isCopybook(d.getUri(), d.getText()))
@@ -291,11 +269,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
     openDocuments.forEach(
         doc ->
             scheduleAnalysis(
-                doc,
-                analysisResultsRevisions.getOrDefault(doc.getUri(), 0),
-                false,
-                true,
-                eventSource));
+                doc, analysisResultsRevisions.getOrDefault(doc.getUri(), 0), false, true));
   }
 
   private void cancelRunningAnalysis(List<CobolDocumentModel> openDocuments) {
@@ -312,13 +286,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @param uris
    * @param copybookUri
    * @param copybookContent
-   * @param eventSource
    */
   public void reanalyseCopybooksAssociatedPrograms(
-      List<String> uris,
-      String copybookUri,
-      String copybookContent,
-      SourceUnitGraph.EventSource eventSource) {
+      List<String> uris, String copybookUri, String copybookContent) {
     documentModelService.removeDocumentDiagnostics(copybookUri);
     Optional.ofNullable(documentModelService.get(copybookUri))
         .ifPresent(model -> model.update(copybookContent));
@@ -346,8 +316,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
 
       subroutineService.invalidateCache();
       LOG.info("Cache invalidated");
-      scheduleAnalysis(
-          documentModel, analysisResultsRevisions.getOrDefault(uri, 0), false, true, eventSource);
+      scheduleAnalysis(documentModel, analysisResultsRevisions.getOrDefault(uri, 0), false, true);
     }
   }
 
@@ -422,11 +391,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
   }
 
   @Override
-  public void notifyAllListeners(
-      AnalysisState state, CobolDocumentModel model, SourceUnitGraph.EventSource eventSource) {
+  public void notifyAllListeners(AnalysisState state, CobolDocumentModel model) {
     SINGLE_THREAD_EXECUTOR.execute(
-        () ->
-            this.analysisStateListeners.forEach(lis -> lis.notifyState(state, model, eventSource)));
+        () -> this.analysisStateListeners.forEach(lis -> lis.notifyState(state, model)));
   }
 
   /**
