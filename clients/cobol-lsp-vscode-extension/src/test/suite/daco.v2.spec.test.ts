@@ -49,10 +49,7 @@ suiteifJavaBasedServer(
         "Unexpected number of diagnostics",
       );
 
-      assert.ok(
-        diagnostics[0].message.includes("Variable name COPY is not allowed"),
-        `Unexpected diagnostic message: '${diagnostics[0].message}'`,
-      );
+      assert.match(diagnostics[0].message, /Variable name COPY is not allowed/);
     });
   },
 );
