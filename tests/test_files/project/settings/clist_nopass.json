@@ -1,5 +1,6 @@
 {
     "cobol-lsp.cpy-manager.profiles": "noPass",
     "cobol-lsp.cpy-manager.paths-dsn": ["CLIST"],
-    "cobol-lsp.maxVmCount": -1
+    "cobol-lsp.maxVmCount": -1,
+    "dialect.api.version": "new"
 }

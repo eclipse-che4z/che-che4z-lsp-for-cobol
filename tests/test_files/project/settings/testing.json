@@ -2,5 +2,6 @@
   "cobol-lsp.cpy-manager.profiles": "",
   "cobol-lsp.cpy-manager.paths-local": ["testing"],
   "cobol-lsp.cpy-manager.paths-dsn": [],
-  "cobol-lsp.maxVmCount": -1
+  "cobol-lsp.maxVmCount": -1,
+  "dialect.api.version": "new"
 }

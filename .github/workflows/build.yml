@@ -28,10 +28,12 @@ on:
     branches:
       - development
       - master
+      - new-daco
   push:
     branches:
       - development
       - master
+      - new-daco
 
 jobs:
   checks:
