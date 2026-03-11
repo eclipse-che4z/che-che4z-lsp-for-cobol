@@ -12,5 +12,6 @@
       ],
     "cobol-lsp.cpy-manager.paths-dsn": [],
     "editor.snippetSuggestions": "top",
-    "files.autoSave": "off"
+    "files.autoSave": "off",
+    "dialect.api.version": "new"
 }
