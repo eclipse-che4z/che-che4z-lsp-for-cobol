@@ -15,39 +15,44 @@ import * as vscode from "vscode";
 import * as assert from "assert";
 import * as helper from "./testHelper";
 
-const isNativeBasedServer = "NATIVE" === vscode.workspace
-  .getConfiguration('cobol-lsp')
-  .get<string | null>('serverRuntime');
+const isNativeBasedServer =
+  "NATIVE" ===
+  vscode.workspace
+    .getConfiguration("cobol-lsp")
+    .get<string | null>("serverRuntime");
 
 const suiteifJavaBasedServer = isNativeBasedServer ? suite.skip : suite;
 
-suiteifJavaBasedServer("Integration Test Suite: New DaCo Dialect specific tests", function () {
-  this.timeout(helper.TEST_TIMEOUT);
-
-  suiteSetup(async function () {
-    await helper.updateConfig("daco.json");
-    await helper.activate();
-  });
-
-  this.afterEach(async function () {
+suiteifJavaBasedServer(
+  "Integration Test Suite: New DaCo Dialect specific tests",
+  function () {
     this.timeout(helper.TEST_TIMEOUT);
-    await helper.closeAllEditors();
-  });
 
-  test("Run New DaCo dialect", async () => {
-    const editor = await helper.showDocument("cobol-daco/DACOSMPL.cbl");
-    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    suiteSetup(async function () {
+      await helper.updateConfig("daco.json");
+      await helper.activate();
+    });
 
-    helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(
-      diagnostics.length,
-      27,
-      "Unexpected number of diagnostics",
-    );
+    this.afterEach(async function () {
+      this.timeout(helper.TEST_TIMEOUT);
+      await helper.closeAllEditors();
+    });
 
-    assert.ok(
-      diagnostics[0].message.includes("Variable name COPY is not allowed"),
-      `Unexpected diagnostic message: '${diagnostics[0].message}'`,
-    );
-  });
-});
+    test("Run New DaCo dialect", async () => {
+      const editor = await helper.showDocument("cobol-daco/DACOSMPL.cbl");
+      const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+
+      helper.printAllDiagnostics(diagnostics);
+      assert.strictEqual(
+        diagnostics.length,
+        27,
+        "Unexpected number of diagnostics",
+      );
+
+      assert.ok(
+        diagnostics[0].message.includes("Variable name COPY is not allowed"),
+        `Unexpected diagnostic message: '${diagnostics[0].message}'`,
+      );
+    });
+  },
+);
