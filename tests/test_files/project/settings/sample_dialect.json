@@ -14,5 +14,6 @@
     "editor.snippetSuggestions": "top",
     "files.autoSave": "off",
     "cobol-lsp.dialects": ["SAMPLE"],
-    "cobol-lsp.maxVmCount": -1
+    "cobol-lsp.maxVmCount": -1,
+    "dialect.api.version": "new"
 }
