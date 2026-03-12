@@ -294,7 +294,7 @@ The `proc_grps.json` file is formatted as an array of JSON elements, with one JS
             - Specify whether the TAR file is stored locally, in a mainframe data set, or in a USS folder. The allowed values are **"local"**, **"DSN"** and **"uss"**.  
         - **"tarFileLocation":** (string)
             - Specify the path to the TAR file.
-        - (Optional) **"searchPattern":** (string)
+        - (Optional) **"folderPattern":** (string)
             - Specify a path within the TAR file to index for copybooks. If you do not specify this parameter, the entire TAR file is indexed.
         - (Optional) **"profile":** (string)
             - Specify the name of a Zowe profile to use to download a TAR file that is stored remotely. If you do not include this parameter, the Zowe profile specified in the extension settings is used. 
@@ -420,7 +420,7 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                         {
                              "locationType": "uss",
                              "tarFileLocation": "/remote/uss/idms/cpy.tar",
-                             "searchPattern": "accounts/cpy"
+                             "folderPattern": "accounts/cpy"
                         }
                         ]
                 }, 
