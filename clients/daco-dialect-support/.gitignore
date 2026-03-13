@@ -1,3 +1,4 @@
 out
 dist/*
 !dist/note.md
+src/generated
