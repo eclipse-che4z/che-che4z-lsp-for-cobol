@@ -26,8 +26,7 @@
 !resources/logo.png
 !package.json
 # * bundled extension code
-!dist/extension.js
-!dist/extension.js.map
+!dist/**/*
 # ** dialect snippets
 !snippets.json
 # ** dialect implementation
