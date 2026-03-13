@@ -18,3 +18,5 @@ out
 *.md
 # Ignore npm package lock
 package-lock.json
+# Ignore Antlr generated files
+src/generated
