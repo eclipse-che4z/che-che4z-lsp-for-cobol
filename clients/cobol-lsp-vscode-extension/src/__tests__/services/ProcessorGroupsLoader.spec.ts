@@ -233,7 +233,7 @@ describe("ProcessorGroupsLoader", () => {
       expect(preprocessors).not.toBeUndefined();
       expect(preprocessors?.length).toBe(2);
       expect(preprocessors?.[0].name).toBe("PREPROC1");
-      expect(preprocessors?.[1].name).toBe("DB2");
+      expect(preprocessors?.[1].name).toBe("SQL");
     });
   });
 });
