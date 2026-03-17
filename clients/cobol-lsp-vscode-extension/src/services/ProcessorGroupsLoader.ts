@@ -33,8 +33,8 @@ const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
 const PG_PROC_FILE = "proc_grps.json";
 
-const translatePreprocessor: { [key: string]: "DB2" | "CICS" } = Object.freeze({
-  DSNHPC: "DB2",
+const translatePreprocessor: { [key: string]: "SQL" | "CICS" } = Object.freeze({
+  DSNHPC: "SQL",
   DFHECP1$: "CICS",
 });
 
@@ -204,7 +204,7 @@ const readEndevorConfigCached = new Memoize(
     if (endevorData) {
       const processorGroups = endevorData.pgroups
         .map(transformProcessorGroup([EndevorElementLib, EndevorMemberLib]))
-        .map(renameProcessorGroup);
+        .map(renamePreprocessors);
 
       processorGroups.forEach((pg) => {
         workspaceConfig.processorGroups[pg.name] = pg;
@@ -388,7 +388,7 @@ const transformProcessorGroup =
     return result;
   };
 
-const renameProcessorGroup = (pg: ProcessorGroup): ProcessorGroup => {
+const renamePreprocessors = (pg: ProcessorGroup): ProcessorGroup => {
   if (pg.preprocessors) {
     pg.preprocessors = pg.preprocessors.map((p) => ({
       ...p,
