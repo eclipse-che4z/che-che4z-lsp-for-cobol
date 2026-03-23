@@ -29,7 +29,10 @@ import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
 import { getVariablesFromUri } from "./util/FSUtils";
-import { ANALYSIS_LIMIT_REASON } from "../constants";
+import {
+  ANALYSIS_LIMIT_REASON,
+  SETTINGS_UNREACHABLE_CODE_SEVERITY,
+} from "../constants";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -95,20 +98,24 @@ type LatestResultData = {
 );
 
 export class AnalysisTask {
-  private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
+  private worker: Worker | undefined;
 
   constructor(
     private documentUri: string,
-    public programs: Program[],
-    public requestVersion: number,
+    private programs: Program[],
+    private requestVersion: number,
     private delegate: AnalysisServiceDelegate,
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
   ) {
     this.logChannel?.debug(
-      `Create new task with request version: ${requestVersion}`,
+      `Create new task with request version: ${this.requestVersion}`,
     );
+  }
 
+  start() {
+    if (this.worker) return;
+    this.worker = new Worker(join(__dirname, "./Worker.js"));
     this.worker.on("message", (data: WorkerResultMessage) => {
       if (data.type === "result") {
         this.delegate.finishTask(
@@ -154,16 +161,15 @@ export class AnalysisTask {
         this.requestVersion,
       );
     });
-
     this.worker.postMessage({
       vmCount: SettingsService.getMaxVMCount(),
       severity: SettingsService.getUnreachableCodeSeverity()?.valueOf(),
-      programs: programs,
+      programs: this.programs,
     });
   }
 
   public async abort() {
-    await this.worker.terminate();
+    await this.worker?.terminate();
   }
 }
 
@@ -182,6 +188,8 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private requestVersion: number = 1;
   private hideProgress?: () => void = undefined;
 
+  private toDispose: vscode.Disposable[] = [];
+
   public constructor(
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
@@ -189,6 +197,19 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
+
+    this.toDispose.push(
+      vscode.workspace.onDidChangeConfiguration((e) => {
+        if (!e.affectsConfiguration(SETTINGS_UNREACHABLE_CODE_SEVERITY)) return;
+        if (SettingsService.getUnreachableCodeSeverity() !== undefined)
+          this.tasks.forEach((x) => x.start());
+      }),
+    );
+  }
+
+  public dispose() {
+    this.toDispose.forEach((x) => void x.dispose());
+    this.toDispose = [];
   }
 
   private setTask(documentUri: string, task: AnalysisTask) {
@@ -227,6 +248,8 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.logChannel?.debug(
       `Get analysis request for the document: ${documentUri}`,
     );
+
+    this.tasks.get(documentUri)?.start();
 
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.promise) {
@@ -278,6 +301,8 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       this.mainChannel,
       this.logChannel,
     );
+    if (SettingsService.getUnreachableCodeSeverity() !== undefined)
+      task.start();
     this.setTask(documentUri, task);
   }
 

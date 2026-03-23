@@ -17,6 +17,8 @@ import {
   ControlFlowAnalysisService,
 } from "../../services/ControlFlowService";
 import { LogOutputChannel } from "vscode";
+import { getConfigurationResult } from "../../__mocks__/vscode";
+import { SETTINGS_UNREACHABLE_CODE_SEVERITY } from "../../constants";
 
 const apiResult: ApiResult = {
   controlFlowAST: [
@@ -100,6 +102,14 @@ jest.mock("worker_threads", () => ({
 }));
 
 describe("ControlFlowService tests", () => {
+  beforeEach(() => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "ERROR";
+  });
+
+  afterEach(() => {
+    delete getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY];
+  });
+
   test("Build queued for analysis", async () => {
     const service = new ControlFlowAnalysisService();
     const queueAnalysis = jest.spyOn(service, "queueAnalysis");
@@ -141,6 +151,7 @@ describe("ControlFlowService analysis task tests", () => {
   };
 
   beforeEach(() => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "ERROR";
     logChannel = {
       trace: jest.fn(),
       debug: jest.fn(),
@@ -148,6 +159,10 @@ describe("ControlFlowService analysis task tests", () => {
       warn: jest.fn(),
       error: jest.fn(),
     };
+  });
+
+  afterEach(() => {
+    delete getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY];
   });
 
   test("AnalysisTask log error to logger channel", async () => {
