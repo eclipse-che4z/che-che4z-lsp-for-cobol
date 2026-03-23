@@ -29,10 +29,7 @@ import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
 import { getVariablesFromUri } from "./util/FSUtils";
-import {
-  ANALYSIS_LIMIT_REASON,
-  SETTINGS_UNREACHABLE_CODE_SEVERITY,
-} from "../constants";
+import { ANALYSIS_LIMIT_REASON } from "../constants";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -194,8 +191,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
   private requestVersion: number = 1;
   private hideProgress?: () => void = undefined;
 
-  private toDispose: vscode.Disposable[] = [];
-
   public constructor(
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
@@ -203,14 +198,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
-
-    this.toDispose.push(
-      vscode.workspace.onDidChangeConfiguration((e) => {
-        if (!e.affectsConfiguration(SETTINGS_UNREACHABLE_CODE_SEVERITY)) return;
-        if (SettingsService.getUnreachableCodeSeverity() !== undefined)
-          this.tasks.forEach((x) => x.start());
-      }),
-    );
   }
 
   startedTask(documentUri: string): void {
@@ -227,11 +214,6 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
         () => p,
       );
     }
-  }
-
-  public dispose() {
-    this.toDispose.forEach((x) => void x.dispose());
-    this.toDispose = [];
   }
 
   private setTask(documentUri: string, task: AnalysisTask) {
