@@ -139,6 +139,7 @@ export async function activate(
       log: true,
     }),
   );
+  context.subscriptions.push(analysisService);
   languageClientService.addNotificationHandler(
     "cfast/ready",
     analysisService.makeControlFlowAstNotificationHandler(),
