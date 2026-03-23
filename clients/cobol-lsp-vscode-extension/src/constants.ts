@@ -77,6 +77,7 @@ export const DEFAULT_DIALECT = "COBOL";
 export const CLEARING_COPYBOOK_CACHE = "Clearing downloaded copybook cache";
 export const COPYBOOK_CACHE_CLEARED_INFO = "Downloaded copybooks removed";
 export const ZOWE_FOLDER = "zowe";
+export const ZOWE_FSP_CACHE = "zowe-fsp";
 export const FAIL_CREATE_COPYBOOK_FOLDER_MSG = `Failed to create copybook internal folder`;
 export const FAIL_CREATE_GLOBAL_STORAGE_MSG = `Failed to create extension global storage folder`;
 export const E4E_SCHEME: string = "ndvr";
