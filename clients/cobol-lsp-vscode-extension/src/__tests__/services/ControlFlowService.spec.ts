@@ -102,10 +102,6 @@ jest.mock("worker_threads", () => ({
 }));
 
 describe("ControlFlowService tests", () => {
-  beforeEach(() => {
-    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "ERROR";
-  });
-
   afterEach(() => {
     delete getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY];
   });
@@ -128,6 +124,8 @@ describe("ControlFlowService tests", () => {
   });
 
   test("Propagate errors", async () => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "ERROR";
+
     const service = new ControlFlowAnalysisService();
     await service.handleControlFlowAst(apiResult);
 
@@ -138,6 +136,25 @@ describe("ControlFlowService tests", () => {
     lastWorkerErrorTrigger?.(Error("boom"));
 
     await expect(p).rejects.toThrow("boom");
+  });
+
+  test("Defer analysis", async () => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "NONE";
+
+    const service = new ControlFlowAnalysisService();
+    await service.handleControlFlowAst(apiResult);
+
+    expect(lastWorkerResultTrigger).toBeUndefined();
+    expect(lastWorkerErrorTrigger).toBeUndefined();
+
+    const p = service.getAnalysis(apiResult.documentUri);
+
+    expect(lastWorkerResultTrigger).toBeTruthy();
+    expect(lastWorkerErrorTrigger).toBeTruthy();
+
+    lastWorkerResultTrigger?.();
+
+    expect(await p).toBeTruthy();
   });
 });
 

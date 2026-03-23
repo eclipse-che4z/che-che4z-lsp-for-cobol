@@ -61,6 +61,7 @@ export type AnalysisResult = {
 };
 
 interface AnalysisServiceDelegate {
+  startedTask(documentUri: string): void;
   finishTask(
     documentUri: string,
     graphs: GraphDTO[],
@@ -113,8 +114,13 @@ export class AnalysisTask {
     );
   }
 
+  started(): boolean {
+    return !!this.worker;
+  }
+
   start() {
     if (this.worker) return;
+    this.delegate.startedTask(this.documentUri);
     this.worker = new Worker(join(__dirname, "./Worker.js"));
     this.worker.on("message", (data: WorkerResultMessage) => {
       if (data.type === "result") {
@@ -207,14 +213,9 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     );
   }
 
-  public dispose() {
-    this.toDispose.forEach((x) => void x.dispose());
-    this.toDispose = [];
-  }
-
-  private setTask(documentUri: string, task: AnalysisTask) {
-    this.tasks.set(documentUri, task);
+  startedTask(documentUri: string): void {
     if (!this.hideProgress) {
+      // TODO: This is kind of broken when multiple files are being analyzed
       const p = new Promise<void>((resolve) => {
         this.hideProgress = resolve;
       });
@@ -228,9 +229,25 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
+  public dispose() {
+    this.toDispose.forEach((x) => void x.dispose());
+    this.toDispose = [];
+  }
+
+  private setTask(documentUri: string, task: AnalysisTask) {
+    this.tasks.set(documentUri, task);
+  }
+
+  private isTaskInProgress() {
+    for (const v of this.tasks.values()) {
+      if (v.started()) return true;
+    }
+    return false;
+  }
+
   private deleteTask(documentUri: string) {
     this.tasks.delete(documentUri);
-    if (this.tasks.size == 0 && this.hideProgress) {
+    if (!this.isTaskInProgress() && this.hideProgress) {
       this.hideProgress();
       this.hideProgress = undefined;
     }
