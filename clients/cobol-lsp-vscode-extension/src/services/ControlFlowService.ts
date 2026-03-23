@@ -321,7 +321,10 @@ export class ControlFlowAnalysisService
       this.mainChannel,
       this.logChannel,
     );
-    if (SettingsService.getUnreachableCodeSeverity() !== undefined)
+    if (
+      SettingsService.getUnreachableCodeSeverity() !== undefined ||
+      latestResult?.promise
+    )
       task.start();
     this.setTask(documentUri, task);
   }
