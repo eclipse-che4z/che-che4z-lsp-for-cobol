@@ -187,7 +187,9 @@ function extractFilename(documentUri: string) {
   }
 }
 
-export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
+export class ControlFlowAnalysisService
+  implements AnalysisServiceDelegate, vscode.Disposable
+{
   private tasks: Map<string, AnalysisTask>;
   private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
@@ -209,6 +211,7 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
         if (!e.affectsConfiguration(SETTINGS_UNREACHABLE_CODE_SEVERITY)) return;
         if (SettingsService.getUnreachableCodeSeverity() !== undefined)
           this.tasks.forEach((x) => x.start());
+        else this.diagnosticService.clearDiagnostics();
       }),
     );
   }
@@ -472,8 +475,10 @@ class DiagnosticService {
     );
   }
 
-  public clearDiagnostics(documentUri: string) {
-    this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
+  public clearDiagnostics(documentUri?: string) {
+    if (documentUri)
+      this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
+    else this.diagnosticCollection.clear();
   }
 }
 
