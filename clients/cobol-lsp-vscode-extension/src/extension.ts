@@ -253,7 +253,7 @@ async function createExtensionFolder(context: vscode.ExtensionContext) {
 
 async function makeZoweCache(
   uri: vscode.Uri,
-  invalidationCallback: () => void,
+  invalidationCallback: () => void | Promise<void>,
 ) {
   await vscode.workspace.fs.createDirectory(uri);
   return new ZoweCache(uri, invalidationCallback);
@@ -275,7 +275,7 @@ function attachEventHandlers(
     "copybook/resolve",
     resolveCopybookURI,
   );
-  languageClientService.addRequestHandler("file/content", (u) =>
+  languageClientService.addRequestHandler("file/content", (u: string) =>
     readFileContent(u, zoweCache),
   );
 }

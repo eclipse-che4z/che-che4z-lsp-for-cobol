@@ -18,7 +18,7 @@ import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
 import { outputChannel } from "../util/OutputChannel";
 import { zoweSemaphore } from "./ZoweThrottling";
 
-async function sha256(s: string): Promise<string> {
+function sha256(s: string): string {
   return crypto.createHash("sha256").update(s).digest().toString("hex");
 }
 
@@ -33,7 +33,7 @@ export class ZoweCache {
 
   constructor(
     private cacheUri: vscode.Uri,
-    private invalidateCallback: () => void,
+    private invalidateCallback: () => void | Promise<void>,
     private timeout: number = 1000,
   ) {}
 
@@ -45,37 +45,37 @@ export class ZoweCache {
   }
 
   public async readCached(uriString: string) {
-    const uri = await this.generateFileUri(uriString);
+    const uri = this.generateFileUri(uriString);
 
     try {
       return await vscode.workspace.fs.readFile(uri);
-    } catch (e) {
+    } catch (_e) {
       return undefined;
     }
   }
 
   private async writeCached(uriString: string, data: Uint8Array) {
-    const uri = await this.generateFileUri(uriString);
+    const uri = this.generateFileUri(uriString);
 
     try {
       await vscode.workspace.fs.writeFile(uri, data);
-    } catch (e) {
+    } catch (_e) {
       /* ignore */
     }
   }
 
   private async deleteCached(uriString: string) {
-    const uri = await this.generateFileUri(uriString);
+    const uri = this.generateFileUri(uriString);
 
     try {
       await vscode.workspace.fs.delete(uri);
-    } catch (e) {
+    } catch (_e) {
       /* ignore */
     }
   }
 
-  private async generateFileUri(uriString: string) {
-    const hash = await sha256(uriString);
+  private generateFileUri(uriString: string) {
+    const hash = sha256(uriString);
     return vscode.Uri.joinPath(this.cacheUri, `${ZoweCache.version}.${hash}`);
   }
 
@@ -85,7 +85,7 @@ export class ZoweCache {
       clearTimeout(this.invalidatePending);
     }
     this.invalidatePending = setTimeout(
-      () => this.invalidateCallback(),
+      () => void this.invalidateCallback(),
       this.timeout,
     );
   }
@@ -132,7 +132,9 @@ export async function readZoweFileContent(
   try {
     const result = await Promise.race([zowePromise, cachedVersion]);
     if (result) return result;
-  } catch (e) {}
+  } catch (_e) {
+    /* ignore */
+  }
 
   return zowePromise;
 }
