@@ -51,7 +51,11 @@ describe("DialectService test", () => {
   });
 
   test("Test DialectService registerStartHandler creates handlers for LSP client", () => {
-    const service = new DialectService(languageClientService, undefined, outputChannel);
+    const service = new DialectService(
+      languageClientService,
+      undefined,
+      outputChannel,
+    );
 
     service.registerStartHandler("DIALECT", () => {
       return Promise.resolve();
@@ -68,7 +72,11 @@ describe("DialectService test", () => {
   });
 
   test("Test DialectService handles dialect processing event", () => {
-    const service = new DialectService(languageClientService, undefined, outputChannel);
+    const service = new DialectService(
+      languageClientService,
+      undefined,
+      outputChannel,
+    );
     let processDialect = false;
 
     service.registerStartHandler("DIALECT", () => {
