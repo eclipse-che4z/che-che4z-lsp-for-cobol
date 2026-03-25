@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { splitFilename } from "../../util/FSUtils";
-import { zoweSemaphore } from "../ZoweThrottling";
 import {
   MemberCacheItem,
   ZoweExplorerDownloader,
@@ -23,53 +22,25 @@ import * as vscode from "vscode";
  * Copybook downloader from MVS using Zowe Explorer
  */
 export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
-  constructor() {
-    super();
-  }
-
   public async getAllMembers(
     profileName: string,
     dataset: string,
   ): Promise<MemberCacheItem[]> {
-    const id = this.createId(profileName, dataset, []);
-
-    if (this.memberListCache.has(id)) {
-      return this.memberListCache.get(id)!;
-    }
-
-    let membersPromise = this.pendingMemberListCache.get(id);
-    if (membersPromise) return membersPromise.then((x) => x ?? []);
-
-    membersPromise = this.limitFailedRequests(
+    return this.makeCachedRequest(
       `list dataset members ${profileName}/${dataset}`,
-      async () => {
-        const response = await zoweSemaphore.locked(() =>
-          vscode.workspace.fs.readDirectory(
-            vscode.Uri.from({
-              scheme: "zowe-ds",
-              path: `/${profileName}/${dataset}`,
-            }),
-          ),
-        );
-        return response.map((item) => {
+      this.createId(profileName, dataset, []),
+      vscode.Uri.from({
+        scheme: "zowe-ds",
+        path: `/${profileName}/${dataset}`,
+      }),
+      (response) =>
+        response.map((item) => {
           const [name, extension] = splitFilename(item[0]);
           return {
             name,
             extension,
           };
-        });
-      },
+        }),
     );
-    this.pendingMemberListCache.set(id, membersPromise);
-
-    try {
-      const members = await membersPromise;
-      if (members && this.pendingMemberListCache.get(id) === membersPromise)
-        this.memberListCache.set(id, members);
-      return members ?? [];
-    } finally {
-      if (this.pendingMemberListCache.get(id) === membersPromise)
-        this.pendingMemberListCache.delete(id);
-    }
   }
 }

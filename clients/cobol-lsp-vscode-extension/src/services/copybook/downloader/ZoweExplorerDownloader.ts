@@ -14,6 +14,7 @@
 import * as vscode from "vscode";
 import { FAILED_REQUESTS_LIMIT } from "../../../constants";
 import { hasMember } from "../../util/Utils";
+import { zoweSemaphore } from "../ZoweThrottling";
 
 export interface MemberCacheItem {
   name: string;
@@ -64,7 +65,44 @@ export abstract class ZoweExplorerDownloader {
     this.failedRequests.clear();
   }
 
-  public async limitFailedRequests<T>(
+  protected async makeCachedRequest(
+    title: string,
+    requestId: string,
+    uri: vscode.Uri,
+    responseTransformer: (
+      files: [string, vscode.FileType][],
+    ) => MemberCacheItem[],
+  ) {
+    const cachedResponse = this.memberListCache.get(requestId);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    let membersPromise = this.pendingMemberListCache.get(requestId);
+    if (membersPromise) return membersPromise.then((x) => x ?? []);
+
+    membersPromise = this.limitFailedRequests(title, () =>
+      zoweSemaphore
+        .locked(() => vscode.workspace.fs.readDirectory(uri))
+        .then(responseTransformer),
+    );
+    this.pendingMemberListCache.set(requestId, membersPromise);
+
+    try {
+      const members = await membersPromise;
+      if (
+        members &&
+        this.pendingMemberListCache.get(requestId) === membersPromise
+      )
+        this.memberListCache.set(requestId, members);
+      return members ?? [];
+    } finally {
+      if (this.pendingMemberListCache.get(requestId) === membersPromise)
+        this.pendingMemberListCache.delete(requestId);
+    }
+  }
+
+  private async limitFailedRequests<T>(
     requestId: string,
     request: () => Promise<T>,
   ): Promise<T | undefined> {

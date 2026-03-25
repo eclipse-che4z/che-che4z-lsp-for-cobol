@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { splitFilename } from "../../util/FSUtils";
-import { zoweSemaphore } from "../ZoweThrottling";
 import {
   MemberCacheItem,
   ZoweExplorerDownloader,
@@ -23,41 +22,24 @@ import * as vscode from "vscode";
  * Copybook downloader from USS using Zowe Explorer
  */
 export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
-  constructor() {
-    super();
-  }
-
   public async getAllMembers(
     profileName: string,
     dataset: string,
     allowedCopybooksExtensions: string[],
   ): Promise<MemberCacheItem[]> {
-    const id = this.createId(profileName, dataset, allowedCopybooksExtensions);
-
-    if (this.memberListCache.has(id)) {
-      return this.memberListCache.get(id)!;
-    }
-
-    allowedCopybooksExtensions = allowedCopybooksExtensions?.map((ext) =>
-      ext.toLowerCase(),
-    );
+    allowedCopybooksExtensions = allowedCopybooksExtensions
+      ?.map((ext) => ext.toLowerCase())
+      .sort();
     const allowedNoExtension = allowedCopybooksExtensions?.includes("");
 
-    let membersPromise = this.pendingMemberListCache.get(id);
-    if (membersPromise) return membersPromise.then((x) => x ?? []);
-
-    membersPromise = this.limitFailedRequests(
+    return this.makeCachedRequest(
       `list USS directory ${profileName}/${dataset}`,
-      async () => {
-        const response = await zoweSemaphore.locked(() =>
-          vscode.workspace.fs.readDirectory(
-            vscode.Uri.from({
-              scheme: "zowe-uss",
-              path: `/${profileName}${dataset}`,
-            }),
-          ),
-        );
-
+      this.createId(profileName, dataset, allowedCopybooksExtensions),
+      vscode.Uri.from({
+        scheme: "zowe-uss",
+        path: `/${profileName}${dataset}`,
+      }),
+      (response) => {
         const members: MemberCacheItem[] = [];
         for (const file of response) {
           if (file[1] !== vscode.FileType.File) continue;
@@ -74,16 +56,5 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
         return members;
       },
     );
-    this.pendingMemberListCache.set(id, membersPromise);
-
-    try {
-      const members = await membersPromise;
-      if (members && this.pendingMemberListCache.get(id) === membersPromise)
-        this.memberListCache.set(id, members);
-      return members ?? [];
-    } finally {
-      if (this.pendingMemberListCache.get(id) === membersPromise)
-        this.pendingMemberListCache.delete(id);
-    }
   }
 }
