@@ -34,6 +34,7 @@ describe("USS copybook lib", () => {
       .mockResolvedValue({ api: {} as IApiRegisterClient });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
     getConfigurationResult["copybook-extensions"] = [".CPY", ".cpy", ""];
+    jest.clearAllMocks();
   });
 
   describe("resolveCopybookUri", () => {
@@ -267,6 +268,28 @@ describe("USS copybook lib", () => {
         );
         expect(result).toEqual([]);
       });
+    });
+  });
+
+  describe("Concurrent requests", () => {
+    it("are merged when identical", async () => {
+      const lib = new UssPathLib("/remote/uss/copybooks", "profile");
+      const promises = [];
+      for (let i = 0; i < 3; ++i) {
+        promises.push(
+          lib.resolveCopybookUri(
+            "COPYBOOK",
+            vscode.Uri.file("/program.cbl"),
+            DEFAULT_DIALECT,
+          ),
+        );
+      }
+      const results = await Promise.all(promises);
+      const expectedUri = vscode.Uri.parse(
+        "zowe-uss:/profile/remote/uss/copybooks/COPYBOOK.CPY",
+      );
+      expect(results).toEqual([expectedUri, expectedUri, expectedUri]);
+      expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(1);
     });
   });
 });
