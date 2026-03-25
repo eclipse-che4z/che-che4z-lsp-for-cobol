@@ -103,7 +103,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
-    "build": "npm run test && esbuild src/extension.ts --bundle --sourcemap --target=node16.17.1,chrome108 --outdir=dist --external:vscode --format=cjs",
+    "build": "npm run compile && esbuild src/extension.ts --bundle --sourcemap --target=node16.17.1,chrome108 --outdir=dist --external:vscode --format=cjs",
     "compile": "npm run grammar && tsc -p ./",
     "grammar": "npm run lexer && npm run parser",
     "lexer": "antlr-ng -Dlanguage=TypeScript -l -o src/generated ./src/antlr/DaCoLexer.g4",
