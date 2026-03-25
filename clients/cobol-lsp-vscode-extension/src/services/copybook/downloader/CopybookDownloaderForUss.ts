@@ -43,9 +43,10 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
     );
     const allowedNoExtension = allowedCopybooksExtensions?.includes("");
 
-    const members: MemberCacheItem[] = [];
+    let membersPromise = this.pendingMemberListCache.get(id);
+    if (membersPromise) return membersPromise.then((x) => x ?? []);
 
-    await this.limitFailedRequests(
+    membersPromise = this.limitFailedRequests(
       `list USS directory ${profileName}/${dataset}`,
       async () => {
         const response = await zoweSemaphore.locked(() =>
@@ -57,25 +58,32 @@ export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
           ),
         );
 
+        const members: MemberCacheItem[] = [];
         for (const file of response) {
-          if (file[1] === vscode.FileType.File) {
-            const [name, extension] = splitFilename(file[0]);
+          if (file[1] !== vscode.FileType.File) continue;
+          const [name, extension] = splitFilename(file[0]);
 
-            if (extension) {
-              if (
-                allowedCopybooksExtensions?.includes(extension.toLowerCase())
-              ) {
-                members.push({ name, extension });
-              }
-            } else if (allowedNoExtension) {
-              members.push({ name });
+          if (extension) {
+            if (allowedCopybooksExtensions?.includes(extension.toLowerCase())) {
+              members.push({ name, extension });
             }
+          } else if (allowedNoExtension) {
+            members.push({ name });
           }
         }
-        this.memberListCache.set(id, members);
+        return members;
       },
     );
+    this.pendingMemberListCache.set(id, membersPromise);
 
-    return members;
+    try {
+      const members = await membersPromise;
+      if (members && this.pendingMemberListCache.get(id) === membersPromise)
+        this.memberListCache.set(id, members);
+      return members ?? [];
+    } finally {
+      if (this.pendingMemberListCache.get(id) === membersPromise)
+        this.pendingMemberListCache.delete(id);
+    }
   }
 }

@@ -37,8 +37,10 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
       return this.memberListCache.get(id)!;
     }
 
-    let members: MemberCacheItem[] = [];
-    await this.limitFailedRequests(
+    let membersPromise = this.pendingMemberListCache.get(id);
+    if (membersPromise) return membersPromise.then((x) => x ?? []);
+
+    membersPromise = this.limitFailedRequests(
       `list dataset members ${profileName}/${dataset}`,
       async () => {
         const response = await zoweSemaphore.locked(() =>
@@ -49,18 +51,25 @@ export class CopybookDownloaderForDsn extends ZoweExplorerDownloader {
             }),
           ),
         );
-        members = response.map((item) => {
+        return response.map((item) => {
           const [name, extension] = splitFilename(item[0]);
           return {
             name,
             extension,
           };
         });
-
-        this.memberListCache.set(id, members);
       },
     );
+    this.pendingMemberListCache.set(id, membersPromise);
 
-    return members;
+    try {
+      const members = await membersPromise;
+      if (members && this.pendingMemberListCache.get(id) === membersPromise)
+        this.memberListCache.set(id, members);
+      return members ?? [];
+    } finally {
+      if (this.pendingMemberListCache.get(id) === membersPromise)
+        this.pendingMemberListCache.delete(id);
+    }
   }
 }

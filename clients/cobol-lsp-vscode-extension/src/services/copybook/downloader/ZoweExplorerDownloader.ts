@@ -26,6 +26,10 @@ export abstract class ZoweExplorerDownloader {
   public static profileStore: Map<string, "locked-profile" | "valid-profile"> =
     new Map();
   protected memberListCache: Map<string, MemberCacheItem[]> = new Map();
+  protected pendingMemberListCache: Map<
+    string,
+    Promise<MemberCacheItem[] | undefined>
+  > = new Map();
   protected failedRequests: Map<string, number> = new Map();
 
   protected createId(profileName: string, path: string, extensions: string[]) {
@@ -37,6 +41,7 @@ export abstract class ZoweExplorerDownloader {
    */
   public clearMemberListCache() {
     this.memberListCache.clear();
+    this.pendingMemberListCache.clear();
   }
 
   public fsChanged(uri: vscode.Uri) {
@@ -50,16 +55,19 @@ export abstract class ZoweExplorerDownloader {
     [...this.memberListCache.keys()]
       .filter((x) => x.startsWith(partialKey))
       .forEach((k) => this.memberListCache.delete(k));
+    [...this.pendingMemberListCache.keys()]
+      .filter((x) => x.startsWith(partialKey))
+      .forEach((k) => this.pendingMemberListCache.delete(k));
   }
 
   public reenableFailedRequests() {
     this.failedRequests.clear();
   }
 
-  public async limitFailedRequests(
+  public async limitFailedRequests<T>(
     requestId: string,
-    request: () => Promise<void>,
-  ) {
+    request: () => Promise<T>,
+  ): Promise<T | undefined> {
     const attempt = this.failedRequests.get(requestId) ?? 1;
     if (attempt <= FAILED_REQUESTS_LIMIT) {
       try {
