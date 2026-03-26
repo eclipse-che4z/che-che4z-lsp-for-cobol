@@ -229,7 +229,7 @@ jobs:
         working-directory: clients/daco-dialect-support
         run: |
           npm ci
-          npm run test
+          npm run test:unit
       - name: update version with PR or build number
         if: github.event_name == 'pull_request' || github.event.inputs.include_build_number == 'true'
         working-directory: clients/cobol-lsp-vscode-extension
