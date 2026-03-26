@@ -152,7 +152,7 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    */
   protected validateDb2MaxInt(input: string | undefined) {
-    let value = Number.parseInt(input ?? "");
+    const value = Number.parseInt(input ?? "");
     if (!(value > 0 && value <= 32767)) {
       this.notifyError("db2SqlParser.maxIntValue", input ?? "");
     }
@@ -184,7 +184,7 @@ export abstract class MessageServiceParser extends Parser {
     min: number,
     max: number,
   ) {
-    let value = Number.parseInt(input ?? "");
+    const value = Number.parseInt(input ?? "");
     if (!(value > min && value < max)) {
       this.notifyError(
         "parsers.validValueMsg",
@@ -224,7 +224,7 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    */
   protected validate34or16(input: string | undefined) {
-    let value = Number.parseInt(input ?? "");
+    const value = Number.parseInt(input ?? "");
     if (!(value == 34 || value == 16)) {
       this.notifyError("parsers.validValueMsg", input ?? "", "34 or 16");
     }
@@ -277,7 +277,7 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    */
   protected validateDbNames(input: string | undefined) {
-    let names = (input ?? "").split("\\.");
+    const names = (input ?? "").split("\\.");
     if (names.length > 1) {
       this.validateLength(names[0], "database name", 8);
       this.validateLength(names[1], "table space name", 8);
@@ -303,7 +303,7 @@ export abstract class MessageServiceParser extends Parser {
     input: string | undefined,
     startsWith: string[],
   ): boolean {
-    for (let item of startsWith) {
+    for (const item of startsWith) {
       if (input?.startsWith(item)) return true;
     }
     return false;
@@ -314,7 +314,7 @@ export abstract class MessageServiceParser extends Parser {
     allowedValues: string[],
   ): boolean {
     input = input?.toUpperCase();
-    for (let item of allowedValues) {
+    for (const item of allowedValues) {
       if (input === item.toUpperCase()) return true;
     }
     return false;
