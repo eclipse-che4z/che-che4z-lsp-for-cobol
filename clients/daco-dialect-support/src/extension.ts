@@ -39,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-    unregisterDialect();
+  unregisterDialect();
 }
 
 async function updateApiVersion(context: vscode.ExtensionContext) {

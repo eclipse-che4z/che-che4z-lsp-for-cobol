@@ -20,3 +20,4 @@ out
 package-lock.json
 # Ignore Antlr generated files
 src/generated
+.vscode-test
