@@ -116,7 +116,7 @@
     "pretest": "npm run compile",
     "test:unit": "jest src/unit --passWithNoTests",
     "test:integration": "node ./out/test/runTest.js",
-    "test": "npm run test:unit",
+    "test": "npm run test:unit && npm run test:integration",
     "package": "vsce package --no-dependencies"
   },
   "devDependencies": {
