@@ -16,12 +16,34 @@ import { TAR_FOLDER } from "../../../constants";
 import { loadProfile } from "../../util/Utils";
 import * as vscode from "vscode";
 
+const pendingCache: Map<string, Promise<boolean>> = new Map();
+
 export class CopybookBinaryDownloader {
   constructor(
     private storagePath: vscode.Uri,
     private explorerAPI: IApiRegisterClient,
   ) {}
+
   public async downloadFile(
+    path: string,
+    profile: string,
+    type: "USS" | "DSN",
+  ): Promise<boolean> {
+    const id = `${type}|${profile}|${path}`;
+    let p = pendingCache.get(id);
+    if (p) return p;
+
+    p = this.downloadFileImpl(path, profile, type);
+    pendingCache.set(id, p);
+
+    try {
+      return await p;
+    } finally {
+      pendingCache.delete(id);
+    }
+  }
+
+  private async downloadFileImpl(
     path: string,
     profile: string,
     type: "USS" | "DSN",
