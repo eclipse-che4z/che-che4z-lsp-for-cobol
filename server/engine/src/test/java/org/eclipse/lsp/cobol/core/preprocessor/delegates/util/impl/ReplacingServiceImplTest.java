@@ -91,7 +91,9 @@ class ReplacingServiceImplTest {
             ImmutablePair.of("", ""), locality, CobolLanguageId.COBOL, SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("a\\s{1,999}b\\s{1,999}c(?<=(?:^|[.,;]?\\s)a\\s{1,999}b\\s{1,999}c)(?=[,;]?\\s|\\.|$)", ""),
+            Pair.of(
+                "a\\s{1,999}b\\s{1,999}c(?<=(?:^|[.,;]?\\s)a\\s{1,999}b\\s{1,999}c)(?=[,;]?\\s|\\.|$)",
+                ""),
             Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
             ImmutablePair.of("a   b  \nc", ""),
