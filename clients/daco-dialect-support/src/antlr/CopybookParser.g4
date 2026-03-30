@@ -19,9 +19,13 @@ options {tokenVocab = CopybookLexer;  superClass = MessageServiceParser;}
 import { MessageServiceParser } from "../antlr/MessageServiceParser";
 }
 
-workingStorageSection
-   : WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
+startRule
+   : header dataDescriptionEntry*
    ;
+
+header
+  : ~(LEVEL_NUMBER | COPY)*
+  ;
 
 dataDescriptionEntry
    : copyMaid | variableEntry
@@ -32,7 +36,7 @@ copyMaid
    ;
 
 layoutId
-   : COPYBOOK_IDENTIFIER
+   : DACO_COPYBOOK_IDENTIFIER
    ;
 
 layoutUsage

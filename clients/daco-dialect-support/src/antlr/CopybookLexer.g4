@@ -17,9 +17,10 @@ lexer grammar CopybookLexer;
 channels{COMMENTS}
 import TechnicalLexer;
 
-WORKING_STORAGE      : W O R K I N G MINUSCHAR S T O R A G E ;
-SECTION              : S E C T I O N ;
 COPY                 : C O P Y ;
 MAID                 : M A I D ;
 
-SUFFIX : [a-zA-Z]{3};
+DACO_COPYBOOK_IDENTIFIER
+  : [A-Z0-9]+ ('-' [A-Z0-9] [A-Z0-9] [A-Z0-9])?
+  ;
+SUFFIX : [A-Z] [A-Z] [A-Z];
