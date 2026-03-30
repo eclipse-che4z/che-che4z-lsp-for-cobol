@@ -814,7 +814,7 @@ INTEGERLITERAL : DIGIT+;
 IDENTIFIER : [\p{Alnum}\p{General_Category=Other_Letter}] [-_\p{Alnum}\p{General_Category=Other_Letter}]*;
 NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)?
     (
-        (DOT_FS | COMMACHAR { commaCharAllowed }?) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
+        DIGIT* (DOT_FS) DIGIT+ (('e' | 'E') (PLUSCHAR | MINUSCHAR)? DIGIT+)?
         |
         DIGIT+
         (
