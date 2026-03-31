@@ -31,8 +31,12 @@ dataDescriptionEntry
    : copyMaid | variableEntry
    ;
 
+
 copyMaid
-   : LEVEL_NUMBER? COPY MAID layoutId (layoutUsage)?
+   : LEVEL_NUMBER? COPY MAID 
+      (l=layoutId { this.validateTokenWithRegex($l.start!, /^[A-Z0-9]*([-][A-Z0-9]{3})?$/, "Invalid layout identifier"); }) 
+      (u=layoutUsage { this.validateTokenWithRegex($u.start!, /^[A-Z]{3}$/, "Invalid layout usage");})? 
+      DOT_FS
    ;
 
 layoutId
@@ -40,7 +44,7 @@ layoutId
    ;
 
 layoutUsage
-   : SUFFIX
+   : DACO_COPYBOOK_IDENTIFIER
    ;
 
 variableEntry

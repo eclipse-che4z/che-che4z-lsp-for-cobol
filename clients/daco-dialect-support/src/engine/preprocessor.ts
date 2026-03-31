@@ -27,7 +27,7 @@ import {
 export class DaCoPreprocessor {
   public async execute(
     context: IDocumentProcessingContext,
-    programUri: vscode.Uri,
+    _programUri: vscode.Uri,
     text: string,
     outputChannel: vscode.OutputChannel,
   ) {
@@ -96,6 +96,6 @@ export class DaCoPreprocessor {
     },
     descriptor: CopybookDescriptor,
   ) {
-    throw new Error("Method not implemented.");
+    //throw new Error("Method not implemented.");
   }
 }

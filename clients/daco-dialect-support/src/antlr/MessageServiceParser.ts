@@ -11,7 +11,7 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-import { Parser } from "antlr4ng";
+import { Parser, Token } from "antlr4ng";
 
 export abstract class MessageServiceParser extends Parser {
   private static ALPHANUMERIC: RegExp = new RegExp("[a-zA-Z0-9]+");
@@ -22,7 +22,12 @@ export abstract class MessageServiceParser extends Parser {
     param2?: string,
   ): string {
     const message = "";
-    //super.notifyErrorListeners(message);
+    super.notifyErrorListeners(message, this.getCurrentToken(), null);
+    return message;
+  }
+
+  private notifyErrorEx(message: string, token?: Token): string {
+    super.notifyErrorListeners(message, token || this.getCurrentToken(), null);
     return message;
   }
 
@@ -116,20 +121,9 @@ export abstract class MessageServiceParser extends Parser {
     );
   }
 
-  /**
-   * Validate a string with a regex and throw an error if it is incorrect
-   *
-   * @param input string to check
-   * @param regex regex string
-   * @param error error code name
-   */
-  protected validateTokenWithRegex(
-    input: string | undefined,
-    regex: string,
-    error: string,
-  ) {
-    if (!input?.match(regex)) {
-      this.notifyError(error, input ?? "");
+  protected validateTokenWithRegex(token: Token, regex: RegExp, error: string) {
+    if (!token || !regex.test(token.text ?? "")) {
+      this.notifyErrorEx(error, token);
     }
   }
 

@@ -81,7 +81,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
     const layoutUsage = ctx.layoutUsage();
     const name = layoutId.getText();
 
-    const suffix = layoutUsage ? layoutUsage.SUFFIX()?.getText() : undefined;
+    const suffix = layoutUsage?.getText();
     const level = ctx.LEVEL_NUMBER()
       ? Number.parseInt(ctx.LEVEL_NUMBER()!.getText(), 10)
       : 0;
@@ -90,14 +90,14 @@ export class CopybookVisitor extends CopybookParserVisitor<
       ctx.start.line - 1,
       ctx.start.column,
       ctx.stop.line - 1,
-      ctx.stop.column,
+      ctx.stop.column + (ctx.stop.text?.length ?? 0),
     );
 
     const nameRange = new vscode.Range(
       layoutId.start.line - 1,
       layoutId.start.column,
       layoutId.stop.line - 1,
-      layoutId.stop.column,
+      layoutId.stop.column + (layoutId.stop.text?.length ?? 0),
     );
 
     descriptors.push(

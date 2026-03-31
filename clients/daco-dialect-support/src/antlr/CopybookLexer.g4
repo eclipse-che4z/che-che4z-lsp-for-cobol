@@ -21,6 +21,7 @@ COPY                 : C O P Y ;
 MAID                 : M A I D ;
 
 DACO_COPYBOOK_IDENTIFIER
-  : [A-Z0-9]+ ('-' [A-Z0-9] [A-Z0-9] [A-Z0-9])?
+  : [A-Z0-9]+ ('-' [A-Z0-9]*)?
   ;
-SUFFIX : [A-Z] [A-Z] [A-Z];
+
+IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
