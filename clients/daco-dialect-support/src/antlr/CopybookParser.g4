@@ -20,17 +20,20 @@ import { MessageServiceParser } from "../antlr/MessageServiceParser";
 }
 
 startRule
-   : header dataDescriptionEntry*
+   : skipUntilWS workingStorageBody EOF
    ;
 
-header
-  : ~(LEVEL_NUMBER | COPY)*
-  ;
+skipUntilWS
+   : (.)*? WORKING_STORAGE SECTION DOT_FS
+   ;
+
+workingStorageBody
+   : dataDescriptionEntry*
+   ;
 
 dataDescriptionEntry
    : copyMaid | variableEntry
    ;
-
 
 copyMaid
    : LEVEL_NUMBER? COPY MAID 
@@ -48,7 +51,15 @@ layoutUsage
    ;
 
 variableEntry
-   : LEVEL_NUMBER identifier .*?
+   : LEVEL_NUMBER identifier variablePart* DOT_FS
+   ;
+
+variablePart
+   : identifier
+   | PIC
+   | INTEGERLITERAL
+   | NUMERICLITERAL
+   | DACO_COPYBOOK_IDENTIFIER
    ;
 
 identifier

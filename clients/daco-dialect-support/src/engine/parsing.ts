@@ -89,6 +89,9 @@ export class CopybookVisitor extends CopybookParserVisitor<
     const name = layoutId.getText();
 
     const suffix = layoutUsage?.getText();
+
+    console.log("Copybook level: " + ctx.LEVEL_NUMBER()?.getText());
+
     const level = ctx.LEVEL_NUMBER()
       ? Number.parseInt(ctx.LEVEL_NUMBER()!.getText(), 10)
       : 0;

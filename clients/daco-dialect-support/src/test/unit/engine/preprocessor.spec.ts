@@ -16,6 +16,16 @@ import { Uri, DiagnosticSeverity } from "vscode";
 import { DaCoPreprocessor } from "../../../engine/preprocessor";
 
 describe("DaCoPreprocessor test", () => {
+  const HEADER =
+    "        IDENTIFICATION DIVISION.\n" +
+    "          PROGRAM-ID. PARTEST.\n" +
+    "        ENVIRONMENT DIVISION.\n" +
+    "        IDMS-CONTROL SECTION.\n" +
+    "            PROTOCOL. MODE ABC.\n" +
+    "            IDMS-RECORDS MANUAL\n" +
+    "          DATA DIVISION.\n" +
+    "          WORKING-STORAGE SECTION.\n";
+
   const preprocessor = new DaCoPreprocessor();
   const copybookContext: any = {
     resolveCopybook: jest.fn(),
@@ -42,7 +52,10 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      "COPY MAID TEST-AA12.",
+      HEADER +
+        "          01 COPY MAID TEST-AA12.\n" +
+        "          PROCEDURE DIVISION.\n" +
+        "              DISPLAY ABC.\n",
       outputChannel,
     );
 
@@ -51,8 +64,8 @@ describe("DaCoPreprocessor test", () => {
         severity: DiagnosticSeverity.Error,
         message: "Invalid layout identifier",
         range: expect.objectContaining({
-          start: expect.objectContaining({ line: 0, character: 10 }),
-          end: expect.objectContaining({ line: 0, character: 19 }),
+          start: expect.objectContaining({ line: 8, character: 23 }),
+          end: expect.objectContaining({ line: 8, character: 32 }),
         }),
       }),
     );
@@ -62,7 +75,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      "COPY MAID TEST-A12 SUFFIX.",
+      HEADER + "          COPY MAID TEST-A12 SUFFIX.",
       outputChannel,
     );
 
@@ -71,8 +84,8 @@ describe("DaCoPreprocessor test", () => {
         severity: DiagnosticSeverity.Error,
         message: "Invalid layout usage",
         range: expect.objectContaining({
-          start: expect.objectContaining({ line: 0, character: 19 }),
-          end: expect.objectContaining({ line: 0, character: 25 }),
+          start: expect.objectContaining({ line: 8, character: 29 }),
+          end: expect.objectContaining({ line: 8, character: 35 }),
         }),
       }),
     );
@@ -82,14 +95,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      "        IDENTIFICATION DIVISION.\n" +
-        "          PROGRAM-ID. PARTEST.\n" +
-        "        ENVIRONMENT DIVISION.\n" +
-        "        IDMS-CONTROL SECTION.\n" +
-        "            PROTOCOL. MODE ABC.\n" +
-        "            IDMS-RECORDS MANUAL\n" +
-        "          DATA DIVISION.\n" +
-        "          WORKING-STORAGE SECTION.\n" +
+      HEADER +
         "          01 COPY MAID NAME.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -99,7 +105,7 @@ describe("DaCoPreprocessor test", () => {
     expect(context.resolveCopybook).toHaveBeenCalledWith(
       "NAME",
       expect.objectContaining({
-        start: expect.objectContaining({ line: 8, character: 13 }),
+        start: expect.objectContaining({ line: 8, character: 10 }),
         end: expect.objectContaining({ line: 8, character: 28 }),
       }),
       expect.objectContaining({
@@ -113,14 +119,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      "        IDENTIFICATION DIVISION.\n" +
-        "          PROGRAM-ID. PARTEST.\n" +
-        "        ENVIRONMENT DIVISION.\n" +
-        "        IDMS-CONTROL SECTION.\n" +
-        "            PROTOCOL. MODE ABC.\n" +
-        "            IDMS-RECORDS MANUAL\n" +
-        "          DATA DIVISION.\n" +
-        "          WORKING-STORAGE SECTION.\n" +
+      HEADER +
         "          01 COPY MAID NAME-ABC KMK.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -131,7 +130,7 @@ describe("DaCoPreprocessor test", () => {
     expect(context.resolveCopybook).toHaveBeenCalledWith(
       "NAME-ABC_KMK",
       expect.objectContaining({
-        start: expect.objectContaining({ line: 8, character: 13 }),
+        start: expect.objectContaining({ line: 8, character: 10 }),
         end: expect.objectContaining({ line: 8, character: 36 }),
       }),
       expect.objectContaining({
@@ -141,18 +140,11 @@ describe("DaCoPreprocessor test", () => {
     );
   });
 
-  it("should adjust copybook variable levels", async () => {
+  it("should not adjust copybook equal variable levels", async () => {
     await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      "        IDENTIFICATION DIVISION.\n" +
-        "          PROGRAM-ID. PARTEST.\n" +
-        "        ENVIRONMENT DIVISION.\n" +
-        "        IDMS-CONTROL SECTION.\n" +
-        "            PROTOCOL. MODE ABC.\n" +
-        "            IDMS-RECORDS MANUAL\n" +
-        "          DATA DIVISION.\n" +
-        "          WORKING-STORAGE SECTION.\n" +
+      HEADER +
         "          01 COPY MAID NAME.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -160,5 +152,17 @@ describe("DaCoPreprocessor test", () => {
     );
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "NAME",
+      expect.objectContaining({
+        start: expect.objectContaining({ line: 8, character: 10 }),
+        end: expect.objectContaining({ line: 8, character: 28 }),
+      }),
+      expect.objectContaining({
+        start: expect.objectContaining({ line: 8, character: 23 }),
+        end: expect.objectContaining({ line: 8, character: 27 }),
+      }),
+    );
+    expect(copybookContext.replace).not.toHaveBeenCalled();
   });
 });

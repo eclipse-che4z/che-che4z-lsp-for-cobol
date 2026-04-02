@@ -34,10 +34,27 @@ export class DaCoPreprocessor {
     text: string,
     outputChannel: vscode.OutputChannel,
   ) {
-    const charStream = antlr.CharStream.fromString(text);
+    const procMatch = new RegExp(/PROCEDURE\s+DIVISION\.?/i).exec(text);
+
+    const end =
+      procMatch?.index !== undefined && procMatch.index > 0
+        ? procMatch.index
+        : text.length;
+
+    const sliced = text.slice(0, end);
+    const charStream = antlr.CharStream.fromString(sliced);
+
     const lexer = new CopybookLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
     const parser = new CopybookParser(tokenStream);
+
+    tokenStream.fill();
+    for (const t of tokenStream.getTokens()) {
+      console.log(
+        JSON.stringify(t.text),
+        parser.vocabulary.getSymbolicName(t.type),
+      );
+    }
 
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
@@ -48,7 +65,10 @@ export class DaCoPreprocessor {
     lexer.addErrorListener(lexerErrors);
     parser.addErrorListener(parserErrors);
 
-    const descriptors = new CopybookVisitor().visit(parser.startRule()) || [];
+    const tree = parser.startRule();
+    console.log(tree.toStringTree(parser));
+
+    const descriptors = new CopybookVisitor().visit(tree) || [];
 
     this.addParsingErrors(context, [
       ...lexerErrors.errors,
@@ -153,6 +173,13 @@ export class DaCoPreprocessor {
       const levelDifference = copybookLevel - descriptor.level;
       const updatedLevel = copybookLevel - levelDifference;
       const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
+      console.log(
+        "Updating level from " + descriptor.level + " to " + updatedLevelStr,
+        " Copybook level: " +
+          copybookLevel +
+          " Descriptor level: " +
+          descriptor.level,
+      );
       context.replace(descriptor.levelRange, updatedLevelStr);
     }
   }

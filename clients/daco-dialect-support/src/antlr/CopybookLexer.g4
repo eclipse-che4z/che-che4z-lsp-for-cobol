@@ -17,11 +17,20 @@ lexer grammar CopybookLexer;
 channels{COMMENTS}
 import TechnicalLexer;
 
+WORKING_STORAGE : W O R K I N G MINUSCHAR S T O R A G E;
+SECTION : S E C T I O N;
+
 COPY                 : C O P Y ;
 MAID                 : M A I D ;
+PIC                  : P I C;
+
+LEVEL_NUMBER : ([1-9])|([0][1-9])|([1234][0-9]);
+LEVEL_NUMBER_66 : '66';
+LEVEL_NUMBER_77 : '77';
+LEVEL_NUMBER_88 : '88';
 
 DACO_COPYBOOK_IDENTIFIER
   : [A-Z0-9]+ ('-' [A-Z0-9]*)?
   ;
 
-IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
+
