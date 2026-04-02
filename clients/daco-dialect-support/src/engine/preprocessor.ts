@@ -19,10 +19,12 @@ import { CopybookLexer } from "../generated/CopybookLexer";
 import * as antlr from "antlr4ng";
 import {
   CollectingErrorListener,
-  CopybookDescriptor,
+  CopybookContentVisitor,
   CopybookVisitor,
   ParseError,
 } from "./parsing";
+import { VariableLexer } from "../generated/VariableLexer";
+import { VariableParser } from "../generated/VariableParser";
 
 export class DaCoPreprocessor {
   public async execute(
@@ -58,17 +60,22 @@ export class DaCoPreprocessor {
         const copybookName =
           descriptor.name + (descriptor.suffix ? `_${descriptor.suffix}` : "");
 
-        const result = await context.resolveCopybook(
+        const copybook = await context.resolveCopybook(
           copybookName,
           descriptor.statementRange,
           descriptor.nameRange,
         );
 
-        if (result) {
+        if (copybook) {
           outputChannel.appendLine(
-            `Resolved copybook '${copybookName}' at ${result.uri.toString()}`,
+            `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
           );
-          this.insertCopybookContent(context, result, descriptor);
+          this.insertCopybookContent(
+            context,
+            copybook,
+            descriptor.level,
+            descriptor.suffix,
+          );
         }
       }),
     );
@@ -89,13 +96,36 @@ export class DaCoPreprocessor {
 
   private insertCopybookContent(
     context: IDocumentProcessingContext,
-    result: {
+    copybook: {
       context: IDocumentProcessingContext;
       uri: vscode.Uri;
       text: string;
     },
-    descriptor: CopybookDescriptor,
+    copybookLevel: number,
+    layoutUsage?: string,
   ) {
-    //throw new Error("Method not implemented.");
+    const charStream = antlr.CharStream.fromString(copybook.text);
+    const lexer = new VariableLexer(charStream);
+    const tokenStream = new antlr.CommonTokenStream(lexer);
+    const parser = new VariableParser(tokenStream);
+
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+
+    const lexerErrors = new CollectingErrorListener();
+    const parserErrors = new CollectingErrorListener();
+
+    lexer.addErrorListener(lexerErrors);
+    parser.addErrorListener(parserErrors);
+
+    const tree = parser.startRule();
+    console.log(tree.toStringTree(parser));
+
+    const errors: ParseError[] = [
+      ...lexerErrors.errors,
+      ...parserErrors.errors,
+    ];
+
+    const descriptors = new CopybookContentVisitor().visit(tree) || [];
   }
 }

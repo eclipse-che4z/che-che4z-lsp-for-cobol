@@ -18,9 +18,13 @@ import {
   Token,
   Recognizer,
   ATNSimulator,
+  ParserRuleContext,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import { CopyMaidContext } from "../generated/CopybookParser";
+import { VariableParserVisitor } from "../generated/VariableParserVisitor";
+
+import { DataDescriptionEntryFormat1Context } from "../generated/VariableParser";
 
 export interface ParseError {
   line: number;
@@ -36,6 +40,15 @@ export class CopybookDescriptor {
     public level: number,
     public name: string,
     public suffix?: string,
+  ) {}
+}
+
+export class VariableDescriptor {
+  constructor(
+    public levelRange: vscode.Range,
+    public level: number,
+    public nameRange: vscode.Range,
+    public name: string,
   ) {}
 }
 
@@ -70,15 +83,9 @@ export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
-    const descriptors: CopybookDescriptor[] = [];
-    const layoutId = ctx.layoutId();
-    if (!ctx.start || !ctx.stop) {
-      return descriptors;
-    }
-    if (!layoutId?.start || !layoutId?.stop) {
-      return descriptors;
-    }
+    const layoutId = ctx.layoutId()!;
     const layoutUsage = ctx.layoutUsage();
+
     const name = layoutId.getText();
 
     const suffix = layoutUsage?.getText();
@@ -86,23 +93,53 @@ export class CopybookVisitor extends CopybookParserVisitor<
       ? Number.parseInt(ctx.LEVEL_NUMBER()!.getText(), 10)
       : 0;
 
-    const statementRange = new vscode.Range(
-      ctx.start.line - 1,
-      ctx.start.column,
-      ctx.stop.line - 1,
-      ctx.stop.column + (ctx.stop.text?.length ?? 0),
-    );
+    const statementRange = createRange(ctx);
+    const nameRange = createRange(layoutId);
 
-    const nameRange = new vscode.Range(
-      layoutId.start.line - 1,
-      layoutId.start.column,
-      layoutId.stop.line - 1,
-      layoutId.stop.column + (layoutId.stop.text?.length ?? 0),
-    );
-
-    descriptors.push(
+    return [
       new CopybookDescriptor(statementRange, nameRange, level, name, suffix),
-    );
-    return descriptors;
+      ...(super.visitChildren(ctx) ?? []),
+    ];
   };
+
+  protected aggregateResult = (
+    aggregate: CopybookDescriptor[] | null,
+    nextResult: CopybookDescriptor[] | null,
+  ): CopybookDescriptor[] | null => {
+    return [...(aggregate ?? []), ...(nextResult ?? [])];
+  };
+}
+
+export class CopybookContentVisitor extends VariableParserVisitor<
+  VariableDescriptor[]
+> {
+  visitDataDescriptionEntryFormat1? = (
+    ctx: DataDescriptionEntryFormat1Context,
+  ): VariableDescriptor[] => {
+    const levelRange = createRange(ctx.levelNumber());
+    const level = Number.parseInt(ctx.levelNumber().getText());
+    const nameRange = createRange(ctx.entryName()!);
+    const name = ctx.entryName()?.getText() ?? "";
+
+    return [
+      new VariableDescriptor(levelRange, level, nameRange, name),
+      ...(super.visitChildren(ctx) ?? []),
+    ];
+  };
+
+  protected aggregateResult = (
+    aggregate: VariableDescriptor[] | null,
+    nextResult: VariableDescriptor[] | null,
+  ): VariableDescriptor[] | null => {
+    return [...(aggregate ?? []), ...(nextResult ?? [])];
+  };
+}
+
+function createRange(ctx?: ParserRuleContext) {
+  return new vscode.Range(
+    (ctx?.start?.line ?? 1) - 1,
+    ctx?.start?.column ?? 0,
+    (ctx?.stop?.line ?? 1) - 1,
+    (ctx?.stop?.column ?? 0) + (ctx?.stop?.text?.length ?? 0),
+  );
 }
