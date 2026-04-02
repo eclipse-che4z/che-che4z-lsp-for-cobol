@@ -16,7 +16,6 @@ import * as vscode from "vscode";
 import * as crypto from "crypto";
 import { loadProcessorGroupCopybooksLibs } from "../ProcessorGroups";
 import { outputChannel } from "../util/OutputChannel";
-import { zoweSemaphore } from "./ZoweThrottling";
 
 function sha256(s: string): string {
   return crypto.createHash("sha256").update(s).digest().toString("hex");
@@ -119,9 +118,7 @@ export async function readZoweFileContent(
   uri: vscode.Uri,
   zoweCache?: ZoweCache,
 ) {
-  const zowePromise = zoweSemaphore.locked(() =>
-    vscode.workspace.fs.readFile(uri),
-  );
+  const zowePromise = Promise.resolve(vscode.workspace.fs.readFile(uri));
   const uriString = uri.toString();
   if (!zoweCache || zoweCache.useZoweOnly(uriString)) return zowePromise;
 

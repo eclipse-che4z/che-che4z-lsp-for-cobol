@@ -14,7 +14,6 @@
 import * as vscode from "vscode";
 import { FAILED_REQUESTS_LIMIT } from "../../../constants";
 import { hasMember } from "../../util/Utils";
-import { zoweSemaphore } from "../ZoweThrottling";
 
 export interface MemberCacheItem {
   name: string;
@@ -82,9 +81,9 @@ export abstract class ZoweExplorerDownloader {
     if (membersPromise) return membersPromise.then((x) => x ?? []);
 
     membersPromise = this.limitFailedRequests(title, () =>
-      zoweSemaphore
-        .locked(() => vscode.workspace.fs.readDirectory(uri))
-        .then(responseTransformer),
+      Promise.resolve(vscode.workspace.fs.readDirectory(uri)).then(
+        responseTransformer,
+      ),
     );
     this.pendingMemberListCache.set(requestId, membersPromise);
 
