@@ -20,6 +20,7 @@ describe("DaCoPreprocessor test", () => {
   const copybookContext: any = {
     resolveCopybook: jest.fn(),
     addDiagnostic: jest.fn(),
+    replace: jest.fn(),
   };
   const context: any = {
     resolveCopybook: jest.fn().mockResolvedValue({

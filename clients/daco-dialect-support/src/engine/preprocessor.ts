@@ -22,6 +22,7 @@ import {
   CopybookContentVisitor,
   CopybookVisitor,
   ParseError,
+  VariableDescriptor,
 } from "./parsing";
 import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
@@ -122,10 +123,42 @@ export class DaCoPreprocessor {
     console.log(tree.toStringTree(parser));
 
     const errors: ParseError[] = [
+    this.addParsingErrors(context, [
       ...lexerErrors.errors,
       ...parserErrors.errors,
-    ];
+    ]);
 
     const descriptors = new CopybookContentVisitor().visit(tree) || [];
+    descriptors.forEach((descriptor) => {
+      this.processVariableDescriptor(
+        copybook.context,
+        descriptor,
+        copybookLevel,
+        layoutUsage,
+      );
+    });
+  }
+
+  private processVariableDescriptor(
+    context: IDocumentProcessingContext,
+    descriptor: VariableDescriptor,
+    copybookLevel: number,
+    layoutUsage: string | undefined,
+  ) {
+    if (layoutUsage) {
+      const updatedName = this.updateVariableName(descriptor.name, layoutUsage);
+      context.replace(descriptor.nameRange, updatedName);
+    }
+
+    if (copybookLevel != descriptor.level) {
+      const levelDifference = copybookLevel - descriptor.level;
+      const updatedLevel = copybookLevel - levelDifference;
+      const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
+      context.replace(descriptor.levelRange, updatedLevelStr);
+    }
+  }
+
+  private updateVariableName(name: string, suffix: string) {
+    return name;
   }
 }
