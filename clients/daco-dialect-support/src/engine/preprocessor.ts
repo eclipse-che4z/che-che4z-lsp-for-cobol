@@ -122,7 +122,6 @@ export class DaCoPreprocessor {
     const tree = parser.startRule();
     console.log(tree.toStringTree(parser));
 
-    const errors: ParseError[] = [
     this.addParsingErrors(context, [
       ...lexerErrors.errors,
       ...parserErrors.errors,
