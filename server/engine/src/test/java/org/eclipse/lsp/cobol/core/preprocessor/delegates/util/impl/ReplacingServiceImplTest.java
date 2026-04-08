@@ -91,7 +91,9 @@ class ReplacingServiceImplTest {
             ImmutablePair.of("", ""), locality, CobolLanguageId.COBOL, SearchPattern.EXACT));
     assertEquals(
         new ResultWithErrors<>(
-            Pair.of("a\\s+b\\s+c(?<=(?:^|[.,;]?\\s)a\\s+b\\s+c)(?=[,;]?\\s|\\.|$)", ""),
+            Pair.of(
+                "a\\s{1,999}b\\s{1,999}c(?<=(?:^|[.,;]?\\s)a\\s{1,999}b\\s{1,999}c)(?=[,;]?\\s|\\.|$)",
+                ""),
             Collections.emptyList()),
         replacingService.retrievePseudoTextReplacingPattern(
             ImmutablePair.of("a   b  \nc", ""),
@@ -127,7 +129,7 @@ class ReplacingServiceImplTest {
         replacingService.retrieveTokenReplacingPattern(
             Pair.of("IDENTIFICATION", "DIVISION"), CobolLanguageId.COBOL));
     assertEquals(
-        Pair.of("\\s+A(?<=(?:^|[.,;]?\\s)\\s+A)(?=[,;]?\\s|\\.|$)", "B"),
+        Pair.of("\\s{1,999}A(?<=(?:^|[.,;]?\\s)\\s{1,999}A)(?=[,;]?\\s|\\.|$)", "B"),
         replacingService.retrieveTokenReplacingPattern(
             Pair.of("\n" + "A", "\n" + "  B "), CobolLanguageId.COBOL));
   }

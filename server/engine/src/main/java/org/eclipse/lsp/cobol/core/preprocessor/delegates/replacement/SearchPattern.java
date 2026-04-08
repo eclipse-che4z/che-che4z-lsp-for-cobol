@@ -88,7 +88,7 @@ public enum SearchPattern {
   };
 
   private static String adjustSpaces(String escapeSpecialCharacters) {
-    return String.join("\\s+", escapeSpecialCharacters.split("[\\r\\n]*\\s+"));
+    return String.join("\\s{1,999}", escapeSpecialCharacters.split("[\\r\\n]*\\s+"));
   }
 
   private static boolean isQuotedString(String text) {
