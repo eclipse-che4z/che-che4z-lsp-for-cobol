@@ -105,10 +105,10 @@ public class DidChangeWatchedFilesHandler {
     return uri.startsWith(VSCODE_SCHEME_PREFIX);
   }
 
-  static final Pattern ZOWE_FSP_PATTER = Pattern.compile(".*/zowe-fsp/v\\d+\\.[a-f0-9]{64}$");
+  static final Pattern ZOWE_FSP_PATTERN = Pattern.compile(".*/zowe-fsp/v\\d+\\.[a-f0-9]{64}$");
 
   private boolean isZoweFspCacheFile(String uri) {
-    return ZOWE_FSP_PATTER.matcher(uri).matches();
+    return ZOWE_FSP_PATTERN.matcher(uri).matches();
   }
 
   private void logFileChanges(Set<String> changes) {
