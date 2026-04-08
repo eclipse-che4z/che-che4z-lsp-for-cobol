@@ -105,12 +105,11 @@ export class ZoweCache {
         return;
       }
       await this.writeCached(uriString, z.value);
-      this.invalidate();
     } else if (isNotFoundError(z.reason)) {
       this.obtainedZoweResponse(uriString);
       await this.deleteCached(uriString);
-      if (c.status === "fulfilled" && c.value) this.invalidate();
     }
+    if (c.status === "fulfilled" && c.value) this.invalidate();
   }
 }
 
