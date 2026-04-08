@@ -59,7 +59,7 @@ public class QualifiedReferenceUpdateVariableUsage implements Processor<Qualifie
     }
 
     if (variableUsageChain.isEmpty()) {
-      LOG.warn("Qualified reference node don't have any variable usages. {}", node);
+      LOG.debug("Qualified reference node don't have any variable usages. {}", node);
       return;
     }
 
