@@ -92,9 +92,7 @@ describe("ProcessorGroupsLoader", () => {
 
       it("generates workspace processor group with dsn path first", () => {
         const result = readSettingConfig(DEFAULT_DIALECT);
-        expect(result.libs).toEqual([
-          new UssPathLib("/user/copybooks"),
-        ]);
+        expect(result.libs).toEqual([new UssPathLib("/user/copybooks")]);
       });
     });
   });
