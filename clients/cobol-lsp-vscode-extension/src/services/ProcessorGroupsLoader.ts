@@ -311,7 +311,7 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
           folderPattern: internalPath,
         };
       }
-      return uss;
+      return { uss };
     },
   );
   return {

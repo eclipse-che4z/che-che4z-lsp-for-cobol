@@ -37,6 +37,7 @@ import {
 import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
 import { E4EExternalConfigurationResponse } from "../../type/e4eApi";
 import { e4eMock } from "../../__mocks__/getE4EMock.utility";
+import { UssPathLib } from "../../services/copybookLibs/UssPathLib";
 
 describe("ProcessorGroupsLoader", () => {
   describe("readSettingConfig", () => {
@@ -79,6 +80,21 @@ describe("ProcessorGroupsLoader", () => {
         const result = readSettingConfig(DEFAULT_DIALECT);
         expect(result.libs![0]).toEqual(new DatasetLib("FIRST.DATASET"));
         expect(result.libs![1]).toEqual(new DatasetLib("SECOND.DATASET"));
+      });
+    });
+
+    describe("uss is correctly processed", () => {
+      beforeEach(() => {
+        getConfigurationResult["paths-local"] = [];
+        getConfigurationResult["paths-dsn"] = [];
+        getConfigurationResult["paths-uss"] = ["/user/copybooks"];
+      });
+
+      it("generates workspace processor group with dsn path first", () => {
+        const result = readSettingConfig(DEFAULT_DIALECT);
+        expect(result.libs).toEqual([
+          new UssPathLib("/user/copybooks"),
+        ]);
       });
     });
   });
