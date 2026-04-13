@@ -12,16 +12,21 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as path from "path";
+import * as path from "node:path";
 
 import { runTests } from "@vscode/test-electron";
-import * as os from "os";
+import * as os from "node:os";
 
 async function main() {
   try {
     // The folder containing the Extension Manifest package.json
     // Passed to `--extensionDevelopmentPath`
-    const extensionDevelopmentPath = path.resolve(__dirname, "../../");
+    const extensionDevelopmentPath = [
+      path.join(__dirname, "../../"),
+      path.join(__dirname, "../../../idms-dialect-support/"),
+      path.join(__dirname, "../../../daco-dialect-support/"),
+      path.join(__dirname, "../../../sample-dialect-support/"),
+    ];
     // The path to test runner
     // Passed to --extensionTestsPath
     const extensionTestsPath = path.resolve(__dirname, "./suite/index");
@@ -35,7 +40,7 @@ async function main() {
       launchArgs,
     });
   } catch (err) {
-    console.error("Failed to run tests");
+    console.error("Failed to run tests: ", err);
     process.exit(1);
   }
 }
