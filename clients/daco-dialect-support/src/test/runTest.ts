@@ -24,14 +24,19 @@ async function main() {
     const extensionDevelopmentPath = [
       path.join(__dirname, "../../"),
       path.join(__dirname, "../../../idms-dialect-support/"),
-      path.join(__dirname, "../../../daco-dialect-support/"),
-      path.join(__dirname, "../../../sample-dialect-support/"),
+      path.join(__dirname, "../../../cobol-lsp-vscode-extension/"),
     ];
     // The path to test runner
     // Passed to --extensionTestsPath
     const extensionTestsPath = path.resolve(__dirname, "./suite/index");
 
-    const launchArgs = ["--user-data-dir", `${os.tmpdir()}`];
+    const launchArgs = [
+      path.join(__dirname, "../../test_files"),
+      "--disable-extensions",
+      "--disable-workspace-trust",
+      "--user-data-dir",
+      `${os.tmpdir()}`,
+    ];
 
     // Download VS Code, unzip it and run the integration test
     await runTests({

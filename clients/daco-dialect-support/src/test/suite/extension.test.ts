@@ -12,14 +12,37 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
+import * as helper from "./testHelper";
+import { pos, range } from "./testHelper";
 
-suite("Extension Test Suite", () => {
-  vscode.window.showInformationMessage("Start all tests.");
+suite("Extension Test Suite", function () {
+  this.timeout(helper.TEST_TIMEOUT);
 
-  test("Sample test", () => {
-    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+  suiteSetup(async function () {
+    await helper.activate();
+  });
+
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  test("Sample test", async () => {
+    await helper.sleep(100000);
+
+    // const editor = await helper.showDocument("USER2.cbl");
+    // const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    // assert.strictEqual(diagnostics.length, 1);
+    // const d0 = diagnostics[0];
+
+    // assert.strictEqual(d0.message, "Syntax error on 'Program1-id'");
+    // helper.assertRangeIsEqual(d0.range, range(pos(14, 7), pos(14, 18)));
   });
 });
