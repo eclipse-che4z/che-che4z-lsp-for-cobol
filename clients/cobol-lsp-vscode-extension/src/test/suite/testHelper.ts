@@ -34,12 +34,6 @@ export async function activate() {
   if (idms && !idms.isActive) {
     await idms.activate();
   }
-  const daco = vscode.extensions.getExtension(
-    "BroadcomMFD.cobol-language-support-for-daco",
-  )!;
-  if (daco && !daco.isActive) {
-    await daco.activate();
-  }
   const sample = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-sample-dialect",
   )!;
