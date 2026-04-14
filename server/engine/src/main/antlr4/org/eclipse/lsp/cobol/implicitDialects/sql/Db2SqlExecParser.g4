@@ -1306,7 +1306,7 @@ dbs_basic_and_distinct_predicate: dbs_expressions (dbs_predicate_condition | IS 
 dbs_exist_predicate: EXISTS LPARENCHAR dbs_select RPARENCHAR;
 dbs_in_predicate: dbs_expressions NOT? IN LPARENCHAR dbs_expressions (dbs_comma_separator dbs_expressions)* RPARENCHAR;
 dbs_between_predicate: dbs_expressions NOT? BETWEEN dbs_expressions AND dbs_expressions;
-dbs_like_predicate: dbs_sql_identifier NOT? LIKE dbs_expressions (ESCAPE dbs_expressions)?;
+dbs_like_predicate: dbs_expressions NOT? LIKE dbs_expressions (ESCAPE dbs_expressions)?;
 dbs_null_predicate: dbs_expression IS NOT? NULL;
 dbs_predicate: dbs_basic_and_distinct_predicate
                 | dbs_quantified_predicate //
