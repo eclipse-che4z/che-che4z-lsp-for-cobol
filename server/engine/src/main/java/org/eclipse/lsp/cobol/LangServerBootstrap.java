@@ -75,6 +75,8 @@ public class LangServerBootstrap {
     ClientProvider provider = injector.getInstance(ClientProvider.class);
 
     langServerBootstrap.start(args, server, provider);
+
+    System.exit(0);
   }
 
   private static boolean isCliMode(String[] args) {
