@@ -626,6 +626,7 @@ DS : D S;
 DS3270 : D S '3' '2' '7' '0';
 DSALIMIT : D S A L I M I T;
 DSANAME : D S A N A M E;
+DSIDERR : D S I D E R R;
 DSIE : D S I E;
 DSNAME : D S N A M E;
 DSNAME01 : D S N A M E '0' '1';
