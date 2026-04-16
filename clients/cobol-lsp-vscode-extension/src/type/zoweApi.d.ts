@@ -21,7 +21,7 @@ interface IApiRegisterClient {
   getMvsApi(profile: IProfileLoaded): IMvs;
   registeredApiTypes(): string[];
   onProfileUpdated?(fn: (profile: IProfileLoaded) => unknown): void;
-  onProfilesUpdate?(fn: (changeType: 0|1|2) => unknown): void;
+  onProfilesUpdate?(fn: (changeType: 0 | 1 | 2) => unknown): void;
 }
 
 interface IApiExplorerExtender {
