@@ -115,7 +115,7 @@ async function v2Api(context: vscode.ExtensionContext) {
       programUri: vscode.Uri,
       text: string,
     ) => {
-      preprocessor.execute(context, programUri, text, outputChannel);
+      await preprocessor.execute(context, programUri, text, outputChannel);
     },
   );
   if (unregister instanceof Error) {

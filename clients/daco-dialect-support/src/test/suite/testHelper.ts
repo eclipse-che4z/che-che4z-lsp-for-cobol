@@ -28,18 +28,12 @@ export async function activate() {
   const idms = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-idms",
   );
-
-  console.log("*******" + JSON.stringify(idms));
-
   if (idms && !idms.isActive) {
     await idms.activate();
   }
   const daco = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-daco",
   );
-
-  console.log("*******" + JSON.stringify(daco));
-
   if (daco && !daco.isActive) {
     await daco.activate();
   }

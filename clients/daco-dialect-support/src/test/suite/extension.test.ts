@@ -34,15 +34,14 @@ suite("Extension Test Suite", function () {
     await helper.closeAllEditors();
   });
 
-  test("Sample test", async () => {
-    await helper.sleep(100000);
+  test("Resolve copybook without suffix successfully", async () => {
+    const editor = await helper.showDocument("DaCo1.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
 
-    // const editor = await helper.showDocument("USER2.cbl");
-    // const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    // assert.strictEqual(diagnostics.length, 1);
-    // const d0 = diagnostics[0];
-
-    // assert.strictEqual(d0.message, "Syntax error on 'Program1-id'");
-    // helper.assertRangeIsEqual(d0.range, range(pos(14, 7), pos(14, 18)));
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(11, 20), pos(11, 32)));
   });
 });

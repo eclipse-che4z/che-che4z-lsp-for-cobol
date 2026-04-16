@@ -301,8 +301,8 @@ jobs:
         working-directory: clients/daco-dialect-support
         run: |
           npm ci
-          npm run compile
-          npm run test:integration
+          npm run package
+          xvfb-run -a npm run test:integration
       - name: SonarQube Scan
         if: github.ref == 'refs/heads/development'
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
