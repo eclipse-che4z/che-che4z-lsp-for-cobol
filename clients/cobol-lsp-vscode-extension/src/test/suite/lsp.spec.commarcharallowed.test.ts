@@ -32,7 +32,7 @@ suite("TF51590: COBOL LS - SQL COMMA DECIMAL ENABLED/DISABLED", function () {
   });
 
   test("TC399993-Test sql-decimal-comma-allowed FALSE", async () => {
-    await helper.updateConfig("sql_decimal_comma_allowed.json");
+    await helper.updateConfig("sql_decimal_comma_allowed_false.json");
     const editor = await helper.showDocument("SQL_IN_KEYWORD.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     assert.strictEqual(diagnostics.length, 0);
