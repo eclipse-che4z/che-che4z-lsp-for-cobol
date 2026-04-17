@@ -11,23 +11,10 @@
  * Contributors:
  *   Broadcom, Inc. - initial API and implementation
  */
-export class Uri {
-  static file(path: string) {
-    return {
-      fsPath: path,
-      path,
-      toString: () => path,
-    };
-  }
+import { URI, Utils } from "vscode-uri";
 
-  static parse(value: string) {
-    return {
-      fsPath: value,
-      path: value,
-      toString: () => value,
-    };
-  }
-}
+export const Uri = URI;
+Object.assign(Uri, Utils);
 
 export class Range {
   public start: Position;

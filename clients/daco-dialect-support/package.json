@@ -133,13 +133,14 @@
     "eslint": "^9.39.4",
     "eslint-plugin-sonarjs": "^1.0.4",
     "glob": "^8.0.3",
-    "mocha": "^10.1.0",
-    "prettier": "2.8.7",
     "jest-jasmine2": "^29.7.0",
     "jest-sonar-reporter": "^2.0.0",
+    "mocha": "^10.1.0",
+    "prettier": "2.8.7",
     "ts-jest": "^29.4.4",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.2"
+    "typescript-eslint": "8.57.2",
+    "vscode-uri": "^3.1.0"
   },
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support",
