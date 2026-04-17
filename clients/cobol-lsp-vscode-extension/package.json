@@ -441,7 +441,7 @@
           "default": "true",
           "description": "Enables syntactic validation of SQL statements inside EXEC SQL blocks"
         },
-        "cobol-lsp.sql-comma-char-allowed": {
+        "cobol-lsp.sql-decimal-comma-allowed": {
           "type": "boolean",
           "default": false,
           "description": "Enables comma char use for decimal values in SQL statements"

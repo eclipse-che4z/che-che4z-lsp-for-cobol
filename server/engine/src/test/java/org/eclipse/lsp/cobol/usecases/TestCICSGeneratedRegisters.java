@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -76,6 +77,7 @@ public class TestCICSGeneratedRegisters {
             false,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of());
 

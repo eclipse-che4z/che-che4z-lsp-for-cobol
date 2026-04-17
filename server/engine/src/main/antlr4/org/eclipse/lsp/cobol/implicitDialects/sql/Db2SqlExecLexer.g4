@@ -15,7 +15,7 @@ lexer grammar Db2SqlExecLexer;
 @lexer::members {
     private boolean commaCharAllowed = false;
 
-    public void setCommaCharAllowed(boolean value) {
+    public void setSQLDecimalCommaAllowed(boolean value) {
         this.commaCharAllowed = value;
     }
 }

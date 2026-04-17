@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonPrimitive;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -196,6 +197,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -225,6 +227,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DATACOM_SERVER"))));
   }
@@ -258,6 +261,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
     analysisConfig.getCompilerOptions().add("STDSQL(YES)");
@@ -279,6 +283,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.DISABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
@@ -302,6 +307,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.DISABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
@@ -322,6 +328,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.DISABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
@@ -342,6 +349,7 @@ class TestSqlIncludeStatementForImplicitlyDefinedCpy {
             true,
             false,
             SqlProcessing.DISABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("target-sql-backend", new JsonPrimitive("DB2_SERVER")));
 
