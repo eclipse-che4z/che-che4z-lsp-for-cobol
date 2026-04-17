@@ -214,7 +214,7 @@ export async function updateConfig(configFileName: string) {
     "settings.json",
   );
   const settingsValueLoc = vscode.Uri.joinPath(
-    vscode.Uri.file(getWorkspacePath()),
+    vscode.workspace.workspaceFolders[0].uri,
     "settings",
     configFileName,
   );
