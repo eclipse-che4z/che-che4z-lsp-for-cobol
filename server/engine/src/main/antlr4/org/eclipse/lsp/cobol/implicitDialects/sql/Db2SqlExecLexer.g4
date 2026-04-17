@@ -13,7 +13,11 @@
  */
 lexer grammar Db2SqlExecLexer;
 @lexer::members {
-   boolean commaCharAllowed = true;
+    private boolean commaCharAllowed = false;
+
+    public void setCommaCharAllowed(boolean value) {
+        this.commaCharAllowed = value;
+    }
 }
 channels{COMMENTS}
 

@@ -80,6 +80,7 @@ public interface ConfigurationService {
     boolean cicsTranslatorEnabled;
     List<DialectRegistryItem> dialectRegistry;
     SqlProcessing isSQLProcessingEnabled;
+    boolean sqlCommaCharAllowed;
     List<String> compilerOptions;
     ErrorSeverity unusedVariableSeverity;
     //    CobolProgramLayout layout;
@@ -91,6 +92,7 @@ public interface ConfigurationService {
       cicsTranslatorEnabled = true;
       dialectRegistry = ImmutableList.of();
       isSQLProcessingEnabled = SqlProcessing.ENABLED;
+      sqlCommaCharAllowed = false;
       compilerOptions = ImmutableList.of();
       unusedVariableSeverity = null;
       dialectsSettings = ImmutableMap.of();

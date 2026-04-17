@@ -106,6 +106,20 @@ public class ConfigHelper {
   }
 
   /**
+   * Comma char allowed client configurations
+   *
+   * @param commaCharAllowed
+   * @return True if checked or false
+   */
+  public boolean parseSqlCommaCharAllowed(JsonElement commaCharAllowed) {
+    if (commaCharAllowed instanceof JsonNull) {
+      return false;
+    } else {
+      return commaCharAllowed.getAsBoolean();
+    }
+  }
+
+  /**
    * Parse CICS translator client configurations to {@link Boolean}
    *
    * @param options CICS translator client configuration

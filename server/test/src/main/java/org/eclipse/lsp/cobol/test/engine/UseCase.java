@@ -70,6 +70,8 @@ public class UseCase {
 
   @Builder.Default SqlProcessing sqlProcessing = SqlProcessing.ENABLED;
 
+  @Builder.Default boolean sqlCommaCharAllowed = false;
+
   @Builder.Default UnusedVariableSeverity unusedVariableSeverity = new UnusedVariableSeverity();
 
   /** preprocessor directives mapped with preprocessor name */
@@ -89,6 +91,7 @@ public class UseCase {
             cicsTranslator,
             false,
             sqlProcessing,
+            sqlCommaCharAllowed,
             ImmutableList.of(),
             dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);

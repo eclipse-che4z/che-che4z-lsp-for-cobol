@@ -35,6 +35,7 @@ public enum SettingsParametersEnum {
   CICS_TRANSLATOR_ENABLED("cics.translator"),
   SQL_PROCESSING_ENABLED_SETTING("target-sql-backend-enable-processing"),
   SQL_BACKEND_SETTING("target-sql-backend"),
+  SQL_COMMA_CHAR_ALLOWED("sql-comma-char-allowed"),
   COMPILER_OPTIONS("compiler.options"),
   DIALECT_REGISTRY("dialect.registry"),
   COBOL_PROGRAM_LAYOUT("cobol.program.layout"),
