@@ -265,7 +265,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
             .collect(Collectors.toList());
     copybookService.invalidateCache(true);
     subroutineService.invalidateCache();
-    LOG.info("Cache invalidated");
+    LOG.info("Cache invalidated - reanalysing opened programs");
     openDocuments.forEach(
         doc ->
             scheduleAnalysis(
@@ -315,7 +315,7 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
               });
 
       subroutineService.invalidateCache();
-      LOG.info("Cache invalidated");
+      LOG.info("Cache invalidated - reanalysing program: {}", uri);
       scheduleAnalysis(documentModel, analysisResultsRevisions.getOrDefault(uri, 0), false, true);
     }
   }

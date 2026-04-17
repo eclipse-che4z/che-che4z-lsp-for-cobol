@@ -12,7 +12,6 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 import { splitFilename } from "../../util/FSUtils";
-import { zoweSemaphore } from "../ZoweThrottling";
 import {
   MemberCacheItem,
   ZoweExplorerDownloader,
@@ -23,59 +22,39 @@ import * as vscode from "vscode";
  * Copybook downloader from USS using Zowe Explorer
  */
 export class CopybookDownloaderForUss extends ZoweExplorerDownloader {
-  constructor() {
-    super();
-  }
-
   public async getAllMembers(
     profileName: string,
     dataset: string,
     allowedCopybooksExtensions: string[],
   ): Promise<MemberCacheItem[]> {
-    const id = this.createId(profileName, dataset, allowedCopybooksExtensions);
-
-    if (this.memberListCache.has(id)) {
-      return this.memberListCache.get(id)!;
-    }
-
-    allowedCopybooksExtensions = allowedCopybooksExtensions?.map((ext) =>
-      ext.toLowerCase(),
-    );
+    allowedCopybooksExtensions = allowedCopybooksExtensions
+      ?.map((ext) => ext.toLowerCase())
+      .sort();
     const allowedNoExtension = allowedCopybooksExtensions?.includes("");
 
-    const members: MemberCacheItem[] = [];
-
-    await this.limitFailedRequests(
+    return this.makeCachedRequest(
       `list USS directory ${profileName}/${dataset}`,
-      async () => {
-        const response = await zoweSemaphore.locked(() =>
-          vscode.workspace.fs.readDirectory(
-            vscode.Uri.from({
-              scheme: "zowe-uss",
-              path: `/${profileName}${dataset}`,
-            }),
-          ),
-        );
-
+      this.createId(profileName, dataset, allowedCopybooksExtensions),
+      vscode.Uri.from({
+        scheme: "zowe-uss",
+        path: `/${profileName}${dataset}`,
+      }),
+      (response) => {
+        const members: MemberCacheItem[] = [];
         for (const file of response) {
-          if (file[1] === vscode.FileType.File) {
-            const [name, extension] = splitFilename(file[0]);
+          if (file[1] !== vscode.FileType.File) continue;
+          const [name, extension] = splitFilename(file[0]);
 
-            if (extension) {
-              if (
-                allowedCopybooksExtensions?.includes(extension.toLowerCase())
-              ) {
-                members.push({ name, extension });
-              }
-            } else if (allowedNoExtension) {
-              members.push({ name });
+          if (extension) {
+            if (allowedCopybooksExtensions?.includes(extension.toLowerCase())) {
+              members.push({ name, extension });
             }
+          } else if (allowedNoExtension) {
+            members.push({ name });
           }
         }
-        this.memberListCache.set(id, members);
+        return members;
       },
     );
-
-    return members;
   }
 }

@@ -2,6 +2,7 @@ import { readFileResult } from "../../../__mocks__/vscode";
 import {
   readFileContent,
   resolveCopybookURI,
+  ZoweCache,
 } from "../../../services/copybook/CopybookMessageHandler";
 import * as vscode from "vscode";
 import * as ProcessorGroups from "../../../services/ProcessorGroups";
@@ -14,6 +15,10 @@ export type Writable<T> = {
 };
 
 describe("CopybookMessageHandler", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe("readFileContent", () => {
     beforeEach(() => {
       readFileResult["/workspace/file"] = "CONTENT";
@@ -46,6 +51,45 @@ describe("CopybookMessageHandler", () => {
       expect(outputChannel.error).toHaveBeenCalledWith(
         expect.stringContaining("file/content message handler error"),
       );
+    });
+
+    it("can read content files from mainframe using Zowe FS Provider with cache", async () => {
+      const uri = vscode.Uri.parse("zowe-ds:/MY.DATASET/HELLO");
+      const cacheDir = vscode.Uri.parse("cache:/dir");
+      const cache = new ZoweCache(cacheDir, () => {}, 0);
+
+      const result = await readFileContent(uri.toString(), cache);
+      expect(result).toEqual("MAINFRAME-CONTENT");
+
+      await new Promise((resolve) => setTimeout(resolve, 1));
+
+      expect(vscode.workspace.fs.readFile).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ scheme: "zowe-ds" }),
+      );
+      expect(vscode.workspace.fs.readFile).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ scheme: "cache" }),
+      );
+      expect(vscode.workspace.fs.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({ scheme: "cache" }),
+        expect.arrayContaining([]),
+      );
+    });
+
+    it("verify invalidation callback is called on cache content mismatch", async () => {
+      const uri = vscode.Uri.parse("zowe-ds:/MY.DATASET/HELLO");
+      const cacheDir = vscode.Uri.parse("cache:/dir");
+      readFileResult[
+        "/dir/v1.692a6a0082f326f237b682a830363f468d7562e63405ca966c9d7937fdf3c73e"
+      ] = "DOES NOT MATCH";
+      await new Promise<void>((invalidate, reject) => {
+        const cache = new ZoweCache(cacheDir, invalidate, 0);
+
+        readFileContent(uri.toString(), cache)
+          .then((result) => expect(result).toEqual("MAINFRAME-CONTENT"))
+          .catch(reject);
+      });
     });
   });
 

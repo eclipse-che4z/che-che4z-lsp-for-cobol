@@ -33,6 +33,7 @@ describe("Dataset copybook lib", () => {
       .spyOn(Utils, "getZoweExplorerAPI")
       .mockResolvedValue({ api: {} as IApiRegisterClient });
     await initializeExternalAPIs(vscode.Uri.file("/storage"));
+    jest.clearAllMocks();
   });
 
   describe("resolveCopybookUri", () => {
@@ -197,6 +198,28 @@ describe("Dataset copybook lib", () => {
         expect(result).toBeUndefined();
         expect(statSpy).toHaveBeenCalledTimes(2); // credentials check and retry
         expect(vscode.workspace.fs.readDirectory).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Concurrent requests", () => {
+      it("are merged when identical", async () => {
+        const lib = new DatasetLib("DATASET.WITH.COPYBOOK", "profile");
+        const promises = [];
+        for (let i = 0; i < 3; ++i) {
+          promises.push(
+            lib.resolveCopybookUri(
+              "COPYBOOK",
+              vscode.Uri.file("/program.cbl"),
+              DEFAULT_DIALECT,
+            ),
+          );
+        }
+        const results = await Promise.all(promises);
+        const expectedUri = vscode.Uri.parse(
+          "zowe-ds:/profile/DATASET.WITH.COPYBOOK/COPYBOOK.cpy",
+        );
+        expect(results).toEqual([expectedUri, expectedUri, expectedUri]);
+        expect(vscode.workspace.fs.readDirectory).toHaveBeenCalledTimes(1);
       });
     });
 

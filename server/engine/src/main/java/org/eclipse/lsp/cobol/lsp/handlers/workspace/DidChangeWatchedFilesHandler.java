@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -92,7 +93,8 @@ public class DidChangeWatchedFilesHandler {
   private boolean isRelevantFileChange(FileEvent change) {
     return !isGitMetadataFile(change.getUri())
         && !change.getUri().startsWith(GIT_SCHEME_PREFIX)
-        && !isVscodeSchemaFile(change.getUri());
+        && !isVscodeSchemaFile(change.getUri())
+        && !isZoweFspCacheFile(change.getUri());
   }
 
   private boolean isGitMetadataFile(String uri) {
@@ -101,6 +103,12 @@ public class DidChangeWatchedFilesHandler {
 
   private boolean isVscodeSchemaFile(String uri) {
     return uri.startsWith(VSCODE_SCHEME_PREFIX);
+  }
+
+  static final Pattern ZOWE_FSP_PATTERN = Pattern.compile(".*/zowe-fsp/v\\d+\\.[a-f0-9]{64}$");
+
+  private boolean isZoweFspCacheFile(String uri) {
+    return ZOWE_FSP_PATTERN.matcher(uri).matches();
   }
 
   private void logFileChanges(Set<String> changes) {

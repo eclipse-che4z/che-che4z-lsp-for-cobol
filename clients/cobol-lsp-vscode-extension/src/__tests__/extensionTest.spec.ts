@@ -50,7 +50,7 @@ jest.mock("../services/reporter");
 
 const context = {
   subscriptions: [],
-  globalStorageUri: { fsPath: "/storagePath" },
+  globalStorageUri: vscode.Uri.parse("scheme:/storagePath"),
 } as unknown as vscode.ExtensionContext;
 
 beforeEach(() => {

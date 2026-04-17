@@ -32,6 +32,7 @@ import {
   HP_LANGUAGE_ID,
   LANGUAGE_ID,
   ZOWE_FOLDER,
+  ZOWE_FSP_CACHE,
 } from "./constants";
 import type { ExternalAPIsService } from "./services/ExternalAPIsService";
 import {
@@ -71,6 +72,7 @@ import {
 import {
   readFileContent,
   resolveCopybookURI,
+  ZoweCache,
 } from "./services/copybook/CopybookMessageHandler";
 import { invalidateConfig } from "./services/ProcessorGroupsLoader";
 import { outputChannel } from "./services/util/OutputChannel";
@@ -128,6 +130,13 @@ export async function activate(
     },
   });
 
+  const zoweCache = await makeZoweCache(
+    vscode.Uri.joinPath(context.globalStorageUri, ZOWE_FSP_CACHE),
+    languageClientService.invalidateConfiguration,
+  );
+
+  attachEventHandlers(languageClientService, zoweCache);
+
   externalApis = await initializeExternalAPIs(
     context.globalStorageUri,
     languageClientService.invalidateConfiguration,
@@ -150,6 +159,7 @@ export async function activate(
   DialectRegistry.clear();
   const dialectService = new DialectService(
     languageClientService,
+    zoweCache,
     outputChannel,
   );
 
@@ -241,17 +251,18 @@ async function createExtensionFolder(context: vscode.ExtensionContext) {
   }
 }
 
-async function initializeLanguageClientService(
-  context: vscode.ExtensionContext,
-  middleware: Middleware,
+async function makeZoweCache(
+  uri: vscode.Uri,
+  invalidationCallback: () => void | Promise<void>,
 ) {
-  const languageClientService = new LanguageClientService(
-    outputChannel,
-    context.globalStorageUri,
-    middleware,
-  );
-  context.subscriptions.push(languageClientService);
+  await vscode.workspace.fs.createDirectory(uri);
+  return new ZoweCache(uri, invalidationCallback);
+}
 
+function attachEventHandlers(
+  languageClientService: LanguageClientService,
+  zoweCache: ZoweCache,
+) {
   languageClientService.addRequestHandler(
     "cobol/resolveSubroutine",
     resolveSubroutineURI,
@@ -264,7 +275,21 @@ async function initializeLanguageClientService(
     "copybook/resolve",
     resolveCopybookURI,
   );
-  languageClientService.addRequestHandler("file/content", readFileContent);
+  languageClientService.addRequestHandler("file/content", (u: string) =>
+    readFileContent(u, zoweCache),
+  );
+}
+
+async function initializeLanguageClientService(
+  context: vscode.ExtensionContext,
+  middleware: Middleware,
+) {
+  const languageClientService = new LanguageClientService(
+    outputChannel,
+    context.globalStorageUri,
+    middleware,
+  );
+  context.subscriptions.push(languageClientService);
 
   try {
     if (SettingsService.serverRuntime() === "NATIVE") {
