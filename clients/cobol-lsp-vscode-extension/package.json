@@ -443,7 +443,7 @@
         },
         "cobol-lsp.sql-comma-char-allowed": {
           "type": "boolean",
-          "default": "false",
+          "default": false,
           "description": "Enables comma char use for decimal values in SQL statements"
         },
         "cobol-lsp.dialects": {
