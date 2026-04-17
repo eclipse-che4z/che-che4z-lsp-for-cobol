@@ -39,12 +39,6 @@ export async function activate() {
   }
 }
 
-export function getWorkspacePath(): string {
-  if (vscode.workspace.workspaceFolders)
-    return vscode.workspace.workspaceFolders[0].uri.fsPath;
-  throw new Error("Workspace not found");
-}
-
 export function getWorkspace(): vscode.WorkspaceFolder {
   if (vscode.workspace.workspaceFolders)
     return vscode.workspace.workspaceFolders[0];
