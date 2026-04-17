@@ -187,17 +187,13 @@ export async function waitFor(
   label: string = "",
 ) {
   const startTime = Date.now();
-  if (await Promise.resolve(doneFunc())) {
-    return true;
-  }
   while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
       console.trace((label ? label : "") + "timeout!");
-      return false;
+      throw Error("Timeout");
     }
   }
-  return true;
 }
 
 export function sleep(ms: number): Promise<unknown> {
