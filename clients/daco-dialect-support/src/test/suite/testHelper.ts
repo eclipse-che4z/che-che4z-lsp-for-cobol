@@ -305,45 +305,5 @@ export function printAllDiagnostics(diagnostics: vscode.Diagnostic[]) {
   );
 }
 
-export async function getWorkspaceFile(workspace_file: string) {
-  const files = await vscode.workspace.findFiles(workspace_file);
-
-  assert.ok(files?.[0], workspace_file);
-  return files[0];
-}
-
-export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
-  const fileUri =
-    typeof file === "string" ? await getWorkspaceFile(file) : file;
-
-  const initialDiags = vscode.languages
-    .getDiagnostics(fileUri)
-    .map((x) => JSON.stringify(x))
-    .sort();
-
-  const result = new Promise<vscode.Diagnostic[]>((resolve) => {
-    let listener: vscode.Disposable | null =
-      vscode.languages.onDidChangeDiagnostics((e) => {
-        if (!listener) return;
-        const forFile = e.uris.find((v) => v.toString() === fileUri.toString());
-        if (!forFile) return;
-        const diags = vscode.languages.getDiagnostics(forFile);
-        if (
-          diags.length === initialDiags.length &&
-          diags
-            .map((x) => JSON.stringify(x))
-            .sort()
-            .every((x, i) => x === initialDiags[i])
-        )
-          return;
-        listener.dispose();
-        listener = null;
-        resolve(diags);
-      });
-  });
-
-  return result;
-}
-
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 export const asMutable = <T>(value: T): Mutable<T> => value as Mutable<T>;
