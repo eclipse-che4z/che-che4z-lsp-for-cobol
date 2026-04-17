@@ -17,7 +17,6 @@ import * as helper from "./testHelper";
 
 suite("TF51590: COBOL LS - SQL COMMA DECIMAL ENABLED/DISABLED", function () {
   suiteSetup(async function () {
-    this.timeout(0);
     await helper.activate();
   });
 

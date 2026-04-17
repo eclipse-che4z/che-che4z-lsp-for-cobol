@@ -113,7 +113,8 @@ public class ConfigHelper {
    * @return Enabled if checked or Disabled otherwise, Disabled in the case of an invalid state
    */
   public SqlDecimalComma parseSQLDecimalCommaAllowed(JsonElement sqlDecimalCommaAllowed) {
-    if (sqlDecimalCommaAllowed.isJsonPrimitive() && sqlDecimalCommaAllowed.getAsJsonPrimitive().isBoolean()) {
+    if (sqlDecimalCommaAllowed.isJsonPrimitive()
+        && sqlDecimalCommaAllowed.getAsJsonPrimitive().isBoolean()) {
       return sqlDecimalCommaAllowed.getAsBoolean()
           ? SqlDecimalComma.ENABLED
           : SqlDecimalComma.DISABLED;
