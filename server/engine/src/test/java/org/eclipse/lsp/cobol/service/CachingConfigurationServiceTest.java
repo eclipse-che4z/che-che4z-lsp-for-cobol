@@ -224,7 +224,7 @@ class CachingConfigurationServiceTest {
             JsonNull.INSTANCE,
             new JsonArray(),
             JsonNull.INSTANCE,
-            new JsonPrimitive("true"),
+            new JsonPrimitive(true),
             JsonNull.INSTANCE,
             new JsonArray(),
             dialectsSettings);
