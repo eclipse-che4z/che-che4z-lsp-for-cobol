@@ -53,7 +53,7 @@ suite("TF51590: COBOL LS - SQL COMMA DECIMAL ENABLED/DISABLED", function () {
     await helper.updateConfig("basic.json");
     const editor = await helper.showDocument("SQL_IN_KEYWORD.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics.length, 0);
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
