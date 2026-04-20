@@ -235,7 +235,7 @@
         "configuration": "./syntaxes/lang-config-hp.json"
       },
       {
-        "id": "ndvr-cobol",
+        "id": "endevor-print-cobol",
         "extensions": [
           ".cbl.prnt",
           ".cob.prnt",
@@ -244,7 +244,7 @@
           ".cpy.prnt"
         ],
         "aliases": [
-          "NDVR-COBOL"
+          "Endevor Print COBOL"
         ]
       }
     ],
@@ -285,7 +285,7 @@
         }
       },
       {
-        "language": "ndvr-cobol",
+        "language": "endevor-print-cobol",
         "scopeName": "source.ndvr.cobol",
         "path": "./syntaxes/NDVR.COBOL.tmLanguage.json",
         "embeddedLanguages": {
