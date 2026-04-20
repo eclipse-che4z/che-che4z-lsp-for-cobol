@@ -81,13 +81,14 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
 ) {
   if (item.scopeUri) {
     try {
+      const scopeUri = vscode.Uri.parse(item.scopeUri);
       const configuration = vscode.workspace
-        .getConfiguration()
+        .getConfiguration(undefined, scopeUri)
         .get(item.section);
       if (typeof configuration !== "undefined") {
         const decodedConfiguration = decodeUnknown(codec, configuration);
         const itemWithScope = {
-          scopeUri: vscode.Uri.parse(item.scopeUri),
+          scopeUri,
           section: item.section,
         };
         const object = await processorGroupLoader(
