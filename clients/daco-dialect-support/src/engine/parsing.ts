@@ -92,9 +92,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
     console.log("Copybook level: " + ctx.LEVEL_NUMBER()?.getText());
 
-    const level = ctx.LEVEL_NUMBER()
-      ? Number.parseInt(ctx.LEVEL_NUMBER()!.getText(), 10)
-      : 0;
+    const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
 
     const statementRange = createRange(ctx);
     const nameRange = createRange(layoutId);
