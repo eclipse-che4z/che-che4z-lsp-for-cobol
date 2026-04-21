@@ -47,7 +47,7 @@ layoutId
    ;
 
 layoutUsage
-   : DACO_COPYBOOK_IDENTIFIER
+   : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z]{3}$/, "Invalid layout usage");}
    ;
 
 variableEntry
