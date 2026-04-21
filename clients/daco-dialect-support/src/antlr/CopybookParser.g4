@@ -43,7 +43,7 @@ copyMaid
    ;
 
 layoutId
-   : DACO_COPYBOOK_IDENTIFIER
+   : DACO_COPYBOOK_IDENTIFIER  { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z0-9]*([-][A-Z0-9]{3})?$/, "Invalid layout identifier"); }) 
    ;
 
 layoutUsage
