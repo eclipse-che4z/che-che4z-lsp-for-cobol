@@ -37,8 +37,8 @@ dataDescriptionEntry
 
 copyMaid
    : LEVEL_NUMBER? COPY MAID 
-      (l=layoutId { this.validateTokenWithRegex($l.start!, /^[A-Z0-9]*([-][A-Z0-9]{3})?$/, "Invalid layout identifier"); }) 
-      (u=layoutUsage { this.validateTokenWithRegex($u.start!, /^[A-Z]{3}$/, "Invalid layout usage");})? 
+      layoutId
+      layoutUsage? 
       DOT_FS
    ;
 
