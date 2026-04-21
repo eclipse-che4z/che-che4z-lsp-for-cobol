@@ -83,6 +83,10 @@ export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
+    if (!ctx.layoutId()) {
+      return super.visitChildren(ctx) ?? [];
+    }
+
     const layoutId = ctx.layoutId()!;
     const layoutUsage = ctx.layoutUsage();
 
@@ -119,8 +123,12 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   ): VariableDescriptor[] => {
     const levelRange = createRange(ctx.levelNumber());
     const level = Number.parseInt(ctx.levelNumber().getText());
-    const nameRange = createRange(ctx.entryName()!);
     const name = ctx.entryName()?.getText() ?? "";
+
+    if (name === "") {
+      return super.visitChildren(ctx) ?? [];
+    }
+    const nameRange = createRange(ctx.entryName());
 
     return [
       new VariableDescriptor(levelRange, level, nameRange, name),
@@ -136,7 +144,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   };
 }
 
-function createRange(ctx?: ParserRuleContext) {
+function createRange(ctx: ParserRuleContext | null): vscode.Range {
   return new vscode.Range(
     (ctx?.start?.line ?? 1) - 1,
     ctx?.start?.column ?? 0,
