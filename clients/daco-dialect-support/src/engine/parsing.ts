@@ -146,7 +146,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   };
 }
 
-function createRange(ctx: ParserRuleContext | null): vscode.Range {
+function createRange(ctx: ParserRuleContext): vscode.Range {
   return new vscode.Range(
     (ctx?.start?.line ?? 1) - 1,
     ctx?.start?.column ?? 0,
