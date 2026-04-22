@@ -1268,7 +1268,7 @@ without_or_with: (WITHOUT | WITH);
 yes_or_no: (YES | NO);
 
 dbs_select_into_suffix: INTO (target_variable_names_loop | dbs_array_variable) dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
-                                        dbs_orderby_clause? (dbs_offset_fetch_clause | dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
+                                        dbs_orderby_clause? (dbs_offset_fetch_clause | dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data dbs_select_statement_queryno_clause)*;
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*;
 dbs_select_statement_common_table_expression: dbs_sql_identifier (LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR)? AS dbs_fullselect;
