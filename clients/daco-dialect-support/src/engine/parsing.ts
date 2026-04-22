@@ -123,7 +123,9 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   ): VariableDescriptor[] => {
     const levelRange = createRange(ctx.levelNumber());
     const level = Number.parseInt(ctx.levelNumber().getText());
-    const name = ctx.entryName()?.getText() ?? "";
+    const entryName = ctx.entryName();
+    if (!entryName) return super.visitChildren(ctx) ?? [];
+    const name = entryName.getText() ?? "";
 
     if (name === "") {
       return super.visitChildren(ctx) ?? [];
