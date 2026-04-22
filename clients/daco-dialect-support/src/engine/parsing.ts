@@ -63,26 +63,45 @@ export class CollectingErrorListener extends BaseErrorListener {
     msg: string,
     _e: RecognitionException | null,
   ): void {
-    const range = offendingSymbol
-      ? new vscode.Range(
-          (offendingSymbol?.line ?? 1) - 1,
-          offendingSymbol?.column ?? 0,
-          (offendingSymbol?.line ?? 1) - 1,
-          (offendingSymbol?.column ?? 0) + (offendingSymbol?.text?.length ?? 1),
-        )
-      : new vscode.Range(
-          line - 1,
-          charPositionInLine,
-          line - 1,
-          charPositionInLine + 1,
-        );
-
     this.errors.push({
       line,
       column: charPositionInLine,
       message: msg,
-      range: range,
+      range: this.getRangeForSyntaxError(
+        offendingSymbol,
+        line,
+        charPositionInLine,
+      ),
     });
+  }
+
+  private getRangeForSyntaxError(
+    offendingSymbol: Token | null,
+    line: number,
+    charPositionInLine: number,
+  ) {
+    if (offendingSymbol) {
+      const lastPos =
+        offendingSymbol.stop == -1
+          ? offendingSymbol.column + (offendingSymbol.text?.length ?? 1)
+          : offendingSymbol.column +
+            offendingSymbol.stop -
+            offendingSymbol.start +
+            1;
+
+      return new vscode.Range(
+        offendingSymbol.line - 1,
+        offendingSymbol.column,
+        offendingSymbol.line - 1,
+        lastPos,
+      );
+    }
+    return new vscode.Range(
+      line - 1,
+      charPositionInLine,
+      line - 1,
+      charPositionInLine + 1,
+    );
   }
 }
 
