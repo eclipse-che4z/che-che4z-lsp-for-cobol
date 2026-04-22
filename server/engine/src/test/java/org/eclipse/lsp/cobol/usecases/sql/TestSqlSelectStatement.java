@@ -195,7 +195,7 @@ class TestSqlSelectStatement {
 
   @ParameterizedTest
   @MethodSource("textsToTest")
-  @DisplayName("Parameterized - sql whenever statements tests")
+  @DisplayName("Parameterized - sql select statements tests")
   void test(String text) {
     UseCaseEngine.runTest(text, ImmutableList.of(), ImmutableMap.of());
   }
