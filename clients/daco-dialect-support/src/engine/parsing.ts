@@ -147,9 +147,9 @@ export class CopybookContentVisitor extends VariableParserVisitor<
 
 function createRange(ctx: ParserRuleContext): vscode.Range {
   return new vscode.Range(
-    (ctx?.start?.line ?? 1) - 1,
-    ctx?.start?.column ?? 0,
-    (ctx?.stop?.line ?? 1) - 1,
-    (ctx?.stop?.column ?? 0) + (ctx?.stop?.text?.length ?? 0),
+    (ctx.start?.line ?? 1) - 1,
+    ctx.start?.column ?? 0,
+    (ctx.stop?.line ?? 1) - 1,
+    (ctx.stop?.column ?? 0) + (ctx.stop?.text?.length ?? 0),
   );
 }

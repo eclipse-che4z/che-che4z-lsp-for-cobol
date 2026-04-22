@@ -28,6 +28,8 @@ import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
 
 export class DaCoPreprocessor {
+  private firstCopybookLevel: number = 0;
+
   public async execute(
     context: IDocumentProcessingContext,
     _programUri: vscode.Uri,
@@ -170,21 +172,24 @@ export class DaCoPreprocessor {
     }
 
     if (copybookLevel != descriptor.level) {
-      const levelDifference = copybookLevel - descriptor.level;
-      const updatedLevel = copybookLevel - levelDifference;
+      const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
       const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
-      console.log(
-        "Updating level from " + descriptor.level + " to " + updatedLevelStr,
-        " Copybook level: " +
-          copybookLevel +
-          " Descriptor level: " +
-          descriptor.level,
-      );
       context.replace(descriptor.levelRange, updatedLevelStr);
     }
   }
 
   private updateVariableName(name: string, suffix: string) {
     return name;
+  }
+
+  private calculateLevel(copybookLevel: number, level: number): number {
+    if (copybookLevel != 0) {
+      if (this.firstCopybookLevel == 0) {
+        this.firstCopybookLevel = level;
+        return copybookLevel;
+      }
+      return level - this.firstCopybookLevel + copybookLevel;
+    }
+    return level;
   }
 }
