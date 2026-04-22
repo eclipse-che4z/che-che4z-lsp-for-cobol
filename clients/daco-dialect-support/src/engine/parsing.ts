@@ -63,21 +63,26 @@ export class CollectingErrorListener extends BaseErrorListener {
     msg: string,
     _e: RecognitionException | null,
   ): void {
-    if (offendingSymbol) {
-      const range = new vscode.Range(
-        (offendingSymbol.line ?? 1) - 1,
-        offendingSymbol.column ?? 0,
-        (offendingSymbol.line ?? 1) - 1,
-        (offendingSymbol.column ?? 0) + (offendingSymbol.text?.length ?? 1),
-      );
+    const range = offendingSymbol
+      ? new vscode.Range(
+          (offendingSymbol?.line ?? 1) - 1,
+          offendingSymbol?.column ?? 0,
+          (offendingSymbol?.line ?? 1) - 1,
+          (offendingSymbol?.column ?? 0) + (offendingSymbol?.text?.length ?? 1),
+        )
+      : new vscode.Range(
+          line - 1,
+          charPositionInLine,
+          line - 1,
+          charPositionInLine + 1,
+        );
 
-      this.errors.push({
-        line,
-        column: charPositionInLine,
-        message: msg,
-        range: range,
-      });
-    }
+    this.errors.push({
+      line,
+      column: charPositionInLine,
+      message: msg,
+      range: range,
+    });
   }
 }
 
