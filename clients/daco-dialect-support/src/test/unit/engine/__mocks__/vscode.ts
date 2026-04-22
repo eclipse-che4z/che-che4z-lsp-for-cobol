@@ -21,13 +21,18 @@ export class Range {
   public end: Position;
 
   constructor(
-    startLine: number,
-    startCharacter: number,
-    endLine: number,
-    endCharacter: number,
+    par0: number | Position,
+    par1: number | Position,
+    endLine?: number,
+    endCharacter?: number,
   ) {
-    this.start = new Position(startLine, startCharacter);
-    this.end = new Position(endLine, endCharacter);
+    if (endLine && endCharacter) {
+      this.start = new Position(par0 as number, par1 as number);
+      this.end = new Position(endLine, endCharacter);
+    } else {
+      this.start = par0 as Position;
+      this.end = par1 as Position;
+    }
   }
 }
 

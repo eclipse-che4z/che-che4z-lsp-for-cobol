@@ -100,8 +100,8 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
     const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
 
-    const statementRange = createRange(ctx);
-    const nameRange = createRange(layoutId);
+    const statementRange = constructRange(ctx);
+    const nameRange = constructRange(layoutId);
 
     return [
       new CopybookDescriptor(statementRange, nameRange, level, name, suffix),
@@ -123,7 +123,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   visitDataDescriptionEntryFormat1? = (
     ctx: DataDescriptionEntryFormat1Context,
   ): VariableDescriptor[] => {
-    const levelRange = createRange(ctx.levelNumber());
+    const levelRange = constructRange(ctx.levelNumber());
     const level = Number.parseInt(ctx.levelNumber().getText());
     const entryName = ctx.entryName();
     const name = entryName?.getText() ?? "";
@@ -131,7 +131,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     if (name === "" || !entryName) {
       return super.visitChildren(ctx) ?? [];
     }
-    const nameRange = createRange(entryName);
+    const nameRange = constructRange(entryName);
 
     return [
       new VariableDescriptor(levelRange, level, nameRange, name),
@@ -147,11 +147,16 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   };
 }
 
-function createRange(ctx: ParserRuleContext): vscode.Range {
-  return new vscode.Range(
-    (ctx.start?.line ?? 1) - 1,
-    ctx.start?.column ?? 0,
-    (ctx.stop?.line ?? 1) - 1,
-    (ctx.stop?.column ?? 0) + (ctx.stop?.text?.length ?? 0),
-  );
+function constructRange(ctx: ParserRuleContext): vscode.Range {
+  const start = ctx.start!;
+  const stop = ctx.stop;
+  const startPosition = new vscode.Position(start.line - 1, start?.column);
+  const stopPosition =
+    stop == null || start.start > stop.stop
+      ? startPosition
+      : new vscode.Position(
+          stop.line - 1,
+          stop.column + stop.stop - stop.start + 1,
+        );
+  return new vscode.Range(startPosition, stopPosition);
 }
