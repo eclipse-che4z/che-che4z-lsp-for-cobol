@@ -83,11 +83,11 @@ export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
-    if (!ctx.layoutId()) {
+    const layoutId = ctx.layoutId();
+    if (!layoutId) {
       return super.visitChildren(ctx) ?? [];
     }
 
-    const layoutId = ctx.layoutId()!;
     const layoutUsage = ctx.layoutUsage();
 
     const name = layoutId.getText();
