@@ -35,7 +35,7 @@ const DESCRIPTION = "DaCo dialect support";
 const DIALECT_API_VERSION_CONFIG = "dialect.api.version";
 
 export async function activate(context: vscode.ExtensionContext) {
-  updateApiVersion(context);
+  await updateApiVersion(context);
 }
 
 export function deactivate() {
@@ -57,9 +57,9 @@ async function updateApiVersion(context: vscode.ExtensionContext) {
   unregisterDialect();
 
   if (version === "legacy") {
-    v1Api(context);
+    await v1Api(context);
   } else {
-    v2Api(context);
+    await v2Api(context);
   }
 }
 
@@ -95,11 +95,9 @@ async function v1Api(context: vscode.ExtensionContext) {
 async function v2Api(context: vscode.ExtensionContext) {
   const outputChannel = vscode.window.createOutputChannel(DESCRIPTION);
   const preprocessor = new DaCoPreprocessor();
-
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
-
   const v2Api = await getV2Api(extensionId);
   if (v2Api instanceof Error) {
     vscode.window.showErrorMessage(v2Api.toString());
@@ -117,10 +115,9 @@ async function v2Api(context: vscode.ExtensionContext) {
       programUri: vscode.Uri,
       text: string,
     ) => {
-      preprocessor.execute(context, programUri, text, outputChannel);
+      await preprocessor.execute(context, programUri, text, outputChannel);
     },
   );
-
   if (unregister instanceof Error) {
     vscode.window.showErrorMessage(unregister.toString());
     return;
