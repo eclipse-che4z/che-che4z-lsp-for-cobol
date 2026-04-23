@@ -124,12 +124,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
     ];
   };
 
-  protected aggregateResult = (
-    aggregate: CopybookDescriptor[] | null,
-    nextResult: CopybookDescriptor[] | null,
-  ): CopybookDescriptor[] | null => {
-    return [...(aggregate ?? []), ...(nextResult ?? [])];
-  };
+  protected aggregateResult = concatResults;
 }
 
 export class CopybookContentVisitor extends VariableParserVisitor<
