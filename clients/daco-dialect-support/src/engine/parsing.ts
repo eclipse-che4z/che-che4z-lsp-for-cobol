@@ -92,6 +92,10 @@ export class CollectingErrorListener extends BaseErrorListener {
   }
 }
 
+function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
+    return [...(r1 ?? []), ...(r2 ?? [])];
+}
+
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
