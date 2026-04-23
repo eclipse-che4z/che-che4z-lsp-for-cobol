@@ -229,6 +229,7 @@ jobs:
         working-directory: clients/daco-dialect-support
         run: |
           npm ci
+          npm run compile
           npm run test:unit
       - name: update version with PR or build number
         if: github.event_name == 'pull_request' || github.event.inputs.include_build_number == 'true'
@@ -296,6 +297,12 @@ jobs:
           cp ../../server/engine/target/server.jar ./server/jar
           npm run build
           xvfb-run -a npm exec c8 -- --reporter=lcovonly --allowExternal --exclude="**/test/**" --exclude=".vscode-test/**" --exclude=".vscode-test-web/**" -- npm run test:integration
+      - name: Run DaCo LS extension integration tests
+        working-directory: clients/daco-dialect-support
+        run: |
+          npm ci
+          npm run package
+          xvfb-run -a npm run test:integration
       - name: SonarQube Scan
         if: github.ref == 'refs/heads/development'
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602
