@@ -26,7 +26,7 @@ export class Range {
     endLine?: number,
     endCharacter?: number,
   ) {
-    if (endLine && endCharacter) {
+    if (endLine !== undefined && endCharacter !== undefined) {
       this.start = new Position(par0 as number, par1 as number);
       this.end = new Position(endLine, endCharacter);
     } else {
