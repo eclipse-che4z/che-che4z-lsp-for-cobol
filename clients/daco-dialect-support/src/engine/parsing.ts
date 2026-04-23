@@ -149,12 +149,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     ];
   };
 
-  protected aggregateResult = (
-    aggregate: VariableDescriptor[] | null,
-    nextResult: VariableDescriptor[] | null,
-  ): VariableDescriptor[] | null => {
-    return [...(aggregate ?? []), ...(nextResult ?? [])];
-  };
+  protected aggregateResult = concatResults;
 }
 
 function constructRange(ctx: ParserRuleContext): vscode.Range {
