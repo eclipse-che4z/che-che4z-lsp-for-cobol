@@ -161,7 +161,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
 function constructRange(ctx: ParserRuleContext): vscode.Range {
   const start = ctx.start!;
   const stop = ctx.stop;
-  const startPosition = new vscode.Position(start.line - 1, start?.column);
+  const startPosition = new vscode.Position(start.line - 1, start.column);
   const stopPosition =
     stop == null || start.start > stop.stop
       ? startPosition
