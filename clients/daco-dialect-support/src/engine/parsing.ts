@@ -80,27 +80,14 @@ export class CollectingErrorListener extends BaseErrorListener {
     line: number,
     charPositionInLine: number,
   ) {
-    if (offendingSymbol) {
-      const lastPos =
-        offendingSymbol.stop == -1
-          ? offendingSymbol.column + (offendingSymbol.text?.length ?? 1)
-          : offendingSymbol.column +
-            offendingSymbol.stop -
-            offendingSymbol.start +
-            1;
-
-      return new vscode.Range(
-        offendingSymbol.line - 1,
-        offendingSymbol.column,
-        offendingSymbol.line - 1,
-        lastPos,
-      );
-    }
+    const tokenLength = offendingSymbol
+      ? offendingSymbol.stop - offendingSymbol.start + 1
+      : 0;
     return new vscode.Range(
       line - 1,
       charPositionInLine,
       line - 1,
-      charPositionInLine + 1,
+      charPositionInLine + tokenLength,
     );
   }
 }
