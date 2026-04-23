@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2026 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom, Inc. - initial API and implementation
+ */
+
 lexer grammar TechnicalLexer;
 channels{COMMENTS}
 // This grammar should not contains any explicit token declaration.
@@ -11,6 +25,7 @@ COLONCHAR : ':';
 COMMACHAR : ',';
 COMMENTTAG : '*>';
 DOLLARCHAR : '$';
+POUNDCHAR : '£';
 DOUBLEQUOTE : '"';
 DOUBLEEQUALCHAR : '==';
 DOUBLEMORETHANCHAR : '>>';
@@ -44,6 +59,8 @@ LEVEL_NUMBER_66 : '66';
 LEVEL_NUMBER_77 : '77';
 LEVEL_NUMBER_88 : '88';
 
+IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
+
 INTEGERLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT+ | LEVEL_NUMBER;
 
 SINGLEDIGITLITERAL : DIGIT;
@@ -53,10 +70,6 @@ NUMERICLITERAL : (PLUSCHAR | MINUSCHAR)? DIGIT* (DOT_FS | COMMACHAR) DIGIT+ (('e
 NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER | NULLTERMINATED;
 
 CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
-
-IDENTIFIER : [a-zA-Z0-9][-_a-zA-Z0-9]*;
-COPYBOOK_IDENTIFIER : [a-zA-Z0-9#@$][-_a-zA-Z0-9#@$]*;
-FILENAME : IDENTIFIER+ '.' IDENTIFIER+;
 
 OCTDIGITS : OCT_DIGIT;
 HEX_NUMBERS : HEXNUMBER;
