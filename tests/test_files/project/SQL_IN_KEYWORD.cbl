@@ -27,4 +27,5 @@
        PROCEDURE DIVISION.
        MAIN-PROCESSING SECTION.
          MAINLINE-PARAGRAPH.    
+             DISPLAY A.
              STOP RUN.

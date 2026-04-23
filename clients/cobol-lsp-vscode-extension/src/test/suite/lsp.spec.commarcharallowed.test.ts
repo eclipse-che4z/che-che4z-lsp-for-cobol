@@ -34,8 +34,11 @@ suite("TF51590: COBOL LS - SQL COMMA DECIMAL ENABLED/DISABLED", function () {
   test("TC399994-Test sql-decimal-comma-allowed NULL", async () => {
     await helper.updateConfig("basic.json");
     const editor = await helper.showDocument("SQL_IN_KEYWORD.cbl");
-    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 0);
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.strictEqual(diagnostics.length, 1);
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
@@ -43,8 +46,11 @@ suite("TF51590: COBOL LS - SQL COMMA DECIMAL ENABLED/DISABLED", function () {
   test("TC399993-Test sql-decimal-comma-allowed FALSE", async () => {
     await helper.updateConfig("sql_decimal_comma_allowed_false.json");
     const editor = await helper.showDocument("SQL_IN_KEYWORD.cbl");
-    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 0);
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.strictEqual(diagnostics.length, 1);
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
@@ -52,8 +58,11 @@ suite("TF51590: COBOL LS - SQL COMMA DECIMAL ENABLED/DISABLED", function () {
   test("TC399992-Test sql-decimal-comma-allowed TRUE", async () => {
     await helper.updateConfig("sql_decimal_comma_allowed.json");
     const editor = await helper.showDocument("SQL_IN_KEYWORD.cbl");
-    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-    assert.strictEqual(diagnostics.length, 1);
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      2,
+    );
+    assert.strictEqual(diagnostics.length, 2);
   })
     .timeout(helper.TEST_TIMEOUT)
     .slow(1000);
