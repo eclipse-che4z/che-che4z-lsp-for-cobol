@@ -12,14 +12,36 @@
  *   Broadcom - initial API and implementation
  */
 
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
+import * as helper from "./testHelper";
+import { pos, range } from "./testHelper";
 
-suite("Extension Test Suite", () => {
-  vscode.window.showInformationMessage("Start all tests.");
+suite("Extension Test Suite", function () {
+  this.timeout(helper.TEST_TIMEOUT);
 
-  test("Sample test", () => {
-    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+  suiteSetup(async function () {
+    await helper.activate();
+  });
+
+  this.afterEach(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  this.afterAll(async function () {
+    this.timeout(helper.TEST_TIMEOUT);
+    await helper.closeAllEditors();
+  });
+
+  test("Resolve copybook without suffix successfully", async () => {
+    const editor = await helper.showDocument("DaCo1.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(11, 20), pos(11, 32)));
   });
 });

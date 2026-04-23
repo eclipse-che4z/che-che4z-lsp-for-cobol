@@ -103,18 +103,18 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
-    "build": "npm run grammar && esbuild src/extension.ts --bundle --sourcemap --target=node16.17.1,chrome108 --outdir=dist --external:vscode --format=cjs",
+    "build": "npm run compile && esbuild src/extension.ts --bundle --sourcemap --target=node16.17.1,chrome108 --outdir=dist --external:vscode --format=cjs",
     "compile": "npm run grammar && tsc -p ./",
     "grammar": "npm run lexer && npm run parser",
-    "lexer": "antlr-ng -Dlanguage=TypeScript -l -o src/generated ./src/antlr/DaCoLexer.g4",
-    "parser": "antlr-ng -Dlanguage=TypeScript -v -o src/generated ./src/antlr/DaCoParser.g4",
+    "lexer": "antlr-ng -Dlanguage=TypeScript -l -o src/generated ./src/antlr/DaCoLexer.g4 && antlr-ng -Dlanguage=TypeScript -l -o src/generated ./src/antlr/CopybookLexer.g4 && antlr-ng -Dlanguage=TypeScript -l -o src/generated ./src/antlr/VariableLexer.g4",
+    "parser": "antlr-ng -Dlanguage=TypeScript -v -o src/generated ./src/antlr/DaCoParser.g4 && antlr-ng -Dlanguage=TypeScript -v -o src/generated ./src/antlr/CopybookParser.g4 && antlr-ng -Dlanguage=TypeScript -v -o src/generated ./src/antlr/VariableParser.g4",
     "watch": "tsc -watch -p ./",
     "lint-format": "prettier -c .",
     "lint-quality": "eslint ./src",
     "lint-fix": "eslint --fix ./src && prettier -w .",
     "lint": "npm run lint-format && npm run lint-quality",
     "pretest": "npm run compile",
-    "test:unit": "jest src/unit --passWithNoTests",
+    "test:unit": "jest src/test/unit",
     "test:integration": "node ./out/test/runTest.js",
     "test": "npm run test:unit && npm run test:integration",
     "package": "vsce package --no-dependencies"
@@ -122,6 +122,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@types/glob": "^8.0.3",
+    "@types/jest": "^29.5.14",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.18.126",
     "@types/vscode": "1.74.0",
@@ -132,11 +133,14 @@
     "eslint": "^9.39.4",
     "eslint-plugin-sonarjs": "^1.0.4",
     "glob": "^8.0.3",
+    "jest-jasmine2": "^29.7.0",
+    "jest-sonar-reporter": "^2.0.0",
     "mocha": "^10.1.0",
     "prettier": "2.8.7",
     "ts-jest": "^29.4.4",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.2"
+    "typescript-eslint": "8.57.2",
+    "vscode-uri": "^3.1.0"
   },
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support",
