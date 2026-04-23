@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Broadcom.
+ * Copyright (c) 2026 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -9,43 +9,34 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom - initial API and implementation
+ *   Broadcom, Inc. - initial API and implementation
  */
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
-import { LANGUAGE_ID } from "../../constants";
-import * as t from "io-ts";
-import { isRight } from "fp-ts/Either";
-import { Predicate } from "fp-ts/lib/Predicate";
 
 export const TEST_TIMEOUT = 150000;
+export const LANGUAGE_ID = "cobol";
 
 export async function activate() {
   // The extensionId is `publisher.name` from package.json
   const cobol = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support",
-  )!;
+  );
   if (cobol && !cobol.isActive) {
     await cobol.activate();
   }
   const idms = vscode.extensions.getExtension(
     "BroadcomMFD.cobol-language-support-for-idms",
-  )!;
+  );
   if (idms && !idms.isActive) {
     await idms.activate();
   }
-  const sample = vscode.extensions.getExtension(
-    "BroadcomMFD.cobol-language-support-for-sample-dialect",
-  )!;
-  if (sample && !sample.isActive) {
-    await sample.activate();
+  const daco = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-daco",
+  );
+  if (daco && !daco.isActive) {
+    await daco.activate();
   }
-}
-
-export function getWorkspacePath(): string {
-  if (vscode.workspace.workspaceFolders)
-    return vscode.workspace.workspaceFolders[0].uri.fsPath;
-  throw new Error("Workspace not found");
 }
 
 export function getWorkspace(): vscode.WorkspaceFolder {
@@ -56,7 +47,7 @@ export function getWorkspace(): vscode.WorkspaceFolder {
 
 export async function getUri(workspace_file: string): Promise<vscode.Uri> {
   const files = await vscode.workspace.findFiles(workspace_file);
-  assert.ok(files && files[0], `Cannot find file ${workspace_file}`);
+  assert.ok(files?.[0], `Cannot find file ${workspace_file}`);
   return files[0];
 }
 
@@ -190,19 +181,13 @@ export async function waitFor(
   label: string = "",
 ) {
   const startTime = Date.now();
-  if (await Promise.resolve(doneFunc())) {
-    return true;
-  }
-  // console.log("waiting" + (label ? label : "") + "...")
   while (!(await Promise.resolve(doneFunc()))) {
     await sleep(100);
     if (Date.now() - startTime > timeout) {
       console.trace((label ? label : "") + "timeout!");
-      return false;
+      throw Error("Timeout");
     }
   }
-  // console.log("done! Time: " + (Date.now() - startTime + "."));
-  return true;
 }
 
 export function sleep(ms: number): Promise<unknown> {
@@ -220,40 +205,22 @@ export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
 
 export async function updateConfig(configFileName: string) {
   // update the settings.json with this file content
+  if (!vscode.workspace.workspaceFolders) {
+    throw new Error("Workspace not found");
+  }
   const settingsFileLoc = vscode.Uri.joinPath(
-    vscode.workspace.workspaceFolders![0].uri,
+    vscode.workspace.workspaceFolders[0].uri,
     ".vscode",
     "settings.json",
   );
   const settingsValueLoc = vscode.Uri.joinPath(
-    vscode.Uri.file(getWorkspacePath()),
+    vscode.workspace.workspaceFolders[0].uri,
     "settings",
     configFileName,
   );
   await vscode.workspace.fs.copy(settingsValueLoc, settingsFileLoc, {
     overwrite: true,
   });
-}
-
-const SettingsCodec = t.record(t.string, t.unknown);
-
-export async function updateConfigValue(key: string, value: unknown) {
-  const settingsFileLoc = vscode.Uri.joinPath(
-    vscode.workspace.workspaceFolders![0].uri,
-    ".vscode",
-    "settings.json",
-  );
-  const settingsFileData = await vscode.workspace.fs.readFile(settingsFileLoc);
-  const settingsText = new TextDecoder().decode(settingsFileData);
-  const decodedSettings = SettingsCodec.decode(JSON.parse(settingsText));
-  if (isRight(decodedSettings)) {
-    const settings = decodedSettings.right;
-    settings[key] = value;
-    await vscode.workspace.fs.writeFile(
-      settingsFileLoc,
-      Buffer.from(JSON.stringify(settings)),
-    );
-  }
 }
 
 export function assertRangeIsEqual(
@@ -330,114 +297,6 @@ export function printAllDiagnostics(diagnostics: vscode.Diagnostic[]) {
         d.range.end.character,
     ),
   );
-}
-
-export async function executeCommandMultipleTimes(
-  command: string,
-  times: number,
-) {
-  for (let index = 0; index < times; index++) {
-    await vscode.commands.executeCommand(command);
-  }
-}
-
-export async function getWorkspaceFile(workspace_file: string) {
-  const files = await vscode.workspace.findFiles(workspace_file);
-
-  assert.ok(files && files[0], workspace_file);
-
-  return files[0];
-}
-
-export async function waitForDiagnosticsChange(file: string | vscode.Uri) {
-  const fileUri =
-    typeof file === "string" ? await getWorkspaceFile(file) : file;
-
-  const initialDiags = vscode.languages
-    .getDiagnostics(fileUri)
-    .map((x) => JSON.stringify(x))
-    .sort();
-
-  const result = new Promise<vscode.Diagnostic[]>((resolve) => {
-    let listener: vscode.Disposable | null =
-      vscode.languages.onDidChangeDiagnostics((e) => {
-        if (!listener) return;
-        const forFile = e.uris.find((v) => v.toString() === fileUri.toString());
-        if (!forFile) return;
-        const diags = vscode.languages.getDiagnostics(forFile);
-        if (
-          diags.length === initialDiags.length &&
-          diags
-            .map((x) => JSON.stringify(x))
-            .sort()
-            .every((x, i) => x === initialDiags[i])
-        )
-          return;
-        listener.dispose();
-        listener = null;
-        resolve(diags);
-      });
-  });
-
-  return result;
-}
-
-export async function triggerCompletionsAndWaitForResults() {
-  while (true) {
-    // Get the active text editor
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      throw new Error("No active editor found");
-    }
-
-    await vscode.commands.executeCommand(
-      "editor.action.triggerSuggest",
-      editor.document.uri,
-    );
-
-    const position = editor.selection.active;
-    const document = editor.document;
-
-    // Trigger the completion provider manually
-    const completions =
-      await vscode.commands.executeCommand<vscode.CompletionList>(
-        "vscode.executeCompletionItemProvider",
-        document.uri,
-        position,
-      );
-
-    if (completions && completions.items.length > 0) {
-      return completions;
-    }
-    await sleep(100);
-  }
-}
-
-export function hasDiagnosticMatches(
-  uri: vscode.Uri,
-  predicate: Predicate<vscode.Diagnostic>,
-) {
-  const diagnostics = vscode.languages.getDiagnostics(uri);
-  assert.ok(diagnostics.some(predicate));
-}
-
-export async function getHoverContent(
-  editor: vscode.TextEditor,
-  position: vscode.Position,
-) {
-  let hoverResults: vscode.Hover[] | undefined = [];
-  await waitFor(async () => {
-    hoverResults = await vscode.commands.executeCommand(
-      "vscode.executeHoverProvider",
-      editor.document.uri,
-      position,
-    );
-    if (hoverResults === undefined) {
-      return false;
-    }
-    return hoverResults.length > 0;
-  });
-  return hoverResults;
 }
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
