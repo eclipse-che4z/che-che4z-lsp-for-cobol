@@ -19,12 +19,14 @@ import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.jar.JarFile;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.junit.jupiter.api.Assertions;
@@ -59,11 +61,17 @@ class CobolLSPropertiesResourceBundleTest {
         new CobolLSPropertiesResourceBundle("resourceBundles/test", Locale.FRENCH);
     CobolLSPropertiesResourceBundle spyBundle = spy(bundle);
 
-    doReturn(
-            org.apache.commons.io.IOUtils.toInputStream(
-                "test.test: flip flop", StandardCharsets.UTF_8))
+    doAnswer(
+            i -> {
+              try (InputStream stream =
+                  org.apache.commons.io.IOUtils.toInputStream(
+                      "test.test: flip flop", StandardCharsets.UTF_8)) {
+                ((Properties) i.getArgument(0)).load(stream);
+              }
+              return null;
+            })
         .when(spyBundle)
-        .getDialectResources(any(), any());
+        .loadDialectResources(any(), any(), any());
     DialectRegistryItem dialectRegistryItem =
         new DialectRegistryItem(
             "dummyDialect", 1, URI.create("file://uri"), "dummy dialect", "dummyDialect");

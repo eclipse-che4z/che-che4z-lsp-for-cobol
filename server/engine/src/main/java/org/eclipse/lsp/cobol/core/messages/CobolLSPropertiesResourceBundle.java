@@ -18,13 +18,12 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 
 /**
@@ -64,10 +63,9 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
       List<String> resourceName = toSuspectedBundleNames(locale);
       Collections.reverse(resourceName);
       LOG.debug("URI for dialect jar:" + dialectRegistryItem.getUri());
-      InputStream validResources = getDialectResources(resourceName, dialectRegistryItem.getUri());
-      properties.load(validResources);
+      loadDialectResources(properties, resourceName, dialectRegistryItem.getUri());
     } catch (Exception e) {
-
+      LOG.error("Error loading resources", e);
     }
     return properties;
   }
@@ -76,22 +74,26 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
    * Returns an input stream based on the most appropriate resource bundle based on locale for a
    * dialect
    *
+   * @param p Properties to load the resources into
    * @param resourceName Ordered list of resources to search based on locale
    * @param jarUri dialect jar URI
-   * @return an {@link InputStream} for found resource
    * @throws IOException when no resource is found or jar not found
    */
   @VisibleForTesting
-  public InputStream getDialectResources(List<String> resourceName, URI jarUri) throws IOException {
-    JarFile jar = new JarFile(jarUri.toURL().getFile());
-    for (String s : resourceName) {
-      if (Objects.nonNull(jar.getJarEntry(s))) {
-        return jar.getInputStream(jar.getJarEntry(s));
-      } else {
-        LOG.debug("Resource Bundle " + s + " not available at " + jarUri);
+  public void loadDialectResources(Properties p, List<String> resourceName, URI jarUri)
+      throws IOException {
+    try (JarFile jar = new JarFile(jarUri.toURL().getFile())) {
+      for (String s : resourceName) {
+        final JarEntry jarEntry = jar.getJarEntry(s);
+        if (jarEntry == null) {
+          LOG.debug("Resource Bundle " + s + " not available at " + jarUri);
+          continue;
+        }
+        try (InputStream stream = jar.getInputStream(jarEntry)) {
+          p.load(stream);
+        }
       }
     }
-    return IOUtils.toInputStream("", StandardCharsets.UTF_8);
   }
 
   private List<String> toSuspectedBundleNames(String baseName, Locale locale) {
