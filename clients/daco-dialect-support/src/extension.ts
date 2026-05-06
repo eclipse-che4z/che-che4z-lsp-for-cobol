@@ -21,7 +21,7 @@ import {
 import { DaCoPreprocessor } from "./engine/preprocessor";
 import { MessageService } from "./engine/services/MessageService";
 
-const COPY_REGEX = new RegExp(/^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i);
+const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
 
 let unregisterDialect = () => {};
 const isCopyStatement = (statement: string) => {

@@ -28,7 +28,7 @@ import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
 import { MessageService } from "./services/MessageService";
 
-const PROC_REGEX = new RegExp(/PROCEDURE\s+DIVISION\.?/i);
+const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
 
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
