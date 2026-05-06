@@ -28,6 +28,8 @@ import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
 import { MessageService } from "./services/MessageService";
 
+const PROC_REGEX = new RegExp(/PROCEDURE\s+DIVISION\.?/i);
+
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
 
@@ -38,7 +40,7 @@ export class DaCoPreprocessor {
     outputChannel: vscode.OutputChannel,
     messageService: MessageService,
   ) {
-    const procMatch = new RegExp(/PROCEDURE\s+DIVISION\.?/i).exec(text);
+    const procMatch = PROC_REGEX.exec(text);
 
     const end =
       procMatch?.index !== undefined && procMatch.index > 0
