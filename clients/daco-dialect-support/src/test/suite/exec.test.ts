@@ -57,4 +57,21 @@ suite("EXEC statements Test Suite", function () {
       range(pos(17, 19), pos(17, 31)),
     );
   });
+
+  test("Show diagnostic for invalid layout identifier", async () => {
+    const editor = await helper.showDocument("DaCo2.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 6);
+
+    const invalidLayoutDiagnostics = diagnostics.filter((d) =>
+      d.message.includes("Invalid layout identifier"),
+    );
+    assert.strictEqual(invalidLayoutDiagnostics.length, 1);
+
+    helper.assertRangeIsEqual(
+      invalidLayoutDiagnostics[0].range,
+      range(pos(8, 25), pos(8, 34)),
+    );
+  });
 });
