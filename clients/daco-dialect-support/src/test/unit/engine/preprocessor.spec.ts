@@ -14,6 +14,7 @@
 
 import { Uri, DiagnosticSeverity } from "vscode";
 import { DaCoPreprocessor } from "../../../engine/preprocessor";
+import { MessageService } from "../../../engine/services/MessageService";
 
 describe("DaCoPreprocessor test", () => {
   const HEADER =
@@ -57,6 +58,7 @@ describe("DaCoPreprocessor test", () => {
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
       outputChannel,
+      createMessageService(),
     );
 
     expect(context.addDiagnostic).toHaveBeenCalledWith(
@@ -77,6 +79,7 @@ describe("DaCoPreprocessor test", () => {
       Uri.parse("file:///test.cbl"),
       HEADER + "          COPY MAID TEST-A12 SUFFIX.",
       outputChannel,
+      createMessageService(),
     );
 
     expect(context.addDiagnostic).toHaveBeenCalledWith(
@@ -100,6 +103,7 @@ describe("DaCoPreprocessor test", () => {
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
       outputChannel,
+      createMessageService(),
     );
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.resolveCopybook).toHaveBeenCalledWith(
@@ -124,6 +128,7 @@ describe("DaCoPreprocessor test", () => {
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
       outputChannel,
+      createMessageService(),
     );
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
@@ -149,6 +154,7 @@ describe("DaCoPreprocessor test", () => {
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
       outputChannel,
+      createMessageService(),
     );
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
@@ -166,3 +172,10 @@ describe("DaCoPreprocessor test", () => {
     expect(copybookContext.replace).not.toHaveBeenCalled();
   });
 });
+
+function createMessageService() {
+  return new MessageService({
+    "validation.layout_identifier": "Invalid layout identifier",
+    "validation.layout_usage": "Invalid layout usage",
+  });
+}
