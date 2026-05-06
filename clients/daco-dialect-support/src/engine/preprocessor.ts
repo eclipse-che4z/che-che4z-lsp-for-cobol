@@ -26,6 +26,9 @@ import {
 } from "./parsing";
 import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
+import { MessageService } from "./services/MessageService";
+
+const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
 
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
@@ -35,8 +38,9 @@ export class DaCoPreprocessor {
     _programUri: vscode.Uri,
     text: string,
     outputChannel: vscode.OutputChannel,
+    messageService: MessageService,
   ) {
-    const procMatch = new RegExp(/PROCEDURE\s+DIVISION\.?/i).exec(text);
+    const procMatch = PROC_REGEX.exec(text);
 
     const end =
       procMatch?.index !== undefined && procMatch.index > 0
@@ -46,9 +50,14 @@ export class DaCoPreprocessor {
     const sliced = text.slice(0, end);
     const charStream = antlr.CharStream.fromString(sliced);
 
+    outputChannel.appendLine(
+      `Starting preprocessing. Procedure division starts at index ${end}. Processing text:\n${sliced}`,
+    );
+
     const lexer = new CopybookLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
     const parser = new CopybookParser(tokenStream);
+    parser.setMessageService(messageService);
 
     tokenStream.fill();
     for (const t of tokenStream.getTokens()) {
@@ -71,6 +80,10 @@ export class DaCoPreprocessor {
     console.log(tree.toStringTree(parser));
 
     const descriptors = new CopybookVisitor().visit(tree) || [];
+
+    outputChannel.appendLine(
+      `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
+    );
 
     this.addParsingErrors(context, [
       ...lexerErrors.errors,
