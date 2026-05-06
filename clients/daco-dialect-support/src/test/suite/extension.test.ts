@@ -13,7 +13,6 @@
  */
 
 import * as assert from "node:assert";
-import * as vscode from "vscode";
 import * as helper from "./testHelper";
 import { pos, range } from "./testHelper";
 
@@ -43,5 +42,22 @@ suite("Extension Test Suite", function () {
     const d0 = diagnostics[0];
     assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
     helper.assertRangeIsEqual(d0.range, range(pos(11, 20), pos(11, 32)));
+  });
+
+  test("Show diagnostic for invalid layout identifier", async () => {
+    const editor = await helper.showDocument("DaCo2.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 6);
+
+    const invalidLayoutDiagnostics = diagnostics.filter((d) =>
+      d.message.includes("Invalid layout identifier"),
+    );
+    assert.strictEqual(invalidLayoutDiagnostics.length, 1);
+
+    helper.assertRangeIsEqual(
+      invalidLayoutDiagnostics[0].range,
+      range(pos(8, 25), pos(8, 34)),
+    );
   });
 });
