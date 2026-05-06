@@ -43,11 +43,11 @@ copyMaid
    ;
 
 layoutId
-   : DACO_COPYBOOK_IDENTIFIER  { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z0-9]*([-][A-Z0-9]{3})?$/, "Invalid layout identifier"); } 
+   : DACO_COPYBOOK_IDENTIFIER  { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z0-9]*([-][A-Z0-9]{3})?$/, "validation.layout_identifier"); } 
    ;
 
 layoutUsage
-   : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z]{3}$/, "Invalid layout usage");}
+   : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z]{3}$/, "validation.layout_usage");}
    ;
 
 variableEntry

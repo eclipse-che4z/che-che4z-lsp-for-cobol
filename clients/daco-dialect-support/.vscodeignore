@@ -23,7 +23,7 @@
 !LICENSE
 !README.md
 !CHANGELOG.md
-!resources/logo.png
+!resources/*
 !package.json
 # * bundled extension code
 !dist/**/*
