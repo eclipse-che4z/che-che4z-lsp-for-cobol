@@ -19,11 +19,13 @@ import {
   IDocumentProcessingContext,
 } from "@code4z/cobol-dialect-api";
 import { DaCoPreprocessor } from "./engine/preprocessor";
+import { MessageService } from "./engine/services/MessageService";
+
+const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
 
 let unregisterDialect = () => {};
 const isCopyStatement = (statement: string) => {
-  const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
-  const match = statement.match(regex);
+  const match = COPY_REGEX.exec(statement);
   if (!match) {
     return { isCopy: false };
   }
@@ -103,6 +105,9 @@ async function v2Api(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage(v2Api.toString());
     return;
   }
+  const messageService = await MessageService.create(context);
+  outputChannel.appendLine(`Registering dialect with API version 2`);
+
   const unregister = await v2Api.registerDialect(
     {
       name: DIALECT_NAME,
@@ -115,7 +120,17 @@ async function v2Api(context: vscode.ExtensionContext) {
       programUri: vscode.Uri,
       text: string,
     ) => {
-      await preprocessor.execute(context, programUri, text, outputChannel);
+      outputChannel.appendLine(
+        `Executing preprocessor for document ${programUri.toString()}`,
+      );
+
+      await preprocessor.execute(
+        context,
+        programUri,
+        text,
+        outputChannel,
+        messageService,
+      );
     },
   );
   if (unregister instanceof Error) {
