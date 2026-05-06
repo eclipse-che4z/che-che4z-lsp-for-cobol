@@ -28,7 +28,6 @@ export class MessageService {
       "resources",
       "en.json",
     );
-
     const data = await vscode.workspace.fs.readFile(uri);
     const messages = JSON.parse(Buffer.from(data).toString("utf8"));
 
@@ -39,7 +38,7 @@ export class MessageService {
     const template = this.messages[key];
 
     if (!template) {
-      return `Missing message: ${key}`;
+      throw new Error(`Missing message: ${key}`);
     }
 
     return this.format(template, args);

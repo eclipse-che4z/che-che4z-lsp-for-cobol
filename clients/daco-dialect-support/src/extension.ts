@@ -21,10 +21,11 @@ import {
 import { DaCoPreprocessor } from "./engine/preprocessor";
 import { MessageService } from "./engine/services/MessageService";
 
+const copyRegex = new RegExp(/^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i);
+
 let unregisterDialect = () => {};
 const isCopyStatement = (statement: string) => {
-  const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
-  const match = new RegExp(regex).exec(statement);
+  const match = copyRegex.exec(statement);
   if (!match) {
     return { isCopy: false };
   }
@@ -104,7 +105,7 @@ async function v2Api(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage(v2Api.toString());
     return;
   }
-  const messageService = await createMessageService(context);
+  const messageService = await MessageService.create(context);
   outputChannel.appendLine(`Registering dialect with API version 2`);
 
   const unregister = await v2Api.registerDialect(
@@ -137,12 +138,4 @@ async function v2Api(context: vscode.ExtensionContext) {
     return;
   }
   context.subscriptions.push(unregister);
-}
-
-async function createMessageService(context: vscode.ExtensionContext) {
-  const uri = vscode.Uri.joinPath(context.extensionUri, "resources", "en.json");
-  const data = await vscode.workspace.fs.readFile(uri);
-  const messages = JSON.parse(Buffer.from(data).toString("utf8"));
-
-  return new MessageService(messages);
 }

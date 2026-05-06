@@ -26,8 +26,9 @@ describe("MessageService test", () => {
     expect(result).toBe("Hello, World!");
   });
 
-  it("should return missing message for unknown keys", () => {
-    const result = messageService.get("unknown.key");
-    expect(result).toBe("Missing message: unknown.key");
+  it("should throw error for missing keys", () => {
+    expect(() => messageService.get("unknown.key")).toThrow(
+      "Missing message: unknown.key",
+    );
   });
 });
