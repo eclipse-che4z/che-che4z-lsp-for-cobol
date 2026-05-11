@@ -29,6 +29,8 @@ import { VariableParser } from "../generated/VariableParser";
 import { MessageService } from "./services/MessageService";
 
 const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
+const WRK_SECTION = /WORKING-STORAGE\s+SECTION\s*\./i;
+const WRK_SUFFIX = "WRK";
 
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
@@ -90,12 +92,27 @@ export class DaCoPreprocessor {
       ...parserErrors.errors,
     ]);
 
+    console.log(`Found ${descriptors.length} copybook descriptors:`);
+    descriptors.forEach((descriptor) =>
+      console.log(
+        `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, prevName=${descriptor.prevName}`,
+      ),
+    );
     await Promise.all(
       descriptors.map(async (descriptor) => {
         outputChannel.appendLine(`Descriptor: ${JSON.stringify(descriptor)}`);
-        const copybookName =
-          descriptor.name + (descriptor.suffix ? `_${descriptor.suffix}` : "");
 
+        const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
+        const copybookName =
+          descriptor.name +
+          (descriptor.suffix && !hasWrkSuffix ? `_${descriptor.suffix}` : "");
+
+        const suffix = hasWrkSuffix
+          ? this.extractSuffix(descriptor.prevName)
+          : undefined;
+
+        console.log(`Resolving copybook '${copybookName}'...`);
+        outputChannel.appendLine(`Resolving copybook '${copybookName}'...`);
         const copybook = await context.resolveCopybook(
           copybookName,
           descriptor.statementRange,
@@ -103,6 +120,9 @@ export class DaCoPreprocessor {
         );
 
         if (copybook) {
+          console.log(
+            `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+          );
           outputChannel.appendLine(
             `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
           );
@@ -110,11 +130,27 @@ export class DaCoPreprocessor {
             context,
             copybook,
             descriptor.level,
-            descriptor.suffix,
+            suffix,
           );
         }
       }),
     );
+  }
+
+  private extractSuffix(prevName: string | undefined): string {
+    if (!prevName) {
+      return "";
+    }
+    const parts = prevName.split("-");
+    if (parts.length > 1) {
+      const suffix = parts.at(-1);
+      if (suffix) {
+        if (parts.length - 1 >= 0 && suffix.length > 1) {
+          return suffix.substring(1);
+        }
+      }
+    }
+    return "";
   }
 
   private addParsingErrors(
@@ -138,7 +174,7 @@ export class DaCoPreprocessor {
       text: string;
     },
     copybookLevel: number,
-    layoutUsage?: string,
+    prevSuffix?: string,
   ) {
     const charStream = antlr.CharStream.fromString(copybook.text);
     const lexer = new VariableLexer(charStream);
@@ -168,7 +204,7 @@ export class DaCoPreprocessor {
         copybook.context,
         descriptor,
         copybookLevel,
-        layoutUsage,
+        prevSuffix,
       );
     });
   }
@@ -177,22 +213,23 @@ export class DaCoPreprocessor {
     context: IDocumentProcessingContext,
     descriptor: VariableDescriptor,
     copybookLevel: number,
-    layoutUsage: string | undefined,
+    suffix?: string,
   ) {
-    if (layoutUsage) {
-      const updatedName = this.updateVariableName(descriptor.name, layoutUsage);
+    if (suffix) {
+      const updatedName = this.updateVariableName(descriptor.name, suffix);
       context.replace(descriptor.nameRange, updatedName);
     }
 
+    const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
     if (copybookLevel != descriptor.level) {
-      const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
       const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
       context.replace(descriptor.levelRange, updatedLevelStr);
     }
   }
 
   private updateVariableName(name: string, suffix: string) {
-    return name;
+    console.log(`Updating variable name '${name}' with suffix '${suffix}'...`);
+    return name + suffix;
   }
 
   private calculateLevel(copybookLevel: number, level: number): number {

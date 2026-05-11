@@ -14,12 +14,16 @@
  */
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
 
 /** Dialect Copybook Info object is a part of the V2 dialect processing */
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DialectCopybookInfo {
   String copybookName;
   Location statementLocation;
