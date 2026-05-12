@@ -32,7 +32,7 @@ workingStorageBody
    ;
 
 dataDescriptionEntry
-   : copyMaid | variableEntry
+   : copyMaid | variableEntry | variableEntrySpecificLevel
    ;
 
 copyMaid
@@ -51,12 +51,15 @@ layoutUsage
    ;
 
 variableEntry
-   : levelNumber DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
+   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
    ;
 
-levelNumber
-   : LEVEL_NUMBER
-   | LEVEL_NUMBER_66
+variableEntrySpecificLevel
+   : specificLevelNumber DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
+   ;
+
+specificLevelNumber
+   : LEVEL_NUMBER_66
    | LEVEL_NUMBER_77
    | LEVEL_NUMBER_88
    ;

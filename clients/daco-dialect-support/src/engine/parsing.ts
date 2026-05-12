@@ -143,7 +143,8 @@ export class CopybookVisitor extends CopybookParserVisitor<
     if (ctx.DACO_COPYBOOK_IDENTIFIER()) {
       ctx.DACO_COPYBOOK_IDENTIFIER()?.getText();
 
-      if (ctx.levelNumber()?.getText() !== LEVEL_88) {
+      const levelNumber = ctx.LEVEL_NUMBER()?.getText();
+      if (levelNumber) {
         this.prevName = ctx
           .DACO_COPYBOOK_IDENTIFIER()
           ?.getText()
