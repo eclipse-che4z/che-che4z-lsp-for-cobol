@@ -35,6 +35,19 @@ describe("parsing test", () => {
     expect(result).toEqual([]);
   });
 
+  it("should fallback when DACO_COPYBOOK_IDENTIFIER is missing", () => {
+    const visitor = new CopybookVisitor();
+
+    const ctx = {
+      DACO_COPYBOOK_IDENTIFIER: () => null,
+      getChildCount: () => 0,
+      getChild: () => null,
+    } as any;
+
+    const result = visitor.visitVariableEntry(ctx);
+    expect(result).toEqual([]);
+  });
+
   it("should skip when entryName is missing", () => {
     const visitor = new CopybookContentVisitor();
 
