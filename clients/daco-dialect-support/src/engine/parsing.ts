@@ -140,16 +140,9 @@ export class CopybookVisitor extends CopybookParserVisitor<
   };
 
   visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
-    if (ctx.DACO_COPYBOOK_IDENTIFIER()) {
-      ctx.DACO_COPYBOOK_IDENTIFIER()?.getText();
-
-      const levelNumber = ctx.LEVEL_NUMBER()?.getText();
-      if (levelNumber) {
-        this.prevName = ctx
-          .DACO_COPYBOOK_IDENTIFIER()
-          ?.getText()
-          ?.toUpperCase();
-      }
+    const newName = ctx.DACO_COPYBOOK_IDENTIFIER()?.getText()?.toUpperCase();
+    if (newName) {
+        this.prevName = newName;
     }
     return super.visitChildren(ctx) ?? [];
   };
