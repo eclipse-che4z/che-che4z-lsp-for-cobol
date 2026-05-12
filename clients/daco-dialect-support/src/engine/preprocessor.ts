@@ -29,17 +29,20 @@ import { VariableParser } from "../generated/VariableParser";
 import { MessageService } from "./services/MessageService";
 
 const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
+const WRK_SUFFIX = "WRK";
 
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
+
+  constructor(private readonly outputChannel: vscode.OutputChannel) {}
 
   public async execute(
     context: IDocumentProcessingContext,
     _programUri: vscode.Uri,
     text: string,
-    outputChannel: vscode.OutputChannel,
     messageService: MessageService,
   ) {
+    this.firstCopybookLevel = 0; // Reset for each execution
     const procMatch = PROC_REGEX.exec(text);
 
     const end =
@@ -50,7 +53,7 @@ export class DaCoPreprocessor {
     const sliced = text.slice(0, end);
     const charStream = antlr.CharStream.fromString(sliced);
 
-    outputChannel.appendLine(
+    this.outputChannel.appendLine(
       `Starting preprocessing. Procedure division starts at index ${end}. Processing text:\n${sliced}`,
     );
 
@@ -81,7 +84,7 @@ export class DaCoPreprocessor {
 
     const descriptors = new CopybookVisitor().visit(tree) || [];
 
-    outputChannel.appendLine(
+    this.outputChannel.appendLine(
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
     );
 
@@ -90,12 +93,31 @@ export class DaCoPreprocessor {
       ...parserErrors.errors,
     ]);
 
+    console.log(`Found ${descriptors.length} copybook descriptors:`);
+    descriptors.forEach((descriptor) =>
+      console.log(
+        `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, prevName=${descriptor.prevName}`,
+      ),
+    );
     await Promise.all(
       descriptors.map(async (descriptor) => {
-        outputChannel.appendLine(`Descriptor: ${JSON.stringify(descriptor)}`);
-        const copybookName =
-          descriptor.name + (descriptor.suffix ? `_${descriptor.suffix}` : "");
+        this.outputChannel.appendLine(
+          `Descriptor: ${JSON.stringify(descriptor)}`,
+        );
 
+        const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
+        const copybookName =
+          descriptor.name +
+          (descriptor.suffix && !hasWrkSuffix ? `_${descriptor.suffix}` : "");
+
+        const suffix = hasWrkSuffix
+          ? this.extractSuffix(descriptor.prevName)
+          : undefined;
+
+        console.log(`Resolving copybook '${copybookName}'...`);
+        this.outputChannel.appendLine(
+          `Resolving copybook '${copybookName}'...`,
+        );
         const copybook = await context.resolveCopybook(
           copybookName,
           descriptor.statementRange,
@@ -103,18 +125,31 @@ export class DaCoPreprocessor {
         );
 
         if (copybook) {
-          outputChannel.appendLine(
+          console.log(
+            `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+          );
+          this.outputChannel.appendLine(
             `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
           );
           this.insertCopybookContent(
             context,
             copybook,
             descriptor.level,
-            descriptor.suffix,
+            suffix,
           );
         }
       }),
     );
+  }
+
+  private extractSuffix(prevName: string | undefined): string {
+    if (!prevName) {
+      return "";
+    }
+    if (prevName.length > 2) {
+      return prevName.substring(prevName.length - 2);
+    }
+    return "";
   }
 
   private addParsingErrors(
@@ -138,7 +173,7 @@ export class DaCoPreprocessor {
       text: string;
     },
     copybookLevel: number,
-    layoutUsage?: string,
+    prevSuffix?: string,
   ) {
     const charStream = antlr.CharStream.fromString(copybook.text);
     const lexer = new VariableLexer(charStream);
@@ -168,7 +203,7 @@ export class DaCoPreprocessor {
         copybook.context,
         descriptor,
         copybookLevel,
-        layoutUsage,
+        prevSuffix,
       );
     });
   }
@@ -177,22 +212,30 @@ export class DaCoPreprocessor {
     context: IDocumentProcessingContext,
     descriptor: VariableDescriptor,
     copybookLevel: number,
-    layoutUsage: string | undefined,
+    suffix?: string,
   ) {
-    if (layoutUsage) {
-      const updatedName = this.updateVariableName(descriptor.name, layoutUsage);
+    if (suffix) {
+      const updatedName = this.updateVariableName(descriptor.name, suffix);
       context.replace(descriptor.nameRange, updatedName);
     }
 
+    const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
+    this.outputChannel.appendLine(
+      `Processing variable '${descriptor.name}' with level ${descriptor.level}. Copybook level: ${copybookLevel}. First copybook Level: ${this.firstCopybookLevel} Updated level: ${updatedLevel}`,
+    );
     if (copybookLevel != descriptor.level) {
-      const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
       const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
       context.replace(descriptor.levelRange, updatedLevelStr);
     }
   }
 
   private updateVariableName(name: string, suffix: string) {
-    return name;
+    console.log(`Updating variable name '${name}' with suffix '${suffix}'...`);
+    const dashIndex = name.lastIndexOf("-");
+    if (dashIndex === name.length - 4) {
+      return name.substring(0, dashIndex + 2) + suffix;
+    }
+    return name + suffix;
   }
 
   private calculateLevel(copybookLevel: number, level: number): number {

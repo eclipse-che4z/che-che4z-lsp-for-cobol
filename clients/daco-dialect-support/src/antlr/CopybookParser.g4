@@ -24,7 +24,7 @@ startRule
    ;
 
 skipUntilWS
-   : (.)*? WORKING_STORAGE SECTION DOT_FS
+   : (~WORKING_STORAGE)* WORKING_STORAGE SECTION DOT_FS
    ;
 
 workingStorageBody
@@ -51,17 +51,12 @@ layoutUsage
    ;
 
 variableEntry
-   : LEVEL_NUMBER identifier variablePart* DOT_FS
+   : levelNumber DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
    ;
 
-variablePart
-   : identifier
-   | PIC
-   | INTEGERLITERAL
-   | NUMERICLITERAL
-   | DACO_COPYBOOK_IDENTIFIER
-   ;
-
-identifier
-   : IDENTIFIER
+levelNumber
+   : LEVEL_NUMBER
+   | LEVEL_NUMBER_66
+   | LEVEL_NUMBER_77
+   | LEVEL_NUMBER_88
    ;

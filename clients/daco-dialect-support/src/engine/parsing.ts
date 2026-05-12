@@ -21,10 +21,18 @@ import {
   ParserRuleContext,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
-import { CopyMaidContext } from "../generated/CopybookParser";
+import {
+  CopyMaidContext,
+  VariableEntryContext,
+} from "../generated/CopybookParser";
 import { VariableParserVisitor } from "../generated/VariableParserVisitor";
 
-import { DataDescriptionEntryFormat1Context } from "../generated/VariableParser";
+import {
+  DataDescriptionEntryFormat1Context,
+  DataRedefinesClauseContext,
+} from "../generated/VariableParser";
+
+const LEVEL_88 = "88";
 
 export interface ParseError {
   line: number;
@@ -40,6 +48,7 @@ export class CopybookDescriptor {
     public level: number,
     public name: string,
     public suffix?: string,
+    public prevName?: string,
   ) {}
 }
 
@@ -99,6 +108,8 @@ function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
+  prevName?: string;
+
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
     const layoutId = ctx.layoutId();
     if (!layoutId) {
@@ -106,25 +117,48 @@ export class CopybookVisitor extends CopybookParserVisitor<
     }
 
     const layoutUsage = ctx.layoutUsage();
-
     const name = layoutId.getText();
-
     const suffix = layoutUsage?.getText();
 
     console.log("Copybook level: " + ctx.LEVEL_NUMBER()?.getText());
 
     const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
-
     const statementRange = constructRange(ctx);
     const nameRange = constructRange(layoutId);
 
     return [
-      new CopybookDescriptor(statementRange, nameRange, level, name, suffix),
+      new CopybookDescriptor(
+        statementRange,
+        nameRange,
+        level,
+        name,
+        suffix,
+        this.prevName,
+      ),
       ...(super.visitChildren(ctx) ?? []),
     ];
   };
 
-  protected aggregateResult = concatResults;
+  visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
+    if (ctx.DACO_COPYBOOK_IDENTIFIER()) {
+      ctx.DACO_COPYBOOK_IDENTIFIER()?.getText();
+
+      if (ctx.levelNumber()?.getText() !== LEVEL_88) {
+        this.prevName = ctx
+          .DACO_COPYBOOK_IDENTIFIER()
+          ?.getText()
+          ?.toUpperCase();
+      }
+    }
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  protected aggregateResult(
+    aggregate: CopybookDescriptor[] | null,
+    nextResult: CopybookDescriptor[] | null,
+  ): CopybookDescriptor[] | null {
+    return concatResults(aggregate, nextResult);
+  }
 }
 
 export class CopybookContentVisitor extends VariableParserVisitor<
@@ -149,7 +183,22 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     ];
   };
 
-  protected aggregateResult = concatResults;
+  dataRedefinesClause? = (
+    ctx: DataRedefinesClauseContext,
+  ): VariableDescriptor[] => {
+    const redefinedName = ctx.dataName()?.getText();
+    if (redefinedName) {
+      //this.prevName = redefinedName.toUpperCase();
+    }
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  protected aggregateResult(
+    aggregate: VariableDescriptor[] | null,
+    nextResult: VariableDescriptor[] | null,
+  ): VariableDescriptor[] | null {
+    return concatResults(aggregate, nextResult);
+  }
 }
 
 function constructRange(ctx: ParserRuleContext): vscode.Range {
