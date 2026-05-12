@@ -32,8 +32,6 @@ import {
   DataRedefinesClauseContext,
 } from "../generated/VariableParser";
 
-const LEVEL_88 = "88";
-
 export interface ParseError {
   line: number;
   column: number;
@@ -147,12 +145,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
     return super.visitChildren(ctx) ?? [];
   };
 
-  protected aggregateResult(
-    aggregate: CopybookDescriptor[] | null,
-    nextResult: CopybookDescriptor[] | null,
-  ): CopybookDescriptor[] | null {
-    return concatResults(aggregate, nextResult);
-  }
+  protected aggregateResult = concatResults;
 }
 
 export class CopybookContentVisitor extends VariableParserVisitor<
@@ -187,12 +180,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     return super.visitChildren(ctx) ?? [];
   };
 
-  protected aggregateResult(
-    aggregate: VariableDescriptor[] | null,
-    nextResult: VariableDescriptor[] | null,
-  ): VariableDescriptor[] | null {
-    return concatResults(aggregate, nextResult);
-  }
+  protected aggregateResult = concatResults;
 }
 
 function constructRange(ctx: ParserRuleContext): vscode.Range {
