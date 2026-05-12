@@ -142,7 +142,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
   visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
     const newName = ctx.DACO_COPYBOOK_IDENTIFIER()?.getText()?.toUpperCase();
     if (newName) {
-        this.prevName = newName;
+      this.prevName = newName;
     }
     return super.visitChildren(ctx) ?? [];
   };
