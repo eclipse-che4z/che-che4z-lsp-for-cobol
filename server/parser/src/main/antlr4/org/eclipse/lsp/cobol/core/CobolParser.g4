@@ -610,7 +610,7 @@ dataDescriptionEntry
 dataDescriptionEntryFormat1
    : levelNumber entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
-   | dataOccursClause | dataSignClause | dataSynchronizedClause
+   | dataOccursClause | dataSignClause | dataSynchronizedClause | dataDateFormatClause
    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
    dot_fs   ;
 
@@ -714,6 +714,10 @@ dataSignClause
 
 dataSynchronizedClause
    : (SYNCHRONIZED | SYNC) (LEFT | RIGHT)?
+   ;
+
+dataDateFormatClause
+   : DATE FORMAT IS? DATE_FORMAT
    ;
 
 dataUsageClause
