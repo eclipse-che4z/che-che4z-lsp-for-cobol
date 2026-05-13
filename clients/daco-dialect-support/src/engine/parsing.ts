@@ -21,10 +21,16 @@ import {
   ParserRuleContext,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
-import { CopyMaidContext } from "../generated/CopybookParser";
+import {
+  CopyMaidContext,
+  VariableEntryContext,
+} from "../generated/CopybookParser";
 import { VariableParserVisitor } from "../generated/VariableParserVisitor";
 
-import { DataDescriptionEntryFormat1Context } from "../generated/VariableParser";
+import {
+  DataDescriptionEntryFormat1Context,
+  DataRedefinesClauseContext,
+} from "../generated/VariableParser";
 
 export interface ParseError {
   line: number;
@@ -40,6 +46,7 @@ export class CopybookDescriptor {
     public level: number,
     public name: string,
     public suffix?: string,
+    public parentName?: string,
   ) {}
 }
 
@@ -96,9 +103,42 @@ function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
   return [...(r1 ?? []), ...(r2 ?? [])];
 }
 
+export class NameResolver {
+  private readonly nameStack: { level: number; name: string }[] = [];
+  private lastLevel: number = 0;
+
+  public getParentName(level: number): string | undefined {
+    for (let i = this.nameStack.length - 1; i >= 0; i--) {
+      if (this.nameStack[i].level < level) {
+        return this.nameStack[i].name;
+      }
+    }
+    return undefined;
+  }
+
+  public pushName(level: number, name: string) {
+    if (this.lastLevel < level) {
+      this.nameStack.push({ level, name });
+      this.lastLevel = level;
+    } else {
+      // Pop all names with level greater than or equal to the current level
+      while (
+        this.nameStack.length > 0 &&
+        (this.nameStack.at(-1)?.level ?? 0) >= level
+      ) {
+        this.nameStack.pop();
+      }
+      this.nameStack.push({ level, name });
+      this.lastLevel = level;
+    }
+  }
+}
+
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
+  private readonly parentNameResolver: NameResolver = new NameResolver();
+
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
     const layoutId = ctx.layoutId();
     if (!layoutId) {
@@ -106,22 +146,36 @@ export class CopybookVisitor extends CopybookParserVisitor<
     }
 
     const layoutUsage = ctx.layoutUsage();
-
     const name = layoutId.getText();
-
     const suffix = layoutUsage?.getText();
 
     console.log("Copybook level: " + ctx.LEVEL_NUMBER()?.getText());
 
     const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
-
     const statementRange = constructRange(ctx);
     const nameRange = constructRange(layoutId);
 
     return [
-      new CopybookDescriptor(statementRange, nameRange, level, name, suffix),
+      new CopybookDescriptor(
+        statementRange,
+        nameRange,
+        level,
+        name,
+        suffix,
+        this.parentNameResolver.getParentName(level),
+      ),
       ...(super.visitChildren(ctx) ?? []),
     ];
+  };
+
+  visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
+    const newName = ctx.DACO_COPYBOOK_IDENTIFIER()?.getText()?.toUpperCase();
+    const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
+
+    if (newName) {
+      this.parentNameResolver.pushName(level, newName);
+    }
+    return super.visitChildren(ctx) ?? [];
   };
 
   protected aggregateResult = concatResults;
@@ -147,6 +201,16 @@ export class CopybookContentVisitor extends VariableParserVisitor<
       new VariableDescriptor(levelRange, level, nameRange, name),
       ...(super.visitChildren(ctx) ?? []),
     ];
+  };
+
+  dataRedefinesClause? = (
+    ctx: DataRedefinesClauseContext,
+  ): VariableDescriptor[] => {
+    const redefinedName = ctx.dataName()?.getText();
+    if (redefinedName) {
+      //this.prevName = redefinedName.toUpperCase();
+    }
+    return super.visitChildren(ctx) ?? [];
   };
 
   protected aggregateResult = concatResults;
