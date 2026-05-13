@@ -1,0 +1,5 @@
+       01  MAIN-X.
+           03 F90-X.
+             05 SOME-X            PIC X(4)    VALUE SPACE.
+           03 F91-X REDEFINES F90-XLO.
+             05 FILLER                 PIC X(37).

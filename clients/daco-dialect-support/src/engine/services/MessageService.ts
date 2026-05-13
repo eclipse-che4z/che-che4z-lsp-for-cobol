@@ -45,7 +45,7 @@ export class MessageService {
   }
 
   private format(template: string, args: unknown[]): string {
-    return template.replace(/{(\d+)}/g, (_, index) => {
+    return template.replaceAll(/{(\d+)}/g, (_, index) => {
       return args[index] === undefined ? `{${index}}` : String(args[index]);
     });
   }
