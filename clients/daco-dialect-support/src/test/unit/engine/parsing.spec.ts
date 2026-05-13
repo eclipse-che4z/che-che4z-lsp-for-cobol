@@ -15,6 +15,7 @@
 import {
   CopybookContentVisitor,
   CopybookVisitor,
+  NameResolver,
 } from "../../../engine/parsing";
 
 describe("parsing test", () => {
@@ -42,6 +43,7 @@ describe("parsing test", () => {
       DACO_COPYBOOK_IDENTIFIER: () => null,
       getChildCount: () => 0,
       getChild: () => null,
+      LEVEL_NUMBER: () => ({ getText: () => "01" }),
     } as any;
 
     const result = visitor.visitVariableEntry(ctx);
@@ -65,5 +67,29 @@ describe("parsing test", () => {
 
     const result = visitor.visitDataDescriptionEntryFormat1(ctx);
     expect(result).toEqual([]);
+  });
+});
+
+describe("name resolver test", () => {
+  let nameResolver: NameResolver;
+
+  beforeEach(() => {
+    nameResolver = new NameResolver();
+  });
+
+  it("should return undefined when parent name is missing", () => {
+    nameResolver.pushName(1, "TEST");
+    const result = nameResolver.getParentName(1);
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined when parent name is missing", () => {
+    nameResolver.pushName(1, "TEST1");
+    nameResolver.pushName(3, "TEST3");
+    nameResolver.pushName(5, "TEST5");
+    nameResolver.pushName(3, "TEST3-2");
+
+    const result = nameResolver.getParentName(5);
+    expect(result).toBe("TEST3-2");
   });
 });

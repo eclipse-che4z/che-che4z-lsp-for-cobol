@@ -6,7 +6,7 @@
            IDMS-RECORDS MANUAL
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 PARENT.
+       01 PARENT-XLD.
            05 CHILD-XLD PIC X(2).
                88 AB VALUE "AB".
            05 COPY MAID DACO07-XBG WRK.

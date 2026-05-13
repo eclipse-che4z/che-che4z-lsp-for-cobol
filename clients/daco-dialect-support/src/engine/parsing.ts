@@ -103,10 +103,41 @@ function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
   return [...(r1 ?? []), ...(r2 ?? [])];
 }
 
+export class NameResolver {
+  private readonly nameStack: { level: number; name: string }[] = [];
+  private lastLevel: number = 0;
+
+  public getParentName(level: number): string | undefined {
+    for (let i = this.nameStack.length - 1; i >= 0; i--) {
+      if (this.nameStack[i].level < level) {
+        return this.nameStack[i].name;
+      }
+    }
+    return undefined;
+  }
+
+  public pushName(level: number, name: string) {
+    if (this.lastLevel < level) {
+      this.nameStack.push({ level, name });
+      this.lastLevel = level;
+    } else {
+      // Pop all names with level greater than or equal to the current level
+      while (
+        this.nameStack.length > 0 &&
+        (this.nameStack.at(-1)?.level ?? 0) >= level
+      ) {
+        this.nameStack.pop();
+      }
+      this.nameStack.push({ level, name });
+      this.lastLevel = level;
+    }
+  }
+}
+
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
-  prevName?: string;
+  private readonly parentNameResolver: NameResolver = new NameResolver();
 
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
     const layoutId = ctx.layoutId();
@@ -131,7 +162,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
         level,
         name,
         suffix,
-        this.prevName,
+        this.parentNameResolver.getParentName(level),
       ),
       ...(super.visitChildren(ctx) ?? []),
     ];
@@ -139,8 +170,10 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
   visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
     const newName = ctx.DACO_COPYBOOK_IDENTIFIER()?.getText()?.toUpperCase();
+    const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
+
     if (newName) {
-      this.prevName = newName;
+      this.parentNameResolver.pushName(level, newName);
     }
     return super.visitChildren(ctx) ?? [];
   };
