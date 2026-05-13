@@ -1,4 +1,5 @@
 out
 dist/*
 !dist/note.md
-src/generated
+src/generated/*
+src/antlr/gen/*

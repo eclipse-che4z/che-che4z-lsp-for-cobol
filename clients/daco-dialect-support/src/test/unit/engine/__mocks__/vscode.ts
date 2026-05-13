@@ -46,3 +46,9 @@ export enum DiagnosticSeverity {
   Information = 2,
   Hint = 3,
 }
+
+export const workspace = {
+  fs: {
+    readFile: jest.fn(),
+  },
+};
