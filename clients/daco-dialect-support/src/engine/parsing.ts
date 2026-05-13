@@ -46,7 +46,7 @@ export class CopybookDescriptor {
     public level: number,
     public name: string,
     public suffix?: string,
-    public prevName?: string,
+    public parentName?: string,
   ) {}
 }
 
