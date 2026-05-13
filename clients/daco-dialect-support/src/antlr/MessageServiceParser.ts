@@ -57,7 +57,7 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    */
   protected validateSubSchemaNameLength(input: string | undefined) {
-    if (input != undefined && !input.match("16|18")) {
+    if (input != undefined && !/16|18/.exec(input)) {
       this.notifyError("cobolParser.subSchemaNameLength", input);
     }
   }
@@ -302,7 +302,7 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    */
   protected validateDbNames(input: string | undefined) {
-    const names = (input ?? "").split("\\.");
+    const names = (input ?? "").split(String.raw`\.`);
     if (names.length > 1) {
       this.validateLength(names[0], "database name", 8);
       this.validateLength(names[1], "table space name", 8);
@@ -312,16 +312,11 @@ export abstract class MessageServiceParser extends Parser {
   }
 
   private tryParseInt(input: string | undefined): number | undefined {
-    let parsedValue: number | undefined;
     if (input === undefined) {
       return undefined;
     }
-    try {
-      parsedValue = Number.parseInt(input);
-    } catch (error) {
-      parsedValue = undefined;
-    }
-    return parsedValue;
+    const value = Number.parseInt(input, 10);
+    return Number.isNaN(value) ? undefined : value;
   }
 
   private checkStartsWith(

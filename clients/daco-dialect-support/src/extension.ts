@@ -96,7 +96,7 @@ async function v1Api(context: vscode.ExtensionContext) {
 
 async function v2Api(context: vscode.ExtensionContext) {
   const outputChannel = vscode.window.createOutputChannel(DESCRIPTION);
-  const preprocessor = new DaCoPreprocessor();
+  const messageService = await MessageService.create(context);
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
@@ -105,7 +105,6 @@ async function v2Api(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage(v2Api.toString());
     return;
   }
-  const messageService = await MessageService.create(context);
   outputChannel.appendLine(`Registering dialect with API version 2`);
 
   const unregister = await v2Api.registerDialect(
@@ -124,13 +123,8 @@ async function v2Api(context: vscode.ExtensionContext) {
         `Executing preprocessor for document ${programUri.toString()}`,
       );
 
-      await preprocessor.execute(
-        context,
-        programUri,
-        text,
-        outputChannel,
-        messageService,
-      );
+      const preprocessor = new DaCoPreprocessor(outputChannel, messageService);
+      await preprocessor.execute(context, programUri, text);
     },
   );
   if (unregister instanceof Error) {

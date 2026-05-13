@@ -9,6 +9,7 @@ export default defineConfig([
     "out/",
     "dist/",
     "src/generated/",
+    "src/antlr/gen/",
     "**/*.d.ts",
     "**/*.js",
   ]),

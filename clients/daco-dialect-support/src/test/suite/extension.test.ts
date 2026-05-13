@@ -34,18 +34,18 @@ suite("Extension Test Suite", function () {
   });
 
   test("Resolve copybook without suffix successfully", async () => {
-    const editor = await helper.showDocument("DaCo1.cbl");
+    const editor = await helper.showDocument("DaCo01.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
     assert.strictEqual(diagnostics.length, 1);
 
     const d0 = diagnostics[0];
     assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
-    helper.assertRangeIsEqual(d0.range, range(pos(11, 20), pos(11, 32)));
+    helper.assertRangeIsEqual(d0.range, range(pos(11, 19), pos(11, 31)));
   });
 
   test("Show diagnostic for invalid layout identifier", async () => {
-    const editor = await helper.showDocument("DaCo2.cbl");
+    const editor = await helper.showDocument("DaCo02.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
     assert.strictEqual(diagnostics.length, 6);
@@ -57,7 +57,77 @@ suite("Extension Test Suite", function () {
 
     helper.assertRangeIsEqual(
       invalidLayoutDiagnostics[0].range,
-      range(pos(8, 25), pos(8, 34)),
+      range(pos(8, 24), pos(8, 33)),
     );
   });
+
+  test("Resolve copybook with suffix successfully", async () => {
+    const editor = await helper.showDocument("DaCo03.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(11, 19), pos(11, 31)));
+  });
+
+  test("Resolve copybook with WRK suffix successfully", async () => {
+    const editor = await helper.showDocument("DaCo04.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(17, 19), pos(17, 31)));
+  });
+
+  test("Resolve copybook with WRK suffix with various cases successfully", async () => {
+    const editor = await helper.showDocument("DaCo05.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(17, 19), pos(17, 31)));
+  });
+
+  test("Resolve copybook with WRK suffix (different case) successfully", async () => {
+    const editor = await helper.showDocument("DaCo06.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(12, 19), pos(12, 31)));
+  });
+
+  test("Resolve copybook with WRK suffix (88 level case) successfully", async () => {
+    const editor = await helper.showDocument("DaCo07.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(14, 19), pos(14, 31)));
+  });
+
+  // test("Resolve copybook with WRK suffix (redefine use case) successfully", async () => {
+  //   const editor = await helper.showDocument("DaCo08.cbl");
+  //   const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+  //   helper.printAllDiagnostics(diagnostics);
+  //   assert.strictEqual(diagnostics.length, 1);
+
+  //   const d0 = diagnostics[0];
+  //   assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+  //   helper.assertRangeIsEqual(d0.range, range(pos(14, 19), pos(14, 31)));
+  // });
 });
