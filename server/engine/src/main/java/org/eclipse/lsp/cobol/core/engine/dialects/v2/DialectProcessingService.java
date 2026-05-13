@@ -119,14 +119,16 @@ public class DialectProcessingService {
 
       addErrors(errorList, copybook, copybookId, copybookInfo.getDiagnostics());
 
+      Location statementLocation =
+          document.mapLocation(copybookInfo.getStatementLocation().getRange());
       CopyNode copyNode =
           new CopyNode(
               Locality.builder()
-                  .uri(copybookInfo.getStatementLocation().getUri())
+                  .uri(statementLocation.getUri())
                   .copybookId(parentCopybookId)
-                  .range(copybookInfo.getStatementLocation().getRange())
+                  .range(statementLocation.getRange())
                   .build(),
-              copybookInfo.getNameLocation(),
+              document.mapLocation(copybookInfo.getNameLocation().getRange()),
               copybookInfo.getCopybookName(),
               dialectName,
               copybookInfo.getUri());
