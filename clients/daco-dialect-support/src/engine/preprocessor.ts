@@ -34,15 +34,16 @@ const WRK_SUFFIX = "WRK";
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
 
-  constructor(private readonly outputChannel: vscode.OutputChannel) {}
+  constructor(
+    private readonly outputChannel: vscode.OutputChannel,
+    private readonly messageService: MessageService,
+  ) {}
 
   public async execute(
     context: IDocumentProcessingContext,
     _programUri: vscode.Uri,
     text: string,
-    messageService: MessageService,
   ) {
-    this.firstCopybookLevel = 0; // Reset for each execution
     const procMatch = PROC_REGEX.exec(text);
 
     const end =
@@ -60,7 +61,7 @@ export class DaCoPreprocessor {
     const lexer = new CopybookLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
     const parser = new CopybookParser(tokenStream);
-    parser.setMessageService(messageService);
+    parser.setMessageService(this.messageService);
 
     tokenStream.fill();
     for (const t of tokenStream.getTokens()) {
@@ -96,7 +97,7 @@ export class DaCoPreprocessor {
     console.log(`Found ${descriptors.length} copybook descriptors:`);
     descriptors.forEach((descriptor) =>
       console.log(
-        `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, prevName=${descriptor.prevName}`,
+        `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, parentName=${descriptor.parentName}`,
       ),
     );
     await Promise.all(
@@ -111,7 +112,7 @@ export class DaCoPreprocessor {
           (descriptor.suffix && !hasWrkSuffix ? `_${descriptor.suffix}` : "");
 
         const suffix = hasWrkSuffix
-          ? this.extractSuffix(descriptor.prevName)
+          ? this.extractSuffix(descriptor.parentName)
           : undefined;
 
         console.log(`Resolving copybook '${copybookName}'...`);
@@ -142,12 +143,12 @@ export class DaCoPreprocessor {
     );
   }
 
-  private extractSuffix(prevName: string | undefined): string {
-    if (!prevName) {
+  private extractSuffix(parentName: string | undefined): string {
+    if (!parentName) {
       return "";
     }
-    if (prevName.length > 2) {
-      return prevName.substring(prevName.length - 2);
+    if (parentName.length > 2) {
+      return parentName.substring(parentName.length - 2);
     }
     return "";
   }

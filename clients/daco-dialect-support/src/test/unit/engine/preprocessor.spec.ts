@@ -30,7 +30,10 @@ describe("DaCoPreprocessor test", () => {
   const outputChannel: any = {
     appendLine: jest.fn(),
   };
-  const preprocessor = new DaCoPreprocessor(outputChannel);
+  const preprocessor = new DaCoPreprocessor(
+    outputChannel,
+    createMessageService(),
+  );
   const copybookContext: any = {
     resolveCopybook: jest.fn(),
     addDiagnostic: jest.fn(),
@@ -57,7 +60,6 @@ describe("DaCoPreprocessor test", () => {
         "          01 COPY MAID TEST-AA12.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
-      createMessageService(),
     );
 
     expect(context.addDiagnostic).toHaveBeenCalledWith(
@@ -77,7 +79,6 @@ describe("DaCoPreprocessor test", () => {
       context,
       Uri.parse("file:///test.cbl"),
       HEADER + "          COPY MAID TEST-A12 SUFFIX.",
-      createMessageService(),
     );
 
     expect(context.addDiagnostic).toHaveBeenCalledWith(
@@ -100,7 +101,6 @@ describe("DaCoPreprocessor test", () => {
         "          01 COPY MAID NAME.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
-      createMessageService(),
     );
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.resolveCopybook).toHaveBeenCalledWith(
@@ -124,7 +124,6 @@ describe("DaCoPreprocessor test", () => {
         "          01 COPY MAID NAME-ABC KMK.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
-      createMessageService(),
     );
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
@@ -149,7 +148,6 @@ describe("DaCoPreprocessor test", () => {
         "          01 COPY MAID NAME.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
-      createMessageService(),
     );
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
