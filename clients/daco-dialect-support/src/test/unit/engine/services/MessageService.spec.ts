@@ -12,7 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as vscode from "vscode";
+import { URI } from "vscode-uri";
 import { MessageService } from "../../../../engine/services/MessageService";
+
+jest.mock("vscode");
 
 describe("MessageService test", () => {
   const messages = {
@@ -20,6 +24,10 @@ describe("MessageService test", () => {
   };
 
   const messageService = new MessageService(messages);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it("should format messages with parameters", () => {
     const result = messageService.get("test.key", "World");
@@ -30,5 +38,22 @@ describe("MessageService test", () => {
     expect(() => messageService.get("unknown.key")).toThrow(
       "Missing message: unknown.key",
     );
+  });
+
+  it("should format number instead of message for missing parameter", () => {
+    const result = messageService.get("test.key");
+    expect(result).toBe("Hello, {0}!");
+  });
+
+  it("should create MessageService object with correct messages", async () => {
+    const context = {
+      extensionUri: URI.file("/path/to/extension"),
+    };
+    jest
+      .spyOn(vscode.workspace.fs, "readFile")
+      .mockResolvedValue(Buffer.from(JSON.stringify(messages)));
+
+    const service = await MessageService.create(context as any);
+    expect(service).toBeInstanceOf(MessageService);
   });
 });
