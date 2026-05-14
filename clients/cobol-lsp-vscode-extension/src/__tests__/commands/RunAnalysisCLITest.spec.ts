@@ -64,7 +64,7 @@ describe("Test Analysis CLI command functionality", () => {
     expect(buildJavaCommandSpy).toHaveBeenCalledWith("'/storagePath'");
     expect(buildJavaCommandSpy).toHaveReturnedWith(
       process.platform === "win32"
-        ? 'java -jar "\\test\\server\\jar\\server.jar" analysis -s "/storagePath" -cf=.'
+        ? "java -jar \"\\test\\server\\jar\\server.jar\" analysis -s '/storagePath' -cf=."
         : "java -jar \"/test/server/jar/server.jar\" analysis -s '/storagePath' -cf=.",
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
