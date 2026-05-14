@@ -56,6 +56,7 @@ export class VariableDescriptor {
     public level: number,
     public nameRange: vscode.Range,
     public name: string,
+    public type: "DEFINITION" | "REDEFINITION" = "DEFINITION",
   ) {}
 }
 
@@ -203,12 +204,23 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     ];
   };
 
-  dataRedefinesClause? = (
+  visitDataRedefinesClause? = (
     ctx: DataRedefinesClauseContext,
   ): VariableDescriptor[] => {
-    const redefinedName = ctx.dataName()?.getText();
-    if (redefinedName) {
-      //this.prevName = redefinedName.toUpperCase();
+    const redefinitionName = ctx.dataName();
+
+    if (redefinitionName) {
+      const nameRange = constructRange(redefinitionName);
+      return [
+        new VariableDescriptor(
+          nameRange,
+          0,
+          nameRange,
+          redefinitionName.getText(),
+          "REDEFINITION",
+        ),
+        ...(super.visitChildren(ctx) ?? []),
+      ];
     }
     return super.visitChildren(ctx) ?? [];
   };
