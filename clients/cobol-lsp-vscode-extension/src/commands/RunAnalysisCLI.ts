@@ -261,13 +261,15 @@ export class RunAnalysis {
    */
   private getQuotedPath(fsPath: string): string {
     if (this.checkIfPowerShell()) {
-      // PowerShell: Reject paths containing any quote characters
-      if (fsPath.includes("'") || fsPath.includes('"')) {
+      // Double quotes are dangerous because they allow variable expansion in PowerShell.
+      if (fsPath.includes('"')) {
         throw new Error(
           "Paths containing quote characters cannot be safely executed in PowerShell.",
         );
       }
-      return fsPath;
+      // Escape single quotes by doubling them up (' -> '')
+      const escapedPath = fsPath.replace(/'/g, "''");
+      return `'${escapedPath}'`;
     } else {
       // POSIX: Escape embedded single quotes by closing the string,
       // adding an escaped single quote, and reopening the string.
