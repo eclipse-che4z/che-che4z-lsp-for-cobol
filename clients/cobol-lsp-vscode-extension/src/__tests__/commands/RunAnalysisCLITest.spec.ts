@@ -61,14 +61,14 @@ describe("Test Analysis CLI command functionality", () => {
 
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
-    expect(buildJavaCommandSpy).toHaveBeenCalledWith("/storagePath");
+    expect(buildJavaCommandSpy).toHaveBeenCalledWith("'/storagePath'");
     expect(buildJavaCommandSpy).toHaveReturnedWith(
       process.platform === "win32"
         ? 'java -jar "\\test\\server\\jar\\server.jar" analysis -s "/storagePath" -cf=.'
-        : 'java -jar "/test/server/jar/server.jar" analysis -s "/storagePath" -cf=.',
+        : "java -jar \"/test/server/jar/server.jar\" analysis -s '/storagePath' -cf=.",
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
-      'analysis -s "/storagePath" -cf=.',
+      "analysis -s '/storagePath' -cf=.",
     );
     expect(sendToTerminalSpy).toHaveBeenCalled();
 
@@ -115,11 +115,11 @@ describe("Test Analysis CLI command functionality", () => {
     expect(runCobolAnalysisCommandSpy).toHaveBeenCalled();
     expect(getCurrentFileLocationSpy).toHaveBeenCalled();
     expect(buildNativeCommandSpy).toHaveBeenCalledWith(
-      "/storagePath",
+      "'/storagePath'",
       process.platform,
     );
     expect(buildAnalysisCommandPortionSpy).toHaveReturnedWith(
-      'analysis -s "/storagePath" -cf=.',
+      "analysis -s '/storagePath' -cf=.",
     );
     expect(sendToTerminalSpy).toHaveBeenCalled();
 

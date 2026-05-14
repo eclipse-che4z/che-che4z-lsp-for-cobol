@@ -418,3 +418,8 @@ export enum FileChangeType {
   Created = 2,
   Deleted = 3,
 }
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace env {
+  export const shell: string = "";
+}
