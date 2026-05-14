@@ -30,6 +30,7 @@ import { MessageService } from "./services/MessageService";
 
 const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
 const WRK_SUFFIX = "WRK";
+const FILLER_NAME = "FILLER";
 
 export class DaCoPreprocessor {
   private firstCopybookLevel: number = 0;
@@ -220,18 +221,24 @@ export class DaCoPreprocessor {
       context.replace(descriptor.nameRange, updatedName);
     }
 
-    const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
-    this.outputChannel.appendLine(
-      `Processing variable '${descriptor.name}' with level ${descriptor.level}. Copybook level: ${copybookLevel}. First copybook Level: ${this.firstCopybookLevel} Updated level: ${updatedLevel}`,
-    );
-    if (copybookLevel != descriptor.level) {
-      const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
-      context.replace(descriptor.levelRange, updatedLevelStr);
+    if (descriptor.type === "DEFINITION") {
+      const updatedLevel = this.calculateLevel(copybookLevel, descriptor.level);
+      this.outputChannel.appendLine(
+        `Processing variable '${descriptor.name}' with level ${descriptor.level}. Copybook level: ${copybookLevel}. First copybook Level: ${this.firstCopybookLevel} Updated level: ${updatedLevel}`,
+      );
+      if (updatedLevel != descriptor.level) {
+        const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
+        context.replace(descriptor.levelRange, updatedLevelStr);
+      }
     }
   }
 
   private updateVariableName(name: string, suffix: string) {
     console.log(`Updating variable name '${name}' with suffix '${suffix}'...`);
+    if (name.toUpperCase() === FILLER_NAME) {
+      return name;
+    }
+
     const dashIndex = name.lastIndexOf("-");
     if (dashIndex === name.length - 4) {
       return name.substring(0, dashIndex + 2) + suffix;
