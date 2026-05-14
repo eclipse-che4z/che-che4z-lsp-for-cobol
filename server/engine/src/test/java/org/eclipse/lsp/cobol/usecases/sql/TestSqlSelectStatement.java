@@ -187,10 +187,41 @@ class TestSqlSelectStatement {
           + "               LIMIT 1 OFFSET 1\n"
           + "           END-EXEC.\n";
 
+  private static final String SELECT19 =
+      TEXT
+          + "       DECLARE SYSTAB_CSR CURSOR FOR\n"
+          + "           SELECT DISTINCT T.NAME\n"
+          + "           FROM SYSIBM.SYSTABLES T\n"
+          + "               WHERE T.NAME = 'SYSPLAN'\n"
+          + "                  AND T.NAME IN\n"
+          + "                       (SELECT DISTINCT C.TBNAME\n"
+          + "                          FROM SYSIBM.SYSCOLUMNS C\n"
+          + "                         WHERE C.COLNO IN (1, 2, 3, 4, 5)\n"
+          + "                           AND C.COLTYPE = 'CHAR'\n"
+          + "                       )\n"
+          + "                 FOR FETCH ONLY\n"
+          + "               WITH UR\n"
+          + "           END-EXEC.\n";
+
+  private static final String SELECT20 =
+      TEXT
+          + "       DECLARE SYSTAB_CSR2 CURSOR FOR\n"
+          + "               SELECT DISTINCT T.NAME\n"
+          + "                 FROM SYSIBM.SYSTABLES T\n"
+          + "                 WHERE T.NAME NOT IN\n"
+          + "                       (SELECT TB2.TBNAME\n"
+          + "                          FROM SYSIBM.SYSCOLUMNS TB2\n"
+          + "                         WHERE TB2.NAME = 'NAME'\n"
+          + "                       )\n"
+          + "                 FOR FETCH ONLY\n"
+          + "               WITH UR\n"
+          + "           END-EXEC.\n";
+
   private static Stream<String> textsToTest() {
     return Stream.of(
         SELECT, SELECT2, SELECT3, SELECT4, SELECT5, SELECT6, SELECT7, SELECT8, SELECT9, SELECT10,
-        SELECT11, SELECT12, SELECT13, SELECT14, SELECT15, SELECT16, SELECT17, SELECT18);
+        SELECT11, SELECT12, SELECT13, SELECT14, SELECT15, SELECT16, SELECT17, SELECT18, SELECT19,
+        SELECT20);
   }
 
   @ParameterizedTest

@@ -1304,7 +1304,7 @@ dbs_quantified_predicate: dbs_expression dbs_predicate_condition (SOME|ANY|ALL) 
 dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR dbs_sql_identifier dbs_comma_separator INTEGERLITERAL RPARENCHAR;
 dbs_basic_and_distinct_predicate: dbs_expressions (dbs_predicate_condition | IS NOT? DISTINCT FROM) dbs_expressions;
 dbs_exist_predicate: EXISTS LPARENCHAR dbs_select RPARENCHAR;
-dbs_in_predicate: dbs_expressions NOT? IN LPARENCHAR dbs_expressions (dbs_comma_separator dbs_expressions)* RPARENCHAR;
+dbs_in_predicate: dbs_expressions NOT? IN LPARENCHAR (dbs_fullselect | dbs_expressions (dbs_comma_separator dbs_expressions)*) RPARENCHAR;
 dbs_between_predicate: dbs_expressions NOT? BETWEEN dbs_expressions AND dbs_expressions;
 dbs_like_predicate: dbs_expressions NOT? LIKE dbs_expressions (ESCAPE dbs_expressions)?;
 dbs_null_predicate: dbs_expression IS NOT? NULL;
