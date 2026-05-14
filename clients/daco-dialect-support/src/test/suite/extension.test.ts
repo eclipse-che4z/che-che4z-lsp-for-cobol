@@ -120,14 +120,14 @@ suite("Extension Test Suite", function () {
     helper.assertRangeIsEqual(d0.range, range(pos(14, 19), pos(14, 31)));
   });
 
-  // test("Resolve copybook with WRK suffix (redefine use case) successfully", async () => {
-  //   const editor = await helper.showDocument("DaCo08.cbl");
-  //   const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
-  //   helper.printAllDiagnostics(diagnostics);
-  //   assert.strictEqual(diagnostics.length, 1);
+  test("Resolve copybook with WRK suffix (redefine use case) successfully", async () => {
+    const editor = await helper.showDocument("DaCo08.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
 
-  //   const d0 = diagnostics[0];
-  //   assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
-  //   helper.assertRangeIsEqual(d0.range, range(pos(14, 19), pos(14, 31)));
-  // });
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(12, 19), pos(12, 31)));
+  });
 });
