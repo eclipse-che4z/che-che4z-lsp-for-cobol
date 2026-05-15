@@ -92,6 +92,23 @@ public abstract class MessageServiceParser extends Parser {
   }
 
   /**
+   * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
+   * {@link CobolParser}
+   *
+   * <p>Example: notifyWarning("db2SqlParser.validValueMsg", input, value); would notify
+   * errorListener with the externalized messages.
+   *
+   * @param token Related token
+   * @param messageId Unique ID for each message in externalized message file.
+   * @param parameters Arguments referenced by the format specifiers in the format string in
+   *     externalized message file.
+   */
+  public void notifyWarning(Token token, String messageId, String... parameters) {
+    String message = getMessageForParser(messageId, parameters);
+    notifyErrorListeners(token, message, new WarningRecognitionException());
+  }
+
+  /**
    * @param message Message string which needs to be passed to {@link
    *     org.antlr.v4.runtime.ANTLRErrorListener}
    *     <p>NOTE: This method is for testing only. Advised to use notifyErrorListeners instead.

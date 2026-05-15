@@ -27,8 +27,8 @@ options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
     notifyError(t, "ErrorStrategy.reportInputMismatch", t.getText());
   }
 
-  private void markObsolete(TokenStream _input, Token t) {
-    notifyError(t, "cobolParser.ObsoleteCode", t.getText());
+  private void markMLEDeprecated(TokenStream _input, Token t) {
+    notifyWarning(t, "cobolParser.MLEDeprecated", t.getText());
   }
 }
 
@@ -721,7 +721,7 @@ dataSynchronizedClause
    ;
 
 dataDateFormatClause
-   : DATE FORMAT IS? DATE_PATTERN {markObsolete(_input, $DATE);}
+   : DATE FORMAT IS? DATE_PATTERN {markMLEDeprecated(_input, $DATE);}
    ;
 
 dataUsageClause
@@ -2288,9 +2288,9 @@ fileName
 
 functionName
    : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
-   | DATEVAL {markObsolete(_input, $DATEVAL);}
-   | UNDATE {markObsolete(_input, $UNDATE);}
-   | YEARWINDOW {markObsolete(_input, $YEARWINDOW);};
+   | DATEVAL {markMLEDeprecated(_input, $DATEVAL);}
+   | UNDATE {markMLEDeprecated(_input, $UNDATE);}
+   | YEARWINDOW {markMLEDeprecated(_input, $YEARWINDOW);};
 
 
 indexName
