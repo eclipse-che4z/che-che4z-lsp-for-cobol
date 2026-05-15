@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutionException;
@@ -120,7 +121,8 @@ public class LangServerBootstrap {
   private void launchServerWithSocket(LanguageServer server, ClientProvider provider)
       throws IOException, InterruptedException, ExecutionException {
     logger.info("Language server awaiting socket communication on port [{}]", LSP_PORT);
-    try (ServerSocket serverSocket = new ServerSocket(LSP_PORT);
+    try (ServerSocket serverSocket =
+            new ServerSocket(LSP_PORT, 0, InetAddress.getLoopbackAddress());
         Socket socket = serverSocket.accept();
         InputStream input = socket.getInputStream();
         OutputStream output = socket.getOutputStream()) {
