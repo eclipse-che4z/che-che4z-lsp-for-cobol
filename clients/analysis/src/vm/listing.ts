@@ -85,7 +85,7 @@ abstract class Placeholder implements CobolInstruction {
 class GotoPlaceholder extends Placeholder {
   constructor(
     node: CFASTNode,
-    public target: string,
+    public target: ProcedureName
   ) {
     super(node);
   }
@@ -490,8 +490,7 @@ export class ProgramListing {
     }
 
     if (node.type === "goto") {
-      const target = (node as Goto).targetName[0];
-      this.instructions.push(new GotoPlaceholder(node, target));
+      this.instructions.push(new GotoPlaceholder(node, this.getTargetProcedureFromNode((node as Goto))));
       return;
     }
 
@@ -641,7 +640,7 @@ export class ProgramListing {
         new RestoreProgramUnit(this.symbolTable.getCurrentProgramUnit()),
       );
       if (cicsHandle.handleType === "LABEL") {
-        this.instructions.push(new GotoPlaceholder(node, cicsHandle.value));
+        this.instructions.push(new GotoPlaceholder(node, this.getTargetProcedureFromNode(cicsHandle)));
       } else {
         this.instructions.push(new SimpleCobolInstruction(node));
       }
@@ -675,7 +674,7 @@ export class ProgramListing {
         new RestoreProgramUnit(this.symbolTable.getCurrentProgramUnit()),
       );
       if (whenever.wheneverType === "GOTO") {
-        this.instructions.push(new GotoPlaceholder(node, whenever.value));
+        this.instructions.push(new GotoPlaceholder(node, this.getTargetProcedureFromNode(whenever)));
       } else {
         this.instructions.push(new SimpleCobolInstruction(node));
       }
@@ -711,13 +710,46 @@ export class ProgramListing {
     this.instructions.push(new SimpleCobolInstruction(node));
   }
 
+private getTargetProcedureFromNode(node: Goto | CicsHandleAbend | SqlWhenever): ProcedureName {
+  let target: string;
+
+  switch (node.type) {
+    case "goto":
+      target = node.targetName[0];
+      break;
+    case "execcicshandle":
+    case "execwhenever":
+      target = node.value;
+      break;
+    default:
+      throw new Error(`Unexpected node type: ${(node as any).type}`);
+  }
+
+  let inSection: string | undefined;
+
+  if (node.parent?.type === "section") {
+    const section = node.parent as Section; 
+    
+    const hasMatchingParagraph = section.children?.some(
+      e => e.type === "paragraph" && (e as Paragraph).name === target
+    );
+
+    if (hasMatchingParagraph) {
+      inSection = section.name;
+    }
+  }
+
+  return { 
+    inSection, 
+    name: target 
+  };
+}
+
   private processPlaceholders() {
     for (let i = 0; i < this.instructions.length; i++) {
       if (this.instructions[i] instanceof GotoPlaceholder) {
         const placeholder = this.instructions[i] as GotoPlaceholder;
-        const result = this.symbolTable.getProcedurePositionByName({
-          name: placeholder.target,
-        });
+        const result = this.symbolTable.getProcedurePositionByName(placeholder.target);
         if (result) {
           this.instructions[i] = new GotoInstruction(
             placeholder.getInitialNode(),

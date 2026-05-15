@@ -35,6 +35,7 @@ public class AnalysisConfig {
   boolean isCicsTranslatorEnabled;
   boolean collectAstChanges;
   SqlProcessing sqlProcessing;
+  SqlDecimalComma sqlDecimalCommaAllowed;
   List<DialectRegistryItem> dialectRegistry;
   Map<String, JsonElement> dialectsSettings;
   List<String> compilerOptions = new ArrayList<>();
@@ -56,6 +57,7 @@ public class AnalysisConfig {
         true,
         false,
         SqlProcessing.ENABLED,
+        SqlDecimalComma.DISABLED,
         ImmutableList.of(),
         ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }
@@ -68,6 +70,7 @@ public class AnalysisConfig {
         true,
         collectAstChanges,
         SqlProcessing.ENABLED,
+        SqlDecimalComma.DISABLED,
         ImmutableList.of(),
         ImmutableMap.of("target-sql-backend", new Gson().toJsonTree(SQLBackend.DB2_SERVER)));
   }

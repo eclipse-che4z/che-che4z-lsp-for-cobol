@@ -1,0 +1,6 @@
+digraph A {
+rankdir=LR;
+<tets67>-><SEC1>;
+<SEC1>-><SEC2>;
+<SEC2>-><SECTION-END>;
+}

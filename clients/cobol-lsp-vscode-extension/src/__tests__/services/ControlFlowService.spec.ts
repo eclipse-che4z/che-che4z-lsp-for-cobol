@@ -17,6 +17,8 @@ import {
   ControlFlowAnalysisService,
 } from "../../services/ControlFlowService";
 import { LogOutputChannel } from "vscode";
+import { getConfigurationResult } from "../../__mocks__/vscode";
+import { SETTINGS_UNREACHABLE_CODE_SEVERITY } from "../../constants";
 
 const apiResult: ApiResult = {
   controlFlowAST: [
@@ -100,6 +102,10 @@ jest.mock("worker_threads", () => ({
 }));
 
 describe("ControlFlowService tests", () => {
+  afterEach(() => {
+    delete getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY];
+  });
+
   test("Build queued for analysis", async () => {
     const service = new ControlFlowAnalysisService();
     const queueAnalysis = jest.spyOn(service, "queueAnalysis");
@@ -118,6 +124,8 @@ describe("ControlFlowService tests", () => {
   });
 
   test("Propagate errors", async () => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "ERROR";
+
     const service = new ControlFlowAnalysisService();
     await service.handleControlFlowAst(apiResult);
 
@@ -128,6 +136,25 @@ describe("ControlFlowService tests", () => {
     lastWorkerErrorTrigger?.(Error("boom"));
 
     await expect(p).rejects.toThrow("boom");
+  });
+
+  test("Defer analysis", async () => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "NONE";
+
+    const service = new ControlFlowAnalysisService();
+    await service.handleControlFlowAst(apiResult);
+
+    expect(lastWorkerResultTrigger).toBeUndefined();
+    expect(lastWorkerErrorTrigger).toBeUndefined();
+
+    const p = service.getAnalysis(apiResult.documentUri);
+
+    expect(lastWorkerResultTrigger).toBeTruthy();
+    expect(lastWorkerErrorTrigger).toBeTruthy();
+
+    lastWorkerResultTrigger?.();
+
+    expect(await p).toBeTruthy();
   });
 });
 
@@ -141,6 +168,7 @@ describe("ControlFlowService analysis task tests", () => {
   };
 
   beforeEach(() => {
+    getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY] = "ERROR";
     logChannel = {
       trace: jest.fn(),
       debug: jest.fn(),
@@ -148,6 +176,10 @@ describe("ControlFlowService analysis task tests", () => {
       warn: jest.fn(),
       error: jest.fn(),
     };
+  });
+
+  afterEach(() => {
+    delete getConfigurationResult[SETTINGS_UNREACHABLE_CODE_SEVERITY];
   });
 
   test("AnalysisTask log error to logger channel", async () => {

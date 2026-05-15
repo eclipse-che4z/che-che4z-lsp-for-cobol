@@ -437,6 +437,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     Db2SqlExecParser parser = new Db2SqlExecParser(tokens);
     Db2ErrorListener listener = new Db2ErrorListener(context.getProgramDocumentUri());
+    lexer.setSQLDecimalCommaAllowed(context.getConfig().getSqlDecimalCommaAllowed().toBoolean());
     lexer.removeErrorListeners();
     lexer.addErrorListener(listener);
     parser.removeErrorListeners();

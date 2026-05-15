@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -58,6 +59,7 @@ class CachingConfigurationServiceTest {
             true,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of()),
         configuration.getConfig(null, CopybookProcessingMode.ENABLED));
@@ -83,6 +85,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("true"),
             new JsonArray(),
             new JsonPrimitive("true"),
+            new JsonPrimitive("false"),
             new JsonArray(),
             new JsonPrimitive("ERROR"),
             predefinedParagraphs);
@@ -95,6 +98,7 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
+                SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
                 "dialect")))
@@ -110,6 +114,7 @@ class CachingConfigurationServiceTest {
             true,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("dialect", predefinedParagraphs));
     expected.getUnusedVariableSeverity().severity = ErrorSeverity.ERROR;
@@ -135,6 +140,7 @@ class CachingConfigurationServiceTest {
             JsonNull.INSTANCE,
             new JsonArray(),
             JsonNull.INSTANCE,
+            new JsonPrimitive("false"),
             JsonNull.INSTANCE,
             new JsonArray(),
             dialectsSettings);
@@ -146,6 +152,7 @@ class CachingConfigurationServiceTest {
                 CICS_TRANSLATOR_ENABLED.label,
                 DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
+                SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
                 "dialect")))
@@ -161,6 +168,7 @@ class CachingConfigurationServiceTest {
             false,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
@@ -195,5 +203,164 @@ class CachingConfigurationServiceTest {
     CachingConfigurationService configuration =
         new CachingConfigurationService(settingsService, dialectService);
     assertEquals(configuration.getDialectWatchingFolders().get(0), expectedResult);
+  }
+
+  @Test
+  void testSQLDecimalCommaAllowedTRUE() {
+    SettingsService settingsService = spy(SettingsService.class);
+
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
+    JsonArray dialectsSettings = new JsonArray();
+    dialectsSettings.add("test");
+
+    JsonArray dialectSettings = new JsonArray();
+    JsonArray subroutineSettings = new JsonArray();
+    dialectSettings.add("Dialect");
+    List<Object> clientConfig =
+        Arrays.asList(
+            dialectSettings,
+            subroutineSettings,
+            JsonNull.INSTANCE,
+            new JsonArray(),
+            JsonNull.INSTANCE,
+            new JsonPrimitive(true),
+            JsonNull.INSTANCE,
+            new JsonArray(),
+            dialectsSettings);
+    when(settingsService.fetchConfigurations(
+            "",
+            Arrays.asList(
+                DIALECTS.label,
+                SUBROUTINE_LOCAL_PATHS.label,
+                CICS_TRANSLATOR_ENABLED.label,
+                DIALECT_REGISTRY.label,
+                SQL_PROCESSING_ENABLED_SETTING.label,
+                SQL_DECIMAL_COMMA_ALLOWED.label,
+                COMPILER_OPTIONS.label,
+                UNUSED_VARIABLE_SEVERITY.label,
+                "dialect")))
+        .thenReturn(supplyAsync(() -> clientConfig));
+
+    CachingConfigurationService configuration =
+        new CachingConfigurationService(settingsService, dialectService);
+
+    assertEquals(
+        new AnalysisConfig(
+            CopybookProcessingMode.DISABLED,
+            ImmutableList.of("Dialect"),
+            false,
+            false,
+            SqlProcessing.ENABLED,
+            SqlDecimalComma.ENABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("dialect", dialectsSettings)),
+        configuration.getConfig("", CopybookProcessingMode.DISABLED));
+  }
+
+  @Test
+  void testSQLDecimalCommaAllowedNULL() {
+    SettingsService settingsService = spy(SettingsService.class);
+
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
+    JsonArray dialectsSettings = new JsonArray();
+    dialectsSettings.add("test");
+
+    JsonArray dialectSettings = new JsonArray();
+    JsonArray subroutineSettings = new JsonArray();
+    dialectSettings.add("Dialect");
+    List<Object> clientConfig =
+        Arrays.asList(
+            dialectSettings,
+            subroutineSettings,
+            JsonNull.INSTANCE,
+            new JsonArray(),
+            JsonNull.INSTANCE,
+            JsonNull.INSTANCE,
+            JsonNull.INSTANCE,
+            new JsonArray(),
+            dialectsSettings);
+    when(settingsService.fetchConfigurations(
+            "",
+            Arrays.asList(
+                DIALECTS.label,
+                SUBROUTINE_LOCAL_PATHS.label,
+                CICS_TRANSLATOR_ENABLED.label,
+                DIALECT_REGISTRY.label,
+                SQL_PROCESSING_ENABLED_SETTING.label,
+                SQL_DECIMAL_COMMA_ALLOWED.label,
+                COMPILER_OPTIONS.label,
+                UNUSED_VARIABLE_SEVERITY.label,
+                "dialect")))
+        .thenReturn(supplyAsync(() -> clientConfig));
+
+    CachingConfigurationService configuration =
+        new CachingConfigurationService(settingsService, dialectService);
+
+    assertEquals(
+        new AnalysisConfig(
+            CopybookProcessingMode.DISABLED,
+            ImmutableList.of("Dialect"),
+            false,
+            false,
+            SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("dialect", dialectsSettings)),
+        configuration.getConfig("", CopybookProcessingMode.DISABLED));
+  }
+
+  @Test
+  void testSQLDecimalCommaAllowedNONSENSE() {
+    SettingsService settingsService = spy(SettingsService.class);
+
+    DialectService dialectService = mock(DialectService.class);
+    when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
+    JsonArray dialectsSettings = new JsonArray();
+    dialectsSettings.add("test");
+
+    JsonArray dialectSettings = new JsonArray();
+    JsonArray subroutineSettings = new JsonArray();
+    dialectSettings.add("Dialect");
+    List<Object> clientConfig =
+        Arrays.asList(
+            dialectSettings,
+            subroutineSettings,
+            JsonNull.INSTANCE,
+            new JsonArray(),
+            JsonNull.INSTANCE,
+            new JsonPrimitive("foobar"),
+            JsonNull.INSTANCE,
+            new JsonArray(),
+            dialectsSettings);
+    when(settingsService.fetchConfigurations(
+            "",
+            Arrays.asList(
+                DIALECTS.label,
+                SUBROUTINE_LOCAL_PATHS.label,
+                CICS_TRANSLATOR_ENABLED.label,
+                DIALECT_REGISTRY.label,
+                SQL_PROCESSING_ENABLED_SETTING.label,
+                SQL_DECIMAL_COMMA_ALLOWED.label,
+                COMPILER_OPTIONS.label,
+                UNUSED_VARIABLE_SEVERITY.label,
+                "dialect")))
+        .thenReturn(supplyAsync(() -> clientConfig));
+
+    CachingConfigurationService configuration =
+        new CachingConfigurationService(settingsService, dialectService);
+
+    assertEquals(
+        new AnalysisConfig(
+            CopybookProcessingMode.DISABLED,
+            ImmutableList.of("Dialect"),
+            false,
+            false,
+            SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
+            ImmutableList.of(),
+            ImmutableMap.of("dialect", dialectsSettings)),
+        configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 }

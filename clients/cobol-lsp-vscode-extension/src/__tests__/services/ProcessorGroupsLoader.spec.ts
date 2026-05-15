@@ -25,10 +25,19 @@ import {
   LibsDefinitions,
   readSettingConfig,
   readWorkspaceConfig,
+  readEndevorConfig,
   transformLibs,
 } from "../../services/ProcessorGroupsLoader";
 import * as vscode from "vscode";
 import { outputChannel } from "../../services/util/OutputChannel";
+import {
+  externalApis,
+  initializeExternalAPIs,
+} from "../../services/ExternalAPIsService";
+import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/CopybookDownloaderForE4E";
+import { E4EExternalConfigurationResponse } from "../../type/e4eApi";
+import { e4eMock } from "../../__mocks__/getE4EMock.utility";
+import { UssPathLib } from "../../services/copybookLibs/UssPathLib";
 
 describe("ProcessorGroupsLoader", () => {
   describe("readSettingConfig", () => {
@@ -71,6 +80,19 @@ describe("ProcessorGroupsLoader", () => {
         const result = readSettingConfig(DEFAULT_DIALECT);
         expect(result.libs![0]).toEqual(new DatasetLib("FIRST.DATASET"));
         expect(result.libs![1]).toEqual(new DatasetLib("SECOND.DATASET"));
+      });
+    });
+
+    describe("uss is correctly processed", () => {
+      beforeEach(() => {
+        getConfigurationResult["paths-local"] = [];
+        getConfigurationResult["paths-dsn"] = [];
+        getConfigurationResult["paths-uss"] = ["/user/copybooks"];
+      });
+
+      it("generates workspace processor group with dsn path first", () => {
+        const result = readSettingConfig(DEFAULT_DIALECT);
+        expect(result.libs).toEqual([new UssPathLib("/user/copybooks")]);
       });
     });
   });
@@ -175,6 +197,57 @@ describe("ProcessorGroupsLoader", () => {
         new LocalPathLib("/local/lib/2"),
         new DatasetLib("remote.lib.2"),
       ]);
+    });
+  });
+
+  describe("transform pre processors", () => {
+    it("test transformed and non-transformed preprocessor", async () => {
+      const WORKSPACE_PATH = "/tests/processor-groups-loader";
+      const WORKSPACE_URI = vscode.Uri.file(WORKSPACE_PATH);
+      const mockConfigResponse: E4EExternalConfigurationResponse = {
+        pgroups: [
+          {
+            name: "DATASET",
+            libs: [
+              {
+                dataset: "MY.DATASET",
+              },
+            ],
+            preprocessor: [
+              {
+                name: "PREPROC1",
+              },
+              {
+                name: "DSNHPC",
+              },
+            ],
+          },
+        ],
+        pgms: [{ program: "COBOL/PROGRAM", pgroup: "endevor_pgroup" }],
+      };
+
+      await initializeExternalAPIs(vscode.Uri.file("/storage"));
+      jest.spyOn(externalApis, "handleAsEndevorElement").mockReturnValue(true);
+      const e4eDownloader = new CopybookDownloaderForE4E(
+        vscode.Uri.file("/storagePath"),
+        e4eMock,
+      );
+      externalApis.e4eDownloader = e4eDownloader;
+
+      jest
+        .spyOn(externalApis.e4eDownloader, "getEndevorProcessorGroupConfig")
+        .mockResolvedValue(mockConfigResponse);
+
+      const result = await readEndevorConfig(
+        vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob"),
+      );
+      expect(result).not.toBeUndefined();
+
+      const preprocessors = result?.processorGroups["DATASET"]?.preprocessors;
+      expect(preprocessors).not.toBeUndefined();
+      expect(preprocessors?.length).toBe(2);
+      expect(preprocessors?.[0].name).toBe("PREPROC1");
+      expect(preprocessors?.[1].name).toBe("SQL");
     });
   });
 });

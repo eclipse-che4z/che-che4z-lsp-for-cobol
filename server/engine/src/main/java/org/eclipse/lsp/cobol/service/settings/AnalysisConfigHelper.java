@@ -39,6 +39,7 @@ class AnalysisConfigHelper {
             entity.isCicsTranslatorEnabled(),
             false,
             entity.getIsSQLProcessingEnabled(),
+            entity.getIsSQLDecimalCommaAllowed(),
             entity.getDialectRegistry(),
             entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());

@@ -86,13 +86,23 @@ export function clearDiagnostics() {
   diagnosticCollection.clear();
 }
 
-class ExternalAPIsService {
+function makeCreateDeleteWatcher(scheme: string) {
+  return vscode.workspace.createFileSystemWatcher(
+    new vscode.RelativePattern(vscode.Uri.from({ scheme, path: "/" }), "**/*"),
+    false,
+    true,
+    false,
+  );
+}
+
+class ExternalAPIsService implements vscode.Disposable {
   e4eApi: E4E | undefined;
   dsnService?: CopybookDownloaderForDsn;
   ussService?: CopybookDownloaderForUss;
   e4eDownloader?: CopybookDownloaderForE4E;
   binaryDownloader?: CopybookBinaryDownloader;
   tarCache?: Memoize<[tarFileUri: vscode.Uri], TarContent[]>;
+  toDispose: vscode.Disposable[] = [];
 
   constructor(
     private storagePath: vscode.Uri,
@@ -104,6 +114,11 @@ class ExternalAPIsService {
     if (e4e) this.e4eAppeared(e4e);
     if (explorer) this.explorerAppeared(explorer);
     if (tarCache) this.tarCache = tarCache;
+  }
+
+  dispose(): void {
+    for (const d of this.toDispose.reverse()) d.dispose();
+    this.toDispose = [];
   }
 
   /**
@@ -138,8 +153,10 @@ class ExternalAPIsService {
   }
 
   public explorerAppeared(api: IApiRegisterClient) {
-    this.ussService = new CopybookDownloaderForUss();
-    this.dsnService = new CopybookDownloaderForDsn();
+    const ussService = new CopybookDownloaderForUss();
+    const dsnService = new CopybookDownloaderForDsn();
+    this.ussService = ussService;
+    this.dsnService = dsnService;
     this.binaryDownloader = new CopybookBinaryDownloader(this.storagePath, api);
     diagnosticCollection.clear();
     if (api.onProfileUpdated) {
@@ -151,6 +168,16 @@ class ExternalAPIsService {
         }
       });
     }
+    const ussWatcher = makeCreateDeleteWatcher("zowe-uss");
+    const dsWatcher = makeCreateDeleteWatcher("zowe-ds");
+    this.toDispose.push(
+      ussWatcher,
+      ussWatcher.onDidCreate((uri) => ussService.fsChanged(uri)),
+      ussWatcher.onDidDelete((uri) => ussService.fsChanged(uri)),
+      dsWatcher,
+      dsWatcher.onDidCreate((uri) => dsnService.fsChanged(uri)),
+      dsWatcher.onDidDelete((uri) => dsnService.fsChanged(uri)),
+    );
   }
 
   public reenableFailedRequests() {

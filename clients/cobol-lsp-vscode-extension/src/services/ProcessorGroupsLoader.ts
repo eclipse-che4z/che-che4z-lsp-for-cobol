@@ -33,6 +33,11 @@ const PG_FOLDER = ".cobolplugin";
 const PGR_PGM_FILE = "pgm_conf.json";
 const PG_PROC_FILE = "proc_grps.json";
 
+const translatePreprocessor: { [key: string]: "SQL" | "CICS" } = Object.freeze({
+  DSNHPC: "SQL",
+  DFHECP1$: "CICS",
+});
+
 type ProgramConfig = {
   program: string;
   processorGroup: ProcessorGroup;
@@ -197,9 +202,10 @@ const readEndevorConfigCached = new Memoize(
         documentUri,
       );
     if (endevorData) {
-      const processorGroups = endevorData.pgroups.map(
-        transformProcessorGroup([EndevorElementLib, EndevorMemberLib]),
-      );
+      const processorGroups = endevorData.pgroups
+        .map(transformProcessorGroup([EndevorElementLib, EndevorMemberLib]))
+        .map(renamePreprocessors);
+
       processorGroups.forEach((pg) => {
         workspaceConfig.processorGroups[pg.name] = pg;
       });
@@ -305,7 +311,7 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
           folderPattern: internalPath,
         };
       }
-      return uss;
+      return { uss };
     },
   );
   return {
@@ -381,6 +387,17 @@ const transformProcessorGroup =
 
     return result;
   };
+
+const renamePreprocessors = (pg: ProcessorGroup): ProcessorGroup => {
+  if (pg.preprocessors) {
+    pg.preprocessors = pg.preprocessors.map((p) => ({
+      ...p,
+      name: translatePreprocessor[p.name?.toUpperCase()] ?? p.name,
+    }));
+  }
+
+  return pg;
+};
 
 export function transformLibs(
   libDefinitions: LibsDefinitions | undefined,

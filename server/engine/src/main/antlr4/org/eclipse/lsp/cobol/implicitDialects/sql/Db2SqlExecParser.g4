@@ -1268,7 +1268,7 @@ without_or_with: (WITHOUT | WITH);
 yes_or_no: (YES | NO);
 
 dbs_select_into_suffix: INTO (target_variable_names_loop | dbs_array_variable) dbs_from_clause dbs_where_clause? dbs_groupby_clause? dbs_having_clause?
-                                        dbs_orderby_clause? dbs_offset_fetch_clause?  (dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data)* dbs_select_statement_queryno_clause?;
+                                        dbs_orderby_clause? (dbs_offset_fetch_clause | dbs_select_statement_isolation_clause | dbs_select_statement_skip_locked_data | dbs_select_statement_queryno_clause)*;
 common_table_expression_loop: dbs_select_statement_common_table_expression (dbs_comma_separator dbs_select_statement_common_table_expression)*;
 target_variable_names_loop: dbs_sql_variable_reference (dbs_comma_separator dbs_sql_variable_reference)*;
 dbs_select_statement_common_table_expression: dbs_sql_identifier (LPARENCHAR dbs_sql_identifier (dbs_comma_separator dbs_sql_identifier)* RPARENCHAR)? AS dbs_fullselect;
@@ -1304,9 +1304,9 @@ dbs_quantified_predicate: dbs_expression dbs_predicate_condition (SOME|ANY|ALL) 
 dbs_array_exists_predicate: ARRAY_EXISTS LPARENCHAR dbs_sql_identifier dbs_comma_separator INTEGERLITERAL RPARENCHAR;
 dbs_basic_and_distinct_predicate: dbs_expressions (dbs_predicate_condition | IS NOT? DISTINCT FROM) dbs_expressions;
 dbs_exist_predicate: EXISTS LPARENCHAR dbs_select RPARENCHAR;
-dbs_in_predicate: dbs_expressions NOT? IN LPARENCHAR dbs_expressions (dbs_comma_separator dbs_expressions)* RPARENCHAR;
+dbs_in_predicate: dbs_expressions NOT? IN LPARENCHAR (dbs_fullselect | dbs_expressions (dbs_comma_separator dbs_expressions)*) RPARENCHAR;
 dbs_between_predicate: dbs_expressions NOT? BETWEEN dbs_expressions AND dbs_expressions;
-dbs_like_predicate: dbs_sql_identifier NOT? LIKE dbs_expressions (ESCAPE dbs_expressions)?;
+dbs_like_predicate: dbs_expressions NOT? LIKE dbs_expressions (ESCAPE dbs_expressions)?;
 dbs_null_predicate: dbs_expression IS NOT? NULL;
 dbs_predicate: dbs_basic_and_distinct_predicate
                 | dbs_quantified_predicate //

@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
@@ -80,6 +81,7 @@ public interface ConfigurationService {
     boolean cicsTranslatorEnabled;
     List<DialectRegistryItem> dialectRegistry;
     SqlProcessing isSQLProcessingEnabled;
+    SqlDecimalComma isSQLDecimalCommaAllowed;
     List<String> compilerOptions;
     ErrorSeverity unusedVariableSeverity;
     //    CobolProgramLayout layout;
@@ -91,6 +93,7 @@ public interface ConfigurationService {
       cicsTranslatorEnabled = true;
       dialectRegistry = ImmutableList.of();
       isSQLProcessingEnabled = SqlProcessing.ENABLED;
+      isSQLDecimalCommaAllowed = SqlDecimalComma.DISABLED;
       compilerOptions = ImmutableList.of();
       unusedVariableSeverity = null;
       dialectsSettings = ImmutableMap.of();

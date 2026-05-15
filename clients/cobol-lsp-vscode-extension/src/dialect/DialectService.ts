@@ -24,6 +24,7 @@ import { Location } from "vscode";
 import {
   readFileContent,
   resolveCopybookURI,
+  type ZoweCache,
 } from "../services/copybook/CopybookMessageHandler";
 
 type RangePayload = {
@@ -202,6 +203,7 @@ export class DialectService {
 
   public constructor(
     languageClientService: LanguageClientService,
+    private readonly zoweCache?: ZoweCache,
     private readonly outputChannel?: vscode.OutputChannel,
   ) {
     languageClientService.addRequestHandler(
@@ -269,7 +271,7 @@ export class DialectService {
     if (copybookUri === undefined) {
       return undefined;
     }
-    const text = await readFileContent(copybookUri);
+    const text = await readFileContent(copybookUri, this.zoweCache);
 
     if (text === undefined) {
       return undefined;

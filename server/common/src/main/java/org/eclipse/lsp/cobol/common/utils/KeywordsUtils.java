@@ -36,8 +36,8 @@ public class KeywordsUtils {
    */
   public Map<String, String> getKeywords(ClassLoader classLoader, String fileName) {
     Properties props = new Properties();
-    try {
-      props.load(classLoader.getResourceAsStream(fileName));
+    try (InputStream stream = classLoader.getResourceAsStream(fileName)) {
+      props.load(stream);
       return props.entrySet().stream()
           .collect(
               Collectors.toMap(

@@ -46,12 +46,16 @@ describe("DialectService test", () => {
   });
 
   test("Test DialectService constructor creates handlers for LSP client", () => {
-    new DialectService(languageClientService, outputChannel);
+    new DialectService(languageClientService, undefined, outputChannel);
     expect(languageClientService.addRequestHandler).toHaveBeenCalled();
   });
 
   test("Test DialectService registerStartHandler creates handlers for LSP client", () => {
-    const service = new DialectService(languageClientService, outputChannel);
+    const service = new DialectService(
+      languageClientService,
+      undefined,
+      outputChannel,
+    );
 
     service.registerStartHandler("DIALECT", () => {
       return Promise.resolve();
@@ -60,7 +64,7 @@ describe("DialectService test", () => {
   });
 
   test("Test DialectService log error to the output channel if handler was not found", () => {
-    new DialectService(languageClientService, outputChannel);
+    new DialectService(languageClientService, undefined, outputChannel);
     dialectHandler("DIALECT", "URI", "TEXT");
     expect(outputChannel.appendLine).toHaveBeenCalledWith(
       "Handler for the dialect DIALECT was not found, dialect processing ignored",
@@ -68,7 +72,11 @@ describe("DialectService test", () => {
   });
 
   test("Test DialectService handles dialect processing event", () => {
-    const service = new DialectService(languageClientService, outputChannel);
+    const service = new DialectService(
+      languageClientService,
+      undefined,
+      outputChannel,
+    );
     let processDialect = false;
 
     service.registerStartHandler("DIALECT", () => {

@@ -26,6 +26,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.UnusedVariableSeverity;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
@@ -70,6 +71,8 @@ public class UseCase {
 
   @Builder.Default SqlProcessing sqlProcessing = SqlProcessing.ENABLED;
 
+  @Builder.Default SqlDecimalComma sqlDecimalCommaAllowed = SqlDecimalComma.DISABLED;
+
   @Builder.Default UnusedVariableSeverity unusedVariableSeverity = new UnusedVariableSeverity();
 
   /** preprocessor directives mapped with preprocessor name */
@@ -89,6 +92,7 @@ public class UseCase {
             cicsTranslator,
             false,
             sqlProcessing,
+            sqlDecimalCommaAllowed,
             ImmutableList.of(),
             dialectsSettings);
     analysisConfig.getCompilerOptions().addAll(compilerOptions);

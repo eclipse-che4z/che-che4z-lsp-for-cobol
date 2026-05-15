@@ -29,7 +29,10 @@ import { WorkerResultMessage } from "./worker/messages";
 import { GraphDTO } from "@code4z/analysis/lib/model/GraphDTO";
 import { telemetryEvent, telemetryExceptionEvent } from "./reporter";
 import { getVariablesFromUri } from "./util/FSUtils";
-import { ANALYSIS_LIMIT_REASON } from "../constants";
+import {
+  ANALYSIS_LIMIT_REASON,
+  SETTINGS_UNREACHABLE_CODE_SEVERITY,
+} from "../constants";
 
 const EVENT_ANALYSIS_ERROR = "ccf.analysis.error";
 
@@ -58,6 +61,7 @@ export type AnalysisResult = {
 };
 
 interface AnalysisServiceDelegate {
+  startedTask(documentUri: string): void;
   finishTask(
     documentUri: string,
     graphs: GraphDTO[],
@@ -95,20 +99,29 @@ type LatestResultData = {
 );
 
 export class AnalysisTask {
-  private worker: Worker = new Worker(join(__dirname, "./Worker.js"));
+  private worker: Worker | undefined;
 
   constructor(
     private documentUri: string,
-    public programs: Program[],
-    public requestVersion: number,
+    private programs: Program[],
+    private requestVersion: number,
     private delegate: AnalysisServiceDelegate,
     private mainChannel?: vscode.OutputChannel,
     private logChannel?: vscode.LogOutputChannel,
   ) {
     this.logChannel?.debug(
-      `Create new task with request version: ${requestVersion}`,
+      `Create new task with request version: ${this.requestVersion}`,
     );
+  }
 
+  started(): boolean {
+    return !!this.worker;
+  }
+
+  start() {
+    if (this.worker) return;
+    this.delegate.startedTask(this.documentUri);
+    this.worker = new Worker(join(__dirname, "./Worker.js"));
     this.worker.on("message", (data: WorkerResultMessage) => {
       if (data.type === "result") {
         this.delegate.finishTask(
@@ -154,16 +167,15 @@ export class AnalysisTask {
         this.requestVersion,
       );
     });
-
     this.worker.postMessage({
       vmCount: SettingsService.getMaxVMCount(),
       severity: SettingsService.getUnreachableCodeSeverity()?.valueOf(),
-      programs: programs,
+      programs: this.programs,
     });
   }
 
   public async abort() {
-    await this.worker.terminate();
+    await this.worker?.terminate();
   }
 }
 
@@ -175,12 +187,16 @@ function extractFilename(documentUri: string) {
   }
 }
 
-export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
+export class ControlFlowAnalysisService
+  implements AnalysisServiceDelegate, vscode.Disposable
+{
   private tasks: Map<string, AnalysisTask>;
   private latestResults: Map<string, LatestResultData>;
   private diagnosticService: DiagnosticService;
   private requestVersion: number = 1;
   private hideProgress?: () => void = undefined;
+
+  private toDispose: vscode.Disposable[] = [];
 
   public constructor(
     private mainChannel?: vscode.OutputChannel,
@@ -189,11 +205,20 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.tasks = new Map<string, AnalysisTask>();
     this.diagnosticService = new DiagnosticService();
     this.latestResults = new Map<string, LatestResultData>();
+
+    this.toDispose.push(
+      vscode.workspace.onDidChangeConfiguration((e) => {
+        if (!e.affectsConfiguration(SETTINGS_UNREACHABLE_CODE_SEVERITY)) return;
+        if (SettingsService.getUnreachableCodeSeverity() !== undefined)
+          this.tasks.forEach((x) => x.start());
+        else this.diagnosticService.clearDiagnostics();
+      }),
+    );
   }
 
-  private setTask(documentUri: string, task: AnalysisTask) {
-    this.tasks.set(documentUri, task);
+  startedTask(documentUri: string): void {
     if (!this.hideProgress) {
+      // TODO: This is kind of broken when multiple files are being analyzed
       const p = new Promise<void>((resolve) => {
         this.hideProgress = resolve;
       });
@@ -207,9 +232,25 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     }
   }
 
+  public dispose() {
+    this.toDispose.forEach((x) => void x.dispose());
+    this.toDispose = [];
+  }
+
+  private setTask(documentUri: string, task: AnalysisTask) {
+    this.tasks.set(documentUri, task);
+  }
+
+  private isTaskInProgress() {
+    for (const v of this.tasks.values()) {
+      if (v.started()) return true;
+    }
+    return false;
+  }
+
   private deleteTask(documentUri: string) {
     this.tasks.delete(documentUri);
-    if (this.tasks.size == 0 && this.hideProgress) {
+    if (!this.isTaskInProgress() && this.hideProgress) {
       this.hideProgress();
       this.hideProgress = undefined;
     }
@@ -227,6 +268,8 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
     this.logChannel?.debug(
       `Get analysis request for the document: ${documentUri}`,
     );
+
+    this.tasks.get(documentUri)?.start();
 
     const latestResult = this.latestResults.get(documentUri);
     if (latestResult?.promise) {
@@ -278,6 +321,11 @@ export class ControlFlowAnalysisService implements AnalysisServiceDelegate {
       this.mainChannel,
       this.logChannel,
     );
+    if (
+      SettingsService.getUnreachableCodeSeverity() !== undefined ||
+      latestResult?.promise
+    )
+      task.start();
     this.setTask(documentUri, task);
   }
 
@@ -430,8 +478,10 @@ class DiagnosticService {
     );
   }
 
-  public clearDiagnostics(documentUri: string) {
-    this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
+  public clearDiagnostics(documentUri?: string) {
+    if (documentUri)
+      this.diagnosticCollection.delete(vscode.Uri.parse(documentUri));
+    else this.diagnosticCollection.clear();
   }
 }
 

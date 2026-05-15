@@ -26,6 +26,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
@@ -103,6 +104,22 @@ public class ConfigHelper {
     return ConfigHelper.getValueAsString(objects)
         .map(SQLBackend::valueOf)
         .orElse(SQLBackend.DB2_SERVER);
+  }
+
+  /**
+   * Parse SQL Decimal Comma Allowed configurations to {@link SqlProcessing}
+   *
+   * @param sqlDecimalCommaAllowed SQL Decimal Comma allowed checkbox state from configuration
+   * @return Enabled if checked or Disabled otherwise, Disabled in the case of an invalid state
+   */
+  public SqlDecimalComma parseSQLDecimalCommaAllowed(JsonElement sqlDecimalCommaAllowed) {
+    if (sqlDecimalCommaAllowed.isJsonPrimitive()
+        && sqlDecimalCommaAllowed.getAsJsonPrimitive().isBoolean()) {
+      return sqlDecimalCommaAllowed.getAsBoolean()
+          ? SqlDecimalComma.ENABLED
+          : SqlDecimalComma.DISABLED;
+    }
+    return SqlDecimalComma.DISABLED;
   }
 
   /**

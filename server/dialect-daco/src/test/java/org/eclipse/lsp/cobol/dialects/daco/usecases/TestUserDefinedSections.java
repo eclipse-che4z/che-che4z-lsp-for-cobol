@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.util.Map;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
@@ -86,6 +87,7 @@ class TestUserDefinedSections {
             true,
             false,
             SqlProcessing.ENABLED,
+            SqlDecimalComma.DISABLED,
             ImmutableList.of(),
             dialectConfig);
     UseCaseEngine.runTestForDiagnostics(
