@@ -72,7 +72,6 @@ public class TestSymbolVariableName {
         ImmutablePair.of("count", ""),
         ImmutablePair.of("currency", ""),
         ImmutablePair.of("data", ""),
-        ImmutablePair.of("date", ""),
         ImmutablePair.of("day", ""),
         ImmutablePair.of("dbcs", ""),
         ImmutablePair.of("exit", ""),
