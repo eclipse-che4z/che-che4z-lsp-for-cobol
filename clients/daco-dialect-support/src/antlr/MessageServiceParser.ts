@@ -15,7 +15,7 @@ import { Parser, Token } from "antlr4ng";
 import { MessageService } from "../engine/services/MessageService";
 
 export abstract class MessageServiceParser extends Parser {
-  private static readonly ALPHANUMERIC: RegExp = /[a-zA-Z0-9]+/;
+  private static readonly ALPHANUMERIC: RegExp = /^[a-zA-Z0-9]+$/;
   private messageService?: MessageService;
 
   public setMessageService(messageService: MessageService) {
@@ -34,7 +34,12 @@ export abstract class MessageServiceParser extends Parser {
     param1: string,
     param2?: string,
   ): string {
-    const message = "";
+    const message = this.getMessageService().get(
+      template,
+      param1,
+      param2 ?? "",
+    );
+
     super.notifyErrorListeners(message, this.getCurrentToken(), null);
     return message;
   }
