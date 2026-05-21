@@ -217,7 +217,7 @@ export class DaCoPreprocessor {
         }
         const item: Item = {
           type: "VARIABLE",
-          tokens: tokens,
+          tokens,
         };
         items.push(item);
       }
