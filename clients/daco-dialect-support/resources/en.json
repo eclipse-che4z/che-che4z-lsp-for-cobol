@@ -1,4 +1,8 @@
 {
   "validation.layout_identifier": "Invalid layout identifier",
-  "validation.layout_usage": "Invalid layout usage"
+  "validation.layout_usage": "Invalid layout usage",
+  "parsers.intRangeValue": "Allowed range is {0} to {1}",
+  "parsers.exactLength": "Exact length of {0} must be {1} bytes",
+  "parsers.alphaNumeric": "Only alphanumerics are allowed for {0}",
+  "parsers.maxLength": "Max length limit of {0} bytes allowed for {1}."
 }
