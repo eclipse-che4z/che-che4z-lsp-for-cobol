@@ -12,10 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import { Position, Range } from "vscode";
 import {
   CopybookContentVisitor,
   CopybookVisitor,
+  DaCoVisitor,
   NameResolver,
+  StatementDescriptor,
 } from "../../../engine/parsing";
 
 describe("parsing test", () => {
@@ -67,6 +70,33 @@ describe("parsing test", () => {
 
     const result = visitor.visitDataDescriptionEntryFormat1(ctx);
     expect(result).toEqual([]);
+  });
+
+  it("should skip when dataName is missing", () => {
+    const visitor = new CopybookContentVisitor();
+
+    const ctx = {
+      dataName: () => null,
+      getChildCount: () => 0,
+      getChild: () => null,
+    } as any;
+
+    const result = visitor.visitDataRedefinesClause(ctx);
+    expect(result).toEqual([]);
+  });
+
+  it("should construct range for the context", () => {
+    const visitor = new DaCoVisitor();
+
+    const ctx = {
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+      getChildCount: () => 0,
+      getChild: () => null,
+    } as any;
+
+    const result = visitor.visitDacoStatements(ctx);
+    expect(result.length).toEqual(1);
   });
 });
 

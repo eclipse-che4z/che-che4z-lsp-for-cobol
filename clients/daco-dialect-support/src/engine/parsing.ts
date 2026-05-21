@@ -31,6 +31,12 @@ import {
   DataDescriptionEntryFormat1Context,
   DataRedefinesClauseContext,
 } from "../generated/VariableParser";
+import { DaCoParserVisitor } from "../generated/DaCoParserVisitor";
+import {
+  DacoStatementsContext,
+  QualifiedDataNameContext,
+  VariableUsageNameContext,
+} from "../generated/DaCoParser";
 
 export interface ParseError {
   line: number;
@@ -41,22 +47,31 @@ export interface ParseError {
 
 export class CopybookDescriptor {
   constructor(
-    public statementRange: vscode.Range,
-    public nameRange: vscode.Range,
-    public level: number,
-    public name: string,
-    public suffix?: string,
-    public parentName?: string,
+    public readonly statementRange: vscode.Range,
+    public readonly nameRange: vscode.Range,
+    public readonly level: number,
+    public readonly name: string,
+    public readonly suffix?: string,
+    public readonly parentName?: string,
   ) {}
 }
 
 export class VariableDescriptor {
   constructor(
-    public levelRange: vscode.Range,
-    public level: number,
-    public nameRange: vscode.Range,
-    public name: string,
-    public type: "DEFINITION" | "REDEFINITION" = "DEFINITION",
+    public readonly levelRange: vscode.Range,
+    public readonly level: number,
+    public readonly nameRange: vscode.Range,
+    public readonly name: string,
+    public readonly type: "DEFINITION" | "REDEFINITION" = "DEFINITION",
+  ) {}
+}
+
+export class StatementDescriptor {
+  constructor(
+    public readonly range: vscode.Range,
+    public readonly statementRange: vscode.Range,
+    public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
+    public readonly children: StatementDescriptor[],
   ) {}
 }
 
@@ -228,9 +243,65 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   protected aggregateResult = concatResults;
 }
 
+export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
+  visitDacoStatements?: (ctx: DacoStatementsContext) => StatementDescriptor[] =
+    (ctx: DacoStatementsContext): StatementDescriptor[] => {
+      const statements: StatementDescriptor[] = [];
+
+      statements.push(
+        new StatementDescriptor(
+          constructRange(ctx),
+          constructRangeFromTokens(ctx.start!, ctx.stop),
+          "STATEMENT",
+          this.visitChildren(ctx) ?? [],
+        ),
+      );
+      return statements;
+    };
+
+  visitQualifiedDataName?: (
+    ctx: QualifiedDataNameContext,
+  ) => StatementDescriptor[] = (
+    ctx: QualifiedDataNameContext,
+  ): StatementDescriptor[] => {
+    return [
+      new StatementDescriptor(
+        constructRange(ctx),
+        constructRange(ctx),
+        "VARIABLE",
+        this.visitChildren(ctx) ?? [],
+      ),
+    ];
+  };
+
+  visitVariableUsageName?: (
+    ctx: VariableUsageNameContext,
+  ) => StatementDescriptor[] = (
+    ctx: VariableUsageNameContext,
+  ): StatementDescriptor[] => {
+    return [
+      new StatementDescriptor(
+        constructRange(ctx),
+        constructRange(ctx),
+        "VARIABLE_USAGE",
+        this.visitChildren(ctx) ?? [],
+      ),
+    ];
+  };
+
+  protected aggregateResult = concatResults;
+}
+
 function constructRange(ctx: ParserRuleContext): vscode.Range {
   const start = ctx.start!;
   const stop = ctx.stop;
+  return constructRangeFromTokens(start, stop);
+}
+
+function constructRangeFromTokens(
+  start: Token,
+  stop: Token | null,
+): vscode.Range {
   const startPosition = new vscode.Position(start.line - 1, start.column);
   const stopPosition =
     stop == null || start.start > stop.stop
