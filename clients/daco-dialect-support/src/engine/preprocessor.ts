@@ -213,7 +213,7 @@ export class DaCoPreprocessor {
         const name = `VAR_${index++}`;
 
         if (child.children.length > 0) {
-          tokens.push(...this.createTokens(name, child.children));
+          this.createTokens(tokens, name, child.children);
         }
         const item: Item = {
           type: "VARIABLE",
