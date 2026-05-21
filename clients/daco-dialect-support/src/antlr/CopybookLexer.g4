@@ -19,6 +19,9 @@ import TechnicalLexer;
 
 WORKING_STORAGE : W O R K I N G MINUSCHAR S T O R A G E;
 SECTION : S E C T I O N;
+PROCEDURE : P R O C E D U R E;
+DIVISION : D I V I S I O N;
+PROCEDURE_DIVISION: PROCEDURE DIVISION;
 
 COPY                 : C O P Y ;
 MAID                 : M A I D ;
