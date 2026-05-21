@@ -24,8 +24,8 @@ startRule
    ;
 
 skipUntilWS
-    : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS workingStorageBody)? EOF
-    ;
+   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS workingStorageBody)? EOF
+   ;
 
 workingStorageBody
    : dataDescriptionEntry*
