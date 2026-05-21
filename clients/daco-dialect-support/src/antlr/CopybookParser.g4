@@ -24,7 +24,7 @@ startRule
    ;
 
 skipUntilWS
-   : (~WORKING_STORAGE)* WORKING_STORAGE SECTION DOT_FS
+   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS workingStorageBody)? EOF
    ;
 
 workingStorageBody
