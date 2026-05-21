@@ -13,20 +13,29 @@
  */
 
 import * as vscode from "vscode";
-import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
+import {
+  IDocumentProcessingContext,
+  Item,
+  Token,
+} from "@code4z/cobol-dialect-api";
 import { CopybookParser } from "../generated/CopybookParser";
 import { CopybookLexer } from "../generated/CopybookLexer";
 import * as antlr from "antlr4ng";
 import {
   CollectingErrorListener,
   CopybookContentVisitor,
+  CopybookDescriptor,
   CopybookVisitor,
+  DaCoVisitor,
   ParseError,
+  StatementDescriptor,
   VariableDescriptor,
 } from "./parsing";
 import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
 import { MessageService } from "./services/MessageService";
+import { DaCoLexer } from "../generated/DaCoLexer";
+import { DaCoParser } from "../generated/DaCoParser";
 
 const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
 const WRK_SUFFIX = "WRK";
@@ -45,6 +54,20 @@ export class DaCoPreprocessor {
     _programUri: vscode.Uri,
     text: string,
   ) {
+    const descriptors = this.collectCopybookDescriptors(context, text);
+    await this.processCopybooks(descriptors, context);
+
+    const statementDescriptors = this.collectStatementsDescriptors(
+      context,
+      text,
+    );
+    await this.processStatements(statementDescriptors, context);
+  }
+
+  private collectCopybookDescriptors(
+    context: IDocumentProcessingContext,
+    text: string,
+  ): CopybookDescriptor[] {
     const procMatch = PROC_REGEX.exec(text);
 
     const end =
@@ -96,6 +119,13 @@ export class DaCoPreprocessor {
     ]);
 
     console.log(`Found ${descriptors.length} copybook descriptors:`);
+    return descriptors;
+  }
+
+  private async processCopybooks(
+    descriptors: CopybookDescriptor[],
+    context: IDocumentProcessingContext,
+  ) {
     descriptors.forEach((descriptor) =>
       console.log(
         `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, parentName=${descriptor.parentName}`,
@@ -142,6 +172,109 @@ export class DaCoPreprocessor {
         }
       }),
     );
+  }
+
+  private async processStatements(
+    descriptors: StatementDescriptor[],
+    context: IDocumentProcessingContext,
+  ) {
+    descriptors.forEach((descriptor) =>
+      console.log(
+        `Statement Descriptor: type=${descriptor.type}, range=${JSON.stringify(
+          descriptor.statementRange,
+        )}`,
+      ),
+    );
+    descriptors.forEach((descriptor) => {
+      this.outputChannel.appendLine(
+        `Statement Descriptor: ${JSON.stringify(descriptor)}`,
+      );
+      if (descriptor.children.length > 0) {
+        context.replaceWithMap(
+          descriptor.range,
+          descriptor.statementRange,
+          this.traverseChildren(descriptor.children),
+          " ",
+        );
+      } else {
+        context.replace(descriptor.statementRange, " ");
+      }
+    });
+  }
+
+  private traverseChildren(children: StatementDescriptor[]): Item[] {
+    const items: Item[] = [];
+    let index = 0;
+    children.forEach((child) => {
+      if (child.type === "VARIABLE") {
+        const tokens: Token[] = [];
+        const name = `VAR_${index++}`;
+
+        if (child.children.length > 0) {
+          this.createTokens(tokens, name, child.children);
+        }
+        const item: Item = {
+          type: "VARIABLE",
+          tokens,
+        };
+        items.push(item);
+      }
+    });
+    return items;
+  }
+
+  private createTokens(
+    tokens: Token[],
+    name: string,
+    children: StatementDescriptor[],
+  ): Token[] {
+    let index = 0;
+    children.forEach((child) => {
+      if (child.type === "VARIABLE_USAGE") {
+        const tokenName = `${name}_USG_${index++}`;
+        const token: Token = { name: tokenName, range: child.statementRange };
+        tokens.push(token);
+        this.createTokens(tokens, tokenName, child.children);
+      }
+    });
+    return tokens;
+  }
+
+  private collectStatementsDescriptors(
+    context: IDocumentProcessingContext,
+    text: string,
+  ): StatementDescriptor[] {
+    const charStream = antlr.CharStream.fromString(text);
+    const lexer = new DaCoLexer(charStream);
+    const tokenStream = new antlr.CommonTokenStream(lexer);
+    const parser = new DaCoParser(tokenStream);
+    parser.setMessageService(this.messageService);
+
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+
+    const lexerErrors = new CollectingErrorListener();
+    const parserErrors = new CollectingErrorListener();
+
+    lexer.addErrorListener(lexerErrors);
+    parser.addErrorListener(parserErrors);
+
+    try {
+      const tree = parser.startRule();
+      console.log(tree.toStringTree(parser));
+
+      this.addParsingErrors(context, [
+        ...lexerErrors.errors,
+        ...parserErrors.errors,
+      ]);
+
+      return new DaCoVisitor().visit(tree) || [];
+    } catch (e) {
+      this.outputChannel.appendLine(
+        "Error during parsing: " + JSON.stringify(e),
+      );
+      return [];
+    }
   }
 
   private extractSuffix(parentName: string | undefined): string {
