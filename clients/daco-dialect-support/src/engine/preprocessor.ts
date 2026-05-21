@@ -234,9 +234,7 @@ export class DaCoPreprocessor {
         const tokenName = `${name}_USG_${index++}`;
         const token: Token = { name: tokenName, range: child.statementRange };
         tokens.push(token);
-        if (child.children.length > 0) {
-          tokens.push(...this.createTokens(tokens, tokenName, child.children));
-        }
+        this.createTokens(tokens, tokenName, child.children);
       }
     });
     return tokens;
