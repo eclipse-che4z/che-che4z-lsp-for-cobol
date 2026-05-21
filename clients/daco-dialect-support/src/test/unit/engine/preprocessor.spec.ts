@@ -17,7 +17,7 @@ import { DaCoPreprocessor } from "../../../engine/preprocessor";
 import { MessageService } from "../../../engine/services/MessageService";
 
 describe("DaCoPreprocessor test", () => {
-  const HEADER =
+  const HEADER_0 =
     "        IDENTIFICATION DIVISION.\n" +
     "          PROGRAM-ID. PARTEST.\n" +
     "        ENVIRONMENT DIVISION.\n" +
@@ -26,6 +26,11 @@ describe("DaCoPreprocessor test", () => {
     "            IDMS-RECORDS MANUAL\n" +
     "          DATA DIVISION.\n" +
     "          WORKING-STORAGE SECTION.\n";
+
+  const HEADER_1 =
+    "        IDENTIFICATION DIVISION.\n" +
+    "          PROGRAM-ID. PARTEST.\n" +
+    "        PROCEDURE DIVISION.\n";
 
   const outputChannel: any = {
     appendLine: jest.fn(),
@@ -45,6 +50,8 @@ describe("DaCoPreprocessor test", () => {
       uri: Uri.parse("file:///copybook.cbl"),
       text: "         01 ABC PIC 9.",
     }),
+    replace: jest.fn(),
+    replaceWithMap: jest.fn(),
     addDiagnostic: jest.fn(),
   };
 
@@ -56,7 +63,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      HEADER +
+      HEADER_0 +
         "          01 COPY MAID TEST-AA12.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -78,7 +85,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      HEADER + "          COPY MAID TEST-A12 SUFFIX.",
+      HEADER_0 + "          COPY MAID TEST-A12 SUFFIX.",
     );
 
     expect(context.addDiagnostic).toHaveBeenCalledWith(
@@ -97,7 +104,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      HEADER +
+      HEADER_0 +
         "          01 COPY MAID NAME.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -120,7 +127,7 @@ describe("DaCoPreprocessor test", () => {
     preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      HEADER +
+      HEADER_0 +
         "          01 COPY MAID NAME-ABC KMK.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -144,7 +151,7 @@ describe("DaCoPreprocessor test", () => {
     await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      HEADER +
+      HEADER_0 +
         "          01 COPY MAID NAME.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
@@ -163,6 +170,28 @@ describe("DaCoPreprocessor test", () => {
       }),
     );
     expect(copybookContext.replace).not.toHaveBeenCalled();
+  });
+
+  it("should parse READ TRANSACTION", async () => {
+    await preprocessor.execute(
+      context,
+      Uri.parse("file:///test.cbl"),
+      HEADER_1 + "          READ TRANSACTION\n" + "          GO TO FOO.\n",
+    );
+
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.replace).toHaveBeenCalled();
+  });
+
+  it("should parse WRITE TRANSACTION with variable usage", async () => {
+    await preprocessor.execute(
+      context,
+      Uri.parse("file:///test.cbl"),
+      HEADER_1 + "          WRITE TRANSACTION 3167 LENGTH TRANSACTION-SIZE.\n",
+    );
+
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.replaceWithMap).toHaveBeenCalled();
   });
 });
 
