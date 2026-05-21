@@ -130,4 +130,96 @@ suite("Extension Test Suite", function () {
     assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
     helper.assertRangeIsEqual(d0.range, range(pos(12, 19), pos(12, 31)));
   });
+
+  test("Process READ TRANSACTION statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo09.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(6, 19), pos(6, 31)));
+  });
+
+  test("Process READ TRANSACTION statement (validate parameters) successfully", async () => {
+    const editor = await helper.showDocument("DaCo10.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 3);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(
+      d0.message,
+      "Only alphanumerics are allowed for task name",
+    );
+    helper.assertRangeIsEqual(d0.range, range(pos(14, 28), pos(14, 32)));
+
+    const d1 = diagnostics[1];
+    assert.strictEqual(d1.message, "Exact length of task name must be 4 bytes");
+    helper.assertRangeIsEqual(d1.range, range(pos(15, 28), pos(15, 30)));
+
+    const d2 = diagnostics[2];
+    assert.strictEqual(d2.message, "Exact length of task name must be 4 bytes");
+    helper.assertRangeIsEqual(d2.range, range(pos(16, 28), pos(16, 33)));
+  });
+
+  test("Process WRITE TRANSACTION statement (validate parameters) successfully", async () => {
+    const editor = await helper.showDocument("DaCo11.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 10);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(
+      d0.message,
+      "Only alphanumerics are allowed for task name",
+    );
+    helper.assertRangeIsEqual(d0.range, range(pos(24, 29), pos(24, 33)));
+
+    const d1 = diagnostics[1];
+    assert.strictEqual(d1.message, "Exact length of task name must be 4 bytes");
+    helper.assertRangeIsEqual(d1.range, range(pos(25, 29), pos(25, 31)));
+
+    const d2 = diagnostics[2];
+    assert.strictEqual(d2.message, "Exact length of task name must be 4 bytes");
+    helper.assertRangeIsEqual(d2.range, range(pos(26, 29), pos(26, 34)));
+
+    const d3 = diagnostics[3];
+    assert.strictEqual(d3.message, "Allowed range is 4 to 2048");
+    helper.assertRangeIsEqual(d3.range, range(pos(27, 41), pos(27, 42)));
+
+    const d4 = diagnostics[4];
+    assert.strictEqual(d4.message, "Allowed range is 4 to 2048");
+    helper.assertRangeIsEqual(d4.range, range(pos(28, 42), pos(28, 43)));
+
+    const d5 = diagnostics[5];
+    assert.strictEqual(d5.message, "Allowed range is 4 to 2048");
+    helper.assertRangeIsEqual(d5.range, range(pos(29, 41), pos(29, 45)));
+
+    const d6 = diagnostics[6];
+    assert.strictEqual(d6.message, "Allowed range is 4 to 2048");
+    helper.assertRangeIsEqual(d6.range, range(pos(30, 42), pos(30, 46)));
+
+    const d7 = diagnostics[7];
+    assert.strictEqual(
+      d7.message,
+      "Max length limit of 19 bytes allowed for dbu.",
+    );
+    helper.assertRangeIsEqual(d7.range, range(pos(31, 47), pos(31, 68)));
+
+    const d8 = diagnostics[8];
+    assert.strictEqual(
+      d8.message,
+      "Max length limit of 19 bytes allowed for dbu.",
+    );
+    helper.assertRangeIsEqual(d8.range, range(pos(32, 48), pos(32, 69)));
+
+    const d9 = diagnostics[9];
+    assert.strictEqual(
+      d9.message,
+      "Variable FDERESS4342 does not exist in structure NOT_EXISTING",
+    );
+    helper.assertRangeIsEqual(d9.range, range(pos(33, 38), pos(33, 65)));
+  });
 });
