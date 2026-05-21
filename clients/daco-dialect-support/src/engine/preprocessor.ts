@@ -187,16 +187,19 @@ export class DaCoPreprocessor {
     );
     descriptors.forEach((descriptor) => {
       this.outputChannel.appendLine(
+        `Statement Descriptor: ${JSON.stringify(descriptor)}`,
+      );
+      if (descriptor.children.length > 0) {
+        context.replaceWithMap(
+          descriptor.range,
+          descriptor.statementRange,
+          this.traverseChildren(descriptor.children),
           " ",
         );
-            this.traverseChildren(descriptor.children),
-            " ",
-          );
-        } else {
-          context.replace(descriptor.statementRange, " ");
-        }
-      }),
-    );
+      } else {
+        context.replace(descriptor.statementRange, " ");
+      }
+    });
   }
 
   private traverseChildren(children: StatementDescriptor[]): Item[] {
@@ -220,8 +223,11 @@ export class DaCoPreprocessor {
     return items;
   }
 
-  private createTokens(name: string, children: StatementDescriptor[]): Token[] {
-    const tokens: Token[] = [];
+  private createTokens(
+    tokens: Token[],
+    name: string,
+    children: StatementDescriptor[],
+  ): Token[] {
     let index = 0;
     children.forEach((child) => {
       if (child.type === "VARIABLE_USAGE") {
@@ -229,7 +235,7 @@ export class DaCoPreprocessor {
         const token: Token = { name: tokenName, range: child.statementRange };
         tokens.push(token);
         if (child.children.length > 0) {
-          tokens.push(...this.createTokens(tokenName, child.children));
+          tokens.push(...this.createTokens(tokens, tokenName, child.children));
         }
       }
     });
