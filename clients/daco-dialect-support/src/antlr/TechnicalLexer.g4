@@ -71,9 +71,6 @@ NONNUMERICLITERAL : UNTRMSTRINGLITERAL | STRINGLITERAL | DBCSLITERAL | HEXNUMBER
 
 CHAR_STRING_CONSTANT : HEXNUMBER | STRINGLITERAL;
 
-OCTDIGITS : OCT_DIGIT;
-HEX_NUMBERS : HEXNUMBER;
-
 // whitespace, line breaks, comments, ...
 NEWLINE : '\r'? '\n' -> channel(HIDDEN);
 COMMENTLINE : COMMENTTAG WS ~('\n' | '\r')* -> channel(COMMENTS);
@@ -116,9 +113,7 @@ fragment DBCSLITERAL :
 	| [GN] '\'' (~['\n\r] | '\'\'' | '"')* '\''
 ;
 
-fragment
-OCT_DIGIT        : [0-8] ;
-fragment DIGIT: OCT_DIGIT | [9];
+fragment DIGIT: [0-9];
 // case insensitive chars
 fragment A:('a'|'A');
 fragment B:('b'|'B');
