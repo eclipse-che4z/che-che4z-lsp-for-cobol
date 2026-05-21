@@ -47,31 +47,31 @@ export interface ParseError {
 
 export class CopybookDescriptor {
   constructor(
-    public statementRange: vscode.Range,
-    public nameRange: vscode.Range,
-    public level: number,
-    public name: string,
-    public suffix?: string,
-    public parentName?: string,
+    public readonly statementRange: vscode.Range,
+    public readonly nameRange: vscode.Range,
+    public readonly level: number,
+    public readonly name: string,
+    public readonly suffix?: string,
+    public readonly parentName?: string,
   ) {}
 }
 
 export class VariableDescriptor {
   constructor(
-    public levelRange: vscode.Range,
-    public level: number,
-    public nameRange: vscode.Range,
-    public name: string,
-    public type: "DEFINITION" | "REDEFINITION" = "DEFINITION",
+    public readonly levelRange: vscode.Range,
+    public readonly level: number,
+    public readonly nameRange: vscode.Range,
+    public readonly name: string,
+    public readonly type: "DEFINITION" | "REDEFINITION" = "DEFINITION",
   ) {}
 }
 
 export class StatementDescriptor {
   constructor(
-    public range: vscode.Range,
-    public statementRange: vscode.Range,
-    public type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
-    public children: StatementDescriptor[],
+    public readonly range: vscode.Range,
+    public readonly statementRange: vscode.Range,
+    public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
+    public readonly children: StatementDescriptor[],
   ) {}
 }
 

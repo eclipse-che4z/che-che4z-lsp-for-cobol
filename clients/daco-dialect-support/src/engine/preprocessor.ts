@@ -185,15 +185,10 @@ export class DaCoPreprocessor {
         )}`,
       ),
     );
-    await Promise.all(
-      descriptors.map(async (descriptor) => {
-        this.outputChannel.appendLine(
-          `Statement Descriptor: ${JSON.stringify(descriptor)}`,
+    descriptors.forEach((descriptor) => {
+      this.outputChannel.appendLine(
+          " ",
         );
-        if (descriptor.children.length > 0) {
-          context.replaceWithMap(
-            descriptor.range,
-            descriptor.statementRange,
             this.traverseChildren(descriptor.children),
             " ",
           );
