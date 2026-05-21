@@ -95,7 +95,7 @@ public abstract class MessageServiceParser extends Parser {
    * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
    * {@link CobolParser}
    *
-   * <p>Example: notifyWarning("db2SqlParser.validValueMsg", input, value); would notify
+   * <p>Example: notifyWarning(token, "db2SqlParser.validValueMsg", input, value); would notify
    * errorListener with the externalized messages.
    *
    * @param token Related token
