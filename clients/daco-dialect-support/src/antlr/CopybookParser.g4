@@ -24,19 +24,7 @@ startRule
    ;
 
 skipUntilWS
-    : (notWsOrProcedure)* (workingStorageSection | procedureDivision)? DOT_FS
-    ;
-
-notWsOrProcedure
-    : ~(WORKING_STORAGE | PROCEDURE_DIVISION)
-    ;
-
-workingStorageSection
-    : WORKING_STORAGE SECTION
-    ;
-
-procedureDivision
-    : PROCEDURE_DIVISION
+    : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS workingStorageBody)? EOF
     ;
 
 workingStorageBody
