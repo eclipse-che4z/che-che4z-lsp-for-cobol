@@ -250,13 +250,11 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
     (ctx: DacoStatementsContext): StatementDescriptor[] => {
       const statements: StatementDescriptor[] = [];
 
-      if (ctx.dfldRcu()) {
-        this.addStatementForTerminalNodes(
-          [ctx.dfldRcu()?.ON(), ctx.dfldRcu()?.RCU()].filter(
-            (node): node is TerminalNode => node !== undefined,
-          ),
-          statements,
-        );
+      if (ctx.dfldRcu()?.ON()?.symbol && ctx.dfldRcu()?.RCU().symbol) {
+        const start = ctx.dfldRcu()?.ON()?.symbol;
+        const end = ctx.dfldRcu()?.RCU().symbol;
+        const range = constructRangeFromTokens(start!, end!);
+        statements.push(new StatementDescriptor(range, range, "STATEMENT", []));
       } else {
         statements.push(
           new StatementDescriptor(
@@ -299,22 +297,6 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
       ),
     ];
   };
-
-  private addStatementForTerminalNodes(
-    nodes: TerminalNode[],
-    statements: StatementDescriptor[],
-  ) {
-    nodes.forEach((node) => {
-      statements.push(
-        new StatementDescriptor(
-          constructRangeFromTokens(node.symbol, node.symbol),
-          constructRangeFromTokens(node.symbol, node.symbol),
-          "STATEMENT",
-          [],
-        ),
-      );
-    });
-  }
 
   protected aggregateResult = concatResults;
 }
