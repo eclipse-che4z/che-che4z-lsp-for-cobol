@@ -250,10 +250,11 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
     (ctx: DacoStatementsContext): StatementDescriptor[] => {
       const statements: StatementDescriptor[] = [];
 
-      if (ctx.dfldRcu()?.ON()?.symbol && ctx.dfldRcu()?.RCU().symbol) {
-        const start = ctx.dfldRcu()?.ON()?.symbol;
-        const end = ctx.dfldRcu()?.RCU().symbol;
-        const range = constructRangeFromTokens(start!, end!);
+      const dfldRcu = ctx.dfldRcu();
+      const onSymbol = dfldRcu?.ON()?.symbol;
+      const rcuSymbol = dfldRcu?.RCU()?.symbol;
+      if (onSymbol && rcuSymbol) {
+        const range = constructRangeFromTokens(onSymbol, rcuSymbol);
         statements.push(new StatementDescriptor(range, range, "STATEMENT", []));
       } else {
         statements.push(
