@@ -12,13 +12,11 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { Position, Range } from "vscode";
 import {
   CopybookContentVisitor,
   CopybookVisitor,
   DaCoVisitor,
   NameResolver,
-  StatementDescriptor,
 } from "../../../engine/parsing";
 
 describe("parsing test", () => {
@@ -93,6 +91,7 @@ describe("parsing test", () => {
       stop: { line: 1, column: 1, start: 0, stop: 1 },
       getChildCount: () => 0,
       getChild: () => null,
+      dfldRcu: () => null,
     } as any;
 
     const result = visitor.visitDacoStatements(ctx);
