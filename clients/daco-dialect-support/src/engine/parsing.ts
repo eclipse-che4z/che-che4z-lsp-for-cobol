@@ -19,6 +19,7 @@ import {
   Recognizer,
   ATNSimulator,
   ParserRuleContext,
+  TerminalNode,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
@@ -34,6 +35,7 @@ import {
 import { DaCoParserVisitor } from "../generated/DaCoParserVisitor";
 import {
   DacoStatementsContext,
+  DfldRcuContext,
   QualifiedDataNameContext,
   VariableUsageNameContext,
 } from "../generated/DaCoParser";
@@ -248,14 +250,23 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
     (ctx: DacoStatementsContext): StatementDescriptor[] => {
       const statements: StatementDescriptor[] = [];
 
-      statements.push(
-        new StatementDescriptor(
-          constructRange(ctx),
-          constructRangeFromTokens(ctx.start!, ctx.stop),
-          "STATEMENT",
-          this.visitChildren(ctx) ?? [],
-        ),
-      );
+      if (ctx.dfldRcu()) {
+        this.addStatementForTerminalNodes(
+          [ctx.dfldRcu()?.ON(), ctx.dfldRcu()?.RCU()].filter(
+            (node): node is TerminalNode => node !== undefined,
+          ),
+          statements,
+        );
+      } else {
+        statements.push(
+          new StatementDescriptor(
+            constructRange(ctx),
+            constructRangeFromTokens(ctx.start!, ctx.stop),
+            "STATEMENT",
+            this.visitChildren(ctx) ?? [],
+          ),
+        );
+      }
       return statements;
     };
 
@@ -288,6 +299,22 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
       ),
     ];
   };
+
+  private addStatementForTerminalNodes(
+    nodes: TerminalNode[],
+    statements: StatementDescriptor[],
+  ) {
+    nodes.forEach((node) => {
+      statements.push(
+        new StatementDescriptor(
+          constructRangeFromTokens(node.symbol, node.symbol),
+          constructRangeFromTokens(node.symbol, node.symbol),
+          "STATEMENT",
+          [],
+        ),
+      );
+    });
+  }
 
   protected aggregateResult = concatResults;
 }

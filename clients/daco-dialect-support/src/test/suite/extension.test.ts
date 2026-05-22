@@ -12,6 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
+import * as vscode from "vscode";
 import * as assert from "node:assert";
 import * as helper from "./testHelper";
 import { pos, range } from "./testHelper";
@@ -222,4 +223,48 @@ suite("Extension Test Suite", function () {
     );
     helper.assertRangeIsEqual(d9.range, range(pos(33, 38), pos(33, 65)));
   });
+
+  test("Process DFLD statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo12.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(14, 19), pos(14, 31)));
+
+    await checkDefinition(editor, new vscode.Position(11, 31), 8);
+  });
+
+  test("Process DFLD (exception case) statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo13.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    const d0 = diagnostics[0];
+    assert.strictEqual(d0.message, "Variable NOT_EXISTING is not defined");
+    helper.assertRangeIsEqual(d0.range, range(pos(14, 19), pos(14, 31)));
+
+    await checkDefinition(editor, new vscode.Position(11, 24), 7);
+  });
 });
+
+async function checkDefinition(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLine: number,
+) {
+  const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
+    "vscode.executeDefinitionProvider",
+    editor.document.uri,
+    position,
+  );
+
+  assert.ok(definitions);
+  assert.strictEqual(definitions.length, 1);
+
+  const definition = definitions[0];
+  assert.strictEqual(definition.range.start.line, expectedLine);
+}
