@@ -66,6 +66,7 @@ public enum SearchPattern {
         return Arrays.stream(split)
             .map(String::trim)
             .filter(sd -> !StringUtils.isEmpty(sd))
+            .map(Pattern::quote)
             .collect(Collectors.joining(regex));
       }
       return Pattern.quote(trim);
