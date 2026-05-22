@@ -29,8 +29,8 @@ import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
-import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.lsp.DialectItemDTO;
 
 /** Config helper class */
 @Slf4j
@@ -54,44 +54,28 @@ public class ConfigHelper {
   /**
    * Parse dialect registry client configurations to {@link List<DialectRegistryItem>}
    *
-   * @param jsonArray client dialect registry configuration
+   * @param dialects client dialect registry configuration
    * @return {@link List<DialectRegistryItem>}
    */
-  public List<DialectRegistryItem> parseDialectRegistry(JsonArray jsonArray) {
-    return Streams.stream(jsonArray)
-        .map(JsonElement::getAsJsonObject)
+  public List<DialectRegistryItem> parseDialectRegistry(List<DialectItemDTO> dialects) {
+    return dialects.stream()
         .filter(Objects::nonNull)
         .map(
             o -> {
               URI uri = null;
-              if (o.get("uri") != null) {
+              if (o.getUri() != null) {
                 try {
-                  JsonObject jsonUri = o.get("uri").getAsJsonObject();
-                  String path = getAsString(jsonUri, "path");
-                  String scheme = getAsString(jsonUri, "scheme");
-                  String host = getAsString(jsonUri, "host");
-                  String fragment = getAsString(jsonUri, "fragment");
-                  uri = new URI(scheme, host, path, fragment);
+                  uri = new URI(o.getUri());
                 } catch (Exception e) {
                   LOG.warn("Cannot parse dialect registry item {}", o, e);
                   return null;
                 }
               }
               return new DialectRegistryItem(
-                  o.get("name").getAsString(),
-                  Optional.ofNullable(o.get("protocolVersion"))
-                      .map(JsonElement::getAsInt)
-                      .orElse(CobolDialect.COBOL_DIALECT_JAVA_VERSION),
-                  uri,
-                  o.get("description").getAsString(),
-                  o.get("extensionId").getAsString());
+                  o.getName(), o.getProtocolVersion(), uri, o.getDescription(), o.getExtensionId());
             })
         .filter(Objects::nonNull)
         .collect(toList());
-  }
-
-  private String getAsString(JsonObject json, String field) {
-    return Optional.ofNullable(json.get(field)).map(JsonElement::getAsString).orElse(null);
   }
 
   /**

@@ -28,11 +28,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
+import org.eclipse.lsp.cobol.lsp.DialectItemDTO;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.CachingConfigurationService;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.junit.jupiter.api.Test;
@@ -49,8 +52,10 @@ class CachingConfigurationServiceTest {
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
 
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
 
     assertEquals(
         new AnalysisConfig(
@@ -72,6 +77,12 @@ class CachingConfigurationServiceTest {
     DialectService dialectService = mock(DialectService.class);
     when(dialectService.getSettingsSections()).thenReturn(ImmutableList.of("dialect"));
 
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    when(client.availableDialects())
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                ImmutableList.of(new DialectItemDTO(2, "Dialect", "", "", null))));
+
     JsonArray dialectSettings = new JsonArray();
     dialectSettings.add("Dialect");
 
@@ -83,7 +94,6 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             subroutines,
             new JsonPrimitive("true"),
-            new JsonArray(),
             new JsonPrimitive("true"),
             new JsonPrimitive("false"),
             new JsonArray(),
@@ -96,7 +106,6 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
@@ -105,7 +114,7 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
 
     final AnalysisConfig expected =
         new AnalysisConfig(
@@ -115,7 +124,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             SqlDecimalComma.DISABLED,
-            ImmutableList.of(),
+            ImmutableList.of(new DialectRegistryItem("Dialect", 2, null, "", "")),
             ImmutableMap.of("dialect", predefinedParagraphs));
     expected.getUnusedVariableSeverity().severity = ErrorSeverity.ERROR;
     assertEquals(expected, configuration.getConfig("", CopybookProcessingMode.DISABLED));
@@ -130,6 +139,10 @@ class CachingConfigurationServiceTest {
     JsonArray dialectsSettings = new JsonArray();
     dialectsSettings.add("test");
 
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    when(client.availableDialects())
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
+
     JsonArray dialectSettings = new JsonArray();
     JsonArray subroutineSettings = new JsonArray();
     dialectSettings.add("Dialect");
@@ -138,7 +151,6 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             subroutineSettings,
             JsonNull.INSTANCE,
-            new JsonArray(),
             JsonNull.INSTANCE,
             new JsonPrimitive("false"),
             JsonNull.INSTANCE,
@@ -150,7 +162,6 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
@@ -159,7 +170,7 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
 
     assertEquals(
         new AnalysisConfig(
@@ -183,8 +194,9 @@ class CachingConfigurationServiceTest {
     when(settingsService.fetchTextConfigurationWithScope(documentUri, section))
         .thenReturn(CompletableFuture.completedFuture(ImmutableList.of(expectedValue)));
     DialectService dialectService = mock(DialectService.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
     configuration
         .getListConfiguration(documentUri, section)
         .whenComplete(
@@ -198,10 +210,11 @@ class CachingConfigurationServiceTest {
   void testGetDialectWatchingFolders() {
     SettingsService settingsService = mock(SettingsService.class);
     DialectService dialectService = mock(DialectService.class);
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
     String expectedResult = "dialect-watch-folders";
     when(dialectService.getWatchingFolderSettings()).thenReturn(ImmutableList.of(expectedResult));
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
     assertEquals(configuration.getDialectWatchingFolders().get(0), expectedResult);
   }
 
@@ -214,6 +227,12 @@ class CachingConfigurationServiceTest {
     JsonArray dialectsSettings = new JsonArray();
     dialectsSettings.add("test");
 
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    when(client.availableDialects())
+        .thenReturn(
+            CompletableFuture.completedFuture(
+                ImmutableList.of(new DialectItemDTO(2, "Dialect", "", "", null))));
+
     JsonArray dialectSettings = new JsonArray();
     JsonArray subroutineSettings = new JsonArray();
     dialectSettings.add("Dialect");
@@ -222,7 +241,6 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             subroutineSettings,
             JsonNull.INSTANCE,
-            new JsonArray(),
             JsonNull.INSTANCE,
             new JsonPrimitive(true),
             JsonNull.INSTANCE,
@@ -234,7 +252,6 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
@@ -243,7 +260,7 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
 
     assertEquals(
         new AnalysisConfig(
@@ -253,7 +270,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             SqlDecimalComma.ENABLED,
-            ImmutableList.of(),
+            ImmutableList.of(new DialectRegistryItem("Dialect", 2, null, "", "")),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
@@ -267,6 +284,10 @@ class CachingConfigurationServiceTest {
     JsonArray dialectsSettings = new JsonArray();
     dialectsSettings.add("test");
 
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    when(client.availableDialects())
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
+
     JsonArray dialectSettings = new JsonArray();
     JsonArray subroutineSettings = new JsonArray();
     dialectSettings.add("Dialect");
@@ -275,7 +296,6 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             subroutineSettings,
             JsonNull.INSTANCE,
-            new JsonArray(),
             JsonNull.INSTANCE,
             JsonNull.INSTANCE,
             JsonNull.INSTANCE,
@@ -287,7 +307,6 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
@@ -296,7 +315,7 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
 
     assertEquals(
         new AnalysisConfig(
@@ -320,6 +339,10 @@ class CachingConfigurationServiceTest {
     JsonArray dialectsSettings = new JsonArray();
     dialectsSettings.add("test");
 
+    CobolLanguageClient client = mock(CobolLanguageClient.class);
+    when(client.availableDialects())
+        .thenReturn(CompletableFuture.completedFuture(ImmutableList.of()));
+
     JsonArray dialectSettings = new JsonArray();
     JsonArray subroutineSettings = new JsonArray();
     dialectSettings.add("Dialect");
@@ -328,7 +351,6 @@ class CachingConfigurationServiceTest {
             dialectSettings,
             subroutineSettings,
             JsonNull.INSTANCE,
-            new JsonArray(),
             JsonNull.INSTANCE,
             new JsonPrimitive("foobar"),
             JsonNull.INSTANCE,
@@ -340,7 +362,6 @@ class CachingConfigurationServiceTest {
                 DIALECTS.label,
                 SUBROUTINE_LOCAL_PATHS.label,
                 CICS_TRANSLATOR_ENABLED.label,
-                DIALECT_REGISTRY.label,
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
@@ -349,7 +370,7 @@ class CachingConfigurationServiceTest {
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration =
-        new CachingConfigurationService(settingsService, dialectService);
+        new CachingConfigurationService(settingsService, dialectService, () -> client);
 
     assertEquals(
         new AnalysisConfig(

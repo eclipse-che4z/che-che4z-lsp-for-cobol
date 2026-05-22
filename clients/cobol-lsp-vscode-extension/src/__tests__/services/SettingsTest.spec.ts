@@ -16,11 +16,6 @@ import * as vscode from "vscode";
 import { lspConfigHandler, SettingsService } from "../../services/Settings";
 import { SettingsUtils } from "../../services/util/SettingsUtils";
 import { getTabSettings } from "../../services/SmartTabSettings";
-import {
-  DIALECT_REGISTRY_SECTION,
-  DialectInfo,
-  DialectRegistry,
-} from "../../dialect/DialectRegistry";
 
 import { asMutable } from "../../test/suite/testHelper";
 import {
@@ -159,38 +154,6 @@ describe("SettingsService returns correct Copybook Configuration Values", () => 
 });
 
 describe("SettingService lspConfigHandler", () => {
-  describe("dialects registry configuration", () => {
-    const dialect: DialectInfo = {
-      name: "testDialect",
-      protocolVersion: 2,
-      description: "test-dialect",
-      extensionId: "",
-      snippetUri: vscode.Uri.file(""),
-      isCopyStatement: undefined,
-    };
-
-    beforeAll(() => {
-      DialectRegistry.registerV2(
-        dialect.extensionId,
-        dialect.name,
-        dialect.description,
-        dialect.snippetUri,
-      );
-    });
-
-    afterAll(() => {
-      DialectRegistry.clear();
-    });
-
-    test("returns dialects configuration", async () => {
-      const result = await lspConfigHandler({
-        items: [{ section: DIALECT_REGISTRY_SECTION }],
-      });
-
-      expect(result).toEqual(expect.arrayContaining([[dialect]]));
-    });
-  });
-
   describe("enabled dialects section", () => {
     beforeAll(() => {
       jest.spyOn(vscode.workspace, "getConfiguration").mockReturnValue({

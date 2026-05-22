@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.copybook.CopyBookDTO;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.lsp.DialectItemDTO;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -84,6 +85,16 @@ public interface CobolLanguageClient extends LanguageClient, DialectClientApi {
    */
   @JsonNotification("cfast/ready")
   default void cfastReady(ExtendedApiResult result) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Gets the list of installed dialects
+   *
+   * @return List of available dialects
+   */
+  @JsonRequest("availableDialects")
+  default CompletableFuture<List<DialectItemDTO>> availableDialects() {
     throw new UnsupportedOperationException();
   }
 }

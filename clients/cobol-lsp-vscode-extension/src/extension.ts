@@ -278,6 +278,15 @@ function attachEventHandlers(
   languageClientService.addRequestHandler("file/content", (u: string) =>
     readFileContent(u, zoweCache),
   );
+  languageClientService.addRequestHandler("availableDialects", () =>
+    DialectRegistry.getDialects().map((d) => ({
+      protocolVersion: d.protocolVersion,
+      name: d.name,
+      description: d.description,
+      extensionId: d.extensionId,
+      ...(d.protocolVersion === 1 ? { uri: d.uri.toString() } : {}),
+    })),
+  );
 }
 
 async function initializeLanguageClientService(

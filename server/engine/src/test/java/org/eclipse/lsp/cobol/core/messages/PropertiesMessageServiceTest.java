@@ -18,12 +18,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.inject.Provider;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,7 @@ class PropertiesMessageServiceTest {
   private LocaleStore localeMock;
   SettingsService settingsService = mock(SettingsService.class);
   WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+  Provider<CobolLanguageClient> client = () -> mock(CobolLanguageClient.class);
 
   @BeforeEach
   public void beforeAll() {
@@ -43,7 +46,7 @@ class PropertiesMessageServiceTest {
     when(localeMock.getApplicationLocale()).thenReturn(Locale.ENGLISH);
     messageService =
         new PropertiesMessageService(
-            "resourceBundles/test", localeMock, settingsService, workingFolderService);
+            "resourceBundles/test", localeMock, settingsService, workingFolderService, client);
   }
 
   @Test
@@ -60,7 +63,7 @@ class PropertiesMessageServiceTest {
     when(localeMock.getApplicationLocale()).thenReturn(Locale.FRENCH);
     MessageService messageServiceFR =
         new PropertiesMessageService(
-            "resourceBundles/test", localeMock, settingsService, workingFolderService);
+            "resourceBundles/test", localeMock, settingsService, workingFolderService, client);
     assertEquals("French test selected.", messageServiceFR.getMessage("1"));
 
     assertEquals(
@@ -74,7 +77,7 @@ class PropertiesMessageServiceTest {
         MissingResourceException.class,
         () ->
             new PropertiesMessageService(
-                "dummy", localeMock, settingsService, workingFolderService));
+                "dummy", localeMock, settingsService, workingFolderService, client));
   }
 
   @Test
@@ -84,7 +87,8 @@ class PropertiesMessageServiceTest {
             "resourceBundles/Test_messageServiceEmptyFile",
             localeMock,
             settingsService,
-            workingFolderService);
+            workingFolderService,
+            client);
     assertEquals("1", messageServiceLocal.getMessage("1"));
   }
 
@@ -92,7 +96,7 @@ class PropertiesMessageServiceTest {
   void whenMultipleMsgServiceExist_thenSupportDuplicateKeys() {
     MessageService messageService1 =
         new PropertiesMessageService(
-            "resourceBundles/test-2", localeMock, settingsService, workingFolderService);
+            "resourceBundles/test-2", localeMock, settingsService, workingFolderService, client);
     final String formattedMessage = messageService1.getMessage("1", localeMock);
     assertEquals("This is a duplicate key test for diff msg service.", formattedMessage);
   }

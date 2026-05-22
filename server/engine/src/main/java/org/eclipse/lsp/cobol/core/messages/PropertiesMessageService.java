@@ -17,10 +17,9 @@ package org.eclipse.lsp.cobol.core.messages;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECTS;
-import static org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum.DIALECT_REGISTRY;
 
-import com.google.gson.JsonArray;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import java.io.IOException;
@@ -37,6 +36,7 @@ import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
+import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.ConfigHelper;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
 
@@ -53,17 +53,20 @@ public class PropertiesMessageService implements MessageService {
   private CobolLSPropertiesResourceBundle resourceBundle;
   private final SettingsService settingsService;
   private final WorkingFolderService workingFolderService;
+  private final Provider<CobolLanguageClient> clientProvider;
 
   @Inject
   public PropertiesMessageService(
       @Named("resourceFileLocation") String baseName,
       LocaleStore localeStore,
       SettingsService settingsService,
-      WorkingFolderService workingFolderService) {
+      WorkingFolderService workingFolderService,
+      Provider<CobolLanguageClient> clientProvider) {
     this.baseName = baseName;
     this.localeStore = localeStore;
     this.settingsService = settingsService;
     this.workingFolderService = workingFolderService;
+    this.clientProvider = clientProvider;
     resourceBundle =
         new CobolLSPropertiesResourceBundle(baseName, localeStore.getApplicationLocale());
     subscribeToLocaleStore();
@@ -112,12 +115,13 @@ public class PropertiesMessageService implements MessageService {
         .fetchTextConfiguration(DIALECTS.label)
         .thenAccept(
             dialects ->
-                this.settingsService
-                    .fetchConfiguration(DIALECT_REGISTRY.label)
+                this.clientProvider
+                    .get()
+                    .availableDialects()
                     .thenAccept(
                         registry -> {
                           List<DialectRegistryItem> dialectRegistryItems =
-                              ConfigHelper.parseDialectRegistry((JsonArray) registry.get(0));
+                              ConfigHelper.parseDialectRegistry(registry);
                           handleRegisteredDialects(dialects, dialectRegistryItems);
                           handleImplicitDialects(dialects, dialectRegistryItems);
                         }));

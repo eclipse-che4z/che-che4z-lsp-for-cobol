@@ -37,10 +37,6 @@ import {
   ANALYSIS_MODE,
 } from "../constants";
 import {
-  DialectRegistry,
-  DIALECT_REGISTRY_SECTION,
-} from "../dialect/DialectRegistry";
-import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,
   loadProcessorGroupDialectConfig,
@@ -115,9 +111,6 @@ export async function lspConfigHandler(request: Request) {
   for (const item of request.items) {
     try {
       switch (item.section) {
-        case DIALECT_REGISTRY_SECTION:
-          result.push(DialectRegistry.getDialects());
-          break;
         case COBOL_PRGM_LAYOUT:
           result.push(SettingsService.getCobolProgramLayout());
           break;
