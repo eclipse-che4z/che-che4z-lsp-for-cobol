@@ -8,7 +8,7 @@
   ],
   "cobol-lsp.cpy-manager.paths-dsn": [],
   "editor.snippetSuggestions": "top",
-  "cobol-lsp.dialects": ["IDMS", "DaCo"],
+  "cobol-lsp.dialects": ["DaCo", "IDMS"],
   "cobol-lsp.maxVmCount": -1,
   "dialect.api.version": "new",
   "cobol-lsp.cpy-manager.daco.paths-local": ["copybooks"]

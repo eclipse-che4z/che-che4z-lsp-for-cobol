@@ -19,6 +19,7 @@ import {
   Recognizer,
   ATNSimulator,
   ParserRuleContext,
+  TerminalNode,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
@@ -34,6 +35,7 @@ import {
 import { DaCoParserVisitor } from "../generated/DaCoParserVisitor";
 import {
   DacoStatementsContext,
+  DfldRcuContext,
   QualifiedDataNameContext,
   VariableUsageNameContext,
 } from "../generated/DaCoParser";
@@ -248,14 +250,22 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
     (ctx: DacoStatementsContext): StatementDescriptor[] => {
       const statements: StatementDescriptor[] = [];
 
-      statements.push(
-        new StatementDescriptor(
-          constructRange(ctx),
-          constructRangeFromTokens(ctx.start!, ctx.stop),
-          "STATEMENT",
-          this.visitChildren(ctx) ?? [],
-        ),
-      );
+      const dfldRcu = ctx.dfldRcu();
+      const onSymbol = dfldRcu?.ON()?.symbol;
+      const rcuSymbol = dfldRcu?.RCU()?.symbol;
+      if (onSymbol && rcuSymbol) {
+        const range = constructRangeFromTokens(onSymbol, rcuSymbol);
+        statements.push(new StatementDescriptor(range, range, "STATEMENT", []));
+      } else {
+        statements.push(
+          new StatementDescriptor(
+            constructRange(ctx),
+            constructRangeFromTokens(ctx.start!, ctx.stop),
+            "STATEMENT",
+            this.visitChildren(ctx) ?? [],
+          ),
+        );
+      }
       return statements;
     };
 
