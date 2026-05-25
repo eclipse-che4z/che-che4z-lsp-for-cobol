@@ -352,4 +352,216 @@ suite("Miscellaneous statements Test Suite", function () {
       range(pos(13, 19), pos(13, 31)),
     );
   });
+
+  test("Process OPEN PACKET statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo18.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 7);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of task name must be 4 bytes",
+      range(pos(23, 23), pos(23, 24)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of receiver packet must be 3 bytes",
+      range(pos(24, 29), pos(24, 33)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of task name must be 4 bytes",
+      range(pos(24, 23), pos(24, 24)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of task name must be 4 bytes",
+      range(pos(25, 23), pos(25, 28)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(26, 32), pos(26, 35)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(27, 48), pos(27, 51)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(29, 19), pos(29, 22)),
+    );
+  });
+
+  test("Process GET ENTITY statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo19.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 5);
+
+    checkDiagnostic(
+      diagnostics,
+      "String length must be between 3 and 4",
+      range(pos(30, 22), pos(30, 26)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "String length must be between 3 and 4",
+      range(pos(31, 22), pos(31, 29)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Only allowed value(s): OWNER, OWN, DESIGNER, AVG, ANALIST, ANA",
+      range(pos(32, 39), pos(32, 47)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of tal must be 2 bytes",
+      range(pos(33, 51), pos(33, 56)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Only allowed value(s): DOM",
+      range(pos(34, 22), pos(34, 28)),
+    );
+  });
+
+  test("Process GET ITEM statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo20.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 7);
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(24, 24), pos(24, 34)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(25, 46), pos(25, 56)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(26, 35), pos(26, 45)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(27, 24), pos(27, 34)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(28, 32), pos(28, 42)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(29, 32), pos(29, 42)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DSR443-RW1 is not defined",
+      range(pos(30, 42), pos(30, 52)),
+    );
+  });
+
+  test("Process GET JOB statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo21.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DET002-XW1 is not defined",
+      range(pos(16, 19), pos(16, 29)),
+    );
+  });
+
+  test("Process GET NETWORK statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo22.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DET002-XW1 is not defined",
+      range(pos(16, 23), pos(16, 33)),
+    );
+  });
+
+  test("Process GET ODETTE statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo23.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DET002-XW1 is not defined",
+      range(pos(16, 22), pos(16, 32)),
+    );
+  });
+
+  test("Process GET TASK statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo24.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 2);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of task name must be 4 bytes",
+      range(pos(16, 20), pos(16, 27)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable SDFRE is not defined",
+      range(pos(17, 20), pos(17, 25)),
+    );
+  });
+
+  test("Process GET USER statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo25.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 2);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of kls must be 3 bytes",
+      range(pos(18, 20), pos(18, 26)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable DETFR-EW is not defined",
+      range(pos(19, 26), pos(19, 34)),
+    );
+  });
 });
