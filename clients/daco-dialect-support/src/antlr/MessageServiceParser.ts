@@ -296,9 +296,9 @@ export abstract class MessageServiceParser extends Parser {
    */
   protected trimQuotes(input: string | undefined): string {
     if (input !== undefined) {
-      return input.replace(/^"(.*)"$/, "$1");
+      input = input.replace(/^(['"])(.*)\1$/, "$2");
     }
-    return "";
+    return input ?? "";
   }
 
   /**
