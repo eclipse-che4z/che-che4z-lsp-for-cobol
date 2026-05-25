@@ -3925,7 +3925,10 @@
   },
   {
     "name": "org.eclipse.lsp.cobol.lsp.DialectItemDTO",
-    "allDeclaredFields": true
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
   },
   {
     "name": "org.eclipse.lsp.cobol.common.copybook.CopyBookDTO",
