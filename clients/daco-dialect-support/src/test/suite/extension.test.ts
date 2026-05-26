@@ -903,7 +903,7 @@ suite("Extension Test Suite", function () {
     );
   });
 
-  test("Process RETURN FIELD statement successfully", async () => {
+  test("Process RETURN status statement successfully", async () => {
     const editor = await helper.showDocument("DaCo31.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);

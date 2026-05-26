@@ -19,7 +19,6 @@ import {
   Recognizer,
   ATNSimulator,
   ParserRuleContext,
-  TerminalNode,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
@@ -35,7 +34,6 @@ import {
 import { DaCoParserVisitor } from "../generated/DaCoParserVisitor";
 import {
   DacoStatementsContext,
-  DfldRcuContext,
   QualifiedDataNameContext,
   VariableUsageNameContext,
 } from "../generated/DaCoParser";
@@ -74,7 +72,7 @@ export class StatementDescriptor {
     public readonly statementRange: vscode.Range,
     public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
     public readonly children: StatementDescriptor[],
-    public readonly filler: string = "\u200B",
+    public readonly filler: string = " CONTINUE ",
   ) {}
 }
 
