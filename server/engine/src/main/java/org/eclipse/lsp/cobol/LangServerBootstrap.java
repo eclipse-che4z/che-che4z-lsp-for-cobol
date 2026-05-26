@@ -14,9 +14,6 @@
  */
 package org.eclipse.lsp.cobol;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.ConsoleAppender;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.io.IOException;
