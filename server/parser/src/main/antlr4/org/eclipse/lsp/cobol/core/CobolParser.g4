@@ -2290,8 +2290,8 @@ functionName
    : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
    | DATEVAL {markMLEDeprecated(_input, $DATEVAL);}
    | UNDATE {markMLEDeprecated(_input, $UNDATE);}
-   | YEARWINDOW {markMLEDeprecated(_input, $YEARWINDOW);};
-
+   | YEARWINDOW {markMLEDeprecated(_input, $YEARWINDOW);}
+   ;
 
 indexName
    : cobolWord
