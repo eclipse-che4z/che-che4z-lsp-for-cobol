@@ -27,7 +27,6 @@ export const SETTINGS_UNREACHABLE_CODE_SEVERITY: string =
   "cobol-lsp.unreachable-code-severity";
 export const SETTINGS_MAXIMUM_VM_COUNT: string = "cobol-lsp.maxVmCount";
 
-export const SERVER_PORT = "cobol-lsp.server.port";
 export const ANALYSIS_MODE = "cobol-lsp.analysis-mode";
 export const SERVER_RUNTIME = "cobol-lsp.serverRuntime";
 export const JAVA_HOME = "cobol-lsp.java.home";

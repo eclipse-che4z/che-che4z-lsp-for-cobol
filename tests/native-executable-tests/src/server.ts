@@ -48,17 +48,16 @@ export class Server {
     private logger: ConsoleLogger;
     private diagnostics: PublishDiagnosticsParams | null = null;
 
-    constructor(rootPath: string, name: string, configLoc: string, port?: number) {
+    constructor(rootPath: string, name: string, configLoc: string) {
         this.rootPath = rootPath;
         this.name = name;
         this.configLoc = configLoc;
-        this.port = port;
         this.logger = new ConsoleLogger();
     }
 
     public async launchServer() {
         const serverLaucher = new ServerLaucher();
-        const { reader, writer } = await serverLaucher.createSocketMessageTransporter(this.logger, this.port);
+        const { reader, writer } = await serverLaucher.createMessageTransporter(this.logger);
         this.reader =  reader;
         this.writer = writer;
     }

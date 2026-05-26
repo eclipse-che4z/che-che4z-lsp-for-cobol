@@ -13,7 +13,6 @@
  */
 
 import * as fs from "node:fs";
-import * as net from "node:net";
 import { join } from "node:path";
 import * as vscode from "vscode";
 
@@ -27,7 +26,6 @@ import {
   LanguageClient,
   LanguageClientOptions,
   Middleware,
-  StreamInfo,
 } from "vscode-languageclient/node";
 import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
 import { JavaCheck, SUPPORTED_JAVA_VERSION } from "./JavaCheck";
@@ -80,7 +78,7 @@ export class LanguageClientService {
 
   public async checkPrerequisites() {
     const version = await new JavaCheck().getInstalledJavaVersion();
-    if (!SettingsService.getLspPort() && !fs.existsSync(this.executablePath)) {
+    if (!fs.existsSync(this.executablePath)) {
       throw new Error("LSP server for " + LANGUAGE_ID + " not found");
     }
     telemetryEvent("log", ["bootstrap", "java-version"], `${version}`);
@@ -242,22 +240,6 @@ export class LanguageClientService {
     if (this.isNativeBuildEnabled) {
       return this.executableService.getNativeLanguageClient();
     }
-    const port = SettingsService.getLspPort();
-    if (port) {
-      // Connect to language server via socket
-      const connectionInfo = {
-        host: "localhost",
-        port,
-      };
-      return () => {
-        const socket = net.connect(connectionInfo);
-        const result: StreamInfo = {
-          reader: socket,
-          writer: socket,
-        };
-        return Promise.resolve(result);
-      };
-    }
     return {
       args: [
         "-Dline.separator=\r\n",
@@ -265,7 +247,6 @@ export class LanguageClientService {
         "-Xmx768M",
         "-jar",
         jarPath,
-        "pipeEnabled",
       ],
       command: SettingsService.getJavaCommand(),
       options: { detached: false },

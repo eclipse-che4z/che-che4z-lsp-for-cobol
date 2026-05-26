@@ -18,7 +18,6 @@ import {
   COPYBOOK_EXTENSIONS,
   PATHS_USS,
   PATHS_DSN,
-  SERVER_PORT,
   SERVER_RUNTIME,
   JAVA_HOME,
   SETTINGS_CPY_EXTENSIONS,
@@ -203,16 +202,6 @@ export class SettingsService {
       dialect,
       global ?? [],
     );
-  }
-
-  /**
-   * Get Lsp Port from configuration
-   * @returns lsp port number
-   */
-  public static getLspPort(): number | undefined {
-    if (vscode.workspace.getConfiguration().get(SERVER_PORT)) {
-      return Number(vscode.workspace.getConfiguration().get(SERVER_PORT));
-    }
   }
 
   /**

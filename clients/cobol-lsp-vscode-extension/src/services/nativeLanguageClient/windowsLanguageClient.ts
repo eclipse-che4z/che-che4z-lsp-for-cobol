@@ -28,7 +28,6 @@ export class WindowsLanguageClient implements NativeLanguageClient {
   public getServer(): Executable {
     return {
       args: [
-        "pipeEnabled",
         "-Dline.separator=\r\n",
         "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
         "-DserverType=NATIVE",
