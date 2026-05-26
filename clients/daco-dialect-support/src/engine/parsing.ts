@@ -74,6 +74,7 @@ export class StatementDescriptor {
     public readonly statementRange: vscode.Range,
     public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
     public readonly children: StatementDescriptor[],
+    public readonly filler: string = "\u200B",
   ) {}
 }
 
@@ -255,7 +256,9 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
       const rcuSymbol = dfldRcu?.RCU()?.symbol;
       if (onSymbol && rcuSymbol) {
         const range = constructRangeFromTokens(onSymbol, rcuSymbol);
-        statements.push(new StatementDescriptor(range, range, "STATEMENT", []));
+        statements.push(
+          new StatementDescriptor(range, range, "STATEMENT", [], " "),
+        );
       } else {
         statements.push(
           new StatementDescriptor(
