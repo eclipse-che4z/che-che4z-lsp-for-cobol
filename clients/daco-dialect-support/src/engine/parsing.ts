@@ -72,7 +72,7 @@ export class StatementDescriptor {
     public readonly statementRange: vscode.Range,
     public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
     public readonly children: StatementDescriptor[],
-    public readonly filler: string = " CONTINUE ",
+    public readonly filler: string = "CONTINUE",
   ) {}
 }
 
