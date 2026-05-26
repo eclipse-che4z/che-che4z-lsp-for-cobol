@@ -84,29 +84,6 @@ public class LangServerBootstrap {
     return Guice.createInjector(new ServiceModule(), new EngineModule(), new DatabusModule());
   }
 
-  static boolean isPipeEnabled(@NonNull String[] args) {
-    return args.length > 0 && PIPE_ARG.equals(args[0]);
-  }
-
-  static Launcher<CobolLanguageClient> createServerLauncher(
-      @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
-    ThreadFactory tf =
-        new ThreadFactory() {
-          private int counter = 0;
-
-          public Thread newThread(Runnable r) {
-            return new Thread(r, "LSP" + "-" + counter++);
-          }
-        };
-    return new LSPLauncher.Builder<CobolLanguageClient>()
-        .setLocalService(server)
-        .setExecutorService(Executors.newCachedThreadPool(tf))
-        .setRemoteInterface(CobolLanguageClient.class)
-        .setInput(in)
-        .setOutput(out)
-        .create();
-  }
-
   private void start(
       @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
       throws InterruptedException, ExecutionException {
@@ -128,5 +105,28 @@ public class LangServerBootstrap {
     provider.setClient(launcher.getRemoteProxy());
     // suspend the main thread on listening
     launcher.startListening().get();
+  }
+
+  static boolean isPipeEnabled(@NonNull String[] args) {
+    return args.length > 0 && PIPE_ARG.equals(args[0]);
+  }
+
+  static Launcher<CobolLanguageClient> createServerLauncher(
+      @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
+    ThreadFactory tf =
+        new ThreadFactory() {
+          private int counter = 0;
+
+          public Thread newThread(Runnable r) {
+            return new Thread(r, "LSP" + "-" + counter++);
+          }
+        };
+    return new LSPLauncher.Builder<CobolLanguageClient>()
+        .setLocalService(server)
+        .setExecutorService(Executors.newCachedThreadPool(tf))
+        .setRemoteInterface(CobolLanguageClient.class)
+        .setInput(in)
+        .setOutput(out)
+        .create();
   }
 }

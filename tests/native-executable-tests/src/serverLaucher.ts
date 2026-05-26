@@ -20,59 +20,60 @@ import {
 } from "vscode-languageserver-protocol/node";
 import * as os from "os";
 
-const serverExecutable = {
-  args: [
-    "-Dline.separator=\r\n",
-    "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
-  ],
-  command: "",
-  options: { stdio: "pipe", detached: false, cwd: "" },
+const engines = {
+  Windows_NT: {
+    command: "engine.exe",
+    cwd: "server/windows",
+  },
+  Darwin: {
+    command: "./server-mac",
+    cwd: "server/mac",
+  },
+  Linux: {
+    command: "./server-linux",
+    cwd: "server/linux",
+  },
 };
+
+function isSupportedOs(osType: string): osType is keyof typeof engines {
+  return osType in engines;
+}
+
 const utf8 = "utf-8";
 
 export class ServerLaucher {
   createMessageTransporter = (logger: Logger) => {
-    return this.startANativeBuild(logger);
-  };
-
-  private startANativeBuild(logger: Logger) {
-    switch (os.type()) {
-      case "Windows_NT":
-        serverExecutable.command = "engine.exe";
-        serverExecutable.options.cwd = "server/windows";
-        break;
-      case "Darwin":
-        serverExecutable.command = "./server-mac";
-        serverExecutable.options.cwd = "server/mac";
-        break;
-      case "Linux":
-        serverExecutable.command = "./server-linux";
-        serverExecutable.options.cwd = "server/linux";
-        break;
-      default:
-        console.error("OS not supported yet !!!");
+    const osType = os.type();
+    if (!isSupportedOs(osType)) {
+      console.error("OS not supported yet !!!");
+      return Promise.reject(Error("Unsupported OS"));
     }
+    const { command, cwd } = engines[osType];
+
     const serverProcess = cp.spawn(
-      serverExecutable.command,
-      serverExecutable.args,
-      serverExecutable.options as cp.SpawnOptions,
+      command,
+      [
+        "-Dline.separator=\r\n",
+        "-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener",
+      ],
+      { stdio: "pipe", detached: false, cwd },
     );
     if (!serverProcess || !serverProcess.pid) {
       console.log(
         serverProcess,
-        `Launching server using command ${serverExecutable.command} failed.`,
+        `Launching server using command ${command} failed.`,
       );
     }
-    
-    serverProcess!.stderr!.on("data", (data) => {
+
+    serverProcess.stderr.on("data", (data) => {
       logger.error(typeof data === "string" ? data : data.toString(utf8));
     });
-    serverProcess!.stdout!.on("data", (data) => {
+    serverProcess.stdout.on("data", (data) => {
       logger.log(typeof data === "string" ? data : data.toString(utf8));
     });
     return Promise.resolve({
-      reader: new StreamMessageReader(serverProcess.stdout!),
-      writer: new StreamMessageWriter(serverProcess.stdin!),
+      reader: new StreamMessageReader(serverProcess.stdout),
+      writer: new StreamMessageWriter(serverProcess.stdin),
     });
-  }
+  };
 }
