@@ -12,10 +12,10 @@
  *  Broadcom, Inc. - initial API and implementation
  */
 
-import { Server } from "../server";
+import {Server} from "../server";
 import * as fs from "fs";
 import * as path from "path";
-import { ProtocolConnection } from "vscode-languageserver-protocol";
+import {ProtocolConnection} from "vscode-languageserver-protocol";
 
 //TODO :
 // 1. Get working folder as a cmd line. deduce programs and copybooks based on file structure.
@@ -23,50 +23,48 @@ import { ProtocolConnection } from "vscode-languageserver-protocol";
 // 3. Automate the path for executables.
 
 describe("Test native builds", () => {
-  // Path where the test file are
-  const cobol85TestSuitePath = "../test_files/Cobol85PositiveTestsSuite";
 
-  // Folder under the workspace where cobol prgm resides
-  const cobolProgramFolder = "positive";
+    // Path where the test file are
+    const cobol85TestSuitePath = "../test_files/Cobol85PositiveTestsSuite";
 
-  const progDir = path.join(cobol85TestSuitePath, cobolProgramFolder);
+    // Folder under the workspace where cobol prgm resides
+    const cobolProgramFolder = "positive"
 
-  //resources/clientConfig.json = contains the configuration for client
-  const server = new Server(
-    path.resolve(progDir),
-    "SampleProj",
-    "resources/clientConfig.json",
-  );
-  let serverConnection: ProtocolConnection;
+    const progDir = path.join(cobol85TestSuitePath, cobolProgramFolder);
 
-  beforeAll(async () => {
-    await server.launchServer(); // launch server
-    serverConnection = await server.establishLSProtocolConnection();
-  });
+    //resources/clientConfig.json = contains the configuration for client
+    const server = new Server(path.resolve(progDir), "SampleProj", "resources/clientConfig.json");
+    let serverConnection: ProtocolConnection;
 
-  afterAll(async () => {
-    await server.shutdownServer(serverConnection); // close server
-  });
+    beforeAll(async () => {
+        await server.launchServer(); // launch server
+        serverConnection = await server.establishLSProtocolConnection();
+    })
 
-  test("tests diagnostic error for cobol85 test suite", async () => {
-    for (const f of fs.readdirSync(progDir)) {
-      process.stdout.write(`=== WORKING ON ${f} ===\r\n`);
-      (serverConnection as any).syncedDoc = f;
-      await server.openDocument(serverConnection, f);
-      const response = await server.checkForDiagnosticsNotification(f);
-      if (response.diagnostics.length > 0) {
-        process.stdout.write(`seems issue with following response\r\n`);
-        process.stdout.write(`${JSON.stringify(response.diagnostics)}\r\n`);
-      }
-      expect(
-        (response.diagnostics && !response.diagnostics) ||
-          response.diagnostics.length === 0 ||
-          response.diagnostics.filter(
-            (item: any) => item && item.severity && item.severity >= 2,
-          ).length === response.diagnostics.length, // Ignore less severe error
-      ).toBeTruthy();
-      server.resetDiagnosticsResponse();
-      await server.closeDocument(serverConnection, f);
-    }
-  }, 999999);
+    afterAll(async () => {
+        await server.shutdownServer(serverConnection); // close server
+    })
+
+    test("tests diagnostic error for cobol85 test suite", async () => {
+        for (const f of fs.readdirSync(progDir)) {
+            process.stdout.write(`=== WORKING ON ${f} ===\r\n`);
+            (serverConnection as any).syncedDoc = f;
+            await server.openDocument(serverConnection, f);
+            const response = await server.checkForDiagnosticsNotification(f);
+            if (response.diagnostics.length > 0) {
+                process.stdout.write(`seems issue with following response\r\n`);
+                process.stdout.write(`${JSON.stringify(response.diagnostics)}\r\n`);
+            }
+            expect(
+                (response.diagnostics && !response.diagnostics)
+                || (response.diagnostics.length === 0)
+                || (response.diagnostics.filter((item: any) => item && item.severity && item.severity >= 2)
+                    .length === response.diagnostics.length) // Ignore less severe error
+            )
+                .toBeTruthy();
+            server.resetDiagnosticsResponse();
+            await server.closeDocument(serverConnection, f);
+        }
+    }, 999999);
 });
+
