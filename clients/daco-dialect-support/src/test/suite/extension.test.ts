@@ -651,6 +651,318 @@ suite("Extension Test Suite", function () {
       range(pos(19, 26), pos(19, 34)),
     );
   });
+
+  test("Process SHOW error MESSAGE statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo26.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 2);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of language code must be 2 bytes",
+      range(pos(17, 24), pos(17, 30)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(18, 24), pos(18, 27)),
+    );
+  });
+
+  test("Process SHOW MESSAGE statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo27.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 30);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(62, 21), pos(62, 23)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(63, 25), pos(63, 27)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(64, 24), pos(64, 26)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(65, 28), pos(65, 30)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(66, 22), pos(66, 24)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(67, 26), pos(67, 28)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(68, 21), pos(68, 25)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(69, 25), pos(69, 29)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(70, 24), pos(70, 28)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(71, 28), pos(71, 32)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(72, 22), pos(72, 26)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(73, 26), pos(73, 30)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(74, 25), pos(74, 28)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(75, 29), pos(75, 32)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(76, 28), pos(76, 31)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(77, 32), pos(77, 35)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(78, 26), pos(78, 29)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(79, 30), pos(79, 33)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(80, 36), pos(80, 39)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(81, 40), pos(81, 43)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(82, 39), pos(82, 42)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(83, 43), pos(83, 46)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(84, 37), pos(84, 40)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(85, 41), pos(85, 44)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(86, 47), pos(86, 50)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(87, 51), pos(87, 54)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(88, 50), pos(88, 53)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(89, 54), pos(89, 57)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(90, 48), pos(90, 51)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(91, 52), pos(91, 55)),
+    );
+  });
+
+  test("Process SHOW RESULT statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo28.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 2);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of task name must be 4 bytes",
+      range(pos(11, 23), pos(11, 25)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of task name must be 4 bytes",
+      range(pos(12, 23), pos(12, 28)),
+    );
+  });
+
+  test("Process SHOW RESULT statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo29.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(12, 19), pos(12, 31)),
+    );
+  });
+
+  test("Process RETURN FIELD statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo30.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    checkDiagnostic(
+      diagnostics,
+      "Max length limit of 12 bytes allowed for field name.",
+      range(pos(6, 24), pos(6, 37)),
+    );
+  });
+
+  test("Process RETURN status statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo31.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 9);
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(27, 23), pos(27, 25)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(28, 26), pos(28, 28)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(29, 24), pos(29, 26)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(30, 23), pos(30, 27)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(31, 26), pos(31, 30)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Exact length of message code must be 3 bytes",
+      range(pos(32, 24), pos(32, 28)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(33, 27), pos(33, 30)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(34, 30), pos(34, 33)),
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "Variable ASD is not defined",
+      range(pos(35, 28), pos(35, 31)),
+    );
+  });
 });
 
 async function checkDefinition(
