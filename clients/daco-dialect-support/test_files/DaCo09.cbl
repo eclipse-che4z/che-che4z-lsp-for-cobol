@@ -2,7 +2,7 @@
        PROGRAM-ID.    TEST1.
        PROCEDURE DIVISION.
        FOO.
-       READ TRANSACTION
+           READ TRANSACTION
            GO TO FOO.
            DISPLAY NOT_EXISTING.
 
