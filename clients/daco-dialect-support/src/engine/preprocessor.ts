@@ -194,10 +194,10 @@ export class DaCoPreprocessor {
           descriptor.range,
           descriptor.statementRange,
           this.traverseChildren(descriptor.children),
-          " ",
+          descriptor.filler,
         );
       } else {
-        context.replace(descriptor.statementRange, " ");
+        context.replace(descriptor.statementRange, descriptor.filler);
       }
     });
   }
