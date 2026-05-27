@@ -614,7 +614,7 @@ dataDescriptionEntry
 dataDescriptionEntryFormat1
    : levelNumber entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
-   | dataOccursClause | dataSignClause | dataSynchronizedClause | dataDateFormatClause
+   | dataOccursClause | dataSignClause | dataSynchronizedClause
    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
    dot_fs   ;
 
@@ -680,7 +680,7 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) PICTUREIS? pictureString
+   : (PICTURE | PIC) PICTUREIS? pictureString dataDateFormatClause?
    ;
 
 pictureString
