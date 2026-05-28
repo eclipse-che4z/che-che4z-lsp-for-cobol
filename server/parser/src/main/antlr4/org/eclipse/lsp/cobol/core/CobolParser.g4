@@ -30,6 +30,10 @@ options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
   private void markMLEDeprecated(TokenStream _input, Token t) {
     notifyWarning(t, "cobolParser.MLEDeprecated", t.getText());
   }
+
+  private void markMLEDeprecated(ParserRuleContext ctx, String ruleText) {
+    notifyWarning(ctx, "cobolParser.MLEDeprecated", ruleText, ctx.getText());
+  }
 }
 
 startRule : compilationUnit EOF;
@@ -721,7 +725,7 @@ dataSynchronizedClause
    ;
 
 dataDateFormatClause
-   : DATE FORMAT IS? DATE_PATTERN {markMLEDeprecated(_input, $DATE);}
+   : DATE FORMAT IS? DATE_PATTERN {markMLEDeprecated($ctx, $text);}
    ;
 
 dataUsageClause

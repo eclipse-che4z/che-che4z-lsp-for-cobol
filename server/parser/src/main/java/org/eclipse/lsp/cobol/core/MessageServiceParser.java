@@ -20,9 +20,8 @@ package org.eclipse.lsp.cobol.core;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenStream;
+
+import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
 
@@ -106,6 +105,29 @@ public abstract class MessageServiceParser extends Parser {
   public void notifyWarning(Token token, String messageId, String... parameters) {
     String message = getMessageForParser(messageId, parameters);
     notifyErrorListeners(token, message, new WarningRecognitionException());
+  }
+
+  /**
+   * Extend the functionality of {@link org.eclipse.lsp.cobol.common.message.MessageService} for
+   * {@link CobolParser}
+   *
+   * <p>Example: notifyWarning(token, "db2SqlParser.validValueMsg", input, value); would notify
+   * errorListener with the externalized messages.
+   *
+   * @param ctx Related parser rule context
+   * @param messageId Unique ID for each message in externalized message file.
+   * @param ruleText Full text, including whitespace, of rule from Parser.
+   * @param parameters Arguments referenced by the format specifiers in the format string in
+   *     externalized message file.
+   */
+  public void notifyWarning(ParserRuleContext ctx, String messageId, String ruleText, String... parameters) {
+    CommonToken fakeToken = new CommonToken(ctx.start);
+
+    fakeToken.setStartIndex(ctx.start.getStartIndex());
+    fakeToken.setStopIndex(ctx.start.getStartIndex() + ruleText.length() - 1);
+    fakeToken.setText(ruleText);
+
+    notifyWarning(fakeToken, messageId, parameters);
   }
 
   /**
