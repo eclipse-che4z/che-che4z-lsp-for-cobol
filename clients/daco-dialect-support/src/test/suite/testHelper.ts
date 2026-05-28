@@ -301,3 +301,14 @@ export function printAllDiagnostics(diagnostics: vscode.Diagnostic[]) {
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 export const asMutable = <T>(value: T): Mutable<T> => value as Mutable<T>;
+
+export function checkDiagnostic(
+  diagnostics: vscode.Diagnostic[],
+  message: string,
+  range: vscode.Range,
+) {
+  assert.ok(
+    diagnostics.some((d) => d.message === message && d.range.isEqual(range)),
+    `Expected '${message}' not found at range ${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`,
+  );
+}
