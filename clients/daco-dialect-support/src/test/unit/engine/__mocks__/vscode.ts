@@ -36,14 +36,6 @@ export class Range {
   }
 }
 
-export class Diagnostic {
-  constructor(
-    public range: Range,
-    public message: string,
-    public severity: DiagnosticSeverity,
-  ) {}
-}
-
 export class Position {
   constructor(public line: number, public character: number) {}
 }

@@ -190,7 +190,13 @@ export class DaCoPreprocessor {
         context.replace(descriptor.statementRange, descriptor.filler);
       }
       descriptor.diagnostics.forEach((d) => {
-        context.addDiagnostic(d);
+        context.addDiagnostic(
+          new vscode.Diagnostic(
+            descriptor.statementRange,
+            this.messageService.get(d.template),
+            d.severity,
+          ),
+        );
       });
     });
   }

@@ -66,13 +66,18 @@ export class VariableDescriptor {
   ) {}
 }
 
+export type DiagnosticMessage = {
+  severity: vscode.DiagnosticSeverity;
+  template: string;
+};
+
 export class StatementDescriptor {
   constructor(
     public readonly range: vscode.Range,
     public readonly statementRange: vscode.Range,
     public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
     public readonly children: StatementDescriptor[],
-    public readonly diagnostics: vscode.Diagnostic[] = [],
+    public readonly diagnostics: DiagnosticMessage[] = [],
     public readonly filler: string = "CONTINUE",
   ) {}
 }
@@ -261,22 +266,18 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
           new StatementDescriptor(range, range, "STATEMENT", [], [], " "),
         );
       } else {
-        const statementRange = constructRangeFromTokens(ctx.start!, ctx.stop);
-        const diagnostics: vscode.Diagnostic[] = [];
+        const diagnostics: DiagnosticMessage[] = [];
         if (isSortTable) {
-          diagnostics.push(
-            new vscode.Diagnostic(
-              statementRange,
-              "The code block is deprecated and not supported",
-              vscode.DiagnosticSeverity.Warning,
-            ),
-          );
+          diagnostics.push({
+            severity: vscode.DiagnosticSeverity.Warning,
+            template: "parsers.depricated",
+          });
         }
 
         statements.push(
           new StatementDescriptor(
             constructRange(ctx),
-            statementRange,
+            constructRangeFromTokens(ctx.start!, ctx.stop),
             "STATEMENT",
             this.visitChildren(ctx) ?? [],
             diagnostics,
