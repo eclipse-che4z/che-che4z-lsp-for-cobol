@@ -20,7 +20,6 @@ package org.eclipse.lsp.cobol.core;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.*;
 import org.eclipse.lsp.cobol.common.message.MessageServiceProvider;
 import org.eclipse.lsp.cobol.parser.WarningRecognitionException;
@@ -120,7 +119,8 @@ public abstract class MessageServiceParser extends Parser {
    * @param parameters Arguments referenced by the format specifiers in the format string in
    *     externalized message file.
    */
-  public void notifyWarning(ParserRuleContext ctx, String messageId, String ruleText, String... parameters) {
+  public void notifyWarning(
+      ParserRuleContext ctx, String messageId, String ruleText, String... parameters) {
     CommonToken fakeToken = new CommonToken(ctx.start);
 
     fakeToken.setStartIndex(ctx.start.getStartIndex());
