@@ -87,14 +87,6 @@ export class DaCoPreprocessor {
     const parser = new CopybookParser(tokenStream);
     parser.setMessageService(this.messageService);
 
-    tokenStream.fill();
-    for (const t of tokenStream.getTokens()) {
-      console.log(
-        JSON.stringify(t.text),
-        parser.vocabulary.getSymbolicName(t.type),
-      );
-    }
-
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
 
@@ -105,8 +97,6 @@ export class DaCoPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    console.log(tree.toStringTree(parser));
-
     const descriptors = new CopybookVisitor().visit(tree) || [];
 
     this.outputChannel.appendLine(
@@ -199,6 +189,9 @@ export class DaCoPreprocessor {
       } else {
         context.replace(descriptor.statementRange, descriptor.filler);
       }
+      descriptor.diagnostics.forEach((d) => {
+        context.addDiagnostic(d);
+      });
     });
   }
 
@@ -261,7 +254,6 @@ export class DaCoPreprocessor {
 
     try {
       const tree = parser.startRule();
-      console.log(tree.toStringTree(parser));
 
       this.addParsingErrors(context, [
         ...lexerErrors.errors,
@@ -325,7 +317,6 @@ export class DaCoPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    console.log(tree.toStringTree(parser));
 
     this.addParsingErrors(context, [
       ...lexerErrors.errors,
