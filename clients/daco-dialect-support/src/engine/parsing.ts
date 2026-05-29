@@ -270,7 +270,7 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
         if (isSortTable) {
           diagnostics.push({
             severity: vscode.DiagnosticSeverity.Warning,
-            template: "parsers.depricated",
+            template: "parsers.deprecated",
           });
         }
 
