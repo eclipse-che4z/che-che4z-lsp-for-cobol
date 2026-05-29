@@ -92,10 +92,32 @@ describe("parsing test", () => {
       getChildCount: () => 0,
       getChild: () => null,
       dfldRcu: () => null,
+      tableDMLStatement: () => null,
     } as any;
 
     const result = visitor.visitDacoStatements(ctx);
     expect(result.length).toEqual(1);
+  });
+
+  it("should create diagnostic for the SORT TABLE context", () => {
+    const visitor = new DaCoVisitor();
+
+    const ctx = {
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+      getChildCount: () => 0,
+      getChild: () => null,
+      dfldRcu: () => null,
+      tableDMLStatement: () => {
+        return {
+          sortTableStatement: () => ({}),
+        };
+      },
+    } as any;
+
+    const result = visitor.visitDacoStatements(ctx);
+    expect(result.length).toEqual(1);
+    expect(result[0].diagnostics.length).toEqual(1);
   });
 });
 
