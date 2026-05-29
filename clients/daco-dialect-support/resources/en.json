@@ -8,5 +8,5 @@
   "parsers.startsWith": "String must starts with {0} values",
   "parsers.stringLengthRange": "String length must be between {0} and {1}",
   "parsers.allowedStringValues": "Only allowed value(s): {0}",
-  "parsers.depricated": "The code block is deprecated and not supported"
+  "parsers.deprecated": "The code block is deprecated and not supported"
 }
