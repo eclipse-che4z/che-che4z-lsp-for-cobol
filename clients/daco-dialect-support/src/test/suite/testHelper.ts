@@ -312,3 +312,21 @@ export function checkDiagnostic(
     `Expected '${message}' not found at range ${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`,
   );
 }
+
+export async function checkDefinition(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLine: number,
+) {
+  const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
+    "vscode.executeDefinitionProvider",
+    editor.document.uri,
+    position,
+  );
+
+  assert.ok(definitions);
+  assert.strictEqual(definitions.length, 1);
+
+  const definition = definitions[0];
+  assert.strictEqual(definition.range.start.line, expectedLine);
+}
