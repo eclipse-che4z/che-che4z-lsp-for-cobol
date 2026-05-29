@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2026 Broadcom.
- * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ * Copyright (c) 2022 DAF Trucks NV.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Broadcom, Inc. - initial API and implementation
+ * DAF Trucks NV – implementation of DaCo COBOL statements
+ * and DAF development standards
  */
 
 lexer grammar DaCoLexer;
