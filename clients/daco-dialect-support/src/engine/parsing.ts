@@ -66,12 +66,18 @@ export class VariableDescriptor {
   ) {}
 }
 
+export type DiagnosticMessage = {
+  severity: vscode.DiagnosticSeverity;
+  template: string;
+};
+
 export class StatementDescriptor {
   constructor(
     public readonly range: vscode.Range,
     public readonly statementRange: vscode.Range,
     public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
     public readonly children: StatementDescriptor[],
+    public readonly diagnostics: DiagnosticMessage[] = [],
     public readonly filler: string = "CONTINUE",
   ) {}
 }
@@ -252,18 +258,29 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
       const dfldRcu = ctx.dfldRcu();
       const onSymbol = dfldRcu?.ON()?.symbol;
       const rcuSymbol = dfldRcu?.RCU()?.symbol;
+      const isSortTable = ctx.tableDMLStatement()?.sortTableStatement();
+
       if (onSymbol && rcuSymbol) {
         const range = constructRangeFromTokens(onSymbol, rcuSymbol);
         statements.push(
-          new StatementDescriptor(range, range, "STATEMENT", [], " "),
+          new StatementDescriptor(range, range, "STATEMENT", [], [], " "),
         );
       } else {
+        const diagnostics: DiagnosticMessage[] = [];
+        if (isSortTable) {
+          diagnostics.push({
+            severity: vscode.DiagnosticSeverity.Warning,
+            template: "parsers.deprecated",
+          });
+        }
+
         statements.push(
           new StatementDescriptor(
             constructRange(ctx),
             constructRangeFromTokens(ctx.start!, ctx.stop),
             "STATEMENT",
             this.visitChildren(ctx) ?? [],
+            diagnostics,
           ),
         );
       }
