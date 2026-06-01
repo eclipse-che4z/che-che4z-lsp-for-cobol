@@ -68,33 +68,58 @@ export class DaCoPreprocessor {
   private cleanup(context: IDocumentProcessingContext, text: string): string {
     const dcdbPattern = /^[\s\d]{7}D-[BC]/gm;
 
+    let lastPosition = { position: new vscode.Position(0, 1), absPosition: 1 };
     text = text.replace(dcdbPattern, (match, offset) => {
-      const start = this.findPosition(text, offset);
-      const end = this.findPosition(text, offset + match.length - 1);
+      const startPosition = this.findPosition(
+        text,
+        lastPosition.absPosition,
+        lastPosition.position.line,
+        lastPosition.position.character,
+        offset,
+      );
+      const endPosition = this.findPosition(
+        text,
+        startPosition.absPosition,
+        startPosition.position.line,
+        startPosition.position.character,
+        offset + match.length - 1,
+      );
+      lastPosition = endPosition;
 
       const replacement = " ".repeat(match.length);
-      context.replace(new vscode.Range(start, end), replacement);
+      context.replace(
+        new vscode.Range(startPosition.position, endPosition.position),
+        replacement,
+      );
 
       return replacement;
     });
     return text;
   }
 
-  private findPosition(text: string, pos: number): vscode.Position {
-    let c = 1;
-    let line = 0;
-    let col = 1;
+  private findPosition(
+    text: string,
+    absPosition: number,
+    startLine: number,
+    startColumn: number,
+    finishAbsPosition: number,
+  ): { position: vscode.Position; absPosition: number } {
+    let line = startLine;
+    let col = startColumn;
 
-    while (c <= pos) {
-      if (text.charAt(c) === "\n") {
+    while (absPosition <= finishAbsPosition) {
+      if (text.charAt(absPosition) === "\n") {
         ++line;
         col = 1;
       } else {
         ++col;
       }
-      c++;
+      absPosition++;
     }
-    return new vscode.Position(line, col);
+    return {
+      position: new vscode.Position(line, col),
+      absPosition,
+    };
   }
 
   private collectCopybookDescriptors(
