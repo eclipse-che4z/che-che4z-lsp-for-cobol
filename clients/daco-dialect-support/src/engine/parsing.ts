@@ -38,6 +38,10 @@ import {
   VariableUsageNameContext,
 } from "../generated/DaCoParser";
 
+const BLANK_STATEMENT = "CONTINUE";
+const BLANK_VALUE = "ZERO";
+const SPACE_VALUE = " ";
+
 export interface ParseError {
   line: number;
   column: number;
@@ -78,7 +82,7 @@ export class StatementDescriptor {
     public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
     public readonly children: StatementDescriptor[],
     public readonly diagnostics: DiagnosticMessage[] = [],
-    public readonly filler: string = "CONTINUE",
+    public readonly filler: string = BLANK_STATEMENT,
   ) {}
 }
 
@@ -259,11 +263,19 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
       const onSymbol = dfldRcu?.ON()?.symbol;
       const rcuSymbol = dfldRcu?.RCU()?.symbol;
       const isSortTable = ctx.tableDMLStatement()?.sortTableStatement();
+      const isRowCondition = ctx.ifRowCondition();
 
       if (onSymbol && rcuSymbol) {
         const range = constructRangeFromTokens(onSymbol, rcuSymbol);
         statements.push(
-          new StatementDescriptor(range, range, "STATEMENT", [], [], " "),
+          new StatementDescriptor(
+            range,
+            range,
+            "STATEMENT",
+            [],
+            [],
+            SPACE_VALUE,
+          ),
         );
       } else {
         const diagnostics: DiagnosticMessage[] = [];
@@ -274,13 +286,16 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
           });
         }
 
+        const filler = isRowCondition ? BLANK_VALUE : undefined;
+
         statements.push(
           new StatementDescriptor(
             constructRange(ctx),
-            constructRangeFromTokens(ctx.start!, ctx.stop),
+            constructRange(ctx),
             "STATEMENT",
             this.visitChildren(ctx) ?? [],
             diagnostics,
+            filler,
           ),
         );
       }
