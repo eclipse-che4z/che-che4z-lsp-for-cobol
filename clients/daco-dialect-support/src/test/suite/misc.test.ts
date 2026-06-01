@@ -274,4 +274,17 @@ suite("Miscellaneous statements Test Suite", function () {
       range(pos(35, 28), pos(35, 31)),
     );
   });
+
+  test("Process IF ROW statement successfully", async () => {
+    const editor = await helper.showDocument("DaCo69.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(14, 23), pos(14, 35)),
+    );
+  });
 });
