@@ -54,6 +54,7 @@ export class DaCoPreprocessor {
     _programUri: vscode.Uri,
     text: string,
   ) {
+    text = this.cleanup(context, text);
     const descriptors = this.collectCopybookDescriptors(context, text);
     await this.processCopybooks(descriptors, context);
 
@@ -62,6 +63,38 @@ export class DaCoPreprocessor {
       text,
     );
     await this.processStatements(statementDescriptors, context);
+  }
+
+  private cleanup(context: IDocumentProcessingContext, text: string): string {
+    const dcdbPattern = /^[\s\d]{7}D-[BC]/gm;
+
+    text = text.replace(dcdbPattern, (match, offset) => {
+      const start = this.findPosition(text, offset);
+      const end = this.findPosition(text, offset + match.length - 1);
+
+      const replacement = " ".repeat(match.length);
+      context.replace(new vscode.Range(start, end), replacement);
+
+      return replacement;
+    });
+    return text;
+  }
+
+  private findPosition(text: string, pos: number): vscode.Position {
+    let c = 1;
+    let line = 0;
+    let col = 1;
+
+    while (c <= pos) {
+      if (text.charAt(c) === "\n") {
+        ++line;
+        col = 1;
+      } else {
+        ++col;
+      }
+      c++;
+    }
+    return new vscode.Position(line, col);
   }
 
   private collectCopybookDescriptors(
