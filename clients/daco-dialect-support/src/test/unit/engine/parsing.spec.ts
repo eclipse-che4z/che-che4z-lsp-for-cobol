@@ -170,6 +170,24 @@ describe("parsing test", () => {
     expect(result).toHaveLength(1);
     expect(result[0].filler).toEqual(" ");
   });
+
+  it("should substitute with value the IF ROW clause context", () => {
+    const visitor = new DaCoVisitor();
+
+    const ctx = {
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+      getChildCount: () => 0,
+      getChild: () => null,
+      dfldRcu: () => null,
+      ifRowCondition: jest.fn().mockReturnValue({}),
+      tableDMLStatement: () => null,
+    } as any;
+
+    const result = visitor.visitDacoStatements(ctx);
+    expect(result.length).toEqual(1);
+    expect(result[0].filler).toEqual("ZERO");
+  });
 });
 
 describe("name resolver test", () => {
