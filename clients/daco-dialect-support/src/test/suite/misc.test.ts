@@ -287,4 +287,30 @@ suite("Miscellaneous statements Test Suite", function () {
       range(pos(14, 23), pos(14, 35)),
     );
   });
+
+  test("Cleanup D-C and D-B tokens successfully", async () => {
+    const editor = await helper.showDocument("DaCo72.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(14, 19), pos(14, 31)),
+    );
+  });
+
+  test("Process DACO-SECTION successfully", async () => {
+    const editor = await helper.showDocument("DaCo73.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable UNKVAR-XW4 is not defined",
+      range(pos(7, 22), pos(7, 32)),
+    );
+  });
 });
