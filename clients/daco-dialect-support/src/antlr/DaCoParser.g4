@@ -49,7 +49,7 @@ dacoStatements
     | stringDMLStatement
     | debugStatement
     | ifRowCondition
-    | execStatement DOT_FS?
+    | execStatement
     ;
 
 ifRowCondition
