@@ -54,6 +54,7 @@ export class DaCoPreprocessor {
     _programUri: vscode.Uri,
     text: string,
   ) {
+    text = this.cleanup(context, text);
     const descriptors = this.collectCopybookDescriptors(context, text);
     await this.processCopybooks(descriptors, context);
 
@@ -62,6 +63,63 @@ export class DaCoPreprocessor {
       text,
     );
     await this.processStatements(statementDescriptors, context);
+  }
+
+  private cleanup(context: IDocumentProcessingContext, text: string): string {
+    const dcdbPattern = /^[\s\d]{7}D-[BC]/gm;
+
+    let lastPosition = { position: new vscode.Position(0, 0), absPosition: 0 };
+    text = text.replace(dcdbPattern, (match, offset) => {
+      const startPosition = this.findPosition(
+        text,
+        lastPosition.absPosition,
+        lastPosition.position.line,
+        lastPosition.position.character,
+        offset,
+      );
+      const endPosition = this.findPosition(
+        text,
+        startPosition.absPosition,
+        startPosition.position.line,
+        startPosition.position.character,
+        offset + match.length - 1,
+      );
+      lastPosition = endPosition;
+
+      const replacement = " ".repeat(match.length);
+      context.replace(
+        new vscode.Range(startPosition.position, endPosition.position),
+        replacement,
+      );
+
+      return replacement;
+    });
+    return text;
+  }
+
+  private findPosition(
+    text: string,
+    absPosition: number,
+    startLine: number,
+    startColumn: number,
+    finishAbsPosition: number,
+  ): { position: vscode.Position; absPosition: number } {
+    let line = startLine;
+    let col = startColumn;
+
+    while (absPosition < finishAbsPosition) {
+      if (text.charAt(absPosition) === "\n") {
+        ++line;
+        col = 1;
+      } else {
+        ++col;
+      }
+      absPosition++;
+    }
+    return {
+      position: new vscode.Position(line, col),
+      absPosition,
+    };
   }
 
   private collectCopybookDescriptors(
