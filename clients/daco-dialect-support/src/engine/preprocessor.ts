@@ -107,7 +107,7 @@ export class DaCoPreprocessor {
     let line = startLine;
     let col = startColumn;
 
-    while (absPosition <= finishAbsPosition) {
+    while (absPosition < finishAbsPosition) {
       if (text.charAt(absPosition) === "\n") {
         ++line;
         col = 1;
