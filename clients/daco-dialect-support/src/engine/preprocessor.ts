@@ -68,7 +68,7 @@ export class DaCoPreprocessor {
   private cleanup(context: IDocumentProcessingContext, text: string): string {
     const dcdbPattern = /^[\s\d]{7}D-[BC]/gm;
 
-    let lastPosition = { position: new vscode.Position(0, 1), absPosition: 1 };
+    let lastPosition = { position: new vscode.Position(0, 0), absPosition: 0 };
     text = text.replace(dcdbPattern, (match, offset) => {
       const startPosition = this.findPosition(
         text,
