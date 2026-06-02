@@ -33,6 +33,7 @@ import {
 } from "../generated/VariableParser";
 import { DaCoParserVisitor } from "../generated/DaCoParserVisitor";
 import {
+  DacoSectionsContext,
   DacoStatementsContext,
   QualifiedDataNameContext,
   VariableUsageNameContext,
@@ -255,6 +256,21 @@ export class CopybookContentVisitor extends VariableParserVisitor<
 }
 
 export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
+  visitDacoSections? = (ctx: DacoSectionsContext): StatementDescriptor[] => {
+    const statements: StatementDescriptor[] = [];
+    statements.push(
+      new StatementDescriptor(
+        constructRange(ctx),
+        constructRange(ctx),
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        [],
+        SPACE_VALUE,
+      ),
+    );
+    return statements;
+  };
+
   visitDacoStatements?: (ctx: DacoStatementsContext) => StatementDescriptor[] =
     (ctx: DacoStatementsContext): StatementDescriptor[] => {
       const statements: StatementDescriptor[] = [];
@@ -263,7 +279,6 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
       const onSymbol = dfldRcu?.ON()?.symbol;
       const rcuSymbol = dfldRcu?.RCU()?.symbol;
       const isSortTable = ctx.tableDMLStatement()?.sortTableStatement();
-      const isRowCondition = ctx.ifRowCondition();
 
       if (onSymbol && rcuSymbol) {
         const range = constructRangeFromTokens(onSymbol, rcuSymbol);
@@ -286,8 +301,6 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
           });
         }
 
-        const filler = isRowCondition ? BLANK_VALUE : undefined;
-
         statements.push(
           new StatementDescriptor(
             constructRange(ctx),
@@ -295,12 +308,22 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
             "STATEMENT",
             this.visitChildren(ctx) ?? [],
             diagnostics,
-            filler,
+            this.getFiller(ctx),
           ),
         );
       }
       return statements;
     };
+
+  private getFiller(ctx: DacoStatementsContext): string {
+    if (ctx.ifRowCondition()) {
+      return BLANK_VALUE;
+    }
+    if (ctx.execStatement()) {
+      return SPACE_VALUE;
+    }
+    return BLANK_STATEMENT;
+  }
 
   visitQualifiedDataName?: (
     ctx: QualifiedDataNameContext,
