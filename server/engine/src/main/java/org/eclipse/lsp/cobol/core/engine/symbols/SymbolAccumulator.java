@@ -324,6 +324,20 @@ public class SymbolAccumulator implements VariableAccumulator {
               .location(function.getLocality().toOriginalLocation())
               .build());
     }
+
+    if (!this.userDefinedFunctions.containsKey(functionName)) {
+      List<String> mleFunctionNames = Arrays.asList("DATEVAL", "UNDATE", "YEARWINDOW");
+      if (mleFunctionNames.stream().anyMatch(fn -> fn.equalsIgnoreCase(functionName))) {
+        return Optional.of(
+            SyntaxError.syntaxError()
+                .errorSource(ErrorSource.PARSING)
+                .messageTemplate(MessageTemplate.of("cobolParser.MLEDeprecated"))
+                .severity(ErrorSeverity.WARNING)
+                .location(function.getLocality().toOriginalLocation())
+                .build());
+      }
+    }
+
     return Optional.empty();
   }
 

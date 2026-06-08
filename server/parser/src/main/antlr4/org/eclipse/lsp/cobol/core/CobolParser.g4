@@ -2292,7 +2292,7 @@ fileName
 
 functionName
    : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED
-   | mle=(DATEVAL | UNDATE | YEARWINDOW) {markMLEDeprecated(_input, $mle);}
+   | mle=(DATEVAL | UNDATE | YEARWINDOW)
    | cobolWord
    ;
 

@@ -27,6 +27,10 @@ import org.junit.jupiter.api.Test;
 /** This test checks if Millennium Language Extensions are being marked correctly. */
 class TestMLEStatements {
 
+  // Corresponds to "cobolParser.MLEDeprecated"
+  private static final String ERROR_MSG =
+      "Millennium Language Extensions are deprecated in later COBOL versions.";
+
   private static final String MLE =
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID. MLE-DEMO.\n"
@@ -45,14 +49,32 @@ class TestMLEStatements {
           + "                   FUNCTION {_{$$YEARWINDOW}|errorFive_}.\n"
           + "           STOP RUN.\n";
 
+  private static final String MLE2 =
+      "       {$$*IDENTIFICATION DIVISION.                             \n"
+          + "       FUNCTION-ID. DATEVAL.                                  \n"
+          + "       DATA DIVISION.                                       \n"
+          + "       LINKAGE SECTION.                                     \n"
+          + "       01  {$*UNRELATED-STUFF}.                                 \n"
+          + "           05  {$*NUM}         PIC X(1234).                     \n"
+          + "       PROCEDURE DIVISION RETURNING {$UNRELATED-STUFF}.        \n"
+          + "       END FUNCTION DATEVAL.|DATEVAL}                                  \n"
+          + "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. PGMNAME.\n"
+          + "       ENVIRONMENT DIVISION.\n"
+          + "       CONFIGURATION SECTION.\n"
+          + "       REPOSITORY.\n"
+          + "                   FUNCTION {$$DATEVAL}.\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "               DISPLAY FUNCTION {$$DATEVAL}.\n"
+          + "               EXIT PROGRAM.\n";
+
   @Test
   void testMLE() {
-    // Corresponds to "cobolParser.MLEDeprecated"
-    String messageStr = "Millennium Language Extensions are deprecated in later COBOL versions.";
-
     Diagnostic diagnostic =
         new Diagnostic(
-            new Range(), messageStr, DiagnosticSeverity.Warning, ErrorSource.PARSING.getText());
+            new Range(), ERROR_MSG, DiagnosticSeverity.Warning, ErrorSource.PARSING.getText());
 
     UseCaseEngine.runTest(
         MLE,
@@ -64,5 +86,10 @@ class TestMLEStatements {
             "errorFour", diagnostic,
             "errorFive", diagnostic),
         ImmutableMap.of());
+  }
+
+  @Test
+  void testMLE2() {
+    UseCaseEngine.runTest(MLE2, ImmutableList.of(), ImmutableMap.of());
   }
 }
