@@ -50,8 +50,20 @@ layoutUsage
    : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z]{3}$/, "validation.layout_usage");}
    ;
 
+suffix
+   : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z0-9]{2}$/, "validation.copy_from_suffix");}
+   ;
+
 variableEntry
-   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
+   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (copyFromEntry | variableOptionEntry) DOT_FS
+   ;
+
+copyFromEntry
+   : COPY_FROM suffix
+   ;
+
+variableOptionEntry
+   : (~DOT_FS)*
    ;
 
 variableEntrySpecificLevel

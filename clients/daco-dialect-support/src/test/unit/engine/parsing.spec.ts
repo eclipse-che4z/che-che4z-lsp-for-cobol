@@ -17,6 +17,8 @@ import {
   CopybookVisitor,
   DaCoVisitor,
   NameResolver,
+  VariableAccumulator,
+  VariableDescriptor,
 } from "../../../engine/parsing";
 
 describe("parsing test", () => {
@@ -25,7 +27,7 @@ describe("parsing test", () => {
   });
 
   it("should fallback when layoutId is missing", () => {
-    const visitor = new CopybookVisitor();
+    const visitor = new CopybookVisitor(new VariableAccumulator());
 
     const ctx = {
       layoutId: () => null,
@@ -38,7 +40,7 @@ describe("parsing test", () => {
   });
 
   it("should fallback when DACO_COPYBOOK_IDENTIFIER is missing", () => {
-    const visitor = new CopybookVisitor();
+    const visitor = new CopybookVisitor(new VariableAccumulator());
 
     const ctx = {
       DACO_COPYBOOK_IDENTIFIER: () => null,
@@ -70,17 +72,69 @@ describe("parsing test", () => {
     expect(result).toEqual([]);
   });
 
-  it("should skip when dataName is missing", () => {
+  it("should add variable redefine descriptor", () => {
     const visitor = new CopybookContentVisitor();
 
+    const dataName = {
+      getText: () => "ENTRY TEXT",
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+    };
+
     const ctx = {
-      dataName: () => null,
+      dataName: () => dataName,
       getChildCount: () => 0,
       getChild: () => null,
     } as any;
 
     const result = visitor.visitDataRedefinesClause(ctx);
-    expect(result).toEqual([]);
+    expect(result.length).toEqual(1);
+    expect(result[0].type).toEqual("REDEFINITION");
+  });
+
+  it("should add COPY-FROM variable descriptor to the accumulator for copybook content", () => {
+    const accumulator = new VariableAccumulator();
+    const visitor = new CopybookVisitor(accumulator);
+
+    const symbol = {
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+    };
+
+    const levelNumber = {
+      getText: () => "01",
+      getSymbol: () => symbol,
+    };
+
+    const identifier = {
+      getText: () => "IDENTIFIER",
+      getSymbol: () => symbol,
+    };
+
+    const suffix = {
+      getText: () => "SUFFIX",
+    };
+
+    const copyFrom = {
+      getSymbol: () => symbol,
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+      suffix: () => suffix,
+    };
+
+    const ctx = {
+      DACO_COPYBOOK_IDENTIFIER: () => identifier,
+      LEVEL_NUMBER: () => levelNumber,
+      copyFromEntry: () => copyFrom,
+      getChildCount: () => 0,
+      getChild: () => null,
+    } as any;
+
+    const result = visitor.visitVariableEntry(ctx);
+    expect(accumulator.descriptors.length).toEqual(1);
+    expect((accumulator.descriptors[0] as VariableDescriptor).type).toEqual(
+      "COPY-FROM",
+    );
   });
 
   it("should construct range for the context", () => {
