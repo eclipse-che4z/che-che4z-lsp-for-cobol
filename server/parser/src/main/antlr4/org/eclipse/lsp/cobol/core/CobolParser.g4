@@ -676,7 +676,7 @@ dataOccursSort
    ;
 
 dataPictureClause
-   : (PICTURE | PIC) PICTUREIS? pictureString
+   : (PICTURE | PIC) PICTUREIS? pictureString dataDateFormatClause?
    ;
 
 pictureString
@@ -714,6 +714,10 @@ dataSignClause
 
 dataSynchronizedClause
    : (SYNCHRONIZED | SYNC) (LEFT | RIGHT)?
+   ;
+
+dataDateFormatClause
+   : DATE FORMAT IS? DATE_PATTERN
    ;
 
 dataUsageClause
@@ -2280,6 +2284,7 @@ fileName
 
 functionName
    : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
+   | DATEVAL | UNDATE | YEARWINDOW
    ;
 
 indexName
@@ -2406,6 +2411,7 @@ allowedCobolKeywords
    | DISK | KEYBOARD | PORT | READER | REMOTE | VIRTUAL | LIBRARY | DEFINITION | PARSE | BOOL | ESCAPE | INITIALIZED
    | LOC | BYTITLE | BYFUNCTION | ABORT | ORDERLY | ASSOCIATED_DATA | ASSOCIATED_DATA_LENGTH
    | VOLATILE | PARAGRAPH
+   | DATEVAL | FORMAT | UNDATE | YEARWINDOW | DATE_PATTERN
    ;
 
 dialectNodeFiller

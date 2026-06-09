@@ -223,6 +223,7 @@ public class SymbolAccumulator implements VariableAccumulator {
         "CURRENT-DATE",
         "DATE-OF-INTEGER",
         "DATE-TO-YYYYMMDD",
+        "DATEVAL",
         "DAY-OF-INTEGER",
         "DAY-TO-YYYYDDD",
         "DISPLAY-OF",
@@ -280,6 +281,7 @@ public class SymbolAccumulator implements VariableAccumulator {
         "TEST-NUMVAL-F",
         "TRIM",
         "ULENGTH",
+        "UNDATE",
         "UPOS",
         "UPPER-CASE",
         "USUBSTR",
@@ -289,8 +291,12 @@ public class SymbolAccumulator implements VariableAccumulator {
         "UWIDTH",
         "VARIANCE",
         "WHEN-COMPILED",
-        "YEAR-TO-YYYY");
+        "YEAR-TO-YYYY",
+        "YEARWINDOW");
   }
+
+  private static final List<String> MLE_FUNCTIONS =
+      Arrays.asList("DATEVAL", "UNDATE", "YEARWINDOW");
 
   /**
    * Add function usage or definition to a program
@@ -321,6 +327,17 @@ public class SymbolAccumulator implements VariableAccumulator {
               .location(function.getLocality().toOriginalLocation())
               .build());
     }
+
+    if (fi.isImplicit() && MLE_FUNCTIONS.stream().anyMatch(functionName::equals)) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .messageTemplate(MessageTemplate.of("cobolParser.MLEDeprecated"))
+              .severity(ErrorSeverity.WARNING)
+              .location(function.getLocality().toOriginalLocation())
+              .build());
+    }
+
     return Optional.empty();
   }
 
