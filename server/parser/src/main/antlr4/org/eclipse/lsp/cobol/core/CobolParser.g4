@@ -26,14 +26,6 @@ options {tokenVocab = CobolLexer; superClass = MessageServiceParser;}
     }
     notifyError(t, "ErrorStrategy.reportInputMismatch", t.getText());
   }
-
-  private void markMLEDeprecated(TokenStream _input, Token t) {
-    notifyWarning(t, "cobolParser.MLEDeprecated", t.getText());
-  }
-
-  private void markMLEDeprecated(ParserRuleContext ctx, String ruleText) {
-    notifyWarning(ctx, "cobolParser.MLEDeprecated", ruleText, ctx.getText());
-  }
 }
 
 startRule : compilationUnit EOF;
@@ -725,7 +717,7 @@ dataSynchronizedClause
    ;
 
 dataDateFormatClause
-   : DATE FORMAT IS? DATE_PATTERN {markMLEDeprecated($ctx, $text);}
+   : DATE FORMAT IS? DATE_PATTERN
    ;
 
 dataUsageClause
@@ -2291,9 +2283,8 @@ fileName
    ;
 
 functionName
-   : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED
-   | mle=(DATEVAL | UNDATE | YEARWINDOW)
-   | cobolWord
+   : INTEGER | LENGTH | RANDOM | SUM | MAX | WHEN_COMPILED | cobolWord
+   | DATEVAL | UNDATE | YEARWINDOW
    ;
 
 indexName

@@ -295,6 +295,9 @@ public class SymbolAccumulator implements VariableAccumulator {
         "YEARWINDOW");
   }
 
+  private static final List<String> MLE_FUNCTIONS =
+      Arrays.asList("DATEVAL", "UNDATE", "YEARWINDOW");
+
   /**
    * Add function usage or definition to a program
    *
@@ -325,17 +328,14 @@ public class SymbolAccumulator implements VariableAccumulator {
               .build());
     }
 
-    if (!this.userDefinedFunctions.containsKey(functionName)) {
-      List<String> mleFunctionNames = Arrays.asList("DATEVAL", "UNDATE", "YEARWINDOW");
-      if (mleFunctionNames.stream().anyMatch(fn -> fn.equalsIgnoreCase(functionName))) {
-        return Optional.of(
-            SyntaxError.syntaxError()
-                .errorSource(ErrorSource.PARSING)
-                .messageTemplate(MessageTemplate.of("cobolParser.MLEDeprecated"))
-                .severity(ErrorSeverity.WARNING)
-                .location(function.getLocality().toOriginalLocation())
-                .build());
-      }
+    if (fi.isImplicit() && MLE_FUNCTIONS.stream().anyMatch(functionName::equals)) {
+      return Optional.of(
+          SyntaxError.syntaxError()
+              .errorSource(ErrorSource.PARSING)
+              .messageTemplate(MessageTemplate.of("cobolParser.MLEDeprecated"))
+              .severity(ErrorSeverity.WARNING)
+              .location(function.getLocality().toOriginalLocation())
+              .build());
     }
 
     return Optional.empty();

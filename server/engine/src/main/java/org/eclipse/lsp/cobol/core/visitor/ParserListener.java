@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *    Broadcom, Inc. - initial API and implementation
+ *    Broadcom - initial API and implementation
  *
  */
 package org.eclipse.lsp.cobol.core.visitor;
@@ -20,7 +20,10 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;

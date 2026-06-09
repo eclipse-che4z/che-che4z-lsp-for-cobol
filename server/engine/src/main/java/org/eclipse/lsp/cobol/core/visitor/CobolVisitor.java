@@ -1290,6 +1290,21 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
   }
 
   @Override
+  public List<Node> visitDataDateFormatClause(CobolParser.DataDateFormatClauseContext ctx) {
+    final Locality locality =
+        locationToLocality(extendedDocument.mapLocation(AntlrRangeUtils.constructRange(ctx)));
+    final SyntaxError error =
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.PARSING)
+            .messageTemplate(MessageTemplate.of("cobolParser.MLEDeprecated"))
+            .severity(ErrorSeverity.WARNING)
+            .location(locality.toOriginalLocation())
+            .build();
+    errors.add(error);
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<Node> visitEnvironmentSwitchNameClause(EnvironmentSwitchNameClauseContext ctx) {
     Locality locality =
         getLocality(
