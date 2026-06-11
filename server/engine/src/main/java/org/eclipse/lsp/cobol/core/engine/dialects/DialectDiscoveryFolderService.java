@@ -17,10 +17,12 @@ package org.eclipse.lsp.cobol.core.engine.dialects;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +44,6 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
   private final WorkingFolderService workingFolderService;
   private final Communications communications;
-  private final List<URLClassLoader> classLoaderHolder = new LinkedList<>();
   private final CodeActions actions;
 
   @Inject
@@ -131,11 +132,12 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       URI jarUri, CopybookService copybookService, MessageService messageService) {
     List<CobolDialect> dialects = new LinkedList<>();
     try {
-      URLClassLoader classLoader = createClassLoader(jarUri);
-      classLoaderHolder.add(classLoader);
+      if (jarUri.getScheme() != "file")
+        throw new UnsupportedOperationException("Dialect must reside on local filesystem");
 
+      final File jarFile = Paths.get(jarUri).toFile();
       List<String> classnames =
-          getClassNames(jarUri.getPath()).stream()
+          getClassNames(jarFile).stream()
               .filter(c -> !c.equals(CobolDialect.class.getName()))
               .filter(c -> c.endsWith("Dialect"))
               .collect(Collectors.toList());
@@ -143,6 +145,8 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       if (classnames.isEmpty()) {
         throw new Exception("Cannot find dialect class in the jar file " + jarUri);
       }
+
+      final URLClassLoader classLoader = createClassLoader(jarUri);
 
       for (String classname : classnames) {
         Class<CobolDialect> clazz =
@@ -161,7 +165,7 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     return new URLClassLoader(new URL[] {uriToJar.toURL()}, this.getClass().getClassLoader());
   }
 
-  private List<String> getClassNames(String filename) throws IOException {
+  private List<String> getClassNames(File filename) throws IOException {
     List<String> classNames = new ArrayList<>();
     try (ZipInputStream zip = new ZipInputStream(new FileInputStream(filename))) {
       for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
