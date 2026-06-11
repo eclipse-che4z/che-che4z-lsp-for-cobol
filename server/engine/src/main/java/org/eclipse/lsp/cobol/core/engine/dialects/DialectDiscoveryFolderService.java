@@ -149,8 +149,9 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       final URLClassLoader classLoader = createClassLoader(jarUri);
 
       for (String classname : classnames) {
-        final Class<? extends CobolDialect> clazz =
-            Class.forName(classname, false, classLoader).asSubclass(CobolDialect.class);
+        final Class<?> c = Class.forName(classname, false, classLoader);
+        if (!CobolDialect.class.isAssignableFrom(c)) continue;
+        final Class<? extends CobolDialect> clazz = c.asSubclass(CobolDialect.class);
         final Constructor<? extends CobolDialect> constructor =
             clazz.getConstructor(CopybookService.class, MessageService.class);
         dialects.add(constructor.newInstance(copybookService, messageService));
