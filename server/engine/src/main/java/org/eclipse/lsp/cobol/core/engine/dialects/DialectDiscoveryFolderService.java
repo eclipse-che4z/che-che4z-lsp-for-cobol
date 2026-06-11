@@ -132,7 +132,7 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       URI jarUri, CopybookService copybookService, MessageService messageService) {
     List<CobolDialect> dialects = new LinkedList<>();
     try {
-      if (jarUri.getScheme() != "file")
+      if (!"file".equals(jarUri.getScheme()))
         throw new UnsupportedOperationException("Dialect must reside on local filesystem");
 
       final File jarFile = Paths.get(jarUri).toFile();
