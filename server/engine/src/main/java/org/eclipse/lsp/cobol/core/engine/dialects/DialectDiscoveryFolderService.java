@@ -136,7 +136,7 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
         throw new UnsupportedOperationException("Dialect must reside on local filesystem");
 
       final File jarFile = Paths.get(jarUri).toFile();
-      List<String> classnames =
+      final List<String> classnames =
           getClassNames(jarFile).stream()
               .filter(c -> !c.equals(CobolDialect.class.getName()))
               .filter(c -> c.endsWith("Dialect"))
@@ -149,9 +149,9 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
       final URLClassLoader classLoader = createClassLoader(jarUri);
 
       for (String classname : classnames) {
-        Class<CobolDialect> clazz =
-            (Class<CobolDialect>) Class.forName(classname, true, classLoader);
-        Constructor<CobolDialect> constructor =
+        final Class<? extends CobolDialect> clazz =
+            Class.forName(classname, false, classLoader).asSubclass(CobolDialect.class);
+        final Constructor<? extends CobolDialect> constructor =
             clazz.getConstructor(CopybookService.class, MessageService.class);
         dialects.add(constructor.newInstance(copybookService, messageService));
       }
