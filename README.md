@@ -9,7 +9,7 @@
 
 # COBOL Language Support
 
-COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to automatically retrieve copybooks used in your programs and store them in your workspace. COBOL Language Support also supports COBOL programs which interact with Datacom, CICS, and DB2 SQL. An add-on extension which adds support for the IDMS dialect is available on the VS Code Marketplace.
+COBOL Language Support enhances the COBOL programming experience on your IDE. The extension leverages the language server protocol to provide autocomplete, syntax highlighting and coloring, and diagnostic features for COBOL code and copybooks. The COBOL Language Support extension can also connect to a mainframe using the Zowe Explorer extension to resolve remotely stored copybooks in mainframe data sets and USS files. COBOL Language Support also supports COBOL programs which interact with Datacom, CICS, and DB2 SQL. An add-on extension which adds support for the IDMS dialect is available on the VS Code Marketplace.
 
 COBOL Language Support recognizes files with the extensions `.cob`, `.cbl` and `.cobol` as COBOL files.
 
@@ -41,7 +41,7 @@ If you do not have Java on your workstation, COBOL Language Support uses the nat
 
 ## Integrate with Zowe Explorer and Explorer for Endevor
 
-Integrating COBOL Language Support with the Zowe Explorer and Explorer for Endevor extensions let you:
+Integrating COBOL Language Support with the Zowe Explorer and Explorer for Endevor extensions enables you to:
 
 - Load your data sets containing COBOL code directly from the data set tree.
 - Load your COBOL code directly from Endevor elements.
@@ -171,6 +171,8 @@ If you specify your subroutine folders using absolute paths or paths containing 
 
 The COBOL Language Support extension supports copybooks used in your source code that are stored in local folders in your workspace. If you have copybooks stored in mainframe data sets or USS directories, you can use a Zowe Explorer profile to resolve and open copybooks that are stored in remote locations. You specify the data sets and folders that contain copybooks used in your project in the extension settings. You can also configure COBOL Language Support to use copybooks that are stored in TAR files locally or on the mainframe.
 
+If you load your COBOL source in Explorer for Endevor, COBOL Language Support automatically retrieves copybooks that are specified in the Endevor processor group.
+
 When a copybook is used in the program, the folders and data sets are searched in the order they are listed for files and members that match the name of the copybook. If a copybook with the same file name is located in both a local folder and a remote location, the one in the local folder is used.
 
 Copybook support features are disabled for files stored in the folder **.c4z/.extsrcs** in your workspace. If you also use the [Debugger for Mainframe](https://github.com/BroadcomMFD/debugger-for-mainframe) extension to debug your COBOL programs, you might have some files stored in this folder.
@@ -236,13 +238,13 @@ TAR files that you retrieve from remote locations are stored in your VS Code glo
 
 ### Retrieve Copybooks from Endevor
 
-When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your VS Code global storage folder.
+When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your workspace.
 
 The extension setting **Cpy-manager: Endevor-dependencies** determines how copybooks are retrieved from the mainframe when you open a COBOL file in Explorer for Endevor. This setting has the following options:
 * **ENDEVOR_PROCESSOR**
-  * Downloads copybooks from locations that are specified in the Endevor element processor group.
+  * Enables automatic retrieval of copybooks from locations that are specified in the Endevor element processor group.
 * **ZOWE**
-  * Resolves copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings.
+  * Disables automatic retrieval of copybooks from the Endevor processor group, and resolves copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings instead.
 
 Copybooks that you retrieve from Endevor locations are stored in your VS Code global storage folder. 
 
