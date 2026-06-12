@@ -4,7 +4,7 @@
   "description": "Code4z rich language support extension for COBOL code and copybooks.",
   "author": "Broadcom",
   "license": "EPL-2.0",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "preview": false,
   "publisher": "BroadcomMFD",
   "engines": {
