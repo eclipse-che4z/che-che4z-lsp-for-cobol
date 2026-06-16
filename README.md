@@ -238,15 +238,13 @@ TAR files that you retrieve from remote locations are stored in your VS Code glo
 
 ### Retrieve Copybooks from Endevor
 
-When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your workspace.
+When you open a COBOL file using Explorer for Endevor, COBOL copybooks that are specified in the Endevor element processor group are automatically downloaded to your VS Code global storage folder.
 
 The extension setting **Cpy-manager: Endevor-dependencies** determines how copybooks are retrieved from the mainframe when you open a COBOL file in Explorer for Endevor. This setting has the following options:
 * **ENDEVOR_PROCESSOR**
   * Enables automatic retrieval of copybooks from locations that are specified in the Endevor element processor group.
 * **ZOWE**
   * Disables automatic retrieval of copybooks from the Endevor processor group, and resolves copybooks from locations that are specified in the **paths-dsn** and **paths-uss** settings instead.
-
-Copybooks that you retrieve from Endevor locations are stored in your VS Code global storage folder. 
 
 ### Copybook Support Features
 
