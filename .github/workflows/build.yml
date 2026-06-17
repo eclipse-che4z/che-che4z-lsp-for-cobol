@@ -32,6 +32,7 @@ on:
     branches:
       - development
       - master
+      - release/preparation_v2.5.1
 
 jobs:
   checks:
