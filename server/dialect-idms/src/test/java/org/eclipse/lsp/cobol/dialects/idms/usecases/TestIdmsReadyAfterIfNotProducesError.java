@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.dialects.idms.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ class TestIdmsReadyAfterIfNotProducesError {
   void test() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());

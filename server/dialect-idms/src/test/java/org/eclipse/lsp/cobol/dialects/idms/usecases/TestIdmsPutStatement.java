@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -92,7 +91,7 @@ class TestIdmsPutStatement {
   void test(String text) {
     UseCaseEngine.runTestForDiagnostics(
         text,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());

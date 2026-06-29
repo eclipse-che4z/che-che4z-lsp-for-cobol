@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.stream.Stream;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.idms.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.idms.utils.Fixtures;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Range;
@@ -87,7 +86,7 @@ class TestIdmsReadyStatement {
   void test(String text) {
     UseCaseEngine.runTestForDiagnostics(
         text,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(
             "1",
             new Diagnostic(

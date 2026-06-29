@@ -109,7 +109,7 @@ class TestIdmsModifyMapStatement {
   void test(String text) {
     UseCaseEngine.runTestForDiagnostics(
         text,
-        ImmutableList.of(Fixtures.subschemaCopy(""), Fixtures.mapsCopy("")),
+        ImmutableList.of(Fixtures.mapsCopy("")),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());

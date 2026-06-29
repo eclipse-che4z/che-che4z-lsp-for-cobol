@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -52,7 +51,7 @@ class TestDaCoTableRowInitializeStatement {
 
     UseCaseEngine.runTestForDiagnostics(
         TEXT,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(
             "1",
             new Diagnostic(

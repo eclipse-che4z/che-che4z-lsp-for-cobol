@@ -74,6 +74,8 @@ class TestIdmsControlSectionAll {
       "            PROTOCOL. MODE ABC.\n"
           + "            IDMS-RECORDS WITHIN WORKING-STORAGE\n"
           + "         DATA DIVISION.\n"
+          + "        SCHEMA SECTION.\n"
+          + "            DB EMPSS01 WITHIN ENPSCHM VERSION 1234.\n"
           + "         WORKING-STORAGE SECTION.\n"
           + "         PROCEDURE DIVISION.\n"
           + "           DISPLAY {$EMPLOYEE}.\n";

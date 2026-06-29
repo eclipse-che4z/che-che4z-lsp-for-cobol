@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.dialects.daco.usecases;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ class TestOnRcuRangeException {
   void test() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());

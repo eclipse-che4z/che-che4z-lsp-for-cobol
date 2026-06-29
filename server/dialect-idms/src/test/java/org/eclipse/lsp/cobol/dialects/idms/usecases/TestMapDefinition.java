@@ -62,7 +62,7 @@ class TestMapDefinition {
     final AnalysisResult result =
         UseCaseEngine.runTestForDiagnostics(
             TEXT,
-            ImmutableList.of(Fixtures.subschemaCopy(""), Fixtures.mapsCopy("")),
+            ImmutableList.of(Fixtures.mapsCopy("")),
             ImmutableMap.of(),
             ImmutableList.of(),
             new AnalysisConfig(

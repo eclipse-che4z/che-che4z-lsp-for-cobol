@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.junit.jupiter.api.Test;
@@ -92,7 +91,7 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingStorageCode() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_WS,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
@@ -112,8 +111,7 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingSectionDynamicCode() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT,
-        ImmutableList.of(
-            new CobolText("PMOREC", DaCoDialect.NAME, COPY), Fixtures.subschemaCopy("")),
+        ImmutableList.of(new CobolText("PMOREC", DaCoDialect.NAME, COPY)),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
@@ -123,7 +121,7 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingStorageCode_Dynamic() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_DYN,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
@@ -133,7 +131,7 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingStorageCode_DynamicWithDuplicates() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_DYN_DUPLICATE,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());
@@ -143,7 +141,7 @@ class TestDaCoImplicitCode {
   void testImplicitWorkingStorageSML() {
     UseCaseEngine.runTestForDiagnostics(
         TEXT_SML,
-        ImmutableList.of(Fixtures.subschemaCopy("")),
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getDaCoAnalysisConfig());

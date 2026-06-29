@@ -22,8 +22,6 @@ import org.eclipse.lsp.cobol.common.model.NodeType;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.dialects.daco.DaCoDialect;
 import org.eclipse.lsp.cobol.dialects.daco.utils.DialectConfigs;
-import org.eclipse.lsp.cobol.dialects.daco.utils.Fixtures;
-import org.eclipse.lsp.cobol.dialects.idms.IdmsDialect;
 import org.eclipse.lsp.cobol.test.CobolText;
 import org.eclipse.lsp.cobol.test.engine.UseCaseEngine;
 import org.eclipse.lsp.cobol.test.engine.UseCaseUtils;
@@ -51,12 +49,10 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
 
   @Test
   void test() {
-    CobolText idmsCopybook = Fixtures.subschemaCopy("");
     ImmutableList<CobolText> copybooks =
         ImmutableList.of(
             new CobolText("BHTRGL", DaCoDialect.NAME, BHTRGL),
-            new CobolText("BHTRGL_ABC", DaCoDialect.NAME, BHTRGL_ABC),
-            idmsCopybook);
+            new CobolText("BHTRGL_ABC", DaCoDialect.NAME, BHTRGL_ABC));
     ImmutableMap<String, Diagnostic> diagnostics = ImmutableMap.of();
     MatcherAssert.assertThat(
         UseCaseEngine.runTestForDiagnostics(
@@ -72,8 +68,6 @@ class TestCopyMaidWithQualifierHasCorrectDefinition {
             .map(CopyNode::getUri)
             .collect(toList()),
         Matchers.containsInAnyOrder(
-            UseCaseUtils.toURI("BHTRGL", "DaCo"),
-            UseCaseUtils.toURI("BHTRGL_ABC", "DaCo"),
-            UseCaseUtils.toURI(idmsCopybook.getFileName(), IdmsDialect.NAME)));
+            UseCaseUtils.toURI("BHTRGL", "DaCo"), UseCaseUtils.toURI("BHTRGL_ABC", "DaCo")));
   }
 }
