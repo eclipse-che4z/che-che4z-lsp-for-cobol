@@ -25,7 +25,6 @@ import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
   CopyMaidContext,
   VariableEntryContext,
-  VariableOptionEntryContext,
 } from "../generated/CopybookParser";
 import { VariableParserVisitor } from "../generated/VariableParserVisitor";
 
@@ -40,6 +39,7 @@ import {
   QualifiedDataNameContext,
   VariableUsageNameContext,
 } from "../generated/DaCoParser";
+import { MessageService } from "./services/MessageService";
 
 const BLANK_STATEMENT = "CONTINUE";
 const BLANK_VALUE = "ZERO";
@@ -70,7 +70,7 @@ export type RedefinitionVariableDescriptor = {
 };
 
 export type RegularVariableDescriptor = {
-  type: "DEFINITION" | "REDEFINITION";
+  type: "DEFINITION";
   levelRange: vscode.Range;
   level: number;
   nameRange: vscode.Range;
@@ -207,13 +207,48 @@ export class VariableAccumulator {
   }
 }
 
+type CopyFromOptions =
+  | { kind: "COPY_FROM"; suffix: string }
+  | { kind: "REGULAR_OPTIONS"; options: string };
+
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
   private readonly parentNameResolver: NameResolver = new NameResolver();
 
-  public constructor(public accumulator: VariableAccumulator) {
+  public constructor(
+    public accumulator: VariableAccumulator,
+    private readonly messageService: MessageService,
+  ) {
     super();
+  }
+
+  private parseCopyFromOptions(options: string): CopyFromOptions {
+    const trimmed = options.trim();
+
+    const match = /^COPY-FROM\s+([A-Z0-9]+)$/i.exec(trimmed);
+
+    if (!match) {
+      return {
+        kind: "REGULAR_OPTIONS",
+        options,
+      };
+    }
+
+    const suffix = match[1].toUpperCase();
+
+    if (!/^[A-Z0-9]{2}$/.test(suffix)) {
+      const message = this.messageService.get(
+        "validation.copy_from_suffix",
+        suffix,
+      );
+      throw new Error(message);
+    }
+
+    return {
+      kind: "COPY_FROM",
+      suffix,
+    };
   }
 
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
@@ -251,16 +286,17 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
     if (newName) {
       this.parentNameResolver.pushName(level, newName);
-      const type = ctx.copyFromEntry() ? "COPY-FROM" : "DEFINITION";
+
+      const optionsText = createOptionsStr(ctx.variableOptionEntry());
+      const parsed = this.parseCopyFromOptions(optionsText);
 
       const nameRange = constructRangeFromTokens(
         ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
         ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
       );
 
-      if (type === "COPY-FROM") {
-        const copyFromRange = constructRange(ctx.copyFromEntry());
-        const suffix = ctx.copyFromEntry()?.suffix()?.getText() ?? "";
+      if (parsed.kind === "COPY_FROM") {
+        const copyFromRange = constructRange(ctx.variableOptionEntry());
         this.accumulator.add({
           levelRange: constructRangeFromTokens(
             ctx.LEVEL_NUMBER().getSymbol(),
@@ -270,7 +306,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
           copyFromRange: copyFromRange,
           nameRange: nameRange,
           name: newName,
-          suffix: suffix,
+          suffix: parsed.suffix,
           type: "COPY-FROM",
         });
       } else {
@@ -283,7 +319,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
           nameRange: nameRange,
           name: newName,
           type: "DEFINITION",
-          options: createOptionsStr(ctx.variableOptionEntry()),
+          options: optionsText,
         });
       }
     }

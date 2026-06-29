@@ -169,7 +169,8 @@ export class DaCoPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    const descriptors = new CopybookVisitor(accumulator).visit(tree) || [];
+    const descriptors =
+      new CopybookVisitor(accumulator, this.messageService).visit(tree) || [];
 
     this.outputChannel.appendLine(
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,

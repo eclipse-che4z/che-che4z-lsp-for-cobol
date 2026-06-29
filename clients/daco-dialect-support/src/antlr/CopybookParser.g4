@@ -24,7 +24,7 @@ startRule
    ;
 
 skipUntilWS
-   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS workingStorageBody)? EOF
+   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS)?
    ;
 
 workingStorageBody
@@ -50,16 +50,8 @@ layoutUsage
    : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z]{3}$/, "validation.layout_usage");}
    ;
 
-suffix
-   : DACO_COPYBOOK_IDENTIFIER { this.validateTokenWithRegex($DACO_COPYBOOK_IDENTIFIER, /^[A-Z0-9]{2}$/, "validation.copy_from_suffix");}
-   ;
-
 variableEntry
-   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (copyFromEntry | variableOptionEntry) DOT_FS
-   ;
-
-copyFromEntry
-   : COPY_FROM suffix
+   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (variableOptionEntry) DOT_FS
    ;
 
 variableOptionEntry
