@@ -92,7 +92,7 @@ suite("COPY-FROM statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "Can't find source for NODE1",
+      "Source for NODE1 not found",
       range(pos(9, 20), pos(9, 32)),
     );
 
