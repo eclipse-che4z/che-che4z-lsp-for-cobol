@@ -185,7 +185,27 @@ export class NameResolver {
 }
 
 export class VariableAccumulator {
-  public descriptors: (VariableDescriptor | CopybookDescriptor)[] = [];
+  private readonly descriptors: (VariableDescriptor | CopybookDescriptor)[] =
+    [];
+  private readonly copybookDescriptors: Map<
+    CopybookDescriptor,
+    VariableDescriptor[]
+  > = new Map();
+
+  public generateDescriptors(): VariableDescriptor[] {
+    const result: VariableDescriptor[] = [];
+
+    for (const descriptor of this.descriptors) {
+      if (descriptor instanceof CopybookDescriptor) {
+        result.push(...(this.copybookDescriptors.get(descriptor) ?? []));
+      } else {
+        result.push(descriptor);
+      }
+    }
+
+    return result;
+  }
+
   public add(descriptor: VariableDescriptor) {
     this.descriptors.push(descriptor);
   }
@@ -198,12 +218,7 @@ export class VariableAccumulator {
     descriptor: CopybookDescriptor,
     variables: VariableDescriptor[],
   ) {
-    for (let i = 0; i < this.descriptors.length; i++) {
-      if (this.descriptors[i] === descriptor) {
-        this.descriptors.splice(i, 1, ...variables);
-        break;
-      }
-    }
+    this.copybookDescriptors.set(descriptor, variables);
   }
 }
 

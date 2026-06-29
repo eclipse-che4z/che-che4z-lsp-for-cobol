@@ -66,9 +66,9 @@ export class DaCoPreprocessor {
     );
     await this.processCopybooks(descriptors, context, accumulator);
 
-    const variableDescriptors = accumulator.descriptors.filter(
-      (d): d is VariableDescriptor => !!d && "type" in d,
-    );
+    const variableDescriptors = accumulator
+      .generateDescriptors()
+      .filter((d): d is VariableDescriptor => !!d && "type" in d);
     this.processCopyFrom(context, variableDescriptors);
 
     const statementDescriptors = this.collectStatementsDescriptors(
