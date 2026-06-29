@@ -28,7 +28,9 @@ import {
   CopybookVisitor,
   DaCoVisitor,
   ParseError,
+  RegularVariableDescriptor,
   StatementDescriptor,
+  VariableAccumulator,
   VariableDescriptor,
 } from "./parsing";
 import { VariableLexer } from "../generated/VariableLexer";
@@ -54,15 +56,26 @@ export class DaCoPreprocessor {
     _programUri: vscode.Uri,
     text: string,
   ) {
+    const accumulator = new VariableAccumulator();
+
     text = this.cleanup(context, text);
-    const descriptors = this.collectCopybookDescriptors(context, text);
-    await this.processCopybooks(descriptors, context);
+    const descriptors = this.collectCopybookDescriptors(
+      context,
+      text,
+      accumulator,
+    );
+    await this.processCopybooks(descriptors, context, accumulator);
+
+    const variableDescriptors = accumulator
+      .generateDescriptors()
+      .filter((d): d is VariableDescriptor => !!d && "type" in d);
+    this.processCopyFrom(context, variableDescriptors);
 
     const statementDescriptors = this.collectStatementsDescriptors(
       context,
       text,
     );
-    await this.processStatements(statementDescriptors, context);
+    this.processStatements(statementDescriptors, context);
   }
 
   private cleanup(context: IDocumentProcessingContext, text: string): string {
@@ -125,6 +138,7 @@ export class DaCoPreprocessor {
   private collectCopybookDescriptors(
     context: IDocumentProcessingContext,
     text: string,
+    accumulator: VariableAccumulator,
   ): CopybookDescriptor[] {
     const procMatch = PROC_REGEX.exec(text);
 
@@ -155,7 +169,8 @@ export class DaCoPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    const descriptors = new CopybookVisitor().visit(tree) || [];
+    const descriptors =
+      new CopybookVisitor(accumulator, this.messageService).visit(tree) || [];
 
     this.outputChannel.appendLine(
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
@@ -173,56 +188,157 @@ export class DaCoPreprocessor {
   private async processCopybooks(
     descriptors: CopybookDescriptor[],
     context: IDocumentProcessingContext,
+    accumulator: VariableAccumulator,
   ) {
     descriptors.forEach((descriptor) =>
       console.log(
         `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, parentName=${descriptor.parentName}`,
       ),
     );
-    await Promise.all(
-      descriptors.map(async (descriptor) => {
+
+    for (const descriptor of descriptors) {
+      this.outputChannel.appendLine(
+        `Descriptor: ${JSON.stringify(descriptor)}`,
+      );
+
+      const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
+      const copybookName =
+        descriptor.name +
+        (descriptor.suffix && !hasWrkSuffix ? `_${descriptor.suffix}` : "");
+
+      const suffix = hasWrkSuffix
+        ? this.extractSuffix(descriptor.parentName)
+        : undefined;
+
+      console.log(`Resolving copybook '${copybookName}'...`);
+      this.outputChannel.appendLine(`Resolving copybook '${copybookName}'...`);
+      const copybook = await context.resolveCopybook(
+        copybookName,
+        descriptor.statementRange,
+        descriptor.nameRange,
+      );
+
+      if (copybook) {
+        console.log(
+          `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+        );
         this.outputChannel.appendLine(
-          `Descriptor: ${JSON.stringify(descriptor)}`,
+          `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
         );
-
-        const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
-        const copybookName =
-          descriptor.name +
-          (descriptor.suffix && !hasWrkSuffix ? `_${descriptor.suffix}` : "");
-
-        const suffix = hasWrkSuffix
-          ? this.extractSuffix(descriptor.parentName)
-          : undefined;
-
-        console.log(`Resolving copybook '${copybookName}'...`);
-        this.outputChannel.appendLine(
-          `Resolving copybook '${copybookName}'...`,
+        const variables = this.insertCopybookContent(
+          context,
+          copybook,
+          descriptor.level,
+          suffix,
         );
-        const copybook = await context.resolveCopybook(
-          copybookName,
-          descriptor.statementRange,
-          descriptor.nameRange,
-        );
-
-        if (copybook) {
-          console.log(
-            `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
-          );
-          this.outputChannel.appendLine(
-            `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
-          );
-          this.insertCopybookContent(
-            context,
-            copybook,
-            descriptor.level,
-            suffix,
-          );
-        }
-      }),
-    );
+        accumulator.insertCopybookVariables(descriptor, variables);
+      }
+    }
   }
 
-  private async processStatements(
+  private processCopyFrom(
+    context: IDocumentProcessingContext,
+    variables: VariableDescriptor[],
+  ) {
+    for (let i = 0; i < variables.length; i++) {
+      const variableDescriptor = variables[i];
+      if (variableDescriptor.type === "COPY-FROM") {
+        const copyFromVariables = this.findCopyFromVariables(
+          variables,
+          i,
+          variableDescriptor.level,
+          variableDescriptor.suffix,
+        );
+        let replacementText = " ";
+        if (copyFromVariables.length > 0) {
+          replacementText = copyFromVariables[0].options;
+          const suffix = this.extractSuffixWithValidation(
+            context,
+            variableDescriptor.name,
+            variableDescriptor.nameRange,
+          );
+          if (suffix) {
+            copyFromVariables.slice(1).forEach((v) => {
+              const updatedName = this.updateVariableName(v.name, suffix);
+              replacementText += `.\n        ${v.level
+                .toString()
+                .padStart(2, "0")} ${updatedName} ${v.options}`;
+            });
+          }
+        } else {
+          context.addDiagnostic(
+            new vscode.Diagnostic(
+              variableDescriptor.copyFromRange,
+              this.messageService.get(
+                "validation.copy_from.noMatchingVariable",
+                variableDescriptor.name,
+              ),
+              vscode.DiagnosticSeverity.Error,
+            ),
+          );
+        }
+        context.replace(variableDescriptor.copyFromRange, replacementText);
+      }
+    }
+  }
+
+  private extractSuffixWithValidation(
+    context: IDocumentProcessingContext,
+    name: string,
+    nameRange: vscode.Range,
+  ): string | undefined {
+    const suffix = this.extractSuffix(name);
+    if (suffix.length !== 2) {
+      context.addDiagnostic(
+        new vscode.Diagnostic(
+          nameRange,
+          this.messageService.get("validation.copy_from.retrieve.suffix"),
+          vscode.DiagnosticSeverity.Error,
+        ),
+      );
+      return undefined;
+    }
+    return suffix;
+  }
+
+  private findCopyFromVariables(
+    variables: VariableDescriptor[],
+    index: number,
+    level: number,
+    suffix: string,
+  ): RegularVariableDescriptor[] {
+    const result: RegularVariableDescriptor[] = [];
+
+    // Search in descending order to find the closest variables with the same suffix and higher level than the COPY-FROM variable
+    for (let i = index - 1; i >= 0; i--) {
+      const variableDescriptor = variables[i];
+      if (variableDescriptor.type !== "DEFINITION") {
+        continue;
+      }
+      const varSuffix = this.extractSuffix(variableDescriptor.name);
+      if (suffix === varSuffix && variableDescriptor.level >= level) {
+        result.push(variableDescriptor);
+      }
+    }
+    if (result.length > 0) {
+      result.reverse();
+    } else {
+      // Search in the ascending order to find variables with the same suffix and higher level than the COPY-FROM variable
+      for (let i = index + 1; i < variables.length; i++) {
+        const variableDescriptor = variables[i];
+        if (variableDescriptor.type !== "DEFINITION") {
+          continue;
+        }
+        const varSuffix = this.extractSuffix(variableDescriptor.name);
+        if (suffix === varSuffix && variableDescriptor.level >= level) {
+          result.push(variableDescriptor);
+        }
+      }
+    }
+    return result;
+  }
+
+  private processStatements(
     descriptors: StatementDescriptor[],
     context: IDocumentProcessingContext,
   ) {
@@ -365,7 +481,7 @@ export class DaCoPreprocessor {
     },
     copybookLevel: number,
     prevSuffix?: string,
-  ) {
+  ): VariableDescriptor[] {
     const charStream = antlr.CharStream.fromString(copybook.text);
     const lexer = new VariableLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
@@ -396,6 +512,8 @@ export class DaCoPreprocessor {
         prevSuffix,
       );
     });
+
+    return descriptors;
   }
 
   private processVariableDescriptor(
@@ -417,6 +535,7 @@ export class DaCoPreprocessor {
       if (updatedLevel != descriptor.level) {
         const updatedLevelStr = updatedLevel.toString().padStart(2, "0");
         context.replace(descriptor.levelRange, updatedLevelStr);
+        descriptor.level = updatedLevel;
       }
     }
   }
