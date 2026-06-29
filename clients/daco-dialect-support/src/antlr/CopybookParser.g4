@@ -24,7 +24,7 @@ startRule
    ;
 
 skipUntilWS
-   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS workingStorageBody)? EOF
+   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS)?
    ;
 
 workingStorageBody
@@ -51,7 +51,11 @@ layoutUsage
    ;
 
 variableEntry
-   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
+   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (variableOptionEntry) DOT_FS
+   ;
+
+variableOptionEntry
+   : (~DOT_FS)*
    ;
 
 variableEntrySpecificLevel
