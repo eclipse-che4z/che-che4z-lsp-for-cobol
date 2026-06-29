@@ -11,5 +11,5 @@
   "parsers.deprecated": "The code block is deprecated and not supported",
   "validation.copy_from_suffix": "COPY-FROM suffix must contain 2 characters",
   "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
-  "validation.copy_from.noMatchingVariable": "Can't find source for {0}"
+  "validation.copy_from.noMatchingVariable": "Source for {0} not found"
 }
