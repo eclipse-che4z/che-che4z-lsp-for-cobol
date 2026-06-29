@@ -12,14 +12,12 @@
  *   Broadcom - initial API and implementation
  */
 
-import { Interval } from "antlr4ng";
 import {
   CopybookContentVisitor,
   CopybookVisitor,
   DaCoVisitor,
   NameResolver,
   VariableAccumulator,
-  VariableDescriptor,
 } from "../../../engine/parsing";
 import { MessageService } from "../../../engine/services/MessageService";
 
