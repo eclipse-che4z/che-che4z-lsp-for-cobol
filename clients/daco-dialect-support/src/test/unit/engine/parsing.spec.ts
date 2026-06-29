@@ -17,7 +17,9 @@ import {
   CopybookVisitor,
   DaCoVisitor,
   NameResolver,
+  VariableAccumulator,
 } from "../../../engine/parsing";
+import { MessageService } from "../../../engine/services/MessageService";
 
 describe("parsing test", () => {
   beforeEach(() => {
@@ -25,7 +27,10 @@ describe("parsing test", () => {
   });
 
   it("should fallback when layoutId is missing", () => {
-    const visitor = new CopybookVisitor();
+    const visitor = new CopybookVisitor(
+      new VariableAccumulator(),
+      createMessageService(),
+    );
 
     const ctx = {
       layoutId: () => null,
@@ -38,7 +43,10 @@ describe("parsing test", () => {
   });
 
   it("should fallback when DACO_COPYBOOK_IDENTIFIER is missing", () => {
-    const visitor = new CopybookVisitor();
+    const visitor = new CopybookVisitor(
+      new VariableAccumulator(),
+      createMessageService(),
+    );
 
     const ctx = {
       DACO_COPYBOOK_IDENTIFIER: () => null,
@@ -70,17 +78,24 @@ describe("parsing test", () => {
     expect(result).toEqual([]);
   });
 
-  it("should skip when dataName is missing", () => {
+  it("should add variable redefine descriptor", () => {
     const visitor = new CopybookContentVisitor();
 
+    const dataName = {
+      getText: () => "ENTRY TEXT",
+      start: { line: 1, column: 0, start: 0 },
+      stop: { line: 1, column: 1, start: 0, stop: 1 },
+    };
+
     const ctx = {
-      dataName: () => null,
+      dataName: () => dataName,
       getChildCount: () => 0,
       getChild: () => null,
     } as any;
 
     const result = visitor.visitDataRedefinesClause(ctx);
-    expect(result).toEqual([]);
+    expect(result.length).toEqual(1);
+    expect(result[0].type).toEqual("REDEFINITION");
   });
 
   it("should construct range for the context", () => {
@@ -186,3 +201,10 @@ describe("name resolver test", () => {
     expect(result).toBe("TEST3-2");
   });
 });
+
+function createMessageService() {
+  return new MessageService({
+    "validation.layout_identifier": "Invalid layout identifier",
+    "validation.layout_usage": "Invalid layout usage",
+  });
+}

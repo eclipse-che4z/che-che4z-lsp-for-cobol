@@ -59,8 +59,8 @@ describe("DaCoPreprocessor test", () => {
     jest.clearAllMocks();
   });
 
-  it("should report a diagnostic for mismatched layout identifier", () => {
-    preprocessor.execute(
+  it("should report a diagnostic for mismatched layout identifier", async () => {
+    await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
       HEADER_0 +
@@ -81,8 +81,8 @@ describe("DaCoPreprocessor test", () => {
     );
   });
 
-  it("should report a diagnostic for mismatched layout usage", () => {
-    preprocessor.execute(
+  it("should report a diagnostic for mismatched layout usage", async () => {
+    await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
       HEADER_0 + "          COPY MAID TEST-A12 SUFFIX.",
@@ -100,8 +100,8 @@ describe("DaCoPreprocessor test", () => {
     );
   });
 
-  it("should resolve copybook reference", () => {
-    preprocessor.execute(
+  it("should resolve copybook reference", async () => {
+    await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
       HEADER_0 +
@@ -123,8 +123,8 @@ describe("DaCoPreprocessor test", () => {
     );
   });
 
-  it("should resolve copybook reference with suffix", () => {
-    preprocessor.execute(
+  it("should resolve copybook reference with suffix", async () => {
+    await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
       HEADER_0 +
@@ -192,6 +192,34 @@ describe("DaCoPreprocessor test", () => {
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.replaceWithMap).toHaveBeenCalled();
+  });
+
+  it("should replace D-B with spaces", async () => {
+    await preprocessor.execute(
+      context,
+      Uri.parse("file:///test.cbl"),
+      HEADER_1 + "       D-B\n",
+    );
+
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.replace).toHaveBeenCalled();
+  });
+
+  it("should replace COPY-FROM statement", async () => {
+    await preprocessor.execute(
+      context,
+      Uri.parse("file:///test.cbl"),
+      HEADER_0 +
+        "       01 AREA-XW4.\n" +
+        "           03 TBLOPT-XW4.\n" +
+        "               07 TBLCRI-XW4.\r\n" +
+        "                 09 RUSCRI-BW4       PIC S9(2)   VALUE ZERO  COMP.\n" +
+        "                 09 ROWCRI-XW4                   OCCURS 40.\n" +
+        "       01 AREA-XW5.\n" +
+        "           05 TBLCRI-XW6  COPY-FROM W4.\n",
+    );
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.replace).toHaveBeenCalled();
   });
 });
 
