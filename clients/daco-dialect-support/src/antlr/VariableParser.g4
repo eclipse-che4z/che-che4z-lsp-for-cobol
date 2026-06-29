@@ -35,22 +35,22 @@ dataDescriptionEntry
    ;
 
 dataDescriptionEntryFormat1
-    : levelNumber entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
-    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
-    | dataOccursClause | dataSignClause | dataSynchronizedClause
-    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+    : levelNumber entryName? variableOptionEntry
     DOT_FS
     ;
+
+variableOptionEntry 
+    :(dataGroupUsageClause | dataRedefinesClause | dataExternalClause
+    | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
+    | dataOccursClause | dataSignClause | dataSynchronizedClause
+    | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*;
 
 dataDescriptionEntryFormat2
     : LEVEL_NUMBER_66 entryName? dataRenamesClause DOT_FS
     ;
 
 dataDescriptionEntryFormat1Level77
-    : LEVEL_NUMBER_77 entryName? (dataGroupUsageClause | dataRedefinesClause | dataExternalClause
-      | dataGlobalClause | dataPictureClause | dataUsageClause | dataValueClause
-      | dataOccursClause | dataSignClause | dataSynchronizedClause
-      | dataJustifiedClause | dataBlankWhenZeroClause | dataDynamicLengthClause | dataVolatileClause)*
+    : LEVEL_NUMBER_77 entryName? variableOptionEntry
       DOT_FS
     ;
 
