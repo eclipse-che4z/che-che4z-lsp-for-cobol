@@ -131,10 +131,7 @@ describe("parsing test", () => {
     } as any;
 
     const result = visitor.visitVariableEntry(ctx);
-    expect(accumulator.descriptors.length).toEqual(1);
-    expect((accumulator.descriptors[0] as VariableDescriptor).type).toEqual(
-      "COPY-FROM",
-    );
+    expect(accumulator.descriptors).toMatchObject([{ type: "COPY-FROM" }]);
   });
 
   it("should construct range for the context", () => {
