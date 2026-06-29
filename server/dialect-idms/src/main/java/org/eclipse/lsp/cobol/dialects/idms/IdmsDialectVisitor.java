@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.model.Locality;
+import org.eclipse.lsp.cobol.dialects.idms.IdmsParser.SchemaSectionContext;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 
@@ -40,6 +41,7 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
     private boolean recordsManualExists;
     private String recordsWithinPlacement;
     private boolean mapSectionExists;
+    private boolean schemaSectionPresent;
   }
 
   private final DialectProcessingContext context;
@@ -79,6 +81,12 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
   }
 
   @Override
+  public List<IdmsCopybookDescriptor> visitSchemaSection(SchemaSectionContext ctx) {
+    recordsDescriptor.setSchemaSectionPresent(true);
+    return visitChildren(ctx);
+  }
+
+  @Override
   public List<IdmsCopybookDescriptor> visitMapSection(IdmsParser.MapSectionContext ctx) {
     recordsDescriptor.setMapSectionExists(true);
     return visitChildren(ctx);
@@ -114,7 +122,9 @@ class IdmsDialectVisitor extends IdmsParserBaseVisitor<List<IdmsCopybookDescript
     for (int i = 0; i < lines.length; i++) {
       Matcher matcher = pattern.matcher(lines[i]);
       if (matcher.find()) {
-        result.add(createDescriptor(i, SUBSCHEMA_COPY, matcher.start(), matcher.end()));
+        if (recordsDescriptor.isSchemaSectionPresent()) {
+          result.add(createDescriptor(i, SUBSCHEMA_COPY, matcher.start(), matcher.end()));
+        }
         if (recordsDescriptor.isMapSectionExists()) {
           result.add(createDescriptor(i, MAPS_COPY, matcher.start(), matcher.end()));
         }

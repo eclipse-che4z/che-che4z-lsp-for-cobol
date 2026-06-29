@@ -103,6 +103,12 @@ class TestIdmsCopy {
           + "        WORKING-STORAGE SECTION.\n"
           + "             01 COPY IDMS {~SUBSCHEMA-NAMES!IDMS}.\n";
 
+  private static final String SUBSCHEMA_NAMES_ONLY_WITH_SCHEMA =
+      "        IDENTIFICATION DIVISION. \n"
+          + "        PROGRAM-ID. test1.\n"
+          + "        DATA DIVISION.\n"
+          + "        WORKING-STORAGE SECTION.\n";
+
   private static final String COPY_IDMS_LEVELS =
       "       WORKING-STORAGE SECTION.\n" + "         01 COPY IDMS {~EMPLOYEE!IDMS} VERSION 03.\n";
 
@@ -197,6 +203,16 @@ class TestIdmsCopy {
     UseCaseEngine.runTest(
         COPY_IDMS_SUBSCHEMA_NAMES,
         ImmutableList.of(new CobolText("SUBSCHEMA-NAMES", IdmsDialect.NAME, "")),
+        ImmutableMap.of(),
+        ImmutableList.of(),
+        DialectConfigs.getIDMSAnalysisConfig());
+  }
+
+  @Test
+  void testIdmsCopySubschemaNamesWithSectionOnly() {
+    UseCaseEngine.runTest(
+        SUBSCHEMA_NAMES_ONLY_WITH_SCHEMA,
+        ImmutableList.of(),
         ImmutableMap.of(),
         ImmutableList.of(),
         DialectConfigs.getIDMSAnalysisConfig());
