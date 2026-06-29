@@ -19,6 +19,7 @@ import {
   Recognizer,
   ATNSimulator,
   ParserRuleContext,
+  Interval,
 } from "antlr4ng";
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
@@ -38,6 +39,7 @@ import {
   QualifiedDataNameContext,
   VariableUsageNameContext,
 } from "../generated/DaCoParser";
+import { MessageService } from "./services/MessageService";
 
 const BLANK_STATEMENT = "CONTINUE";
 const BLANK_VALUE = "ZERO";
@@ -61,15 +63,35 @@ export class CopybookDescriptor {
   ) {}
 }
 
-export class VariableDescriptor {
-  constructor(
-    public readonly levelRange: vscode.Range,
-    public readonly level: number,
-    public readonly nameRange: vscode.Range,
-    public readonly name: string,
-    public readonly type: "DEFINITION" | "REDEFINITION" = "DEFINITION",
-  ) {}
-}
+export type RedefinitionVariableDescriptor = {
+  type: "REDEFINITION";
+  nameRange: vscode.Range;
+  name: string;
+};
+
+export type RegularVariableDescriptor = {
+  type: "DEFINITION";
+  levelRange: vscode.Range;
+  level: number;
+  nameRange: vscode.Range;
+  name: string;
+  options: string;
+};
+
+export type CopyFromVariableDescriptor = {
+  type: "COPY-FROM";
+  levelRange: vscode.Range;
+  level: number;
+  nameRange: vscode.Range;
+  name: string;
+  copyFromRange: vscode.Range;
+  suffix: string;
+};
+
+export type VariableDescriptor =
+  | RedefinitionVariableDescriptor
+  | RegularVariableDescriptor
+  | CopyFromVariableDescriptor;
 
 export type DiagnosticMessage = {
   severity: vscode.DiagnosticSeverity;
@@ -162,10 +184,87 @@ export class NameResolver {
   }
 }
 
+export class VariableAccumulator {
+  private readonly descriptors: (VariableDescriptor | CopybookDescriptor)[] =
+    [];
+  private readonly copybookDescriptors: Map<
+    CopybookDescriptor,
+    VariableDescriptor[]
+  > = new Map();
+
+  public generateDescriptors(): VariableDescriptor[] {
+    const result: VariableDescriptor[] = [];
+
+    for (const descriptor of this.descriptors) {
+      if (descriptor instanceof CopybookDescriptor) {
+        result.push(...(this.copybookDescriptors.get(descriptor) ?? []));
+      } else {
+        result.push(descriptor);
+      }
+    }
+
+    return result;
+  }
+
+  public add(descriptor: VariableDescriptor) {
+    this.descriptors.push(descriptor);
+  }
+
+  public addCopybookPlaceholder(descriptor: CopybookDescriptor) {
+    this.descriptors.push(descriptor);
+  }
+
+  public insertCopybookVariables(
+    descriptor: CopybookDescriptor,
+    variables: VariableDescriptor[],
+  ) {
+    this.copybookDescriptors.set(descriptor, variables);
+  }
+}
+
+type CopyFromOptions =
+  | { kind: "COPY_FROM"; suffix: string }
+  | { kind: "REGULAR_OPTIONS"; options: string };
+
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
   private readonly parentNameResolver: NameResolver = new NameResolver();
+
+  public constructor(
+    public accumulator: VariableAccumulator,
+    private readonly messageService: MessageService,
+  ) {
+    super();
+  }
+
+  private parseCopyFromOptions(options: string): CopyFromOptions {
+    const trimmed = options.trim();
+
+    const match = /^COPY-FROM\s+([A-Z0-9]+)$/i.exec(trimmed);
+
+    if (!match) {
+      return {
+        kind: "REGULAR_OPTIONS",
+        options,
+      };
+    }
+
+    const suffix = match[1].toUpperCase();
+
+    if (!/^[A-Z0-9]{2}$/.test(suffix)) {
+      const message = this.messageService.get(
+        "validation.copy_from_suffix",
+        suffix,
+      );
+      throw new Error(message);
+    }
+
+    return {
+      kind: "COPY_FROM",
+      suffix,
+    };
+  }
 
   visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
     const layoutId = ctx.layoutId();
@@ -183,17 +282,17 @@ export class CopybookVisitor extends CopybookParserVisitor<
     const statementRange = constructRange(ctx);
     const nameRange = constructRange(layoutId);
 
-    return [
-      new CopybookDescriptor(
-        statementRange,
-        nameRange,
-        level,
-        name,
-        suffix,
-        this.parentNameResolver.getParentName(level),
-      ),
-      ...(super.visitChildren(ctx) ?? []),
-    ];
+    const descriptor = new CopybookDescriptor(
+      statementRange,
+      nameRange,
+      level,
+      name,
+      suffix,
+      this.parentNameResolver.getParentName(level),
+    );
+    this.accumulator.addCopybookPlaceholder(descriptor);
+
+    return [descriptor, ...(super.visitChildren(ctx) ?? [])];
   };
 
   visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
@@ -202,6 +301,42 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
     if (newName) {
       this.parentNameResolver.pushName(level, newName);
+
+      const optionsText = createOptionsStr(ctx.variableOptionEntry());
+      const parsed = this.parseCopyFromOptions(optionsText);
+
+      const nameRange = constructRangeFromTokens(
+        ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
+        ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
+      );
+
+      if (parsed.kind === "COPY_FROM") {
+        const copyFromRange = constructRange(ctx.variableOptionEntry());
+        this.accumulator.add({
+          levelRange: constructRangeFromTokens(
+            ctx.LEVEL_NUMBER().getSymbol(),
+            ctx.LEVEL_NUMBER().getSymbol(),
+          ),
+          level: level,
+          copyFromRange: copyFromRange,
+          nameRange: nameRange,
+          name: newName,
+          suffix: parsed.suffix,
+          type: "COPY-FROM",
+        });
+      } else {
+        this.accumulator.add({
+          levelRange: constructRangeFromTokens(
+            ctx.LEVEL_NUMBER().getSymbol(),
+            ctx.LEVEL_NUMBER().getSymbol(),
+          ),
+          level: level,
+          nameRange: nameRange,
+          name: newName,
+          type: "DEFINITION",
+          options: optionsText,
+        });
+      }
     }
     return super.visitChildren(ctx) ?? [];
   };
@@ -226,7 +361,14 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     const nameRange = constructRange(entryName);
 
     return [
-      new VariableDescriptor(levelRange, level, nameRange, name),
+      {
+        levelRange: levelRange,
+        level: level,
+        nameRange: nameRange,
+        name: name,
+        type: "DEFINITION",
+        options: createOptionsStr(ctx.variableOptionEntry()),
+      },
       ...(super.visitChildren(ctx) ?? []),
     ];
   };
@@ -239,13 +381,11 @@ export class CopybookContentVisitor extends VariableParserVisitor<
     if (redefinitionName) {
       const nameRange = constructRange(redefinitionName);
       return [
-        new VariableDescriptor(
-          nameRange,
-          0,
-          nameRange,
-          redefinitionName.getText(),
-          "REDEFINITION",
-        ),
+        {
+          nameRange: nameRange,
+          name: redefinitionName.getText(),
+          type: "REDEFINITION",
+        },
         ...(super.visitChildren(ctx) ?? []),
       ];
     }
@@ -358,16 +498,24 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
   protected aggregateResult = concatResults;
 }
 
-function constructRange(ctx: ParserRuleContext): vscode.Range {
-  const start = ctx.start!;
-  const stop = ctx.stop;
+function constructRange(
+  ctx: ParserRuleContext | null | undefined,
+): vscode.Range {
+  const start = ctx?.start;
+  const stop = ctx?.stop;
   return constructRangeFromTokens(start, stop);
 }
 
 function constructRangeFromTokens(
-  start: Token,
-  stop: Token | null,
+  start: Token | null | undefined,
+  stop: Token | null | undefined,
 ): vscode.Range {
+  if (!start) {
+    return new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(0, 0),
+    );
+  }
   const startPosition = new vscode.Position(start.line - 1, start.column);
   const stopPosition =
     stop == null || start.start > stop.stop
@@ -377,4 +525,20 @@ function constructRangeFromTokens(
           stop.column + stop.stop - stop.start + 1,
         );
   return new vscode.Range(startPosition, stopPosition);
+}
+
+function createOptionsStr(ctx: ParserRuleContext | null): string {
+  if (!ctx) {
+    return "";
+  }
+  const start = ctx.start?.start;
+  const stop = ctx.stop?.stop;
+
+  if (start && stop) {
+    return (
+      ctx.start?.inputStream?.getTextFromInterval(Interval.of(start!, stop!)) ??
+      ""
+    );
+  }
+  return "";
 }

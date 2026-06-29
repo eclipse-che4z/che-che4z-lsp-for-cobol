@@ -8,5 +8,8 @@
   "parsers.startsWith": "String must starts with {0} values",
   "parsers.stringLengthRange": "String length must be between {0} and {1}",
   "parsers.allowedStringValues": "Only allowed value(s): {0}",
-  "parsers.deprecated": "The code block is deprecated and not supported"
+  "parsers.deprecated": "The code block is deprecated and not supported",
+  "validation.copy_from_suffix": "COPY-FROM suffix must contain 2 characters",
+  "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
+  "validation.copy_from.noMatchingVariable": "Source for {0} not found"
 }
