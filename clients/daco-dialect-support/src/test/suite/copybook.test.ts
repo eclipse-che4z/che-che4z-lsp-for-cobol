@@ -223,7 +223,7 @@ suite("Copybook Test Suite", function () {
     helper.checkDiagnostic(
       diagnostics,
       "Variable NOT_EXISTING is not defined",
-      range(pos(11, 19), pos(11, 31)),
+      range(pos(12, 19), pos(12, 31)),
     );
   });
 
@@ -236,7 +236,7 @@ suite("Copybook Test Suite", function () {
     helper.checkDiagnostic(
       diagnostics,
       "Variable NOT_EXISTING is not defined",
-      range(pos(14, 19), pos(14, 31)),
+      range(pos(16, 19), pos(16, 31)),
     );
   });
 });

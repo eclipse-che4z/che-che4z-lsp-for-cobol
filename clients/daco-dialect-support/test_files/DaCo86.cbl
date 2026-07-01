@@ -9,5 +9,6 @@
         01 PARENT-XN1.
             05 COPY MAID DACO06-XBG WRK.
        PROCEDURE DIVISION.
+           DISPLAY BHTRGL-XN1.
            DISPLAY NOT_EXISTING. 
       
