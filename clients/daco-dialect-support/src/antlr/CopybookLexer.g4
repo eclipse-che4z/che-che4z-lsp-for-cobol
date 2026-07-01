@@ -19,6 +19,7 @@ import TechnicalLexer;
 
 WORKING_STORAGE : W O R K I N G MINUSCHAR S T O R A G E;
 SECTION : S E C T I O N;
+LINKAGE : L I N K A G E;
 
 COPY                 : C O P Y ;
 MAID                 : M A I D ;
