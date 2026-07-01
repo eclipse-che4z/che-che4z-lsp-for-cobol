@@ -14,6 +14,7 @@
 import * as assert from "node:assert";
 import * as helper from "./testHelper";
 import { pos, range } from "./testHelper";
+import { DiagnosticSeverity } from "vscode";
 
 suite("COPY-FROM statement Test Suite", function () {
   this.timeout(helper.TEST_TIMEOUT);
@@ -36,7 +37,14 @@ suite("COPY-FROM statement Test Suite", function () {
     const editor = await helper.showDocument("DaCo74.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics.length, 2);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+      range(pos(11, 7), pos(11, 29)),
+      DiagnosticSeverity.Warning,
+    );
 
     helper.checkDiagnostic(
       diagnostics,
@@ -49,7 +57,14 @@ suite("COPY-FROM statement Test Suite", function () {
     const editor = await helper.showDocument("DaCo75.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics.length, 2);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+      range(pos(10, 7), pos(10, 29)),
+      DiagnosticSeverity.Warning,
+    );
 
     helper.checkDiagnostic(
       diagnostics,
@@ -62,7 +77,14 @@ suite("COPY-FROM statement Test Suite", function () {
     const editor = await helper.showDocument("DaCo76.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics.length, 2);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+      range(pos(10, 7), pos(10, 29)),
+      DiagnosticSeverity.Warning,
+    );
 
     helper.checkDiagnostic(
       diagnostics,
@@ -107,7 +129,14 @@ suite("COPY-FROM statement Test Suite", function () {
     const editor = await helper.showDocument("DaCo79.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 1);
+    assert.strictEqual(diagnostics.length, 2);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+      range(pos(10, 7), pos(10, 29)),
+      DiagnosticSeverity.Warning,
+    );
 
     helper.checkDiagnostic(
       diagnostics,

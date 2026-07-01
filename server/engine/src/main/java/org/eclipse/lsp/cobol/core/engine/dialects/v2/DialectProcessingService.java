@@ -161,7 +161,7 @@ public class DialectProcessingService {
     for (Diagnostic diagnostic : diagnostics) {
       Location location = document.mapLocation(diagnostic.getRange());
       errorList.add(
-          DialectErrorHelper.dialectError(
+          DialectErrorHelper.dialectDiagnostic(
               Locality.builder()
                   .copybookId(copybookId)
                   .uri(location.getUri())
@@ -169,7 +169,8 @@ public class DialectProcessingService {
                   .build(),
               diagnostic.getMessage(),
               getErrorCode(diagnostic.getCode()),
-              diagnostic.getRelatedInformation()));
+              diagnostic.getRelatedInformation(),
+              diagnostic.getSeverity()));
     }
   }
 
