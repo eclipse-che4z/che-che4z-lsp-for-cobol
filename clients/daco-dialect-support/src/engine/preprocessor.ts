@@ -201,14 +201,31 @@ export class DaCoPreprocessor {
         `Descriptor: ${JSON.stringify(descriptor)}`,
       );
 
-      const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
-      const copybookName =
-        descriptor.name +
-        (descriptor.suffix && !hasWrkSuffix ? `_${descriptor.suffix}` : "");
+      this.validateMissingSuffix(
+        context,
+        descriptor.suffix,
+        descriptor.statementRange,
+      );
+      this.validateInvalidSuffix(
+        context,
+        descriptor.suffix,
+        descriptor.suffixRange,
+      );
 
-      const suffix = hasWrkSuffix
-        ? this.extractSuffix(descriptor.parentName)
-        : undefined;
+      const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
+      let copybookName = descriptor.name;
+      let parentNameSuffix = undefined;
+      if (hasWrkSuffix) {
+        this.validateParentName(
+          context,
+          descriptor.parentName,
+          descriptor.parentNameRange,
+        );
+        parentNameSuffix = this.extractSuffix(descriptor.parentName);
+      } else {
+        copybookName =
+          descriptor.name + (descriptor.suffix ? `_${descriptor.suffix}` : "");
+      }
 
       console.log(`Resolving copybook '${copybookName}'...`);
       this.outputChannel.appendLine(`Resolving copybook '${copybookName}'...`);
@@ -229,9 +246,63 @@ export class DaCoPreprocessor {
           context,
           copybook,
           descriptor.level,
-          suffix,
+          parentNameSuffix,
         );
         accumulator.insertCopybookVariables(descriptor, variables);
+      }
+    }
+  }
+
+  private validateMissingSuffix(
+    context: IDocumentProcessingContext,
+    suffix: string | undefined,
+    statementRange: vscode.Range,
+  ) {
+    if (!suffix) {
+      const message = this.messageService.get(
+        "validation.missing.layout_usage",
+      );
+
+      context.addDiagnostic(
+        new vscode.Diagnostic(
+          statementRange,
+          message,
+          vscode.DiagnosticSeverity.Warning,
+        ),
+      );
+    }
+  }
+
+  private validateInvalidSuffix(
+    context: IDocumentProcessingContext,
+    suffix: string | undefined,
+    suffixRange: vscode.Range | undefined,
+  ) {
+    if (suffix && suffixRange && !/^[A-Z]{3}$/.test(suffix)) {
+      const message = this.messageService.get("validation.layout_usage");
+      context.addDiagnostic(new vscode.Diagnostic(suffixRange, message));
+    }
+  }
+
+  private validateParentName(
+    context: IDocumentProcessingContext,
+    parentName: string | undefined,
+    parentNameRange: vscode.Range | undefined,
+  ) {
+    if (!parentName || !/^[A-Z]+-[A-Z]{2}\d$/.test(parentName)) {
+      const message = this.messageService.get(
+        "validation.copybook.parentName",
+        parentName,
+      );
+
+      if (parentNameRange) {
+        context.addDiagnostic(
+          new vscode.Diagnostic(
+            parentNameRange,
+            message,
+            vscode.DiagnosticSeverity.Error,
+          ),
+        );
       }
     }
   }

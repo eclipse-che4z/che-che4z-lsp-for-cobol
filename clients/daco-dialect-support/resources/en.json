@@ -11,5 +11,7 @@
   "parsers.deprecated": "The code block is deprecated and not supported",
   "validation.copy_from_suffix": "COPY-FROM suffix must contain 2 characters",
   "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
-  "validation.copy_from.noMatchingVariable": "Source for {0} not found"
+  "validation.copy_from.noMatchingVariable": "Source for {0} not found",
+  "validation.missing.layout_usage": "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+  "validation.copybook.parentName": "Parent variable '{0}' must match the pattern <NAME>-XXN"
 }
