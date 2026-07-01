@@ -213,4 +213,30 @@ suite("Copybook Test Suite", function () {
       range(pos(10, 19), pos(10, 31)),
     );
   });
+
+  test("Resolve copybook in LINKAGE SECTION without WORKING-STORAGE", async () => {
+    const editor = await helper.showDocument("DaCo86.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(11, 19), pos(11, 31)),
+    );
+  });
+
+  test("Resolve copybook in both WORKING-STORAGE and LINKAGE SECTION", async () => {
+    const editor = await helper.showDocument("DaCo87.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(14, 19), pos(14, 31)),
+    );
+  });
 });
