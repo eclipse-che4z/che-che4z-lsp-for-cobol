@@ -14,6 +14,7 @@
 import * as assert from "node:assert";
 import * as helper from "./testHelper";
 import { pos, range } from "./testHelper";
+import { DiagnosticSeverity } from "vscode";
 
 suite("DML statements Test Suite", function () {
   this.timeout(helper.TEST_TIMEOUT);
@@ -73,24 +74,28 @@ suite("DML statements Test Suite", function () {
       diagnostics,
       "The code block is deprecated and not supported",
       range(pos(13, 11), pos(13, 47)),
+      DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
       diagnostics,
       "The code block is deprecated and not supported",
       range(pos(14, 11), pos(14, 48)),
+      DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
       diagnostics,
       "The code block is deprecated and not supported",
       range(pos(15, 11), pos(15, 47)),
+      DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
       diagnostics,
       "The code block is deprecated and not supported",
       range(pos(16, 11), pos(16, 48)),
+      DiagnosticSeverity.Warning,
     );
 
     helper.checkDefinition(editor, pos(16, 23), 10);

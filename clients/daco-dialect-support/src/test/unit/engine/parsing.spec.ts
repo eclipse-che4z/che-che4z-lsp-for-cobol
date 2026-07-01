@@ -20,6 +20,7 @@ import {
   VariableAccumulator,
 } from "../../../engine/parsing";
 import { MessageService } from "../../../engine/services/MessageService";
+import { Range } from "./__mocks__/vscode";
 
 describe("parsing test", () => {
   beforeEach(() => {
@@ -180,25 +181,26 @@ describe("parsing test", () => {
 
 describe("name resolver test", () => {
   let nameResolver: NameResolver;
+  const range = new Range(0, 0, 1, 1) as any;
 
   beforeEach(() => {
     nameResolver = new NameResolver();
   });
 
   it("should return undefined when parent name is missing", () => {
-    nameResolver.pushName(1, "TEST");
+    nameResolver.pushName(1, "TEST", range);
     const result = nameResolver.getParentName(1);
     expect(result).toBeUndefined();
   });
 
-  it("should return undefined when parent name is missing", () => {
-    nameResolver.pushName(1, "TEST1");
-    nameResolver.pushName(3, "TEST3");
-    nameResolver.pushName(5, "TEST5");
-    nameResolver.pushName(3, "TEST3-2");
+  it("should return proper parent name", () => {
+    nameResolver.pushName(1, "TEST1", range);
+    nameResolver.pushName(3, "TEST3", range);
+    nameResolver.pushName(5, "TEST5", range);
+    nameResolver.pushName(3, "TEST3-2", range);
 
     const result = nameResolver.getParentName(5);
-    expect(result).toBe("TEST3-2");
+    expect(result).toStrictEqual({ name: "TEST3-2", range });
   });
 });
 
