@@ -16,6 +16,14 @@ import { URI, Utils } from "vscode-uri";
 export const Uri = URI;
 Object.assign(Uri, Utils);
 
+export class Diagnostic {
+  constructor(
+    public range: Range,
+    public message: string,
+    public severity: DiagnosticSeverity = DiagnosticSeverity.Error,
+  ) {}
+}
+
 export class Range {
   public start: Position;
   public end: Position;

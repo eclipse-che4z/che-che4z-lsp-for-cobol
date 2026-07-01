@@ -59,7 +59,9 @@ export class CopybookDescriptor {
     public readonly level: number,
     public readonly name: string,
     public readonly suffix?: string,
+    public readonly suffixRange?: vscode.Range,
     public readonly parentName?: string,
+    public readonly parentNameRange?: vscode.Range,
   ) {}
 }
 
@@ -154,21 +156,27 @@ function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
 }
 
 export class NameResolver {
-  private readonly nameStack: { level: number; name: string }[] = [];
+  private readonly nameStack: {
+    level: number;
+    name: string;
+    range: vscode.Range;
+  }[] = [];
   private lastLevel: number = 0;
 
-  public getParentName(level: number): string | undefined {
+  public getParentName(
+    level: number,
+  ): { name: string; range: vscode.Range } | undefined {
     for (let i = this.nameStack.length - 1; i >= 0; i--) {
       if (this.nameStack[i].level < level) {
-        return this.nameStack[i].name;
+        return { name: this.nameStack[i].name, range: this.nameStack[i].range };
       }
     }
     return undefined;
   }
 
-  public pushName(level: number, name: string) {
+  public pushName(level: number, name: string, range: vscode.Range) {
     if (this.lastLevel < level) {
-      this.nameStack.push({ level, name });
+      this.nameStack.push({ level, name, range });
       this.lastLevel = level;
     } else {
       // Pop all names with level greater than or equal to the current level
@@ -178,7 +186,7 @@ export class NameResolver {
       ) {
         this.nameStack.pop();
       }
-      this.nameStack.push({ level, name });
+      this.nameStack.push({ level, name, range });
       this.lastLevel = level;
     }
   }
@@ -282,13 +290,16 @@ export class CopybookVisitor extends CopybookParserVisitor<
     const statementRange = constructRange(ctx);
     const nameRange = constructRange(layoutId);
 
+    const parentInfo = this.parentNameResolver.getParentName(level);
     const descriptor = new CopybookDescriptor(
       statementRange,
       nameRange,
       level,
       name,
       suffix,
-      this.parentNameResolver.getParentName(level),
+      layoutUsage ? constructRange(layoutUsage) : undefined,
+      parentInfo?.name,
+      parentInfo?.range,
     );
     this.accumulator.addCopybookPlaceholder(descriptor);
 
@@ -300,15 +311,15 @@ export class CopybookVisitor extends CopybookParserVisitor<
     const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
 
     if (newName) {
-      this.parentNameResolver.pushName(level, newName);
-
-      const optionsText = createOptionsStr(ctx.variableOptionEntry());
-      const parsed = this.parseCopyFromOptions(optionsText);
-
       const nameRange = constructRangeFromTokens(
         ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
         ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
       );
+
+      this.parentNameResolver.pushName(level, newName, nameRange);
+
+      const optionsText = createOptionsStr(ctx.variableOptionEntry());
+      const parsed = this.parseCopyFromOptions(optionsText);
 
       if (parsed.kind === "COPY_FROM") {
         const copyFromRange = constructRange(ctx.variableOptionEntry());

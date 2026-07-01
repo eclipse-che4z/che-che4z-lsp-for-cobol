@@ -306,9 +306,15 @@ export function checkDiagnostic(
   diagnostics: vscode.Diagnostic[],
   message: string,
   range: vscode.Range,
+  severity: vscode.DiagnosticSeverity = vscode.DiagnosticSeverity.Error,
 ) {
   assert.ok(
-    diagnostics.some((d) => d.message === message && d.range.isEqual(range)),
+    diagnostics.some(
+      (d) =>
+        d.message === message &&
+        d.range.isEqual(range) &&
+        d.severity == severity,
+    ),
     `Expected '${message}' not found at range ${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`,
   );
 }
