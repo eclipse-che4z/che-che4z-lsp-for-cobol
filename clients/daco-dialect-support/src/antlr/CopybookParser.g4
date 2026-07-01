@@ -20,15 +20,18 @@ import { MessageServiceParser } from "../antlr/MessageServiceParser";
 }
 
 startRule
-   : skipUntilWS workingStorageBody EOF
+   : skipUntilFirstSection
+     dataSection*
+     EOF
    ;
 
-skipUntilWS
-   : (~WORKING_STORAGE)* (WORKING_STORAGE SECTION DOT_FS)?
+skipUntilFirstSection
+   : (~(WORKING_STORAGE | LINKAGE))*
    ;
 
-workingStorageBody
-   : dataDescriptionEntry*
+dataSection
+   : WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
+   | LINKAGE SECTION DOT_FS dataDescriptionEntry*
    ;
 
 dataDescriptionEntry
