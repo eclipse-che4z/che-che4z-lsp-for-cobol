@@ -77,11 +77,13 @@ type CopybookPayload = {
   diagnostics: DiagnosticPayload[];
 };
 
+type ServerDiagnosticSeverity = "Error" | "Warning" | "Information" | "Hint";
+
 type DiagnosticPayload = {
   message: string;
   range: RangePayload;
   relatedInformation: RelatedInformationPayload[] | undefined;
-  severity: number;
+  severity: ServerDiagnosticSeverity;
   source: string | undefined;
   tags: number[];
   code: string | undefined;
@@ -352,11 +354,26 @@ function serializeDiagnostics(d: vscode.Diagnostic): DiagnosticPayload {
     message: d.message,
     range: serializeRange(d.range),
     relatedInformation: serializeRelatedInformation(d.relatedInformation),
-    severity: d.severity,
+    severity: toServerSeverity(d.severity),
     source: d.source,
     tags: d.tags || [],
     code: code,
   };
+}
+
+function toServerSeverity(
+  severity: vscode.DiagnosticSeverity,
+): ServerDiagnosticSeverity {
+  switch (severity) {
+    case vscode.DiagnosticSeverity.Error:
+      return "Error";
+    case vscode.DiagnosticSeverity.Warning:
+      return "Warning";
+    case vscode.DiagnosticSeverity.Information:
+      return "Information";
+    case vscode.DiagnosticSeverity.Hint:
+      return "Hint";
+  }
 }
 
 function serializeRelatedInformation(

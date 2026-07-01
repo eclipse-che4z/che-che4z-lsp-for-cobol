@@ -105,16 +105,16 @@ describe("DaCoPreprocessor test", () => {
       context,
       Uri.parse("file:///test.cbl"),
       HEADER_0 +
-        "          01 COPY MAID NAME.\n" +
+        "          01 COPY MAID NAME OTP.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
     );
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.resolveCopybook).toHaveBeenCalledWith(
-      "NAME",
+      "NAME_OTP",
       expect.objectContaining({
         start: expect.objectContaining({ line: 8, character: 10 }),
-        end: expect.objectContaining({ line: 8, character: 28 }),
+        end: expect.objectContaining({ line: 8, character: 32 }),
       }),
       expect.objectContaining({
         start: expect.objectContaining({ line: 8, character: 23 }),
@@ -152,17 +152,17 @@ describe("DaCoPreprocessor test", () => {
       context,
       Uri.parse("file:///test.cbl"),
       HEADER_0 +
-        "          01 COPY MAID NAME.\n" +
+        "          01 COPY MAID NAME OTP.\n" +
         "          PROCEDURE DIVISION.\n" +
         "              DISPLAY ABC.\n",
     );
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.resolveCopybook).toHaveBeenCalledWith(
-      "NAME",
+      "NAME_OTP",
       expect.objectContaining({
         start: expect.objectContaining({ line: 8, character: 10 }),
-        end: expect.objectContaining({ line: 8, character: 28 }),
+        end: expect.objectContaining({ line: 8, character: 32 }),
       }),
       expect.objectContaining({
         start: expect.objectContaining({ line: 8, character: 23 }),
@@ -227,5 +227,7 @@ function createMessageService() {
   return new MessageService({
     "validation.layout_identifier": "Invalid layout identifier",
     "validation.layout_usage": "Invalid layout usage",
+    "validation.missing.layout_usage":
+      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
   });
 }
