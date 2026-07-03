@@ -24,6 +24,7 @@ import {
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
   CopyMaidContext,
+  SkipCopyMaidContext,
   VariableEntryContext,
 } from "../generated/CopybookParser";
 import { VariableParserVisitor } from "../generated/VariableParserVisitor";
@@ -63,6 +64,12 @@ export class CopybookDescriptor {
     public readonly parentName?: string,
     public readonly parentNameRange?: vscode.Range,
   ) {}
+}
+
+export class CopybookDescriptorPD extends CopybookDescriptor {
+  constructor(statementRange: vscode.Range) {
+    super(statementRange, statementRange, 0, "");
+  }
 }
 
 export type RedefinitionVariableDescriptor = {
@@ -350,6 +357,10 @@ export class CopybookVisitor extends CopybookParserVisitor<
       }
     }
     return super.visitChildren(ctx) ?? [];
+  };
+
+  visitSkipCopyMaid = (ctx: SkipCopyMaidContext): CopybookDescriptor[] => {
+    return [new CopybookDescriptorPD(constructRange(ctx))];
   };
 
   protected aggregateResult = concatResults;
