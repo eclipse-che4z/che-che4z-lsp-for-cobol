@@ -24,7 +24,7 @@ import {
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
   CopyMaidContext,
-  CopyMaidProcedureDivisionContext,
+  SkipCopyMaidContext,
   VariableEntryContext,
 } from "../generated/CopybookParser";
 import { VariableParserVisitor } from "../generated/VariableParserVisitor";
@@ -359,9 +359,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
     return super.visitChildren(ctx) ?? [];
   };
 
-  visitCopyMaidProcedureDivision = (
-    ctx: CopyMaidProcedureDivisionContext,
-  ): CopybookDescriptor[] => {
+  visitSkipCopyMaid = (ctx: SkipCopyMaidContext): CopybookDescriptor[] => {
     return [new CopybookDescriptorPD(constructRange(ctx))];
   };
 

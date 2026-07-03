@@ -30,12 +30,12 @@ procedureDivision
    : PROCEDURE DIVISION DOT_FS procedureDivisionItem*;
 
 procedureDivisionItem
-   : copyMaidProcedureDivision
+   : skipCopyMaid
    | procedureSection
    | .
    ;
 
-copyMaidProcedureDivision
+skipCopyMaid
    : copyMaid
    ;
 
