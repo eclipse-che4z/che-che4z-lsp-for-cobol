@@ -221,6 +221,23 @@ describe("DaCoPreprocessor test", () => {
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.replace).toHaveBeenCalled();
   });
+
+  it("should report an error for COPY-FROM statement with invalid source suffix", async () => {
+    await preprocessor.execute(
+      context,
+      Uri.parse("file:///test.cbl"),
+      HEADER_0 +
+        "       01 AREA-XW4.\n" +
+        "           03 TBLOPT-XW4.\n" +
+        "               07 TBLCRI-XW4.\r\n" +
+        "                 09 RUSCRI-BW4       PIC S9(2)   VALUE ZERO  COMP.\n" +
+        "                 09 ROWCRI-XW4                   OCCURS 40.\n" +
+        "       01 AREA-XW5.\n" +
+        "           05 A COPY-FROM W4.\n",
+    );
+    expect(context.addDiagnostic).toHaveBeenCalled();
+    expect(context.replace).toHaveBeenCalled();
+  });
 });
 
 function createMessageService() {
@@ -229,5 +246,6 @@ function createMessageService() {
     "validation.layout_usage": "Invalid layout usage",
     "validation.missing.layout_usage":
       "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+    "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
   });
 }

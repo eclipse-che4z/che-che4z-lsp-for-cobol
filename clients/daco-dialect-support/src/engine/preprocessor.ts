@@ -25,6 +25,7 @@ import {
   CollectingErrorListener,
   CopybookContentVisitor,
   CopybookDescriptor,
+  CopybookDescriptorPD,
   CopybookVisitor,
   DaCoVisitor,
   ParseError,
@@ -39,7 +40,6 @@ import { MessageService } from "./services/MessageService";
 import { DaCoLexer } from "../generated/DaCoLexer";
 import { DaCoParser } from "../generated/DaCoParser";
 
-const PROC_REGEX = /PROCEDURE\s+DIVISION\.?/i;
 const WRK_SUFFIX = "WRK";
 const FILLER_NAME = "FILLER";
 
@@ -140,19 +140,7 @@ export class DaCoPreprocessor {
     text: string,
     accumulator: VariableAccumulator,
   ): CopybookDescriptor[] {
-    const procMatch = PROC_REGEX.exec(text);
-
-    const end =
-      procMatch?.index !== undefined && procMatch.index > 0
-        ? procMatch.index
-        : text.length;
-
-    const sliced = text.slice(0, end);
-    const charStream = antlr.CharStream.fromString(sliced);
-
-    this.outputChannel.appendLine(
-      `Starting preprocessing. Procedure division starts at index ${end}. Processing text:\n${sliced}`,
-    );
+    const charStream = antlr.CharStream.fromString(text);
 
     const lexer = new CopybookLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
@@ -200,6 +188,11 @@ export class DaCoPreprocessor {
       this.outputChannel.appendLine(
         `Descriptor: ${JSON.stringify(descriptor)}`,
       );
+
+      if (descriptor instanceof CopybookDescriptorPD) {
+        context.replace(descriptor.nameRange, "");
+        continue;
+      }
 
       this.validateMissingSuffix(
         context,

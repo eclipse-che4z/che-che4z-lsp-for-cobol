@@ -22,7 +22,29 @@ import { MessageServiceParser } from "../antlr/MessageServiceParser";
 startRule
    : skipUntilFirstSection
      dataSection*
+     procedureDivision?
      EOF
+   ;
+
+procedureDivision
+   : PROCEDURE DIVISION DOT_FS procedureDivisionItem*;
+
+procedureDivisionItem
+   : skipCopyMaid
+   | procedureSection
+   | .
+   ;
+
+skipCopyMaid
+   : copyMaid
+   ;
+
+procedureSection
+   : sectionName SECTION DOT_FS
+   ;
+
+sectionName
+   : IDENTIFIER
    ;
 
 skipUntilFirstSection
