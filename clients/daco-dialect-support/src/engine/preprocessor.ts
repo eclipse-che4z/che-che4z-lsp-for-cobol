@@ -27,19 +27,17 @@ import {
 import { MessageService } from "./services/MessageService";
 import { DaCoLexer } from "../generated/DaCoLexer";
 import { DaCoParser } from "../generated/DaCoParser";
-import { CopyFromPreprocessor } from "./copyfrom";
+import { processCopyFrom } from "./copyfrom";
 import { CopybookPreprocessor } from "./copybook";
 import { addParsingErrors } from "./util";
 
 export class DaCoPreprocessor {
-  private readonly copyFromPreprocessor: CopyFromPreprocessor;
   private readonly copybookPreprocessor: CopybookPreprocessor;
 
   constructor(
     private readonly outputChannel: vscode.OutputChannel,
     private readonly messageService: MessageService,
   ) {
-    this.copyFromPreprocessor = new CopyFromPreprocessor(this.messageService);
     this.copybookPreprocessor = new CopybookPreprocessor(
       this.messageService,
       outputChannel,
@@ -56,7 +54,7 @@ export class DaCoPreprocessor {
       context,
       text,
     );
-    this.copyFromPreprocessor.execute(context, variableDescriptors);
+    processCopyFrom(context, variableDescriptors, this.messageService);
 
     const statementDescriptors = this.collectStatementsDescriptors(
       context,
