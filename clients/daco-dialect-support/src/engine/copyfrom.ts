@@ -36,18 +36,22 @@ export class CopyFromPreprocessor {
         let replacementText = " ";
         if (copyFromVariables.length > 0) {
           replacementText = copyFromVariables[0].options;
-          const suffix = this.extractSuffixWithValidation(
-            context,
-            variableDescriptor.name,
-            variableDescriptor.nameRange,
-          );
-          if (suffix) {
+          const suffix = extractSuffix(variableDescriptor.name);
+          if (suffix.length === 2) {
             copyFromVariables.slice(1).forEach((v) => {
               const updatedName = updateVariableName(v.name, suffix);
               replacementText += `.\n        ${v.level
                 .toString()
                 .padStart(2, "0")} ${updatedName} ${v.options}`;
             });
+          } else {
+            context.addDiagnostic(
+              new vscode.Diagnostic(
+                variableDescriptor.nameRange,
+                this.messageService.get("validation.copy_from.retrieve.suffix"),
+                vscode.DiagnosticSeverity.Error,
+              ),
+            );
           }
         } else {
           context.addDiagnostic(
