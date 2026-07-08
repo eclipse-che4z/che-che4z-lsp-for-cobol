@@ -1,0 +1,17 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    TEST1.
+       ENVIRONMENT DIVISION.
+       IDMS-CONTROL SECTION.
+           PROTOCOL. MODE ABC.
+           IDMS-RECORDS MANUAL
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+           01 COPY MAID DACO01-A12 WRK.
+       PROCEDURE DIVISION.
+010100 S010 SECTION.
+010300 S010-000.
+010400     MOVE ABC            TO ABC
+010700     COPY MAID PMOREC                                               I3000
+010900     CONTINUE.                                                      P005A0
+011000 S010-999.
+           DISPLAY NOT_EXISTING.
