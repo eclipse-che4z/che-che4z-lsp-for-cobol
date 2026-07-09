@@ -98,14 +98,9 @@ function generateReplacementText(
     const definition = variables[j];
     if (definition.type === "DEFINITION") {
       let options = definition.options;
-      if (
-        j < variables.length - 1 &&
-        variables[j + 1].type === "REDEFINITION"
-      ) {
-        options = ` REDEFINES ${updateVariableName(
-          variables[j + 1].name,
-          suffix,
-        )}`;
+      const next = variables[j + 1];
+      if (next?.type === "REDEFINITION") {
+        options = ` REDEFINES ${updateVariableName(next.name, suffix)}`;
       }
       const updatedName = updateVariableName(definition.name, suffix);
       replacementText += `.\n        ${(definition.level - delta)
