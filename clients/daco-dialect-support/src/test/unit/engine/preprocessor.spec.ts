@@ -14,7 +14,7 @@
 
 import { Uri, DiagnosticSeverity } from "vscode";
 import { DaCoPreprocessor } from "../../../engine/preprocessor";
-import { MessageService } from "../../../engine/services/MessageService";
+import { createMessageService } from "./utils";
 
 describe("DaCoPreprocessor test", () => {
   const HEADER_0 =
@@ -239,13 +239,3 @@ describe("DaCoPreprocessor test", () => {
     expect(context.replace).toHaveBeenCalled();
   });
 });
-
-function createMessageService() {
-  return new MessageService({
-    "validation.layout_identifier": "Invalid layout identifier",
-    "validation.layout_usage": "Invalid layout usage",
-    "validation.missing.layout_usage":
-      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
-    "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
-  });
-}

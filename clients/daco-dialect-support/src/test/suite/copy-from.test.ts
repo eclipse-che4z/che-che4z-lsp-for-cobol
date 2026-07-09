@@ -196,4 +196,17 @@ suite("COPY-FROM statement Test Suite", function () {
       range(pos(10, 19), pos(10, 31)),
     );
   });
+
+  test("Process COPY-FROM with redefines variables", async () => {
+    const editor = await helper.showDocument("DaCo89.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(38, 19), pos(38, 31)),
+    );
+  });
 });
