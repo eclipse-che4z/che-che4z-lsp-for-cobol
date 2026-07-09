@@ -158,7 +158,6 @@ function generateVariableArray(
   end: number,
 ) {
   const result = [];
-  if (start >= 0) {
     const level = (variables[start] as RegularVariableDescriptor).level;
     result.push(variables[start]);
 
