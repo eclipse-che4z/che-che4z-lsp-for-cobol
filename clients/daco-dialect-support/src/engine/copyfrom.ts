@@ -117,7 +117,6 @@ function findCopyFromVariablesDescending(
   index: number,
   name: string,
 ): VariableDescriptor[] {
-  let position = -1;
 
   // Search in descending order to find the closest variables with the same suffix and higher level than the COPY-FROM variable
   for (let i = index - 1; i >= 0; i--) {
