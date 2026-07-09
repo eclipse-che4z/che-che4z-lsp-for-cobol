@@ -95,8 +95,8 @@ function generateReplacementText(
   }
 
   for (let j = 1; j < variables.length; j++) {
-    if (variables[j].type === "DEFINITION") {
-      const definition = variables[j] as RegularVariableDescriptor;
+    const definition = variables[j];
+    if (definition.type === "DEFINITION") {
       let options = definition.options;
       if (
         j < variables.length - 1 &&
