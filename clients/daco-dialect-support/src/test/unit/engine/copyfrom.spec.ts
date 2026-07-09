@@ -17,6 +17,7 @@ import {
   CopyFromVariableDescriptor,
   RedefinitionVariableDescriptor,
   RegularVariableDescriptor,
+  VariableDescriptor,
 } from "../../../engine/parsing";
 import { createMessageService } from "./utils";
 
