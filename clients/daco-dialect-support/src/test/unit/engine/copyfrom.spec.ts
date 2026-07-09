@@ -31,7 +31,7 @@ describe("copy-from parsing test", () => {
   });
 
   it("should add diagnostic for when no source found", () => {
-    const variables = [
+    const variables: VariableDescriptor[] = [
       {
         name: "NAME-XAA",
         suffix: "BB",
