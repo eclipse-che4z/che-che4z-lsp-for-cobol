@@ -129,7 +129,7 @@ function findCopyFromVariablesDescending(
     }
   }
 
-  return generateVariableArray(variables, position, index);
+  return [];
 }
 
 function findCopyFromVariablesAscending(
