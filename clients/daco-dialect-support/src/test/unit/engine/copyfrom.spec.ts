@@ -93,40 +93,54 @@ describe("copy-from parsing test", () => {
   });
 
   it("should process redefinitions", () => {
-    const variables = [
+    const range = new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(1, 1),
+    );
+    const variables: VariableDescriptor[] = [
       {
         name: "NAME-XAA",
-        level: 1,
+        nameRange: range,
         options: "",
         type: "DEFINITION",
-      } as RegularVariableDescriptor,
+        level: 1,
+        levelRange: range,
+      },
       {
         name: "VAR-XCC",
-        level: 3,
+        nameRange: range,
         options: "OPTIONS",
         type: "DEFINITION",
-      } as RegularVariableDescriptor,
+        level: 3,
+        levelRange: range,
+      },
       {
         name: "VAR-XAA",
+        nameRange: range,
         type: "REDEFINITION",
-      } as RedefinitionVariableDescriptor,
+      },
       {
         name: "NEXT-XCC",
-        level: 1,
+        nameRange: range,
+        options: "",
         type: "DEFINITION",
-      } as RegularVariableDescriptor,
-      {
         level: 1,
-        copyFromRange: {},
-        suffix: "AA",
+        levelRange: range,
+      },
+      {
         name: "NAME-XBB",
+        nameRange: range,
+        level: 1,
+        levelRange: range,
+        copyFromRange: range,
+        suffix: "AA",
         type: "COPY-FROM",
-      } as CopyFromVariableDescriptor,
+      },
     ];
     processCopyFrom(context, variables, createMessageService());
 
     expect(context.replace).toHaveBeenCalledWith(
-      {},
+      range,
       ".\n        03 VAR-XBB  REDEFINES VAR-XBB",
     );
     expect(context.addDiagnostic).not.toHaveBeenCalled();
