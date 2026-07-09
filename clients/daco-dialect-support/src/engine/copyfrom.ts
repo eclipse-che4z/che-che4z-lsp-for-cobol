@@ -130,26 +130,8 @@ function findCopyFromVariablesDescending(
       break;
     }
   }
-  const result = [];
-  if (position >= 0) {
-    const level = (variables[position] as RegularVariableDescriptor).level;
-    result.push(variables[position]);
 
-    for (let i = position + 1; i < index; i++) {
-      const variableDescriptor = variables[i];
-      if (
-        variableDescriptor.type === "DEFINITION" &&
-        variableDescriptor.level <= level
-      ) {
-        break;
-      }
-      if (variableDescriptor.type !== "COPY-FROM") {
-        result.push(variableDescriptor);
-      }
-    }
-  }
-
-  return result;
+  return generateVariableArray(variables, position, index);
 }
 
 function findCopyFromVariablesAscending(
@@ -170,12 +152,21 @@ function findCopyFromVariablesAscending(
       break;
     }
   }
-  const result = [];
-  if (position >= 0) {
-    const level = (variables[position] as RegularVariableDescriptor).level;
-    result.push(variables[position]);
 
-    for (let i = position + 1; i < variables.length; i++) {
+  return generateVariableArray(variables, position, variables.length);
+}
+
+function generateVariableArray(
+  variables: VariableDescriptor[],
+  start: number,
+  end: number,
+) {
+  const result = [];
+  if (start >= 0) {
+    const level = (variables[start] as RegularVariableDescriptor).level;
+    result.push(variables[start]);
+
+    for (let i = start + 1; i < end; i++) {
       const variableDescriptor = variables[i];
       if (
         variableDescriptor.type === "DEFINITION" &&
@@ -188,6 +179,5 @@ function findCopyFromVariablesAscending(
       }
     }
   }
-
   return result;
 }
