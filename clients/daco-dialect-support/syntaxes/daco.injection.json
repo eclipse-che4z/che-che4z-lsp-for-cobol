@@ -1,50 +1,43 @@
 {
-    "scopeName": "daco.injection",
-    "injectionSelector": "L:source.cobol",
-    "patterns": [
-      {
-        "include": "#exec-statement"
-      },
-      {
-        "include": "#da-co-keywords"
-      }
-    ],
-    "repository": {
-        "da-co-keywords": {
-            "match": "(?<![\\-\\w])(?i:ASC|BUFFER|CHECK|DEBUG-CONTENTS|DEBUG-ITEM|DEBUG-LINE|DEBUG-NAME|DEBUG-SUB-1|DEBUG-SUB-2|DEBUG-SUB-3|DES|DESCRIPTION|DFLD|DOM|DUPLICATE|ENDRPT|ENTITY|GRS|INVERT|ITEM|JNIENVPTR|JOB|LINE-COUNTER|MODIFY|ODETTE|PACKET|PAGE-COUNTER|PRIOR|RESTORE|RESULT|RETURN-CODE|ROW|RCU|SHIFT-IN|SHIFT-OUT|SHOW|SINGLE|SORT-CONTROL|SORT-CORE-SIZE|SORT-FILE-SIZE|SORT-MESSAGE|SORT-MODE-SIZE|SORT-RETURN|TALLY|TASK|TRANSACTION|USER|YES|TRANSFER|ABEND|ATTACH|BIND|CHANGE|COMMIT|CONNECT|DC|DEQUEUE|DISCONNECT|ENDPAGE|ENQUEUE|ERASE|FINISH|FREE|INQUIRE|KEEP|LOAD|OBTAIN|POST|PUT|ROLLBACK|SNAP|STARTPAGE|STORE)(?![\\-\\w])",
-            "name": "keyword.cobol"
-          },
-      "exec-statement": {
-        "begin": "\\b(EXEC(?!(?i) +(?:SQL|CICS)))\\b",
-        "beginCaptures": {
-          "1": { "name": "keyword.cobol.daco" }
-        },
-        "end": "(?=\\s*\\.?\\n)|(?=^.{72,})|$",
-        "patterns": [
-          {
-            "match": "\\b(USING)\\b",
-            "name": "keyword.cobol.daco"
-          },
-          {
-            "match": "'[^']*'",
-            "name": "string.quoted.single.daco"
-          },
-          {
-            "match": "\"[^\"]*\"",
-            "name": "string.quoted.double.daco"
-          },
-          {
-            "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
-            "name": "source.cobol.daco"
-          }
-        ]
-      }
+  "scopeName": "daco.injection",
+  "injectionSelector": "L:source.cobol",
+  "patterns": [
+    {
+      "include": "#exec-statement"
+    },
+    {
+      "include": "#da-co-keywords"
     }
   ],
   "repository": {
     "da-co-keywords": {
       "match": "(?<![\\-\\w])(?i:ASC|BUFFER|CHECK|DEBUG-CONTENTS|DEBUG-ITEM|DEBUG-LINE|DEBUG-NAME|DEBUG-SUB-1|DEBUG-SUB-2|DEBUG-SUB-3|DES|DESCRIPTION|DFLD|DOM|DUPLICATE|ENDRPT|ENTITY|GRS|INVERT|ITEM|JNIENVPTR|JOB|LINE-COUNTER|MODIFY|ODETTE|PACKET|PAGE-COUNTER|PRIOR|RESTORE|RESULT|RETURN-CODE|ROW|RCU|SHIFT-IN|SHIFT-OUT|SHOW|SINGLE|SORT-CONTROL|SORT-CORE-SIZE|SORT-FILE-SIZE|SORT-MESSAGE|SORT-MODE-SIZE|SORT-RETURN|TALLY|TASK|TRANSACTION|USER|YES|TRANSFER|ABEND|ATTACH|BIND|CHANGE|COMMIT|CONNECT|DC|DEQUEUE|DISCONNECT|ENDPAGE|ENQUEUE|ERASE|FINISH|FREE|INQUIRE|KEEP|LOAD|OBTAIN|POST|PUT|ROLLBACK|SNAP|STARTPAGE|STORE)(?![\\-\\w])",
       "name": "keyword.cobol"
+    },
+    "exec-statement": {
+      "begin": "\\b(EXEC(?!(?i) +(?:SQL|CICS)))\\b",
+      "beginCaptures": {
+        "1": { "name": "keyword.cobol.daco" }
+      },
+      "end": "(?=\\s*\\.?\\n)|(?=^.{72,})|$",
+      "patterns": [
+        {
+          "match": "\\b(USING)\\b",
+          "name": "keyword.cobol.daco"
+        },
+        {
+          "match": "'[^']*'",
+          "name": "string.quoted.single.daco"
+        },
+        {
+          "match": "\"[^\"]*\"",
+          "name": "string.quoted.double.daco"
+        },
+        {
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "source.cobol.daco"
+        }
+      ]
     }
   }
 }
