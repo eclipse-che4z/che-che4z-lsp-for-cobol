@@ -36,6 +36,7 @@ export function processCopyFrom(
         ) + variableDescriptor.suffix
       ).toUpperCase();
 
+      // Search order is defined in the dialect spec
       let copyFromVariables: VariableDescriptor[] =
         findCopyFromVariablesDescending(variables, i, name);
       if (copyFromVariables.length === 0) {
@@ -117,7 +118,6 @@ function findCopyFromVariablesDescending(
   index: number,
   name: string,
 ): VariableDescriptor[] {
-
   // Search in descending order to find the closest variables with the same suffix and higher level than the COPY-FROM variable
   for (let i = index - 1; i >= 0; i--) {
     const variableDescriptor = variables[i];
@@ -137,7 +137,6 @@ function findCopyFromVariablesAscending(
   index: number,
   name: string,
 ): VariableDescriptor[] {
-
   // Search in the ascending order to find variables with the same suffix and higher level than the COPY-FROM variable
   for (let i = index + 1; i < variables.length; i++) {
     const variableDescriptor = variables[i];
@@ -158,20 +157,19 @@ function generateVariableArray(
   end: number,
 ) {
   const result = [];
-    const level = (variables[start] as RegularVariableDescriptor).level;
-    result.push(variables[start]);
+  const level = (variables[start] as RegularVariableDescriptor).level;
+  result.push(variables[start]);
 
-    for (let i = start + 1; i < end; i++) {
-      const variableDescriptor = variables[i];
-      if (
-        variableDescriptor.type === "DEFINITION" &&
-        variableDescriptor.level <= level
-      ) {
-        break;
-      }
-      if (variableDescriptor.type !== "COPY-FROM") {
-        result.push(variableDescriptor);
-      }
+  for (let i = start + 1; i < end; i++) {
+    const variableDescriptor = variables[i];
+    if (
+      variableDescriptor.type === "DEFINITION" &&
+      variableDescriptor.level <= level
+    ) {
+      break;
+    }
+    if (variableDescriptor.type !== "COPY-FROM") {
+      result.push(variableDescriptor);
     }
   }
   return result;

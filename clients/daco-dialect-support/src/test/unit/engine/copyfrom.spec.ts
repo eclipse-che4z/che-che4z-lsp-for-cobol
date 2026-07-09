@@ -12,6 +12,7 @@
  *   Broadcom - initial API and implementation
  */
 
+import * as vscode from "vscode";
 import { processCopyFrom } from "../../../engine/copyfrom";
 import {
   CopyFromVariableDescriptor,
@@ -32,42 +33,62 @@ describe("copy-from parsing test", () => {
   });
 
   it("should add diagnostic for when no source found", () => {
+    const range = new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(1, 1),
+    );
     const variables: VariableDescriptor[] = [
       {
         name: "NAME-XAA",
+        nameRange: range,
         suffix: "BB",
-        copyFromRange: {},
+        copyFromRange: range,
         type: "COPY-FROM",
-      } as CopyFromVariableDescriptor,
+        level: 1,
+        levelRange: range,
+      },
     ];
     processCopyFrom(context, variables, createMessageService());
 
-    expect(context.replace).toHaveBeenCalledWith({}, " ");
+    expect(context.replace).toHaveBeenCalledWith(range, " ");
     expect(context.addDiagnostic).toHaveBeenCalledWith(
       expect.objectContaining({
         message: "Source for NAME-XAA not found",
-        range: {},
+        range: range,
       }),
     );
   });
 
   it("should find descending variable", () => {
-    const variables = [
+    const range = new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(1, 1),
+    );
+    const variables: VariableDescriptor[] = [
       {
         name: "VAR-XAA",
+        nameRange: range,
         options: "OPTIONS",
         type: "DEFINITION",
-      } as RegularVariableDescriptor,
+        level: 1,
+        levelRange: range,
+      },
       {
-        copyFromRange: {},
+        nameRange: range,
+        copyFromRange: new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(1, 1),
+        ),
         name: "VAR-XBB",
         suffix: "AA",
         type: "COPY-FROM",
-      } as CopyFromVariableDescriptor,
+        level: 1,
+        levelRange: range,
+      },
     ];
     processCopyFrom(context, variables, createMessageService());
 
-    expect(context.replace).toHaveBeenCalledWith({}, "OPTIONS");
+    expect(context.replace).toHaveBeenCalledWith(range, "OPTIONS");
     expect(context.addDiagnostic).not.toHaveBeenCalled();
   });
 
