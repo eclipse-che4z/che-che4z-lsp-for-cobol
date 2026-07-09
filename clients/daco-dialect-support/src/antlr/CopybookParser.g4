@@ -27,7 +27,11 @@ startRule
    ;
 
 procedureDivision
-   : PROCEDURE DIVISION DOT_FS procedureDivisionItem*;
+   : PROCEDURE DIVISION procedureDivisionOptions DOT_FS procedureDivisionItem*;
+
+procedureDivisionOptions
+   : (~DOT_FS)*
+   ;
 
 procedureDivisionItem
    : skipCopyMaid
@@ -36,7 +40,9 @@ procedureDivisionItem
    ;
 
 skipCopyMaid
-   : copyMaid
+   : LEVEL_NUMBER? COPY MAID 
+      layoutId
+      layoutUsage?
    ;
 
 procedureSection
@@ -63,7 +69,7 @@ dataDescriptionEntry
 copyMaid
    : LEVEL_NUMBER? COPY MAID 
       layoutId
-      layoutUsage? 
+      layoutUsage?
       DOT_FS
    ;
 
