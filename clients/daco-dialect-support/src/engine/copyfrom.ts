@@ -137,7 +137,6 @@ function findCopyFromVariablesAscending(
   index: number,
   name: string,
 ): VariableDescriptor[] {
-  let position = -1;
 
   // Search in the ascending order to find variables with the same suffix and higher level than the COPY-FROM variable
   for (let i = index + 1; i < variables.length; i++) {
