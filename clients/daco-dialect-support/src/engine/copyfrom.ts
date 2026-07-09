@@ -145,8 +145,7 @@ function findCopyFromVariablesAscending(
       continue;
     }
     if (name === variableDescriptor.name.toUpperCase()) {
-      position = i;
-      break;
+      return generateVariableArray(variables, i, variables.length);
     }
   }
 
