@@ -313,4 +313,17 @@ suite("Miscellaneous statements Test Suite", function () {
       range(pos(7, 22), pos(7, 32)),
     );
   });
+
+  test("Process PROCEDURE DIVISION with options successfully", async () => {
+    const editor = await helper.showDocument("DaCo91.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(11, 19), pos(11, 31)),
+    );
+  });
 });
