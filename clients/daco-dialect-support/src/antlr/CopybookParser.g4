@@ -41,14 +41,10 @@ procedureDivisionItem
    ;
 
 proceduralNoiseBlock
-   : (
-       { this.tokenStream.LA(1) !== -1 &&
-         !(this.tokenStream.LA(1) === CopybookLexer.IDENTIFIER && this.tokenStream.LA(2) === CopybookLexer.SECTION) &&
-         !(this.tokenStream.LA(1) === CopybookLexer.DACO_COPYBOOK_IDENTIFIER && this.tokenStream.LA(2) === CopybookLexer.SECTION) &&
-         !(this.tokenStream.LA(1) === CopybookLexer.COPY)
-       }?
-       .
-     )+
+   : IDENTIFIER
+   | DACO_COPYBOOK_IDENTIFIER
+   | ~IDENTIFIER
+   | ~DACO_COPYBOOK_IDENTIFIER
    ;
 
 skipCopyMaid
@@ -67,13 +63,7 @@ sectionName
    ;
 
 skipUntilFirstSection
-   : (
-       { this.tokenStream.LA(1) !== -1 && 
-         this.tokenStream.LA(1) !== CopybookLexer.WORKING_STORAGE && 
-         this.tokenStream.LA(1) !== CopybookLexer.LINKAGE 
-       }?
-       .
-     )*
+   : (~(WORKING_STORAGE | LINKAGE))*
    ;
 
 dataSection
