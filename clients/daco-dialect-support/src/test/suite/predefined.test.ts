@@ -32,7 +32,7 @@ suite("Predefined Sections Test Suite", function () {
     await helper.closeAllEditors();
   });
 
-  test("Resolve lowercase prederfined section sucessfully", async () => {
+  test("Resolve lowercase predefined section sucessfully", async () => {
     const editor = await helper.showDocument("DaCo92.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
