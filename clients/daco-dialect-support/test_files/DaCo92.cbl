@@ -10,6 +10,7 @@
            03 F00-XL1 PIC X.
        PROCEDURE DIVISION 
            USING TRAREC-XL1.
+         s930 SECTION.
+           GO TO S930.
            DISPLAY NOT_EXISTING.
-           GO TO s930.
            

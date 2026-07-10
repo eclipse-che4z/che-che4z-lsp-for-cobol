@@ -41,7 +41,7 @@ suite("Predefined Sections Test Suite", function () {
     helper.checkDiagnostic(
       diagnostics,
       "Variable NOT_EXISTING is not defined",
-      range(pos(12, 19), pos(12, 31)),
+      range(pos(14, 19), pos(14, 31)),
     );
   });
 
