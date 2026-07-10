@@ -45,7 +45,7 @@ suite("Predefined Sections Test Suite", function () {
     );
   });
 
-  test("Resolve already defined prederfined section", async () => {
+  test("Resolve already defined predefined section", async () => {
     const editor = await helper.showDocument("DaCo93.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
