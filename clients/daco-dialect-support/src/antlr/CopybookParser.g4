@@ -17,7 +17,6 @@ options {tokenVocab = CopybookLexer;  superClass = MessageServiceParser;}
 
 @header {
 import { MessageServiceParser } from "../antlr/MessageServiceParser";
-import { CopybookLexer } from "./CopybookLexer"
 }
 
 startRule

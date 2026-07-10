@@ -92,9 +92,6 @@ export class CopybookPreprocessor {
     const visitor = new CopybookVisitor(accumulator, this.messageService);
     const descriptors = visitor.visit(tree) || [];
 
-    console.log("--- PARSED TREE ---");
-    console.log(tree.toStringTree(parser));
-
     this.outputChannel.appendLine(
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
     );
