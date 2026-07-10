@@ -59,7 +59,7 @@ describe("Predefined sections test suite", () => {
     expect(context.insert).not.toHaveBeenCalled();
   });
 
-  it("should insert anly not existing section", () => {
+  it("should insert only missing section", () => {
     jest
       .spyOn(SettingsService, "getPredefinedSections")
       .mockImplementation(() => ["PREDEF0", "PREDEF1"]);
