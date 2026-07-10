@@ -17,6 +17,7 @@ options {tokenVocab = CopybookLexer;  superClass = MessageServiceParser;}
 
 @header {
 import { MessageServiceParser } from "../antlr/MessageServiceParser";
+import { CopybookLexer } from "./CopybookLexer"
 }
 
 startRule
@@ -34,9 +35,20 @@ procedureDivisionOptions
    ;
 
 procedureDivisionItem
-   : skipCopyMaid
+   : skipCopyMaid DOT_FS?
    | procedureSection
-   | .
+   | proceduralNoiseBlock
+   ;
+
+proceduralNoiseBlock
+   : (
+       { this.tokenStream.LA(1) !== -1 &&
+         !(this.tokenStream.LA(1) === CopybookLexer.IDENTIFIER && this.tokenStream.LA(2) === CopybookLexer.SECTION) &&
+         !(this.tokenStream.LA(1) === CopybookLexer.DACO_COPYBOOK_IDENTIFIER && this.tokenStream.LA(2) === CopybookLexer.SECTION) &&
+         !(this.tokenStream.LA(1) === CopybookLexer.COPY)
+       }?
+       .
+     )+
    ;
 
 skipCopyMaid
@@ -51,10 +63,17 @@ procedureSection
 
 sectionName
    : IDENTIFIER
+   | DACO_COPYBOOK_IDENTIFIER
    ;
 
 skipUntilFirstSection
-   : (~(WORKING_STORAGE | LINKAGE))*
+   : (
+       { this.tokenStream.LA(1) !== -1 && 
+         this.tokenStream.LA(1) !== CopybookLexer.WORKING_STORAGE && 
+         this.tokenStream.LA(1) !== CopybookLexer.LINKAGE 
+       }?
+       .
+     )*
    ;
 
 dataSection
