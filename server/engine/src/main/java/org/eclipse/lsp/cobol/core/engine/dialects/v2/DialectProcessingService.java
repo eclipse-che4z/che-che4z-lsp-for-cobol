@@ -82,6 +82,7 @@ public class DialectProcessingService {
           context.getExtendedDocument(),
           result.getReplacements(),
           result.getReplacementMaps(),
+          result.getInsertions(),
           result.getCopybooks(),
           errorList,
           dialectName,
@@ -99,11 +100,18 @@ public class DialectProcessingService {
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
+      DocumentInsertion[] insertions,
       DialectCopybookInfo[] copybookInfos,
       List<SyntaxError> errorList,
       String dialectName,
       String parentCopybookId,
       String programUri) {
+
+    // Apply insertion first for simplification
+    for (DocumentInsertion insertion : insertions) {
+      ExtendedText extendedText = new ExtendedText(insertion.getText(), insertion.getSource());
+      document.insertCopybook(insertion.getLine(), extendedText);
+    }
 
     ArrayList<Node> nodes =
         applyReplacements(document, replacements, replacementMaps, parentCopybookId);
@@ -141,6 +149,7 @@ public class DialectProcessingService {
               copybook,
               copybookInfo.getReplacements(),
               copybookInfo.getReplacementMaps(),
+              copybookInfo.getInsertions(),
               copybookInfo.getCopybooks(),
               errorList,
               dialectName,

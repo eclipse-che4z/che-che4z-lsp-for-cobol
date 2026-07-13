@@ -20,6 +20,7 @@ import {
   CopybookDescriptor,
   CopybookDescriptorPD,
   CopybookVisitor,
+  ProgramInfoAccumulator,
   VariableAccumulator,
   VariableDescriptor,
 } from "./parsing";
@@ -43,24 +44,34 @@ export class CopybookPreprocessor {
   public async execute(
     context: IDocumentProcessingContext,
     text: string,
-  ): Promise<VariableDescriptor[]> {
+  ): Promise<{
+    variables: VariableDescriptor[];
+    programInfo: ProgramInfoAccumulator;
+  }> {
     const accumulator = new VariableAccumulator();
-    const descriptors = this.collectCopybookDescriptors(
+    const { descriptors, programInfo } = this.collectCopybookDescriptors(
       context,
       text,
       accumulator,
     );
+
     await this.processCopybooks(descriptors, context, accumulator);
-    return accumulator
-      .generateDescriptors()
-      .filter((d): d is VariableDescriptor => !!d && "type" in d);
+    return {
+      variables: accumulator
+        .generateDescriptors()
+        .filter((d): d is VariableDescriptor => !!d && "type" in d),
+      programInfo: programInfo,
+    };
   }
 
   private collectCopybookDescriptors(
     context: IDocumentProcessingContext,
     text: string,
     accumulator: VariableAccumulator,
-  ): CopybookDescriptor[] {
+  ): {
+    descriptors: CopybookDescriptor[];
+    programInfo: ProgramInfoAccumulator;
+  } {
     const charStream = antlr.CharStream.fromString(text);
 
     const lexer = new CopybookLexer(charStream);
@@ -78,8 +89,8 @@ export class CopybookPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    const descriptors =
-      new CopybookVisitor(accumulator, this.messageService).visit(tree) || [];
+    const visitor = new CopybookVisitor(accumulator, this.messageService);
+    const descriptors = visitor.visit(tree) || [];
 
     this.outputChannel.appendLine(
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
@@ -88,7 +99,10 @@ export class CopybookPreprocessor {
     addParsingErrors(context, [...lexerErrors.errors, ...parserErrors.errors]);
 
     console.log(`Found ${descriptors.length} copybook descriptors:`);
-    return descriptors;
+    return {
+      descriptors: descriptors,
+      programInfo: visitor.programInfo,
+    };
   }
 
   private async processCopybooks(

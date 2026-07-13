@@ -178,5 +178,6 @@ export interface IDocumentProcessingContext {
     tokenItems: Item[],
     replacementMap: string,
   ): void;
+  insert(line: number, text: string, source?: string): void;
   addDiagnostic(diagnostic: vscode.Diagnostic): void;
 }
