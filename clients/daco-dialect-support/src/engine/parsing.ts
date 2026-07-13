@@ -24,7 +24,6 @@ import {
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
   CopyMaidContext,
-  ProceduralNoiseBlockContext,
   ProcedureDivisionContext,
   ProcedureSectionContext,
   SkipCopyMaidContext,
@@ -387,12 +386,6 @@ export class CopybookVisitor extends CopybookParserVisitor<
     this.programInfo.procedureDivisionNameStart = ctx.PROCEDURE().symbol.line;
     this.programInfo.procedureDivisionNameEnd = ctx.DOT_FS().symbol.line;
     return super.visitChildren(ctx) ?? [];
-  };
-
-  visitProceduralNoiseBlock = (
-    _ctx: ProceduralNoiseBlockContext,
-  ): CopybookDescriptor[] => {
-    return [];
   };
 
   protected aggregateResult = concatResults;

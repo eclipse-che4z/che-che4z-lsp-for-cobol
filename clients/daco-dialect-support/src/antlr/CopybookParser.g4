@@ -36,14 +36,7 @@ procedureDivisionOptions
 procedureDivisionItem
    : skipCopyMaid DOT_FS?
    | procedureSection
-   | proceduralNoiseBlock
-   ;
-
-proceduralNoiseBlock
-   : IDENTIFIER
-   | DACO_COPYBOOK_IDENTIFIER
-   | ~IDENTIFIER
-   | ~DACO_COPYBOOK_IDENTIFIER
+   | .+?
    ;
 
 skipCopyMaid
