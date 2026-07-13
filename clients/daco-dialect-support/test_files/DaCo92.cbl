@@ -1,0 +1,16 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    TEST1.
+       ENVIRONMENT DIVISION.
+       IDMS-CONTROL SECTION.
+           PROTOCOL. MODE ABC.
+           IDMS-RECORDS MANUAL
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  TRAREC-XL1.
+           03 F00-XL1 PIC X.
+       PROCEDURE DIVISION 
+           USING TRAREC-XL1.
+         s930 SECTION.
+           GO TO S930.
+           DISPLAY NOT_EXISTING.
+           
