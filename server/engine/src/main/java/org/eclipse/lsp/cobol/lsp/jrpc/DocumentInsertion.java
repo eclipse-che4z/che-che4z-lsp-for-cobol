@@ -22,5 +22,5 @@ import lombok.Value;
 public class DocumentInsertion {
   int line;
   @NonNull String text;
-  @NonNull String source;
+  String source;
 }
