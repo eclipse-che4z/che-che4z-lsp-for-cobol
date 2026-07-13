@@ -35,7 +35,10 @@ suite("Copybook Test Suite", function () {
 
   test("Resolve copybook without suffix successfully", async () => {
     const editor = await helper.showDocument("DaCo01.cbl");
-    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      2,
+    );
     helper.printAllDiagnostics(diagnostics);
     assert.strictEqual(diagnostics.length, 2);
 
