@@ -24,6 +24,8 @@ import {
 import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
 import {
   CopyMaidContext,
+  ProcedureDivisionContext,
+  ProcedureSectionContext,
   SkipCopyMaidContext,
   VariableEntryContext,
 } from "../generated/CopybookParser";
@@ -241,10 +243,18 @@ type CopyFromOptions =
   | { kind: "COPY_FROM"; suffix: string }
   | { kind: "REGULAR_OPTIONS"; options: string };
 
+export class ProgramInfoAccumulator {
+  public readonly sections: string[] = [];
+  public procedureDivisionNameStart?: number;
+  public procedureDivisionNameEnd?: number;
+}
+
 export class CopybookVisitor extends CopybookParserVisitor<
   CopybookDescriptor[]
 > {
   private readonly parentNameResolver: NameResolver = new NameResolver();
+  public readonly programInfo: ProgramInfoAccumulator =
+    new ProgramInfoAccumulator();
 
   public constructor(
     public accumulator: VariableAccumulator,
@@ -361,6 +371,21 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
   visitSkipCopyMaid = (ctx: SkipCopyMaidContext): CopybookDescriptor[] => {
     return [new CopybookDescriptorPD(constructRange(ctx))];
+  };
+
+  visitProcedureSection = (
+    ctx: ProcedureSectionContext,
+  ): CopybookDescriptor[] => {
+    this.programInfo.sections.push(ctx.sectionName().getText().toUpperCase());
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitProcedureDivision = (
+    ctx: ProcedureDivisionContext,
+  ): CopybookDescriptor[] => {
+    this.programInfo.procedureDivisionNameStart = ctx.PROCEDURE().symbol.line;
+    this.programInfo.procedureDivisionNameEnd = ctx.DOT_FS().symbol.line;
+    return super.visitChildren(ctx) ?? [];
   };
 
   protected aggregateResult = concatResults;
