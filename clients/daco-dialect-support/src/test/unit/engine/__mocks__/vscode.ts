@@ -59,4 +59,11 @@ export const workspace = {
   fs: {
     readFile: jest.fn(),
   },
+  getConfiguration: jest.fn().mockReturnValue({
+    get: jest.fn(),
+  }),
+};
+
+export const window = {
+  showErrorMessage: jest.fn(),
 };
