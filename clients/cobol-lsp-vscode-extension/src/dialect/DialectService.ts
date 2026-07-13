@@ -65,6 +65,12 @@ type DocumentReplacementMapPayload = {
   replacementMap: string;
 };
 
+type DocumentInsertionPayload = {
+  line: number;
+  text: string;
+  source?: string;
+};
+
 type CopybookPayload = {
   copybookName: string;
   statementLocation: LocationPayload;
@@ -73,6 +79,7 @@ type CopybookPayload = {
   text: string;
   replacements: DocumentReplacementPayload[];
   replacementMaps: DocumentReplacementMapPayload[];
+  insertions: DocumentInsertionPayload[];
   copybooks: CopybookPayload[];
   diagnostics: DiagnosticPayload[];
 };
@@ -106,6 +113,12 @@ type DocumentReplacementMap = {
   replacementMap: string;
 };
 
+type DucumentInsertion = {
+  line: number;
+  text: string;
+  source?: string;
+};
+
 type CopybookInfo = {
   copybookName: string;
   statementLocation: Location;
@@ -117,6 +130,7 @@ type CopybookInfo = {
 class Context implements IDocumentProcessingContext {
   replacements: DocumentReplacement[] = [];
   replacementMaps: DocumentReplacementMap[] = [];
+  insertions: DucumentInsertion[] = [];
   children: Context[] = [];
   diagnostics: vscode.Diagnostic[] = [];
 
@@ -194,6 +208,9 @@ class Context implements IDocumentProcessingContext {
       replacementMap: replacementMap,
     };
     this.replacementMaps.push(replacement);
+  }
+  insert(line: number, text: string, source?: string): void {
+    this.insertions.push({ line, text, source });
   }
   addDiagnostic(diagnostic: vscode.Diagnostic): void {
     this.diagnostics.push(diagnostic);
@@ -313,6 +330,7 @@ export class DialectService {
       ),
       replacements: context.replacements.map((r) => serializeReplacement(r)),
       replacementMaps: context.replacementMaps.map(serializeReplacementMap),
+      insertions: context.insertions,
       uri: context.copybookInfo.uri.toString(),
       text: context.copybookInfo.text,
       copybooks: copybooks,
@@ -338,6 +356,7 @@ export class DialectService {
     return {
       replacements: context.replacements.map((r) => serializeReplacement(r)),
       replacementMaps: context.replacementMaps.map(serializeReplacementMap),
+      insertions: context.insertions,
       copybooks: copybooks,
       diagnostics: context.diagnostics.map((d) => serializeDiagnostics(d)),
     };

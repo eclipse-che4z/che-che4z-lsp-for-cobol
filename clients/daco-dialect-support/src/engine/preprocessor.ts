@@ -30,6 +30,7 @@ import { DaCoParser } from "../generated/DaCoParser";
 import { processCopyFrom } from "./copyfrom";
 import { CopybookPreprocessor } from "./copybook";
 import { addParsingErrors } from "./util";
+import { generatePredefinedSections } from "./predefined";
 
 export class DaCoPreprocessor {
   private readonly copybookPreprocessor: CopybookPreprocessor;
@@ -50,11 +51,17 @@ export class DaCoPreprocessor {
     text: string,
   ) {
     text = this.cleanup(context, text);
-    const variableDescriptors = await this.copybookPreprocessor.execute(
+    const { variables, programInfo } = await this.copybookPreprocessor.execute(
       context,
       text,
     );
-    processCopyFrom(context, variableDescriptors, this.messageService);
+
+    processCopyFrom(context, variables, this.messageService);
+    generatePredefinedSections(
+      context,
+      programInfo.sections,
+      programInfo.procedureDivisionNameEnd,
+    );
 
     const statementDescriptors = this.collectStatementsDescriptors(
       context,

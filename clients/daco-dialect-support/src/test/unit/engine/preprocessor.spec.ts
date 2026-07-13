@@ -15,6 +15,7 @@
 import { Uri, DiagnosticSeverity } from "vscode";
 import { DaCoPreprocessor } from "../../../engine/preprocessor";
 import { createMessageService } from "./utils";
+import { SettingsService } from "../../../engine/services/settings";
 
 describe("DaCoPreprocessor test", () => {
   const HEADER_0 =
@@ -57,6 +58,9 @@ describe("DaCoPreprocessor test", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest
+      .spyOn(SettingsService, "getPredefinedSections")
+      .mockImplementation(() => []);
   });
 
   it("should report a diagnostic for mismatched layout identifier", async () => {

@@ -23,6 +23,7 @@ const context = {
   resolveCopybook: jest.fn(),
   replace: jest.fn(),
   replaceWithMap: jest.fn(),
+  insert: jest.fn(),
   addDiagnostic: jest.fn(),
 };
 

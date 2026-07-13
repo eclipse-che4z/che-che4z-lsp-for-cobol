@@ -34,9 +34,9 @@ procedureDivisionOptions
    ;
 
 procedureDivisionItem
-   : skipCopyMaid
+   : skipCopyMaid DOT_FS?
    | procedureSection
-   | .
+   | .+?
    ;
 
 skipCopyMaid
@@ -51,6 +51,7 @@ procedureSection
 
 sectionName
    : IDENTIFIER
+   | DACO_COPYBOOK_IDENTIFIER
    ;
 
 skipUntilFirstSection

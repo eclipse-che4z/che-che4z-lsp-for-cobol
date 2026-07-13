@@ -20,6 +20,7 @@ import {
 } from "@code4z/cobol-dialect-api";
 import { DaCoPreprocessor } from "./engine/preprocessor";
 import { MessageService } from "./engine/services/MessageService";
+import { SettingsService } from "./engine/services/settings";
 
 const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
 
@@ -34,7 +35,6 @@ const isCopyStatement = (statement: string) => {
 
 const DIALECT_NAME = "DaCo";
 const DESCRIPTION = "DaCo dialect support";
-const DIALECT_API_VERSION_CONFIG = "dialect.api.version";
 
 export async function activate(context: vscode.ExtensionContext) {
   await updateApiVersion(context);
@@ -45,16 +45,7 @@ export function deactivate() {
 }
 
 async function updateApiVersion(context: vscode.ExtensionContext) {
-  const version = vscode.workspace
-    .getConfiguration()
-    .get<string>(DIALECT_API_VERSION_CONFIG, "legacy");
-
-  if (version !== "legacy" && version !== "new") {
-    vscode.window.showErrorMessage(
-      `Invalid API version: '${version}'. Expected 'legacy' or 'new'.`,
-    );
-    return;
-  }
+  const version = SettingsService.getApiVersion();
 
   unregisterDialect();
 
