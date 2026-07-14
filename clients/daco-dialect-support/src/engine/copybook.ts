@@ -17,19 +17,22 @@ import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
 import {
   CollectingErrorListener,
   CopybookContentVisitor,
-  CopybookDescriptor,
-  CopybookDescriptorPD,
-  CopybookVisitor,
-  ProgramInfoAccumulator,
-  VariableAccumulator,
-  VariableDescriptor,
+  ProgramVisitor,
 } from "./parsing";
-import { CopybookLexer } from "../generated/CopybookLexer";
+import { ProgramLexer } from "../generated/ProgramLexer";
 import { MessageService } from "./services/MessageService";
-import { CopybookParser } from "../generated/CopybookParser";
+import { ProgramParser } from "../generated/ProgramParser";
 import { addParsingErrors, extractSuffix, updateVariableName } from "./util";
 import { VariableLexer } from "../generated/VariableLexer";
 import { VariableParser } from "../generated/VariableParser";
+import {
+  CopybookDescriptor,
+  CopybookDescriptorPD,
+  ParseError,
+  ProgramInfo,
+  VariableAccumulator,
+  VariableDescriptor,
+} from "./model";
 
 const WRK_SUFFIX = "WRK";
 
@@ -44,39 +47,27 @@ export class CopybookPreprocessor {
   public async execute(
     context: IDocumentProcessingContext,
     text: string,
-  ): Promise<{
-    variables: VariableDescriptor[];
-    programInfo: ProgramInfoAccumulator;
-  }> {
-    const accumulator = new VariableAccumulator();
-    const { descriptors, programInfo } = this.collectCopybookDescriptors(
-      context,
-      text,
-      accumulator,
-    );
+  ): Promise<ProgramInfo> {
+    const { programInfo, errors } = this.analyzeProgram(text);
+    addParsingErrors(context, errors);
 
-    await this.processCopybooks(descriptors, context, accumulator);
-    return {
-      variables: accumulator
-        .generateDescriptors()
-        .filter((d): d is VariableDescriptor => !!d && "type" in d),
-      programInfo: programInfo,
-    };
+    await this.processCopybooks(
+      context,
+      programInfo.copybooks,
+      programInfo.accumulator,
+    );
+    return programInfo;
   }
 
-  private collectCopybookDescriptors(
-    context: IDocumentProcessingContext,
-    text: string,
-    accumulator: VariableAccumulator,
-  ): {
-    descriptors: CopybookDescriptor[];
-    programInfo: ProgramInfoAccumulator;
+  private analyzeProgram(text: string): {
+    programInfo: ProgramInfo;
+    errors: ParseError[];
   } {
     const charStream = antlr.CharStream.fromString(text);
 
-    const lexer = new CopybookLexer(charStream);
+    const lexer = new ProgramLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
-    const parser = new CopybookParser(tokenStream);
+    const parser = new ProgramParser(tokenStream);
     parser.setMessageService(this.messageService);
 
     lexer.removeErrorListeners();
@@ -89,25 +80,25 @@ export class CopybookPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    const visitor = new CopybookVisitor(accumulator, this.messageService);
-    const descriptors = visitor.visit(tree) || [];
+    const visitor = new ProgramVisitor(this.messageService);
+    const copybooks = visitor.visit(tree) || [];
+    const programInfo = visitor.programInfo;
+    programInfo.copybooks = copybooks;
 
     this.outputChannel.appendLine(
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
     );
 
-    addParsingErrors(context, [...lexerErrors.errors, ...parserErrors.errors]);
-
-    console.log(`Found ${descriptors.length} copybook descriptors:`);
+    console.log(`Found ${programInfo.copybooks.length} copybook descriptors:`);
     return {
-      descriptors: descriptors,
       programInfo: visitor.programInfo,
+      errors: [...lexerErrors.errors, ...parserErrors.errors],
     };
   }
 
   private async processCopybooks(
-    descriptors: CopybookDescriptor[],
     context: IDocumentProcessingContext,
+    descriptors: CopybookDescriptor[],
     accumulator: VariableAccumulator,
   ) {
     descriptors.forEach((descriptor) =>
