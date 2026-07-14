@@ -14,10 +14,9 @@
 
 import {
   CopybookContentVisitor,
-  CopybookVisitor,
+  ProgramVisitor,
   DaCoVisitor,
   NameResolver,
-  VariableAccumulator,
 } from "../../../engine/parsing";
 import { MessageService } from "../../../engine/services/MessageService";
 import { Range } from "./__mocks__/vscode";
@@ -28,10 +27,7 @@ describe("parsing test", () => {
   });
 
   it("should fallback when layoutId is missing", () => {
-    const visitor = new CopybookVisitor(
-      new VariableAccumulator(),
-      createMessageService(),
-    );
+    const visitor = new ProgramVisitor(createMessageService());
 
     const ctx = {
       layoutId: () => null,
@@ -44,10 +40,7 @@ describe("parsing test", () => {
   });
 
   it("should fallback when DACO_COPYBOOK_IDENTIFIER is missing", () => {
-    const visitor = new CopybookVisitor(
-      new VariableAccumulator(),
-      createMessageService(),
-    );
+    const visitor = new ProgramVisitor(createMessageService());
 
     const ctx = {
       DACO_COPYBOOK_IDENTIFIER: () => null,
@@ -95,7 +88,7 @@ describe("parsing test", () => {
     } as any;
 
     const result = visitor.visitDataRedefinesClause(ctx);
-    expect(result.length).toEqual(1);
+    expect(result).toHaveLength(1);
     expect(result[0].type).toEqual("REDEFINITION");
   });
 
@@ -114,7 +107,7 @@ describe("parsing test", () => {
     } as any;
 
     const result = visitor.visitDacoStatements(ctx);
-    expect(result.length).toEqual(1);
+    expect(result).toHaveLength(1);
   });
 
   it("should create diagnostic for the SORT TABLE context", () => {
@@ -136,8 +129,8 @@ describe("parsing test", () => {
     } as any;
 
     const result = visitor.visitDacoStatements(ctx);
-    expect(result.length).toEqual(1);
-    expect(result[0].diagnostics.length).toEqual(1);
+    expect(result).toHaveLength(1);
+    expect(result[0].diagnostics).toHaveLength(1);
   });
 
   it("should substitute with value the IF ROW clause context", () => {
@@ -155,7 +148,7 @@ describe("parsing test", () => {
     } as any;
 
     const result = visitor.visitDacoStatements(ctx);
-    expect(result.length).toEqual(1);
+    expect(result).toHaveLength(1);
     expect(result[0].filler).toEqual("ZERO");
   });
 
@@ -174,7 +167,7 @@ describe("parsing test", () => {
     } as any;
 
     const result = visitor.visitDacoStatements(ctx);
-    expect(result.length).toEqual(1);
+    expect(result).toHaveLength(1);
     expect(result[0].filler).toEqual(" ");
   });
 });
