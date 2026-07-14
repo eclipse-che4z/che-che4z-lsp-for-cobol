@@ -18,107 +18,46 @@ import {
   Token,
   Recognizer,
   ATNSimulator,
-  ParserRuleContext,
-  Interval,
 } from "antlr4ng";
-import { CopybookParserVisitor } from "../generated/CopybookParserVisitor";
+import { ProgramParserVisitor } from "../generated/ProgramParserVisitor";
 import {
   CopyMaidContext,
   ProcedureDivisionContext,
   ProcedureSectionContext,
   SkipCopyMaidContext,
   VariableEntryContext,
-} from "../generated/CopybookParser";
+} from "../generated/ProgramParser";
 import { VariableParserVisitor } from "../generated/VariableParserVisitor";
 
 import {
   DataDescriptionEntryFormat1Context,
   DataRedefinesClauseContext,
 } from "../generated/VariableParser";
-import { DaCoParserVisitor } from "../generated/DaCoParserVisitor";
+import { StatementsParserVisitor } from "../generated/StatementsParserVisitor";
 import {
   DacoSectionsContext,
   DacoStatementsContext,
   QualifiedDataNameContext,
   VariableUsageNameContext,
-} from "../generated/DaCoParser";
+} from "../generated/StatementsParser";
 import { MessageService } from "./services/MessageService";
-
-const BLANK_STATEMENT = "CONTINUE";
-const BLANK_VALUE = "ZERO";
-const SPACE_VALUE = " ";
-
-export interface ParseError {
-  line: number;
-  column: number;
-  message: string;
-  range: vscode.Range;
-}
-
-export class CopybookDescriptor {
-  constructor(
-    public readonly statementRange: vscode.Range,
-    public readonly nameRange: vscode.Range,
-    public readonly level: number,
-    public readonly name: string,
-    public readonly suffix?: string,
-    public readonly suffixRange?: vscode.Range,
-    public readonly parentName?: string,
-    public readonly parentNameRange?: vscode.Range,
-  ) {}
-}
-
-export class CopybookDescriptorPD extends CopybookDescriptor {
-  constructor(statementRange: vscode.Range) {
-    super(statementRange, statementRange, 0, "");
-  }
-}
-
-export type RedefinitionVariableDescriptor = {
-  type: "REDEFINITION";
-  nameRange: vscode.Range;
-  name: string;
-};
-
-export type RegularVariableDescriptor = {
-  type: "DEFINITION";
-  levelRange: vscode.Range;
-  level: number;
-  nameRange: vscode.Range;
-  name: string;
-  options: string;
-};
-
-export type CopyFromVariableDescriptor = {
-  type: "COPY-FROM";
-  levelRange: vscode.Range;
-  level: number;
-  nameRange: vscode.Range;
-  name: string;
-  copyFromRange: vscode.Range;
-  suffix: string;
-};
-
-export type VariableDescriptor =
-  | RedefinitionVariableDescriptor
-  | RegularVariableDescriptor
-  | CopyFromVariableDescriptor;
-
-export type DiagnosticMessage = {
-  severity: vscode.DiagnosticSeverity;
-  template: string;
-};
-
-export class StatementDescriptor {
-  constructor(
-    public readonly range: vscode.Range,
-    public readonly statementRange: vscode.Range,
-    public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
-    public readonly children: StatementDescriptor[],
-    public readonly diagnostics: DiagnosticMessage[] = [],
-    public readonly filler: string = BLANK_STATEMENT,
-  ) {}
-}
+import {
+  BLANK_STATEMENT,
+  BLANK_VALUE,
+  CopybookDescriptor,
+  CopybookDescriptorPD,
+  DiagnosticMessage,
+  ParseError,
+  ProgramInfo,
+  SPACE_VALUE,
+  StatementDescriptor,
+  VariableDescriptor,
+} from "./model";
+import {
+  constructRange,
+  constructRangeFromTokens,
+  createOptionsStr,
+} from "./util";
 
 export class CollectingErrorListener extends BaseErrorListener {
   public readonly errors: ParseError[] = [];
@@ -201,65 +140,15 @@ export class NameResolver {
   }
 }
 
-export class VariableAccumulator {
-  private readonly descriptors: (VariableDescriptor | CopybookDescriptor)[] =
-    [];
-  private readonly copybookDescriptors: Map<
-    CopybookDescriptor,
-    VariableDescriptor[]
-  > = new Map();
-
-  public generateDescriptors(): VariableDescriptor[] {
-    const result: VariableDescriptor[] = [];
-
-    for (const descriptor of this.descriptors) {
-      if (descriptor instanceof CopybookDescriptor) {
-        result.push(...(this.copybookDescriptors.get(descriptor) ?? []));
-      } else {
-        result.push(descriptor);
-      }
-    }
-
-    return result;
-  }
-
-  public add(descriptor: VariableDescriptor) {
-    this.descriptors.push(descriptor);
-  }
-
-  public addCopybookPlaceholder(descriptor: CopybookDescriptor) {
-    this.descriptors.push(descriptor);
-  }
-
-  public insertCopybookVariables(
-    descriptor: CopybookDescriptor,
-    variables: VariableDescriptor[],
-  ) {
-    this.copybookDescriptors.set(descriptor, variables);
-  }
-}
-
 type CopyFromOptions =
   | { kind: "COPY_FROM"; suffix: string }
   | { kind: "REGULAR_OPTIONS"; options: string };
 
-export class ProgramInfoAccumulator {
-  public readonly sections: string[] = [];
-  public procedureDivisionNameStart?: number;
-  public procedureDivisionNameEnd?: number;
-}
-
-export class CopybookVisitor extends CopybookParserVisitor<
-  CopybookDescriptor[]
-> {
+export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
   private readonly parentNameResolver: NameResolver = new NameResolver();
-  public readonly programInfo: ProgramInfoAccumulator =
-    new ProgramInfoAccumulator();
+  public readonly programInfo: ProgramInfo = new ProgramInfo();
 
-  public constructor(
-    public accumulator: VariableAccumulator,
-    private readonly messageService: MessageService,
-  ) {
+  public constructor(private readonly messageService: MessageService) {
     super();
   }
 
@@ -318,7 +207,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
       parentInfo?.name,
       parentInfo?.range,
     );
-    this.accumulator.addCopybookPlaceholder(descriptor);
+    this.programInfo.accumulator.addCopybookPlaceholder(descriptor);
 
     return [descriptor, ...(super.visitChildren(ctx) ?? [])];
   };
@@ -340,7 +229,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
 
       if (parsed.kind === "COPY_FROM") {
         const copyFromRange = constructRange(ctx.variableOptionEntry());
-        this.accumulator.add({
+        this.programInfo.accumulator.add({
           levelRange: constructRangeFromTokens(
             ctx.LEVEL_NUMBER().getSymbol(),
             ctx.LEVEL_NUMBER().getSymbol(),
@@ -353,7 +242,7 @@ export class CopybookVisitor extends CopybookParserVisitor<
           type: "COPY-FROM",
         });
       } else {
-        this.accumulator.add({
+        this.programInfo.accumulator.add({
           levelRange: constructRangeFromTokens(
             ctx.LEVEL_NUMBER().getSymbol(),
             ctx.LEVEL_NUMBER().getSymbol(),
@@ -442,7 +331,9 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   protected aggregateResult = concatResults;
 }
 
-export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
+export class DaCoVisitor extends StatementsParserVisitor<
+  StatementDescriptor[]
+> {
   visitDacoSections? = (ctx: DacoSectionsContext): StatementDescriptor[] => {
     const statements: StatementDescriptor[] = [];
     statements.push(
@@ -543,49 +434,4 @@ export class DaCoVisitor extends DaCoParserVisitor<StatementDescriptor[]> {
   };
 
   protected aggregateResult = concatResults;
-}
-
-function constructRange(
-  ctx: ParserRuleContext | null | undefined,
-): vscode.Range {
-  const start = ctx?.start;
-  const stop = ctx?.stop;
-  return constructRangeFromTokens(start, stop);
-}
-
-function constructRangeFromTokens(
-  start: Token | null | undefined,
-  stop: Token | null | undefined,
-): vscode.Range {
-  if (!start) {
-    return new vscode.Range(
-      new vscode.Position(0, 0),
-      new vscode.Position(0, 0),
-    );
-  }
-  const startPosition = new vscode.Position(start.line - 1, start.column);
-  const stopPosition =
-    stop == null || start.start > stop.stop
-      ? startPosition
-      : new vscode.Position(
-          stop.line - 1,
-          stop.column + stop.stop - stop.start + 1,
-        );
-  return new vscode.Range(startPosition, stopPosition);
-}
-
-function createOptionsStr(ctx: ParserRuleContext | null): string {
-  if (!ctx) {
-    return "";
-  }
-  const start = ctx.start?.start;
-  const stop = ctx.stop?.stop;
-
-  if (start && stop) {
-    return (
-      ctx.start?.inputStream?.getTextFromInterval(Interval.of(start!, stop!)) ??
-      ""
-    );
-  }
-  return "";
 }
