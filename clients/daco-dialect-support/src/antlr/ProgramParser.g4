@@ -12,8 +12,8 @@
  *   Broadcom - initial API and implementation
  */
 
-parser grammar CopybookParser;
-options {tokenVocab = CopybookLexer;  superClass = MessageServiceParser;}
+parser grammar ProgramParser;
+options {tokenVocab = ProgramLexer;  superClass = MessageServiceParser;}
 
 @header {
 import { MessageServiceParser } from "../antlr/MessageServiceParser";
