@@ -19,18 +19,15 @@ import {
   Token,
 } from "@code4z/cobol-dialect-api";
 import * as antlr from "antlr4ng";
-import {
-  CollectingErrorListener,
-  DaCoVisitor,
-  StatementDescriptor,
-} from "./parsing";
+import { CollectingErrorListener, DaCoVisitor } from "./parsing";
 import { MessageService } from "./services/MessageService";
-import { DaCoLexer } from "../generated/DaCoLexer";
-import { DaCoParser } from "../generated/DaCoParser";
+import { StatementsLexer } from "../generated/StatementsLexer";
+import { StatementsParser } from "../generated/StatementsParser";
 import { processCopyFrom } from "./copyfrom";
 import { CopybookPreprocessor } from "./copybook";
 import { addParsingErrors } from "./util";
 import { generatePredefinedSections } from "./predefined";
+import { StatementDescriptor } from "./model";
 
 export class DaCoPreprocessor {
   private readonly copybookPreprocessor: CopybookPreprocessor;
@@ -51,12 +48,13 @@ export class DaCoPreprocessor {
     text: string,
   ) {
     text = this.cleanup(context, text);
-    const { variables, programInfo } = await this.copybookPreprocessor.execute(
-      context,
-      text,
-    );
+    const programInfo = await this.copybookPreprocessor.execute(context, text);
 
-    processCopyFrom(context, variables, this.messageService);
+    processCopyFrom(
+      context,
+      programInfo.accumulator.generateDescriptors(),
+      this.messageService,
+    );
     generatePredefinedSections(
       context,
       programInfo.sections,
@@ -207,9 +205,9 @@ export class DaCoPreprocessor {
     text: string,
   ): StatementDescriptor[] {
     const charStream = antlr.CharStream.fromString(text);
-    const lexer = new DaCoLexer(charStream);
+    const lexer = new StatementsLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
-    const parser = new DaCoParser(tokenStream);
+    const parser = new StatementsParser(tokenStream);
     parser.setMessageService(this.messageService);
 
     lexer.removeErrorListeners();

@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { processCopyFrom } from "../../../engine/copyfrom";
-import { VariableDescriptor } from "../../../engine/parsing";
+import { VariableDescriptor } from "../../../engine/model";
 import { createMessageService } from "./utils";
 
 describe("copy-from parsing test", () => {

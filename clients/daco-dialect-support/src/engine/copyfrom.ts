@@ -18,7 +18,7 @@ import {
   CopyFromVariableDescriptor,
   RegularVariableDescriptor,
   VariableDescriptor,
-} from "./parsing";
+} from "./model";
 import { MessageService } from "./services/MessageService";
 
 export function processCopyFrom(

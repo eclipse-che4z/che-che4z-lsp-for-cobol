@@ -13,7 +13,8 @@
  */
 import * as vscode from "vscode";
 import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
-import { ParseError } from "./parsing";
+import { ParseError } from "./model";
+import { Token, ParserRuleContext, Interval } from "antlr4ng";
 
 const FILLER_NAME = "FILLER";
 
@@ -51,4 +52,49 @@ export function addParsingErrors(
       range: error.range,
     });
   });
+}
+
+export function constructRange(
+  ctx: ParserRuleContext | null | undefined,
+): vscode.Range {
+  const start = ctx?.start;
+  const stop = ctx?.stop;
+  return constructRangeFromTokens(start, stop);
+}
+
+export function constructRangeFromTokens(
+  start: Token | null | undefined,
+  stop: Token | null | undefined,
+): vscode.Range {
+  if (!start) {
+    return new vscode.Range(
+      new vscode.Position(0, 0),
+      new vscode.Position(0, 0),
+    );
+  }
+  const startPosition = new vscode.Position(start.line - 1, start.column);
+  const stopPosition =
+    stop == null || start.start > stop.stop
+      ? startPosition
+      : new vscode.Position(
+          stop.line - 1,
+          stop.column + stop.stop - stop.start + 1,
+        );
+  return new vscode.Range(startPosition, stopPosition);
+}
+
+export function createOptionsStr(ctx: ParserRuleContext | null): string {
+  if (!ctx) {
+    return "";
+  }
+  const start = ctx.start?.start;
+  const stop = ctx.stop?.stop;
+
+  if (start && stop) {
+    return (
+      ctx.start?.inputStream?.getTextFromInterval(Interval.of(start!, stop!)) ??
+      ""
+    );
+  }
+  return "";
 }
