@@ -12,8 +12,8 @@
  * and DAF development standards
  */
  
-parser grammar DaCoParser;
-options {tokenVocab = DaCoLexer;  superClass = MessageServiceParser;}
+parser grammar StatementsParser;
+options {tokenVocab = StatementsLexer;  superClass = MessageServiceParser;}
 
 @header {
 import { MessageServiceParser } from "../antlr/MessageServiceParser";
