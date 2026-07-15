@@ -19,7 +19,7 @@ import {
   Token,
 } from "@code4z/cobol-dialect-api";
 import * as antlr from "antlr4ng";
-import { CollectingErrorListener, DaCoVisitor } from "./parsing";
+import { CollectingErrorListener, StatementsVisitor } from "./parsing";
 import { MessageService } from "./services/MessageService";
 import { StatementsLexer } from "../generated/StatementsLexer";
 import { StatementsParser } from "../generated/StatementsParser";
@@ -227,7 +227,7 @@ export class DaCoPreprocessor {
         ...parserErrors.errors,
       ]);
 
-      return new DaCoVisitor().visit(tree) || [];
+      return new StatementsVisitor().visit(tree) || [];
     } catch (e) {
       this.outputChannel.appendLine(
         "Error during parsing: " + JSON.stringify(e),
