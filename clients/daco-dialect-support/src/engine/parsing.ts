@@ -27,12 +27,12 @@ import {
   SkipCopyMaidContext,
   VariableEntryContext,
 } from "../generated/ProgramParser";
-import { VariableParserVisitor } from "../generated/VariableParserVisitor";
+import { CopybookContentParserVisitor } from "../generated/CopybookContentParserVisitor";
 
 import {
   DataDescriptionEntryFormat1Context,
   DataRedefinesClauseContext,
-} from "../generated/VariableParser";
+} from "../generated/CopybookContentParser";
 import { StatementsParserVisitor } from "../generated/StatementsParserVisitor";
 import {
   DacoSectionsContext,
@@ -280,7 +280,7 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
   protected aggregateResult = concatResults;
 }
 
-export class CopybookContentVisitor extends VariableParserVisitor<
+export class CopybookContentVisitor extends CopybookContentParserVisitor<
   VariableDescriptor[]
 > {
   visitDataDescriptionEntryFormat1? = (
@@ -331,7 +331,7 @@ export class CopybookContentVisitor extends VariableParserVisitor<
   protected aggregateResult = concatResults;
 }
 
-export class DaCoVisitor extends StatementsParserVisitor<
+export class StatementsVisitor extends StatementsParserVisitor<
   StatementDescriptor[]
 > {
   visitDacoSections? = (ctx: DacoSectionsContext): StatementDescriptor[] => {

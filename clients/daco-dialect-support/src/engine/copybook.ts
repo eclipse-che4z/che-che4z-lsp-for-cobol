@@ -23,8 +23,8 @@ import { ProgramLexer } from "../generated/ProgramLexer";
 import { MessageService } from "./services/MessageService";
 import { ProgramParser } from "../generated/ProgramParser";
 import { addParsingErrors, extractSuffix, updateVariableName } from "./util";
-import { VariableLexer } from "../generated/VariableLexer";
-import { VariableParser } from "../generated/VariableParser";
+import { CopybookContentLexer } from "../generated/CopybookContentLexer";
+import { CopybookContentParser } from "../generated/CopybookContentParser";
 import {
   CopybookDescriptor,
   CopybookDescriptorPD,
@@ -234,9 +234,9 @@ export class CopybookPreprocessor {
     prevSuffix?: string,
   ): VariableDescriptor[] {
     const charStream = antlr.CharStream.fromString(copybook.text);
-    const lexer = new VariableLexer(charStream);
+    const lexer = new CopybookContentLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
-    const parser = new VariableParser(tokenStream);
+    const parser = new CopybookContentParser(tokenStream);
 
     lexer.removeErrorListeners();
     parser.removeErrorListeners();
