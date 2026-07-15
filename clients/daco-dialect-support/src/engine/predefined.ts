@@ -43,3 +43,4 @@ export function generatePredefinedSections(
 function generatePredefinedSection(section: string): string {
   return `       ${section} SECTION.\n           STOP RUN.\n`;
 }
+
