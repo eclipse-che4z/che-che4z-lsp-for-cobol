@@ -15,7 +15,7 @@
 import {
   CopybookContentVisitor,
   ProgramVisitor,
-  DaCoVisitor,
+  StatementsVisitor,
   NameResolver,
 } from "../../../engine/parsing";
 import { MessageService } from "../../../engine/services/MessageService";
@@ -93,7 +93,7 @@ describe("parsing test", () => {
   });
 
   it("should construct range for the context", () => {
-    const visitor = new DaCoVisitor();
+    const visitor = new StatementsVisitor();
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -111,7 +111,7 @@ describe("parsing test", () => {
   });
 
   it("should create diagnostic for the SORT TABLE context", () => {
-    const visitor = new DaCoVisitor();
+    const visitor = new StatementsVisitor();
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -134,7 +134,7 @@ describe("parsing test", () => {
   });
 
   it("should substitute with value the IF ROW clause context", () => {
-    const visitor = new DaCoVisitor();
+    const visitor = new StatementsVisitor();
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -153,7 +153,7 @@ describe("parsing test", () => {
   });
 
   it("should substitute with space the EXEC statement context", () => {
-    const visitor = new DaCoVisitor();
+    const visitor = new StatementsVisitor();
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },

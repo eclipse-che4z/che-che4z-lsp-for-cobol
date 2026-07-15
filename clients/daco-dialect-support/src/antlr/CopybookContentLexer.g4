@@ -12,7 +12,7 @@
  *   Broadcom - initial API and implementation
  */
 
-lexer grammar VariableLexer;
+lexer grammar CopybookContentLexer;
 
 channels{COMMENTS, TECHNICAL}
 import TechnicalLexer;
