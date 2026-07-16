@@ -22,5 +22,6 @@ export function createMessageService() {
       "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
     "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
     "validation.copy_from.noMatchingVariable": "Source for {0} not found",
+    "copybook.not_found": "{0}: Copybook not found",
   });
 }
