@@ -22,6 +22,7 @@ SECTION : S E C T I O N;
 LINKAGE : L I N K A G E;
 PROCEDURE : P R O C E D U R E;
 DIVISION : D I V I S I O N;
+DATA_DIVISION: D A T A [ \t\r\n]+ D I V I S I O N;
 
 COPY                 : C O P Y ;
 MAID                 : M A I D ;
