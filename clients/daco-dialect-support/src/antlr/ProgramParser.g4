@@ -20,10 +20,14 @@ import { MessageServiceParser } from "../antlr/MessageServiceParser";
 }
 
 startRule
-   : skipUntilFirstSection
-     dataSection*
+   : skipUntilDataDivision
+     dataDivision?
      procedureDivision?
      EOF
+   ;
+
+dataDivision
+   : DATA_DIVISION DOT_FS skipUntilFirstSection dataSection*
    ;
 
 procedureDivision
@@ -52,6 +56,10 @@ procedureSection
 sectionName
    : IDENTIFIER
    | DACO_COPYBOOK_IDENTIFIER
+   ;
+
+skipUntilDataDivision
+   : (~(DATA_DIVISION|PROCEDURE))*
    ;
 
 skipUntilFirstSection
