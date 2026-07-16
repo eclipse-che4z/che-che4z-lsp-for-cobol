@@ -59,7 +59,7 @@ sectionName
    ;
 
 skipUntilDataDivision
-   : (~DATA_DIVISION)*
+   : (~(DATA_DIVISION|PROCEDURE))*
    ;
 
 skipUntilFirstSection
