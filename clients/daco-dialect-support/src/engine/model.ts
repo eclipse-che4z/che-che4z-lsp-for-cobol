@@ -26,8 +26,13 @@ export interface ParseError {
 
 export class ProgramInfo {
   public readonly sections: string[] = [];
+
+  public dataDivisionExists: boolean = false;
+  public linkageSectionNameEnd?: number;
+  public workingStorageNameEnd?: number;
   public procedureDivisionNameStart?: number;
   public procedureDivisionNameEnd?: number;
+
   public copybooks: CopybookDescriptor[] = [];
   public accumulator: VariableAccumulator = new VariableAccumulator();
 }

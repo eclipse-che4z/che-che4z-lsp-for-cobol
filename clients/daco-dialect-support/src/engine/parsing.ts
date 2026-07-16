@@ -22,10 +22,12 @@ import {
 import { ProgramParserVisitor } from "../generated/ProgramParserVisitor";
 import {
   CopyMaidContext,
+  DataDivisionContext,
   ProcedureDivisionContext,
   ProcedureSectionContext,
   SkipCopyMaidContext,
   VariableEntryContext,
+  DataSectionContext,
 } from "../generated/ProgramParser";
 import { CopybookContentParserVisitor } from "../generated/CopybookContentParserVisitor";
 
@@ -274,6 +276,21 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
   ): CopybookDescriptor[] => {
     this.programInfo.procedureDivisionNameStart = ctx.PROCEDURE().symbol.line;
     this.programInfo.procedureDivisionNameEnd = ctx.DOT_FS().symbol.line;
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitDataDivision = (ctx: DataDivisionContext): CopybookDescriptor[] => {
+    this.programInfo.dataDivisionExists = true;
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitDataSection = (ctx: DataSectionContext): CopybookDescriptor[] => {
+    if (ctx.WORKING_STORAGE()) {
+      this.programInfo.workingStorageNameEnd = ctx.DOT_FS()?.getSymbol()?.line;
+    }
+    if (ctx.LINKAGE()) {
+      this.programInfo.linkageSectionNameEnd = ctx.DOT_FS()?.getSymbol()?.line;
+    }
     return super.visitChildren(ctx) ?? [];
   };
 

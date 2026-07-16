@@ -53,6 +53,7 @@ describe("DaCoPreprocessor test", () => {
     }),
     replace: jest.fn(),
     replaceWithMap: jest.fn(),
+    insert: jest.fn(),
     addDiagnostic: jest.fn(),
   };
 
