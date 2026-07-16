@@ -209,7 +209,7 @@ class Context implements IDocumentProcessingContext {
     };
     this.replacementMaps.push(replacement);
   }
-  insert(line: number, text: string, source?: string): void {
+  insert(line: number, text: string, source: string): void {
     this.insertions.push({ line, text, source });
   }
   addDiagnostic(diagnostic: vscode.Diagnostic): void {
