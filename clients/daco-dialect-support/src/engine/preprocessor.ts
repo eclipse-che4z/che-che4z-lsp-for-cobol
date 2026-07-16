@@ -26,7 +26,10 @@ import { StatementsParser } from "../generated/StatementsParser";
 import { processCopyFrom } from "./copyfrom";
 import { CopybookPreprocessor } from "./copybook";
 import { addParsingErrors } from "./util";
-import { generatePredefinedSections } from "./predefined";
+import {
+  generatePredefinedSections,
+  generatePredefinedVariables,
+} from "./predefined";
 import { StatementDescriptor } from "./model";
 
 export class DaCoPreprocessor {
@@ -49,11 +52,16 @@ export class DaCoPreprocessor {
   ) {
     text = this.cleanup(context, text);
     const programInfo = await this.copybookPreprocessor.execute(context, text);
+    const variables = programInfo.accumulator.generateDescriptors();
 
-    processCopyFrom(
+    processCopyFrom(context, variables, this.messageService);
+    generatePredefinedVariables(
       context,
-      programInfo.accumulator.generateDescriptors(),
-      this.messageService,
+      variables,
+      programInfo.dataDivisionExists,
+      programInfo.linkageSectionNameEnd,
+      programInfo.workingStorageNameEnd,
+      programInfo.procedureDivisionNameStart,
     );
     generatePredefinedSections(
       context,
