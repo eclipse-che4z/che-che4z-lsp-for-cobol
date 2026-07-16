@@ -60,7 +60,7 @@ suite("Copybook Test Suite", function () {
     const editor = await helper.showDocument("DaCo02.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 7);
+    assert.strictEqual(diagnostics.length, 3);
 
     helper.checkDiagnostic(
       diagnostics,
@@ -72,6 +72,12 @@ suite("Copybook Test Suite", function () {
     helper.checkDiagnostic(
       diagnostics,
       "Invalid layout identifier",
+      range(pos(8, 24), pos(8, 33)),
+    );
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "TEST-AA12: Copybook not found",
       range(pos(8, 24), pos(8, 33)),
     );
   });
@@ -266,6 +272,19 @@ suite("Copybook Test Suite", function () {
       diagnostics,
       "Variable NOT_EXISTING is not defined",
       range(pos(16, 19), pos(16, 31)),
+    );
+  });
+
+  test("Show error if copybook was not found", async () => {
+    const editor = await helper.showDocument("DaCo100.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "TEST-NUL: Copybook not found",
+      range(pos(8, 21), pos(8, 29)),
     );
   });
 });
