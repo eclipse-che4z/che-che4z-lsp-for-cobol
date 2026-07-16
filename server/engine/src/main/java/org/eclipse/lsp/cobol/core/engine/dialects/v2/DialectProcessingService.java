@@ -44,6 +44,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 @Singleton
 public class DialectProcessingService {
   private final Provider<CobolLanguageClient> cliendProvider;
+  private static final String IMPLICIT_DEFAULT = "implicit:///implicit/%s/DEFAULT.cpy";
 
   @Inject
   public DialectProcessingService(Provider<CobolLanguageClient> clientProvider) {
@@ -109,7 +110,11 @@ public class DialectProcessingService {
 
     // Apply insertion first for simplification
     for (DocumentInsertion insertion : insertions) {
-      ExtendedText extendedText = new ExtendedText(insertion.getText(), insertion.getSource());
+      ExtendedText extendedText =
+          new ExtendedText(
+              insertion.getText(),
+              Optional.ofNullable(insertion.getSource())
+                  .orElse(String.format(IMPLICIT_DEFAULT, dialectName)));
       document.insertCopybook(insertion.getLine(), extendedText);
     }
 
