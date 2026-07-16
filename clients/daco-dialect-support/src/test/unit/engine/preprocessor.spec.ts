@@ -177,6 +177,23 @@ describe("DaCoPreprocessor test", () => {
     expect(copybookContext.replace).not.toHaveBeenCalled();
   });
 
+  it("should report an error if copybook was not resolved", async () => {
+    context.resolveCopybook = jest.fn().mockResolvedValue(undefined);
+
+    await preprocessor.execute(
+      context,
+      Uri.parse("file:///test.cbl"),
+      HEADER_0 +
+        "          01 COPY MAID NAME-ABC KMK.\n" +
+        "          PROCEDURE DIVISION.\n" +
+        "              DISPLAY ABC.\n",
+    );
+
+    expect(context.addDiagnostic).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "NAME-ABC: Copybook not found" }),
+    );
+  });
+
   it("should parse READ TRANSACTION", async () => {
     await preprocessor.execute(
       context,
