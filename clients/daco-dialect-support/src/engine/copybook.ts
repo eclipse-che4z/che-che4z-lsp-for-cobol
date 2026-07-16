@@ -151,21 +151,31 @@ export class CopybookPreprocessor {
         descriptor.nameRange,
       );
 
-      if (copybook) {
-        console.log(
-          `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+      if (!copybook) {
+        const message = this.messageService.get(
+          "copybook.not_found",
+          descriptor.name,
         );
-        this.outputChannel.appendLine(
-          `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+        context.addDiagnostic(
+          new vscode.Diagnostic(descriptor.nameRange, message),
         );
-        const variables = this.insertCopybookContent(
-          context,
-          copybook,
-          descriptor.level,
-          parentNameSuffix,
-        );
-        accumulator.insertCopybookVariables(descriptor, variables);
+        context.replace(descriptor.statementRange, "");
+        continue;
       }
+
+      console.log(
+        `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+      );
+      this.outputChannel.appendLine(
+        `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
+      );
+      const variables = this.insertCopybookContent(
+        context,
+        copybook,
+        descriptor.level,
+        parentNameSuffix,
+      );
+      accumulator.insertCopybookVariables(descriptor, variables);
     }
   }
 
