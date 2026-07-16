@@ -17,7 +17,6 @@ import { type CopyStatementParser, MainExtensionId } from "./common";
 
 let v2Api: V2Api | undefined = undefined;
 
-
 export type Token = {
   name: string;
   range: vscode.Range;
@@ -178,6 +177,6 @@ export interface IDocumentProcessingContext {
     tokenItems: Item[],
     replacementMap: string,
   ): void;
-  insert(line: number, text: string, source?: string): void;
+  insert(line: number, text: string, source: string): void;
   addDiagnostic(diagnostic: vscode.Diagnostic): void;
 }
