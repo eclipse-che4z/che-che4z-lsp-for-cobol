@@ -282,6 +282,7 @@ export class CopybookPreprocessor {
   ) {
     if (suffix) {
       const updatedName = updateVariableName(descriptor.name, suffix);
+      descriptor.name = updatedName;
       context.replace(descriptor.nameRange, updatedName);
     }
 

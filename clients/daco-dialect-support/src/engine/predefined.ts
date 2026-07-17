@@ -92,11 +92,7 @@ export function generatePredefinedVariables(
 
 function generateTables(variables: VariableDescriptor[]): string {
   let result = "";
-  const defined = new Set(
-    variables
-      .filter((v) => v.type === "DEFINITION")
-      .map((v) => v.name.toUpperCase()),
-  );
+  const defined = new Set(variables.map((v) => v.name.toUpperCase()));
 
   for (const name of defined) {
     const table = getTableInfo(name);
