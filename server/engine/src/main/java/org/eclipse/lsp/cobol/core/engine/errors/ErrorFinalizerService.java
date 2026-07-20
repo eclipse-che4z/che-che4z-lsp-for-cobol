@@ -267,7 +267,8 @@ public class ErrorFinalizerService {
     return err ->
         (err.getLocation() != null
             && err.getLocation().getCopybookId() != null
-            && !processedErrors.contains(err));
+            && !processedErrors.contains(err)
+            && err.getSeverity() == ErrorSeverity.ERROR);
   }
 
   /**
