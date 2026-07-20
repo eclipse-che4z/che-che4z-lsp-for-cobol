@@ -287,4 +287,17 @@ suite("Copybook Test Suite", function () {
       range(pos(8, 21), pos(8, 29)),
     );
   });
+
+  test("Copybook was cleaned up before insertion", async () => {
+    const editor = await helper.showDocument("DaCo103.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(12, 19), pos(12, 31)),
+    );
+  });
 });
