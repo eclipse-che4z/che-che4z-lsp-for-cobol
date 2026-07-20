@@ -326,13 +326,7 @@ export class CopybookPreprocessor {
       lines[i] =
         SIX_SPACES.slice(0, line.length) +
         line.slice(SEQUENCE_NUMBER_AREA_END, PROGRAM_TEXT_END) +
-        EIGHT_SPACES.slice(
-          0,
-          Math.max(
-            0,
-            line.length - PROGRAM_TEXT_END,
-          ),
-        ) +
+        EIGHT_SPACES.slice(0, Math.max(0, line.length - PROGRAM_TEXT_END)) +
         line.slice(IDENTIFICATION_AREA_END);
     }
 
