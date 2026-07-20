@@ -330,7 +330,7 @@ export class CopybookPreprocessor {
           0,
           Math.max(
             0,
-            Math.min(SEQUENCE_NUMBER_AREA_END, line.length - PROGRAM_TEXT_END),
+            line.length - PROGRAM_TEXT_END,
           ),
         ) +
         line.slice(IDENTIFICATION_AREA_END);
