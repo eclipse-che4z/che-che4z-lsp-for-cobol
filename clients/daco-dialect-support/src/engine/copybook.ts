@@ -35,6 +35,11 @@ import {
 } from "./model";
 
 const WRK_SUFFIX = "WRK";
+const SEQUENCE_NUMBER_AREA_END = 6;
+const PROGRAM_TEXT_END = 72;
+const IDENTIFICATION_AREA_END = 80;
+const SIX_SPACES = "      ";
+const EIGHT_SPACES = "        ";
 
 export class CopybookPreprocessor {
   private firstCopybookLevel: number = 0;
@@ -243,7 +248,9 @@ export class CopybookPreprocessor {
     copybookLevel: number,
     prevSuffix?: string,
   ): VariableDescriptor[] {
-    const charStream = antlr.CharStream.fromString(copybook.text);
+    const charStream = antlr.CharStream.fromString(
+      this.cleanCopybook(copybook.text),
+    );
     const lexer = new CopybookContentLexer(charStream);
     const tokenStream = new antlr.CommonTokenStream(lexer);
     const parser = new CopybookContentParser(tokenStream);
@@ -308,5 +315,21 @@ export class CopybookPreprocessor {
       return level - this.firstCopybookLevel + copybookLevel;
     }
     return level;
+  }
+
+  private cleanCopybook(text: string): string {
+    const lines = text.split(/\r?\n/);
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      lines[i] =
+        SIX_SPACES.slice(0, line.length) +
+        line.slice(SEQUENCE_NUMBER_AREA_END, PROGRAM_TEXT_END) +
+        EIGHT_SPACES.slice(0, Math.max(0, line.length - PROGRAM_TEXT_END)) +
+        line.slice(IDENTIFICATION_AREA_END);
+    }
+
+    return lines.join("\n");
   }
 }
