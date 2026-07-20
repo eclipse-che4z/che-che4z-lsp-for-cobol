@@ -324,7 +324,7 @@ export class CopybookPreprocessor {
       const line = lines[i];
 
       lines[i] =
-        SIX_SPACES.slice(0, Math.min(SEQUENCE_NUMBER_AREA_END, line.length)) +
+        SIX_SPACES.slice(0, line.length) +
         line.slice(SEQUENCE_NUMBER_AREA_END, PROGRAM_TEXT_END) +
         EIGHT_SPACES.slice(
           0,
