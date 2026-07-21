@@ -38,10 +38,10 @@ DACO_COPYBOOK_IDENTIFIER
   : [A-Z0-9]+ ('-' [A-Z0-9]*)?
   ;
 
-CR                   : C R;
-DB                   : D B;
-
 mode PICTURECLAUSE;
+
+fragment CR                   : C R;
+fragment DB                   : D B;
 FINALCHARSTRING: CHARSTRING+ ->popMode;
 CHARSTRING: PICTURECHARSGROUP1+ PICTURECHARSGROUP2? LParIntegralRPar? '.'? (PICTURECHARSGROUP1|PICTURECHARSGROUP2)
 			PICTURECHARSGROUP1+ PICTURECHARSGROUP2? LParIntegralRPar?|
