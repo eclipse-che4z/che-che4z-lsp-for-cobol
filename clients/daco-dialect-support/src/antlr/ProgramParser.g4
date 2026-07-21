@@ -79,7 +79,7 @@ copyMaid
    : LEVEL_NUMBER? COPY MAID 
       layoutId
       layoutUsage?
-      DOT_FS
+      DOT_FS?
    ;
 
 layoutId
@@ -91,7 +91,7 @@ layoutUsage
    ;
 
 variableEntry
-   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (variableOptionEntry) DOT_FS
+   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER variableOptionEntry DOT_FS
    ;
 
 variableOptionEntry
