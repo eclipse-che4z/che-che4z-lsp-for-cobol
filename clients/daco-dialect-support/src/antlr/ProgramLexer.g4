@@ -28,8 +28,6 @@ COPY                 : C O P Y ;
 MAID                 : M A I D ;
 PICTURE              : P I C T U R E -> pushMode(PICTURECLAUSE);
 PIC                  : P I C  -> pushMode(PICTURECLAUSE);
-CR                   : C R;
-DB                   : D B;
 
 LEVEL_NUMBER : ([1-9])|([0][1-9])|([1234][0-9]);
 LEVEL_NUMBER_66 : '66';
@@ -39,6 +37,9 @@ LEVEL_NUMBER_88 : '88';
 DACO_COPYBOOK_IDENTIFIER
   : [A-Z0-9]+ ('-' [A-Z0-9]*)?
   ;
+
+CR                   : C R;
+DB                   : D B;
 
 mode PICTURECLAUSE;
 FINALCHARSTRING: CHARSTRING+ ->popMode;
