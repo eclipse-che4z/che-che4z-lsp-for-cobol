@@ -326,4 +326,17 @@ suite("Miscellaneous statements Test Suite", function () {
       range(pos(11, 19), pos(11, 31)),
     );
   });
+
+  test("Process PIC clause with dots inside successfully", async () => {
+    const editor = await helper.showDocument("DaCo104.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+    );
+  });
 });
