@@ -79,7 +79,7 @@ copyMaid
    : LEVEL_NUMBER? COPY MAID 
       layoutId
       layoutUsage?
-      DOT_FS
+      DOT_FS?
    ;
 
 layoutId
@@ -96,6 +96,7 @@ variableEntry
 
 variableOptionEntry
    : (~DOT_FS)*
+   | PIC ~DOT_FS (DOT_FS ~DOT_FS)* (~DOT_FS)*
    ;
 
 variableEntrySpecificLevel
