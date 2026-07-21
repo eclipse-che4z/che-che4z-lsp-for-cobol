@@ -91,12 +91,11 @@ layoutUsage
    ;
 
 variableEntry
-   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER (variableOptionEntry) DOT_FS
+   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER variableOptionEntry DOT_FS
    ;
 
 variableOptionEntry
    : (~DOT_FS)*
-   | PIC ~DOT_FS (DOT_FS ~DOT_FS)* (~DOT_FS)*
    ;
 
 variableEntrySpecificLevel
