@@ -46,7 +46,7 @@ procedureDivisionItem
 skipCopyMaid
    : LEVEL_NUMBER? COPY MAID 
       layoutId
-      layoutUsage?
+      ({this.inputStream?.LT(-1)?.line === this.inputStream?.LT(1)?.line}? layoutUsage)?
    ;
 
 procedureSection
