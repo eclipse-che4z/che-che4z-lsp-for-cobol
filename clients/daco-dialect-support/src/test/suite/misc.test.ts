@@ -339,4 +339,17 @@ suite("Miscellaneous statements Test Suite", function () {
       range(pos(13, 19), pos(13, 31)),
     );
   });
+
+  test("Allow for 66, 77 and 88 levels non-canonical variable names", async () => {
+    const editor = await helper.showDocument("DaCo107.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+    );
+  });
 });

@@ -39,11 +39,11 @@ describe("parsing test", () => {
     expect(result).toEqual([]);
   });
 
-  it("should fallback when DACO_COPYBOOK_IDENTIFIER is missing", () => {
+  it("should fallback when identifier is missing", () => {
     const visitor = new ProgramVisitor(createMessageService());
 
     const ctx = {
-      DACO_COPYBOOK_IDENTIFIER: () => null,
+      _identifier: () => null,
       getChildCount: () => 0,
       getChild: () => null,
       LEVEL_NUMBER: () => ({ getText: () => "01" }),
