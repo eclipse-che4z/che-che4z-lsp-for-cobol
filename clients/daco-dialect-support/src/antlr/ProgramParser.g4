@@ -62,7 +62,6 @@ identifier
    | DACO_COPYBOOK_IDENTIFIER
    ;
 
-
 skipUntilDataDivision
    : (~(DATA_DIVISION | PROCEDURE))*
    ;
