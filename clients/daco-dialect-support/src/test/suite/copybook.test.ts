@@ -313,4 +313,17 @@ suite("Copybook Test Suite", function () {
       range(pos(12, 19), pos(12, 31)),
     );
   });
+
+  test("Process MAID copybook in the PROCEDURE DIVISION without final dot (under if condition)", async () => {
+    const editor = await helper.showDocument("DaCo106.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(16, 19), pos(16, 31)),
+    );
+  });
 });
