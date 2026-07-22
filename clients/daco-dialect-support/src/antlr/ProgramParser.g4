@@ -54,9 +54,14 @@ procedureSection
    ;
 
 sectionName
+   : identifier
+   ;
+
+identifier
    : IDENTIFIER
    | DACO_COPYBOOK_IDENTIFIER
    ;
+
 
 skipUntilDataDivision
    : (~(DATA_DIVISION | PROCEDURE))*
@@ -91,7 +96,7 @@ layoutUsage
    ;
 
 variableEntry
-   : LEVEL_NUMBER DACO_COPYBOOK_IDENTIFIER variableOptionEntry DOT_FS
+   : LEVEL_NUMBER identifier variableOptionEntry DOT_FS
    ;
 
 variableOptionEntry
@@ -99,7 +104,7 @@ variableOptionEntry
    ;
 
 variableEntrySpecificLevel
-   : specificLevelNumber (DACO_COPYBOOK_IDENTIFIER | IDENTIFIER) (~DOT_FS)* DOT_FS
+   : specificLevelNumber identifier (~DOT_FS)* DOT_FS
    ;
 
 specificLevelNumber
