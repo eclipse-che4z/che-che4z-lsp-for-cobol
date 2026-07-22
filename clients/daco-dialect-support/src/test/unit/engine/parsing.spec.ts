@@ -43,7 +43,7 @@ describe("parsing test", () => {
     const visitor = new ProgramVisitor(createMessageService());
 
     const ctx = {
-      identifier: () => null,
+      _identifier: () => null,
       getChildCount: () => 0,
       getChild: () => null,
       LEVEL_NUMBER: () => ({ getText: () => "01" }),
