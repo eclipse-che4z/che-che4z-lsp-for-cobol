@@ -215,13 +215,13 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
   };
 
   visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
-    const newName = ctx.DACO_COPYBOOK_IDENTIFIER()?.getText()?.toUpperCase();
+    const newName = ctx._identifier?.text?.toUpperCase();
     const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
 
     if (newName) {
       const nameRange = constructRangeFromTokens(
-        ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
-        ctx.DACO_COPYBOOK_IDENTIFIER().getSymbol(),
+        ctx._identifier,
+        ctx._identifier,
       );
 
       this.parentNameResolver.pushName(level, newName, nameRange);
