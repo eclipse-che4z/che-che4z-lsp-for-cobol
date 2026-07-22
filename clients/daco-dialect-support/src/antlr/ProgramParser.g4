@@ -99,7 +99,7 @@ variableOptionEntry
    ;
 
 variableEntrySpecificLevel
-   : specificLevelNumber DACO_COPYBOOK_IDENTIFIER (~DOT_FS)* DOT_FS
+   : specificLevelNumber (DACO_COPYBOOK_IDENTIFIER | IDENTIFIER) (~DOT_FS)* DOT_FS
    ;
 
 specificLevelNumber
