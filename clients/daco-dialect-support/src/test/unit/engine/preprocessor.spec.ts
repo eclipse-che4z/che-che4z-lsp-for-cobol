@@ -90,7 +90,7 @@ describe("DaCoPreprocessor test", () => {
     await preprocessor.execute(
       context,
       Uri.parse("file:///test.cbl"),
-      HEADER_0 + "          COPY MAID TEST-A12 SUFFIX.",
+      HEADER_0 + "       01 COPY MAID TEST-A12 SUFFIX.",
     );
 
     expect(context.addDiagnostic).toHaveBeenCalledWith(
