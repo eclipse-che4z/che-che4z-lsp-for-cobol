@@ -1240,16 +1240,37 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
 
   @Override
   public List<Node> visitProcedureName(ProcedureNameContext ctx) {
+    List<Node> result = new ArrayList<>();
     String ofSection =
         ofNullable(ctx.inSection())
             .map(InSectionContext::sectionName)
             .map(VisitorHelper::getName)
             .orElse(null);
-    return addTreeNode(
-        ctx.paragraphName(),
-        locality ->
-            new CodeBlockUsageNode(
-                locality, VisitorHelper.getName(ctx.paragraphName()), ofSection));
+    List<Node> child = visitInSection(ctx.inSection());
+    result.addAll(addTreeNode(
+            ctx.paragraphName(),
+            locality ->
+                    new CodeBlockUsageNode(
+                            locality, getName(ctx.paragraphName()), ofSection)));
+    result.addAll(child);
+
+    return  result;
+  }
+
+  @Override
+  public List<Node> visitInSection(InSectionContext ctx) {
+    String ofSection =
+            ofNullable(ctx.sectionName())
+                    .map(VisitorHelper::getName)
+                    .orElse(null);
+    if (ofSection != null) {
+      return addTreeNode(
+              ctx.sectionName(),
+              locality ->
+                      new CodeBlockUsageNode(
+                              locality, null, VisitorHelper.getName(ctx.sectionName())));
+    }
+    return Collections.emptyList();
   }
 
   @Override
