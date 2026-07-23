@@ -44,7 +44,7 @@ procedureDivisionItem
    ;
 
 skipCopyMaid
-   : LEVEL_NUMBER? COPY MAID 
+   : COPY MAID 
       layoutId
       ({this.inputStream?.LT(-1)?.line === this.inputStream?.LT(1)?.line}? layoutUsage)?
    ;
@@ -75,7 +75,7 @@ dataDescriptionEntry
    ;
 
 copyMaid
-   : LEVEL_NUMBER? COPY MAID 
+   : LEVEL_NUMBER COPY MAID 
       layoutId
       layoutUsage?
       DOT_FS?
@@ -98,7 +98,7 @@ variableOptionEntry
    ;
 
 variableEntrySpecificLevel
-   : specificLevelNumber identifier = (IDENTIFIER | DACO_COPYBOOK_IDENTIFIER) (~DOT_FS)* DOT_FS
+   : specificLevelNumber identifier = (IDENTIFIER | DACO_COPYBOOK_IDENTIFIER) variableOptionEntry DOT_FS
    ;
 
 specificLevelNumber
