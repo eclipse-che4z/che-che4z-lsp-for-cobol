@@ -137,13 +137,6 @@ export class DaCoPreprocessor {
     descriptors: StatementDescriptor[],
     context: IDocumentProcessingContext,
   ) {
-    descriptors.forEach((descriptor) =>
-      console.log(
-        `Statement Descriptor: type=${descriptor.type}, range=${JSON.stringify(
-          descriptor.statementRange,
-        )}`,
-      ),
-    );
     descriptors.forEach((descriptor) => {
       this.outputChannel.appendLine(
         `Statement Descriptor: ${JSON.stringify(descriptor)}`,

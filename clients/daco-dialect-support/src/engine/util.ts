@@ -19,7 +19,6 @@ import { Token, ParserRuleContext, Interval } from "antlr4ng";
 const FILLER_NAME = "FILLER";
 
 export function updateVariableName(name: string, suffix: string) {
-  console.log(`Updating variable name '${name}' with suffix '${suffix}'...`);
   if (name.toUpperCase() === FILLER_NAME) {
     return name;
   }

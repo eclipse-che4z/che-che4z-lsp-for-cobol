@@ -192,8 +192,6 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
     const name = layoutId.getText();
     const suffix = layoutUsage?.getText();
 
-    console.log("Copybook level: " + ctx.LEVEL_NUMBER()?.getText());
-
     const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
     const statementRange = constructRange(ctx);
     const nameRange = constructRange(layoutId);

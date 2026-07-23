@@ -94,7 +94,6 @@ export class CopybookPreprocessor {
       `Parsing completed with ${lexerErrors.errors.length} lexer errors and ${parserErrors.errors.length} parser errors`,
     );
 
-    console.log(`Found ${programInfo.copybooks.length} copybook descriptors:`);
     return {
       programInfo: visitor.programInfo,
       errors: [...lexerErrors.errors, ...parserErrors.errors],
@@ -106,12 +105,6 @@ export class CopybookPreprocessor {
     descriptors: CopybookDescriptor[],
     accumulator: VariableAccumulator,
   ) {
-    descriptors.forEach((descriptor) =>
-      console.log(
-        `Descriptor: name=${descriptor.name}, level=${descriptor.level}, suffix=${descriptor.suffix}, parentName=${descriptor.parentName}`,
-      ),
-    );
-
     for (const descriptor of descriptors) {
       this.outputChannel.appendLine(
         `Descriptor: ${JSON.stringify(descriptor)}`,
@@ -148,7 +141,6 @@ export class CopybookPreprocessor {
           descriptor.name + (descriptor.suffix ? `_${descriptor.suffix}` : "");
       }
 
-      console.log(`Resolving copybook '${copybookName}'...`);
       this.outputChannel.appendLine(`Resolving copybook '${copybookName}'...`);
       const copybook = await context.resolveCopybook(
         copybookName,
@@ -168,9 +160,6 @@ export class CopybookPreprocessor {
         continue;
       }
 
-      console.log(
-        `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
-      );
       this.outputChannel.appendLine(
         `Resolved copybook '${copybookName}' at ${copybook.uri.toString()}`,
       );
@@ -210,8 +199,17 @@ export class CopybookPreprocessor {
     suffixRange: vscode.Range | undefined,
   ) {
     if (suffix && suffixRange && !/^[A-Z]{3}$/.test(suffix)) {
-      const message = this.messageService.get("validation.layout_usage");
-      context.addDiagnostic(new vscode.Diagnostic(suffixRange, message));
+      const message = this.messageService.get(
+        "validation.layout_usage",
+        suffix,
+      );
+      context.addDiagnostic(
+        new vscode.Diagnostic(
+          suffixRange,
+          message,
+          vscode.DiagnosticSeverity.Warning,
+        ),
+      );
     }
   }
 
@@ -231,7 +229,7 @@ export class CopybookPreprocessor {
           new vscode.Diagnostic(
             parentNameRange,
             message,
-            vscode.DiagnosticSeverity.Error,
+            vscode.DiagnosticSeverity.Warning,
           ),
         );
       }

@@ -18,8 +18,8 @@ import {
   StatementsVisitor,
   NameResolver,
 } from "../../../engine/parsing";
-import { MessageService } from "../../../engine/services/MessageService";
 import { Range } from "./__mocks__/vscode";
+import { createMessageService } from "./utils";
 
 describe("parsing test", () => {
   beforeEach(() => {
@@ -196,10 +196,3 @@ describe("name resolver test", () => {
     expect(result).toStrictEqual({ name: "TEST3-2", range });
   });
 });
-
-function createMessageService() {
-  return new MessageService({
-    "validation.layout_identifier": "Invalid layout identifier",
-    "validation.layout_usage": "Invalid layout usage",
-  });
-}
