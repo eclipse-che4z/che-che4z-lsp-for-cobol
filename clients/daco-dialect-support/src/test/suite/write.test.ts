@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom - initial API and implementation
  */
+import * as vscode from "vscode";
 import * as assert from "node:assert";
 import * as helper from "./testHelper";
 import { pos, range } from "./testHelper";
@@ -116,6 +117,7 @@ suite("WRITE statement Test Suite", function () {
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(14, 46), pos(14, 48)),
+      vscode.DiagnosticSeverity.Warning,
     );
   });
 
@@ -159,12 +161,14 @@ suite("WRITE statement Test Suite", function () {
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(48, 53), pos(48, 55)),
+      vscode.DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(49, 53), pos(49, 56)),
+      vscode.DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
@@ -177,18 +181,21 @@ suite("WRITE statement Test Suite", function () {
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(51, 67), pos(51, 69)),
+      vscode.DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(52, 67), pos(52, 70)),
+      vscode.DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(54, 60), pos(54, 63)),
+      vscode.DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(
@@ -213,6 +220,7 @@ suite("WRITE statement Test Suite", function () {
       diagnostics,
       "Allowed range is 80 to 200",
       range(pos(56, 60), pos(56, 63)),
+      vscode.DiagnosticSeverity.Warning,
     );
 
     helper.checkDiagnostic(

@@ -18,8 +18,8 @@ import {
   StatementsVisitor,
   NameResolver,
 } from "../../../engine/parsing";
-import { MessageService } from "../../../engine/services/MessageService";
 import { Range } from "./__mocks__/vscode";
+import { createMessageService } from "./utils";
 
 describe("parsing test", () => {
   beforeEach(() => {
@@ -93,7 +93,7 @@ describe("parsing test", () => {
   });
 
   it("should construct range for the context", () => {
-    const visitor = new StatementsVisitor();
+    const visitor = new StatementsVisitor(createMessageService());
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -111,7 +111,7 @@ describe("parsing test", () => {
   });
 
   it("should create diagnostic for the SORT TABLE context", () => {
-    const visitor = new StatementsVisitor();
+    const visitor = new StatementsVisitor(createMessageService());
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -134,7 +134,7 @@ describe("parsing test", () => {
   });
 
   it("should substitute with value the IF ROW clause context", () => {
-    const visitor = new StatementsVisitor();
+    const visitor = new StatementsVisitor(createMessageService());
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -153,7 +153,7 @@ describe("parsing test", () => {
   });
 
   it("should substitute with space the EXEC statement context", () => {
-    const visitor = new StatementsVisitor();
+    const visitor = new StatementsVisitor(createMessageService());
 
     const ctx = {
       start: { line: 1, column: 0, start: 0 },
@@ -196,10 +196,3 @@ describe("name resolver test", () => {
     expect(result).toStrictEqual({ name: "TEST3-2", range });
   });
 });
-
-function createMessageService() {
-  return new MessageService({
-    "validation.layout_identifier": "Invalid layout identifier",
-    "validation.layout_usage": "Invalid layout usage",
-  });
-}
