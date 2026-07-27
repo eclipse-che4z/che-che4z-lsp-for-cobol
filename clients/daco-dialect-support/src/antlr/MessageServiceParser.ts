@@ -13,6 +13,7 @@
  */
 import { Parser, Token } from "antlr4ng";
 import { MessageService } from "../engine/services/MessageService";
+import { tryParseInt } from "../engine/util";
 
 export abstract class MessageServiceParser extends Parser {
   private static readonly ALPHANUMERIC: RegExp = /^[a-zA-Z0-9]+$/;
@@ -51,7 +52,7 @@ export abstract class MessageServiceParser extends Parser {
   }
 
   protected validateValue(actual: string | undefined, expected: string) {
-    if (actual != undefined && actual !== expected) {
+    if (actual !== undefined && actual !== expected) {
       this.notifyError("parsers.validValueMsg", actual, expected);
     }
   }
@@ -62,7 +63,7 @@ export abstract class MessageServiceParser extends Parser {
    * @param input string to check
    */
   protected validateSubSchemaNameLength(input: string | undefined) {
-    if (input != undefined && !/16|18/.exec(input)) {
+    if (input !== undefined && !/16|18/.exec(input)) {
       this.notifyError("cobolParser.subSchemaNameLength", input);
     }
   }
@@ -79,7 +80,7 @@ export abstract class MessageServiceParser extends Parser {
     objectType: string,
     validLength: number,
   ) {
-    if (input != undefined && input.length > validLength) {
+    if (input !== undefined && input.length > validLength) {
       this.notifyError("parsers.maxLength", validLength.toString(), objectType);
     }
   }
@@ -94,7 +95,7 @@ export abstract class MessageServiceParser extends Parser {
     input: string | undefined,
     objectType: string,
   ) {
-    if (input != undefined && !MessageServiceParser.ALPHANUMERIC.test(input)) {
+    if (input !== undefined && !MessageServiceParser.ALPHANUMERIC.test(input)) {
       this.notifyError("parsers.alphaNumeric", objectType);
     }
   }
@@ -111,7 +112,7 @@ export abstract class MessageServiceParser extends Parser {
     objectType: string,
     validLength: number,
   ) {
-    if (input != undefined && input.length != validLength) {
+    if (input !== undefined && input.length != validLength) {
       this.notifyError(
         "parsers.exactLength",
         objectType,
@@ -162,9 +163,9 @@ export abstract class MessageServiceParser extends Parser {
     minValue: number,
     maxValue: number,
   ) {
-    const intInputValue = this.tryParseInt(input);
+    const intInputValue = tryParseInt(input);
     if (
-      intInputValue != undefined &&
+      intInputValue !== undefined &&
       !(intInputValue >= minValue && intInputValue <= maxValue)
     ) {
       this.notifyError(
@@ -198,7 +199,7 @@ export abstract class MessageServiceParser extends Parser {
     input: string | undefined,
     ...startsWith: string[]
   ) {
-    if (input != undefined && !this.checkStartsWith(input, startsWith)) {
+    if (input !== undefined && !this.checkStartsWith(input, startsWith)) {
       this.notifyError("parsers.startsWith", startsWith.join(" or "));
     }
   }
@@ -237,7 +238,7 @@ export abstract class MessageServiceParser extends Parser {
     maxLength: number,
   ) {
     if (
-      input != undefined &&
+      input !== undefined &&
       !(input.length >= minLength && input.length <= maxLength)
     ) {
       this.notifyError(
@@ -271,7 +272,7 @@ export abstract class MessageServiceParser extends Parser {
     ...allowedValues: string[]
   ) {
     if (
-      input != undefined &&
+      input !== undefined &&
       !this.checkInputInAllowedValues(input, allowedValues)
     ) {
       this.notifyError("parsers.allowedStringValues", allowedValues.join(", "));
@@ -314,14 +315,6 @@ export abstract class MessageServiceParser extends Parser {
     } else {
       this.validateLength(input, "table space name", 8);
     }
-  }
-
-  private tryParseInt(input: string | undefined): number | undefined {
-    if (input === undefined) {
-      return undefined;
-    }
-    const value = Number.parseInt(input, 10);
-    return Number.isNaN(value) ? undefined : value;
   }
 
   private checkStartsWith(
