@@ -463,7 +463,7 @@ export class StatementsVisitor extends StatementsParserVisitor<
     if (ctx._lengthToken) {
       const length = tryParseInt(ctx._lengthToken.getText());
 
-      if (length != undefined && !(length >= 80 && length <= 200)) {
+      if (length !== undefined && !(length >= 80 && length <= 200)) {
         this.diagnostics.push({
           severity: vscode.DiagnosticSeverity.Warning,
           message: this.messageService.get("parsers.intRangeValue", 80, 200),
