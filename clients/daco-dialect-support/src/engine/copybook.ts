@@ -130,11 +130,6 @@ export class CopybookPreprocessor {
       let copybookName = descriptor.name;
       let parentNameSuffix = undefined;
       if (hasWrkSuffix) {
-        this.validateParentName(
-          context,
-          descriptor.parentName,
-          descriptor.parentNameRange,
-        );
         parentNameSuffix = extractSuffix(descriptor.parentName);
       } else {
         copybookName =
@@ -210,29 +205,6 @@ export class CopybookPreprocessor {
           vscode.DiagnosticSeverity.Warning,
         ),
       );
-    }
-  }
-
-  private validateParentName(
-    context: IDocumentProcessingContext,
-    parentName: string | undefined,
-    parentNameRange: vscode.Range | undefined,
-  ) {
-    if (!parentName || !/^[A-Z]+-[A-Z]{2}\d$/.test(parentName)) {
-      const message = this.messageService.get(
-        "validation.copybook.parentName",
-        parentName,
-      );
-
-      if (parentNameRange) {
-        context.addDiagnostic(
-          new vscode.Diagnostic(
-            parentNameRange,
-            message,
-            vscode.DiagnosticSeverity.Warning,
-          ),
-        );
-      }
     }
   }
 
