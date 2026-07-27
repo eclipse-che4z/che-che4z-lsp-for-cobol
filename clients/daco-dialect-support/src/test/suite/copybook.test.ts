@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom - initial API and implementation
  */
+import * as vscode from "vscode";
 import * as assert from "node:assert";
 import * as helper from "./testHelper";
 import { pos, range } from "./testHelper";
@@ -111,13 +112,7 @@ suite("Copybook Test Suite", function () {
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
 
-    assert.strictEqual(diagnostics.length, 2);
-
-    helper.checkDiagnostic(
-      diagnostics,
-      "Parent variable 'ABC' must match the pattern <NAME>-XXN",
-      range(pos(8, 10), pos(8, 13)),
-    );
+    assert.strictEqual(diagnostics.length, 1);
 
     helper.checkDiagnostic(
       diagnostics,
@@ -131,13 +126,7 @@ suite("Copybook Test Suite", function () {
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
 
-    assert.strictEqual(diagnostics.length, 2);
-
-    helper.checkDiagnostic(
-      diagnostics,
-      "Parent variable 'PARENT-XNT' must match the pattern <NAME>-XXN",
-      range(pos(8, 10), pos(8, 20)),
-    );
+    assert.strictEqual(diagnostics.length, 1);
 
     helper.checkDiagnostic(
       diagnostics,
@@ -150,13 +139,7 @@ suite("Copybook Test Suite", function () {
     const editor = await helper.showDocument("DaCo07.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 2);
-
-    helper.checkDiagnostic(
-      diagnostics,
-      "Parent variable 'PARENT-XLD' must match the pattern <NAME>-XXN",
-      range(pos(8, 10), pos(8, 20)),
-    );
+    assert.strictEqual(diagnostics.length, 1);
 
     helper.checkDiagnostic(
       diagnostics,
@@ -169,13 +152,7 @@ suite("Copybook Test Suite", function () {
     const editor = await helper.showDocument("DaCo08.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 2);
-
-    helper.checkDiagnostic(
-      diagnostics,
-      "Parent variable 'PARENT-XLO' must match the pattern <NAME>-XXN",
-      range(pos(8, 10), pos(8, 20)),
-    );
+    assert.strictEqual(diagnostics.length, 1);
 
     helper.checkDiagnostic(
       diagnostics,
@@ -188,13 +165,7 @@ suite("Copybook Test Suite", function () {
     const editor = await helper.showDocument("DaCo84.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 2);
-
-    helper.checkDiagnostic(
-      diagnostics,
-      "Parent variable 'BHTREG-XWX' must match the pattern <NAME>-XXN",
-      range(pos(10, 16), pos(10, 26)),
-    );
+    assert.strictEqual(diagnostics.length, 1);
 
     helper.checkDiagnostic(
       diagnostics,

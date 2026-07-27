@@ -19,7 +19,6 @@ import { Token, ParserRuleContext, Interval } from "antlr4ng";
 const FILLER_NAME = "FILLER";
 
 export function updateVariableName(name: string, suffix: string) {
-  console.log(`Updating variable name '${name}' with suffix '${suffix}'...`);
   if (name.toUpperCase() === FILLER_NAME) {
     return name;
   }
@@ -97,4 +96,12 @@ export function createOptionsStr(ctx: ParserRuleContext | null): string {
     );
   }
   return "";
+}
+
+export function tryParseInt(input: string | undefined): number | undefined {
+  if (input === undefined) {
+    return undefined;
+  }
+  const value = Number.parseInt(input, 10);
+  return Number.isNaN(value) ? undefined : value;
 }
