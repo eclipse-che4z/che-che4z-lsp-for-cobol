@@ -46,7 +46,7 @@ export function addParsingErrors(
 ) {
   errors.forEach((error) => {
     context.addDiagnostic({
-      severity: vscode.DiagnosticSeverity.Error,
+      severity: error.severity,
       message: error.message,
       range: error.range,
     });

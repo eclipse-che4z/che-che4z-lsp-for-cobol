@@ -81,7 +81,15 @@ export class CollectingErrorListener extends BaseErrorListener {
         line,
         charPositionInLine,
       ),
+      severity: this.getSeverity(msg),
     });
+  }
+
+  private getSeverity(msg: string): vscode.DiagnosticSeverity {
+    // Message with id "parsers.intRangeValue" should be treated as warning
+    return "Allowed range is 80 to 200" === msg
+      ? vscode.DiagnosticSeverity.Warning
+      : vscode.DiagnosticSeverity.Error;
   }
 
   private getRangeForSyntaxError(
