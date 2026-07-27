@@ -31,6 +31,7 @@ import {
   generatePredefinedVariables,
 } from "./predefined";
 import { StatementDescriptor } from "./model";
+import { Diagnostic } from "vscode";
 
 export class DaCoPreprocessor {
   private readonly copybookPreprocessor: CopybookPreprocessor;
@@ -137,13 +138,6 @@ export class DaCoPreprocessor {
     descriptors: StatementDescriptor[],
     context: IDocumentProcessingContext,
   ) {
-    descriptors.forEach((descriptor) =>
-      console.log(
-        `Statement Descriptor: type=${descriptor.type}, range=${JSON.stringify(
-          descriptor.statementRange,
-        )}`,
-      ),
-    );
     descriptors.forEach((descriptor) => {
       this.outputChannel.appendLine(
         `Statement Descriptor: ${JSON.stringify(descriptor)}`,
@@ -235,7 +229,11 @@ export class DaCoPreprocessor {
         ...parserErrors.errors,
       ]);
 
-      return new StatementsVisitor().visit(tree) || [];
+      const visitor = new StatementsVisitor(this.messageService);
+      const statements = visitor.visit(tree) || [];
+
+      visitor.diagnostics.forEach((d) => context.addDiagnostic(d));
+      return statements;
     } catch (e) {
       this.outputChannel.appendLine(
         "Error during parsing: " + JSON.stringify(e),

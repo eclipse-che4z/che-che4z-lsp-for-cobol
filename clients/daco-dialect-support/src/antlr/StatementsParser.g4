@@ -77,7 +77,7 @@ writeReportStatementWithName
     : WRITE REPORT daco_report_name?
         FROM qualifiedDataName
         (TO qualifiedDataName)?
-        (LENGTH ({this.validateIntegerRange(this.inputStream?.LT(1)?.text, 80, 200);} integerLiteral))?
+        (LENGTH lengthToken = integerLiteral)?
         (AFTER ((integerLiteral (LINE | LINES)) | PAGE | qualifiedDataName))?
     ;
 

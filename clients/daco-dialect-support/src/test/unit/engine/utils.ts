@@ -17,7 +17,8 @@ import { MessageService } from "../../../engine/services/MessageService";
 export function createMessageService() {
   return new MessageService({
     "validation.layout_identifier": "Invalid layout identifier",
-    "validation.layout_usage": "Invalid layout usage",
+    "validation.layout_usage":
+      "Layout usage {0} must contain exactly 3 characters",
     "validation.missing.layout_usage":
       "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
     "validation.copy_from.retrieve.suffix": "Cannot retrieve suffix",
