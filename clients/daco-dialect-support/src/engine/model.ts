@@ -22,7 +22,6 @@ export interface ParseError {
   column: number;
   message: string;
   range: vscode.Range;
-  severity: vscode.DiagnosticSeverity;
 }
 
 export class ProgramInfo {

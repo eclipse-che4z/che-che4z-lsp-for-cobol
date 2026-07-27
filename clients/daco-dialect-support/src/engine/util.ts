@@ -46,7 +46,7 @@ export function addParsingErrors(
 ) {
   errors.forEach((error) => {
     context.addDiagnostic({
-      severity: error.severity,
+      severity: vscode.DiagnosticSeverity.Error,
       message: error.message,
       range: error.range,
     });
@@ -96,4 +96,12 @@ export function createOptionsStr(ctx: ParserRuleContext | null): string {
     );
   }
   return "";
+}
+
+export function tryParseInt(input: string | undefined): number | undefined {
+  if (input === undefined) {
+    return undefined;
+  }
+  const value = Number.parseInt(input, 10);
+  return Number.isNaN(value) ? undefined : value;
 }

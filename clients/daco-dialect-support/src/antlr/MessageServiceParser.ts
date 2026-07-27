@@ -13,6 +13,7 @@
  */
 import { Parser, Token } from "antlr4ng";
 import { MessageService } from "../engine/services/MessageService";
+import { tryParseInt } from "../engine/util";
 
 export abstract class MessageServiceParser extends Parser {
   private static readonly ALPHANUMERIC: RegExp = /^[a-zA-Z0-9]+$/;
@@ -162,7 +163,7 @@ export abstract class MessageServiceParser extends Parser {
     minValue: number,
     maxValue: number,
   ) {
-    const intInputValue = this.tryParseInt(input);
+    const intInputValue = tryParseInt(input);
     if (
       intInputValue != undefined &&
       !(intInputValue >= minValue && intInputValue <= maxValue)
@@ -314,14 +315,6 @@ export abstract class MessageServiceParser extends Parser {
     } else {
       this.validateLength(input, "table space name", 8);
     }
-  }
-
-  private tryParseInt(input: string | undefined): number | undefined {
-    if (input === undefined) {
-      return undefined;
-    }
-    const value = Number.parseInt(input, 10);
-    return Number.isNaN(value) ? undefined : value;
   }
 
   private checkStartsWith(

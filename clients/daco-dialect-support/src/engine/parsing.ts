@@ -41,6 +41,7 @@ import {
   DacoStatementsContext,
   QualifiedDataNameContext,
   VariableUsageNameContext,
+  WriteReportStatementWithNameContext,
 } from "../generated/StatementsParser";
 import { MessageService } from "./services/MessageService";
 import {
@@ -59,6 +60,7 @@ import {
   constructRange,
   constructRangeFromTokens,
   createOptionsStr,
+  tryParseInt,
 } from "./util";
 
 export class CollectingErrorListener extends BaseErrorListener {
@@ -81,15 +83,7 @@ export class CollectingErrorListener extends BaseErrorListener {
         line,
         charPositionInLine,
       ),
-      severity: this.getSeverity(msg),
     });
-  }
-
-  private getSeverity(msg: string): vscode.DiagnosticSeverity {
-    // Message with id "parsers.intRangeValue" should be treated as warning
-    return "Allowed range is 80 to 200" === msg
-      ? vscode.DiagnosticSeverity.Warning
-      : vscode.DiagnosticSeverity.Error;
   }
 
   private getRangeForSyntaxError(
@@ -357,6 +351,11 @@ export class CopybookContentVisitor extends CopybookContentParserVisitor<
 export class StatementsVisitor extends StatementsParserVisitor<
   StatementDescriptor[]
 > {
+  public diagnostics: vscode.Diagnostic[] = [];
+  public constructor(private readonly messageService: MessageService) {
+    super();
+  }
+
   visitDacoSections? = (ctx: DacoSectionsContext): StatementDescriptor[] => {
     const statements: StatementDescriptor[] = [];
     statements.push(
@@ -454,6 +453,25 @@ export class StatementsVisitor extends StatementsParserVisitor<
         this.visitChildren(ctx) ?? [],
       ),
     ];
+  };
+
+  visitWriteReportStatementWithName?: (
+    ctx: WriteReportStatementWithNameContext,
+  ) => StatementDescriptor[] = (
+    ctx: WriteReportStatementWithNameContext,
+  ): StatementDescriptor[] => {
+    if (ctx._lengthToken) {
+      const length = tryParseInt(ctx._lengthToken.getText());
+
+      if (length != undefined && !(length >= 80 && length <= 200)) {
+        this.diagnostics.push({
+          severity: vscode.DiagnosticSeverity.Warning,
+          message: this.messageService.get("parsers.intRangeValue", 80, 200),
+          range: constructRange(ctx._lengthToken),
+        });
+      }
+    }
+    return this.visitChildren(ctx) ?? [];
   };
 
   protected aggregateResult = concatResults;
