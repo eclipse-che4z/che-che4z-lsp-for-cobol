@@ -336,6 +336,7 @@ public class DialectService {
           createCobolDialect(r)
               .ifPresent(
                   dialect -> {
+                    unregisterDialectCodeActions(dialectSuppliers.get(r.getName()));
                     registerDialectCodeActions(dialect);
                     dialectSuppliers.put(r.getName(), dialect);
                     registeredDialectItems.put(r.getName(), r);
@@ -372,6 +373,22 @@ public class DialectService {
     discoveryService.registerExecuteCommandCapabilities(
         dialect.getDialectExecuteCommandCapabilities(), dialect.getName());
     discoveryService.registerDialectCodeActionProviders(dialect.getDialectCodeActionProviders());
+  }
+
+  /**
+   * Unregisters a previously-registered dialect's execute command capabilities and code action
+   * providers before it is replaced by a new implementation, so a dialect switch (e.g. legacy
+   * Java to java-agnostic) doesn't leak a stale registration under the same id/providers.
+   *
+   * @param previousDialect the dialect instance being replaced, or null if there was none
+   */
+  private void unregisterDialectCodeActions(CobolDialect previousDialect) {
+    if (previousDialect == null) {
+      return;
+    }
+    discoveryService.unregisterExecuteCommandCapabilities(previousDialect.getName());
+    discoveryService.unregisterDialectCodeActionProviders(
+        previousDialect.getDialectCodeActionProviders());
   }
 
   /**

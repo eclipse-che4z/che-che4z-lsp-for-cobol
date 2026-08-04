@@ -130,6 +130,10 @@ public class TestModule extends AbstractModule {
               public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {}
 
               @Override
+              public void unregisterDialectCodeActionProviders(
+                  List<CodeActionProvider> providers) {}
+
+              @Override
               public List<CobolDialect> loadDialects(
                   CopybookService copybookService, MessageService messageService) {
                 return ImmutableList.of();
