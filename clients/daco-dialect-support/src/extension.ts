@@ -24,7 +24,7 @@ import { SettingsService } from "./engine/services/settings";
 
 const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
 
-let unregisterDialect = () => {};
+let unregisterDialect: () => void | Promise<void> = () => {};
 const isCopyStatement = (statement: string) => {
   const match = COPY_REGEX.exec(statement);
   if (!match) {
@@ -38,16 +38,29 @@ const DESCRIPTION = "DaCo dialect support";
 
 export async function activate(context: vscode.ExtensionContext) {
   await updateApiVersion(context);
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(async (event) => {
+      if (event.affectsConfiguration("dialect.api.version")) {
+        await updateApiVersion(context);
+      }
+    }),
+  );
 }
 
-export function deactivate() {
-  unregisterDialect();
+export function deactivate(): void | Thenable<void> {
+  return unregisterDialect();
 }
 
 async function updateApiVersion(context: vscode.ExtensionContext) {
   const version = SettingsService.getApiVersion();
 
-  unregisterDialect();
+  // The unregister callback triggers its own server round-trip (invalidateConfiguration)
+  // to reanalyze open documents without the old dialect. It must fully settle before the
+  // new dialect is registered, otherwise the two reanalysis requests race on the server
+  // and the stale one can win, publishing empty diagnostics.
+  await unregisterDialect();
+  unregisterDialect = () => {};
 
   if (version === "legacy") {
     await v1Api(context);
@@ -122,5 +135,5 @@ async function v2Api(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage(unregister.toString());
     return;
   }
-  context.subscriptions.push(unregister);
+  unregisterDialect = () => unregister.dispose();
 }

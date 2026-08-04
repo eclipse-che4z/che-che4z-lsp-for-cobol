@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
@@ -28,6 +29,7 @@ import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.core.engine.dialects.v2.CobolDialectV2;
 import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,5 +132,28 @@ class DialectServiceTest {
     dialectService.process(ImmutableList.of("2", "1"), context);
     inOrder.verify(dialect2).extend(context);
     inOrder.verify(dialect1).extend(context);
+  }
+
+  @Test
+  void testUpdateDialectsReplacesDialectWhenRegistryItemChanges() {
+    CobolDialect legacyDialect = configureDialect(mock(DialectProcessingContext.class), "dialect");
+    when(ddService.loadDialects(URI.create(""), copybookService, messageService))
+        .thenReturn(ImmutableList.of(legacyDialect));
+
+    DialectRegistryItem legacyItem =
+        new DialectRegistryItem("dialect", 1, URI.create(""), "", "extensionId");
+    assertTrue(dialectService.updateDialects(ImmutableList.of(legacyItem)));
+    assertSame(legacyDialect, dialectService.getDialectByName("dialect").orElse(null));
+
+    DialectRegistryItem modernItem =
+        new DialectRegistryItem("dialect", 2, URI.create(""), "", "extensionId");
+    assertTrue(dialectService.updateDialects(ImmutableList.of(modernItem)));
+
+    CobolDialect updatedDialect = dialectService.getDialectByName("dialect").orElse(null);
+    assertNotSame(legacyDialect, updatedDialect);
+    assertInstanceOf(CobolDialectV2.class, updatedDialect);
+
+    assertFalse(dialectService.updateDialects(ImmutableList.of(modernItem)));
+    assertSame(updatedDialect, dialectService.getDialectByName("dialect").orElse(null));
   }
 }
