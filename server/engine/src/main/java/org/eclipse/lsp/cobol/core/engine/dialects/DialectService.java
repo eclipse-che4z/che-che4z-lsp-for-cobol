@@ -318,10 +318,10 @@ public class DialectService {
   }
 
   /**
-   * Updates available dialect list based on dialect registry. A dialect is (re)created whenever
-   * it is new or its registry item (e.g. protocol version) changed since the last update, so
-   * switching a dialect's implementation (e.g. legacy Java to java-agnostic) actually takes
-   * effect instead of being silently ignored by the previously-registered instance.
+   * Updates available dialect list based on dialect registry. A dialect is (re)created whenever it
+   * is new or its registry item (e.g. protocol version) changed since the last update, so switching
+   * a dialect's implementation (e.g. legacy Java to java-agnostic) actually takes effect instead of
+   * being silently ignored by the previously-registered instance.
    *
    * @param dialectRegistry is a dialect registry items list
    * @return true if list of dialects were changed or false otherwise
