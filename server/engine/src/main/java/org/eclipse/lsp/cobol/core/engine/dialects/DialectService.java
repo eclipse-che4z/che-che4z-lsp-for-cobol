@@ -60,6 +60,7 @@ import org.eclipse.lsp4j.Range;
 @Singleton
 public class DialectService {
   private final Map<String, CobolDialect> dialectSuppliers;
+  private final Map<String, DialectRegistryItem> registeredDialectItems = new HashMap<>();
   private final DialectDiscoveryService discoveryService;
   private final CopybookService copybookService;
   private final PredefinedCopybookStore predefinedCopybookService;
@@ -317,7 +318,10 @@ public class DialectService {
   }
 
   /**
-   * Updates available dialect list based on dialect registry
+   * Updates available dialect list based on dialect registry. A dialect is (re)created whenever
+   * it is new or its registry item (e.g. protocol version) changed since the last update, so
+   * switching a dialect's implementation (e.g. legacy Java to java-agnostic) actually takes
+   * effect instead of being silently ignored by the previously-registered instance.
    *
    * @param dialectRegistry is a dialect registry items list
    * @return true if list of dialects were changed or false otherwise
@@ -325,18 +329,19 @@ public class DialectService {
   public boolean updateDialects(List<DialectRegistryItem> dialectRegistry) {
     AtomicBoolean changed = new AtomicBoolean(false);
     dialectRegistry.forEach(
-        r ->
-            dialectSuppliers.computeIfAbsent(
-                r.getName(),
-                name ->
-                    this.createCobolDialect(r)
-                        .map(
-                            dialect -> {
-                              registerDialectCodeActions(dialect);
-                              changed.set(true);
-                              return dialect;
-                            })
-                        .orElse(null)));
+        r -> {
+          if (r.equals(registeredDialectItems.get(r.getName()))) {
+            return;
+          }
+          createCobolDialect(r)
+              .ifPresent(
+                  dialect -> {
+                    registerDialectCodeActions(dialect);
+                    dialectSuppliers.put(r.getName(), dialect);
+                    registeredDialectItems.put(r.getName(), r);
+                    changed.set(true);
+                  });
+        });
     return changed.get();
   }
 
