@@ -20,7 +20,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.util.*;
+import lombok.Setter;
 import lombok.Value;
+import lombok.experimental.NonFinal;
 import org.eclipse.lsp.cobol.common.copybook.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.common.copybook.SQLBackend;
 
@@ -42,6 +44,27 @@ public class AnalysisConfig {
   // Map preprocessors name to list of directives
   Map<String, List<String>> preprocessorsDirectives = new HashMap<>();
   UnusedVariableSeverity unusedVariableSeverity = new UnusedVariableSeverity();
+  @Setter @NonFinal AnalysisMode analysisMode;
+
+  public AnalysisConfig(
+      CopybookProcessingMode copybookProcessingMode,
+      List<String> dialects,
+      boolean isCicsTranslatorEnabled,
+      boolean collectAstChanges,
+      SqlProcessing sqlProcessing,
+      SqlDecimalComma sqlDecimalCommaAllowed,
+      List<DialectRegistryItem> dialectRegistry,
+      Map<String, JsonElement> dialectsSettings) {
+    this.copybookProcessingMode = copybookProcessingMode;
+    this.dialects = dialects;
+    this.isCicsTranslatorEnabled = isCicsTranslatorEnabled;
+    this.collectAstChanges = collectAstChanges;
+    this.sqlProcessing = sqlProcessing;
+    this.sqlDecimalCommaAllowed = sqlDecimalCommaAllowed;
+    this.dialectRegistry = dialectRegistry;
+    this.dialectsSettings = dialectsSettings;
+    this.analysisMode = AnalysisMode.ADVANCED;
+  }
 
   /**
    * Create the default language features config, containing all features and the given copybook

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Broadcom.
+ * Copyright (c) 2026 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,13 +12,10 @@
  *    Broadcom - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.core.engine.errors;
 
-/**
- * Diagnostics sensitivity supplied by the client based on {@link
- * org.eclipse.lsp.cobol.service.settings.SettingsParametersEnum#ANALYSIS_MODE}
- */
+package org.eclipse.lsp.cobol.common;
+
 public enum AnalysisMode {
-  BASIC,
-  ADVANCED;
+  ADVANCED,
+  BASIC
 }

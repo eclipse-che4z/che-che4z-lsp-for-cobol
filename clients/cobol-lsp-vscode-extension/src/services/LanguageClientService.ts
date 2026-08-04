@@ -27,7 +27,12 @@ import {
   LanguageClientOptions,
   Middleware,
 } from "vscode-languageclient/node";
-import { HP_LANGUAGE_ID, EXP_LANGUAGE_ID, LANGUAGE_ID } from "../constants";
+import {
+  HP_LANGUAGE_ID,
+  EXP_LANGUAGE_ID,
+  LANGUAGE_ID,
+  APP_ANALYZER_SCHEME,
+} from "../constants";
 import { JavaCheck, SUPPORTED_JAVA_VERSION } from "./JavaCheck";
 import { NativeExecutableService } from "./nativeLanguageClient/nativeExecutableService";
 import { SettingsService } from "./Settings";
@@ -153,6 +158,7 @@ export class LanguageClientService {
 
   public async start(context: vscode.ExtensionContext) {
     const languageClient = this.getLanguageClient();
+    context.subscriptions.push(this.createPartialModeStatusItem());
     try {
       await languageClient.start();
     } catch {
@@ -234,6 +240,24 @@ export class LanguageClientService {
         ],
       },
     };
+  }
+
+  private createPartialModeStatusItem(): vscode.LanguageStatusItem {
+    const selector: vscode.DocumentFilter[] = [
+      { scheme: APP_ANALYZER_SCHEME, language: LANGUAGE_ID },
+    ];
+
+    const statusItem = vscode.languages.createLanguageStatusItem(
+      `${LANGUAGE_ID}.${APP_ANALYZER_SCHEME}.basicAnalysisMode`,
+      selector,
+    );
+
+    statusItem.name = "COBOL Language Support";
+    statusItem.text = "Basic Analysis Mode";
+    statusItem.detail =
+      "Limited IntelliSense: copybook analysis is disabled for this file source.";
+    statusItem.severity = vscode.LanguageStatusSeverity.Warning;
+    return statusItem;
   }
 
   private createServerOptions(jarPath: string) {

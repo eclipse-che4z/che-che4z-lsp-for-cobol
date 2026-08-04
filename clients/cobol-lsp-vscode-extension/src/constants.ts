@@ -108,3 +108,4 @@ export const ANALYSIS_LIMIT_REASON = {
 };
 
 export const TAR_PREFIX = "TAR:";
+export const APP_ANALYZER_SCHEME = "c4z-app-ann";

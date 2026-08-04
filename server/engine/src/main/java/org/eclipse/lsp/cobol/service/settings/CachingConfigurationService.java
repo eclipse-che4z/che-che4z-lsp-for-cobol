@@ -63,7 +63,8 @@ public class CachingConfigurationService implements ConfigurationService {
                 SQL_PROCESSING_ENABLED_SETTING.label,
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
-                UNUSED_VARIABLE_SEVERITY.label));
+                UNUSED_VARIABLE_SEVERITY.label,
+                ANALYSIS_MODE.label));
 
     List<String> dialectsSections =
         Stream.concat(
@@ -156,8 +157,9 @@ public class CachingConfigurationService implements ConfigurationService {
         ConfigHelper.parseSQLDecimalCommaAllowed((JsonElement) clientConfig.get(4)),
         ConfigHelper.parseCompilerOptions(clientConfig.get(5)),
         ConfigHelper.parseUnusedVariableSeverity((JsonElement) clientConfig.get(6)),
+        ConfigHelper.parseAnalysisMode((JsonElement) clientConfig.get(7)),
         getDialectsSettings(
-            clientConfig.subList(7, 7 + dialectsSections.size()).toArray(),
+            clientConfig.subList(8, 8 + dialectsSections.size()).toArray(),
             dialectsSections.toArray()));
   }
 

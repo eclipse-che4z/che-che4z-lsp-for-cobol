@@ -37,7 +37,6 @@ import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectService;
-import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.server.*;
@@ -218,8 +217,7 @@ class CobolLanguageServerTest {
                 localeStore,
                 analysisService,
                 messageService,
-                layoutStore,
-                mock(ErrorFinalizerService.class)),
+                layoutStore),
             lspEventConsumer,
             cancelProgressHandler);
 
@@ -271,7 +269,7 @@ class CobolLanguageServerTest {
             new ShutdownHandler(stateService, lspMessageBroker),
             new InitializeHandler(mock(WatcherServiceImpl.class)),
             new InitializedHandler(
-                mock(WatcherServiceImpl.class), null, null, null, null, null, null, null),
+                mock(WatcherServiceImpl.class), null, null, null, null, null, null),
             lspEventConsumer,
             cancelProgressHandler);
 
@@ -337,7 +335,7 @@ class CobolLanguageServerTest {
             new ExitHandler(stateService),
             new ShutdownHandler(stateService, lspMessageBroker),
             new InitializeHandler(null),
-            new InitializedHandler(null, null, null, null, null, null, null, null),
+            new InitializedHandler(null, null, null, null, null, null, null),
             lspEventConsumer,
             cancelProgressHandler);
     assertEquals(1, stateService.getExitCode());

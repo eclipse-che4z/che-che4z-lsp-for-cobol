@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.eclipse.lsp.cobol.common.AnalysisConfig;
+import org.eclipse.lsp.cobol.common.AnalysisMode;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
@@ -98,6 +99,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("false"),
             new JsonArray(),
             new JsonPrimitive("ERROR"),
+            new JsonPrimitive("ADVANCED"),
             predefinedParagraphs);
 
     when(settingsService.fetchConfigurations(
@@ -110,6 +112,7 @@ class CachingConfigurationServiceTest {
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
+                ANALYSIS_MODE.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -155,6 +158,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("false"),
             JsonNull.INSTANCE,
             new JsonArray(),
+            new JsonPrimitive("BASIC"),
             dialectsSettings);
     when(settingsService.fetchConfigurations(
             "",
@@ -166,13 +170,14 @@ class CachingConfigurationServiceTest {
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
+                ANALYSIS_MODE.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
     CachingConfigurationService configuration =
         new CachingConfigurationService(settingsService, dialectService, () -> client);
 
-    assertEquals(
+    AnalysisConfig expected =
         new AnalysisConfig(
             CopybookProcessingMode.DISABLED,
             ImmutableList.of("Dialect"),
@@ -181,8 +186,9 @@ class CachingConfigurationServiceTest {
             SqlProcessing.ENABLED,
             SqlDecimalComma.DISABLED,
             ImmutableList.of(),
-            ImmutableMap.of("dialect", dialectsSettings)),
-        configuration.getConfig("", CopybookProcessingMode.DISABLED));
+            ImmutableMap.of("dialect", dialectsSettings));
+    expected.setAnalysisMode(AnalysisMode.BASIC);
+    assertEquals(expected, configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
 
   @Test
@@ -245,6 +251,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive(true),
             JsonNull.INSTANCE,
             new JsonArray(),
+            new JsonPrimitive(""),
             dialectsSettings);
     when(settingsService.fetchConfigurations(
             "",
@@ -256,6 +263,7 @@ class CachingConfigurationServiceTest {
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
+                ANALYSIS_MODE.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -300,6 +308,7 @@ class CachingConfigurationServiceTest {
             JsonNull.INSTANCE,
             JsonNull.INSTANCE,
             new JsonArray(),
+            new JsonPrimitive(""),
             dialectsSettings);
     when(settingsService.fetchConfigurations(
             "",
@@ -311,6 +320,7 @@ class CachingConfigurationServiceTest {
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
+                ANALYSIS_MODE.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 
@@ -355,6 +365,7 @@ class CachingConfigurationServiceTest {
             new JsonPrimitive("foobar"),
             JsonNull.INSTANCE,
             new JsonArray(),
+            new JsonPrimitive(""),
             dialectsSettings);
     when(settingsService.fetchConfigurations(
             "",
@@ -366,6 +377,7 @@ class CachingConfigurationServiceTest {
                 SQL_DECIMAL_COMMA_ALLOWED.label,
                 COMPILER_OPTIONS.label,
                 UNUSED_VARIABLE_SEVERITY.label,
+                ANALYSIS_MODE.label,
                 "dialect")))
         .thenReturn(supplyAsync(() -> clientConfig));
 

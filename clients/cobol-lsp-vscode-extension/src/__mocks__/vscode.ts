@@ -329,7 +329,16 @@ export const languages = {
   createDiagnosticCollection: jest
     .fn()
     .mockReturnValue(diagnosticsCollectionMock),
+  createLanguageStatusItem: jest.fn().mockReturnValue({
+    dispose: jest.fn(),
+  }),
 };
+
+export enum LanguageStatusSeverity {
+  Information = 0,
+  Warning = 1,
+  Error = 2,
+}
 
 export class FileNotFound extends Error {
   code: string;

@@ -35,6 +35,7 @@ import {
   SETTINGS_MAXIMUM_VM_COUNT,
   PATHS_LOCAL_KEY,
   ANALYSIS_MODE,
+  APP_ANALYZER_SCHEME,
 } from "../constants";
 import {
   loadProcessorGroupCompileOptionsConfig,
@@ -46,6 +47,7 @@ import { SupportedVariables } from "./util/FSUtils";
 import { decodeUnknown, DecodingError } from "./util/decoder";
 import * as t from "io-ts";
 import { outputChannel } from "./util/OutputChannel";
+import { telemetryEvent } from "./reporter";
 
 const NONE: string = "NONE";
 const MAX_VM_COUNT = 50000;
@@ -106,6 +108,42 @@ async function handleProcessorGroupConfigurationRequest<Type, Output, R>(
   }
 }
 
+const notifiedAppAnalyzerScopeUris = new Set<string>();
+
+function handleAnalysisModeRequest(item: Item) {
+  if (!item.scopeUri) {
+    return SettingsService.getAnalysisMode();
+  }
+
+  let uri: vscode.Uri;
+  try {
+    uri = vscode.Uri.parse(item.scopeUri);
+  } catch {
+    outputChannel.error(
+      `Invalid uri: ${item.scopeUri} while fetching setting - ${item.section}. Defaulting to ADVANCED mode`,
+    );
+    return "ADVANCED";
+  }
+
+  if (uri.scheme !== APP_ANALYZER_SCHEME) {
+    return SettingsService.getAnalysisMode();
+  }
+
+  if (!notifiedAppAnalyzerScopeUris.has(item.scopeUri)) {
+    notifiedAppAnalyzerScopeUris.add(item.scopeUri);
+    outputChannel.info(
+      `Switched ANALYSIS MODE to BASIC for uri ${item.scopeUri}`,
+    );
+    telemetryEvent(
+      "analysis-mode",
+      ["bootstrap", "analysis-mode", "app-analyzer"],
+      `COBOL LS automatically switched to BASIC mode for c4z-app-ann scheme`,
+    );
+  }
+
+  return "BASIC";
+}
+
 export async function lspConfigHandler(request: Request) {
   const result: unknown[] = [];
   for (const item of request.items) {
@@ -113,6 +151,9 @@ export async function lspConfigHandler(request: Request) {
       switch (item.section) {
         case COBOL_PRGM_LAYOUT:
           result.push(SettingsService.getCobolProgramLayout());
+          break;
+        case ANALYSIS_MODE:
+          result.push(handleAnalysisModeRequest(item));
           break;
         case SETTINGS_DIALECT:
           await handleProcessorGroupConfigurationRequest(

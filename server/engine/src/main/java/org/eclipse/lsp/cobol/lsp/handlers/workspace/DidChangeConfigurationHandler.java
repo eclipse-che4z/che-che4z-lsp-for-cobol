@@ -97,10 +97,6 @@ public class DidChangeConfigurationHandler {
 
   private void reanalyseIfRequired() {
     List<String> prevDialects = keywords.getDialectType();
-    CompletableFuture<Boolean> analysisModeFuture =
-        settingsService
-            .fetchConfiguration(ANALYSIS_MODE.label)
-            .thenApply(errorFinalizerService::updateDiagnosticsLevel);
     CompletableFuture<Boolean> copybookFolderFuture =
         this.copybookLocalFolders(null)
             .thenApply(
@@ -123,7 +119,6 @@ public class DidChangeConfigurationHandler {
                     !new HashSet<>(prevDialects).equals(new HashSet<>(keywords.getDialectType())));
     copybookFolderFuture
         .thenCombine(dialectFuture, (b1, b2) -> b1 || b2)
-        .thenCombine(analysisModeFuture, (b1, b2) -> b1 || b2)
         .thenAccept(
             shouldReAnalyse -> {
               if (shouldReAnalyse) {

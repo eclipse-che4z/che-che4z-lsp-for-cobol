@@ -176,7 +176,10 @@ public class CobolLanguageEngine {
                   .symbolTableMap(ImmutableMap.of())
                   .build(),
               ctx.getAccumulatedErrors().stream()
-                  .filter(err -> errorFinalizerService.keepDiagnotics(err, TOLERATED_ERRORS))
+                  .filter(
+                      err ->
+                          errorFinalizerService.keepDiagnotics(
+                              err, TOLERATED_ERRORS, analysisConfig.getAnalysisMode()))
                   .map(errorFinalizerService::localizeErrorMessage)
                   .collect(toList())),
           documentUri);
@@ -191,7 +194,10 @@ public class CobolLanguageEngine {
                   .symbolTableMap(processingResult.getSymbolTableMap())
                   .build(),
               ctx.getAccumulatedErrors().stream()
-                  .filter(err -> errorFinalizerService.keepDiagnotics(err, TOLERATED_ERRORS))
+                  .filter(
+                      err ->
+                          errorFinalizerService.keepDiagnotics(
+                              err, TOLERATED_ERRORS, analysisConfig.getAnalysisMode()))
                   .map(errorFinalizerService::localizeErrorMessage)
                   .collect(toList())),
           documentUri);

@@ -16,15 +16,14 @@ package org.eclipse.lsp.cobol.core.engine.errors;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.lsp.cobol.core.engine.errors.AnalysisMode.ADVANCED;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.eclipse.lsp.cobol.common.AnalysisMode;
 import org.eclipse.lsp.cobol.common.error.ErrorCodes;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -40,7 +39,6 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
 public class ErrorFinalizerService {
 
   private final MessageService messageService;
-  private AnalysisMode filterDiagnostics = ADVANCED;
   public static final Set<String> TOLERATED_ERRORS =
       ImmutableSet.of(
           "cobolParser.subSchemaNameLength",
@@ -208,7 +206,7 @@ public class ErrorFinalizerService {
   public void processLateErrors(AnalysisContext ctx, CopybooksRepository copybooksRepository) {
     List<SyntaxError> accumulatedErrors =
         ctx.getAccumulatedErrors().stream()
-            .filter(err -> keepDiagnotics(err, TOLERATED_ERRORS))
+            .filter(err -> keepDiagnotics(err, TOLERATED_ERRORS, ctx.getConfig().getAnalysisMode()))
             .collect(toList());
     accumulatedErrors.addAll(collectErrorsForCopybooks(accumulatedErrors, copybooksRepository));
     List<SyntaxError> distinct = accumulatedErrors.stream().distinct().collect(toList());
@@ -276,30 +274,14 @@ public class ErrorFinalizerService {
    *
    * @param syntaxError syntax error to be processed
    * @param toleratedErrors
+   * @param analysisMode
    * @return true if diagnostics is within the clients diagnostic level, false otherwise
    */
-  public boolean keepDiagnotics(SyntaxError syntaxError, Set<String> toleratedErrors) {
-    if (this.filterDiagnostics == ADVANCED) return true;
+  public boolean keepDiagnotics(
+      SyntaxError syntaxError, Set<String> toleratedErrors, AnalysisMode analysisMode) {
+    if (analysisMode == AnalysisMode.ADVANCED) return true;
     return ofNullable(syntaxError.getErrorCode())
         .map(errCode -> !toleratedErrors.contains(errCode.getLabel()))
         .orElse(true);
-  }
-
-  /**
-   * update the diagnostics level set by client
-   *
-   * @param levels
-   * @return a boolean if filterDiagnostics is changed
-   */
-  public boolean updateDiagnosticsLevel(List<Object> levels) {
-    if (levels != null && !levels.isEmpty()) {
-      if (levels.get(0) instanceof JsonElement) {
-        JsonElement option = (JsonElement) levels.get(0);
-        boolean isUpdated = AnalysisMode.valueOf(option.getAsString()) != filterDiagnostics;
-        filterDiagnostics = AnalysisMode.valueOf(option.getAsString());
-        return isUpdated;
-      }
-    }
-    return false;
   }
 }

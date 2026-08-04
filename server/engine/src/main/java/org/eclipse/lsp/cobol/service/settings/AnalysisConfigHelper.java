@@ -44,6 +44,7 @@ class AnalysisConfigHelper {
             entity.getDialectsSettings());
     analysisConfig.getCompilerOptions().addAll(entity.getCompilerOptions());
     analysisConfig.getUnusedVariableSeverity().severity = entity.getUnusedVariableSeverity();
+    analysisConfig.setAnalysisMode(entity.getAnalysisMode());
     return analysisConfig;
   }
 }

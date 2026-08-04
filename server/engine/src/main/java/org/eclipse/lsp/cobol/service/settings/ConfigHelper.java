@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.AnalysisMode;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.SqlDecimalComma;
 import org.eclipse.lsp.cobol.common.SqlProcessing;
@@ -147,6 +148,26 @@ public class ConfigHelper {
       }
     }
     return null;
+  }
+
+  /**
+   * Parse analysis mode configuration
+   *
+   * @param option analysis mode option
+   * @return {@link AnalysisMode}
+   */
+  public AnalysisMode parseAnalysisMode(JsonElement option) {
+    if (option.isJsonPrimitive() && option.getAsJsonPrimitive().isString()) {
+      try {
+        return AnalysisMode.valueOf(option.getAsString());
+      } catch (IllegalArgumentException e) {
+        // don't throw
+        LOG.error(
+            "ANALYSIS MODE is switched to ADVANCED. Passed value {} is not acceptable",
+            option.getAsString());
+      }
+    }
+    return AnalysisMode.ADVANCED;
   }
 
   /**

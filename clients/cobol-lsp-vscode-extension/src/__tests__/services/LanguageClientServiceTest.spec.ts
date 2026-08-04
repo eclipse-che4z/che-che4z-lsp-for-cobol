@@ -51,6 +51,7 @@ const context = {
   extension: {
     id: "Publisher.Extension-Name",
   },
+  subscriptions: [],
 } as unknown as vscode.ExtensionContext;
 
 Utils.getZoweExplorerAPI = jest.fn();
