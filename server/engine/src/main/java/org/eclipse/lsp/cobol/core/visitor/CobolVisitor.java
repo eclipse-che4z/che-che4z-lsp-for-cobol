@@ -1268,7 +1268,7 @@ public final class CobolVisitor extends CobolParserBaseVisitor<List<Node>> {
               ctx.sectionName(),
               locality ->
                       new CodeBlockUsageNode(
-                              locality, null, VisitorHelper.getName(ctx.sectionName())));
+                              locality, VisitorHelper.getName(ctx.sectionName()), null));
     }
     return Collections.emptyList();
   }
