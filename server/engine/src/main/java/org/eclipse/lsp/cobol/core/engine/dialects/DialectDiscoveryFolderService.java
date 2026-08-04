@@ -162,4 +162,9 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {
     actions.registerNewProviders(providers);
   }
+
+  @Override
+  public void unregisterDialectCodeActionProviders(List<CodeActionProvider> providers) {
+    actions.unregisterProviders(providers);
+  }
 }
