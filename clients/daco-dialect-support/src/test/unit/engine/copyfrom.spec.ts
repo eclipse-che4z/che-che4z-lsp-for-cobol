@@ -21,6 +21,7 @@ describe("copy-from parsing test", () => {
   const context: any = {
     replace: jest.fn(),
     addDiagnostic: jest.fn(),
+    insert: jest.fn(),
   };
 
   beforeEach(() => {
@@ -52,6 +53,7 @@ describe("copy-from parsing test", () => {
         range: range,
       }),
     );
+    expect(context.insert).not.toHaveBeenCalled();
   });
 
   it("should find descending variable", () => {
@@ -85,6 +87,7 @@ describe("copy-from parsing test", () => {
 
     expect(context.replace).toHaveBeenCalledWith(range, "OPTIONS");
     expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.insert).not.toHaveBeenCalled();
   });
 
   it("should process redefinitions", () => {
@@ -134,10 +137,12 @@ describe("copy-from parsing test", () => {
     ];
     processCopyFrom(context, variables, createMessageService());
 
-    expect(context.replace).toHaveBeenCalledWith(
-      range,
-      ".\n        03 VAR-XBB  REDEFINES VAR-XBB",
-    );
+    expect(context.replace).toHaveBeenCalledWith(range, "");
     expect(context.addDiagnostic).not.toHaveBeenCalled();
+    expect(context.insert).toHaveBeenCalledWith(
+      range.end.line + 1,
+      "        03 VAR-XBB  REDEFINES VAR-XBB.\n",
+      "DaCo COPY-FROM generated text",
+    );
   });
 });
