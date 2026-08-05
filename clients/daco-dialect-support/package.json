@@ -128,8 +128,6 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "16.18.126",
     "@types/vscode": "1.74.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
     "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "2.19.0",
     "antlr-ng": "^1.0.10",
