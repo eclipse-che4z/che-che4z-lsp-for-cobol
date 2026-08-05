@@ -21,6 +21,8 @@ import {
 } from "./model";
 import { MessageService } from "./services/MessageService";
 
+const SOURCE = "DaCo COPY-FROM generated text";
+
 export function processCopyFrom(
   context: IDocumentProcessingContext,
   variables: VariableDescriptor[],
@@ -43,23 +45,30 @@ export function processCopyFrom(
         copyFromVariables = findCopyFromVariablesAscending(variables, i, name);
       }
 
-      const replacementText = generateReplacementText(
+      const { replace, insert } = generateReplacementAndInsertTexts(
         context,
         copyFromVariables,
         messageService,
         variableDescriptor,
       );
-      context.replace(variableDescriptor.copyFromRange, replacementText);
+      context.replace(variableDescriptor.copyFromRange, replace);
+      if (insert.length > 0) {
+        context.insert(
+          variableDescriptor.copyFromRange.end.line + 1,
+          insert,
+          SOURCE,
+        );
+      }
     }
   }
 }
 
-function generateReplacementText(
+function generateReplacementAndInsertTexts(
   context: IDocumentProcessingContext,
   variables: VariableDescriptor[],
   messageService: MessageService,
   copyFromVariable: CopyFromVariableDescriptor,
-): string {
+): { replace: string; insert: string } {
   let replacementText = " ";
 
   if (variables.length === 0) {
@@ -73,11 +82,11 @@ function generateReplacementText(
         vscode.DiagnosticSeverity.Error,
       ),
     );
-    return replacementText;
+    return { replace: replacementText, insert: "" };
   }
 
   if (variables[0].type !== "DEFINITION") {
-    return replacementText;
+    return { replace: replacementText, insert: "" };
   }
 
   replacementText = variables[0].options;
@@ -92,9 +101,10 @@ function generateReplacementText(
         vscode.DiagnosticSeverity.Error,
       ),
     );
-    return replacementText;
+    return { replace: replacementText, insert: "" };
   }
 
+  let insert = "";
   for (let j = 1; j < variables.length; j++) {
     const definition = variables[j];
     if (definition.type === "DEFINITION") {
@@ -104,13 +114,13 @@ function generateReplacementText(
         options = ` REDEFINES ${updateVariableName(next.name, suffix)}`;
       }
       const updatedName = updateVariableName(definition.name, suffix);
-      replacementText += `.\n        ${(definition.level - delta)
+      insert += `        ${(definition.level - delta)
         .toString()
-        .padStart(2, "0")} ${updatedName} ${options}`;
+        .padStart(2, "0")} ${updatedName} ${options}.\n`;
     }
   }
 
-  return replacementText;
+  return { replace: replacementText, insert: insert };
 }
 
 function findCopyFromVariablesDescending(
