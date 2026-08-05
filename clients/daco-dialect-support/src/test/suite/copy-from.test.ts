@@ -51,6 +51,8 @@ suite("COPY-FROM statement Test Suite", function () {
       "Variable NOT_EXISTING is not defined",
       range(pos(14, 19), pos(14, 31)),
     );
+
+    helper.checkHoverText(editor, pos(10, 30), "");
   });
 
   test("Process COPY-FROM statement successfully (case 2)", async () => {

@@ -336,3 +336,22 @@ export async function checkDefinition(
   const definition = definitions[0];
   assert.strictEqual(definition.range.start.line, expectedLine);
 }
+
+export async function checkHoverText(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedText: string,
+) {
+  const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+    "vscode.executeHoverProvider",
+    editor.document.uri,
+    position,
+  );
+
+  const actualHoverString = hovers
+    .flatMap((hover) => hover.contents)
+    .map((content) => (typeof content === "string" ? content : content.value))
+    .join("\n");
+
+  assert.strictEqual(actualHoverString, expectedText);
+}
