@@ -345,7 +345,7 @@ export async function checkHoverText(
   const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
     "vscode.executeHoverProvider",
     editor.document.uri,
-    pos(10, 30),
+    position,
   );
 
   const actualHoverString = hovers
