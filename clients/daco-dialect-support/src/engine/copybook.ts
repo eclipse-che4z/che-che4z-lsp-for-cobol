@@ -123,11 +123,6 @@ export class CopybookPreprocessor {
           descriptor.statementRange,
         );
       }
-      this.validateInvalidSuffix(
-        context,
-        descriptor.suffix,
-        descriptor.suffixRange,
-      );
 
       const hasWrkSuffix = descriptor.suffix?.toUpperCase() === WRK_SUFFIX;
       let copybookName = descriptor.name;
@@ -184,26 +179,6 @@ export class CopybookPreprocessor {
       context.addDiagnostic(
         new vscode.Diagnostic(
           statementRange,
-          message,
-          vscode.DiagnosticSeverity.Warning,
-        ),
-      );
-    }
-  }
-
-  private validateInvalidSuffix(
-    context: IDocumentProcessingContext,
-    suffix: string | undefined,
-    suffixRange: vscode.Range | undefined,
-  ) {
-    if (suffix && suffixRange && !/^[A-Z]{3}$/.test(suffix)) {
-      const message = this.messageService.get(
-        "validation.layout_usage",
-        suffix,
-      );
-      context.addDiagnostic(
-        new vscode.Diagnostic(
-          suffixRange,
           message,
           vscode.DiagnosticSeverity.Warning,
         ),
