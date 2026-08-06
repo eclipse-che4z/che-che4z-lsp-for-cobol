@@ -20,7 +20,10 @@ import {
 } from "@code4z/cobol-dialect-api";
 import { DaCoPreprocessor } from "./engine/preprocessor";
 import { MessageService } from "./engine/services/MessageService";
-import { SettingsService } from "./engine/services/settings";
+import {
+  DIALECT_API_VERSION_CONFIG,
+  SettingsService,
+} from "./engine/services/settings";
 
 const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
 
@@ -41,7 +44,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(async (event) => {
-      if (event.affectsConfiguration("dialect.api.version")) {
+      if (event.affectsConfiguration(DIALECT_API_VERSION_CONFIG)) {
         await updateApiVersion(context);
       }
     }),

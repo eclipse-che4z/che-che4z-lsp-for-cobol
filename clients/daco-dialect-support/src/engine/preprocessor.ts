@@ -31,7 +31,7 @@ import {
   generatePredefinedVariables,
 } from "./predefined";
 import { StatementDescriptor } from "./model";
-import { Diagnostic } from "vscode";
+import { SettingsService } from "./services/settings";
 
 export class DaCoPreprocessor {
   private readonly copybookPreprocessor: CopybookPreprocessor;
@@ -43,6 +43,7 @@ export class DaCoPreprocessor {
     this.copybookPreprocessor = new CopybookPreprocessor(
       this.messageService,
       outputChannel,
+      new Set<string>(SettingsService.getGenericCopybooks()),
     );
   }
 

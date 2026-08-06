@@ -2,5 +2,5 @@
     "cobol-lsp.cpy-manager.profiles": "noPass",
     "cobol-lsp.cpy-manager.paths-dsn": ["CLIST"],
     "cobol-lsp.maxVmCount": -1,
-    "dialect.api.version": "new"
+    "cobol-lsp.daco.dialect.api.version": "new"
 }
