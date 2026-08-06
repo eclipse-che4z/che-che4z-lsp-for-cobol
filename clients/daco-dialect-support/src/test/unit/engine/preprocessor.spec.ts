@@ -89,25 +89,6 @@ describe("DaCoPreprocessor test", () => {
     );
   });
 
-  it("should report a diagnostic for mismatched layout usage", async () => {
-    await preprocessor.execute(
-      context,
-      Uri.parse("file:///test.cbl"),
-      HEADER_0 + "       01 COPY MAID TEST-A12 SUFFIX.",
-    );
-
-    expect(context.addDiagnostic).toHaveBeenCalledWith(
-      expect.objectContaining({
-        severity: DiagnosticSeverity.Warning,
-        message: "Layout usage SUFFIX must contain exactly 3 characters",
-        range: expect.objectContaining({
-          start: expect.objectContaining({ line: 8, character: 29 }),
-          end: expect.objectContaining({ line: 8, character: 35 }),
-        }),
-      }),
-    );
-  });
-
   it("should resolve copybook reference", async () => {
     await preprocessor.execute(
       context,

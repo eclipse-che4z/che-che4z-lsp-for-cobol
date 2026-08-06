@@ -1,6 +1,5 @@
 {
   "validation.layout_identifier": "Invalid layout identifier",
-  "validation.layout_usage": "Layout usage {0} must contain exactly 3 characters",
   "parsers.intRangeValue": "Allowed range is {0} to {1}",
   "parsers.exactLength": "Exact length of {0} must be {1} bytes",
   "parsers.alphaNumeric": "Only alphanumerics are allowed for {0}",
