@@ -47,6 +47,7 @@ export class CopybookPreprocessor {
   public constructor(
     private readonly messageService: MessageService,
     private readonly outputChannel: vscode.OutputChannel,
+    private readonly genericCopybooks: Set<string>,
   ) {}
 
   public async execute(
@@ -115,11 +116,13 @@ export class CopybookPreprocessor {
         continue;
       }
 
-      this.validateMissingSuffix(
-        context,
-        descriptor.suffix,
-        descriptor.statementRange,
-      );
+      if (!this.genericCopybooks.has(descriptor.name.toUpperCase())) {
+        this.validateMissingSuffix(
+          context,
+          descriptor.suffix,
+          descriptor.statementRange,
+        );
+      }
       this.validateInvalidSuffix(
         context,
         descriptor.suffix,
