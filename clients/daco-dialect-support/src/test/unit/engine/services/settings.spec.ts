@@ -60,4 +60,15 @@ describe("SettingsService test suite", () => {
     expect(sections).toHaveLength(1);
     expect(sections[0]).toBe("LOWERCASE");
   });
+
+  it("should return uppercase generic copybooks", () => {
+    vscode.workspace.getConfiguration().get = jest
+      .fn()
+      .mockReturnValue(["lowercase"]);
+
+    const sections = SettingsService.getGenericCopybooks();
+
+    expect(sections).toHaveLength(1);
+    expect(sections[0]).toBe("LOWERCASE");
+  });
 });

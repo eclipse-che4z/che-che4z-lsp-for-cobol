@@ -86,7 +86,25 @@
           ],
           "uniqueItems": true
         },
-        "dialect.api.version": {
+        "cobol-lsp.daco.generic-copybooks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of generic copybooks",
+          "default": [
+            "KMKTAK-XL1",
+            "KMKSES-XL0",
+            "LDDAFC1M",
+            "LDDATE1M",
+            "LDQGTB1M",
+            "LDQGTI1M",
+            "MESSTU-XW9",
+            "TEPTRA-XTT"
+          ],
+          "uniqueItems": true
+        },
+        "cobol-lsp.daco.dialect.api.version": {
           "type": "string",
           "default": "legacy",
           "enum": [
