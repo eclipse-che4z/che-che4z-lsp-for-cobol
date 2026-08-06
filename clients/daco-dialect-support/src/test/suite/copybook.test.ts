@@ -297,4 +297,18 @@ suite("Copybook Test Suite", function () {
       range(pos(16, 19), pos(16, 31)),
     );
   });
+
+  test("No warning for the generic MAID copybook without layout usage", async () => {
+    const editor = await helper.showDocument("DaCo108.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Layout usage is not specified. Explicit usage (e.g. OTP) is recommended for correct resolution and readability",
+      range(pos(8, 7), pos(8, 28)),
+      vscode.DiagnosticSeverity.Warning,
+    );
+  });
 });

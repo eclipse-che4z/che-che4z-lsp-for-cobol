@@ -1,5 +1,5 @@
 {
     "cobol-lsp.maxVmCount": -1,
     "cobol-lsp.analysis-mode": "BASIC",
-    "dialect.api.version": "new"
+    "cobol-lsp.daco.dialect.api.version": "new"
 }

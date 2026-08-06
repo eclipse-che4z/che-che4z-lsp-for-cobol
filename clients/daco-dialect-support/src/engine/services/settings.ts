@@ -14,8 +14,9 @@
 import * as vscode from "vscode";
 
 export type ApiVersion = "legacy" | "new";
-const DIALECT_API_VERSION_CONFIG = "dialect.api.version";
+export const DIALECT_API_VERSION_CONFIG = "cobol-lsp.daco.dialect.api.version";
 const PREDEFINED_SECTIONS_CONFIG = "cobol-lsp.daco.predefined-sections";
+const GENERIC_COPYBOOKS_CONFIG = "cobol-lsp.daco.generic-copybooks";
 
 export class SettingsService {
   public static getPredefinedSections(): string[] {
@@ -24,6 +25,14 @@ export class SettingsService {
       .get(PREDEFINED_SECTIONS_CONFIG, []);
 
     return sections.map((s) => s.toUpperCase());
+  }
+
+  public static getGenericCopybooks(): string[] {
+    const copybooks: string[] = vscode.workspace
+      .getConfiguration()
+      .get(GENERIC_COPYBOOKS_CONFIG, []);
+
+    return copybooks.map((s) => s.toUpperCase());
   }
 
   public static getApiVersion(): ApiVersion {

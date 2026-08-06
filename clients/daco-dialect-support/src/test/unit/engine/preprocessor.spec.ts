@@ -36,10 +36,8 @@ describe("DaCoPreprocessor test", () => {
   const outputChannel: any = {
     appendLine: jest.fn(),
   };
-  const preprocessor = new DaCoPreprocessor(
-    outputChannel,
-    createMessageService(),
-  );
+  let preprocessor: DaCoPreprocessor;
+
   const copybookContext: any = {
     resolveCopybook: jest.fn(),
     addDiagnostic: jest.fn(),
@@ -62,6 +60,11 @@ describe("DaCoPreprocessor test", () => {
     jest
       .spyOn(SettingsService, "getPredefinedSections")
       .mockImplementation(() => []);
+    jest
+      .spyOn(SettingsService, "getGenericCopybooks")
+      .mockImplementation(() => []);
+
+    preprocessor = new DaCoPreprocessor(outputChannel, createMessageService());
   });
 
   it("should report a diagnostic for mismatched layout identifier", async () => {

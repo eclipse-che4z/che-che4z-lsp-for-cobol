@@ -14,5 +14,5 @@
     "files.associations": {
       "**/copybook-analysis/**": "cobol"
     },
-    "dialect.api.version": "new"
+    "cobol-lsp.daco.dialect.api.version": "new"
 }
