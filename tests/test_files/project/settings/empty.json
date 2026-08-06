@@ -3,5 +3,5 @@
     "cobol-lsp.cpy-manager.paths-local": [],
     "cobol-lsp.cpy-manager.paths-dsn": [],
     "cobol-lsp.maxVmCount": -1,
-    "dialect.api.version": "new"
+    "cobol-lsp.daco.dialect.api.version": "new"
 }

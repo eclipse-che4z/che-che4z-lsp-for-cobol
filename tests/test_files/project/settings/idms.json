@@ -13,5 +13,5 @@
     "editor.snippetSuggestions": "top",
     "cobol-lsp.dialects": ["IDMS"],
     "cobol-lsp.maxVmCount": -1,
-    "dialect.api.version": "new"
+    "cobol-lsp.daco.dialect.api.version": "new"
 }
