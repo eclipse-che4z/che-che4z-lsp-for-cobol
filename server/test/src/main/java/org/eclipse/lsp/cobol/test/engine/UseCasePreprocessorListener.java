@@ -15,6 +15,7 @@
 
 package org.eclipse.lsp.cobol.test.engine;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
@@ -338,18 +339,6 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @Override
   public void exitSectionStatement(SectionStatementContext ctx) {
     pop();
-    SectionUsageContext sectionUsage = ctx.sectionUsage();
-    if (sectionUsage != null && sectionUsage.word() != null) {
-      WordContext word = sectionUsage.word();
-      processProcedureToken(
-          word.identifier().getText(),
-          ctx,
-          word.replacement(),
-          procedureUsages,
-          ctx.diagnostic(),
-          new ProcedureId(
-              getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
-    }
     SectionDefinitionContext sectionDefinition = ctx.sectionDefinition();
     if (sectionDefinition != null && sectionDefinition.word() != null) {
       WordContext word = sectionDefinition.word();
@@ -363,6 +352,28 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
           procedureDefinitions,
           ctx.diagnostic(),
           new ProcedureId(sectionName, null));
+    }
+  }
+
+  @Override
+  public void enterSectionUsage(SectionUsageContext ctx) {
+    push();
+  }
+
+  @Override
+  public void exitSectionUsage(SectionUsageContext sectionUsage) {
+    pop();
+    //    SectionUsageContext sectionUsage = ctx.sectionUsage();
+    if (sectionUsage != null && sectionUsage.word() != null) {
+      WordContext word = sectionUsage.word();
+      processProcedureToken(
+          word.identifier().getText(),
+          sectionUsage,
+          word.replacement(),
+          procedureUsages,
+          emptyList(),
+          new ProcedureId(
+              getReplacementText(word.getText(), word.replacement()).get(0).toUpperCase(), null));
     }
   }
 
