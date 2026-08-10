@@ -61,10 +61,6 @@ skipUntilDataDivision
    : (~(DATA_DIVISION | PROCEDURE))*
    ;
 
-skipUntilDataDivision
-   : (~(DATA_DIVISION | PROCEDURE))*
-   ;
-
 skipUntilFirstSection
    : (~(WORKING_STORAGE | LINKAGE))*
    ;
