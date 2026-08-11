@@ -18,7 +18,7 @@ import {
   StatementsVisitor,
   NameResolver,
 } from "../../../engine/parsing";
-import { Range } from "./__mocks__/vscode";
+import { Range, Uri } from "./__mocks__/vscode";
 import { createMessageService } from "./utils";
 
 describe("parsing test", () => {
@@ -27,7 +27,10 @@ describe("parsing test", () => {
   });
 
   it("should fallback when layoutId is missing", () => {
-    const visitor = new ProgramVisitor(createMessageService());
+    const visitor = new ProgramVisitor(
+      createMessageService(),
+      Uri.parse("file:///test.cbl"),
+    );
 
     const ctx = {
       layoutId: () => null,
@@ -40,7 +43,10 @@ describe("parsing test", () => {
   });
 
   it("should fallback when identifier is missing", () => {
-    const visitor = new ProgramVisitor(createMessageService());
+    const visitor = new ProgramVisitor(
+      createMessageService(),
+      Uri.parse("file:///test.cbl"),
+    );
 
     const ctx = {
       _identifier: () => null,
@@ -54,7 +60,7 @@ describe("parsing test", () => {
   });
 
   it("should skip when entryName is missing", () => {
-    const visitor = new CopybookContentVisitor();
+    const visitor = new CopybookContentVisitor(Uri.parse("file:///test.cbl"));
 
     const levelNumber = {
       getText: () => "01",
@@ -73,7 +79,7 @@ describe("parsing test", () => {
   });
 
   it("should add variable redefine descriptor", () => {
-    const visitor = new CopybookContentVisitor();
+    const visitor = new CopybookContentVisitor(Uri.parse("file:///test.cbl"));
 
     const dataName = {
       getText: () => "ENTRY TEXT",

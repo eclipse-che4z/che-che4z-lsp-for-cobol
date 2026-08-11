@@ -21,6 +21,7 @@ import java.util.Optional;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -93,6 +94,57 @@ public class TextMapReplacer {
               r.getStart(), new ExtendedTextLine(t.getValue(), t.getOriginalLocation()));
         });
     return tokens;
+  }
+
+  /**
+   * Builds a new block of text using a replacement map, preserving original locations for
+   * substituted tokens. Unlike {@link #execute}, there is no existing range being replaced - a
+   * brand new block of text is produced instead, anchored at (0, 0) so it can be spliced in as
+   * whole new lines.
+   *
+   * @param extendedText - the extended text object
+   * @param statementRange - a range in the original text this text logically originates from, used
+   *     as the fallback location for the generated (non-token) portions of the result
+   * @param statementMap - a map of token names and its ranges from the original text
+   * @param replacementMap - a new text replacement map
+   * @return the processed text together with the fallback location and per-token replacements
+   */
+  public InsertionResult executeInsert(
+      ExtendedText extendedText,
+      Range statementRange,
+      Map<String, Pair<String, Range>> statementMap,
+      String replacementMap) {
+
+    MappingHelper.validateRange(statementRange);
+    validateMapSize(replacementMap);
+    validateDocumentRange(extendedText, statementRange, "Statement range error: ");
+    if (statementMap.isEmpty()) {
+      throw new IllegalArgumentException("Statement map must contain at least 1 token name");
+    }
+
+    Map<String, Token> tokens = new HashMap<>();
+    for (Map.Entry<String, Pair<String, Range>> entry : statementMap.entrySet()) {
+      tokens.put(
+          entry.getKey(),
+          new Token(
+              entry.getValue().getKey(), extendedText.mapLocation(entry.getValue().getValue())));
+    }
+
+    Map<Range, Token> tokenReplacements = new HashMap<>();
+    String processedText =
+        scanForReplacements(new Position(0, 0), tokens, replacementMap, tokenReplacements);
+
+    Location statementLocation = extendedText.mapLocation(statementRange);
+    return new InsertionResult(processedText, statementLocation, tokenReplacements, tokens);
+  }
+
+  /** Result of building a new block of text from a replacement map */
+  @Value
+  public static class InsertionResult {
+    String text;
+    Location statementLocation;
+    Map<Range, Token> tokenReplacements;
+    Map<String, Token> tokens;
   }
 
   private Map<String, Token> mapStatementTokens(

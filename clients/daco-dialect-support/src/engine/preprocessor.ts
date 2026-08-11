@@ -47,11 +47,7 @@ export class DaCoPreprocessor {
     );
   }
 
-  public async execute(
-    context: IDocumentProcessingContext,
-    _programUri: vscode.Uri,
-    text: string,
-  ) {
+  public async execute(context: IDocumentProcessingContext, text: string) {
     text = this.cleanup(context, text);
     const programInfo = await this.copybookPreprocessor.execute(context, text);
     const variables = programInfo.accumulator.generateDescriptors();

@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -185,6 +187,38 @@ public class ExtendedDocument {
     dirty = true;
     return currentText.replace(
         updatedRange, updatedStatementRange, updatedStatementMap, replacementMap);
+  }
+
+  /**
+   * Inserts a new block of text at the given line, built from a replacement map, preserving
+   * original locations for substituted tokens
+   *
+   * @param line - a line number to insert
+   * @param statementRange - a range in the original text this text logically originates from
+   * @param statementMap - a map of token names and its ranges from the original text
+   * @param replacementMap - a new text replacement map
+   * @return a HashMap of mapped tokens
+   */
+  public Map<String, TextMapReplacer.Token> insertWithMap(
+      int line,
+      Range statementRange,
+      Map<String, Pair<String, Range>> statementMap,
+      String replacementMap) {
+    int updatedLine = updateLineDueToChanges(line);
+    Range updatedStatementRange = updateRangeDueToChanges(statementRange);
+    Map<String, Pair<String, Range>> updatedStatementMap =
+        statementMap.entrySet().stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e ->
+                        ImmutablePair.of(
+                            e.getValue().getKey(),
+                            updateRangeDueToChanges(e.getValue().getValue()))));
+
+    dirty = true;
+    return currentText.insertWithMap(
+        updatedLine, updatedStatementRange, updatedStatementMap, replacementMap);
   }
 
   public void delete(int lineNumber) {

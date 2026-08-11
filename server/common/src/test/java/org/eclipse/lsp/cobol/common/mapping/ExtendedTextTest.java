@@ -18,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -484,6 +486,63 @@ class ExtendedTextTest {
     // line 2: VAR1
     location = extendedText.mapLocation(new Range(new Position(1, 8), new Position(1, 12)));
     assertEquals(var1Location.toString(), location.toString());
+  }
+
+  @Test
+  void testInsertWithMap_order() {
+    ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2\nSTOP RUN.", "uri");
+
+    Pair<String, Range> val1 =
+        ImmutablePair.of("MOD1", new Range(new Position(0, 5), new Position(0, 9)));
+    Pair<String, Range> val2 =
+        ImmutablePair.of("MOD2", new Range(new Position(0, 13), new Position(0, 17)));
+
+    Map<String, Pair<String, Range>> statementMap =
+        ImmutableMap.of(
+            "VAR1", val1,
+            "VAR2", val2);
+
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
+    Map<String, TextMapReplacer.Token> tokens =
+        extendedText.insertWithMap(
+            1,
+            statementRange,
+            statementMap,
+            "DISPLAY {VAR2}.\nDISPLAY {VAR1}.\nMOVE {VAR2} TO {VAR1}");
+
+    assertEquals(
+        "MOVE VAR1 TO VAR2\n"
+            + "DISPLAY MOD2.\n"
+            + "DISPLAY MOD1.\n"
+            + "MOVE MOD2 TO MOD1\n"
+            + "STOP RUN.",
+        extendedText.toString());
+    assertEquals(2, tokens.size());
+
+    Location statementLocation = new Location("uri", statementRange);
+    Location var1Location = new Location("uri", new Range(new Position(0, 5), new Position(0, 9)));
+    Location var2Location =
+        new Location("uri", new Range(new Position(0, 13), new Position(0, 17)));
+
+    // inserted line 1: DISPLAY (filler text self-maps to the generated block, like plain insert())
+    Location location = extendedText.mapLocation(new Range(new Position(1, 0), new Position(1, 7)));
+    assertEquals(statementLocation.toString(), location.toString());
+
+    // inserted line 1: VAR2 (substituted token keeps its original location)
+    location = extendedText.mapLocation(new Range(new Position(1, 8), new Position(1, 12)));
+    assertEquals(var2Location.toString(), location.toString());
+
+    // inserted line 2: DISPLAY (filler text self-maps to the generated block, like plain insert())
+    location = extendedText.mapLocation(new Range(new Position(2, 0), new Position(2, 7)));
+    assertEquals(statementLocation.toString(), location.toString());
+
+    // inserted line 2: VAR1 (substituted token keeps its original location)
+    location = extendedText.mapLocation(new Range(new Position(2, 8), new Position(2, 12)));
+    assertEquals(var1Location.toString(), location.toString());
+
+    // untouched original statement still maps to itself
+    location = extendedText.mapLocation(statementRange);
+    assertEquals(statementLocation.toString(), location.toString());
   }
 
   @Test

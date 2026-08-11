@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -83,6 +85,7 @@ public class DialectProcessingService {
           result.getReplacements(),
           result.getReplacementMaps(),
           result.getInsertions(),
+          result.getInsertionMaps(),
           result.getCopybooks(),
           errorList,
           dialectName,
@@ -101,6 +104,7 @@ public class DialectProcessingService {
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
       DocumentInsertion[] insertions,
+      DocumentInsertionMap[] insertionMaps,
       DialectCopybookInfo[] copybookInfos,
       List<SyntaxError> errorList,
       String dialectName,
@@ -114,7 +118,7 @@ public class DialectProcessingService {
     }
 
     ArrayList<Node> nodes =
-        applyReplacements(document, replacements, replacementMaps, parentCopybookId);
+        applyReplacements(document, replacements, replacementMaps, insertionMaps, parentCopybookId);
 
     for (DialectCopybookInfo copybookInfo : copybookInfos) {
       ExtendedText extendedText =
@@ -150,6 +154,7 @@ public class DialectProcessingService {
               copybookInfo.getReplacements(),
               copybookInfo.getReplacementMaps(),
               copybookInfo.getInsertions(),
+              copybookInfo.getInsertionMaps(),
               copybookInfo.getCopybooks(),
               errorList,
               dialectName,
@@ -194,6 +199,7 @@ public class DialectProcessingService {
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
+      DocumentInsertionMap[] insertionMaps,
       String copybookId) {
     for (DocumentReplacement replacement : replacements) {
       document.replace(replacement.getRange(), replacement.getText());
@@ -201,30 +207,67 @@ public class DialectProcessingService {
 
     ArrayList<Node> result = new ArrayList<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
-      Map<String, Range> statementMap = new HashMap<>();
-      for (ReplacementTokens tokens : replacementMap.getTokenItems()) {
-        Arrays.stream(tokens.getTokens())
-            .forEach(token -> statementMap.put(token.getName(), token.getRange()));
-      }
       Map<String, TextMapReplacer.Token> mappedTokens =
           document.replace(
               replacementMap.getRange(),
               replacementMap.getStatementRange(),
-              statementMap,
+              buildStatementMap(replacementMap.getTokenItems()),
               normalizeReplacementMap(replacementMap.getReplacementMap()));
 
-      for (ReplacementTokens tokens : replacementMap.getTokenItems()) {
+      addMappedNodes(
+          replacementMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
+    }
 
-        List<TextMapReplacer.Token> mappedTokenList =
-            Arrays.stream(tokens.getTokens())
-                .map(t -> mappedTokens.get(t.getName()))
-                .collect(Collectors.toList());
-        NodeHelper.createNodesIfNeeded(
-                tokens.getType(), mappedTokenList, document.getUri(), copybookId)
-            .ifPresent(result::addAll);
-      }
+    for (DocumentInsertionMap insertionMap : insertionMaps) {
+      Map<String, TextMapReplacer.Token> mappedTokens =
+          document.insertWithMap(
+              insertionMap.getLine(),
+              insertionMap.getStatementRange(),
+              buildStatementInsertMap(insertionMap.getTokenItems()),
+              normalizeReplacementMap(insertionMap.getReplacementMap()));
+
+      addMappedNodes(
+          insertionMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
     }
     return result;
+  }
+
+  private static Map<String, Range> buildStatementMap(ReplacementTokens[] tokenItems) {
+    Map<String, Range> statementMap = new HashMap<>();
+    for (ReplacementTokens tokens : tokenItems) {
+      Arrays.stream(tokens.getTokens())
+          .forEach(token -> statementMap.put(token.getName(), token.getRange()));
+    }
+    return statementMap;
+  }
+
+  private static Map<String, Pair<String, Range>> buildStatementInsertMap(
+      ReplacementTokens[] tokenItems) {
+    Map<String, Pair<String, Range>> statementMap = new HashMap<>();
+    for (ReplacementTokens tokens : tokenItems) {
+      Arrays.stream(tokens.getTokens())
+          .forEach(
+              token ->
+                  statementMap.put(
+                      token.getName(), ImmutablePair.of(token.getValue(), token.getRange())));
+    }
+    return statementMap;
+  }
+
+  private static void addMappedNodes(
+      ReplacementTokens[] tokenItems,
+      Map<String, TextMapReplacer.Token> mappedTokens,
+      String uri,
+      String copybookId,
+      List<Node> result) {
+    for (ReplacementTokens tokens : tokenItems) {
+      List<TextMapReplacer.Token> mappedTokenList =
+          Arrays.stream(tokens.getTokens())
+              .map(t -> mappedTokens.get(t.getName()))
+              .collect(Collectors.toList());
+      NodeHelper.createNodesIfNeeded(tokens.getType(), mappedTokenList, uri, copybookId)
+          .ifPresent(result::addAll);
+    }
   }
 
   private static String normalizeReplacementMap(String replacementMap) {

@@ -158,6 +158,9 @@ suite("COPY-FROM statement Test Suite", function () {
       "Variable NOT_EXISTING is not defined",
       range(pos(15, 19), pos(15, 31)),
     );
+
+    await helper.checkDefinition(editor, pos(14, 24), 12);
+    await helper.checkReferences(editor, pos(12, 18), [12, 14]);
   });
 
   test("Process COPY-FROM statement successfully (undefined variable)", async () => {

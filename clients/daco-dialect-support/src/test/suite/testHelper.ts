@@ -324,17 +324,43 @@ export async function checkDefinition(
   position: vscode.Position,
   expectedLine: number,
 ) {
-  const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
-    "vscode.executeDefinitionProvider",
+  await checkLocations("vscode.executeDefinitionProvider", editor, position, [
+    expectedLine,
+  ]);
+}
+
+export async function checkReferences(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLines: number[],
+) {
+  await checkLocations(
+    "vscode.executeReferenceProvider",
+    editor,
+    position,
+    expectedLines,
+  );
+}
+
+async function checkLocations(
+  provider:
+    | "vscode.executeDefinitionProvider"
+    | "vscode.executeReferenceProvider",
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLines: number[],
+) {
+  const locations = await vscode.commands.executeCommand<vscode.Location[]>(
+    provider,
     editor.document.uri,
     position,
   );
 
-  assert.ok(definitions);
-  assert.strictEqual(definitions.length, 1);
-
-  const definition = definitions[0];
-  assert.strictEqual(definition.range.start.line, expectedLine);
+  assert.ok(locations);
+  assert.deepStrictEqual(
+    locations.map((location) => location.range.start.line),
+    expectedLines,
+  );
 }
 
 export async function checkHoverText(

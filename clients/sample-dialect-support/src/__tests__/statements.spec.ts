@@ -12,6 +12,8 @@
  *   Broadcom - initial API and implementation
  */
 
+import type { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import * as vscode from "../__mocks__/vscode";
 import {
   replaceAltStateStatement,
@@ -20,12 +22,15 @@ import {
 } from "../statements";
 
 const context = {
-  resolveCopybook: jest.fn(),
+  getProgramUri: jest.fn<() => never>(),
+  getDocumentUri: jest.fn<() => never>(),
+  resolveCopybook: jest.fn(() => Promise.resolve(undefined)),
   replace: jest.fn(),
   replaceWithMap: jest.fn(),
   insert: jest.fn(),
+  insertWithMap: jest.fn(),
   addDiagnostic: jest.fn(),
-};
+} satisfies IDocumentProcessingContext;
 
 describe("statements replacement functionality", () => {
   beforeEach(() => {

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -345,6 +346,48 @@ public class ExtendedText {
   public Map<String, TextMapReplacer.Token> replace(
       Range range, Range statementRange, Map<String, Range> statementMap, String replacementMap) {
     return TextMapReplacer.execute(this, range, statementRange, statementMap, replacementMap);
+  }
+
+  /**
+   * Inserts a new block of text at the given line, built from a replacement map, preserving
+   * original locations for substituted tokens
+   *
+   * @param line - a line number to insert
+   * @param statementRange - a range in the original text this text logically originates from
+   * @param statementMap - a map of token names and its values and ranges from the original text
+   * @param replacementMap - a new text replacement map
+   * @return a HashMap of mapped tokens
+   */
+  public Map<String, TextMapReplacer.Token> insertWithMap(
+      int line,
+      Range statementRange,
+      Map<String, Pair<String, Range>> statementMap,
+      String replacementMap) {
+    TextMapReplacer.InsertionResult result =
+        TextMapReplacer.executeInsert(this, statementRange, statementMap, replacementMap);
+
+    String[] textLines = MappingHelper.split(result.getText());
+    for (int i = 0; i < textLines.length; i++) {
+      lines.add(line + i, new ExtendedTextLine(textLines[i], result.getStatementLocation()));
+    }
+
+    result
+        .getTokenReplacements()
+        .forEach(
+            (relativeRange, token) -> {
+              Range absoluteRange = shiftRange(relativeRange, line);
+              delete(absoluteRange);
+              insert(
+                  absoluteRange.getStart(),
+                  new ExtendedTextLine(token.getValue(), token.getOriginalLocation()));
+            });
+    return result.getTokens();
+  }
+
+  private static Range shiftRange(Range range, int lineOffset) {
+    return new Range(
+        new Position(range.getStart().getLine() + lineOffset, range.getStart().getCharacter()),
+        new Position(range.getEnd().getLine() + lineOffset, range.getEnd().getCharacter()));
   }
 
   private MappedCharacter getCharacterAt(Position position) {
