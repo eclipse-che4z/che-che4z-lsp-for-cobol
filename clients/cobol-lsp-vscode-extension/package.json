@@ -615,7 +615,7 @@
     "@types/node": "^22.9.0",
     "@types/tar-stream": "^3.1.4",
     "@types/vscode": "1.82",
-    "@vscode/test-electron": "^2.4.1",
+    "@vscode/test-electron": "^3.1.0",
     "@vscode/test-web": "^0.0.63",
     "@vscode/vsce": "3.2.1",
     "assert": "^2.1.0",
