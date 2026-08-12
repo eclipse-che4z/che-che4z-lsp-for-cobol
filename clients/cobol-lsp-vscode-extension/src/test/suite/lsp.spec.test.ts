@@ -911,8 +911,6 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
     );
     assert.strictEqual(diagnostics.length, 1);
 
-    helper.moveCursor(editor, new vscode.Position(17, 24));
-
     const definitions = await vscode.commands.executeCommand<
       vscode.Location[] | vscode.LocationLink[]
     >(
@@ -921,6 +919,22 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
       new vscode.Position(17, 24),
     );
     assert.strictEqual(definitions.length, 1);
+  });
+
+  test("Find references of a section", async () => {
+    const editor = await helper.showDocument("SECTION.CBL");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.strictEqual(diagnostics.length, 1);
+
+    const references = await vscode.commands.executeCommand<vscode.Location[]>(
+      "vscode.executeReferenceProvider",
+      editor.document.uri,
+      new vscode.Position(17, 24),
+    );
+    assert.strictEqual(references.length, 2);
   });
 });
 
