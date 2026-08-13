@@ -142,9 +142,12 @@ public class TextMapReplacer {
 
     statementMap.forEach(
         (tokenName, token) -> {
-          if (extendedText.getUri().equals(token.getOriginalLocation().getUri())) {
-            validateTokenName(extendedText, tokenName, token.getOriginalLocation().getRange());
-          }
+          String value = token.getValue();
+          Location originalLocation = token.getOriginalLocation();
+          Range originalRange = originalLocation.getRange();
+          if (extendedText.getUri().equals(originalLocation.getUri())) {
+            validateTokenName(extendedText, tokenName, originalRange);
+
 
           Location originalLocation;
           String value = token.getValue();
