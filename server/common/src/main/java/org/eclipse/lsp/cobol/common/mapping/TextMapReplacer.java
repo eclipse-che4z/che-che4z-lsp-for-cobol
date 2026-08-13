@@ -149,10 +149,7 @@ public class TextMapReplacer {
             validateTokenName(extendedText, tokenName, originalRange);
 
 
-          Location originalLocation;
-          String value = token.getValue();
-          if (extendedText.getUri().equals(token.getOriginalLocation().getUri())) {
-            originalLocation = extendedText.mapLocation(token.getOriginalLocation().getRange());
+            originalLocation = extendedText.mapLocation(originalRange);
             if (value == null) {
               ExtendedTextLine extendedTextLine =
                   extendedText
