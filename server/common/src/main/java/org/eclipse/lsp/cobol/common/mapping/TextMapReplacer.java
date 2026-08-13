@@ -148,13 +148,10 @@ public class TextMapReplacer {
           if (extendedText.getUri().equals(originalLocation.getUri())) {
             validateTokenName(extendedText, tokenName, originalRange);
 
-
             originalLocation = extendedText.mapLocation(originalRange);
             if (value == null) {
               ExtendedTextLine extendedTextLine =
-                  extendedText
-                      .getLines()
-                      .get(originalRange.getStart().getLine());
+                  extendedText.getLines().get(originalRange.getStart().getLine());
               value =
                   extendedTextLine
                       .subline(
