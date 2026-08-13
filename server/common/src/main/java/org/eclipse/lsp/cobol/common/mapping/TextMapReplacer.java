@@ -162,8 +162,6 @@ public class TextMapReplacer {
                           originalRange.getEnd().getCharacter())
                       .toString();
             }
-          } else {
-            originalLocation = token.getOriginalLocation();
           }
           result.put(tokenName, new Token(value, originalLocation));
         });
