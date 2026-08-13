@@ -183,9 +183,9 @@ class ExtendedDocumentTest {
     Range statementRange = new Range(new Position(5, 8), new Position(5, 17));
     Range divisionRange = new Range(new Position(5, 18), new Position(5, 26));
 
-    Map<String, Range> statementMap = new HashMap<>();
-    statementMap.put("PROC", statementRange);
-    statementMap.put("DIV", divisionRange);
+    Map<String, Token> statementMap = new HashMap<>();
+    statementMap.put("PROC", new Token(new Location(documentUri, statementRange)));
+    statementMap.put("DIV", new Token(new Location(documentUri, divisionRange)));
     String replacementMap = "{DIV} {PROC}";
     document.replace(range, statementRange, statementMap, replacementMap);
     document.commitTransformations();

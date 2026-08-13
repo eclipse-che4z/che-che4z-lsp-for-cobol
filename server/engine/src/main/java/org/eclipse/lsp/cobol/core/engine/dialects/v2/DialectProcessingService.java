@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.CleanerPreprocessor;
 import org.eclipse.lsp.cobol.common.copybook.CopybookName;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
@@ -31,14 +29,13 @@ import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
-import org.eclipse.lsp.cobol.common.mapping.TextMapReplacer;
+import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /** Dialect Api Client * */
@@ -207,7 +204,7 @@ public class DialectProcessingService {
 
     ArrayList<Node> result = new ArrayList<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
-      Map<String, TextMapReplacer.Token> mappedTokens =
+      Map<String, Token> mappedTokens =
           document.replace(
               replacementMap.getRange(),
               replacementMap.getStatementRange(),
@@ -219,11 +216,11 @@ public class DialectProcessingService {
     }
 
     for (DocumentInsertionMap insertionMap : insertionMaps) {
-      Map<String, TextMapReplacer.Token> mappedTokens =
-          document.insertWithMap(
+      Map<String, Token> mappedTokens =
+          document.insert(
               insertionMap.getLine(),
               insertionMap.getStatementRange(),
-              buildStatementInsertMap(insertionMap.getTokenItems()),
+              buildStatementMap(insertionMap.getTokenItems()),
               normalizeReplacementMap(insertionMap.getReplacementMap()));
 
       addMappedNodes(
@@ -232,36 +229,26 @@ public class DialectProcessingService {
     return result;
   }
 
-  private static Map<String, Range> buildStatementMap(ReplacementTokens[] tokenItems) {
-    Map<String, Range> statementMap = new HashMap<>();
-    for (ReplacementTokens tokens : tokenItems) {
-      Arrays.stream(tokens.getTokens())
-          .forEach(token -> statementMap.put(token.getName(), token.getRange()));
-    }
-    return statementMap;
-  }
-
-  private static Map<String, Pair<String, Range>> buildStatementInsertMap(
-      ReplacementTokens[] tokenItems) {
-    Map<String, Pair<String, Range>> statementMap = new HashMap<>();
+  private static Map<String, Token> buildStatementMap(ReplacementTokens[] tokenItems) {
+    Map<String, Token> statementMap = new HashMap<>();
     for (ReplacementTokens tokens : tokenItems) {
       Arrays.stream(tokens.getTokens())
           .forEach(
               token ->
                   statementMap.put(
-                      token.getName(), ImmutablePair.of(token.getValue(), token.getRange())));
+                      token.getName(), new Token(token.getValue(), token.getLocation())));
     }
     return statementMap;
   }
 
   private static void addMappedNodes(
       ReplacementTokens[] tokenItems,
-      Map<String, TextMapReplacer.Token> mappedTokens,
+      Map<String, Token> mappedTokens,
       String uri,
       String copybookId,
       List<Node> result) {
     for (ReplacementTokens tokens : tokenItems) {
-      List<TextMapReplacer.Token> mappedTokenList =
+      List<Token> mappedTokenList =
           Arrays.stream(tokens.getTokens())
               .map(t -> mappedTokens.get(t.getName()))
               .collect(Collectors.toList());

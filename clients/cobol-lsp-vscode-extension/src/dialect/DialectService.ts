@@ -50,7 +50,7 @@ type DocumentReplacementPayload = {
 
 type TokenPayload = {
   name: string;
-  range: RangePayload;
+  location: LocationPayload;
 };
 
 type ItemPayload = {
@@ -486,7 +486,7 @@ function serializeToken(token: Token) {
   return {
     name: token.name,
     value: token.value,
-    range: serializeRange(token.range),
+    location: serializeLocation(token.location),
   };
 }
 

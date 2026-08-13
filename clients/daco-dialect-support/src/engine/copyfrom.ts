@@ -132,11 +132,10 @@ function generateReplacementAndInsertTexts(
             {
               name: levelTokenName,
               value: levelTokenValue,
-              range:
-                context.getDocumentUri().toString() ===
-                definition.uri.toString()
-                  ? definition.levelRange
-                  : copyFromVariable.levelRange,
+              location: new vscode.Location(
+                definition.uri,
+                definition.levelRange,
+              ),
             },
           ],
         },
@@ -145,11 +144,10 @@ function generateReplacementAndInsertTexts(
             {
               name: variableTokenName,
               value: updatedName,
-              range:
-                context.getDocumentUri().toString() ===
-                definition.uri.toString()
-                  ? definition.nameRange
-                  : copyFromVariable.levelRange,
+              location: new vscode.Location(
+                definition.uri,
+                definition.nameRange,
+              ),
             },
           ],
         },
@@ -158,11 +156,10 @@ function generateReplacementAndInsertTexts(
             {
               name: optionsTokenName,
               value: options,
-              range:
-                context.getDocumentUri().toString() ===
-                definition.uri.toString()
-                  ? definition.optionsRange
-                  : copyFromVariable.levelRange,
+              location: new vscode.Location(
+                definition.uri,
+                definition.optionsRange,
+              ),
             },
           ],
         },

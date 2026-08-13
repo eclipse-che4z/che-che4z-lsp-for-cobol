@@ -145,6 +145,11 @@ suite("COPY-FROM statement Test Suite", function () {
       "Variable NOT_EXISTING is not defined",
       range(pos(13, 19), pos(13, 31)),
     );
+
+    await helper.checkReferences(editor, pos(12, 21), [
+      { line: 12, documentName: "DaCo79.cbl" },
+      { line: 3, documentName: "PROTOCC" },
+    ]);
   });
 
   test("Process COPY-FROM statement successfully (duplicate variables)", async () => {

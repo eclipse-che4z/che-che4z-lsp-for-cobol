@@ -21,7 +21,6 @@ import java.util.Optional;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -48,19 +47,14 @@ public class TextMapReplacer {
   private static final char ESCAPE_CHAR = '&';
   private static final char VALUE_REPLACEMENT_CHAR = '|';
 
-  @Value
-  public static class Token {
-    String value;
-    Location originalLocation;
-  }
-
   /**
    * Replaces given range of text with a new text using replacement map
    *
    * @param extendedText - the extended text object
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
-   * @param statementMap - a map of token names and its ranges from the original text
+   * @param statementMap - a map of token names and its default values and locations from the
+   *     original text
    * @param replacementMap - a new text replacement map
    * @return a HashMap of mapped tokens
    */
@@ -68,7 +62,7 @@ public class TextMapReplacer {
       ExtendedText extendedText,
       Range range,
       Range statementRange,
-      Map<String, Range> statementMap,
+      Map<String, Token> statementMap,
       String replacementMap) {
 
     MappingHelper.validateRange(range);
@@ -105,14 +99,15 @@ public class TextMapReplacer {
    * @param extendedText - the extended text object
    * @param statementRange - a range in the original text this text logically originates from, used
    *     as the fallback location for the generated (non-token) portions of the result
-   * @param statementMap - a map of token names and its ranges from the original text
+   * @param statementMap - a map of token names and its default values and locations from the
+   *     original text
    * @param replacementMap - a new text replacement map
    * @return the processed text together with the fallback location and per-token replacements
    */
-  public InsertionResult executeInsert(
+  public InsertionResult prepareInsert(
       ExtendedText extendedText,
       Range statementRange,
-      Map<String, Pair<String, Range>> statementMap,
+      Map<String, Token> statementMap,
       String replacementMap) {
 
     MappingHelper.validateRange(statementRange);
@@ -122,13 +117,7 @@ public class TextMapReplacer {
       throw new IllegalArgumentException("Statement map must contain at least 1 token name");
     }
 
-    Map<String, Token> tokens = new HashMap<>();
-    for (Map.Entry<String, Pair<String, Range>> entry : statementMap.entrySet()) {
-      tokens.put(
-          entry.getKey(),
-          new Token(
-              entry.getValue().getKey(), extendedText.mapLocation(entry.getValue().getValue())));
-    }
+    Map<String, Token> tokens = mapStatementTokens(extendedText, statementMap);
 
     Map<Range, Token> tokenReplacements = new HashMap<>();
     String processedText =
@@ -148,24 +137,37 @@ public class TextMapReplacer {
   }
 
   private Map<String, Token> mapStatementTokens(
-      ExtendedText extendedText, Map<String, Range> statementMap) {
-    Map<String, Token> tokens = new HashMap<>();
+      ExtendedText extendedText, Map<String, Token> statementMap) {
+    Map<String, Token> result = new HashMap<>();
 
     statementMap.forEach(
-        (tokenName, range) -> {
-          validateTokenName(extendedText, tokenName, range);
-          Location originalLocation = extendedText.mapLocation(range);
+        (tokenName, token) -> {
+          if (extendedText.getUri().equals(token.getOriginalLocation().getUri())) {
+            validateTokenName(extendedText, tokenName, token.getOriginalLocation().getRange());
+          }
 
-          ExtendedTextLine extendedTextLine =
-              extendedText.getLines().get(range.getStart().getLine());
-          String value =
-              extendedTextLine
-                  .subline(range.getStart().getCharacter(), range.getEnd().getCharacter())
-                  .toString();
-
-          tokens.put(tokenName, new Token(value, originalLocation));
+          Location originalLocation;
+          String value = token.getValue();
+          if (extendedText.getUri().equals(token.getOriginalLocation().getUri())) {
+            originalLocation = extendedText.mapLocation(token.getOriginalLocation().getRange());
+            if (value == null) {
+              ExtendedTextLine extendedTextLine =
+                  extendedText
+                      .getLines()
+                      .get(token.getOriginalLocation().getRange().getStart().getLine());
+              value =
+                  extendedTextLine
+                      .subline(
+                          token.getOriginalLocation().getRange().getStart().getCharacter(),
+                          token.getOriginalLocation().getRange().getEnd().getCharacter())
+                      .toString();
+            }
+          } else {
+            originalLocation = token.getOriginalLocation();
+          }
+          result.put(tokenName, new Token(value, originalLocation));
         });
-    return tokens;
+    return result;
   }
 
   private String scanForReplacements(

@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -339,12 +338,12 @@ public class ExtendedText {
    *
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
-   * @param statementMap - a map of token names and its ranges from the original text
+   * @param statementMap - a map of token names and its values and locations from the original text
    * @param replacementMap - a new text replacement map
    * @return a HashMap of mapped tokens
    */
-  public Map<String, TextMapReplacer.Token> replace(
-      Range range, Range statementRange, Map<String, Range> statementMap, String replacementMap) {
+  public Map<String, Token> replace(
+      Range range, Range statementRange, Map<String, Token> statementMap, String replacementMap) {
     return TextMapReplacer.execute(this, range, statementRange, statementMap, replacementMap);
   }
 
@@ -354,17 +353,14 @@ public class ExtendedText {
    *
    * @param line - a line number to insert
    * @param statementRange - a range in the original text this text logically originates from
-   * @param statementMap - a map of token names and its values and ranges from the original text
+   * @param statementMap - a map of token names and its values and locations from the original text
    * @param replacementMap - a new text replacement map
    * @return a HashMap of mapped tokens
    */
-  public Map<String, TextMapReplacer.Token> insertWithMap(
-      int line,
-      Range statementRange,
-      Map<String, Pair<String, Range>> statementMap,
-      String replacementMap) {
+  public Map<String, Token> insertWithMap(
+      int line, Range statementRange, Map<String, Token> statementMap, String replacementMap) {
     TextMapReplacer.InsertionResult result =
-        TextMapReplacer.executeInsert(this, statementRange, statementMap, replacementMap);
+        TextMapReplacer.prepareInsert(this, statementRange, statementMap, replacementMap);
 
     String[] textLines = MappingHelper.split(result.getText());
     for (int i = 0; i < textLines.length; i++) {

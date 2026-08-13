@@ -20,7 +20,7 @@ let v2Api: V2Api | undefined = undefined;
 export type Token = {
   name: string;
   value?: string;
-  range: vscode.Range;
+  location: vscode.Location;
 };
 
 export type Item = {
