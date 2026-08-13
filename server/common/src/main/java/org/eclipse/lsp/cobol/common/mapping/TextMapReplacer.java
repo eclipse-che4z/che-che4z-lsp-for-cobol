@@ -154,7 +154,7 @@ public class TextMapReplacer {
               ExtendedTextLine extendedTextLine =
                   extendedText
                       .getLines()
-                      .get(token.getOriginalLocation().getRange().getStart().getLine());
+                      .get(originalRange.getStart().getLine());
               value =
                   extendedTextLine
                       .subline(
