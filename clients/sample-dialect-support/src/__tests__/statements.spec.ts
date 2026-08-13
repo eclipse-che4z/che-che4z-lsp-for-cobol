@@ -21,9 +21,11 @@ import {
   replaceProcessStatement,
 } from "../statements";
 
+const documentUri = vscode.Uri.parse("file://document");
+
 const context = {
   getProgramUri: jest.fn<() => never>(),
-  getDocumentUri: jest.fn<() => never>(),
+  getDocumentUri: jest.fn(() => documentUri),
   resolveCopybook: jest.fn(() => Promise.resolve(undefined)),
   replace: jest.fn(),
   replaceWithMap: jest.fn(),
@@ -52,16 +54,22 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "VAR1",
-              range: new vscode.Range(
-                new vscode.Position(1, 11),
-                new vscode.Position(1, 13),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 11),
+                  new vscode.Position(1, 13),
+                ),
               ),
             },
             {
               name: "GR1",
-              range: new vscode.Range(
-                new vscode.Position(1, 17),
-                new vscode.Position(1, 19),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 17),
+                  new vscode.Position(1, 19),
+                ),
               ),
             },
           ],
@@ -70,16 +78,22 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "VAR2",
-              range: new vscode.Range(
-                new vscode.Position(1, 23),
-                new vscode.Position(1, 25),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 23),
+                  new vscode.Position(1, 25),
+                ),
               ),
             },
             {
               name: "GR2",
-              range: new vscode.Range(
-                new vscode.Position(1, 29),
-                new vscode.Position(1, 31),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 29),
+                  new vscode.Position(1, 31),
+                ),
               ),
             },
           ],
@@ -88,16 +102,22 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "PAR1",
-              range: new vscode.Range(
-                new vscode.Position(1, 43),
-                new vscode.Position(1, 45),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 43),
+                  new vscode.Position(1, 45),
+                ),
               ),
             },
             {
               name: "SEC1",
-              range: new vscode.Range(
-                new vscode.Position(1, 35),
-                new vscode.Position(1, 37),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 35),
+                  new vscode.Position(1, 37),
+                ),
               ),
             },
           ],
@@ -106,16 +126,22 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "PAR2",
-              range: new vscode.Range(
-                new vscode.Position(1, 50),
-                new vscode.Position(1, 52),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 50),
+                  new vscode.Position(1, 52),
+                ),
               ),
             },
             {
               name: "SEC2",
-              range: new vscode.Range(
-                new vscode.Position(1, 58),
-                new vscode.Position(1, 60),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 58),
+                  new vscode.Position(1, 60),
+                ),
               ),
             },
           ],
@@ -124,9 +150,12 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "PROC",
-              range: new vscode.Range(
-                new vscode.Position(1, 62),
-                new vscode.Position(1, 64),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 62),
+                  new vscode.Position(1, 64),
+                ),
               ),
             },
           ],
@@ -149,16 +178,22 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "VAR1",
-              range: new vscode.Range(
-                new vscode.Position(1, 16),
-                new vscode.Position(1, 18),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 16),
+                  new vscode.Position(1, 18),
+                ),
               ),
             },
             {
               name: "GR1",
-              range: new vscode.Range(
-                new vscode.Position(1, 22),
-                new vscode.Position(1, 24),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 22),
+                  new vscode.Position(1, 24),
+                ),
               ),
             },
           ],
@@ -180,16 +215,22 @@ describe("statements replacement functionality", () => {
           tokens: [
             {
               name: "PAR1",
-              range: new vscode.Range(
-                new vscode.Position(1, 16),
-                new vscode.Position(1, 18),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 16),
+                  new vscode.Position(1, 18),
+                ),
               ),
             },
             {
               name: "SEC1",
-              range: new vscode.Range(
-                new vscode.Position(1, 22),
-                new vscode.Position(1, 24),
+              location: new vscode.Location(
+                documentUri,
+                new vscode.Range(
+                  new vscode.Position(1, 22),
+                  new vscode.Position(1, 24),
+                ),
               ),
             },
           ],
