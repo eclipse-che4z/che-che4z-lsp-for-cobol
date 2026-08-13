@@ -158,8 +158,8 @@ public class TextMapReplacer {
               value =
                   extendedTextLine
                       .subline(
-                          token.getOriginalLocation().getRange().getStart().getCharacter(),
-                          token.getOriginalLocation().getRange().getEnd().getCharacter())
+                          originalRange.getStart().getCharacter(),
+                          originalRange.getEnd().getCharacter())
                       .toString();
             }
           } else {
