@@ -12,16 +12,20 @@
  *    Broadcom - initial API and implementation
  *
  */
-package org.eclipse.lsp.cobol.lsp.jrpc;
+package org.eclipse.lsp.cobol.common.mapping;
 
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.eclipse.lsp4j.Location;
 
-/** Data transport object that contains information of the replacement token */
 @Value
-public class ReplacementToken {
-  @NonNull String name;
+@AllArgsConstructor
+public class Token {
   String value;
-  @NonNull Location location;
+  Location originalLocation;
+
+  public Token(Location originalLocation) {
+    value = null;
+    this.originalLocation = originalLocation;
+  }
 }

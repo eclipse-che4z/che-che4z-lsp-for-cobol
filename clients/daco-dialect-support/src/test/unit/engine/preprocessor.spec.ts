@@ -42,6 +42,9 @@ describe("DaCoPreprocessor test", () => {
     resolveCopybook: jest.fn(),
     addDiagnostic: jest.fn(),
     replace: jest.fn(),
+    getDocumentUri: jest
+      .fn()
+      .mockReturnValue(Uri.parse("file:///copybook.cbl")),
   };
   const context: any = {
     resolveCopybook: jest.fn().mockResolvedValue({
@@ -52,7 +55,9 @@ describe("DaCoPreprocessor test", () => {
     replace: jest.fn(),
     replaceWithMap: jest.fn(),
     insert: jest.fn(),
+    insertWithMap: jest.fn(),
     addDiagnostic: jest.fn(),
+    getDocumentUri: jest.fn().mockReturnValue(Uri.parse("file:///test.cbl")),
   };
 
   beforeEach(() => {
@@ -70,7 +75,6 @@ describe("DaCoPreprocessor test", () => {
   it("should report a diagnostic for mismatched layout identifier", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "          01 COPY MAID TEST-AA12.\n" +
         "          PROCEDURE DIVISION.\n" +
@@ -92,7 +96,6 @@ describe("DaCoPreprocessor test", () => {
   it("should resolve copybook reference", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "          01 COPY MAID NAME OTP.\n" +
         "          PROCEDURE DIVISION.\n" +
@@ -115,7 +118,6 @@ describe("DaCoPreprocessor test", () => {
   it("should resolve copybook reference with suffix", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "          01 COPY MAID NAME-ABC KMK.\n" +
         "          PROCEDURE DIVISION.\n" +
@@ -139,7 +141,6 @@ describe("DaCoPreprocessor test", () => {
   it("should not adjust copybook equal variable levels", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "          01 COPY MAID NAME OTP.\n" +
         "          PROCEDURE DIVISION.\n" +
@@ -166,7 +167,6 @@ describe("DaCoPreprocessor test", () => {
 
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "          01 COPY MAID NAME-ABC KMK.\n" +
         "          PROCEDURE DIVISION.\n" +
@@ -181,7 +181,6 @@ describe("DaCoPreprocessor test", () => {
   it("should parse READ TRANSACTION", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_1 + "          READ TRANSACTION\n" + "          GO TO FOO.\n",
     );
 
@@ -192,7 +191,6 @@ describe("DaCoPreprocessor test", () => {
   it("should parse WRITE TRANSACTION with variable usage", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_1 + "          WRITE TRANSACTION 3167 LENGTH TRANSACTION-SIZE.\n",
     );
 
@@ -201,11 +199,7 @@ describe("DaCoPreprocessor test", () => {
   });
 
   it("should replace D-B with spaces", async () => {
-    await preprocessor.execute(
-      context,
-      Uri.parse("file:///test.cbl"),
-      HEADER_1 + "       D-B\n",
-    );
+    await preprocessor.execute(context, HEADER_1 + "       D-B\n");
 
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.replace).toHaveBeenCalled();
@@ -214,7 +208,6 @@ describe("DaCoPreprocessor test", () => {
   it("should replace COPY-FROM statement", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "       01 AREA-XW4.\n" +
         "           03 TBLOPT-XW4.\n" +
@@ -231,7 +224,6 @@ describe("DaCoPreprocessor test", () => {
   it("should report an error for COPY-FROM statement with invalid source suffix", async () => {
     await preprocessor.execute(
       context,
-      Uri.parse("file:///test.cbl"),
       HEADER_0 +
         "       01 AREA-XW4.\n" +
         "           03 TBLOPT-XW4.\n" +
