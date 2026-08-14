@@ -54,7 +54,10 @@ export class CopybookPreprocessor {
     context: IDocumentProcessingContext,
     text: string,
   ): Promise<ProgramInfo> {
-    const { programInfo, errors } = this.analyzeProgram(text);
+    const { programInfo, errors } = this.analyzeProgram(
+      text,
+      context.getDocumentUri(),
+    );
     addParsingErrors(context, errors);
 
     await this.processCopybooks(
@@ -65,7 +68,10 @@ export class CopybookPreprocessor {
     return programInfo;
   }
 
-  private analyzeProgram(text: string): {
+  private analyzeProgram(
+    text: string,
+    documentUri: vscode.Uri,
+  ): {
     programInfo: ProgramInfo;
     errors: ParseError[];
   } {
@@ -86,7 +92,7 @@ export class CopybookPreprocessor {
     parser.addErrorListener(parserErrors);
 
     const tree = parser.startRule();
-    const visitor = new ProgramVisitor(this.messageService);
+    const visitor = new ProgramVisitor(this.messageService, documentUri);
     const copybooks = visitor.visit(tree) || [];
     const programInfo = visitor.programInfo;
     programInfo.copybooks = copybooks;
@@ -216,7 +222,8 @@ export class CopybookPreprocessor {
 
     addParsingErrors(context, [...lexerErrors.errors, ...parserErrors.errors]);
 
-    const descriptors = new CopybookContentVisitor().visit(tree) || [];
+    const descriptors =
+      new CopybookContentVisitor(copybook.uri).visit(tree) || [];
     descriptors.forEach((descriptor) => {
       this.processVariableDescriptor(
         copybook.context,

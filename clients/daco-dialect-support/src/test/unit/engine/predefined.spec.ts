@@ -18,7 +18,7 @@ import {
   IMPLICIT_DACO_WORKING_STORAGE,
 } from "../../../engine/predefined";
 import { SettingsService } from "../../../engine/services/settings";
-import { Range } from "./__mocks__/vscode";
+import { Range, Uri } from "./__mocks__/vscode";
 
 describe("Predefined sections test suite", () => {
   const context: any = {
@@ -166,6 +166,8 @@ describe("Predefined variables test suite", () => {
           nameRange: range,
           name: "TBFmmm-Xnn",
           options: "",
+          optionsRange: range,
+          uri: Uri.parse("file:///test.cbl"),
         },
       ],
       true,
@@ -191,6 +193,8 @@ describe("Predefined variables test suite", () => {
           nameRange: range,
           name: "TBLmmm-Xnn",
           options: "",
+          optionsRange: range,
+          uri: Uri.parse("file:///test.cbl"),
         },
       ],
       true,
@@ -216,6 +220,8 @@ describe("Predefined variables test suite", () => {
           nameRange: range,
           name: "TBLmmm-Xnn",
           options: "",
+          optionsRange: range,
+          uri: Uri.parse("file:///test.cbl"),
         },
         {
           type: "DEFINITION",
@@ -224,6 +230,8 @@ describe("Predefined variables test suite", () => {
           nameRange: range,
           name: "TBLmmm-Xnn",
           options: "",
+          optionsRange: range,
+          uri: Uri.parse("file:///test.cbl"),
         },
       ],
       true,

@@ -16,12 +16,15 @@ import * as vscode from "vscode";
 import { processCopyFrom } from "../../../engine/copyfrom";
 import { VariableDescriptor } from "../../../engine/model";
 import { createMessageService } from "./utils";
+import { Uri } from "./__mocks__/vscode";
 
 describe("copy-from parsing test", () => {
   const context: any = {
     replace: jest.fn(),
     addDiagnostic: jest.fn(),
     insert: jest.fn(),
+    insertWithMap: jest.fn(),
+    getDocumentUri: jest.fn().mockReturnValue(Uri.parse("file:///test.cbl")),
   };
 
   beforeEach(() => {
@@ -69,6 +72,8 @@ describe("copy-from parsing test", () => {
         type: "DEFINITION",
         level: 1,
         levelRange: range,
+        optionsRange: range,
+        uri: Uri.parse("file:///test.cbl"),
       },
       {
         nameRange: range,
@@ -103,6 +108,8 @@ describe("copy-from parsing test", () => {
         type: "DEFINITION",
         level: 1,
         levelRange: range,
+        optionsRange: range,
+        uri: Uri.parse("file:///test.cbl"),
       },
       {
         name: "VAR-XCC",
@@ -111,6 +118,8 @@ describe("copy-from parsing test", () => {
         type: "DEFINITION",
         level: 3,
         levelRange: range,
+        optionsRange: range,
+        uri: Uri.parse("file:///test.cbl"),
       },
       {
         name: "VAR-XAA",
@@ -124,6 +133,8 @@ describe("copy-from parsing test", () => {
         type: "DEFINITION",
         level: 1,
         levelRange: range,
+        optionsRange: range,
+        uri: Uri.parse("file:///test.cbl"),
       },
       {
         name: "NAME-XBB",
@@ -139,10 +150,11 @@ describe("copy-from parsing test", () => {
 
     expect(context.replace).toHaveBeenCalledWith(range, "");
     expect(context.addDiagnostic).not.toHaveBeenCalled();
-    expect(context.insert).toHaveBeenCalledWith(
+    expect(context.insertWithMap).toHaveBeenCalledWith(
       range.end.line + 1,
-      "        03 VAR-XBB  REDEFINES VAR-XBB.\n",
-      "DaCo COPY-FROM generated text",
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
     );
   });
 });

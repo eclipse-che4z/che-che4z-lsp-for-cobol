@@ -30,5 +30,6 @@ public class DialectCopybookInfo {
   DocumentReplacement[] replacements;
   DocumentInsertion[] insertions;
   DocumentReplacementMap[] replacementMaps;
+  DocumentInsertionMap[] insertionMaps;
   Diagnostic[] diagnostics;
 }

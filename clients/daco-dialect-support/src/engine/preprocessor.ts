@@ -47,11 +47,7 @@ export class DaCoPreprocessor {
     );
   }
 
-  public async execute(
-    context: IDocumentProcessingContext,
-    _programUri: vscode.Uri,
-    text: string,
-  ) {
+  public async execute(context: IDocumentProcessingContext, text: string) {
     text = this.cleanup(context, text);
     const programInfo = await this.copybookPreprocessor.execute(context, text);
     const variables = programInfo.accumulator.generateDescriptors();
@@ -147,7 +143,7 @@ export class DaCoPreprocessor {
         context.replaceWithMap(
           descriptor.range,
           descriptor.statementRange,
-          this.traverseChildren(descriptor.children),
+          this.traverseChildren(context.getDocumentUri(), descriptor.children),
           descriptor.filler,
         );
       } else {
@@ -165,7 +161,10 @@ export class DaCoPreprocessor {
     });
   }
 
-  private traverseChildren(children: StatementDescriptor[]): Item[] {
+  private traverseChildren(
+    documentUri: vscode.Uri,
+    children: StatementDescriptor[],
+  ): Item[] {
     const items: Item[] = [];
     let index = 0;
     children.forEach((child) => {
@@ -174,7 +173,7 @@ export class DaCoPreprocessor {
         const name = `VAR_${index++}`;
 
         if (child.children.length > 0) {
-          this.createTokens(tokens, name, child.children);
+          this.createTokens(documentUri, tokens, name, child.children);
         }
         const item: Item = {
           type: "VARIABLE",
@@ -187,6 +186,7 @@ export class DaCoPreprocessor {
   }
 
   private createTokens(
+    documentUri: vscode.Uri,
     tokens: Token[],
     name: string,
     children: StatementDescriptor[],
@@ -195,9 +195,12 @@ export class DaCoPreprocessor {
     children.forEach((child) => {
       if (child.type === "VARIABLE_USAGE") {
         const tokenName = `${name}_USG_${index++}`;
-        const token: Token = { name: tokenName, range: child.statementRange };
+        const token: Token = {
+          name: tokenName,
+          location: new vscode.Location(documentUri, child.statementRange),
+        };
         tokens.push(token);
-        this.createTokens(tokens, tokenName, child.children);
+        this.createTokens(documentUri, tokens, tokenName, child.children);
       }
     });
     return tokens;
