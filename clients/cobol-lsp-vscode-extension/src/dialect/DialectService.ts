@@ -50,7 +50,7 @@ type DocumentReplacementPayload = {
 
 type TokenPayload = {
   name: string;
-  range: RangePayload;
+  location: LocationPayload;
 };
 
 type ItemPayload = {
@@ -71,6 +71,13 @@ type DocumentInsertionPayload = {
   source?: string;
 };
 
+type DocumentInsertionMapPayload = {
+  line: number;
+  statementRange: RangePayload;
+  tokenItems: ItemPayload[];
+  replacementMap: string;
+};
+
 type CopybookPayload = {
   copybookName: string;
   statementLocation: LocationPayload;
@@ -80,6 +87,7 @@ type CopybookPayload = {
   replacements: DocumentReplacementPayload[];
   replacementMaps: DocumentReplacementMapPayload[];
   insertions: DocumentInsertionPayload[];
+  insertionMaps: DocumentInsertionMapPayload[];
   copybooks: CopybookPayload[];
   diagnostics: DiagnosticPayload[];
 };
@@ -119,6 +127,13 @@ type DucumentInsertion = {
   source?: string;
 };
 
+type DocumentInsertionMap = {
+  line: number;
+  statementRange: vscode.Range;
+  tokenItems: Item[];
+  replacementMap: string;
+};
+
 type CopybookInfo = {
   copybookName: string;
   statementLocation: Location;
@@ -131,6 +146,7 @@ class Context implements IDocumentProcessingContext {
   replacements: DocumentReplacement[] = [];
   replacementMaps: DocumentReplacementMap[] = [];
   insertions: DucumentInsertion[] = [];
+  insertionMaps: DocumentInsertionMap[] = [];
   children: Context[] = [];
   diagnostics: vscode.Diagnostic[] = [];
 
@@ -141,6 +157,14 @@ class Context implements IDocumentProcessingContext {
     private readonly documentUri: vscode.Uri,
     public copybookInfo?: CopybookInfo,
   ) {}
+
+  getProgramUri() {
+    return this.programUri;
+  }
+
+  getDocumentUri() {
+    return this.documentUri;
+  }
 
   async resolveCopybook(
     copybookName: string,
@@ -212,6 +236,20 @@ class Context implements IDocumentProcessingContext {
   insert(line: number, text: string, source: string): void {
     this.insertions.push({ line, text, source });
   }
+  insertWithMap(
+    line: number,
+    statementRange: vscode.Range,
+    tokenItems: Item[],
+    replacementMap: string,
+  ): void {
+    const insertion: DocumentInsertionMap = {
+      line,
+      statementRange,
+      tokenItems,
+      replacementMap,
+    };
+    this.insertionMaps.push(insertion);
+  }
   addDiagnostic(diagnostic: vscode.Diagnostic): void {
     this.diagnostics.push(diagnostic);
   }
@@ -238,7 +276,7 @@ export class DialectService {
           );
 
           try {
-            await handler(context, programUri, text);
+            await handler(context, text);
           } catch (e) {
             this.outputChannel?.appendLine(
               `Dialect ${dialectName} processing fails. Cause: ${JSON.stringify(e)}`,
@@ -331,6 +369,7 @@ export class DialectService {
       replacements: context.replacements.map((r) => serializeReplacement(r)),
       replacementMaps: context.replacementMaps.map(serializeReplacementMap),
       insertions: context.insertions,
+      insertionMaps: context.insertionMaps.map(serializeInsertionMap),
       uri: context.copybookInfo.uri.toString(),
       text: context.copybookInfo.text,
       copybooks: copybooks,
@@ -357,6 +396,7 @@ export class DialectService {
       replacements: context.replacements.map((r) => serializeReplacement(r)),
       replacementMaps: context.replacementMaps.map(serializeReplacementMap),
       insertions: context.insertions,
+      insertionMaps: context.insertionMaps.map(serializeInsertionMap),
       copybooks: copybooks,
       diagnostics: context.diagnostics.map((d) => serializeDiagnostics(d)),
     };
@@ -445,7 +485,8 @@ function serializeItem(item: Item) {
 function serializeToken(token: Token) {
   return {
     name: token.name,
-    range: serializeRange(token.range),
+    value: token.value,
+    location: serializeLocation(token.location),
   };
 }
 
@@ -459,5 +500,18 @@ function serializeReplacementMap(
     statementRange: serializeRange(replacement.statementRange),
     tokenItems: tokens,
     replacementMap: replacement.replacementMap,
+  };
+}
+
+function serializeInsertionMap(
+  insertion: DocumentInsertionMap,
+): DocumentInsertionMapPayload {
+  const tokens = insertion.tokenItems.map((i) => serializeItem(i));
+
+  return {
+    line: insertion.line,
+    statementRange: serializeRange(insertion.statementRange),
+    tokenItems: tokens,
+    replacementMap: insertion.replacementMap,
   };
 }

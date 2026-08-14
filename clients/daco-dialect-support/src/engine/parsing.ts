@@ -152,7 +152,10 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
   private readonly parentNameResolver: NameResolver = new NameResolver();
   public readonly programInfo: ProgramInfo = new ProgramInfo();
 
-  public constructor(private readonly messageService: MessageService) {
+  public constructor(
+    private readonly messageService: MessageService,
+    private readonly documentUri: vscode.Uri,
+  ) {
     super();
   }
 
@@ -254,6 +257,8 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
           name: newName,
           type: "DEFINITION",
           options: optionsText,
+          optionsRange: constructRange(ctx.variableOptionEntry()),
+          uri: this.documentUri,
         });
       }
     }
@@ -300,6 +305,10 @@ export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
 export class CopybookContentVisitor extends CopybookContentParserVisitor<
   VariableDescriptor[]
 > {
+  constructor(private readonly documentUri: vscode.Uri) {
+    super();
+  }
+
   visitDataDescriptionEntryFormat1? = (
     ctx: DataDescriptionEntryFormat1Context,
   ): VariableDescriptor[] => {
@@ -321,6 +330,8 @@ export class CopybookContentVisitor extends CopybookContentParserVisitor<
         name: name,
         type: "DEFINITION",
         options: createOptionsStr(ctx.variableOptionEntry()),
+        optionsRange: constructRange(ctx.variableOptionEntry()),
+        uri: this.documentUri,
       },
       ...(super.visitChildren(ctx) ?? []),
     ];

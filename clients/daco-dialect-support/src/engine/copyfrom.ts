@@ -12,7 +12,7 @@
  *   Broadcom - initial API and implementation
  */
 import * as vscode from "vscode";
-import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
+import { IDocumentProcessingContext, Item } from "@code4z/cobol-dialect-api";
 import { extractSuffix, updateVariableName } from "./util";
 import {
   CopyFromVariableDescriptor,
@@ -20,8 +20,6 @@ import {
   VariableDescriptor,
 } from "./model";
 import { MessageService } from "./services/MessageService";
-
-const SOURCE = "DaCo COPY-FROM generated text";
 
 export function processCopyFrom(
   context: IDocumentProcessingContext,
@@ -45,18 +43,19 @@ export function processCopyFrom(
         copyFromVariables = findCopyFromVariablesAscending(variables, i, name);
       }
 
-      const { replace, insert } = generateReplacementAndInsertTexts(
+      const { replace, insert, items } = generateReplacementAndInsertTexts(
         context,
         copyFromVariables,
         messageService,
         variableDescriptor,
       );
       context.replace(variableDescriptor.copyFromRange, replace);
-      if (insert.length > 0) {
-        context.insert(
+      if (items.length > 0) {
+        context.insertWithMap(
           variableDescriptor.copyFromRange.end.line + 1,
+          variableDescriptor.levelRange,
+          items,
           insert,
-          SOURCE,
         );
       }
     }
@@ -68,7 +67,7 @@ function generateReplacementAndInsertTexts(
   variables: VariableDescriptor[],
   messageService: MessageService,
   copyFromVariable: CopyFromVariableDescriptor,
-): { replace: string; insert: string } {
+): { replace: string; insert: string; items: Item[] } {
   let replacementText = " ";
 
   if (variables.length === 0) {
@@ -82,11 +81,11 @@ function generateReplacementAndInsertTexts(
         vscode.DiagnosticSeverity.Error,
       ),
     );
-    return { replace: replacementText, insert: "" };
+    return { replace: replacementText, insert: "", items: [] };
   }
 
   if (variables[0].type !== "DEFINITION") {
-    return { replace: replacementText, insert: "" };
+    return { replace: replacementText, insert: "", items: [] };
   }
 
   replacementText = variables[0].options;
@@ -101,10 +100,12 @@ function generateReplacementAndInsertTexts(
         vscode.DiagnosticSeverity.Error,
       ),
     );
-    return { replace: replacementText, insert: "" };
+    return { replace: replacementText, insert: "", items: [] };
   }
 
   let insert = "";
+  const items: Item[] = [];
+
   for (let j = 1; j < variables.length; j++) {
     const definition = variables[j];
     if (definition.type === "DEFINITION") {
@@ -114,13 +115,59 @@ function generateReplacementAndInsertTexts(
         options = ` REDEFINES ${updateVariableName(next.name, suffix)}`;
       }
       const updatedName = updateVariableName(definition.name, suffix);
-      insert += `        ${(definition.level - delta)
+
+      const tokenNumber = items.length;
+      const levelTokenName = `TokenLevel${tokenNumber}`;
+      const levelTokenValue = `${(definition.level - delta)
         .toString()
-        .padStart(2, "0")} ${updatedName} ${options}.\n`;
+        .padStart(2, "0")}`;
+
+      const variableTokenName = `TokenVariable${tokenNumber}`;
+      const optionsTokenName = `TokenOptions${tokenNumber}`;
+
+      insert += `         {${levelTokenName}} {${variableTokenName}} {${optionsTokenName}}.\n`;
+      items.push(
+        {
+          tokens: [
+            {
+              name: levelTokenName,
+              value: levelTokenValue,
+              location: new vscode.Location(
+                definition.uri,
+                definition.levelRange,
+              ),
+            },
+          ],
+        },
+        {
+          tokens: [
+            {
+              name: variableTokenName,
+              value: updatedName,
+              location: new vscode.Location(
+                definition.uri,
+                definition.nameRange,
+              ),
+            },
+          ],
+        },
+        {
+          tokens: [
+            {
+              name: optionsTokenName,
+              value: options,
+              location: new vscode.Location(
+                definition.uri,
+                definition.optionsRange,
+              ),
+            },
+          ],
+        },
+      );
     }
   }
 
-  return { replace: replacementText, insert: insert };
+  return { replace: replacementText, insert: insert, items: items };
 }
 
 function findCopyFromVariablesDescending(

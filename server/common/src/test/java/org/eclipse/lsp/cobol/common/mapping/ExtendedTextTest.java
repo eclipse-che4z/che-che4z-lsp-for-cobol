@@ -400,11 +400,22 @@ class ExtendedTextTest {
     // The statement map that will be using to replace actual "VOID AAA THRU \n PAR OF PAR." text
     // The name of the token PAR is the same as its value (1st "PAR" token)
     // The name of the token SEC is different from its actual value "PAR" (2nd "PAR" token)
-    Map<String, Range> statementMap =
+    Map<String, Token> statementMap =
         ImmutableMap.of(
-            "AAA", new Range(new Position(1, 10), new Position(1, 13)),
-            "PAR", new Range(new Position(2, 1), new Position(2, 4)),
-            "SEC", new Range(new Position(2, 8), new Position(2, 11)));
+            "AAA",
+                new Token(
+                    new Location(
+                        extendedText.getUri(),
+                        new Range(new Position(1, 10), new Position(1, 13)))),
+            "PAR",
+                new Token(
+                    new Location(
+                        extendedText.getUri(), new Range(new Position(2, 1), new Position(2, 4)))),
+            "SEC",
+                new Token(
+                    new Location(
+                        extendedText.getUri(),
+                        new Range(new Position(2, 8), new Position(2, 11)))));
 
     String replacementMap = "MOVE 1 TO {AAA}\n" + "GO TO {PAR} OF {SEC}.";
 
@@ -448,10 +459,17 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_order() {
     ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2", "uri");
-    Map<String, Range> statementMap =
+    Map<String, Token> statementMap =
         ImmutableMap.of(
-            "VAR1", new Range(new Position(0, 5), new Position(0, 9)),
-            "VAR2", new Range(new Position(0, 13), new Position(0, 17)));
+            "VAR1",
+                new Token(
+                    new Location(
+                        extendedText.getUri(), new Range(new Position(0, 5), new Position(0, 9)))),
+            "VAR2",
+                new Token(
+                    new Location(
+                        extendedText.getUri(),
+                        new Range(new Position(0, 13), new Position(0, 17)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 17));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
@@ -487,10 +505,76 @@ class ExtendedTextTest {
   }
 
   @Test
+  void testInsertWithMap_order() {
+    ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2\nSTOP RUN.", "uri");
+
+    Token val1 =
+        new Token(
+            "MOD1",
+            new Location(extendedText.getUri(), new Range(new Position(0, 5), new Position(0, 9))));
+    Token val2 =
+        new Token(
+            "MOD2",
+            new Location(
+                extendedText.getUri(), new Range(new Position(0, 13), new Position(0, 17))));
+
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "VAR1", val1,
+            "VAR2", val2);
+
+    Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
+    Map<String, Token> tokens =
+        extendedText.insertWithMap(
+            1,
+            statementRange,
+            statementMap,
+            "DISPLAY {VAR2}.\nDISPLAY {VAR1}.\nMOVE {VAR2} TO {VAR1}");
+
+    assertEquals(
+        "MOVE VAR1 TO VAR2\n"
+            + "DISPLAY MOD2.\n"
+            + "DISPLAY MOD1.\n"
+            + "MOVE MOD2 TO MOD1\n"
+            + "STOP RUN.",
+        extendedText.toString());
+    assertEquals(2, tokens.size());
+
+    Location statementLocation = new Location("uri", statementRange);
+    Location var1Location = new Location("uri", new Range(new Position(0, 5), new Position(0, 9)));
+    Location var2Location =
+        new Location("uri", new Range(new Position(0, 13), new Position(0, 17)));
+
+    // inserted line 1: DISPLAY (filler text self-maps to the generated block, like plain insert())
+    Location location = extendedText.mapLocation(new Range(new Position(1, 0), new Position(1, 7)));
+    assertEquals(statementLocation.toString(), location.toString());
+
+    // inserted line 1: VAR2 (substituted token keeps its original location)
+    location = extendedText.mapLocation(new Range(new Position(1, 8), new Position(1, 12)));
+    assertEquals(var2Location.toString(), location.toString());
+
+    // inserted line 2: DISPLAY (filler text self-maps to the generated block, like plain insert())
+    location = extendedText.mapLocation(new Range(new Position(2, 0), new Position(2, 7)));
+    assertEquals(statementLocation.toString(), location.toString());
+
+    // inserted line 2: VAR1 (substituted token keeps its original location)
+    location = extendedText.mapLocation(new Range(new Position(2, 8), new Position(2, 12)));
+    assertEquals(var1Location.toString(), location.toString());
+
+    // untouched original statement still maps to itself
+    location = extendedText.mapLocation(statementRange);
+    assertEquals(statementLocation.toString(), location.toString());
+  }
+
+  @Test
   void testReplaceWithMap_duplication() {
     ExtendedText extendedText = new ExtendedText("STATEMENT VAR1", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("VAR1", new Range(new Position(0, 10), new Position(0, 14)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "VAR1",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 14)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 14));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
@@ -523,8 +607,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_with_braces() {
     ExtendedText extendedText = new ExtendedText("MOVE VAR1 TO VAR2", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("VAR1", new Range(new Position(0, 5), new Position(0, 9)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "VAR1",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 5), new Position(0, 9)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 17));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
@@ -552,8 +640,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_with_double_escape_character() {
     ExtendedText extendedText = new ExtendedText("MOVE 1 TO FOO", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("BAR", new Range(new Position(0, 10), new Position(0, 13)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "BAR",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 13)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
@@ -572,8 +664,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_missing_statement_token() {
     ExtendedText extendedText = new ExtendedText("MOVE 1 TO FOO", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("BAR", new Range(new Position(0, 10), new Position(0, 13)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "BAR",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 13)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 4));
@@ -585,8 +681,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_replace_value() {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("FOO", new Range(new Position(0, 10), new Position(0, 13)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "FOO",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 13)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
@@ -613,8 +713,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_replace_multiple_values() {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("FOO", new Range(new Position(0, 10), new Position(0, 13)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "FOO",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 13)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
@@ -653,8 +757,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_misplaced_value_separator() {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("FOO", new Range(new Position(0, 10), new Position(0, 13)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "FOO",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 13)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
@@ -666,8 +774,12 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_double_value_separator() {
     ExtendedText extendedText = new ExtendedText("STATEMENT FOO", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("FOO", new Range(new Position(0, 10), new Position(0, 13)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "FOO",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 13)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
@@ -679,12 +791,16 @@ class ExtendedTextTest {
   @Test
   void testReplaceWithMap_edge_case_1() {
     ExtendedText extendedText = new ExtendedText("STATEMENT AB", "uri");
-    Map<String, Range> statementMap =
+    Map<String, Token> statementMap =
         ImmutableMap.of(
             "A",
-            new Range(new Position(0, 10), new Position(0, 11)),
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 10), new Position(0, 11)))),
             "B",
-            new Range(new Position(0, 11), new Position(0, 12)));
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 11), new Position(0, 12)))));
 
     Range range = new Range(new Position(0, 0), new Position(0, 12));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
@@ -708,10 +824,10 @@ class ExtendedTextTest {
     Range rangeA = new Range(new Position(0, 10), new Position(0, 11));
     Range rangeB = new Range(new Position(0, 12), new Position(0, 13));
 
-    Map<String, Range> statementMap =
+    Map<String, Token> statementMap =
         ImmutableMap.of(
-            "A", rangeA,
-            "B", rangeB);
+            "A", new Token(new Location(extendedText.getUri(), rangeA)),
+            "B", new Token(new Location(extendedText.getUri(), rangeB)));
 
     Range range = new Range(new Position(0, 0), new Position(0, 13));
     Range statementRange = new Range(new Position(0, 0), new Position(0, 9));
