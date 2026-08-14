@@ -19,7 +19,8 @@ let v2Api: V2Api | undefined = undefined;
 
 export type Token = {
   name: string;
-  range: vscode.Range;
+  value?: string;
+  location: vscode.Location;
 };
 
 export type Item = {
@@ -153,11 +154,12 @@ export interface V2DialectDetail {
 
 export type V2StartProcessingHandler = (
   context: IDocumentProcessingContext,
-  programUri: vscode.Uri,
   text: string,
 ) => Promise<void>;
 
 export interface IDocumentProcessingContext {
+  getProgramUri(): vscode.Uri;
+  getDocumentUri(): vscode.Uri;
   resolveCopybook(
     copybookName: string,
     statementRange: vscode.Range,
@@ -178,5 +180,11 @@ export interface IDocumentProcessingContext {
     replacementMap: string,
   ): void;
   insert(line: number, text: string, source: string): void;
+  insertWithMap(
+    line: number,
+    statementRange: vscode.Range,
+    tokenItems: Item[],
+    replacementMap: string,
+  ): void;
   addDiagnostic(diagnostic: vscode.Diagnostic): void;
 }

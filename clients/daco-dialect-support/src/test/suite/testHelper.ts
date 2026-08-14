@@ -319,22 +319,74 @@ export function checkDiagnostic(
   );
 }
 
+export type ExpectedLocation = number | { line: number; documentName?: string };
+
+/**
+ * Builds an expected location pointing to a specific document, for use with
+ * checkDefinition/checkReferences when the definition/reference resolves outside
+ * the currently opened document (e.g. a copybook).
+ */
+export function inDocument(
+  documentName: string,
+  line: number,
+): ExpectedLocation {
+  return { line, documentName };
+}
+
 export async function checkDefinition(
   editor: vscode.TextEditor,
   position: vscode.Position,
-  expectedLine: number,
+  expectedLine: ExpectedLocation,
 ) {
-  const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
-    "vscode.executeDefinitionProvider",
+  await checkLocations("vscode.executeDefinitionProvider", editor, position, [
+    expectedLine,
+  ]);
+}
+
+export async function checkReferences(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLines: ExpectedLocation[],
+) {
+  await checkLocations(
+    "vscode.executeReferenceProvider",
+    editor,
+    position,
+    expectedLines,
+  );
+}
+
+async function checkLocations(
+  provider:
+    | "vscode.executeDefinitionProvider"
+    | "vscode.executeReferenceProvider",
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLocations: ExpectedLocation[],
+) {
+  const locations = await vscode.commands.executeCommand<vscode.Location[]>(
+    provider,
     editor.document.uri,
     position,
   );
 
-  assert.ok(definitions);
-  assert.strictEqual(definitions.length, 1);
+  assert.ok(locations);
 
-  const definition = definitions[0];
-  assert.strictEqual(definition.range.start.line, expectedLine);
+  const currentDocumentName = basename(editor.document.uri.path);
+  const expected = expectedLocations.map((expectedLocation) =>
+    typeof expectedLocation === "number"
+      ? { line: expectedLocation, documentName: currentDocumentName }
+      : {
+          line: expectedLocation.line,
+          documentName: expectedLocation.documentName ?? currentDocumentName,
+        },
+  );
+  const actual = locations.map((location) => ({
+    line: location.range.start.line,
+    documentName: basename(location.uri.path),
+  }));
+
+  assert.deepStrictEqual(actual, expected);
 }
 
 export async function checkHoverText(

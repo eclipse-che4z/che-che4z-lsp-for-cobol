@@ -49,17 +49,8 @@ export async function activate(context: vscode.ExtensionContext) {
         return { isCopy: true, prefix: match[1] };
       },
     },
-    async (
-      context: IDocumentProcessingContext,
-      programUri: vscode.Uri,
-      text: string,
-    ) => {
-      return await handleProcessDialect(
-        context,
-        programUri,
-        text,
-        outputChannel,
-      );
+    async (context: IDocumentProcessingContext, text: string) => {
+      return await handleProcessDialect(context, text, outputChannel);
     },
   );
 
@@ -72,16 +63,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 async function handleProcessDialect(
   context: IDocumentProcessingContext,
-  programUri: vscode.Uri,
   text: string,
   outputChannel: vscode.OutputChannel,
 ): Promise<void> {
-  await processDocument(context, programUri, text, outputChannel);
+  await processDocument(context, text, outputChannel);
 }
 
 async function processDocument(
   context: IDocumentProcessingContext,
-  documentUri: vscode.Uri,
   text: string,
   outputChannel: vscode.OutputChannel,
   documentParam?: string,
@@ -89,16 +78,18 @@ async function processDocument(
   const startDate = new Date();
   const lines = text.split("\n");
   outputChannel.appendLine(
-    `Start processing document ${documentUri.toString()}, line count: ${
-      lines.length
-    }`,
+    `Start processing document ${context
+      .getDocumentUri()
+      .toString()}, line count: ${lines.length}`,
   );
   for (let i = 0; i < lines.length; i++) {
     await processDocumentLine(context, i, lines, outputChannel, documentParam);
   }
   const endDate = new Date();
   outputChannel.appendLine(
-    `Finish processing document ${documentUri.toString()}. Processing time: ${
+    `Finish processing document ${context
+      .getDocumentUri()
+      .toString()}. Processing time: ${
       endDate.getTime() - startDate.getTime()
     } mills.`,
   );
@@ -159,7 +150,6 @@ async function processDocumentLine(
     if (copybookModel) {
       await processDocument(
         copybookModel.context,
-        copybookModel.uri,
         copybookModel.text,
         outputChannel,
         copybookParam,

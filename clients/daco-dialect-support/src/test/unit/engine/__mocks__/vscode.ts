@@ -24,6 +24,16 @@ export class Diagnostic {
   ) {}
 }
 
+export class Location {
+  public constructor(private uri: typeof Uri, private range: Range) {}
+  public getRange() {
+    return this.range;
+  }
+  public getUri() {
+    return this.uri;
+  }
+}
+
 export class Range {
   public start: Position;
   public end: Position;

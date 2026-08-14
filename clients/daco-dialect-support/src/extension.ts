@@ -121,17 +121,15 @@ async function v2Api(context: vscode.ExtensionContext) {
       snippets,
       isCopyStatement: isCopyStatement,
     },
-    async (
-      context: IDocumentProcessingContext,
-      programUri: vscode.Uri,
-      text: string,
-    ) => {
+    async (context: IDocumentProcessingContext, text: string) => {
       outputChannel.appendLine(
-        `Executing preprocessor for document ${programUri.toString()}`,
+        `Executing preprocessor for document ${context
+          .getProgramUri()
+          .toString()}`,
       );
 
       const preprocessor = new DaCoPreprocessor(outputChannel, messageService);
-      await preprocessor.execute(context, programUri, text);
+      await preprocessor.execute(context, text);
     },
   );
   if (unregister instanceof Error) {

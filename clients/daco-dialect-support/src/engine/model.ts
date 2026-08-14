@@ -69,6 +69,8 @@ export type RegularVariableDescriptor = {
   nameRange: vscode.Range;
   name: string;
   options: string;
+  optionsRange: vscode.Range;
+  uri: vscode.Uri;
 };
 
 export type CopyFromVariableDescriptor = {
