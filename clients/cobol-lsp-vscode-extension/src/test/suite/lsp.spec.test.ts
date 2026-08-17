@@ -903,7 +903,7 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
     assert.strictEqual(locations.length, 1);
   });
 
-  test("Go to definition for a section", async () => {
+  test("TC416632 - Go to definition for a section", async () => {
     const editor = await helper.showDocument("SECTION.CBL");
     const diagnostics = await helper.waitForDiagnosticCount(
       editor.document.uri,
@@ -921,7 +921,7 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
     assert.strictEqual(definitions.length, 1);
   });
 
-  test("Find references of a section", async () => {
+  test("TC416633 - Find references of a section", async () => {
     const editor = await helper.showDocument("SECTION.CBL");
     const diagnostics = await helper.waitForDiagnosticCount(
       editor.document.uri,
