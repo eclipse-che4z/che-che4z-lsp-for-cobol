@@ -269,6 +269,7 @@ export class LanguageClientService {
         "-Dline.separator=\r\n",
         `-Ddialect.path=${this.dialectsPath}`,
         "-Xmx768M",
+        "-Xshare:off",
         "-jar",
         jarPath,
       ],
