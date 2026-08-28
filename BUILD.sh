@@ -21,7 +21,13 @@ set -x
 
 # Compile language server and dialect jars
 cd server
-mvn clean package --no-transfer-progress -Dmaven.test.skip
+
+# Check the first argument and use lima container if requested
+if [ "$1" = "lima" ]; then
+  nerdctl.lima run -it --rm -v ~/.m2:/root/.m2 -v "$(pwd)":/app -w /app maven:3.8.4-openjdk-11 mvn clean install -D skipTests
+else
+  mvn clean package --no-transfer-progress -Dmaven.test.skip
+fi
 cd -
 
 # Copy jars
