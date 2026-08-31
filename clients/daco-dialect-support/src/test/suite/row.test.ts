@@ -40,13 +40,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(23, 19), pos(23, 29)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(24, 19), pos(24, 23)),
     );
 
@@ -71,7 +71,7 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 19), pos(20, 29)),
     );
 
@@ -90,13 +90,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(17, 22), pos(17, 32)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(18, 22), pos(18, 26)),
     );
 
@@ -115,13 +115,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 22), pos(20, 32)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 22), pos(21, 26)),
     );
 
@@ -140,13 +140,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 25), pos(20, 35)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 25), pos(21, 29)),
     );
 
@@ -171,13 +171,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(30, 19), pos(30, 29)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(31, 19), pos(31, 23)),
     );
 
@@ -214,13 +214,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 26), pos(20, 36)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 26), pos(21, 30)),
     );
 
@@ -239,13 +239,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 22), pos(21, 32)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(22, 22), pos(22, 26)),
     );
 
@@ -270,13 +270,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 22), pos(20, 32)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 22), pos(21, 26)),
     );
 
@@ -295,7 +295,7 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 21), pos(20, 31)),
     );
 
@@ -314,13 +314,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(26, 22), pos(26, 32)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(27, 22), pos(27, 26)),
     );
 
@@ -351,7 +351,7 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(22, 20), pos(22, 30)),
     );
 
@@ -370,7 +370,7 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(22, 21), pos(22, 31)),
     );
 
@@ -389,13 +389,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 23), pos(21, 33)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(22, 23), pos(22, 27)),
     );
 
@@ -420,13 +420,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 20), pos(21, 30)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(22, 20), pos(22, 24)),
     );
 
@@ -451,13 +451,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 22), pos(20, 32)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 22), pos(21, 26)),
     );
 
@@ -482,13 +482,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(22, 20), pos(22, 30)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(23, 20), pos(23, 24)),
     );
 
@@ -513,13 +513,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(20, 21), pos(20, 31)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with TBL or TBF values",
+      "String must starts with TBL or TBF",
       range(pos(21, 21), pos(21, 25)),
     );
 
