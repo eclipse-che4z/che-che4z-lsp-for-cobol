@@ -21,6 +21,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.Setter;
@@ -77,6 +78,9 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
     @Override
     public CompletableFuture<String> resolveCopybookUri(
         String cobolFileUri, String copybookName, String dialectType) {
+      if (containsPathTraversal(copybookName)) {
+        return CompletableFuture.completedFuture(null);
+      }
       for (File sp : cpyPaths) {
         for (String ext : cpyExt) {
           String copybookFileName =
@@ -85,8 +89,14 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
           // absolute paths are used as-is
           // relative paths are resolved against the CLI process's current working directory.
           Path cpyFolder =
-              spPath.isAbsolute() ? spPath : Paths.get("").toAbsolutePath().resolve(spPath);
-          Path cpy = cpyFolder.resolve(copybookFileName);
+              (spPath.isAbsolute() ? spPath : Paths.get("").toAbsolutePath().resolve(spPath))
+                  .normalize();
+          Path cpy = cpyFolder.resolve(copybookFileName).normalize();
+
+          if (!cpy.startsWith(cpyFolder)) {
+            // resolved path escapes the configured copybook folder
+            continue;
+          }
 
           if (Files.exists(cpy)) {
             String value = cpy.toUri().toString();
@@ -95,6 +105,19 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
         }
       }
       return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Copybook names may reference a subfolder beneath the configured copybook folder (e.g.
+     * "SAM/SIMPLE"), so '/' and '\' are allowed; only a literal ".." path segment, which is never
+     * needed to address a copybook and is otherwise used to escape the copybook folder, is rejected
+     * outright.
+     */
+    private boolean containsPathTraversal(String copybookName) {
+      if (copybookName == null) {
+        return false;
+      }
+      return Arrays.stream(copybookName.split("[/\\\\]")).anyMatch(".."::equals);
     }
   }
 }

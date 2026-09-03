@@ -217,7 +217,10 @@ public class CliAnalysis implements Callable<Integer> {
   static class ExplicitConfig {
     @CommandLine.Option(
         names = {"-cf", "--copybook-folder"},
-        description = "Path to the copybook folder.")
+        description =
+            "Path to the copybook folder. Copybook names may address a subfolder (e.g. "
+                + "'SAM/SIMPLE'), but must not contain '..' path segments to reference "
+                + "locations outside this folder.")
     private File[] cpyPaths = {};
 
     @CommandLine.Option(
