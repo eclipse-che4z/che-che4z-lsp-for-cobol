@@ -39,6 +39,12 @@
   "icon": "resources/logo.png",
   "main": "./dist/extension.js",
   "browser": "./dist/web/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "The COBOL Language Support extension requires workspace trust only for executing custom preprocessors and loading dialect plugins. The Java runtime path is machine-scoped and cannot be overridden by workspace settings, preventing arbitrary code execution."
+    }
+  },
   "contributes": {
     "snippets": [
       {
@@ -474,6 +480,7 @@
         },
         "cobol-lsp.java.home": {
           "type": "string",
+          "scope": "machine",
           "default": "",
           "markdownDescription": "Absolute path to the **Java Home** directory. The language server will use the Java executable inside this directory. Leave empty to use the executable from the system PATH.\n\n**Examples:**\n- Windows: `C:\\Program Files\\Java\\jdk-21`\n- macOS / Linux: `/usr/lib/jvm/java-21-openjdk`",
           "tags": [
