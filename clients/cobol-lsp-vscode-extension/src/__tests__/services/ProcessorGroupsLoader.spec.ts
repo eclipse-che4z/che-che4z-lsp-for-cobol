@@ -38,6 +38,9 @@ import { CopybookDownloaderForE4E } from "../../services/copybook/downloader/Cop
 import { E4EExternalConfigurationResponse } from "../../type/e4eApi";
 import { e4eMock } from "../../__mocks__/getE4EMock.utility";
 import { UssPathLib } from "../../services/copybookLibs/UssPathLib";
+import { TarCopybookLib } from "../../services/copybookLibs/TarCopybookLib";
+import { CopybookBinaryDownloader } from "../../services/copybook/downloader/CopybookBinaryDownloader";
+import { createZoweExplorerMock } from "../../__mocks__/getZoweExplorerMock.utility";
 
 describe("ProcessorGroupsLoader", () => {
   describe("readSettingConfig", () => {
@@ -93,6 +96,43 @@ describe("ProcessorGroupsLoader", () => {
       it("generates workspace processor group with dsn path first", () => {
         const result = readSettingConfig(DEFAULT_DIALECT);
         expect(result.libs).toEqual([new UssPathLib("/user/copybooks")]);
+      });
+    });
+
+    describe("a tar: prefixed uss setting with a path-traversal payload", () => {
+      const STORAGE_PATH = vscode.Uri.file("/storage");
+
+      beforeEach(async () => {
+        getConfigurationResult["paths-local"] = [];
+        getConfigurationResult["paths-dsn"] = [];
+        getConfigurationResult["paths-uss"] = [
+          "tar:../../../../outside/settings.json",
+        ];
+        await initializeExternalAPIs(STORAGE_PATH);
+        externalApis.binaryDownloader = new CopybookBinaryDownloader(
+          STORAGE_PATH,
+          createZoweExplorerMock(),
+        );
+      });
+
+      it("is wired into a TarCopybookLib, same as the proc_grps.json config path", () => {
+        const result = readSettingConfig(DEFAULT_DIALECT);
+        expect(result.libs![0]).toBeInstanceOf(TarCopybookLib);
+      });
+
+      it("is rejected by the tar cache path guard and never writes outside extension storage", async () => {
+        const result = readSettingConfig(DEFAULT_DIALECT);
+        const tarLib = result.libs![0] as TarCopybookLib;
+
+        const resolved = await tarLib.resolveCopybookUri(
+          "DEPARTMENT",
+          vscode.Uri.file("/program.cbl"),
+          DEFAULT_DIALECT,
+        );
+
+        expect(resolved).toBeFalsy();
+        expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
+        expect(vscode.window.showWarningMessage).not.toHaveBeenCalled();
       });
     });
   });

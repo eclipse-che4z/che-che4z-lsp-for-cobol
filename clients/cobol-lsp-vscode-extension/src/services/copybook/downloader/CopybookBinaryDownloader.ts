@@ -14,9 +14,11 @@
 import { PassThrough } from "stream";
 import { TAR_FOLDER } from "../../../constants";
 import { loadProfile } from "../../util/Utils";
+import { outputChannel } from "../../util/OutputChannel";
 import * as vscode from "vscode";
 
 const pendingCache: Map<string, Promise<boolean>> = new Map();
+const approvedDownloads = new Set<string>();
 
 export class CopybookBinaryDownloader {
   constructor(
@@ -29,6 +31,8 @@ export class CopybookBinaryDownloader {
     profile: string,
     type: "USS" | "DSN",
   ): Promise<boolean> {
+    if (!(await this.isDownloadApproved(path, profile, type))) return false;
+
     const id = `${type}|${profile}|${path}`;
     let p = pendingCache.get(id);
     if (p) return p;
@@ -43,13 +47,51 @@ export class CopybookBinaryDownloader {
     }
   }
 
+  // Workspace-supplied .cobolplugin/proc_grps.json controls which Zowe
+  // profile and remote path get fetched. Require an untampered/trusted
+  // workspace plus one-time explicit consent per profile+path before
+  // spending the user's real mainframe credentials on it.
+  private async isDownloadApproved(
+    path: string,
+    profile: string,
+    type: "USS" | "DSN",
+  ): Promise<boolean> {
+    if (!vscode.workspace.isTrusted) {
+      outputChannel.error(
+        `Refused to download ${type} copybook archive "${path}" using Zowe profile "${profile}": workspace is not trusted.`,
+      );
+      return false;
+    }
+
+    const id = `${type}|${profile}|${path}`;
+    if (approvedDownloads.has(id)) return true;
+
+    const choice = await vscode.window.showWarningMessage(
+      `The workspace configuration (.cobolplugin/proc_grps.json) is requesting a mainframe download using Zowe profile "${profile}":\n${type} ${path}\n\nOnly allow this if you trust this workspace.`,
+      { modal: true },
+      "Allow",
+    );
+
+    if (choice !== "Allow") {
+      outputChannel.error(
+        `Denied ${type} copybook archive download "${path}" using Zowe profile "${profile}".`,
+      );
+      return false;
+    }
+
+    approvedDownloads.add(id);
+    return true;
+  }
+
   private async downloadFileImpl(
     path: string,
     profile: string,
     type: "USS" | "DSN",
   ): Promise<boolean> {
-    const loadedProfile = loadProfile(profile, this.explorerAPI);
     const tarUri = this.getTarFileUri(path);
+    if (!tarUri) return false;
+
+    const loadedProfile = loadProfile(profile, this.explorerAPI);
     try {
       const passThrough = new PassThrough();
       const chunks: Buffer[] = [];
@@ -78,8 +120,17 @@ export class CopybookBinaryDownloader {
     }
   }
 
-  public getTarFileUri(filePath: string) {
-    return vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, filePath);
+  public getTarFileUri(filePath: string): vscode.Uri | undefined {
+    const root = vscode.Uri.joinPath(this.storagePath, TAR_FOLDER);
+    const resolved = vscode.Uri.joinPath(root, filePath);
+    const rootPrefix = root.path.endsWith("/") ? root.path : `${root.path}/`;
+    if (resolved.path !== root.path && !resolved.path.startsWith(rootPrefix)) {
+      outputChannel.error(
+        `Rejected tar file location "${filePath}": it resolves outside of the extension's storage folder.`,
+      );
+      return undefined;
+    }
+    return resolved;
   }
   public async isPresentLocally(
     inputPath: string | vscode.Uri | undefined,

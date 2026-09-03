@@ -64,6 +64,7 @@ export const diagnosticsCollectionMock = {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace workspace {
   export const workspaceFolders = workspaceFoldersMock;
+  export const isTrusted = true;
 
   export function registerFileSystemProvider(
     _scheme: string,
@@ -182,6 +183,7 @@ export namespace window {
     .fn()
     .mockImplementation(() => Promise.resolve());
   export const showInformationMessage = jest.fn().mockReturnValue("Ok");
+  export const showWarningMessage = jest.fn().mockResolvedValue(undefined);
   export const showInputBox = jest.fn();
   export const createStatusBarItem = () => {
     return { show: () => {} };

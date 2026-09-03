@@ -46,6 +46,8 @@ export class TarCopybookLib implements CopybookLib {
       if (!binaryDownloader) return;
 
       tarFileUri = binaryDownloader.getTarFileUri(evaluatedTarPath);
+      if (!tarFileUri) return;
+
       const isAvailableAlready =
         await binaryDownloader.isPresentLocally(tarFileUri);
 
@@ -61,7 +63,6 @@ export class TarCopybookLib implements CopybookLib {
         )
           return;
       }
-      if (!tarFileUri) return;
     }
 
     const matchingFilePath = await this.findMatchingFile(
@@ -95,10 +96,12 @@ export class TarCopybookLib implements CopybookLib {
       if (!binaryDownloader) return [];
 
       tarFileUri = binaryDownloader.getTarFileUri(evaluatedTarPath);
+      if (!tarFileUri) return [];
+
       const isAvailableAlready =
         await binaryDownloader.isPresentLocally(tarFileUri);
 
-      if (!isAvailableAlready || !tarFileUri) {
+      if (!isAvailableAlready) {
         return [];
       }
     }
