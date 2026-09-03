@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -81,5 +82,16 @@ public class CompletionHandler {
   public List<LspEventDependency> getDocumentHighlightDependency(CompletionParams params) {
     return ImmutableList.of(
         asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+  }
+
+  /**
+   * Cancel condition for the completion event: cancel if the document was closed.
+   *
+   * @param params CompletionParams.
+   * @return list of {@link LspEventCancelCondition}
+   */
+  public List<LspEventCancelCondition> getCancelConditions(CompletionParams params) {
+    return ImmutableList.of(
+        asyncAnalysisService.createCancelConditionOnClose(params.getTextDocument().getUri()));
   }
 }
