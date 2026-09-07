@@ -39,12 +39,6 @@
   "icon": "resources/logo.png",
   "main": "./dist/extension.js",
   "browser": "./dist/web/extension.js",
-  "capabilities": {
-    "untrustedWorkspaces": {
-      "supported": true,
-      "description": "The COBOL Language Support extension requires workspace trust only for executing custom preprocessors and loading dialect plugins. The Java runtime path is machine-scoped and cannot be overridden by workspace settings, preventing arbitrary code execution."
-    }
-  },
   "contributes": {
     "snippets": [
       {
