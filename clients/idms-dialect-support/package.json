@@ -91,7 +91,7 @@
     "pretest": "npm run compile && npm run lint",
     "pretty": "prettier -w .",
     "lint-format": "prettier -c .",
-    "lint-quality": "eslint ./src",
+    "lint-quality": "eslint ./src  --ext .ts",
     "lint-fix": "eslint --fix ./src && prettier -w .",
     "lint": "npm run lint-format && npm run lint-quality",
     "test:unit": "jest src/test/unit",

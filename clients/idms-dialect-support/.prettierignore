@@ -22,3 +22,5 @@ package-lock.json
 # Ignore generated ANTLR sources
 src/generated
 src/antlr/gen
+.vscode-test
+dist
