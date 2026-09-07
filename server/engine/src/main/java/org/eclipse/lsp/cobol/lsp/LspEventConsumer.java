@@ -78,8 +78,10 @@ public class LspEventConsumer {
           pendingSince.remove(event);
         } else if (isPendingTooLong(event)) {
           LOG.warn(event + " timed out waiting for its dependencies to be satisfied.");
-          event.getResult().completeExceptionally(
-              new TimeoutException("Timed out waiting for dependencies: " + event));
+          event
+              .getResult()
+              .completeExceptionally(
+                  new TimeoutException("Timed out waiting for dependencies: " + event));
           pendingSince.remove(event);
         } else {
           this.lspMessageBroker.putBack(event);
