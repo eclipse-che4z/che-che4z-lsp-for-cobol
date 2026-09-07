@@ -14,7 +14,11 @@
 
 # Ignore build output
 out
+dist
 # Ignore markdown files
 **/*.md
 # Ignore npm package lock
 package-lock.json
+# Ignore generated ANTLR sources
+src/generated
+src/antlr/gen
