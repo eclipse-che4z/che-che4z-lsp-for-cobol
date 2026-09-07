@@ -110,4 +110,55 @@ class SourceUnitGraphTest {
     assertEquals(1, allAssociatedFilesForACopybook.size());
     assertEquals(URI, allAssociatedFilesForACopybook.get(0));
   }
+
+  @Test
+  void testCyclicCopybooksDoNotCauseStackOverflow() {
+    String mainUri = "file://M.cbl";
+    String copyAUri = "file://A.cpy";
+    String copyBUri = "file://B.cpy";
+    ResolveFileContent resolveFileContent = mock(ResolveFileContent.class);
+    when(resolveFileContent.getFileContent(anyString()))
+        .thenReturn(CompletableFuture.completedFuture("some dummy text"));
+    SourceUnitGraph sourceUnitGraph = new SourceUnitGraph(resolveFileContent);
+    RootNode rootNode = mock(RootNode.class);
+    CopyNode mainCopiesA =
+        new CopyNode(
+            Locality.builder().uri(mainUri).build(),
+            new Location(mainUri, new Range(new Position(0, 0), new Position(0, 5))),
+            "A",
+            copyAUri);
+    CopyNode aCopiesB =
+        new CopyNode(
+            Locality.builder().uri(copyAUri).build(),
+            new Location(copyAUri, new Range(new Position(0, 0), new Position(0, 5))),
+            "B",
+            copyBUri);
+    CopyNode bCopiesA =
+        new CopyNode(
+            Locality.builder().uri(copyBUri).build(),
+            new Location(copyBUri, new Range(new Position(0, 0), new Position(0, 5))),
+            "A",
+            copyAUri);
+    when(rootNode.getDepthFirstStream()).thenReturn(Stream.of(mainCopiesA, aCopiesB, bCopiesA));
+    CobolDocumentModel model =
+        new CobolDocumentModel(
+            mainUri, "text", AnalysisResult.builder().rootNode(rootNode).build());
+
+    // no StackOverflowError here
+    assertDoesNotThrow(() -> sourceUnitGraph.notifyState(AnalysisState.COMPLETED, model));
+
+    // searching it back from either copybook, still resolving to the real owner.
+    assertDoesNotThrow(
+        () -> {
+          List<String> result = sourceUnitGraph.getAllAssociatedFilesForACopybook(copyAUri);
+          assertEquals(1, result.size());
+          assertEquals(mainUri, result.get(0));
+        });
+    assertDoesNotThrow(
+        () -> {
+          List<String> result = sourceUnitGraph.getAllAssociatedFilesForACopybook(copyBUri);
+          assertEquals(1, result.size());
+          assertEquals(mainUri, result.get(0));
+        });
+  }
 }

@@ -249,12 +249,18 @@ public class SourceUnitGraph implements AnalysisStateListener {
    */
   public List<String> getAllAssociatedFilesForACopybook(String uri) {
     List<String> result = new ArrayList<>();
-    List<String> linkedUris =
-        documentGraphIndexedByCopybook.getOrDefault(uri, Collections.emptyList());
-    linkedUris.remove(uri);
-    for (String linkedUri : linkedUris) {
-      if (documentGraphIndexedByCopybook.containsKey(linkedUri)) {
-        result.addAll(getAllAssociatedFilesForACopybook(linkedUri));
+    Set<String> visited = new HashSet<>();
+    visited.add(uri);
+    Deque<String> toVisit =
+        new ArrayDeque<>(documentGraphIndexedByCopybook.getOrDefault(uri, Collections.emptyList()));
+    while (!toVisit.isEmpty()) {
+      String linkedUri = toVisit.pop();
+      if (!visited.add(linkedUri)) {
+        continue;
+      }
+      List<String> linkedUris = documentGraphIndexedByCopybook.get(linkedUri);
+      if (linkedUris != null) {
+        toVisit.addAll(new ArrayList<>(linkedUris));
       } else {
         result.add(linkedUri);
       }
