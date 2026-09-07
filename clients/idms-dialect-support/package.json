@@ -100,6 +100,7 @@
     "package": "vsce package --no-dependencies"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/glob": "^8.0.0",
     "@types/jest": "^29.5.14",
     "@types/mocha": "^10.0.1",
@@ -118,7 +119,8 @@
     "prettier": "2.8.7",
     "ts-jest": "^29.4.4",
     "tslint": "^5.18.0",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "typescript-eslint": "^8.69.0"
   },
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support"
