@@ -32,6 +32,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
+import org.eclipse.lsp.cobol.common.UserInterruptException;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
 import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
 import org.eclipse.lsp.cobol.common.error.ErrorSource;
@@ -170,7 +171,9 @@ public class ReplacingServiceImpl implements ReplacingService {
     String text = extendedDocument.getBaseText(startLine, endLine);
     final List<Integer> lineMap = makeLineMap(text);
     try {
-      Matcher matcher = Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE).matcher(text);
+      Matcher matcher =
+          Pattern.compile(pattern.getLeft(), Pattern.CASE_INSENSITIVE)
+              .matcher(new InterruptibleCharSequence(text));
       while (matcher.find()) {
         Range range =
             new Range(
@@ -214,5 +217,42 @@ public class ReplacingServiceImpl implements ReplacingService {
   private Function<String, Boolean> checkContainWord(String check) {
     return text ->
         Arrays.stream(text.toUpperCase().split("\b")).anyMatch(txt -> txt.equalsIgnoreCase(check));
+  }
+
+  /**
+   * A {@link CharSequence} wrapper that lets a regex {@link Matcher} honor cooperative thread
+   * interruption.
+   * The matcher reads the sequence exclusively through {@code charAt}, so checking there is
+   * enough to make matching on this text interruptible.
+   */
+  private static final class InterruptibleCharSequence implements CharSequence {
+    private final CharSequence inner;
+
+    private InterruptibleCharSequence(CharSequence inner) {
+      this.inner = inner;
+    }
+
+    @Override
+    public int length() {
+      return inner.length();
+    }
+
+    @Override
+    public char charAt(int index) {
+      if (Thread.currentThread().isInterrupted()) {
+        throw new UserInterruptException("Replacing interrupted by user.");
+      }
+      return inner.charAt(index);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+      return new InterruptibleCharSequence(inner.subSequence(start, end));
+    }
+
+    @Override
+    public String toString() {
+      return inner.toString();
+    }
   }
 }
