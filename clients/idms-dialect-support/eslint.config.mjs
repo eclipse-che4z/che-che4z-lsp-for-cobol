@@ -29,7 +29,6 @@ export default defineConfig([
         },
       ],
       "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
       semi: ["error", "always"],
     },
   },
