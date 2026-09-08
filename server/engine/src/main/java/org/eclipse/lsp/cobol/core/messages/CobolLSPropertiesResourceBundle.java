@@ -63,7 +63,8 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
     URI jarUri = dialectRegistryItem.getUri();
     if (jarUri == null) {
       // Java-agnostic (v2) dialects have no jar, so there is no bundled resource file to load.
-      LOG.debug("No dialect jar URI for {}, skipping jar resource bundle", dialectRegistryItem.getName());
+      LOG.debug(
+          "No dialect jar URI for {}, skipping jar resource bundle", dialectRegistryItem.getName());
       return properties;
     }
     try {
