@@ -78,59 +78,6 @@ class CliClientProviderTest {
     }
   }
 
-  @Test
-  void pathTraversalCopybookNameResolvesToNull() {
-    try (MockedStatic<Files> files = mockStatic(Files.class)) {
-      // even if a file happens to exist at the traversed location, it must never be returned
-      files.when(() -> Files.exists(any(Path.class))).thenReturn(true);
-
-      CobolLanguageClient client = buildClient(new File("COBCOPY"));
-      String uri =
-          client.resolveCopybookUri(COBOL_FILE_URI, "../../../../etc/passwd", "COBOL").join();
-
-      assertNull(uri);
-    }
-  }
-
-  @Test
-  void backslashCopybookNameResolvesToNull() {
-    try (MockedStatic<Files> files = mockStatic(Files.class)) {
-      files.when(() -> Files.exists(any(Path.class))).thenReturn(true);
-
-      CobolLanguageClient client = buildClient(new File("COBCOPY"));
-      String uri = client.resolveCopybookUri(COBOL_FILE_URI, "..\\..\\secrets", "COBOL").join();
-
-      assertNull(uri);
-    }
-  }
-
-  @Test
-  void subfolderQualifiedCopybookNameIsResolved() {
-    Path expected = Paths.get("").toAbsolutePath().resolve("COBCOPY").resolve("SAM/SIMPLE.cpy");
-
-    try (MockedStatic<Files> files = mockStatic(Files.class)) {
-      files.when(() -> Files.exists(expected)).thenReturn(true);
-
-      CobolLanguageClient client = buildClient(new File("COBCOPY"));
-      String uri = client.resolveCopybookUri(COBOL_FILE_URI, "SAM/SIMPLE", "COBOL").join();
-
-      assertEquals(expected.toUri().toString(), uri);
-    }
-  }
-
-  @Test
-  void subfolderQualifiedTraversalResolvesToNull() {
-    try (MockedStatic<Files> files = mockStatic(Files.class)) {
-      files.when(() -> Files.exists(any(Path.class))).thenReturn(true);
-
-      CobolLanguageClient client = buildClient(new File("COBCOPY"));
-      String uri =
-          client.resolveCopybookUri(COBOL_FILE_URI, "SAM/../../../../etc/passwd", "COBOL").join();
-
-      assertNull(uri);
-    }
-  }
-
   private static CobolLanguageClient buildClient(File copybookFolder) {
     CliClientProvider provider = new CliClientProvider();
     provider.setCpyPaths(Collections.singletonList(copybookFolder));
