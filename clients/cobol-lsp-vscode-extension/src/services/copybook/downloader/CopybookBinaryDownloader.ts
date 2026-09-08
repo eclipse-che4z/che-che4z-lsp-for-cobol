@@ -12,6 +12,7 @@
  *   Broadcom - initial API and implementation
  */
 import { PassThrough } from "stream";
+import * as path from "node:path";
 import { TAR_FOLDER } from "../../../constants";
 import { loadProfile } from "../../util/Utils";
 import * as vscode from "vscode";
@@ -44,12 +45,13 @@ export class CopybookBinaryDownloader {
   }
 
   private async downloadFileImpl(
-    path: string,
+    remotePath: string,
     profile: string,
     type: "USS" | "DSN",
   ): Promise<boolean> {
+    const tarUri = this.getTarFileUri(remotePath);
+    if (!tarUri) return false;
     const loadedProfile = loadProfile(profile, this.explorerAPI);
-    const tarUri = this.getTarFileUri(path);
     try {
       const passThrough = new PassThrough();
       const chunks: Buffer[] = [];
@@ -59,17 +61,21 @@ export class CopybookBinaryDownloader {
       });
 
       if (type == "DSN") {
-        await this.explorerAPI.getMvsApi(loadedProfile).getContents(path, {
-          returnEtag: true,
-          binary: true,
-          stream: passThrough,
-        });
+        await this.explorerAPI
+          .getMvsApi(loadedProfile)
+          .getContents(remotePath, {
+            returnEtag: true,
+            binary: true,
+            stream: passThrough,
+          });
       } else
-        await this.explorerAPI.getUssApi(loadedProfile).getContents(path, {
-          returnEtag: true,
-          binary: true,
-          stream: passThrough,
-        });
+        await this.explorerAPI
+          .getUssApi(loadedProfile)
+          .getContents(remotePath, {
+            returnEtag: true,
+            binary: true,
+            stream: passThrough,
+          });
       const content = Buffer.concat(chunks);
       await vscode.workspace.fs.writeFile(tarUri, content);
       return true;
@@ -78,8 +84,12 @@ export class CopybookBinaryDownloader {
     }
   }
 
-  public getTarFileUri(filePath: string) {
-    return vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, filePath);
+  public getTarFileUri(filePath: string): vscode.Uri | undefined {
+    const normalized = path.posix.normalize(filePath);
+    if (normalized.startsWith("..") || path.posix.isAbsolute(normalized)) {
+      return undefined;
+    }
+    return vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, normalized);
   }
   public async isPresentLocally(
     inputPath: string | vscode.Uri | undefined,

@@ -132,6 +132,29 @@ describe("Tar copybook lib tests", () => {
         "DSN",
       );
     });
+    it("rejects a tar location that attempts path traversal, without downloading", async () => {
+      extApis.binaryDownloader = new CopybookBinaryDownloader(
+        vscode.Uri.file("/storage"),
+        createZoweExplorerMock(),
+      );
+      extApis.binaryDownloader.downloadFile = jest.fn();
+      const traversalTarLib = new TarCopybookLib(
+        "DSN",
+        "../../../../etc/passwd",
+        "APPLDICT/EMPRPT/**",
+        tarCache,
+        "zeProfile",
+      );
+
+      const result = await traversalTarLib.resolveCopybookUri(
+        "DEPARTMENT",
+        vscode.Uri.file("/program.cbl"),
+        DEFAULT_DIALECT,
+      );
+
+      expect(result).toBeFalsy();
+      expect(extApis.binaryDownloader.downloadFile).not.toHaveBeenCalled();
+    });
     it("Default folder pattern", () => {
       expect(
         TarCopybookLib.create({
