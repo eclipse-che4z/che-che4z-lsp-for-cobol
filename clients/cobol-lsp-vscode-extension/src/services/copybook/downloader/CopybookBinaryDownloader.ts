@@ -16,6 +16,7 @@ import * as path from "node:path";
 import { TAR_FOLDER } from "../../../constants";
 import { loadProfile } from "../../util/Utils";
 import * as vscode from "vscode";
+import { outputChannel } from "../../util/OutputChannel";
 
 const pendingCache: Map<string, Promise<boolean>> = new Map();
 
@@ -49,7 +50,8 @@ export class CopybookBinaryDownloader {
     profile: string,
     type: "USS" | "DSN",
   ): Promise<boolean> {
-    if (!path.posix.isAbsolute(remotePath)) {
+    if (type === "USS" && !path.posix.isAbsolute(remotePath)) {
+      outputChannel.warn(`${remotePath} ignored for file download`);
       return false;
     }
     const loadedProfile = loadProfile(profile, this.explorerAPI);

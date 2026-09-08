@@ -25,7 +25,7 @@ describe("CopybookBinaryDownloader tar path containment", () => {
   });
 
   describe("downloadFile", () => {
-    it("never fetches or writes when the remote path is relative and attempts traversal", async () => {
+    it("never fetches or writes when the remote USS path is relative and attempts traversal", async () => {
       const explorerAPI = createZoweExplorerMock();
       const downloader = new CopybookBinaryDownloader(
         vscode.Uri.file("/storage"),
@@ -35,15 +35,15 @@ describe("CopybookBinaryDownloader tar path containment", () => {
       const result = await downloader.downloadFile(
         "../../../../etc/passwd",
         "zeProfile",
-        "DSN",
+        "USS",
       );
 
       expect(result).toBe(false);
-      expect(getContentMock).not.toHaveBeenCalled();
+      expect(getUSSContentsMock).not.toHaveBeenCalled();
       expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
     });
 
-    it("never fetches or writes when the remote path is relative, even without traversal", async () => {
+    it("never fetches or writes when the remote USS path is relative, even without traversal", async () => {
       const explorerAPI = createZoweExplorerMock();
       const downloader = new CopybookBinaryDownloader(
         vscode.Uri.file("/storage"),
@@ -51,17 +51,17 @@ describe("CopybookBinaryDownloader tar path containment", () => {
       );
 
       const result = await downloader.downloadFile(
-        "MY.DSN.LIB",
+        "MY.USS.FILE",
         "zeProfile",
-        "DSN",
+        "USS",
       );
 
       expect(result).toBe(false);
-      expect(getContentMock).not.toHaveBeenCalled();
+      expect(getUSSContentsMock).not.toHaveBeenCalled();
       expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
     });
 
-    it("downloads and writes under the tar cache root when the remote path is absolute", async () => {
+    it("downloads and writes under the tar cache root when the remote USS path is absolute", async () => {
       const explorerAPI = createZoweExplorerMock();
       const downloader = new CopybookBinaryDownloader(
         vscode.Uri.file("/storage"),
@@ -79,6 +79,29 @@ describe("CopybookBinaryDownloader tar path containment", () => {
       expect(vscode.workspace.fs.writeFile).toHaveBeenCalledWith(
         expect.objectContaining({
           fsPath: vscode.Uri.file("/storage/tar/MY.USS.FILE").fsPath,
+        }),
+        expect.anything(),
+      );
+    });
+
+    it("downloads and writes a relative DSN name without requiring it to be absolute", async () => {
+      const explorerAPI = createZoweExplorerMock();
+      const downloader = new CopybookBinaryDownloader(
+        vscode.Uri.file("/storage"),
+        explorerAPI,
+      );
+
+      const result = await downloader.downloadFile(
+        "MY.DSN.LIB",
+        "zeProfile",
+        "DSN",
+      );
+
+      expect(result).toBe(true);
+      expect(getContentMock).toHaveBeenCalled();
+      expect(vscode.workspace.fs.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fsPath: vscode.Uri.file("/storage/tar/MY.DSN.LIB").fsPath,
         }),
         expect.anything(),
       );

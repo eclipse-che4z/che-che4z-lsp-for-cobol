@@ -7,7 +7,7 @@ import {
 import { DEFAULT_DIALECT } from "../../../../constants";
 import {
   createZoweExplorerMock,
-  getContentMock,
+  getUSSContentsMock,
 } from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { SettingsService } from "../../../../services/Settings";
 import { getTarCached, TarContent } from "../../../../services/util/TarUtil";
@@ -144,7 +144,7 @@ describe("Tar copybook lib tests", () => {
         .fn()
         .mockReturnValue(false);
       const traversalTarLib = new TarCopybookLib(
-        "DSN",
+        "USS",
         "../../../../etc/passwd",
         "APPLDICT/EMPRPT/**",
         tarCache,
@@ -158,7 +158,7 @@ describe("Tar copybook lib tests", () => {
       );
 
       expect(result).toBeFalsy();
-      expect(getContentMock).not.toHaveBeenCalled();
+      expect(getUSSContentsMock).not.toHaveBeenCalled();
       expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
     });
     it("Default folder pattern", () => {

@@ -126,14 +126,14 @@ export class TarCopybookLib implements CopybookLib {
       if ("profile" in config)
         return new TarCopybookLib(
           config["locationType"],
-          path.normalize(config["tarFileLocation"]),
+          path.posix.normalize(config["tarFileLocation"]),
           config["folderPattern"] ?? "**",
           externalApis.tarCache,
           config["profile"],
         );
       return new TarCopybookLib(
         config["locationType"],
-        path.normalize(config["tarFileLocation"]),
+        path.posix.normalize(config["tarFileLocation"]),
         config["folderPattern"] ?? "**",
         externalApis.tarCache,
       );
