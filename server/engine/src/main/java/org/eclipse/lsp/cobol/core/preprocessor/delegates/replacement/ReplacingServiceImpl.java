@@ -221,9 +221,8 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   /**
    * A {@link CharSequence} wrapper that lets a regex {@link Matcher} honor cooperative thread
-   * interruption.
-   * The matcher reads the sequence exclusively through {@code charAt}, so checking there is
-   * enough to make matching on this text interruptible.
+   * interruption. The matcher reads the sequence exclusively through {@code charAt}, so checking
+   * there is enough to make matching on this text interruptible.
    */
   private static final class InterruptibleCharSequence implements CharSequence {
     private final CharSequence inner;
