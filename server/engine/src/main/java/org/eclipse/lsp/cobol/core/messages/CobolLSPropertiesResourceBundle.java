@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.core.messages;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -82,7 +83,7 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   @VisibleForTesting
   public void loadDialectResources(Properties p, List<String> resourceName, URI jarUri)
       throws IOException {
-    try (JarFile jar = new JarFile(jarUri.toURL().getFile())) {
+    try (JarFile jar = new JarFile(new File(jarUri))) {
       for (String s : resourceName) {
         final JarEntry jarEntry = jar.getJarEntry(s);
         if (jarEntry == null) {

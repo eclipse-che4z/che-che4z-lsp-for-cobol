@@ -138,10 +138,23 @@ export function RenumHandler(
   renum: boolean,
   param: RenumberParameters,
 ) {
+  if (!renum) {
+    unNumberLines(editor.document, edit, param);
+    vscode.window.showInformationMessage(
+      `Unnumber successful for columns ${param.start}-${param.end}`,
+    );
+    return;
+  }
+
   const incompatible = findIncompatibleLine(editor.document, param);
-  if (incompatible) reportIncompatibleLine(editor, incompatible);
-  else if (renum) renumberLines(editor.document, edit, param);
-  else unNumberLines(editor.document, edit, param);
+  if (incompatible) {
+    reportIncompatibleLine(editor, incompatible);
+  } else {
+    renumberLines(editor.document, edit, param);
+    vscode.window.showInformationMessage(
+      `Renumber successful for columns ${param.start}-${param.end}`,
+    );
+  }
 }
 
 export function reportIncompatibleLine(
@@ -150,7 +163,7 @@ export function reportIncompatibleLine(
 ) {
   vscode.window
     .showErrorMessage(
-      "Renumber/unnumber sequential numbers is not possible on non numeric lines",
+      "Renumbering sequential numbers is not possible on non-numeric lines",
       "Go to line",
     )
     .then((selection) => {

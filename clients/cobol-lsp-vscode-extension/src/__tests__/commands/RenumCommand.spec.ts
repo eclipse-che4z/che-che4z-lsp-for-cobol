@@ -191,7 +191,7 @@ describe("Tests renumber/unnumber commmands", () => {
   it("check incompatible document reported at correct position", () => {
     reportIncompatibleLine(mockEditor, pos);
     expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-      "Renumber/unnumber sequential numbers is not possible on non numeric lines",
+      "Renumbering sequential numbers is not possible on non-numeric lines",
       "Go to line",
     );
   });

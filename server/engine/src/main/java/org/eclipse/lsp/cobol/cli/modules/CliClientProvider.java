@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.cli.modules;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,10 +81,12 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
         for (String ext : cpyExt) {
           String copybookFileName =
               copybookName + (ext.isEmpty() || ext.startsWith(".") ? ext : "." + ext);
-          Path cpy =
-              sp.isAbsolute()
-                  ? Paths.get(sp.toString(), copybookFileName)
-                  : makeRelativePath(cobolFileUri, sp.toString(), copybookFileName);
+          Path spPath = sp.toPath();
+          // absolute paths are used as-is
+          // relative paths are resolved against the CLI process's current working directory.
+          Path cpyFolder =
+              spPath.isAbsolute() ? spPath : Paths.get("").toAbsolutePath().resolve(spPath);
+          Path cpy = cpyFolder.resolve(copybookFileName);
 
           if (Files.exists(cpy)) {
             String value = cpy.toUri().toString();
@@ -94,11 +95,6 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
         }
       }
       return CompletableFuture.completedFuture(null);
-    }
-
-    private Path makeRelativePath(String cobolFileUri, String cbPath, String copybookFileName) {
-      String folder = Paths.get(URI.create((cobolFileUri))).getParent().toString();
-      return Paths.get(folder, cbPath, copybookFileName);
     }
   }
 }

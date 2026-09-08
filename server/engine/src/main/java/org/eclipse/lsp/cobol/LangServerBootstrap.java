@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.cli.command.Cli;
+import org.eclipse.lsp.cobol.cli.command.CliHelp;
 import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
@@ -57,7 +58,9 @@ public class LangServerBootstrap {
       throws ExecutionException, InterruptedException, IOException {
     if (isCliMode(args)) {
       cliMode = true;
-      int exitCode = new CommandLine(new Cli()).execute(args);
+      CommandLine commandLine = new CommandLine(new Cli());
+      commandLine.setHelpFactory(new CliHelp.Factory());
+      int exitCode = commandLine.execute(args);
       System.exit(exitCode);
     }
     LangServerBootstrap langServerBootstrap = new LangServerBootstrap();
