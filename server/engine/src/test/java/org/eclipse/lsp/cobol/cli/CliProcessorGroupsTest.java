@@ -64,8 +64,10 @@ class CliProcessorGroupsTest {
     String groups =
         "{\n"
             + "    \"pgroups\": [\n"
-            + "        {\"name\": \"GROUP_A\", \"copybook-extensions\": [\".CPY\"], \"libs\": [\"COBCOPY/A\"]},\n"
-            + "        {\"name\": \"GROUP_B\", \"copybook-extensions\": [\".CPY\"], \"libs\": [\"COBCOPY/B\"]}\n"
+            + "        {\"name\": \"GROUP_A\", \"copybook-extensions\": [\".CPY\"], \"libs\":"
+            + " [\"COBCOPY/A\"]},\n"
+            + "        {\"name\": \"GROUP_B\", \"copybook-extensions\": [\".CPY\"], \"libs\":"
+            + " [\"COBCOPY/B\"]}\n"
             + "    ]\n"
             + "}";
     String programs =
