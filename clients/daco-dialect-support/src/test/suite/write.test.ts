@@ -65,7 +65,7 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with R or T",
+      "String must starts with R or T values",
       range(pos(16, 24), pos(16, 29)),
     );
   });
@@ -147,13 +147,13 @@ suite("WRITE statement Test Suite", function () {
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with R or T",
+      "String must starts with R or T values",
       range(pos(47, 24), pos(47, 29)),
     );
 
     helper.checkDiagnostic(
       diagnostics,
-      "String must starts with R or T",
+      "String must starts with R or T values",
       range(pos(47, 24), pos(47, 29)),
     );
 
