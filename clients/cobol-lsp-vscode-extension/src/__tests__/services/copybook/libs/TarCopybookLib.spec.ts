@@ -5,7 +5,10 @@ import {
   initializeExternalAPIs,
 } from "../../../../services/ExternalAPIsService";
 import { DEFAULT_DIALECT } from "../../../../constants";
-import { createZoweExplorerMock } from "../../../../__mocks__/getZoweExplorerMock.utility";
+import {
+  createZoweExplorerMock,
+  getContentMock,
+} from "../../../../__mocks__/getZoweExplorerMock.utility";
 import { SettingsService } from "../../../../services/Settings";
 import { getTarCached, TarContent } from "../../../../services/util/TarUtil";
 import { CopybookBinaryDownloader } from "../../../../services/copybook/downloader/CopybookBinaryDownloader";
@@ -131,6 +134,32 @@ describe("Tar copybook lib tests", () => {
         "zeProfile",
         "DSN",
       );
+    });
+    it("a tar location that attempts path traversal never downloads or writes outside storage", async () => {
+      extApis.binaryDownloader = new CopybookBinaryDownloader(
+        vscode.Uri.file("/storage"),
+        createZoweExplorerMock(),
+      );
+      extApis.binaryDownloader.isPresentLocally = jest
+        .fn()
+        .mockReturnValue(false);
+      const traversalTarLib = new TarCopybookLib(
+        "DSN",
+        "../../../../etc/passwd",
+        "APPLDICT/EMPRPT/**",
+        tarCache,
+        "zeProfile",
+      );
+
+      const result = await traversalTarLib.resolveCopybookUri(
+        "DEPARTMENT",
+        vscode.Uri.file("/program.cbl"),
+        DEFAULT_DIALECT,
+      );
+
+      expect(result).toBeFalsy();
+      expect(getContentMock).not.toHaveBeenCalled();
+      expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
     });
     it("Default folder pattern", () => {
       expect(
