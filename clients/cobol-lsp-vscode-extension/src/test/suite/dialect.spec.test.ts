@@ -58,7 +58,7 @@ suite("Integration Test Suite: Dialect specific tests", function () {
 
     checkDiagnostic(
       diagnostics,
-      "The following paragraph is not defined: S1",
+      "The following section is not defined: S1",
       25,
       40,
       25,
