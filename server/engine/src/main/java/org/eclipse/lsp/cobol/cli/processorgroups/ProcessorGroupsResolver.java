@@ -17,22 +17,58 @@ package org.eclipse.lsp.cobol.cli.processorgroups;
 import com.google.gson.Gson;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Resolve settings based on processor groups configuration */
 @Getter
 public class ProcessorGroupsResolver {
+  private static final Logger LOG = LoggerFactory.getLogger(ProcessorGroupsResolver.class);
   private static final Gson GSON = new Gson();
+
+  /**
+   * Patterns with more wildcard segments than this are rejected instead of compiled, since glob
+   * patterns are translated to regex and pathological combinations of wildcards can make matching
+   * take super-linear time on directories with many long, similar file names.
+   */
+  private static final int MAX_WILDCARD_COUNT = 20;
 
   private final List<Program> programList;
   private final List<ProcessorGroup> processorGroupList;
+  private final Map<Program, PathMatcher> compiledMatchers;
 
   public ProcessorGroupsResolver(String programs, String groups) {
     this.programList = GSON.fromJson(programs, ProgramsJson.class).getPgms();
     this.processorGroupList = GSON.fromJson(groups, ProcessorGroupsJson.class).getPgroups();
+    this.compiledMatchers = compileMatchers(this.programList);
+  }
+
+  private static Map<Program, PathMatcher> compileMatchers(List<Program> programs) {
+    Map<Program, PathMatcher> result = new LinkedHashMap<>();
+    for (Program program : programs) {
+      String pattern = program.getProgram();
+      if (Objects.isNull(pattern)) {
+        continue;
+      }
+      long wildcardCount = pattern.chars().filter(c -> c == '*' || c == '?').count();
+      if (wildcardCount > MAX_WILDCARD_COUNT) {
+        LOG.warn(
+            "Skipping program pattern with too many wildcards ({}): {}", wildcardCount, pattern);
+        continue;
+      }
+      try {
+        result.put(program, FileSystems.getDefault().getPathMatcher("glob:" + pattern));
+      } catch (PatternSyntaxException | UnsupportedOperationException e) {
+        LOG.warn("Skipping invalid program glob pattern '{}': {}", pattern, e.getMessage());
+      }
+    }
+    return result;
   }
 
   /**
@@ -71,10 +107,24 @@ public class ProcessorGroupsResolver {
   }
 
   private boolean match(Program p, Path srcPath, Path workspacePath) {
+    PathMatcher matcher = compiledMatchers.get(p);
+    if (Objects.isNull(matcher)) {
+      return false;
+    }
     if (srcPath.startsWith(workspacePath)) {
       srcPath = workspacePath.relativize(srcPath);
     }
-    return FileSystems.getDefault().getPathMatcher("glob:" + p.getProgram()).matches(srcPath);
+    return matcher.matches(srcPath);
+  }
+
+  /**
+   * Checks whether the given workspace-relative path matches any configured program pattern.
+   *
+   * @param relativeSrcPath path relative to the workspace.
+   * @return true if any program pattern matches the path.
+   */
+  public boolean isSourceFile(Path relativeSrcPath) {
+    return compiledMatchers.values().stream().anyMatch(m -> m.matches(relativeSrcPath));
   }
 
   private ProcessorGroup findProcessorGroup(String pgName) {
