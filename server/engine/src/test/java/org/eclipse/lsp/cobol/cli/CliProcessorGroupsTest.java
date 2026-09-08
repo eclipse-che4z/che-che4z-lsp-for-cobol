@@ -22,8 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Map;
-import org.eclipse.lsp.cobol.cli.processorgroups.Program;
 import org.eclipse.lsp.cobol.cli.processorgroups.ProcessorGroupsResolver;
+import org.eclipse.lsp.cobol.cli.processorgroups.Program;
 import org.junit.jupiter.api.Test;
 
 /** Test processor groups support. */
