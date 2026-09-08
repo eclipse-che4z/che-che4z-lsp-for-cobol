@@ -18,7 +18,6 @@ package org.eclipse.lsp.cobol.cli.modules;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,27 +86,15 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
           // relative paths are resolved against the CLI process's current working directory.
           Path cpyFolder =
               spPath.isAbsolute() ? spPath : Paths.get("").toAbsolutePath().resolve(spPath);
-          Path cpy = cpyFolder.resolve(copybookFileName);
+          Path cpy = cpyFolder.resolve(copybookFileName).normalize();
 
-          if (Files.exists(cpy) && isContainedIn(cpy, cpyFolder)) {
+          if (cpy.startsWith(cpyFolder.normalize()) && Files.exists(cpy)) {
             String value = cpy.toUri().toString();
             return CompletableFuture.completedFuture(value);
           }
         }
       }
       return CompletableFuture.completedFuture(null);
-    }
-
-    /**
-     * Verifies that the resolved copybook path does not escape the configured search folder, e.g.
-     * via a COPY operand such as "../../../etc/passwd" that resolves outside cpyFolder.
-     */
-    private boolean isContainedIn(Path cpy, Path cpyFolder) {
-      try {
-        return cpy.toRealPath().startsWith(cpyFolder.toRealPath());
-      } catch (IOException e) {
-        return false;
-      }
     }
   }
 }
