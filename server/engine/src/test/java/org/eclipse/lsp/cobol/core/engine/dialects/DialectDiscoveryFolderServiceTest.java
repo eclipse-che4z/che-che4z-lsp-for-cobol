@@ -20,6 +20,8 @@ import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -87,6 +89,44 @@ class DialectDiscoveryFolderServiceTest {
         service.loadDialects(
             URI.create(""), mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
+  }
+
+  @Test
+  void testReplaceClassLoader_closesPreviousLoaderForSameJar() throws Exception {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+
+    URI jarUri = URI.create("file:///dialect-test.jar");
+    URLClassLoader firstLoader = spy(new URLClassLoader(new URL[0]));
+    URLClassLoader secondLoader = new URLClassLoader(new URL[0]);
+
+    service.replaceClassLoader(jarUri, firstLoader);
+    verify(firstLoader, never()).close();
+
+    // A second load for the *same* jar must close the previous classloader, otherwise the
+    // jar file handle it holds is never released (locks the file on Windows).
+    service.replaceClassLoader(jarUri, secondLoader);
+    verify(firstLoader, times(1)).close();
+  }
+
+  @Test
+  void testReplaceClassLoader_doesNotCloseLoaderForDifferentJar() throws Exception {
+    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+    Communications communications = mock(ServerCommunications.class);
+    CodeActions actions = mock(CodeActions.class);
+    DialectDiscoveryFolderService service =
+        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+
+    URLClassLoader firstLoader = spy(new URLClassLoader(new URL[0]));
+    URLClassLoader secondLoader = new URLClassLoader(new URL[0]);
+
+    service.replaceClassLoader(URI.create("file:///dialect-a.jar"), firstLoader);
+    service.replaceClassLoader(URI.create("file:///dialect-b.jar"), secondLoader);
+
+    verify(firstLoader, never()).close();
   }
 
   @Test

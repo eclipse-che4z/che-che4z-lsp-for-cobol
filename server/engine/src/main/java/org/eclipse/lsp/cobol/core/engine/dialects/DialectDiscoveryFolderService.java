@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -26,6 +27,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -45,6 +48,11 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   private final WorkingFolderService workingFolderService;
   private final Communications communications;
   private final CodeActions actions;
+  // Tracks the classloader currently backing each dialect jar (keyed by jar URI), so a
+  // reloaded/replaced dialect's previous classloader can be closed once its replacement has
+  // loaded successfully. Without this, each reload leaves the jar file open indefinitely,
+  // which on Windows can lock the file and prevent the extension from being updated/reinstalled.
+  private final Map<String, URLClassLoader> dialectClassLoaders = new ConcurrentHashMap<>();
 
   @Inject
   public DialectDiscoveryFolderService(
@@ -156,10 +164,34 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
             clazz.getConstructor(CopybookService.class, MessageService.class);
         dialects.add(constructor.newInstance(copybookService, messageService));
       }
+
+      replaceClassLoader(jarUri, classLoader);
     } catch (Exception e) {
       LOG.warn("Cannot create dialect {}: {}", jarUri, e.getMessage());
     }
     return dialects;
+  }
+
+  /**
+   * Records the classloader now backing the given dialect jar, closing whatever classloader
+   * previously backed that same jar (e.g. from an earlier load of the same dialect) now that its
+   * replacement has loaded successfully. The previous classloader is only closed here, after the
+   * new one is fully working, so an in-flight analysis still using the previous dialect instance
+   * is never left without a working classloader.
+   *
+   * @param jarUri the dialect jar this classloader was created for
+   * @param classLoader the newly-created classloader now backing that jar
+   */
+  @VisibleForTesting
+  void replaceClassLoader(URI jarUri, URLClassLoader classLoader) {
+    URLClassLoader previous = dialectClassLoaders.put(jarUri.toString(), classLoader);
+    if (previous != null) {
+      try {
+        previous.close();
+      } catch (IOException e) {
+        LOG.warn("Cannot close previous classloader for {}: {}", jarUri, e.getMessage());
+      }
+    }
   }
 
   private URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
