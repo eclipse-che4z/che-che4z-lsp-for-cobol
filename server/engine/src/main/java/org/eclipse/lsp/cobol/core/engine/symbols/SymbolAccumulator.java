@@ -95,11 +95,14 @@ public class SymbolAccumulator implements VariableAccumulator {
     List<CodeBlockReference> resolved = resolveProcedureId(usageNode, symbolTable);
 
     if (resolved.isEmpty()) {
+      String messageKey =
+          usageNode.isSectionUsage()
+              ? "semantics.sectionNotDefined"
+              : "semantics.paragraphNotDefined";
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
-              .messageTemplate(
-                  MessageTemplate.of("semantics.paragraphNotDefined", usageNode.getName()))
+              .messageTemplate(MessageTemplate.of(messageKey, usageNode.getName()))
               .severity(ErrorSeverity.ERROR)
               .location(usageNode.getLocality().toOriginalLocation())
               .build());

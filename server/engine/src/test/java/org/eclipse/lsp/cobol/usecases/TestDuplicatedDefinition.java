@@ -299,7 +299,7 @@ class TestDuplicatedDefinition {
             "2",
             new Diagnostic(
                 new Range(),
-                "The following paragraph is not defined: SECTION-1",
+                "The following section is not defined: SECTION-1",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
