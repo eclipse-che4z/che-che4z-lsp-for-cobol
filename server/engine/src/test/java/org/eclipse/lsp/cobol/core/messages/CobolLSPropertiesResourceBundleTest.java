@@ -101,6 +101,19 @@ class CobolLSPropertiesResourceBundleTest {
   }
 
   @Test
+  void updateMessageResourceBundleWhenUriIsNull() throws IOException {
+    // Java-agnostic (v2) dialects have no jar, so DialectRegistryItem.getUri() is null.
+    DialectRegistryItem dialectRegistryItem =
+        new DialectRegistryItem("dummyDialect", 2, null, "dummy dialect", "dummyDialect");
+    CobolLSPropertiesResourceBundle bundle =
+        new CobolLSPropertiesResourceBundle("resourceBundles/test", Locale.FRENCH);
+    bundle.updateMessageResourceBundle(dialectRegistryItem);
+
+    Assertions.assertEquals(bundle.handleGetObject("test.test"), "test.test");
+    Assertions.assertEquals(bundle.handleGetObject("1"), "French test selected.");
+  }
+
+  @Test
   void updateMessageResourceBundleNoLocale() throws IOException {
     DialectRegistryItem dialectRegistryItem =
         new DialectRegistryItem("dummyDialect", 2, uri, "dummy dialect", "dummyDialect");
