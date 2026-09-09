@@ -305,7 +305,9 @@ public class DialectService {
     try {
       result = dialect.processText(context).unwrap(errors::addAll);
     } catch (StackOverflowError e) {
-      LOG.error("Dialect {} was stopped due to excessive nesting in the source", dialect.getName(), e);
+      LOG.error(
+          "Dialect {} was stopped due to excessive nesting in the source", dialect.getName(), e);
+      errors.add(processingError(context, dialect.getName()));
       errors.add(processingError(context, dialect.getName()));
       result = new DialectOutcome(context);
     }
