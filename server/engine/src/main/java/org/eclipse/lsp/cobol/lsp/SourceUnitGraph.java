@@ -247,7 +247,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @return returns a list of all uri's which consumes the passed URI as a copybook. An empty list
    *     is returned if uri is not a copybook
    */
-  public List<String> getAllAssociatedFilesForACopybook(String uri) {
+  public synchronized List<String> getAllAssociatedFilesForACopybook(String uri) {
     List<String> result = new ArrayList<>();
     Set<String> visited = new HashSet<>();
     visited.add(uri);
@@ -348,7 +348,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param usage
    * @return content of the copybook in the provided range, or else null
    */
-  public List<NodeV> getInjectedCopybookNode(String uri, Position usage) {
+  public synchronized List<NodeV> getInjectedCopybookNode(String uri, Position usage) {
     List<NodeV> result = new ArrayList<>();
     List<NodeV> cobolDocLinks = documentGraph.get(uri);
     List<Map.Entry<String, List<String>>> containedCopybook =

@@ -53,18 +53,6 @@ public class ElementOccurrences implements Occurrences {
         .collect(Collectors.toList());
   }
 
-  private List<Location> getCopybookLocation(TextDocumentPositionParams position, String uri) {
-    List<Location> result = new ArrayList<>();
-    List<SourceUnitGraph.NodeV> injectedCopybookNode =
-        sourceUnitGraph.getInjectedCopybookNode(uri, position.getPosition());
-    for (SourceUnitGraph.NodeV nodeV : injectedCopybookNode) {
-      Location location =
-          new Location(nodeV.getUri(), new Range(new Position(0, 0), new Position(0, 0)));
-      result.add(location);
-    }
-    return result;
-  }
-
   @Override
   public @NonNull List<Location> findReferences(
       @NonNull CobolDocumentModel document,
