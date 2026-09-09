@@ -23,7 +23,7 @@ import {
   SettingsService,
 } from "./engine/services/settings";
 
-const COPY_REGEX = /^.*\bCOPY\s+IDMS(?:\s+"?'?)(\S+)?$/i;
+const COPY_REGEX = /^.*\bCOPY\s+IDMS(?:\s+["']?)(\S+)?$/i;
 
 const DIALECT_NAME = "IDMS";
 const DESCRIPTION = "IDMS dialect support";
