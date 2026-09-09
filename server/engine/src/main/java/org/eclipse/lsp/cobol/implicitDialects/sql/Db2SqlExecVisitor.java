@@ -18,6 +18,8 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.lsp.cobol.core.visitor.VisitorHelper.getName;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -175,18 +177,23 @@ class Db2SqlExecVisitor extends Db2SqlExecValidatorVisitor {
   }
 
   private boolean isVariableUsage(ParserRuleContext ctx) {
-    if (hasColumn(ctx)) {
-      return true;
-    }
-
-    if (ctx instanceof Db2SqlExecParser.Dbs_sql_variable_referenceContext && !isSpecialName(ctx)) {
-      return true;
-    }
-
-    for (ParseTree child : ctx.children) {
-      if (child instanceof ParserRuleContext) {
-        if (isVariableUsage((ParserRuleContext) child)) {
-          return true;
+    Deque<ParserRuleContext> worklist = new ArrayDeque<>();
+    worklist.push(ctx);
+    while (!worklist.isEmpty()) {
+      ParserRuleContext workCtx = worklist.pop();
+      if (hasColumn(workCtx)) {
+        return true;
+      }
+      if (workCtx instanceof Db2SqlExecParser.Dbs_sql_variable_referenceContext
+          && !isSpecialName(workCtx)) {
+        return true;
+      }
+      if (workCtx.children == null) {
+        continue;
+      }
+      for (ParseTree child : workCtx.children) {
+        if (child instanceof ParserRuleContext) {
+          worklist.push((ParserRuleContext) child);
         }
       }
     }
@@ -203,13 +210,19 @@ class Db2SqlExecVisitor extends Db2SqlExecValidatorVisitor {
   }
 
   private boolean isSpecialName(ParserRuleContext ctx) {
-    if (ctx instanceof Db2SqlExecParser.Dbs_special_nameContext) {
-      return true;
-    }
-    for (ParseTree child : ctx.children) {
-      if (child instanceof ParserRuleContext) {
-        if (isSpecialName((ParserRuleContext) child)) {
-          return true;
+    Deque<ParserRuleContext> worklist = new ArrayDeque<>();
+    worklist.push(ctx);
+    while (!worklist.isEmpty()) {
+      ParserRuleContext workCtx = worklist.pop();
+      if (workCtx instanceof Db2SqlExecParser.Dbs_special_nameContext) {
+        return true;
+      }
+      if (workCtx.children == null) {
+        continue;
+      }
+      for (ParseTree child : workCtx.children) {
+        if (child instanceof ParserRuleContext) {
+          worklist.push((ParserRuleContext) child);
         }
       }
     }
