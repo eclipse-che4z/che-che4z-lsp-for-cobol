@@ -15,13 +15,16 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.copybook.CopybookService;
@@ -33,7 +36,7 @@ import org.eclipse.lsp.cobol.service.delegates.communications.ServerCommunicatio
 import org.junit.jupiter.api.Test;
 
 /** Test for DialectDiscoveryFolderService */
-class DialectDiscoveryFolderServiceTest {
+public class DialectDiscoveryFolderServiceTest {
   @Test
   void testLoadDialects() {
     WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
@@ -92,41 +95,82 @@ class DialectDiscoveryFolderServiceTest {
   }
 
   @Test
-  void testReplaceClassLoader_closesPreviousLoaderForSameJar() throws Exception {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
-    Communications communications = mock(ServerCommunications.class);
-    CodeActions actions = mock(CodeActions.class);
-    DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+  void testLoadDialects_reusesClassLoaderForSameJar() throws Exception {
+    DialectDiscoveryFolderService service = createServiceWithDialect();
+    URI jarUri = Paths.get("dialect-test.jar").toUri();
+    URLClassLoader classLoader = mockDialectClassLoader();
+    doReturn(classLoader).when(service).createClassLoader(jarUri);
+    CopybookService copybookService = mock(CopybookService.class);
+    MessageService messageService = mock(MessageService.class);
+    List<CobolDialect> firstDialects =
+        service.loadDialects(jarUri, copybookService, messageService);
+    assertEquals(1, firstDialects.size());
+    List<CobolDialect> secondDialects =
+        service.loadDialects(jarUri, copybookService, messageService);
+    assertEquals(1, secondDialects.size());
+    assertNotSame(firstDialects.get(0), secondDialects.get(0));
 
-    URI jarUri = URI.create("file:///dialect-test.jar");
-    URLClassLoader firstLoader = spy(new URLClassLoader(new URL[0]));
-    URLClassLoader secondLoader = new URLClassLoader(new URL[0]);
-
-    service.replaceClassLoader(jarUri, firstLoader);
-    verify(firstLoader, never()).close();
-
-    // A second load for the *same* jar must close the previous classloader, otherwise the
-    // jar file handle it holds is never released (locks the file on Windows).
-    service.replaceClassLoader(jarUri, secondLoader);
-    verify(firstLoader, times(1)).close();
+    verify(service, times(1)).createClassLoader(jarUri);
+    verify(classLoader, atLeastOnce()).loadClass(TestDialect.class.getName());
+    verify(classLoader, never()).close();
   }
 
   @Test
-  void testReplaceClassLoader_doesNotCloseLoaderForDifferentJar() throws Exception {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
-    Communications communications = mock(ServerCommunications.class);
-    CodeActions actions = mock(CodeActions.class);
-    DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+  void testLoadDialects_usesSeparateClassLoadersForDifferentJars() throws Exception {
+    DialectDiscoveryFolderService service = createServiceWithDialect();
+    URI firstJar = Paths.get("dialect-a.jar").toUri();
+    URI secondJar = Paths.get("dialect-b.jar").toUri();
+    URLClassLoader firstLoader = mockDialectClassLoader();
+    URLClassLoader secondLoader = mockDialectClassLoader();
+    doReturn(firstLoader).when(service).createClassLoader(firstJar);
+    doReturn(secondLoader).when(service).createClassLoader(secondJar);
+    CopybookService copybookService = mock(CopybookService.class);
+    MessageService messageService = mock(MessageService.class);
+    List<CobolDialect> firstDialects =
+        service.loadDialects(firstJar, copybookService, messageService);
+    assertEquals(1, firstDialects.size());
+    List<CobolDialect> secondDialects =
+        service.loadDialects(secondJar, copybookService, messageService);
+    assertEquals(1, secondDialects.size());
 
-    URLClassLoader firstLoader = spy(new URLClassLoader(new URL[0]));
-    URLClassLoader secondLoader = new URLClassLoader(new URL[0]);
-
-    service.replaceClassLoader(URI.create("file:///dialect-a.jar"), firstLoader);
-    service.replaceClassLoader(URI.create("file:///dialect-b.jar"), secondLoader);
-
+    verify(service).createClassLoader(firstJar);
+    verify(service).createClassLoader(secondJar);
+    verify(firstLoader).loadClass(TestDialect.class.getName());
+    verify(secondLoader).loadClass(TestDialect.class.getName());
     verify(firstLoader, never()).close();
+    verify(secondLoader, never()).close();
+  }
+
+  private DialectDiscoveryFolderService createServiceWithDialect() throws IOException {
+    DialectDiscoveryFolderService service =
+        spy(
+            new DialectDiscoveryFolderService(
+                mock(WorkingFolderService.class),
+                mock(Communications.class),
+                mock(CodeActions.class)));
+    doReturn(ImmutableList.of(TestDialect.class.getName())).when(service).getClassNames(any());
+    return service;
+  }
+
+  private URLClassLoader mockDialectClassLoader() throws ClassNotFoundException {
+    // Class.forName requires the loader's JVM state to be initialized even when loadClass is
+    // mocked.
+    URLClassLoader classLoader =
+        mock(
+            URLClassLoader.class,
+            withSettings().useConstructor(new URL[0], getClass().getClassLoader()));
+    doReturn(TestDialect.class).when(classLoader).loadClass(TestDialect.class.getName());
+    return classLoader;
+  }
+
+  /** A dialect fixture returned by the mocked classloaders. */
+  public static class TestDialect implements CobolDialect {
+    public TestDialect(CopybookService copybookService, MessageService messageService) {}
+
+    @Override
+    public String getName() {
+      return "test";
+    }
   }
 
   @Test
