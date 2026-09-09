@@ -17,19 +17,14 @@ package org.eclipse.lsp.cobol.lsp;
 import static org.eclipse.lsp.cobol.lsp.LspMessageBroker.POISON_PILL;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /** A consumer of {@link LspMessageBroker} */
 @Slf4j
 public class LspEventConsumer {
-  private static final long MAX_PENDING_MILLIS = TimeUnit.SECONDS.toMillis(30);
-
   @Getter private final LspMessageBroker lspMessageBroker;
   private final ExecutorService singleThreadExecutor =
       Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Event Consumer"));
@@ -37,10 +32,6 @@ public class LspEventConsumer {
       Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Notification Consumer"));
   private final ExecutorService queryThreadExecutor =
       Executors.newSingleThreadExecutor(r -> new Thread(r, "LSP Query Consumer"));
-  // Tracks how long each pending LspQuery has been waiting on its dependencies, so a query
-  // whose dependency never becomes satisfied (e.g. analysis kept failing) is not requeued
-  // forever; keyed by event identity since LspQuery implementations don't override equals().
-  private final ConcurrentHashMap<LspQuery<?>, Long> pendingSince = new ConcurrentHashMap<>();
 
   protected LspEventConsumer(LspMessageBroker lspMessageBroker) {
     this.lspMessageBroker = lspMessageBroker;
@@ -64,7 +55,6 @@ public class LspEventConsumer {
   private <T> void handle(LspQuery<T> event) {
     if (event.getResult().isCancelled()) {
       LOG.info(event + " was canceled.");
-      pendingSince.remove(event);
       return;
     }
     try {
@@ -75,31 +65,15 @@ public class LspEventConsumer {
         if (isCanceled) {
           LOG.debug("cancel event: " + event);
           event.getResult().cancel(true);
-          pendingSince.remove(event);
-        } else if (isPendingTooLong(event)) {
-          LOG.warn(event + " timed out waiting for its dependencies to be satisfied.");
-          event
-              .getResult()
-              .completeExceptionally(
-                  new TimeoutException("Timed out waiting for dependencies: " + event));
-          pendingSince.remove(event);
         } else {
           this.lspMessageBroker.putBack(event);
         }
         return;
       }
       event.getResult().complete(event.query());
-      pendingSince.remove(event);
     } catch (Exception e) {
       event.getResult().completeExceptionally(e);
-      pendingSince.remove(event);
     }
-  }
-
-  private boolean isPendingTooLong(LspQuery<?> event) {
-    long now = System.currentTimeMillis();
-    long firstSeen = pendingSince.computeIfAbsent(event, e -> now);
-    return now - firstSeen >= MAX_PENDING_MILLIS;
   }
 
   private void consume() throws InterruptedException {
