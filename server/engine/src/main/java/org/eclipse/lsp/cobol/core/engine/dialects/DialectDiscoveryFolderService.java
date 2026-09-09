@@ -154,7 +154,16 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
         throw new Exception("Cannot find dialect class in the jar file " + jarUri);
       }
 
-      final URLClassLoader classLoader = createClassLoader(jarUri);
+      final URLClassLoader classLoader =
+          dialectClassLoaders.computeIfAbsent(
+              jarUri.toString(),
+              key -> {
+                try {
+                  return createClassLoader(jarUri);
+                } catch (MalformedURLException e) {
+                  throw new IllegalStateException("Cannot create class loader for " + jarUri, e);
+                }
+              });
 
       for (String classname : classnames) {
         final Class<?> c = Class.forName(classname, false, classLoader);
@@ -164,41 +173,19 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
             clazz.getConstructor(CopybookService.class, MessageService.class);
         dialects.add(constructor.newInstance(copybookService, messageService));
       }
-
-      replaceClassLoader(jarUri, classLoader);
     } catch (Exception e) {
       LOG.warn("Cannot create dialect {}: {}", jarUri, e.getMessage());
     }
     return dialects;
   }
 
-  /**
-   * Records the classloader now backing the given dialect jar, closing whatever classloader
-   * previously backed that same jar (e.g. from an earlier load of the same dialect) now that its
-   * replacement has loaded successfully. The previous classloader is only closed here, after the
-   * new one is fully working, so an in-flight analysis still using the previous dialect instance is
-   * never left without a working classloader.
-   *
-   * @param jarUri the dialect jar this classloader was created for
-   * @param classLoader the newly-created classloader now backing that jar
-   */
   @VisibleForTesting
-  void replaceClassLoader(URI jarUri, URLClassLoader classLoader) {
-    URLClassLoader previous = dialectClassLoaders.put(jarUri.toString(), classLoader);
-    if (previous != null) {
-      try {
-        previous.close();
-      } catch (IOException e) {
-        LOG.warn("Cannot close previous classloader for {}: {}", jarUri, e.getMessage());
-      }
-    }
-  }
-
-  private URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
+  URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
     return new URLClassLoader(new URL[] {uriToJar.toURL()}, this.getClass().getClassLoader());
   }
 
-  private List<String> getClassNames(File filename) throws IOException {
+  @VisibleForTesting
+  List<String> getClassNames(File filename) throws IOException {
     List<String> classNames = new ArrayList<>();
     try (ZipInputStream zip = new ZipInputStream(new FileInputStream(filename))) {
       for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
