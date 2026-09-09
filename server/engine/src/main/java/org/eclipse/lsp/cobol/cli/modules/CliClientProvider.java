@@ -93,7 +93,7 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
           Path relativePath = cpyFolder.relativize(cpy);
           if (relativePath.startsWith("..")) {
             LOG.warn("{} is ignored for copybook resolution", cpy);
-            return CompletableFuture.completedFuture(null);
+            continue;
           }
           if (Files.exists(cpy)) {
             String value = cpy.toUri().toString();
