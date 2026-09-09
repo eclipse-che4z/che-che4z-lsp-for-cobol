@@ -78,7 +78,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
     }
   }
 
-  private void updateDocumentGraphUponSchedule(CobolDocumentModel model) {
+  private synchronized void updateDocumentGraphUponSchedule(CobolDocumentModel model) {
     updateGraphNodes(model);
   }
 
@@ -165,7 +165,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri document uri
    * @return true if copybook, false otherwise.
    */
-  public boolean isUserSuppliedCopybook(String uri) {
+  public synchronized boolean isUserSuppliedCopybook(String uri) {
     return documentGraphIndexedByCopybook.keySet().stream()
         .anyMatch(copyUri -> copyUri.equals(uri));
   }
@@ -197,7 +197,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri
    * @return content
    */
-  public String getContent(String uri) {
+  public synchronized String getContent(String uri) {
     if (ImplicitCodeUtils.isImplicit(uri)) {
       return null;
     }
@@ -236,7 +236,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param uri document uri
    * @return returns true if the passed document uri is opened in the IDE, false otherwise.
    */
-  public boolean isFileOpened(String uri) {
+  public synchronized boolean isFileOpened(String uri) {
     return Optional.ofNullable(objectRef.get(uri)).map(node -> node.isOpenInIde).orElse(false);
   }
 
@@ -337,7 +337,7 @@ public class SourceUnitGraph implements AnalysisStateListener {
    * @param node
    * @return content of a copyNode
    */
-  public String getCopyNodeContent(CopyNode node) {
+  public synchronized String getCopyNodeContent(CopyNode node) {
     return Optional.ofNullable(objectRef.get(node.getUri())).map(NodeV::getContent).orElse(null);
   }
 
