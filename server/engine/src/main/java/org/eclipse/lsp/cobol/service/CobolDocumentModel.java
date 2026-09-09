@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.*;
@@ -112,18 +113,20 @@ public class CobolDocumentModel {
   }
 
   private void parse(String text) {
-    lines.clear();
+    List<Line> parsedLines = new ArrayList<>();
     try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
       String lineText;
       int lineNumber = 0;
 
       while ((lineText = reader.readLine()) != null) {
-        lines.add(new Line(lineNumber, lineText));
+        parsedLines.add(new Line(lineNumber, lineText));
         lineNumber++;
       }
     } catch (IOException e) {
       LOG.error(e.getMessage());
     }
+    lines.clear();
+    lines.addAll(parsedLines);
   }
 
   private String retrieveToken(Position position, Line route) {
