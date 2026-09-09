@@ -30,9 +30,22 @@ export class JavaCheck {
   }
 
   public async getInstalledJavaVersion() {
+    return this.runVersionCheck(["-version"]);
+  }
+
+  public async isXshareOffSupported(): Promise<boolean> {
+    try {
+      await this.runVersionCheck(["-Xshare:off", "-version"]);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async runVersionCheck(args: string[]) {
     return new Promise<number>((resolve, reject) => {
       let resolved = false;
-      const ls = cp.spawn(SettingsService.getJavaCommand(), ["-version"]);
+      const ls = cp.spawn(SettingsService.getJavaCommand(), args);
       ls.stderr.on("data", (data: Buffer) => {
         const version = JavaCheck.isJavaVersionSupported(data.toString());
         if (version) {
