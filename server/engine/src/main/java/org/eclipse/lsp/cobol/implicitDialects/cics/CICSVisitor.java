@@ -305,12 +305,16 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
 
   private List<TerminalNode> getAllTerminalNodes(ParserRuleContext ctx) {
     List<TerminalNode> result = new ArrayList<>();
-    for (int childNodes = 0; childNodes < ctx.getChildCount(); childNodes++) {
-      ParseTree child = ctx.getChild(childNodes);
-      if (child instanceof TerminalNode) {
-        result.add((TerminalNode) child);
-      } else {
-        result.addAll(getAllTerminalNodes((ParserRuleContext) child));
+    Deque<ParseTree> worklist = new ArrayDeque<>();
+    worklist.push(ctx);
+    while (!worklist.isEmpty()) {
+      ParseTree node = worklist.pop();
+      if (node instanceof TerminalNode) {
+        result.add((TerminalNode) node);
+        continue;
+      }
+      for (int i = node.getChildCount() - 1; i >= 0; i--) {
+        worklist.push(node.getChild(i));
       }
     }
     return result;

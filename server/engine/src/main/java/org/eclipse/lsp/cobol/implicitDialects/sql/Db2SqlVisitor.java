@@ -367,12 +367,16 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   private List<TerminalNode> getAllTerminalNodes(ParserRuleContext ctx) {
     List<TerminalNode> result = new ArrayList<>();
-    for (int childNodes = 0; childNodes < ctx.getChildCount(); childNodes++) {
-      ParseTree child = ctx.getChild(childNodes);
-      if (child instanceof TerminalNode) {
-        result.add((TerminalNode) child);
-      } else {
-        result.addAll(getAllTerminalNodes((ParserRuleContext) child));
+    Deque<ParseTree> worklist = new ArrayDeque<>();
+    worklist.push(ctx);
+    while (!worklist.isEmpty()) {
+      ParseTree node = worklist.pop();
+      if (node instanceof TerminalNode) {
+        result.add((TerminalNode) node);
+        continue;
+      }
+      for (int i = node.getChildCount() - 1; i >= 0; i--) {
+        worklist.push(node.getChild(i));
       }
     }
     return result;
@@ -403,9 +407,11 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   private String preProcessSqlComment(Db2SqlParser.SqlCodeContext ctx) {
     String sqlCode = VisitorHelper.getIntervalText(ctx);
     Matcher matcher = DOUBLE_DASH_SQL_COMMENT.matcher(sqlCode);
+    LinePositionTracker positionTracker = new LinePositionTracker(sqlCode);
     while (matcher.find()) {
-      Position start = findPosition(sqlCode, matcher.start());
-      Position end = findPosition(sqlCode, matcher.end());
+      VisitorHelper.checkInterruption();
+      Position start = positionTracker.positionAt(matcher.start());
+      Position end = positionTracker.positionAt(matcher.end());
       String replace = StringUtils.repeat(CobolDialect.FILLER, matcher.end() - matcher.start() - 1);
       start = Db2SqlVisitorHelper.getAdjustedStartPosition(ctx, start);
       end = Db2SqlVisitorHelper.getAdjustedEndPosition(ctx, end);
@@ -415,20 +421,32 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     return sqlCode;
   }
 
-  private static Position findPosition(String text, int pos) {
-    int c = 1;
-    int line = 0;
-    int col = 1;
-    while (c < pos) {
-      if (text.charAt(c) == '\n') {
-        ++line;
-        col = 1;
-      } else {
-        ++col;
-      }
-      c++;
+  /**
+   * Converts character offsets into a {@link Position} in a single forward pass. Offsets must be
+   * requested in non-decreasing order, which holds for consecutive regex match boundaries.
+   */
+  private static final class LinePositionTracker {
+    private final String text;
+    private int index = 1;
+    private int line;
+    private int column = 1;
+
+    private LinePositionTracker(String text) {
+      this.text = text;
     }
-    return new Position(line, col);
+
+    private Position positionAt(int pos) {
+      while (index < pos) {
+        if (text.charAt(index) == '\n') {
+          ++line;
+          column = 1;
+        } else {
+          ++column;
+        }
+        index++;
+      }
+      return new Position(line, column);
+    }
   }
 
   private Db2SqlExecParser.StartSqlRuleContext parseSQL(

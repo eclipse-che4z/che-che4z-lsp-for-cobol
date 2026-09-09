@@ -301,9 +301,34 @@ public class DialectService {
 
     List<SyntaxError> errors = new ArrayList<>(previousResult.getErrors());
 
-    DialectOutcome result = dialect.processText(context).unwrap(errors::addAll);
+    DialectOutcome result;
+    try {
+      result = dialect.processText(context).unwrap(errors::addAll);
+    } catch (StackOverflowError e) {
+      LOG.error(
+          "Dialect {} was stopped due to excessive nesting in the source", dialect.getName(), e);
+      errors.add(processingError(context, dialect.getName()));
+      errors.add(processingError(context, dialect.getName()));
+      result = new DialectOutcome(context);
+    }
     nodes.addAll(0, result.getDialectNodes());
     return new ResultWithErrors<>(new DialectOutcome(nodes, context), errors);
+  }
+
+  private static SyntaxError processingError(DialectProcessingContext context, String dialectName) {
+    return SyntaxError.syntaxError()
+        .messageTemplate(
+            MessageTemplate.of(
+                "dialects.processingError", dialectName, context.getExtendedDocument().getUri()))
+        .severity(ErrorSeverity.ERROR)
+        .location(
+            new OriginalLocation(
+                new Location(
+                    context.getProgramDocumentUri(),
+                    new Range(new Position(0, 0), new Position(0, 0))),
+                null))
+        .errorSource(ErrorSource.DIALECT)
+        .build();
   }
 
   /**
