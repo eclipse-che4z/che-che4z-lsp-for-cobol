@@ -12,9 +12,12 @@
  *   Broadcom - initial API and implementation
  */
 
-// Placeholder spec proving the Jest/ts-jest toolchain runs end to end.
-describe("v2 engine scaffolding", () => {
-  it("has a working unit test toolchain", () => {
-    expect(true).toBe(true);
-  });
-});
+export const workspace = {
+  getConfiguration: jest.fn().mockReturnValue({
+    get: jest.fn(),
+  }),
+};
+
+export const window = {
+  showErrorMessage: jest.fn(),
+};
