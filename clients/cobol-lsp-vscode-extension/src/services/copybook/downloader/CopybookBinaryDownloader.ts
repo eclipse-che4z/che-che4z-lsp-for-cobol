@@ -54,8 +54,11 @@ export class CopybookBinaryDownloader {
       outputChannel.warn(`${remotePath} ignored for file download`);
       return false;
     }
-    const loadedProfile = loadProfile(profile, this.explorerAPI);
     const tarUri = this.getTarFileUri(remotePath);
+    if (!tarUri) {
+      return false;
+    }
+    const loadedProfile = loadProfile(profile, this.explorerAPI);
     try {
       const passThrough = new PassThrough();
       const chunks: Buffer[] = [];
@@ -88,8 +91,16 @@ export class CopybookBinaryDownloader {
     }
   }
 
-  public getTarFileUri(filePath: string) {
-    return vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, filePath);
+  public getTarFileUri(filePath: string): vscode.Uri | undefined {
+    const tarUri = vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, filePath);
+    const root = path.join(this.storagePath.fsPath, TAR_FOLDER);
+    if (path.relative(root, tarUri.fsPath).startsWith("..")) {
+      outputChannel.warn(
+        `${filePath} resolves outside the tar cache root. Ignored for file download.`,
+      );
+      return undefined;
+    }
+    return tarUri;
   }
   public async isPresentLocally(
     inputPath: string | vscode.Uri | undefined,

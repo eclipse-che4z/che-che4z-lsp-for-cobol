@@ -84,6 +84,24 @@ describe("CopybookBinaryDownloader tar path containment", () => {
       );
     });
 
+    it("never fetches or writes when a POSIX-absolute USS path still resolves outside the tar cache root", async () => {
+      const explorerAPI = createZoweExplorerMock();
+      const downloader = new CopybookBinaryDownloader(
+        vscode.Uri.file("/storage"),
+        explorerAPI,
+      );
+
+      const result = await downloader.downloadFile(
+        "/../../../../tmp/evil",
+        "zeProfile",
+        "USS",
+      );
+
+      expect(result).toBe(false);
+      expect(getUSSContentsMock).not.toHaveBeenCalled();
+      expect(vscode.workspace.fs.writeFile).not.toHaveBeenCalled();
+    });
+
     it("downloads and writes a relative DSN name without requiring it to be absolute", async () => {
       const explorerAPI = createZoweExplorerMock();
       const downloader = new CopybookBinaryDownloader(
