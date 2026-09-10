@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.model.tree;
 
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -41,7 +42,7 @@ public class SubroutineNameNode extends Node implements DefinedAndUsedStructure 
   }
 
   @Override
-  public List<Location> getUsages() {
-    return definition.getUsages();
+  public Stream<Location> getUsages() {
+    return definition.getUsages().stream();
   }
 }

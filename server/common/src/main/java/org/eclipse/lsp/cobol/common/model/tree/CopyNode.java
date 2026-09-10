@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -65,8 +66,8 @@ public class CopyNode extends Node implements DefinedAndUsedStructure {
   }
 
   @Override
-  public List<Location> getUsages() {
-    return ImmutableList.copyOf(usages);
+  public Stream<Location> getUsages() {
+    return usages.stream();
   }
 
   @Override

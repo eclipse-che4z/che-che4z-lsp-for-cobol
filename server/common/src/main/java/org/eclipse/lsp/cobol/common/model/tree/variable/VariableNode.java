@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -115,8 +116,8 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   }
 
   @Override
-  public List<Location> getUsages() {
-    return new ArrayList<>(usages);
+  public Stream<Location> getUsages() {
+    return usages.stream();
   }
 
   public List<Location> getDefinitions() {
