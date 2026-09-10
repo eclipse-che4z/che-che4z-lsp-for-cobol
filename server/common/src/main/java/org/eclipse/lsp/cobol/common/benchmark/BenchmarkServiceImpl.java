@@ -111,7 +111,7 @@ public class BenchmarkServiceImpl implements BenchmarkService {
         .forEach(
             stageName -> {
               line.append(",");
-              line.append(stageName);
+              line.append(escapeCsvField(stageName));
             });
     line.append(",");
     line.append("Total time");
@@ -126,7 +126,7 @@ public class BenchmarkServiceImpl implements BenchmarkService {
 
   private String createTimingLine(
       Collection<Measurement> measurements, String url, String languageId, int lines, int size) {
-    StringBuilder line = new StringBuilder(url);
+    StringBuilder line = new StringBuilder(escapeCsvField(url));
     long total = 0;
     for (Measurement m :
         measurements.stream()
@@ -139,11 +139,22 @@ public class BenchmarkServiceImpl implements BenchmarkService {
     line.append(",");
     line.append(total);
     line.append(",");
-    line.append(languageId);
+    line.append(escapeCsvField(languageId));
     line.append(",");
     line.append(lines);
     line.append(",");
     line.append(size);
     return line.toString();
+  }
+
+  private static String escapeCsvField(String field) {
+    String value = field == null ? "" : field;
+    if (!value.isEmpty()) {
+      char first = value.charAt(0);
+      if (first == '=' || first == '+' || first == '-' || first == '@') {
+        value = "'" + value;
+      }
+    }
+    return "\"" + value.replace("\"", "\"\"") + "\"";
   }
 }
