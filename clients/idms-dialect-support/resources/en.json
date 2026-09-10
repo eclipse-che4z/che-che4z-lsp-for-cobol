@@ -1,0 +1,12 @@
+{
+  "parsers.validValueMsg": "{0} not allowed. It must be {1}",
+  "cobolParser.subSchemaNameLength": "The length {} is not allowed. Allowed values are 16, 18.",
+  "IdmsCopybookVisitor.errorCircularDependency": "{0}: Copybook has circular dependency",
+  "IdmsDialect.maxAdjustmentExceed": "IDMS level not adjusted. {0} ({1} + {2}) exceeds maximum level adjustment of 49",
+  "parsers.maxLength": "Max length limit of %s bytes allowed for {0}.",
+  "semantics.notDefined": "Variable {0} is not defined",
+  "semantics.notDefinedInStructure": "Variable {0} does not exist in structure {1}",
+  "parsers.intRangeValue": "Allowed range is %s to {0}",
+  "parsers.stringLengthRange": "String length must be between {0} and {1}",
+  "copybook.not_found": "{0}: Copybook not found"
+}
