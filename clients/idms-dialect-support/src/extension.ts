@@ -22,6 +22,8 @@ import {
   DIALECT_API_VERSION_CONFIG,
   SettingsService,
 } from "./engine/services/settings";
+import { IdmsPreprocessor } from "./engine/preprocessor";
+import { MessageService } from "./engine/services/MessageService";
 
 const COPY_REGEX = /^.*\bCOPY\s+IDMS(?:\s+["']?)(\S+)?$/i;
 
@@ -101,6 +103,7 @@ async function v1Api(context: vscode.ExtensionContext) {
 }
 
 async function v2Api(context: vscode.ExtensionContext) {
+  const messageService = await MessageService.create(context);
   const outputChannel = vscode.window.createOutputChannel(DESCRIPTION);
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
@@ -119,7 +122,7 @@ async function v2Api(context: vscode.ExtensionContext) {
       snippets,
       isCopyStatement,
     },
-    async (processingContext: IDocumentProcessingContext, _text: string) => {
+    async (processingContext: IDocumentProcessingContext, text: string) => {
       // Placeholder handler: the actual preprocessing engine (copybook resolution,
       // statement blanking, diagnostics) is built incrementally in later stories and
       // gets wired in here. For now this only proves the v2 registration path end-to-end.
@@ -128,6 +131,8 @@ async function v2Api(context: vscode.ExtensionContext) {
           .getProgramUri()
           .toString()}`,
       );
+      const preprocessor = new IdmsPreprocessor(outputChannel, messageService);
+      await preprocessor.execute(processingContext, text);
     },
   );
   if (unregister instanceof Error) {
