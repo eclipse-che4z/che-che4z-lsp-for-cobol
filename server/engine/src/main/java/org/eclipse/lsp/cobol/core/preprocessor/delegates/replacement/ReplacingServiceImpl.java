@@ -58,6 +58,7 @@ public class ReplacingServiceImpl implements ReplacingService {
   private static final int INDIVIDUAL_WORD_VALID_LENGTH = 322;
 
   private final MessageService messageService;
+  private final String wordBoundary = "\\b";
 
   @Inject
   public ReplacingServiceImpl(MessageService messageService) {
@@ -133,7 +134,7 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   private Function<String, Boolean> checkIndividualTextWordLength(int validLength) {
     return rightAttribute ->
-        Arrays.stream(rightAttribute.split("\\b")).anyMatch(c -> c.length() > validLength);
+        Arrays.stream(rightAttribute.split(wordBoundary)).anyMatch(c -> c.length() > validLength);
   }
 
   @NonNull
@@ -213,7 +214,7 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   private Function<String, Boolean> checkContainWord(String check) {
     return text ->
-        Arrays.stream(text.toUpperCase().split("\\b"))
+        Arrays.stream(text.toUpperCase().split(wordBoundary))
             .anyMatch(txt -> txt.equalsIgnoreCase(check));
   }
 }
