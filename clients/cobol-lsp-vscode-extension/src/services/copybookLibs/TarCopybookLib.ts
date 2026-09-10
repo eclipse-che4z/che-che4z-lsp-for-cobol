@@ -1,6 +1,7 @@
 import { Uri } from "vscode";
 import CopybookLib from "./CopybookLib";
 import * as vscode from "vscode";
+import * as path from "node:path";
 import { getProfileNameForCopybook } from "../util/ProfileUtils";
 import { externalApis } from "../ExternalAPIsService";
 import { LibDefinition } from "../ProcessorGroupsLoader";
@@ -125,14 +126,14 @@ export class TarCopybookLib implements CopybookLib {
       if ("profile" in config)
         return new TarCopybookLib(
           config["locationType"],
-          config["tarFileLocation"],
+          path.posix.normalize(config["tarFileLocation"]),
           config["folderPattern"] ?? "**",
           externalApis.tarCache,
           config["profile"],
         );
       return new TarCopybookLib(
         config["locationType"],
-        config["tarFileLocation"],
+        path.posix.normalize(config["tarFileLocation"]),
         config["folderPattern"] ?? "**",
         externalApis.tarCache,
       );
