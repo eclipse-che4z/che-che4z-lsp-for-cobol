@@ -474,6 +474,7 @@
         },
         "cobol-lsp.java.home": {
           "type": "string",
+          "scope": "machine",
           "default": "",
           "markdownDescription": "Absolute path to the **Java Home** directory. The language server will use the Java executable inside this directory. Leave empty to use the executable from the system PATH.\n\n**Examples:**\n- Windows: `C:\\Program Files\\Java\\jdk-21`\n- macOS / Linux: `/usr/lib/jvm/java-21-openjdk`",
           "tags": [

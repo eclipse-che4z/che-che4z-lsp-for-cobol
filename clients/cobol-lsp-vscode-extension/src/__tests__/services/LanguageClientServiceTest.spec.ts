@@ -12,9 +12,11 @@
  *   Broadcom - initial API and implementation
  */
 
+import * as cp from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import { join } from "path";
+import { PassThrough } from "stream";
 import * as vscode from "vscode";
 import { Middleware, LanguageClient } from "vscode-languageclient/node";
 import { JavaCheck } from "../../services/JavaCheck";
@@ -177,6 +179,85 @@ describe("LanguageClientService positive scenario", () => {
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
     const expectedDialectPath = join("/test", "server", "jar", "dialects");
+    const mockProcess = mockSpawnProcess(
+      "",
+      `java version "17.0.2" 2022-01-18 LTS
+      Java(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)
+      Java HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)`,
+      0,
+    );
+    await languageClientService.checkPrerequisites();
+    mockProcess.mockRestore();
+    expect(await languageClientService.start(context)).toBe(undefined);
+    expect(LanguageClient).toHaveBeenCalledTimes(1);
+    expect(LanguageClient).toHaveBeenCalledWith(
+      SERVER_ID,
+      SERVER_DESC,
+      {
+        args: [
+          "-Dline.separator=\r\n",
+          `-Ddialect.path=${expectedDialectPath}`,
+          "-Xmx768M",
+          "-Xshare:off",
+          "-jar",
+          serverPath,
+        ],
+        command: "java",
+        options: { detached: false },
+      },
+      {
+        documentSelector: [SERVER_ID, EXP_LANGUAGE_ID, HP_LANGUAGE_ID],
+        middleware: {},
+        outputChannel: outputChannel,
+        synchronize: {
+          fileEvents: [undefined, undefined, undefined, undefined],
+        },
+      },
+    );
+  });
+
+  test("Test LanguageClientService starts language client without -Xshare:off when it is unsupported", async () => {
+    LanguageClient.prototype.start = jest
+      .fn()
+      .mockReturnValue(Promise.resolve());
+    const serverPath = join("/test", "server", "jar", "server.jar");
+    const expectedDialectPath = join("/test", "server", "jar", "dialects");
+
+    const spawnSpy = jest
+      .spyOn(cp, "spawn")
+      .mockImplementation((_cmd, args) => {
+        const stderrStream = new PassThrough();
+        const supportsXshareOff = !(args as string[]).includes("-Xshare:off");
+        const mockProcess: Partial<cp.ChildProcess> = {
+          stdout: new PassThrough(),
+          stderr: stderrStream,
+          on: (event, callback) => {
+            if (event === "close") {
+              if (supportsXshareOff) {
+                stderrStream.emit(
+                  "data",
+                  `java version "17.0.2" 2022-01-18 LTS
+                  Java(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)
+                  Java HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)`,
+                );
+                callback(0, null);
+              } else {
+                stderrStream.emit(
+                  "data",
+                  "Error occurred during initialization of VM\nUnable to use shared archive.",
+                );
+                callback(1, null);
+              }
+            }
+            return {} as cp.ChildProcess;
+          },
+        };
+        return mockProcess as cp.ChildProcess;
+      });
+
+    await languageClientService.checkPrerequisites();
+    spawnSpy.mockRestore();
+
     expect(await languageClientService.start(context)).toBe(undefined);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
     expect(LanguageClient).toHaveBeenCalledWith(
@@ -211,6 +292,15 @@ describe("LanguageClientService positive scenario", () => {
     const serverPath = join("/test", "server", "jar", "server.jar");
     const expectedDialectPath = join("/test", "server", "jar", "dialects");
     SettingsService.getJavaHome = jest.fn().mockReturnValue("/usr/");
+    const mockProcess = mockSpawnProcess(
+      "",
+      `java version "17.0.2" 2022-01-18 LTS
+      Java(TM) SE Runtime Environment (build 17.0.2+8-LTS-86)
+      Java HotSpot(TM) 64-Bit Server VM (build 17.0.2+8-LTS-86, mixed mode, sharing)`,
+      0,
+    );
+    await languageClientService.checkPrerequisites();
+    mockProcess.mockRestore();
 
     expect(await languageClientService.start(context)).toBe(undefined);
     expect(LanguageClient).toHaveBeenCalledTimes(1);
@@ -222,6 +312,7 @@ describe("LanguageClientService positive scenario", () => {
           "-Dline.separator=\r\n",
           `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
+          "-Xshare:off",
           "-jar",
           serverPath,
         ],

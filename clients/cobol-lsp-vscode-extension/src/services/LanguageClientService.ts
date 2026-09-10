@@ -52,6 +52,7 @@ export class LanguageClientService {
   private languageClient: LanguageClient | undefined;
   private handlers: Array<(languageClient: LanguageClient) => void> = [];
   private isNativeBuildEnabled: boolean = false;
+  private xshareOffSupported: boolean = false;
   private executableService: NativeExecutableService;
 
   constructor(
@@ -82,7 +83,9 @@ export class LanguageClientService {
   }
 
   public async checkPrerequisites() {
-    const version = await new JavaCheck().getInstalledJavaVersion();
+    const javaCheck = new JavaCheck();
+    const version = await javaCheck.getInstalledJavaVersion();
+    this.xshareOffSupported = await javaCheck.isXshareOffSupported();
     if (!fs.existsSync(this.executablePath)) {
       throw new Error("LSP server for " + LANGUAGE_ID + " not found");
     }
@@ -264,14 +267,17 @@ export class LanguageClientService {
     if (this.isNativeBuildEnabled) {
       return this.executableService.getNativeLanguageClient();
     }
+    const args = [
+      "-Dline.separator=\r\n",
+      `-Ddialect.path=${this.dialectsPath}`,
+      "-Xmx768M",
+    ];
+    if (this.xshareOffSupported) {
+      args.push("-Xshare:off");
+    }
+    args.push("-jar", jarPath);
     return {
-      args: [
-        "-Dline.separator=\r\n",
-        `-Ddialect.path=${this.dialectsPath}`,
-        "-Xmx768M",
-        "-jar",
-        jarPath,
-      ],
+      args,
       command: SettingsService.getJavaCommand(),
       options: { detached: false },
     };
