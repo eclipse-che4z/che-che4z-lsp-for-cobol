@@ -148,7 +148,7 @@ public class BenchmarkServiceImpl implements BenchmarkService {
   }
 
   private static String escapeCsvField(String field) {
-    String value = field == null ? "" : field;
+    String value = Objects.toString(field, "");
     if (!value.isEmpty()) {
       char first = value.charAt(0);
       if (first == '=' || first == '+' || first == '-' || first == '@') {
