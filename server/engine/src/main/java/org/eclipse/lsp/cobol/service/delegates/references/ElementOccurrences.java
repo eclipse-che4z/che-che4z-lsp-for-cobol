@@ -79,9 +79,7 @@ public class ElementOccurrences implements Occurrences {
       return Collections.emptyList();
     }
     List<Location> references =
-        element.stream()
-            .flatMap(DefinedAndUsedStructure::getUsages)
-            .collect(Collectors.toList());
+        element.stream().flatMap(DefinedAndUsedStructure::getUsages).collect(Collectors.toList());
     if (refCtx.isIncludeDeclaration()) {
       references.addAll(
           element.stream()

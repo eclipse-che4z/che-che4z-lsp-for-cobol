@@ -122,8 +122,7 @@ public class SymbolsRepository {
       DefinedAndUsedStructure ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    List<Location> usages =
-        ctx.getUsages().filter(uriNotImplicit()).collect(Collectors.toList());
+    List<Location> usages = ctx.getUsages().filter(uriNotImplicit()).collect(Collectors.toList());
 
     String name = ctx.getName();
     if (ctx instanceof CodeBlockUsageNode) {
