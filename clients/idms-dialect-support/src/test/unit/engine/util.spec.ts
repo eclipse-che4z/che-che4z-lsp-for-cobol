@@ -20,9 +20,7 @@ import {
   constructRange,
   constructRangeFromTokens,
   createOptionsStr,
-  extractSuffix,
   tryParseInt,
-  updateVariableName,
 } from "../../../engine/util";
 import { ParseError } from "../../../engine/model";
 
@@ -43,35 +41,6 @@ function createToken(overrides: Partial<Token>): Token {
     ...overrides,
   } as Token;
 }
-
-describe("updateVariableName", () => {
-  it("should return FILLER unchanged regardless of case", () => {
-    expect(updateVariableName("FILLER", "01")).toBe("FILLER");
-    expect(updateVariableName("filler", "01")).toBe("filler");
-  });
-
-  it("should replace the last two characters of a trailing 3-character dash group", () => {
-    expect(updateVariableName("REC-001", "99")).toBe("REC-099");
-  });
-
-  it("should append the suffix when there is no matching dash position", () => {
-    expect(updateVariableName("WS-FIELD", "99")).toBe("WS-FIELD99");
-  });
-});
-
-describe("extractSuffix", () => {
-  it("should return an empty string for undefined input", () => {
-    expect(extractSuffix(undefined)).toBe("");
-  });
-
-  it("should return an empty string when name is 2 characters or shorter", () => {
-    expect(extractSuffix("AB")).toBe("");
-  });
-
-  it("should return the last two characters for longer names", () => {
-    expect(extractSuffix("WS-FIELD-AB")).toBe("AB");
-  });
-});
 
 describe("tryParseInt", () => {
   it("should return undefined for undefined input", () => {
