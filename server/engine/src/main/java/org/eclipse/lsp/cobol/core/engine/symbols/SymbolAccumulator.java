@@ -129,7 +129,10 @@ public class SymbolAccumulator implements VariableAccumulator {
   private List<CodeBlockReference> resolveProcedureId(
       CodeBlockUsageNode usageNode, SymbolTable symbolTable) {
     Map<ProcedureId, CodeBlockReference> procedures = symbolTable.getProcedures();
-    ProcedureId paragraphId = new ProcedureId(usageNode.getOfSection(), usageNode.getName());
+    ProcedureId paragraphId =
+        usageNode.isSectionUsage()
+            ? new ProcedureId(usageNode.getName(), null)
+            : new ProcedureId(usageNode.getOfSection(), usageNode.getName());
     if (procedures.containsKey(paragraphId)) {
       return Collections.singletonList(procedures.get(paragraphId));
     }
