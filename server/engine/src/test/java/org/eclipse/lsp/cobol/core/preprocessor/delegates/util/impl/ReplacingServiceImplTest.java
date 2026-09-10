@@ -20,12 +20,17 @@ import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.dialects.CobolLanguageId;
+import org.eclipse.lsp.cobol.common.error.ErrorSeverity;
+import org.eclipse.lsp.cobol.common.error.ErrorSource;
+import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.message.MessageService;
+import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplaceData;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.replacement.ReplacingService;
@@ -108,6 +113,72 @@ class ReplacingServiceImplTest {
             locality,
             CobolLanguageId.COBOL,
             SearchPattern.EXACT));
+  }
+
+  @Test
+  void rejectsCopyWord() {
+    ReplacingService replacingService = new ReplacingServiceImpl(messageService);
+    SyntaxError invalidWordError =
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.EXTENDED_DOCUMENT)
+            .severity(ErrorSeverity.ERROR)
+            .location(locality.toOriginalLocation())
+            .messageTemplate(MessageTemplate.of("ReplacingServiceImpl.invalidWord"))
+            .build();
+
+    assertEquals(
+        Collections.singletonList(invalidWordError),
+        replacingService
+            .retrievePseudoTextReplacingPattern(
+                ImmutablePair.of("COPY", "XYZ"),
+                locality,
+                CobolLanguageId.COBOL,
+                SearchPattern.EXACT)
+            .getErrors());
+
+    assertEquals(
+        Collections.emptyList(),
+        replacingService
+            .retrievePseudoTextReplacingPattern(
+                ImmutablePair.of("COPYPGM", "XYZ"),
+                locality,
+                CobolLanguageId.COBOL,
+                SearchPattern.EXACT)
+            .getErrors());
+  }
+
+  @Test
+  void rejectsTooLongWord() {
+    ReplacingService replacingService = new ReplacingServiceImpl(messageService);
+    SyntaxError invalidLengthError =
+        SyntaxError.syntaxError()
+            .errorSource(ErrorSource.EXTENDED_DOCUMENT)
+            .severity(ErrorSeverity.ERROR)
+            .location(locality.toOriginalLocation())
+            .messageTemplate(MessageTemplate.of("ReplacingServiceImpl.pseudoTxtInvalidLength"))
+            .build();
+    String tooLongWord = StringUtils.repeat("A", 323);
+    String limitWord = StringUtils.repeat("A", 322);
+
+    assertEquals(
+        Collections.singletonList(invalidLengthError),
+        replacingService
+            .retrievePseudoTextReplacingPattern(
+                ImmutablePair.of("SHORT " + tooLongWord, "XYZ"),
+                locality,
+                CobolLanguageId.COBOL,
+                SearchPattern.EXACT)
+            .getErrors());
+
+    assertEquals(
+        Collections.emptyList(),
+        replacingService
+            .retrievePseudoTextReplacingPattern(
+                ImmutablePair.of("SHORT " + limitWord, "XYZ"),
+                locality,
+                CobolLanguageId.COBOL,
+                SearchPattern.EXACT)
+            .getErrors());
   }
 
   /**
