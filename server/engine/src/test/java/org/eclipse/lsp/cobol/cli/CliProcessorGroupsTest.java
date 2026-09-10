@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import java.nio.file.Path;
@@ -100,5 +101,36 @@ class CliProcessorGroupsTest {
     pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/BPGM2"), workspace);
     PathMatcher matcherAfter = pg.getCompiledMatchers().get(firstProgram);
     assertSame(matcherBefore, matcherAfter, "compiled glob pattern must be cached, not recompiled");
+  }
+
+  @Test
+  void invalidGlobPatternIsRejected() {
+    String groups = "{\"pgroups\": []}";
+    String programs =
+        "{\n"
+            + "    \"pgms\": [\n"
+            + "        {\"program\": \"COBPGM/[\", \"pgroup\": \"GROUP_A\"}\n"
+            + "    ]\n"
+            + "}";
+
+    assertThrows(
+        IllegalArgumentException.class, () -> new ProcessorGroupsResolver(programs, groups));
+  }
+
+  @Test
+  void tooManyWildcardsIsRejected() {
+    String groups = "{\"pgroups\": []}";
+    String manyWildcards = String.join("", java.util.Collections.nCopies(21, "*"));
+    String programs =
+        "{\n"
+            + "    \"pgms\": [\n"
+            + "        {\"program\": \""
+            + manyWildcards
+            + "\", \"pgroup\": \"GROUP_A\"}\n"
+            + "    ]\n"
+            + "}";
+
+    assertThrows(
+        IllegalArgumentException.class, () -> new ProcessorGroupsResolver(programs, groups));
   }
 }

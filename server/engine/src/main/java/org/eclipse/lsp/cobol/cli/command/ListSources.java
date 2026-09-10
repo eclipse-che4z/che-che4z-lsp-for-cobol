@@ -57,7 +57,7 @@ public class ListSources implements Callable<Integer> {
     }
     JsonObject result = new JsonObject();
     JsonArray sources = new JsonArray();
-    if (Objects.nonNull(workspace)) {
+    if (Objects.nonNull(workspace) && Objects.nonNull(parent.processorGroupsResolver)) {
       try (Stream<Path> paths = Files.walk(workspace)) {
         Stream<Path> pathStream =
             paths
@@ -75,9 +75,6 @@ public class ListSources implements Callable<Integer> {
   }
 
   private boolean isSourceFile(Path f) {
-    if (Objects.isNull(parent.processorGroupsResolver)) {
-      return false;
-    }
     return parent.processorGroupsResolver.isSourceFile(f);
   }
 }

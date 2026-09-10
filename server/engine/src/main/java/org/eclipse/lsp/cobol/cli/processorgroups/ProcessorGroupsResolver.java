@@ -23,13 +23,10 @@ import java.util.*;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Resolve settings based on processor groups configuration */
 @Getter
 public class ProcessorGroupsResolver {
-  private static final Logger LOG = LoggerFactory.getLogger(ProcessorGroupsResolver.class);
   private static final Gson GSON = new Gson();
 
   /**
@@ -58,14 +55,16 @@ public class ProcessorGroupsResolver {
       }
       long wildcardCount = pattern.chars().filter(c -> c == '*' || c == '?').count();
       if (wildcardCount > MAX_WILDCARD_COUNT) {
-        LOG.warn(
-            "Skipping program pattern with too many wildcards ({}): {}", wildcardCount, pattern);
-        continue;
+        throw new IllegalArgumentException(
+            String.format(
+                "Invalid program pattern '%s': too many wildcards (%d), maximum allowed is %d",
+                pattern, wildcardCount, MAX_WILDCARD_COUNT));
       }
       try {
         result.put(program, FileSystems.getDefault().getPathMatcher("glob:" + pattern));
       } catch (PatternSyntaxException | UnsupportedOperationException e) {
-        LOG.warn("Skipping invalid program glob pattern '{}': {}", pattern, e.getMessage());
+        throw new IllegalArgumentException(
+            String.format("Invalid program glob pattern '%s': %s", pattern, e.getMessage()), e);
       }
     }
     return result;
