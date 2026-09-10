@@ -133,7 +133,7 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   private Function<String, Boolean> checkIndividualTextWordLength(int validLength) {
     return rightAttribute ->
-        Arrays.stream(rightAttribute.split("\b")).anyMatch(c -> c.length() > validLength);
+        Arrays.stream(rightAttribute.split("\\b")).anyMatch(c -> c.length() > validLength);
   }
 
   @NonNull
@@ -213,6 +213,7 @@ public class ReplacingServiceImpl implements ReplacingService {
 
   private Function<String, Boolean> checkContainWord(String check) {
     return text ->
-        Arrays.stream(text.toUpperCase().split("\b")).anyMatch(txt -> txt.equalsIgnoreCase(check));
+        Arrays.stream(text.toUpperCase().split("\\b"))
+            .anyMatch(txt -> txt.equalsIgnoreCase(check));
   }
 }
