@@ -18,28 +18,6 @@ import { Token, ParserRuleContext, Interval } from "antlr4ng";
 
 const FILLER_NAME = "FILLER";
 
-export function updateVariableName(name: string, suffix: string) {
-  if (name.toUpperCase() === FILLER_NAME) {
-    return name;
-  }
-
-  const dashIndex = name.lastIndexOf("-");
-  if (dashIndex === name.length - 4) {
-    return name.substring(0, dashIndex + 2) + suffix;
-  }
-  return name + suffix;
-}
-
-export function extractSuffix(parentName: string | undefined): string {
-  if (!parentName) {
-    return "";
-  }
-  if (parentName.length > 2) {
-    return parentName.substring(parentName.length - 2);
-  }
-  return "";
-}
-
 export function addParsingErrors(
   context: IDocumentProcessingContext,
   errors: ParseError[],
