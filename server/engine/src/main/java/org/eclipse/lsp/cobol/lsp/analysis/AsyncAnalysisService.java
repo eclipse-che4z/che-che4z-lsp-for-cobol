@@ -185,9 +185,9 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
         analysisResults.remove(id);
         return newDocumentModel;
       } catch (
-          Exception
-              genericException) { // Ideally we should not do this, but a safer catch might help to
-        // remove unknown issues
+      // StackOverflowError is caught explicitly so the failure is logged with
+      // full detail and this document is marked EXCEPTIONALLY_FINISHED
+      Exception | StackOverflowError genericException) {
         LOG.error(
             "Encountered Exception {} , while analysing uri : {}",
             genericException,
