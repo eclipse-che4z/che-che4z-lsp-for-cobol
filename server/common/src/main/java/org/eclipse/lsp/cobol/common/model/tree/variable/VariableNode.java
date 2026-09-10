@@ -23,7 +23,10 @@ import static org.eclipse.lsp.cobol.common.model.tree.variable.VariableType.*;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +54,10 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
   private final VariableType variableType;
   private final String name;
   @Setter private boolean global;
-  @EqualsAndHashCode.Exclude private final List<Location> usages = new ArrayList<>();
+
+  @Getter(AccessLevel.NONE)
+  @EqualsAndHashCode.Exclude
+  private final Set<Location> usages = new LinkedHashSet<>();
 
   protected VariableNode(
       Locality location, String name, VariableType variableType, boolean global) {
@@ -103,10 +109,14 @@ public abstract class VariableNode extends Node implements DefinedAndUsedStructu
    * @param usageNode a variable usage node
    */
   public void addUsage(VariableUsageNode usageNode) {
-    if (!usages.contains(usageNode.getLocality().toLocation())) {
-      usages.add(usageNode.getLocality().toLocation());
+    if (usages.add(usageNode.getLocality().toLocation())) {
       usageNode.addDefinition(this);
     }
+  }
+
+  @Override
+  public List<Location> getUsages() {
+    return new ArrayList<>(usages);
   }
 
   public List<Location> getDefinitions() {
