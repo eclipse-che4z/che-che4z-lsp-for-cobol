@@ -122,7 +122,8 @@ public class SymbolsRepository {
       DefinedAndUsedStructure ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    Stream<Location> usages = ctx.getUsages().filter(uriNotImplicit());
+    List<Location> usages =
+        ctx.getUsages().filter(uriNotImplicit()).collect(Collectors.toList());
 
     String name = ctx.getName();
     if (ctx instanceof CodeBlockUsageNode) {
@@ -146,6 +147,11 @@ public class SymbolsRepository {
   private static class Element implements DefinedAndUsedStructure {
     String name;
     List<Location> definitions;
-    Stream<Location> usages;
+    List<Location> usageLocations;
+
+    @Override
+    public Stream<Location> getUsages() {
+      return usageLocations.stream();
+    }
   }
 }

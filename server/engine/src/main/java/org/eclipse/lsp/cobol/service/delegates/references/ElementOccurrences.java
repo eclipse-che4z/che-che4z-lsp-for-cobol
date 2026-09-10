@@ -80,8 +80,7 @@ public class ElementOccurrences implements Occurrences {
     }
     List<Location> references =
         element.stream()
-            .map(DefinedAndUsedStructure::getUsages)
-            .flatMap(Streams::concat)
+            .flatMap(DefinedAndUsedStructure::getUsages)
             .collect(Collectors.toList());
     if (refCtx.isIncludeDeclaration()) {
       references.addAll(
