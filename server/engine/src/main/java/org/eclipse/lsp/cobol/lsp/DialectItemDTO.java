@@ -25,6 +25,4 @@ public class DialectItemDTO {
   String extensionId;
   String uri;
   String keywords;
-  String watchingFolder;
-  String runBefore;
 }

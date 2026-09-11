@@ -149,8 +149,6 @@ public class PropertiesMessageService implements MessageService {
             createImplicitDialectUri(dialect),
             "implicit found dialects",
             "implicit-dialects",
-            null,
-            null,
             null));
   }
 

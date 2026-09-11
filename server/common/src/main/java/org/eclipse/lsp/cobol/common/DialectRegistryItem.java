@@ -26,6 +26,4 @@ public class DialectRegistryItem {
   String description;
   String extensionId;
   URI keywords;
-  String watchingFolder;
-  String runBefore;
 }

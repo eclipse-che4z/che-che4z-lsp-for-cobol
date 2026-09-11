@@ -88,9 +88,7 @@ public class ConfigHelper {
                   uri,
                   o.getDescription(),
                   o.getExtensionId(),
-                  keywords,
-                  o.getWatchingFolder(),
-                  o.getRunBefore());
+                  keywords);
             })
         .filter(Objects::nonNull)
         .collect(toList());

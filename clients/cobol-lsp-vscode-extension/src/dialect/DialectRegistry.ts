@@ -27,8 +27,6 @@ export type DialectInfo = (
   | {
       protocolVersion: 2;
       keywordsUri: Uri;
-      watchingFolder?: string;
-      runBefore?: string;
     }
 ) & {
   name: string;
@@ -117,8 +115,6 @@ export class DialectRegistry {
     snippets: vscode.Uri,
     keywords: vscode.Uri,
     isCopyStatement?: CopyStatementParser,
-    watchingFolder?: string,
-    runBefore?: string,
   ) {
     const dialectInfo: DialectInfo = {
       name: name,
@@ -128,8 +124,6 @@ export class DialectRegistry {
       snippetUri: snippets,
       keywordsUri: keywords,
       isCopyStatement: isCopyStatement,
-      watchingFolder: watchingFolder,
-      runBefore: runBefore,
     };
     dialectInfoes.set(dialectInfo.name, dialectInfo);
   }
