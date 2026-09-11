@@ -136,7 +136,7 @@ export interface __ExtensionV2DialectDetail {
   name: string;
   description: string;
   snippets: vscode.Uri;
-  keywords: vscode.Uri;
+  keywords?: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 }
 
@@ -151,7 +151,7 @@ export interface V2DialectDetail {
   name: string;
   description: string;
   snippets: vscode.Uri;
-  keywords: vscode.Uri;
+  keywords?: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 }
 
