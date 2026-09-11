@@ -98,8 +98,7 @@ class DialectServiceTest {
         .thenReturn(ImmutableList.of(dialect));
     List<DialectRegistryItem> dialectRegistry =
         ImmutableList.of(
-            new DialectRegistryItem(
-                dialect.getName(), 1, URI.create(""), "", "extensionId", null, null, null));
+            new DialectRegistryItem(dialect.getName(), 1, URI.create(""), "", "extensionId", null));
     dialectService.updateDialects(dialectRegistry);
 
     dialectService.process(ImmutableList.of("dialect"), context);
@@ -125,10 +124,9 @@ class DialectServiceTest {
 
     List<DialectRegistryItem> dialectRegistry =
         ImmutableList.of(
+            new DialectRegistryItem(dialect1.getName(), 1, URI.create(""), "", "extensionId", null),
             new DialectRegistryItem(
-                dialect1.getName(), 1, URI.create(""), "", "extensionId", null, null, null),
-            new DialectRegistryItem(
-                dialect2.getName(), 1, URI.create(""), "", "extensionId", null, null, null));
+                dialect2.getName(), 1, URI.create(""), "", "extensionId", null));
 
     InOrder inOrder = inOrder(dialect1, dialect2);
 
@@ -150,12 +148,12 @@ class DialectServiceTest {
         .thenReturn(ImmutableList.of(legacyDialect));
 
     DialectRegistryItem legacyItem =
-        new DialectRegistryItem("dialect", 1, URI.create(""), "", "extensionId", null, null, null);
+        new DialectRegistryItem("dialect", 1, URI.create(""), "", "extensionId", null);
     assertTrue(dialectService.updateDialects(ImmutableList.of(legacyItem)));
     assertSame(legacyDialect, dialectService.getDialectByName("dialect").orElse(null));
 
     DialectRegistryItem modernItem =
-        new DialectRegistryItem("dialect", 2, URI.create(""), "", "extensionId", null, null, null);
+        new DialectRegistryItem("dialect", 2, URI.create(""), "", "extensionId", null);
     assertTrue(dialectService.updateDialects(ImmutableList.of(modernItem)));
 
     CobolDialect updatedDialect = dialectService.getDialectByName("dialect").orElse(null);
@@ -171,8 +169,7 @@ class DialectServiceTest {
     Path firstKeywords = tempDir.resolve("keywords.txt");
     Files.write(firstKeywords, "BIND=Bind description".getBytes(StandardCharsets.ISO_8859_1));
     DialectRegistryItem firstItem =
-        new DialectRegistryItem(
-            "dialect", 2, null, "", "extensionId", firstKeywords.toUri(), null, null);
+        new DialectRegistryItem("dialect", 2, null, "", "extensionId", firstKeywords.toUri());
 
     assertTrue(dialectService.updateDialects(ImmutableList.of(firstItem)));
     assertEquals(
@@ -182,8 +179,7 @@ class DialectServiceTest {
     Path updatedKeywords = tempDir.resolve("updated-keywords.txt");
     Files.write(updatedKeywords, "FINISH=Finish description".getBytes(StandardCharsets.ISO_8859_1));
     DialectRegistryItem updatedItem =
-        new DialectRegistryItem(
-            "dialect", 2, null, "", "extensionId", updatedKeywords.toUri(), null, null);
+        new DialectRegistryItem("dialect", 2, null, "", "extensionId", updatedKeywords.toUri());
 
     assertTrue(dialectService.updateDialects(ImmutableList.of(updatedItem)));
     assertEquals(

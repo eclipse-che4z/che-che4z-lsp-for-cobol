@@ -81,8 +81,6 @@ export const getV2Api = async (extensionId: string): Promise<V2Api | Error> => {
               snippets: dialect.snippets,
               keywords: dialect.keywords,
               isCopyStatement: dialect.isCopyStatement,
-              watchingFolder: dialect.watchingFolder,
-              runBefore: dialect.runBefore,
             },
             handler,
           );
@@ -140,8 +138,6 @@ export interface __ExtensionV2DialectDetail {
   snippets: vscode.Uri;
   keywords: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
-  watchingFolder?: string;
-  runBefore?: string;
 }
 
 export interface V2Api {
@@ -157,8 +153,6 @@ export interface V2DialectDetail {
   snippets: vscode.Uri;
   keywords: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
-  watchingFolder?: string;
-  runBefore?: string;
 }
 
 export type V2StartProcessingHandler = (
