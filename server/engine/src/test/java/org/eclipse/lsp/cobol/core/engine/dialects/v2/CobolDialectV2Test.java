@@ -82,7 +82,7 @@ class CobolDialectV2Test {
 
   private CobolDialect createDialect(URI keywordsUri) {
     return new CobolDialectV2(
-        new DialectRegistryItem("dialect", 2, null, "", "extensionId", keywordsUri, null, null),
+        new DialectRegistryItem("dialect", 2, null, "", "extensionId", keywordsUri),
         mock(DialectProcessingService.class));
   }
 }
