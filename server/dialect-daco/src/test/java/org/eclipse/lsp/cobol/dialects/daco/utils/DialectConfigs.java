@@ -47,8 +47,8 @@ public class DialectConfigs {
         SqlProcessing.ENABLED,
         SqlDecimalComma.DISABLED,
         ImmutableList.of(
-            new DialectRegistryItem("DaCo", 1, null, "", "", null, null, null),
-            new DialectRegistryItem("IDMS", 1, null, "", "", null, null, null)),
+            new DialectRegistryItem("DaCo", 1, null, "", "", null),
+            new DialectRegistryItem("IDMS", 1, null, "", "", null)),
         createPredefinedSectionsConfig(
             ImmutableList.of("S930", "S940", "S950", "S990", "S991", "S997", "S999")));
   }
@@ -70,8 +70,8 @@ public class DialectConfigs {
         SqlProcessing.ENABLED,
         SqlDecimalComma.DISABLED,
         ImmutableList.of(
-            new DialectRegistryItem("DaCo", 1, null, "", "", null, null, null),
-            new DialectRegistryItem("IDMS", 1, null, "", "", null, null, null)),
+            new DialectRegistryItem("DaCo", 1, null, "", "", null),
+            new DialectRegistryItem("IDMS", 1, null, "", "", null)),
         createPredefinedSectionsConfig(predefinedSections));
   }
 
