@@ -142,6 +142,7 @@ describe("Tests dialect util methods", () => {
         name: "abc",
         description: "desc",
         snippets: vscode.Uri.file("file"),
+        keywords: vscode.Uri.file("keywords-file"),
       }),
     ).toBeTruthy();
   });
