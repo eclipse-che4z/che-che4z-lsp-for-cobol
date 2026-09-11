@@ -49,8 +49,8 @@ public class ParagraphNameNode extends Node implements DefinedAndUsedStructure, 
   }
 
   @Override
-  public List<Location> getUsages() {
-    return usages;
+  public Stream<Location> getUsages() {
+    return usages.stream();
   }
 
   @Override

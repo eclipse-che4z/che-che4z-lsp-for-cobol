@@ -15,6 +15,7 @@
 package org.eclipse.lsp.cobol.common.model;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.eclipse.lsp4j.Location;
 
 /** The interface represents structure that can be defined and used. */
@@ -36,7 +37,7 @@ public interface DefinedAndUsedStructure {
   /**
    * Get structure usages.
    *
-   * @return the list of locations for the usages
+   * @return a stream of locations for the usages
    */
-  List<Location> getUsages();
+  Stream<Location> getUsages();
 }
