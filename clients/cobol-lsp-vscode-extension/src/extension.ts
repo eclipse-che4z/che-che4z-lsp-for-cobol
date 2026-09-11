@@ -214,8 +214,6 @@ export async function activate(
             snippets: dialect.snippets,
             keywords: dialect.keywords,
             isCopyStatement: dialect.isCopyStatement,
-            watchingFolder: dialect.watchingFolder,
-            runBefore: dialect.runBefore,
           },
           handler,
           dialectService,
@@ -291,8 +289,6 @@ function attachEventHandlers(
         ? { uri: d.uri.toString() }
         : {
             keywords: d.keywordsUri.toString(),
-            watchingFolder: d.watchingFolder,
-            runBefore: d.runBefore,
           }),
     })),
   );
@@ -357,8 +353,6 @@ export interface DialectDetailV2 {
   snippets: vscode.Uri;
   keywords: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
-  watchingFolder?: string;
-  runBefore?: string;
 }
 
 const registerNewDialectV1 = async (
@@ -428,8 +422,6 @@ const registerNewDialectV2 = async (
     dialect.snippets,
     dialect.keywords,
     dialect.isCopyStatement,
-    dialect.watchingFolder,
-    dialect.runBefore,
   );
   dialectService.registerStartHandler(dialect.name, handler);
 

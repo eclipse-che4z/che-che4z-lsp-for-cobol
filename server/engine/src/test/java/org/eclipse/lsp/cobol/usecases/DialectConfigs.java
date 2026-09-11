@@ -37,7 +37,7 @@ public class DialectConfigs {
         false,
         SqlProcessing.ENABLED,
         SqlDecimalComma.DISABLED,
-        ImmutableList.of(new DialectRegistryItem("IDMS", 1, null, "", "", null, null, null)),
+        ImmutableList.of(new DialectRegistryItem("IDMS", 1, null, "", "", null)),
         ImmutableMap.of());
   }
 
@@ -57,8 +57,8 @@ public class DialectConfigs {
         SqlProcessing.ENABLED,
         SqlDecimalComma.DISABLED,
         ImmutableList.of(
-            new DialectRegistryItem("DaCo", 1, null, "", "", null, null, null),
-            new DialectRegistryItem("IDMS", 1, null, "", "", null, null, null)),
+            new DialectRegistryItem("DaCo", 1, null, "", "", null),
+            new DialectRegistryItem("IDMS", 1, null, "", "", null)),
         ImmutableMap.of(
             "daco.predefined-sections",
             new Gson().toJsonTree(list),
