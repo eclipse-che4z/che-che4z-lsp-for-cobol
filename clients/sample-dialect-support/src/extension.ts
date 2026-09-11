@@ -25,6 +25,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
+  const keywords = vscode.Uri.joinPath(extensionUri, "keywords.txt");
   const outputChannel = vscode.window.createOutputChannel(
     "SAMPLE Dialect Support",
   );
@@ -40,6 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
       name: DIALECT_NAME,
       description: "SAMPLE dialect support",
       snippets,
+      keywords,
       isCopyStatement: (statement: string) => {
         const regex = /^.*\bCOPY\s+SAMPLE(?:\s+"?'?)(\S+)?$/i;
         const match = statement.match(regex);

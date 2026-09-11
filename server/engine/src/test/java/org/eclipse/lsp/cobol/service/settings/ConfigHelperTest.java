@@ -18,11 +18,44 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonPrimitive;
+import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
+import org.eclipse.lsp.cobol.lsp.DialectItemDTO;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /** Test for ConfigHelper */
 class ConfigHelperTest {
+
+  @Test
+  void parsesKeywordsUriWithoutJarUri() {
+    URI keywords = URI.create("file:///dialect%20with%20spaces/keywords.txt");
+    DialectItemDTO dto =
+        new DialectItemDTO(2, "dialect", "", "extensionId", null, keywords.toString(), null, null);
+
+    List<DialectRegistryItem> registry = ConfigHelper.parseDialectRegistry(ImmutableList.of(dto));
+
+    assertEquals(1, registry.size());
+    assertNull(registry.get(0).getUri());
+    assertEquals(keywords, registry.get(0).getKeywords());
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @ValueSource(strings = {"invalid uri"})
+  void keepsDialectWithoutValidKeywordsUri(String keywords) {
+    DialectItemDTO dto =
+        new DialectItemDTO(2, "dialect", "", "extensionId", null, keywords, null, null);
+
+    List<DialectRegistryItem> registry = ConfigHelper.parseDialectRegistry(ImmutableList.of(dto));
+
+    assertEquals(1, registry.size());
+    assertNull(registry.get(0).getKeywords());
+  }
 
   @Test
   void test_null() {

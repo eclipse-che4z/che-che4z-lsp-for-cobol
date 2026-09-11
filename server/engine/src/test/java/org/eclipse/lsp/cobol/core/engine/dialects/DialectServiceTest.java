@@ -18,7 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
@@ -34,6 +39,7 @@ import org.eclipse.lsp.cobol.core.engine.dialects.v2.DialectProcessingService;
 import org.eclipse.lsp.cobol.core.engine.errors.ErrorFinalizerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InOrder;
 
 /** Test for DialectService */
@@ -92,7 +98,8 @@ class DialectServiceTest {
         .thenReturn(ImmutableList.of(dialect));
     List<DialectRegistryItem> dialectRegistry =
         ImmutableList.of(
-            new DialectRegistryItem(dialect.getName(), 1, URI.create(""), "", "extensionId"));
+            new DialectRegistryItem(
+                dialect.getName(), 1, URI.create(""), "", "extensionId", null, null, null));
     dialectService.updateDialects(dialectRegistry);
 
     dialectService.process(ImmutableList.of("dialect"), context);
@@ -118,8 +125,10 @@ class DialectServiceTest {
 
     List<DialectRegistryItem> dialectRegistry =
         ImmutableList.of(
-            new DialectRegistryItem(dialect1.getName(), 1, URI.create(""), "", "extensionId"),
-            new DialectRegistryItem(dialect2.getName(), 1, URI.create(""), "", "extensionId"));
+            new DialectRegistryItem(
+                dialect1.getName(), 1, URI.create(""), "", "extensionId", null, null, null),
+            new DialectRegistryItem(
+                dialect2.getName(), 1, URI.create(""), "", "extensionId", null, null, null));
 
     InOrder inOrder = inOrder(dialect1, dialect2);
 
@@ -141,12 +150,12 @@ class DialectServiceTest {
         .thenReturn(ImmutableList.of(legacyDialect));
 
     DialectRegistryItem legacyItem =
-        new DialectRegistryItem("dialect", 1, URI.create(""), "", "extensionId");
+        new DialectRegistryItem("dialect", 1, URI.create(""), "", "extensionId", null, null, null);
     assertTrue(dialectService.updateDialects(ImmutableList.of(legacyItem)));
     assertSame(legacyDialect, dialectService.getDialectByName("dialect").orElse(null));
 
     DialectRegistryItem modernItem =
-        new DialectRegistryItem("dialect", 2, URI.create(""), "", "extensionId");
+        new DialectRegistryItem("dialect", 2, URI.create(""), "", "extensionId", null, null, null);
     assertTrue(dialectService.updateDialects(ImmutableList.of(modernItem)));
 
     CobolDialect updatedDialect = dialectService.getDialectByName("dialect").orElse(null);
@@ -155,5 +164,30 @@ class DialectServiceTest {
 
     assertFalse(dialectService.updateDialects(ImmutableList.of(modernItem)));
     assertSame(updatedDialect, dialectService.getDialectByName("dialect").orElse(null));
+  }
+
+  @Test
+  void testModernDialectKeywordsFollowRegistryUpdates(@TempDir Path tempDir) throws IOException {
+    Path firstKeywords = tempDir.resolve("keywords.txt");
+    Files.write(firstKeywords, "BIND=Bind description".getBytes(StandardCharsets.ISO_8859_1));
+    DialectRegistryItem firstItem =
+        new DialectRegistryItem(
+            "dialect", 2, null, "", "extensionId", firstKeywords.toUri(), null, null);
+
+    assertTrue(dialectService.updateDialects(ImmutableList.of(firstItem)));
+    assertEquals(
+        ImmutableMap.of("BIND", "Bind description"),
+        dialectService.getDialectByName("dialect").get().getKeywords());
+
+    Path updatedKeywords = tempDir.resolve("updated-keywords.txt");
+    Files.write(updatedKeywords, "FINISH=Finish description".getBytes(StandardCharsets.ISO_8859_1));
+    DialectRegistryItem updatedItem =
+        new DialectRegistryItem(
+            "dialect", 2, null, "", "extensionId", updatedKeywords.toUri(), null, null);
+
+    assertTrue(dialectService.updateDialects(ImmutableList.of(updatedItem)));
+    assertEquals(
+        ImmutableMap.of("FINISH", "Finish description"),
+        dialectService.getDialectByName("dialect").get().getKeywords());
   }
 }
