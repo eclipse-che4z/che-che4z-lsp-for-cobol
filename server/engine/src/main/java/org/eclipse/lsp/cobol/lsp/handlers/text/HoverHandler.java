@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
@@ -100,6 +101,17 @@ public class HoverHandler {
   public ImmutableList<LspEventDependency> getDependencies(HoverParams params) {
     return ImmutableList.of(
         asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+  }
+
+  /**
+   * Cancel condition for the hover event: cancel if the document was closed.
+   *
+   * @param params HoverParams.
+   * @return list of {@link LspEventCancelCondition}
+   */
+  public List<LspEventCancelCondition> getCancelConditions(HoverParams params) {
+    return ImmutableList.of(
+        asyncAnalysisService.createCancelConditionOnClose(params.getTextDocument().getUri()));
   }
 
   /**
