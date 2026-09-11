@@ -35,7 +35,7 @@ class ConfigHelperTest {
   void parsesKeywordsUriWithoutJarUri() {
     URI keywords = URI.create("file:///dialect%20with%20spaces/keywords.txt");
     DialectItemDTO dto =
-        new DialectItemDTO(2, "dialect", "", "extensionId", null, keywords.toString(), null, null);
+        new DialectItemDTO(2, "dialect", "", "extensionId", null, keywords.toString());
 
     List<DialectRegistryItem> registry = ConfigHelper.parseDialectRegistry(ImmutableList.of(dto));
 
@@ -48,8 +48,7 @@ class ConfigHelperTest {
   @NullSource
   @ValueSource(strings = {"invalid uri"})
   void keepsDialectWithoutValidKeywordsUri(String keywords) {
-    DialectItemDTO dto =
-        new DialectItemDTO(2, "dialect", "", "extensionId", null, keywords, null, null);
+    DialectItemDTO dto = new DialectItemDTO(2, "dialect", "", "extensionId", null, keywords);
 
     List<DialectRegistryItem> registry = ConfigHelper.parseDialectRegistry(ImmutableList.of(dto));
 

@@ -26,8 +26,6 @@ import {
 } from "./engine/services/settings";
 
 const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
-const DACO_CPY_LOCAL_PATHS = "cpy-manager.daco.paths-local";
-const IDMS_DIALECT_NAME = "IDMS";
 
 let unregisterDialect: () => void | Promise<void> = () => {};
 const isCopyStatement = (statement: string) => {
@@ -124,8 +122,6 @@ async function v2Api(context: vscode.ExtensionContext) {
       snippets,
       keywords,
       isCopyStatement: isCopyStatement,
-      watchingFolder: DACO_CPY_LOCAL_PATHS,
-      runBefore: IDMS_DIALECT_NAME,
     },
     async (context: IDocumentProcessingContext, text: string) => {
       outputChannel.appendLine(
