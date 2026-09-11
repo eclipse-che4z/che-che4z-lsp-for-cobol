@@ -366,7 +366,7 @@ public class DialectService {
     }
 
     if (registryItem.getProtocolVersion() == COBOL_DIALECT_MODERN_VERSION) {
-      return Optional.of(new CobolDialectV2(registryItem.getName(), dialectProcessingService));
+      return Optional.of(new CobolDialectV2(registryItem, dialectProcessingService));
     }
 
     LOG.warn("Dialect {} was not found, skipped", registryItem.getName());

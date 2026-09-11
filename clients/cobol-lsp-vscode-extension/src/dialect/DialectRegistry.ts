@@ -24,7 +24,12 @@ export type ProtocolVersion = 1 | 2;
  */
 export type DialectInfo = (
   | { protocolVersion: 1; uri: Uri }
-  | { protocolVersion: 2 }
+  | {
+      protocolVersion: 2;
+      keywordsUri: Uri;
+      watchingFolder?: string;
+      runBefore?: string;
+    }
 ) & {
   name: string;
   description: string;
@@ -110,7 +115,10 @@ export class DialectRegistry {
     name: string,
     description: string,
     snippets: vscode.Uri,
+    keywords: vscode.Uri,
     isCopyStatement?: CopyStatementParser,
+    watchingFolder?: string,
+    runBefore?: string,
   ) {
     const dialectInfo: DialectInfo = {
       name: name,
@@ -118,7 +126,10 @@ export class DialectRegistry {
       description: description,
       extensionId: extensionId,
       snippetUri: snippets,
+      keywordsUri: keywords,
       isCopyStatement: isCopyStatement,
+      watchingFolder: watchingFolder,
+      runBefore: runBefore,
     };
     dialectInfoes.set(dialectInfo.name, dialectInfo);
   }

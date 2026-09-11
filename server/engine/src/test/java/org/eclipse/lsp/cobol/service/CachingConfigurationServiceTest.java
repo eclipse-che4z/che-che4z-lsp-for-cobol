@@ -82,7 +82,8 @@ class CachingConfigurationServiceTest {
     when(client.availableDialects())
         .thenReturn(
             CompletableFuture.completedFuture(
-                ImmutableList.of(new DialectItemDTO(2, "Dialect", "", "", null))));
+                ImmutableList.of(
+                    new DialectItemDTO(2, "Dialect", "", "", null, null, null, null))));
 
     JsonArray dialectSettings = new JsonArray();
     dialectSettings.add("Dialect");
@@ -127,7 +128,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             SqlDecimalComma.DISABLED,
-            ImmutableList.of(new DialectRegistryItem("Dialect", 2, null, "", "")),
+            ImmutableList.of(new DialectRegistryItem("Dialect", 2, null, "", "", null, null, null)),
             ImmutableMap.of("dialect", predefinedParagraphs));
     expected.getUnusedVariableSeverity().severity = ErrorSeverity.ERROR;
     assertEquals(expected, configuration.getConfig("", CopybookProcessingMode.DISABLED));
@@ -237,7 +238,8 @@ class CachingConfigurationServiceTest {
     when(client.availableDialects())
         .thenReturn(
             CompletableFuture.completedFuture(
-                ImmutableList.of(new DialectItemDTO(2, "Dialect", "", "", null))));
+                ImmutableList.of(
+                    new DialectItemDTO(2, "Dialect", "", "", null, null, null, null))));
 
     JsonArray dialectSettings = new JsonArray();
     JsonArray subroutineSettings = new JsonArray();
@@ -278,7 +280,7 @@ class CachingConfigurationServiceTest {
             false,
             SqlProcessing.ENABLED,
             SqlDecimalComma.ENABLED,
-            ImmutableList.of(new DialectRegistryItem("Dialect", 2, null, "", "")),
+            ImmutableList.of(new DialectRegistryItem("Dialect", 2, null, "", "", null, null, null)),
             ImmutableMap.of("dialect", dialectsSettings)),
         configuration.getConfig("", CopybookProcessingMode.DISABLED));
   }
