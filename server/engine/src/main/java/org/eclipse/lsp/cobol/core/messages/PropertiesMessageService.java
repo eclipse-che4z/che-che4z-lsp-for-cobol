@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.common.DialectRegistryItem;
@@ -47,6 +48,8 @@ import org.eclipse.lsp.cobol.service.settings.SettingsService;
 @Singleton
 @Slf4j
 public class PropertiesMessageService implements MessageService {
+
+  private static final Pattern DIALECT_NAME_PATTERN = Pattern.compile("[A-Za-z0-9-]+");
 
   private final String baseName;
   private final LocaleStore localeStore;
@@ -142,6 +145,11 @@ public class PropertiesMessageService implements MessageService {
   }
 
   private void updateResourceBundle(String dialect) {
+    URI uri = createImplicitDialectUri(dialect);
+    if (uri == null) {
+      LOG.warn("Skipping implicit dialect with invalid name: {}", dialect);
+      return;
+    }
     updateResourceBundle(
         new DialectRegistryItem(
             dialect,
@@ -152,6 +160,9 @@ public class PropertiesMessageService implements MessageService {
   }
 
   private URI createImplicitDialectUri(String dialect) {
+    if (!DIALECT_NAME_PATTERN.matcher(dialect).matches()) {
+      return null;
+    }
     return URI.create(this.workingFolderService.getWorkingFolder() + "dialect-" + dialect + ".jar");
   }
 
