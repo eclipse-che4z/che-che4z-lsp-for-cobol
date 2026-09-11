@@ -15,10 +15,16 @@
 package org.eclipse.lsp.cobol.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableList;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.Map;
 import org.eclipse.lsp.cobol.cli.processorgroups.ProcessorGroupsResolver;
+import org.eclipse.lsp.cobol.cli.processorgroups.Program;
 import org.junit.jupiter.api.Test;
 
 /** Test processor groups support. */
@@ -52,5 +58,79 @@ class CliProcessorGroupsTest {
     assertEquals(
         ImmutableList.of("", ".CPY"),
         pg.resolveCopybooksExtensions(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")));
+  }
+
+  @Test
+  void cachedGlobPattern() {
+    String groups =
+        "{\n"
+            + "    \"pgroups\": [\n"
+            + "        {\"name\": \"GROUP_A\", \"copybook-extensions\": [\".CPY\"], \"libs\":"
+            + " [\"COBCOPY/A\"]},\n"
+            + "        {\"name\": \"GROUP_B\", \"copybook-extensions\": [\".CPY\"], \"libs\":"
+            + " [\"COBCOPY/B\"]}\n"
+            + "    ]\n"
+            + "}";
+    String programs =
+        "{\n"
+            + "    \"pgms\": [\n"
+            + "        {\"program\": \"COBPGM/A*\", \"pgroup\": \"GROUP_A\"},\n"
+            + "        {\"program\": \"COBPGM/B*\", \"pgroup\": \"GROUP_B\"}\n"
+            + "    ]\n"
+            + "}";
+
+    ProcessorGroupsResolver pg = new ProcessorGroupsResolver(programs, groups);
+    Map<Program, PathMatcher> compiledMatchers = pg.getCompiledMatchers();
+
+    assertEquals(2, pg.getProgramList().size());
+    assertEquals(
+        2, compiledMatchers.size(), "each program pattern should be compiled into its own entry");
+
+    Path workspace = Paths.get("/root");
+    assertEquals(
+        Paths.get("/root/COBCOPY/A"),
+        pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/APGM1"), workspace).get(0));
+    assertEquals(
+        Paths.get("/root/COBCOPY/B"),
+        pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/BPGM1"), workspace).get(0));
+
+    // no recompilation
+    Program firstProgram = pg.getProgramList().get(0);
+    PathMatcher matcherBefore = compiledMatchers.get(firstProgram);
+    pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/APGM2"), workspace);
+    pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/BPGM2"), workspace);
+    PathMatcher matcherAfter = pg.getCompiledMatchers().get(firstProgram);
+    assertSame(matcherBefore, matcherAfter, "compiled glob pattern must be cached, not recompiled");
+  }
+
+  @Test
+  void invalidGlobPatternIsRejected() {
+    String groups = "{\"pgroups\": []}";
+    String programs =
+        "{\n"
+            + "    \"pgms\": [\n"
+            + "        {\"program\": \"COBPGM/[\", \"pgroup\": \"GROUP_A\"}\n"
+            + "    ]\n"
+            + "}";
+
+    assertThrows(
+        IllegalArgumentException.class, () -> new ProcessorGroupsResolver(programs, groups));
+  }
+
+  @Test
+  void tooManyWildcardsIsRejected() {
+    String groups = "{\"pgroups\": []}";
+    String manyWildcards = String.join("", java.util.Collections.nCopies(21, "*"));
+    String programs =
+        "{\n"
+            + "    \"pgms\": [\n"
+            + "        {\"program\": \""
+            + manyWildcards
+            + "\", \"pgroup\": \"GROUP_A\"}\n"
+            + "    ]\n"
+            + "}";
+
+    assertThrows(
+        IllegalArgumentException.class, () -> new ProcessorGroupsResolver(programs, groups));
   }
 }
