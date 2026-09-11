@@ -288,7 +288,7 @@ function attachEventHandlers(
       ...(d.protocolVersion === 1
         ? { uri: d.uri.toString() }
         : {
-            keywords: d.keywordsUri.toString(),
+            keywords: d.keywordsUri?.toString(),
           }),
     })),
   );
@@ -351,7 +351,7 @@ export interface DialectDetailV2 {
   name: string;
   description: string;
   snippets: vscode.Uri;
-  keywords: vscode.Uri;
+  keywords?: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 }
 
