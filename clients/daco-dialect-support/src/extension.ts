@@ -13,11 +13,66 @@
  */
 
 import * as vscode from "vscode";
-import { getV1Api } from "@code4z/cobol-dialect-api";
+import {
+  getV1Api,
+  getV2Api,
+  IDocumentProcessingContext,
+} from "@code4z/cobol-dialect-api";
+import { DaCoPreprocessor } from "./engine/preprocessor";
+import { MessageService } from "./engine/services/MessageService";
+import {
+  DIALECT_API_VERSION_CONFIG,
+  SettingsService,
+} from "./engine/services/settings";
 
-let unregisterDialect = () => {};
+const COPY_REGEX = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
+
+let unregisterDialect: () => void | Promise<void> = () => {};
+const isCopyStatement = (statement: string) => {
+  const match = COPY_REGEX.exec(statement);
+  if (!match) {
+    return { isCopy: false };
+  }
+  return { isCopy: true, prefix: match[1] };
+};
+
+const DIALECT_NAME = "DaCo";
+const DESCRIPTION = "DaCo dialect support";
 
 export async function activate(context: vscode.ExtensionContext) {
+  await updateApiVersion(context);
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(async (event) => {
+      if (event.affectsConfiguration(DIALECT_API_VERSION_CONFIG)) {
+        await updateApiVersion(context);
+      }
+    }),
+  );
+}
+
+export function deactivate(): void | Thenable<void> {
+  return unregisterDialect();
+}
+
+async function updateApiVersion(context: vscode.ExtensionContext) {
+  const version = SettingsService.getApiVersion();
+
+  // The unregister callback triggers its own server round-trip (invalidateConfiguration)
+  // to reanalyze open documents without the old dialect. It must fully settle before the
+  // new dialect is registered, otherwise the two reanalysis requests race on the server
+  // and the stale one can win, publishing empty diagnostics.
+  await unregisterDialect();
+  unregisterDialect = () => {};
+
+  if (version === "legacy") {
+    await v1Api(context);
+  } else {
+    await v2Api(context);
+  }
+}
+
+async function v1Api(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
@@ -33,18 +88,11 @@ export async function activate(context: vscode.ExtensionContext) {
     return;
   }
   const unregister = await v1Api.registerDialect({
-    name: "DaCo",
-    description: "DaCo dialect support",
+    name: DIALECT_NAME,
+    description: DESCRIPTION,
     snippets,
     jar,
-    isCopyStatement: (statement: string) => {
-      const regex = /^.*\bCOPY\s+MAID(?:\s+"?'?)(\S+)?$/i;
-      const match = statement.match(regex);
-      if (!match) {
-        return { isCopy: false };
-      }
-      return { isCopy: true, prefix: match[1] };
-    },
+    isCopyStatement: isCopyStatement,
   });
   if (unregister instanceof Error) {
     vscode.window.showErrorMessage(unregister.toString());
@@ -53,6 +101,42 @@ export async function activate(context: vscode.ExtensionContext) {
   unregisterDialect = unregister;
 }
 
-export function deactivate() {
-  unregisterDialect();
+async function v2Api(context: vscode.ExtensionContext) {
+  const outputChannel = vscode.window.createOutputChannel(DESCRIPTION);
+  const messageService = await MessageService.create(context);
+  const extensionId = context.extension.id;
+  const extensionUri = context.extensionUri;
+  const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
+  const keywords = vscode.Uri.joinPath(extensionUri, "keywords.txt");
+  const v2Api = await getV2Api(extensionId);
+  if (v2Api instanceof Error) {
+    vscode.window.showErrorMessage(v2Api.toString());
+    return;
+  }
+  outputChannel.appendLine(`Registering dialect with API version 2`);
+
+  const unregister = await v2Api.registerDialect(
+    {
+      name: DIALECT_NAME,
+      description: DESCRIPTION,
+      snippets,
+      keywords,
+      isCopyStatement: isCopyStatement,
+    },
+    async (context: IDocumentProcessingContext, text: string) => {
+      outputChannel.appendLine(
+        `Executing preprocessor for document ${context
+          .getProgramUri()
+          .toString()}`,
+      );
+
+      const preprocessor = new DaCoPreprocessor(outputChannel, messageService);
+      await preprocessor.execute(context, text);
+    },
+  );
+  if (unregister instanceof Error) {
+    vscode.window.showErrorMessage(unregister.toString());
+    return;
+  }
+  unregisterDialect = () => unregister.dispose();
 }

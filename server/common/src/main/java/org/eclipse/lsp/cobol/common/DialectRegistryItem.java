@@ -25,4 +25,5 @@ public class DialectRegistryItem {
   URI uri;
   String description;
   String extensionId;
+  URI keywords;
 }

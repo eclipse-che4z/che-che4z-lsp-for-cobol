@@ -22,6 +22,8 @@ import org.eclipse.lsp4j.Diagnostic;
 public class DialectProcessingResult {
   DocumentReplacement[] replacements;
   DocumentReplacementMap[] replacementMaps;
+  DocumentInsertion[] insertions;
+  DocumentInsertionMap[] insertionMaps;
   DialectCopybookInfo[] copybooks;
   Diagnostic[] diagnostics;
 }

@@ -46,4 +46,7 @@ public class ExplicitDialectDiscoveryService implements DialectDiscoveryService 
 
   @Override
   public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {}
+
+  @Override
+  public void unregisterDialectCodeActionProviders(List<CodeActionProvider> providers) {}
 }

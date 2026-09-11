@@ -16,29 +16,40 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.ResultWithErrors;
 import org.eclipse.lsp.cobol.common.dialects.CobolDialect;
 import org.eclipse.lsp.cobol.common.dialects.DialectOutcome;
 import org.eclipse.lsp.cobol.common.dialects.DialectProcessingContext;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
 
 /** Java Independent COBOL dialect * */
 @Slf4j
 public class CobolDialectV2 implements CobolDialect {
   private final String name;
+  private final Map<String, String> keywords;
   private final DialectProcessingService dialectProcessingService;
 
-  public CobolDialectV2(String name, DialectProcessingService dialectProcessingService) {
-    this.name = name;
+  public CobolDialectV2(
+      DialectRegistryItem registryItem, DialectProcessingService dialectProcessingService) {
+    this.name = registryItem.getName();
+    this.keywords = KeywordsUtils.getKeywords(registryItem.getKeywords());
     this.dialectProcessingService = dialectProcessingService;
   }
 
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public Map<String, String> getKeywords() {
+    return keywords;
   }
 
   /**

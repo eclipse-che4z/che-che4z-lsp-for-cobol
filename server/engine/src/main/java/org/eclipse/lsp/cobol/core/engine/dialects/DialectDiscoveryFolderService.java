@@ -14,6 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -26,6 +27,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -45,6 +48,11 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   private final WorkingFolderService workingFolderService;
   private final Communications communications;
   private final CodeActions actions;
+  // Tracks the classloader currently backing each dialect jar (keyed by jar URI), so a
+  // reloaded/replaced dialect's previous classloader can be closed once its replacement has
+  // loaded successfully. Without this, each reload leaves the jar file open indefinitely,
+  // which on Windows can lock the file and prevent the extension from being updated/reinstalled.
+  private final Map<String, URLClassLoader> dialectClassLoaders = new ConcurrentHashMap<>();
 
   @Inject
   public DialectDiscoveryFolderService(
@@ -146,7 +154,16 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
         throw new Exception("Cannot find dialect class in the jar file " + jarUri);
       }
 
-      final URLClassLoader classLoader = createClassLoader(jarUri);
+      final URLClassLoader classLoader =
+          dialectClassLoaders.computeIfAbsent(
+              jarUri.toString(),
+              key -> {
+                try {
+                  return createClassLoader(jarUri);
+                } catch (MalformedURLException e) {
+                  throw new IllegalStateException("Cannot create class loader for " + jarUri, e);
+                }
+              });
 
       for (String classname : classnames) {
         final Class<?> c = Class.forName(classname, false, classLoader);
@@ -162,11 +179,13 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     return dialects;
   }
 
-  private URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
+  @VisibleForTesting
+  URLClassLoader createClassLoader(URI uriToJar) throws MalformedURLException {
     return new URLClassLoader(new URL[] {uriToJar.toURL()}, this.getClass().getClassLoader());
   }
 
-  private List<String> getClassNames(File filename) throws IOException {
+  @VisibleForTesting
+  List<String> getClassNames(File filename) throws IOException {
     List<String> classNames = new ArrayList<>();
     try (ZipInputStream zip = new ZipInputStream(new FileInputStream(filename))) {
       for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
@@ -202,5 +221,10 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
   @Override
   public void registerDialectCodeActionProviders(List<CodeActionProvider> providers) {
     actions.registerNewProviders(providers);
+  }
+
+  @Override
+  public void unregisterDialectCodeActionProviders(List<CodeActionProvider> providers) {
+    actions.unregisterProviders(providers);
   }
 }

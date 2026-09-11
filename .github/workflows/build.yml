@@ -28,10 +28,12 @@ on:
     branches:
       - development
       - master
+      - new-daco
   push:
     branches:
       - development
       - master
+      - new-daco
 
 jobs:
   checks:
@@ -58,6 +60,16 @@ jobs:
       - name: Check code quality for COBOL LS
         working-directory: clients/cobol-lsp-vscode-extension
         run: npm run lint-quality
+      - name: Install dependencies for DaCo Dialect Support
+        working-directory: clients/daco-dialect-support
+        run: npm ci
+      - name: Check code formatting for DaCo Dialect Support
+        working-directory: clients/daco-dialect-support
+        run: npm run lint-format
+      - name: Check code quality for DaCo Dialect Support
+        working-directory: clients/daco-dialect-support
+        run: npm run lint-quality
+
   checks-server:
     name: Checks server
     runs-on: ubuntu-latest 
@@ -86,7 +98,7 @@ jobs:
       - name: Install dependencies for IDMS dialect
         working-directory: clients/idms-dialect-support
         run: NODE_ENV=production npm ci
-      - name: Install dependencies for DaCo dialect
+      - name: Install dependencies for DaCo Dialect Support
         working-directory: clients/daco-dialect-support
         run: NODE_ENV=production npm ci
       - name: Install dependencies for Sample dialect
@@ -213,6 +225,12 @@ jobs:
         run: |
           npm ci
           npm run test
+      - name: Unit Test DaCo Dialect Support
+        working-directory: clients/daco-dialect-support
+        run: |
+          npm ci
+          npm run compile
+          npm run test:unit
       - name: update version with PR or build number
         if: github.event_name == 'pull_request' || github.event.inputs.include_build_number == 'true'
         working-directory: clients/cobol-lsp-vscode-extension
@@ -279,6 +297,12 @@ jobs:
           cp ../../server/engine/target/server.jar ./server/jar
           npm run build
           xvfb-run -a npm exec c8 -- --reporter=lcovonly --allowExternal --exclude="**/test/**" --exclude=".vscode-test/**" --exclude=".vscode-test-web/**" -- npm run test:integration
+      - name: Run DaCo LS extension integration tests
+        working-directory: clients/daco-dialect-support
+        run: |
+          npm ci
+          npm run package
+          xvfb-run -a npm run test:integration
       - name: SonarQube Scan
         if: github.ref == 'refs/heads/development'
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602

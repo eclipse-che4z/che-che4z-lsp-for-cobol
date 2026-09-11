@@ -28,6 +28,8 @@ public class DialectCopybookInfo {
   String text;
   DialectCopybookInfo[] copybooks;
   DocumentReplacement[] replacements;
+  DocumentInsertion[] insertions;
   DocumentReplacementMap[] replacementMaps;
+  DocumentInsertionMap[] insertionMaps;
   Diagnostic[] diagnostics;
 }

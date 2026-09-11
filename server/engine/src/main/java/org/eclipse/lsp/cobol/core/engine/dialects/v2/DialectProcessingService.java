@@ -29,14 +29,13 @@ import org.eclipse.lsp.cobol.common.error.ErrorCode;
 import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedText;
-import org.eclipse.lsp.cobol.common.mapping.TextMapReplacer;
+import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 /** Dialect Api Client * */
@@ -82,6 +81,8 @@ public class DialectProcessingService {
           context.getExtendedDocument(),
           result.getReplacements(),
           result.getReplacementMaps(),
+          result.getInsertions(),
+          result.getInsertionMaps(),
           result.getCopybooks(),
           errorList,
           dialectName,
@@ -99,14 +100,22 @@ public class DialectProcessingService {
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
+      DocumentInsertion[] insertions,
+      DocumentInsertionMap[] insertionMaps,
       DialectCopybookInfo[] copybookInfos,
       List<SyntaxError> errorList,
       String dialectName,
       String parentCopybookId,
       String programUri) {
 
+    // Apply insertion first for simplification
+    for (DocumentInsertion insertion : insertions) {
+      ExtendedText extendedText = new ExtendedText(insertion.getText(), insertion.getSource());
+      document.insertCopybook(insertion.getLine(), extendedText);
+    }
+
     ArrayList<Node> nodes =
-        applyReplacements(document, replacements, replacementMaps, parentCopybookId);
+        applyReplacements(document, replacements, replacementMaps, insertionMaps, parentCopybookId);
 
     for (DialectCopybookInfo copybookInfo : copybookInfos) {
       ExtendedText extendedText =
@@ -119,14 +128,16 @@ public class DialectProcessingService {
 
       addErrors(errorList, copybook, copybookId, copybookInfo.getDiagnostics());
 
+      Location statementLocation =
+          document.mapLocation(copybookInfo.getStatementLocation().getRange());
       CopyNode copyNode =
           new CopyNode(
               Locality.builder()
-                  .uri(copybookInfo.getStatementLocation().getUri())
+                  .uri(statementLocation.getUri())
                   .copybookId(parentCopybookId)
-                  .range(copybookInfo.getStatementLocation().getRange())
+                  .range(statementLocation.getRange())
                   .build(),
-              copybookInfo.getNameLocation(),
+              document.mapLocation(copybookInfo.getNameLocation().getRange()),
               copybookInfo.getCopybookName(),
               dialectName,
               copybookInfo.getUri());
@@ -139,6 +150,8 @@ public class DialectProcessingService {
               copybook,
               copybookInfo.getReplacements(),
               copybookInfo.getReplacementMaps(),
+              copybookInfo.getInsertions(),
+              copybookInfo.getInsertionMaps(),
               copybookInfo.getCopybooks(),
               errorList,
               dialectName,
@@ -159,7 +172,7 @@ public class DialectProcessingService {
     for (Diagnostic diagnostic : diagnostics) {
       Location location = document.mapLocation(diagnostic.getRange());
       errorList.add(
-          DialectErrorHelper.dialectError(
+          DialectErrorHelper.dialectDiagnostic(
               Locality.builder()
                   .copybookId(copybookId)
                   .uri(location.getUri())
@@ -167,7 +180,8 @@ public class DialectProcessingService {
                   .build(),
               diagnostic.getMessage(),
               getErrorCode(diagnostic.getCode()),
-              diagnostic.getRelatedInformation()));
+              diagnostic.getRelatedInformation(),
+              diagnostic.getSeverity()));
     }
   }
 
@@ -182,6 +196,7 @@ public class DialectProcessingService {
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
+      DocumentInsertionMap[] insertionMaps,
       String copybookId) {
     for (DocumentReplacement replacement : replacements) {
       document.replace(replacement.getRange(), replacement.getText());
@@ -189,30 +204,57 @@ public class DialectProcessingService {
 
     ArrayList<Node> result = new ArrayList<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
-      Map<String, Range> statementMap = new HashMap<>();
-      for (ReplacementTokens tokens : replacementMap.getTokenItems()) {
-        Arrays.stream(tokens.getTokens())
-            .forEach(token -> statementMap.put(token.getName(), token.getRange()));
-      }
-      Map<String, TextMapReplacer.Token> mappedTokens =
+      Map<String, Token> mappedTokens =
           document.replace(
               replacementMap.getRange(),
               replacementMap.getStatementRange(),
-              statementMap,
+              buildStatementMap(replacementMap.getTokenItems()),
               normalizeReplacementMap(replacementMap.getReplacementMap()));
 
-      for (ReplacementTokens tokens : replacementMap.getTokenItems()) {
+      addMappedNodes(
+          replacementMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
+    }
 
-        List<TextMapReplacer.Token> mappedTokenList =
-            Arrays.stream(tokens.getTokens())
-                .map(t -> mappedTokens.get(t.getName()))
-                .collect(Collectors.toList());
-        NodeHelper.createNodesIfNeeded(
-                tokens.getType(), mappedTokenList, document.getUri(), copybookId)
-            .ifPresent(result::addAll);
-      }
+    for (DocumentInsertionMap insertionMap : insertionMaps) {
+      Map<String, Token> mappedTokens =
+          document.insert(
+              insertionMap.getLine(),
+              insertionMap.getStatementRange(),
+              buildStatementMap(insertionMap.getTokenItems()),
+              normalizeReplacementMap(insertionMap.getReplacementMap()));
+
+      addMappedNodes(
+          insertionMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
     }
     return result;
+  }
+
+  private static Map<String, Token> buildStatementMap(ReplacementTokens[] tokenItems) {
+    Map<String, Token> statementMap = new HashMap<>();
+    for (ReplacementTokens tokens : tokenItems) {
+      Arrays.stream(tokens.getTokens())
+          .forEach(
+              token ->
+                  statementMap.put(
+                      token.getName(), new Token(token.getValue(), token.getLocation())));
+    }
+    return statementMap;
+  }
+
+  private static void addMappedNodes(
+      ReplacementTokens[] tokenItems,
+      Map<String, Token> mappedTokens,
+      String uri,
+      String copybookId,
+      List<Node> result) {
+    for (ReplacementTokens tokens : tokenItems) {
+      List<Token> mappedTokenList =
+          Arrays.stream(tokens.getTokens())
+              .map(t -> mappedTokens.get(t.getName()))
+              .collect(Collectors.toList());
+      NodeHelper.createNodesIfNeeded(tokens.getType(), mappedTokenList, uri, copybookId)
+          .ifPresent(result::addAll);
+    }
   }
 
   private static String normalizeReplacementMap(String replacementMap) {
