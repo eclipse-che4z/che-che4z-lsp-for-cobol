@@ -78,7 +78,14 @@ export class CollectingErrorListener extends BaseErrorListener {
 }
 
 function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
-  return [...(r1 ?? []), ...(r2 ?? [])];
+  if (!r1?.length) {
+    return r2 ?? [];
+  }
+
+  for (const item of r2 ?? []) {
+    r1.push(item);
+  }
+  return r1;
 }
 
 /** A data level or nested COPY IDMS statement, in source order. */
