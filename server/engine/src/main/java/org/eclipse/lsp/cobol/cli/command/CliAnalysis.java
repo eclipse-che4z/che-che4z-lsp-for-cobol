@@ -211,6 +211,11 @@ public class CliAnalysis implements Callable<Integer> {
         description = "Path to workspace folder.",
         names = {"-ws", "--workspace"})
     private Path workspace;
+
+    @CommandLine.Option(
+        description = "Allow proc_grps.json libs entries outside the workspace.",
+        names = {"-ael", "--allow-external-libs"})
+    private boolean allowExternalLibs;
   }
 
   /** explicit config options */
@@ -283,7 +288,10 @@ public class CliAnalysis implements Callable<Integer> {
     if (args.workspaceConfig != null && parent.processorGroupsResolver != null) {
       return parent
           .processorGroupsResolver
-          .resolveCopybooksPaths(inputConfig.src.toPath(), args.workspaceConfig.workspace)
+          .resolveCopybooksPaths(
+              inputConfig.src.toPath(),
+              args.workspaceConfig.workspace,
+              args.workspaceConfig.allowExternalLibs)
           .stream()
           .map(Path::toFile)
           .collect(Collectors.toList());
