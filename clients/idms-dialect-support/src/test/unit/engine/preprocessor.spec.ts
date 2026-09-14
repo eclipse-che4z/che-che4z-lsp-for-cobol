@@ -40,6 +40,24 @@ function createContext(uri: string) {
   };
 }
 
+function expectRange(
+  startLine: number,
+  startCharacter: number,
+  endLine: number,
+  endCharacter: number,
+) {
+  return expect.objectContaining({
+    start: expect.objectContaining({
+      line: startLine,
+      character: startCharacter,
+    }),
+    end: expect.objectContaining({
+      line: endLine,
+      character: endCharacter,
+    }),
+  });
+}
+
 describe("IdmsPreprocessor", () => {
   const outputChannel = {
     appendLine: jest.fn(),
@@ -65,21 +83,18 @@ describe("IdmsPreprocessor", () => {
 
     expect(context.resolveCopybook).toHaveBeenCalledWith(
       "MYCOPY",
-      expect.any(vscode.Range),
-      expect.any(vscode.Range),
+      expectRange(0, 7, 0, 29),
+      expectRange(0, 20, 0, 28),
     );
     expect(copybookContext.replace).toHaveBeenCalledTimes(2);
     expect(copybookContext.replace).toHaveBeenNthCalledWith(
       1,
-      expect.objectContaining({
-        start: expect.objectContaining({ line: 0, character: 7 }),
-        end: expect.objectContaining({ line: 0, character: 9 }),
-      }),
+      expectRange(0, 7, 0, 9),
       "03",
     );
     expect(copybookContext.replace).toHaveBeenNthCalledWith(
       2,
-      expect.any(vscode.Range),
+      expectRange(1, 7, 1, 9),
       "06",
     );
   });
@@ -95,7 +110,11 @@ describe("IdmsPreprocessor", () => {
 
     await preprocessor.execute(context, "       COPY IDMS MYCOPY.");
 
-    expect(context.resolveCopybook).toHaveBeenCalledTimes(1);
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "MYCOPY",
+      expectRange(0, 7, 0, 24),
+      expectRange(0, 17, 0, 23),
+    );
     expect(copybookContext.replace).not.toHaveBeenCalled();
   });
 
@@ -116,16 +135,22 @@ describe("IdmsPreprocessor", () => {
         message:
           "IDMS level not adjusted. 50 (2 + 48) exceeds maximum level adjustment of 49",
         severity: vscode.DiagnosticSeverity.Warning,
+        range: expectRange(1, 7, 1, 9),
       }),
     );
     expect(copybookContext.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 0, 9),
+      "03",
+    );
+    expect(copybookContext.replace).toHaveBeenNthCalledWith(
       2,
-      expect.any(vscode.Range),
+      expectRange(1, 7, 1, 9),
       "48",
     );
     expect(copybookContext.replace).toHaveBeenNthCalledWith(
       3,
-      expect.any(vscode.Range),
+      expectRange(2, 7, 2, 9),
       "77",
     );
   });
@@ -140,9 +165,10 @@ describe("IdmsPreprocessor", () => {
       expect.objectContaining({
         message: "MISSING: Copybook not found",
         severity: vscode.DiagnosticSeverity.Error,
+        range: expectRange(0, 17, 0, 24),
       }),
     );
-    expect(context.replace).toHaveBeenCalledWith(expect.any(vscode.Range), "");
+    expect(context.replace).toHaveBeenCalledWith(expectRange(0, 7, 0, 25), "");
   });
 
   it("propagates an outer level adjustment into a nested copybook", async () => {
@@ -162,23 +188,28 @@ describe("IdmsPreprocessor", () => {
 
     await preprocessor.execute(context, "       05 COPY IDMS OUTER.");
 
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "OUTER",
+      expectRange(0, 7, 0, 26),
+      expectRange(0, 20, 0, 25),
+    );
     expect(outerContext.resolveCopybook).toHaveBeenCalledWith(
       "INNER",
-      expect.any(vscode.Range),
-      expect.any(vscode.Range),
+      expectRange(1, 7, 1, 26),
+      expectRange(1, 20, 1, 25),
     );
     expect(outerContext.replace).toHaveBeenCalledWith(
-      expect.any(vscode.Range),
+      expectRange(0, 7, 0, 9),
       "05",
     );
     expect(innerContext.replace).toHaveBeenNthCalledWith(
       1,
-      expect.any(vscode.Range),
+      expectRange(0, 7, 0, 9),
       "07",
     );
     expect(innerContext.replace).toHaveBeenNthCalledWith(
       2,
-      expect.any(vscode.Range),
+      expectRange(1, 7, 1, 9),
       "09",
     );
   });
@@ -194,14 +225,20 @@ describe("IdmsPreprocessor", () => {
 
     await preprocessor.execute(context, "       COPY IDMS LOOP.");
 
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "LOOP",
+      expectRange(0, 7, 0, 22),
+      expectRange(0, 17, 0, 21),
+    );
     expect(copybookContext.resolveCopybook).not.toHaveBeenCalled();
     expect(copybookContext.addDiagnostic).toHaveBeenCalledWith(
       expect.objectContaining({
         message: "LOOP: Copybook has circular dependency",
+        range: expectRange(0, 20, 0, 24),
       }),
     );
     expect(copybookContext.replace).toHaveBeenCalledWith(
-      expect.any(vscode.Range),
+      expectRange(0, 7, 0, 25),
       "",
     );
   });
