@@ -55,27 +55,4 @@ public class DialectUtils {
             line - 1,
             inLine + token.getSymbol().getStopIndex() - token.getSymbol().getStartIndex() + 1));
   }
-
-  /**
-   * Find line column position by string index
-   *
-   * @param text input string
-   * @param pos position in text
-   * @return position
-   */
-  public static Position findPosition(String text, int pos) {
-    int c = 1;
-    int line = 0;
-    int col = 1;
-    while (c <= pos) {
-      if (text.charAt(c) == '\n') {
-        ++line;
-        col = 1;
-      } else {
-        ++col;
-      }
-      c++;
-    }
-    return new Position(line, col);
-  }
 }
