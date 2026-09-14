@@ -1,0 +1,2 @@
+       01  NESTED_COPY.
+           03 RANDOM-NAME            PIC X(16).

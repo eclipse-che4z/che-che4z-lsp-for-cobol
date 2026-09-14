@@ -20,6 +20,7 @@ import {
   constructRange,
   constructRangeFromTokens,
   createOptionsStr,
+  extractLevelRange,
   tryParseInt,
 } from "../../../engine/util";
 import { ParseError } from "../../../engine/model";
@@ -164,6 +165,28 @@ describe("constructRange", () => {
     expect(range.start.character).toBe(1);
     expect(range.end.line).toBe(1);
     expect(range.end.character).toBe(7);
+  });
+});
+
+describe("extractLevelRange", () => {
+  it("should derive a range spanning the token text on a single line", () => {
+    const token = createToken({ text: "05", line: 3, column: 7 });
+
+    const range = extractLevelRange(token);
+
+    expect(range.start.line).toBe(2);
+    expect(range.start.character).toBe(7);
+    expect(range.end.line).toBe(2);
+    expect(range.end.character).toBe(8);
+  });
+
+  it("should collapse to the start position when the token has no text", () => {
+    const token = createToken({ text: undefined, line: 1, column: 4 });
+
+    const range = extractLevelRange(token);
+
+    expect(range.start.character).toBe(4);
+    expect(range.end.character).toBe(3);
   });
 });
 

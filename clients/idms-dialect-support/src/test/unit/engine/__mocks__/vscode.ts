@@ -11,6 +11,7 @@
  * Contributors:
  *   Broadcom - initial API and implementation
  */
+import { URI, Utils } from "vscode-uri";
 
 export const workspace = {
   getConfiguration: jest.fn().mockReturnValue({
@@ -33,7 +34,46 @@ export class Position {
 }
 
 export class Range {
-  constructor(public readonly start: Position, public readonly end: Position) {}
+  public readonly start: Position;
+  public readonly end: Position;
+
+  constructor(
+    start: Position | number,
+    end: Position | number,
+    endLine?: number,
+    endCharacter?: number,
+  ) {
+    if (
+      typeof start === "number" &&
+      typeof end === "number" &&
+      endLine !== undefined &&
+      endCharacter !== undefined
+    ) {
+      this.start = new Position(start, end);
+      this.end = new Position(endLine, endCharacter);
+    } else {
+      this.start = start as Position;
+      this.end = end as Position;
+    }
+  }
+}
+
+export class Diagnostic {
+  public relatedInformation?: DiagnosticRelatedInformation[];
+
+  constructor(
+    public range: Range,
+    public message: string,
+    public severity: DiagnosticSeverity = DiagnosticSeverity.Error,
+  ) {}
+}
+
+export class Location {
+  constructor(public uri: unknown, public range: Range) {}
+}
+
+export class DiagnosticRelatedInformation {
+  constructor(public location: Location, public message: string) {}
 }
 
 export enum DiagnosticSeverity {
@@ -43,9 +83,5 @@ export enum DiagnosticSeverity {
   Hint = 3,
 }
 
-export const Uri = {
-  joinPath: jest.fn((base: unknown, ...paths: string[]) => ({
-    base,
-    paths,
-  })),
-};
+export const Uri = URI;
+Object.assign(Uri, Utils);

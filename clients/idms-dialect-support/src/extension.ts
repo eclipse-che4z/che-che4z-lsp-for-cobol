@@ -123,9 +123,6 @@ async function v2Api(context: vscode.ExtensionContext) {
       isCopyStatement,
     },
     async (processingContext: IDocumentProcessingContext, text: string) => {
-      // Placeholder handler: the actual preprocessing engine (copybook resolution,
-      // statement blanking, diagnostics) is built incrementally in later stories and
-      // gets wired in here. For now this only proves the v2 registration path end-to-end.
       outputChannel.appendLine(
         `Executing preprocessor for document ${processingContext
           .getProgramUri()
