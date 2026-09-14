@@ -14,5 +14,6 @@
     "editor.snippetSuggestions": "top",
     "files.autoSave": "off",
     "cobol-lsp.maxVmCount": -1,
-    "cobol-lsp.sql-decimal-comma-allowed": true
+    "cobol-lsp.sql-decimal-comma-allowed": true,
+    "cobol-lsp.daco.dialect.api.version": "new"
 }

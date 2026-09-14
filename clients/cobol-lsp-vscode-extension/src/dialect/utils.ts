@@ -36,6 +36,12 @@ export const isV2RuntimeDialectDetail = (
   if (!("snippets" in dialect) || typeof dialect.snippets !== "object")
     return false;
   if (
+    "keywords" in dialect &&
+    dialect.keywords !== undefined &&
+    typeof dialect.keywords !== "object"
+  )
+    return false;
+  if (
     "isCopyStatement" in dialect &&
     typeof dialect.isCopyStatement !== "function"
   )
