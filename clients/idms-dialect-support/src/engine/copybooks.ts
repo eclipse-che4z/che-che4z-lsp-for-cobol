@@ -40,7 +40,7 @@ interface ResolvedVariableLevel {
   context: IDocumentProcessingContext;
   range: vscode.Range;
   level: number;
-  processed: boolean;
+  requiresReplacement: boolean;
 }
 
 interface ParsingResult<T> {
@@ -184,7 +184,7 @@ export class IdmsCopybookPreprocessor {
           context: copybook.context,
           range: entry.range,
           level: entry.level,
-          processed: false,
+          requiresReplacement: false,
         });
       } else {
         variables.push(
@@ -214,7 +214,7 @@ export class IdmsCopybookPreprocessor {
     const delta = copybookLevel - firstLevel;
     for (const variable of variables) {
       const adjustedLevel = variable.level + delta;
-      variable.processed = true;
+      variable.requiresReplacement = true;
 
       if (adjustedLevel <= HIGHEST_LEVEL_FOR_ADJUSTMENT) {
         variable.level = adjustedLevel;
@@ -245,7 +245,7 @@ export class IdmsCopybookPreprocessor {
 
   private applyLevelReplacements(variables: ResolvedVariableLevel[]): void {
     for (const variable of variables) {
-      if (variable.processed) {
+      if (variable.requiresReplacement) {
         variable.context.replace(
           variable.range,
           variable.level.toString().padStart(2, "0"),
