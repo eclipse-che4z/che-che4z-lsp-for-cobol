@@ -14,6 +14,7 @@
 import * as vscode from "vscode";
 import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
 import { MessageService } from "./services/MessageService";
+import { IdmsCopybookPreprocessor } from "./copybooks";
 
 export class IdmsPreprocessor {
   constructor(
@@ -21,5 +22,14 @@ export class IdmsPreprocessor {
     private readonly messageService: MessageService,
   ) {}
 
-  public async execute(context: IDocumentProcessingContext, text: string) {}
+  public async execute(
+    context: IDocumentProcessingContext,
+    text: string,
+  ): Promise<void> {
+    const copybookPreprocessor = new IdmsCopybookPreprocessor(
+      this.outputChannel,
+      this.messageService,
+    );
+    await copybookPreprocessor.execute(context, text);
+  }
 }

@@ -18,8 +18,24 @@ import {
   Token,
   Recognizer,
   ATNSimulator,
+  TerminalNode,
 } from "antlr4ng";
-import { ParseError } from "./model";
+import { IdmsParserVisitor } from "../generated/IdmsParserVisitor";
+import { CopyIdmsStatementContext as ProgramCopyIdmsStatementContext } from "../generated/IdmsParser";
+import { IdmsCopyParserVisitor } from "../generated/IdmsCopyParserVisitor";
+import {
+  CopyIdmsStatementContext as CopybookCopyIdmsStatementContext,
+  DataDescriptionEntryFormat1Context,
+  DataDescriptionEntryFormat1Level77Context,
+  DataDescriptionEntryFormat2Context,
+  DataDescriptionEntryFormat3Context,
+} from "../generated/IdmsCopyParser";
+import {
+  IdmsCopybookDescriptor,
+  ParseError,
+  createIdmsCopybookDescriptor,
+} from "./model";
+import { constructRangeFromTokens } from "./util";
 
 export class CollectingErrorListener extends BaseErrorListener {
   public readonly errors: ParseError[] = [];
@@ -63,4 +79,84 @@ export class CollectingErrorListener extends BaseErrorListener {
 
 function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
   return [...(r1 ?? []), ...(r2 ?? [])];
+}
+
+/** A data level or nested COPY IDMS statement, in source order. */
+export type IdmsCopybookEntry =
+  | {
+      kind: "VARIABLE_LEVEL";
+      level: number;
+      range: vscode.Range;
+    }
+  | {
+      kind: "COPYBOOK";
+      descriptor: IdmsCopybookDescriptor;
+    };
+
+/** Collects explicit COPY IDMS statements from a COBOL program. */
+export class IdmsDialectVisitor extends IdmsParserVisitor<
+  IdmsCopybookDescriptor[]
+> {
+  public constructor(private readonly documentUri: string) {
+    super();
+  }
+
+  visitCopyIdmsStatement = (
+    ctx: ProgramCopyIdmsStatementContext,
+  ): IdmsCopybookDescriptor[] => [
+    createIdmsCopybookDescriptor(ctx, this.documentUri),
+  ];
+
+  protected aggregateResult = concatResults;
+}
+
+/** Collects data levels and nested COPY IDMS statements from an IDMS copybook. */
+export class IdmsCopyVisitor extends IdmsCopyParserVisitor<
+  IdmsCopybookEntry[]
+> {
+  public constructor(private readonly documentUri: string) {
+    super();
+  }
+
+  visitCopyIdmsStatement = (
+    ctx: CopybookCopyIdmsStatementContext,
+  ): IdmsCopybookEntry[] => [
+    {
+      kind: "COPYBOOK",
+      descriptor: createIdmsCopybookDescriptor(ctx, this.documentUri),
+    },
+  ];
+
+  visitDataDescriptionEntryFormat1 = (
+    ctx: DataDescriptionEntryFormat1Context,
+  ): IdmsCopybookEntry[] =>
+    this.createVariableLevel(ctx.levelNumber().LEVEL_NUMBER());
+
+  visitDataDescriptionEntryFormat2 = (
+    ctx: DataDescriptionEntryFormat2Context,
+  ): IdmsCopybookEntry[] => this.createVariableLevel(ctx.LEVEL_NUMBER_66());
+
+  visitDataDescriptionEntryFormat1Level77 = (
+    ctx: DataDescriptionEntryFormat1Level77Context,
+  ): IdmsCopybookEntry[] => this.createVariableLevel(ctx.LEVEL_NUMBER_77());
+
+  visitDataDescriptionEntryFormat3 = (
+    ctx: DataDescriptionEntryFormat3Context,
+  ): IdmsCopybookEntry[] => this.createVariableLevel(ctx.LEVEL_NUMBER_88());
+
+  protected aggregateResult = concatResults;
+
+  private createVariableLevel(token: TerminalNode | null): IdmsCopybookEntry[] {
+    if (!token) {
+      return [];
+    }
+
+    return [
+      {
+        kind: "VARIABLE_LEVEL",
+        level: Number.parseInt(token.getText(), 10),
+        range: constructRangeFromTokens(token.symbol, token.symbol),
+      },
+    ];
+  }
 }
