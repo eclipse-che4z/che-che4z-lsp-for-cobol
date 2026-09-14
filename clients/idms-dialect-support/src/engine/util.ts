@@ -60,6 +60,13 @@ export function constructRangeFromTokens(
   return new vscode.Range(startPosition, stopPosition);
 }
 
+export function extractLevelRange(token: Token): vscode.Range {
+  const length = token.text?.length ?? 0;
+  const start = new vscode.Position(token.line - 1, token.column);
+  const end = new vscode.Position(token.line - 1, token.column + length - 1);
+  return new vscode.Range(start, end);
+}
+
 export function createOptionsStr(ctx: ParserRuleContext | null): string {
   if (!ctx) {
     return "";

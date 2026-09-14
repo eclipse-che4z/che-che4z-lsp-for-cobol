@@ -19,15 +19,227 @@ import { MessageService } from "../../../engine/services/MessageService";
 
 jest.mock("vscode");
 
-describe("IdmsPreprocessor test", () => {
-  it("should resolve without error when executed", async () => {
-    const outputChannel = {} as vscode.OutputChannel;
-    const messageService = new MessageService({});
-    const preprocessor = new IdmsPreprocessor(outputChannel, messageService);
-    const context = {} as IDocumentProcessingContext;
+const messages = {
+  "IdmsCopybookVisitor.errorCircularDependency":
+    "{0}: Copybook has circular dependency",
+  "IdmsDialect.maxAdjustmentExceed":
+    "IDMS level not adjusted. {0} ({1} + {2}) exceeds maximum level adjustment of 49",
+  "copybook.not_found": "{0}: Copybook not found",
+};
 
-    await expect(
-      preprocessor.execute(context, "some text"),
-    ).resolves.toBeUndefined();
+function createContext(uri: string) {
+  return {
+    resolveCopybook: jest.fn(),
+    replace: jest.fn(),
+    addDiagnostic: jest.fn(),
+    getDocumentUri: jest.fn().mockReturnValue(vscode.Uri.parse(uri)),
+  } as unknown as IDocumentProcessingContext & {
+    resolveCopybook: jest.Mock;
+    replace: jest.Mock;
+    addDiagnostic: jest.Mock;
+  };
+}
+
+function expectRange(
+  startLine: number,
+  startCharacter: number,
+  endLine: number,
+  endCharacter: number,
+) {
+  return expect.objectContaining({
+    start: expect.objectContaining({
+      line: startLine,
+      character: startCharacter,
+    }),
+    end: expect.objectContaining({
+      line: endLine,
+      character: endCharacter,
+    }),
+  });
+}
+
+describe("IdmsPreprocessor", () => {
+  const outputChannel = {
+    appendLine: jest.fn(),
+  } as unknown as vscode.OutputChannel;
+  const messageService = new MessageService(messages);
+  let preprocessor: IdmsPreprocessor;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    preprocessor = new IdmsPreprocessor(outputChannel, messageService);
+  });
+
+  it("resolves an explicit COPY IDMS and adjusts its levels", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///MYCOPY.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MYCOPY.cpy"),
+      text: "       01 ROOT.\n       04 FIELD PIC X.",
+    });
+
+    await preprocessor.execute(context, "       03 COPY IDMS 'MYCOPY'.");
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "MYCOPY",
+      expectRange(0, 7, 0, 29),
+      expectRange(0, 20, 0, 28),
+    );
+    expect(copybookContext.replace).toHaveBeenCalledTimes(2);
+    expect(copybookContext.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 0, 9),
+      "03",
+    );
+    expect(copybookContext.replace).toHaveBeenNthCalledWith(
+      2,
+      expectRange(1, 7, 1, 9),
+      "06",
+    );
+  });
+
+  it("does not adjust levels when COPY IDMS has no parent level", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///MYCOPY.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MYCOPY.cpy"),
+      text: "       01 ROOT.\n       03 FIELD PIC X.",
+    });
+
+    await preprocessor.execute(context, "       COPY IDMS MYCOPY.");
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "MYCOPY",
+      expectRange(0, 7, 0, 24),
+      expectRange(0, 17, 0, 23),
+    );
+    expect(copybookContext.replace).not.toHaveBeenCalled();
+  });
+
+  it("warns and keeps a regular level when adjustment exceeds 49", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///MYCOPY.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MYCOPY.cpy"),
+      text: "       01 ROOT.\n       48 FIELD PIC X.\n       77 FLAG PIC X.",
+    });
+
+    await preprocessor.execute(context, "       03 COPY IDMS MYCOPY.");
+
+    expect(copybookContext.addDiagnostic).toHaveBeenCalledTimes(1);
+    expect(copybookContext.addDiagnostic).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          "IDMS level not adjusted. 50 (2 + 48) exceeds maximum level adjustment of 49",
+        severity: vscode.DiagnosticSeverity.Warning,
+        range: expectRange(1, 7, 1, 9),
+      }),
+    );
+    expect(copybookContext.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 0, 9),
+      "03",
+    );
+    expect(copybookContext.replace).toHaveBeenNthCalledWith(
+      2,
+      expectRange(1, 7, 1, 9),
+      "48",
+    );
+    expect(copybookContext.replace).toHaveBeenNthCalledWith(
+      3,
+      expectRange(2, 7, 2, 9),
+      "77",
+    );
+  });
+
+  it("removes an unresolved COPY IDMS and reports it", async () => {
+    const context = createContext("file:///program.cbl");
+    context.resolveCopybook.mockResolvedValue(undefined);
+
+    await preprocessor.execute(context, "       COPY IDMS MISSING.");
+
+    expect(context.addDiagnostic).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "MISSING: Copybook not found",
+        severity: vscode.DiagnosticSeverity.Error,
+        range: expectRange(0, 17, 0, 24),
+      }),
+    );
+    expect(context.replace).toHaveBeenCalledWith(expectRange(0, 7, 0, 25), "");
+  });
+
+  it("propagates an outer level adjustment into a nested copybook", async () => {
+    const context = createContext("file:///program.cbl");
+    const outerContext = createContext("file:///OUTER.cpy");
+    const innerContext = createContext("file:///INNER.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: outerContext,
+      uri: vscode.Uri.parse("file:///OUTER.cpy"),
+      text: "       01 OUTER-ROOT.\n       03 COPY IDMS INNER.",
+    });
+    outerContext.resolveCopybook.mockResolvedValue({
+      context: innerContext,
+      uri: vscode.Uri.parse("file:///INNER.cpy"),
+      text: "       01 INNER-ROOT.\n       03 INNER-FIELD PIC X.",
+    });
+
+    await preprocessor.execute(context, "       05 COPY IDMS OUTER.");
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "OUTER",
+      expectRange(0, 7, 0, 26),
+      expectRange(0, 20, 0, 25),
+    );
+    expect(outerContext.resolveCopybook).toHaveBeenCalledWith(
+      "INNER",
+      expectRange(1, 7, 1, 26),
+      expectRange(1, 20, 1, 25),
+    );
+    expect(outerContext.replace).toHaveBeenCalledWith(
+      expectRange(0, 7, 0, 9),
+      "05",
+    );
+    expect(innerContext.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 0, 9),
+      "07",
+    );
+    expect(innerContext.replace).toHaveBeenNthCalledWith(
+      2,
+      expectRange(1, 7, 1, 9),
+      "09",
+    );
+  });
+
+  it("stops a circular nested COPY IDMS", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///LOOP.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///LOOP.cpy"),
+      text: "       01 COPY IDMS LOOP.",
+    });
+
+    await preprocessor.execute(context, "       COPY IDMS LOOP.");
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "LOOP",
+      expectRange(0, 7, 0, 22),
+      expectRange(0, 17, 0, 21),
+    );
+    expect(copybookContext.resolveCopybook).not.toHaveBeenCalled();
+    expect(copybookContext.addDiagnostic).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "LOOP: Copybook has circular dependency",
+        range: expectRange(0, 20, 0, 24),
+      }),
+    );
+    expect(copybookContext.replace).toHaveBeenCalledWith(
+      expectRange(0, 7, 0, 25),
+      "",
+    );
   });
 });
