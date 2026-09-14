@@ -48,8 +48,8 @@ public class SectionNameNode extends Node implements DefinedAndUsedStructure, De
   }
 
   @Override
-  public List<Location> getUsages() {
-    return usages;
+  public Stream<Location> getUsages() {
+    return usages.stream();
   }
 
   /**

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.model.tree.variable;
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -67,11 +68,11 @@ public class VariableDefinitionNameNode extends Node
   }
 
   @Override
-  public List<Location> getUsages() {
+  public Stream<Location> getUsages() {
     return getNearestParentByType(NodeType.VARIABLE)
         .map(VariableNode.class::cast)
         .map(VariableNode::getUsages)
-        .orElseGet(ImmutableList::of);
+        .orElseGet(Stream::of);
   }
 
   @Override

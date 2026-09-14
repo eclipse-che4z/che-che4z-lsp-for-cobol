@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +49,7 @@ public class CodeBlockUsageNode extends Node implements DefinedAndUsedStructure 
   }
 
   @Override
-  public List<Location> getUsages() {
-    return usages;
+  public Stream<Location> getUsages() {
+    return usages.stream();
   }
 }
