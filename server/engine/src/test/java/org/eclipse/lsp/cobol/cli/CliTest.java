@@ -100,7 +100,7 @@ class CliTest {
         Arrays.stream(sw.toString().split(System.lineSeparator()))
             .filter(line -> line.trim().startsWith("-"))
             .collect(Collectors.toList());
-    assertEquals(7, optionLines.size());
+    assertEquals(8, optionLines.size());
     Set<Integer> indents =
         optionLines.stream()
             .map(line -> line.length() - line.replaceFirst("^ +", "").length())
@@ -136,7 +136,7 @@ class CliTest {
             .filter(line -> !line.trim().isEmpty())
             .collect(Collectors.toList());
 
-    assertEquals(13, optionLines.size());
+    assertEquals(14, optionLines.size());
     assertEquals(
         optionLines.size(),
         nonOptionBodyLines.size(),

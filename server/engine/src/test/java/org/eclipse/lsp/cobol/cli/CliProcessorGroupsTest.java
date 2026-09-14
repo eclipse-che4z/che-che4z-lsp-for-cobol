@@ -48,7 +48,8 @@ class CliProcessorGroupsTest {
     ProcessorGroupsResolver pg = new ProcessorGroupsResolver(programsString, groupsString);
     assertEquals(
         Paths.get("/root/COBCOPY/IBM"),
-        pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")).get(0));
+        pg.resolveCopybooksPaths(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root"), false)
+            .get(0));
     assertEquals(
         ImmutableList.of("", ".CPY"),
         pg.resolveCopybooksExtensions(Paths.get("/root/COBPGM/SLICKP3"), Paths.get("/root")));
