@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2026 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -30,12 +30,6 @@ export async function activate() {
   );
   if (idms && !idms.isActive) {
     await idms.activate();
-  }
-  const daco = vscode.extensions.getExtension(
-    "BroadcomMFD.cobol-language-support-for-daco",
-  );
-  if (daco && !daco.isActive) {
-    await daco.activate();
   }
 }
 
