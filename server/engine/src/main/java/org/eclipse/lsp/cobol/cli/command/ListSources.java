@@ -18,14 +18,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.eclipse.lsp.cobol.cli.processorgroups.Program;
 import picocli.CommandLine;
 
 /** list sources cli command */
@@ -60,7 +57,7 @@ public class ListSources implements Callable<Integer> {
     }
     JsonObject result = new JsonObject();
     JsonArray sources = new JsonArray();
-    if (Objects.nonNull(workspace)) {
+    if (Objects.nonNull(workspace) && Objects.nonNull(parent.processorGroupsResolver)) {
       try (Stream<Path> paths = Files.walk(workspace)) {
         Stream<Path> pathStream =
             paths
@@ -78,19 +75,6 @@ public class ListSources implements Callable<Integer> {
   }
 
   private boolean isSourceFile(Path f) {
-    if (Objects.isNull(parent.processorGroupsResolver)) {
-      return false;
-    }
-    java.util.List<String> programRegexList =
-        parent.processorGroupsResolver.getProgramList().stream()
-            .map(Program::getProgram)
-            .collect(Collectors.toList());
-    for (String globPattern : programRegexList) {
-      boolean matches = FileSystems.getDefault().getPathMatcher("glob:" + globPattern).matches(f);
-      if (matches) {
-        return true;
-      }
-    }
-    return false;
+    return parent.processorGroupsResolver.isSourceFile(f);
   }
 }
