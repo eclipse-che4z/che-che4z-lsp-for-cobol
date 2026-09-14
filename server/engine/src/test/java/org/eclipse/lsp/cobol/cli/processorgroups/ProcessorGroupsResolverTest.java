@@ -40,7 +40,8 @@ class ProcessorGroupsResolverTest {
   @Test
   void relativeLibWithinWorkspaceIsKept() {
     String groups =
-        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"copybooks\"], \"copybook-extensions\": [\".cpy\"]}]}";
+        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"copybooks\"], \"copybook-extensions\":"
+            + " [\".cpy\"]}]}";
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
     List<Path> paths =
@@ -53,7 +54,8 @@ class ProcessorGroupsResolverTest {
   @Test
   void relativeLibEscapingWorkspaceViaDotDotIsIgnoredByDefault() {
     String groups =
-        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"../../../../etc\"], \"copybook-extensions\": [\".cpy\"]}]}";
+        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"../../../../etc\"],"
+            + " \"copybook-extensions\": [\".cpy\"]}]}";
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
     List<Path> paths =
@@ -65,7 +67,8 @@ class ProcessorGroupsResolverTest {
   @Test
   void absoluteLibOutsideWorkspaceIsIgnoredByDefault() {
     String groups =
-        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"/etc\"], \"copybook-extensions\": [\".cpy\"]}]}";
+        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"/etc\"], \"copybook-extensions\":"
+            + " [\".cpy\"]}]}";
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
     List<Path> paths =
@@ -77,7 +80,8 @@ class ProcessorGroupsResolverTest {
   @Test
   void absoluteLibOutsideWorkspaceIsKeptWhenExternalLibsAllowed() {
     String groups =
-        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"/etc\"], \"copybook-extensions\": [\".cpy\"]}]}";
+        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"/etc\"], \"copybook-extensions\":"
+            + " [\".cpy\"]}]}";
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
     List<Path> paths =
@@ -90,7 +94,8 @@ class ProcessorGroupsResolverTest {
   @Test
   void relativeLibEscapingWorkspaceViaDotDotIsKeptWhenExternalLibsAllowed() {
     String groups =
-        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"../shared-copybooks\"], \"copybook-extensions\": [\".cpy\"]}]}";
+        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"../shared-copybooks\"],"
+            + " \"copybook-extensions\": [\".cpy\"]}]}";
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
     List<Path> paths =
@@ -106,7 +111,8 @@ class ProcessorGroupsResolverTest {
     Path absoluteInsideWorkspace = workspace.resolve("copybooks").toAbsolutePath();
     String groups =
         String.format(
-            "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"%s\"], \"copybook-extensions\": [\".cpy\"]}]}",
+            "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"%s\"], \"copybook-extensions\":"
+                + " [\".cpy\"]}]}",
             absoluteInsideWorkspace.toString().replace("\\", "\\\\"));
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
@@ -120,7 +126,8 @@ class ProcessorGroupsResolverTest {
   @Test
   void noMatchingProgramResolvesToEmptyList() {
     String groups =
-        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"copybooks\"], \"copybook-extensions\": [\".cpy\"]}]}";
+        "{\"pgroups\": [{\"name\": \"pg1\", \"libs\": [\"copybooks\"], \"copybook-extensions\":"
+            + " [\".cpy\"]}]}";
     ProcessorGroupsResolver resolver = new ProcessorGroupsResolver(PROGRAMS, groups);
 
     List<Path> paths =
