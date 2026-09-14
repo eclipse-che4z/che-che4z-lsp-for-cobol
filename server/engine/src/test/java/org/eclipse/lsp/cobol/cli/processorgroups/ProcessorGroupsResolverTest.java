@@ -25,10 +25,10 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Test that {@link ProcessorGroupsResolver} keeps proc_grps.json "libs" search roots contained
- * within the analyzed workspace by default, since that file is untrusted analyzed-workspace
- * content (e.g. a contributor-supplied PR in a CI pipeline) rather than operator-supplied
- * configuration, while still allowing an explicit opt-in for legitimate shared copybook/macro
- * libraries that live outside the workspace.
+ * within the analyzed workspace by default, since that file is untrusted analyzed-workspace content
+ * (e.g. a contributor-supplied PR in a CI pipeline) rather than operator-supplied configuration,
+ * while still allowing an explicit opt-in for legitimate shared copybook/macro libraries that live
+ * outside the workspace.
  */
 class ProcessorGroupsResolverTest {
 
