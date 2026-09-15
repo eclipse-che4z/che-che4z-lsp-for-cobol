@@ -196,7 +196,6 @@ describe("LanguageClientService positive scenario", () => {
       {
         args: [
           "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-Xshare:off",
           "-jar",
@@ -266,7 +265,6 @@ describe("LanguageClientService positive scenario", () => {
       {
         args: [
           "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-jar",
           serverPath,
@@ -290,7 +288,6 @@ describe("LanguageClientService positive scenario", () => {
       .fn()
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
     SettingsService.getJavaHome = jest.fn().mockReturnValue("/usr/");
     const mockProcess = mockSpawnProcess(
       "",
@@ -310,7 +307,6 @@ describe("LanguageClientService positive scenario", () => {
       {
         args: [
           "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-Xshare:off",
           "-jar",
