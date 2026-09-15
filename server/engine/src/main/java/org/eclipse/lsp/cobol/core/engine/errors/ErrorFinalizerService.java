@@ -97,6 +97,7 @@ public class ErrorFinalizerService {
           "ReplacingServiceImpl.invalidWord",
           "ReplacingServiceImpl.pseudoTxtInvalidLength",
           "semantics.paragraphNotDefined",
+          "semantics.sectionNotDefined",
           "semantics.cannotBeRenamed",
           "semantics.childToRenameNotFound",
           "semantics.emptyStructure",

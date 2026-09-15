@@ -132,7 +132,7 @@ class TestDuplicatedDefinition {
           + "       PROGRAM-ID. AMB11.\n"
           + "       PROCEDURE DIVISION.\n"
           + "       {@*SECTION-1} SECTION.\n"
-          + "           GO TO {#PARAG1|1} OF SECTION-1.\n"
+          + "           GO TO {#PARAG1|1} OF {@SECTION-1}.\n"
           + "       {#*PARAG1}.\n"
           + "       {#*PARAG1}.";
 
@@ -159,7 +159,7 @@ class TestDuplicatedDefinition {
       "       IDENTIFICATION DIVISION.\n"
           + "       PROGRAM-ID.  AMB14.\n"
           + "       PROCEDURE DIVISION.\n"
-          + "           GO TO {PARAG1|1} OF SECTION-1.\n"
+          + "           GO TO {PARAG1|1} OF {SECTION-1|2}.\n"
           + "       {#*PARAG1}.";
 
   @Test
@@ -294,6 +294,12 @@ class TestDuplicatedDefinition {
             new Diagnostic(
                 new Range(),
                 "The following paragraph is not defined: PARAG1",
+                DiagnosticSeverity.Error,
+                ErrorSource.PARSING.getText()),
+            "2",
+            new Diagnostic(
+                new Range(),
+                "The following section is not defined: SECTION-1",
                 DiagnosticSeverity.Error,
                 ErrorSource.PARSING.getText())));
   }
