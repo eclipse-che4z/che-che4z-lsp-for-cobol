@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Synchronized;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -121,8 +122,7 @@ public class SymbolsRepository {
       DefinedAndUsedStructure ctx) {
     List<Location> definitions =
         ctx.getDefinitions().stream().filter(uriNotImplicit()).collect(Collectors.toList());
-    List<Location> usages =
-        ctx.getUsages().stream().filter(uriNotImplicit()).collect(Collectors.toList());
+    List<Location> usages = ctx.getUsages().filter(uriNotImplicit()).collect(Collectors.toList());
 
     String name = ctx.getName();
     if (ctx instanceof CodeBlockUsageNode) {
@@ -146,6 +146,11 @@ public class SymbolsRepository {
   private static class Element implements DefinedAndUsedStructure {
     String name;
     List<Location> definitions;
-    List<Location> usages;
+    List<Location> usageLocations;
+
+    @Override
+    public Stream<Location> getUsages() {
+      return usageLocations.stream();
+    }
   }
 }

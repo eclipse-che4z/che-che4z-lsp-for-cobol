@@ -12,9 +12,11 @@
  *   Broadcom - initial API and implementation
  */
 import { PassThrough } from "stream";
+import * as path from "node:path";
 import { TAR_FOLDER } from "../../../constants";
 import { loadProfile } from "../../util/Utils";
 import * as vscode from "vscode";
+import { outputChannel } from "../../util/OutputChannel";
 
 const pendingCache: Map<string, Promise<boolean>> = new Map();
 
@@ -44,12 +46,19 @@ export class CopybookBinaryDownloader {
   }
 
   private async downloadFileImpl(
-    path: string,
+    remotePath: string,
     profile: string,
     type: "USS" | "DSN",
   ): Promise<boolean> {
+    if (type === "USS" && !path.posix.isAbsolute(remotePath)) {
+      outputChannel.warn(`${remotePath} ignored for file download`);
+      return false;
+    }
+    const tarUri = this.getTarFileUri(remotePath);
+    if (!tarUri) {
+      return false;
+    }
     const loadedProfile = loadProfile(profile, this.explorerAPI);
-    const tarUri = this.getTarFileUri(path);
     try {
       const passThrough = new PassThrough();
       const chunks: Buffer[] = [];
@@ -59,17 +68,21 @@ export class CopybookBinaryDownloader {
       });
 
       if (type == "DSN") {
-        await this.explorerAPI.getMvsApi(loadedProfile).getContents(path, {
-          returnEtag: true,
-          binary: true,
-          stream: passThrough,
-        });
+        await this.explorerAPI
+          .getMvsApi(loadedProfile)
+          .getContents(remotePath, {
+            returnEtag: true,
+            binary: true,
+            stream: passThrough,
+          });
       } else
-        await this.explorerAPI.getUssApi(loadedProfile).getContents(path, {
-          returnEtag: true,
-          binary: true,
-          stream: passThrough,
-        });
+        await this.explorerAPI
+          .getUssApi(loadedProfile)
+          .getContents(remotePath, {
+            returnEtag: true,
+            binary: true,
+            stream: passThrough,
+          });
       const content = Buffer.concat(chunks);
       await vscode.workspace.fs.writeFile(tarUri, content);
       return true;
@@ -78,8 +91,16 @@ export class CopybookBinaryDownloader {
     }
   }
 
-  public getTarFileUri(filePath: string) {
-    return vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, filePath);
+  public getTarFileUri(filePath: string): vscode.Uri | undefined {
+    const tarUri = vscode.Uri.joinPath(this.storagePath, TAR_FOLDER, filePath);
+    const root = path.join(this.storagePath.fsPath, TAR_FOLDER);
+    if (path.relative(root, tarUri.fsPath).startsWith("..")) {
+      outputChannel.warn(
+        `${filePath} resolves outside the tar cache root. Ignored for file download.`,
+      );
+      return undefined;
+    }
+    return tarUri;
   }
   public async isPresentLocally(
     inputPath: string | vscode.Uri | undefined,

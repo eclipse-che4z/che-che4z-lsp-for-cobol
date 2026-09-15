@@ -402,10 +402,12 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
 
   private String preProcessSqlComment(Db2SqlParser.SqlCodeContext ctx) {
     String sqlCode = VisitorHelper.getIntervalText(ctx);
+    PositionTracker positionTracker = new PositionTracker(sqlCode);
     Matcher matcher = DOUBLE_DASH_SQL_COMMENT.matcher(sqlCode);
     while (matcher.find()) {
-      Position start = findPosition(sqlCode, matcher.start());
-      Position end = findPosition(sqlCode, matcher.end());
+      VisitorHelper.checkInterruption();
+      Position start = positionTracker.findPosition(matcher.start());
+      Position end = positionTracker.findPosition(matcher.end());
       String replace = StringUtils.repeat(CobolDialect.FILLER, matcher.end() - matcher.start() - 1);
       start = Db2SqlVisitorHelper.getAdjustedStartPosition(ctx, start);
       end = Db2SqlVisitorHelper.getAdjustedEndPosition(ctx, end);
@@ -413,22 +415,6 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
     }
     sqlCode = matcher.replaceAll("");
     return sqlCode;
-  }
-
-  private static Position findPosition(String text, int pos) {
-    int c = 1;
-    int line = 0;
-    int col = 1;
-    while (c < pos) {
-      if (text.charAt(c) == '\n') {
-        ++line;
-        col = 1;
-      } else {
-        ++col;
-      }
-      c++;
-    }
-    return new Position(line, col);
   }
 
   private Db2SqlExecParser.StartSqlRuleContext parseSQL(
@@ -481,5 +467,29 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
             Locality.builder().range(location.getRange()).uri(location.getUri()).build());
     visitChildren(ctx).forEach(node::addChild);
     return ImmutableList.of(node);
+  }
+
+  private static class PositionTracker {
+    private final String text;
+    private int cursor = 1;
+    private int line = 0;
+    private int col = 1;
+
+    PositionTracker(String text) {
+      this.text = text;
+    }
+
+    public Position findPosition(int targetPos) {
+      while (cursor < targetPos && cursor < text.length()) {
+        if (text.charAt(cursor) == '\n') {
+          line++;
+          col = 1;
+        } else {
+          col++;
+        }
+        cursor++;
+      }
+      return new Position(line, col);
+    }
   }
 }

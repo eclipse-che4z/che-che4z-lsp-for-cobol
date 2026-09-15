@@ -60,7 +60,7 @@ public enum SearchPattern {
       Matcher matcher = NEW_LINE_PATTERN.matcher(trim);
       CobolProgramLayout layout = languageId.getLayout();
       int avoidCharLength = layout.getIndicatorLength() + layout.getSequenceLength();
-      String regex = String.format("( *)(?:(\\n.{%d})? ?)+", avoidCharLength);
+      String regex = String.format("(?:\\n.{%d}| )*+", avoidCharLength);
       if (matcher.find()) {
         String[] split = trim.split(NEW_LINE_PATTERN.pattern());
         return Arrays.stream(split)

@@ -34,6 +34,7 @@ import org.eclipse.lsp.cobol.common.model.tree.ProgramNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingPhase;
 import org.eclipse.lsp.cobol.common.processor.ProcessorDescription;
 import org.eclipse.lsp.cobol.common.utils.KeywordsUtils;
+import org.eclipse.lsp.cobol.common.utils.ThreadInterruptionUtil;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.DaCoCopyFromNode;
 import org.eclipse.lsp.cobol.dialects.daco.nodes.SortTableNode;
 import org.eclipse.lsp.cobol.dialects.daco.processors.DaCoCopyFromProcessor;
@@ -126,9 +127,11 @@ public final class DaCoDialect implements CobolDialect {
   private void removeDcDb(ExtendedDocument extendedDocument) {
     String input = extendedDocument.toString();
     Matcher matcher = dcdbPattern.matcher(input);
+    PositionTracker positionTracker = new PositionTracker(input);
     while (matcher.find()) {
-      Position start = DialectUtils.findPosition(input, matcher.start());
-      Position end = DialectUtils.findPosition(input, matcher.end() - 1);
+      ThreadInterruptionUtil.checkThreadInterrupted();
+      Position start = positionTracker.findPosition(matcher.start());
+      Position end = positionTracker.findPosition(matcher.end() - 1);
       String replace = new String(new char[matcher.end() - matcher.start() - 1]).replace('\0', ' ');
       extendedDocument.replace(new Range(start, end), replace);
     }
@@ -163,5 +166,29 @@ public final class DaCoDialect implements CobolDialect {
   @Override
   public List<String> getWatchingFolderSettings() {
     return ImmutableList.of(DACO_CPY_LOCAL_PATHS);
+  }
+
+  private static class PositionTracker {
+    private final String text;
+    private int cursor = 1;
+    private int line = 0;
+    private int col = 1;
+
+    PositionTracker(String text) {
+      this.text = text;
+    }
+
+    public Position findPosition(int targetPos) {
+      while (cursor < targetPos && cursor < text.length()) {
+        if (text.charAt(cursor) == '\n') {
+          line++;
+          col = 1;
+        } else {
+          col++;
+        }
+        cursor++;
+      }
+      return new Position(line, col);
+    }
   }
 }

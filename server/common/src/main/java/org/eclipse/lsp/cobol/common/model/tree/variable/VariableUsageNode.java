@@ -14,11 +14,11 @@
  */
 package org.eclipse.lsp.cobol.common.model.tree.variable;
 
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -78,8 +78,8 @@ public class VariableUsageNode extends Node implements DefinedAndUsedStructure, 
   }
 
   @Override
-  public List<Location> getUsages() {
-    return getDefinition().map(VariableNode::getUsages).orElseGet(ImmutableList::of);
+  public Stream<Location> getUsages() {
+    return getDefinition().map(VariableNode::getUsages).orElseGet(Stream::of);
   }
 
   @Override

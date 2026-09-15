@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.lsp.events.queries;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.FormattingHandler;
@@ -47,5 +48,10 @@ public class FormattingQuery implements LspQuery<List<? extends TextEdit>> {
   @Override
   public List<? extends TextEdit> query() {
     return formattingHandler.formatting(params);
+  }
+
+  @Override
+  public List<LspEventCancelCondition> getCancelConditions() {
+    return formattingHandler.getCancelConditions(params);
   }
 }

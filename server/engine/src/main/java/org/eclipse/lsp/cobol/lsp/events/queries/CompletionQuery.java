@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.events.queries;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.CompletionHandler;
@@ -51,5 +52,10 @@ public class CompletionQuery implements LspQuery<Either<List<CompletionItem>, Co
   public Either<List<CompletionItem>, CompletionList> query()
       throws ExecutionException, InterruptedException {
     return completionHandler.completion(params);
+  }
+
+  @Override
+  public List<LspEventCancelCondition> getCancelConditions() {
+    return completionHandler.getCancelConditions(params);
   }
 }

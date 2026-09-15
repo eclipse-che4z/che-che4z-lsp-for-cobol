@@ -196,8 +196,8 @@ public abstract class MessageServiceParser extends Parser {
    */
   @VisibleForTesting
   protected void validateDb2MaxInt(String input) {
-    int value = Integer.parseInt(input);
-    if (!(value > 0 && value <= 32767)) {
+    Integer value = tryParseInt(input);
+    if (value == null || !(value > 0 && value <= 32767)) {
       notifyError("db2SqlParser.maxIntValue", input);
     }
   }
@@ -210,8 +210,8 @@ public abstract class MessageServiceParser extends Parser {
    */
   @VisibleForTesting
   protected void validateTextInRange(String input, int min, int max) {
-    int value = Integer.parseInt(input);
-    if (!(value > min && value < max)) {
+    Integer value = tryParseInt(input);
+    if (value == null || !(value > min && value < max)) {
       notifyError(
           "parsers.validValueMsg", input, String.format("in range %d to %d", min + 1, max - 1));
     }
@@ -224,8 +224,8 @@ public abstract class MessageServiceParser extends Parser {
    */
   @VisibleForTesting
   protected void validate34or16(String input) {
-    int value = Integer.parseInt(input);
-    if (!(value == 34 || value == 16)) {
+    Integer value = tryParseInt(input);
+    if (value == null || !(value == 34 || value == 16)) {
       notifyError("parsers.validValueMsg", input, "34 or 16");
     }
   }
