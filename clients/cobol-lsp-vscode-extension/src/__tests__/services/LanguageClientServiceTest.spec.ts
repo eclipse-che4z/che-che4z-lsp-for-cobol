@@ -178,7 +178,6 @@ describe("LanguageClientService positive scenario", () => {
       .fn()
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
     const mockProcess = mockSpawnProcess(
       "",
       `java version "17.0.2" 2022-01-18 LTS
@@ -220,7 +219,6 @@ describe("LanguageClientService positive scenario", () => {
       .fn()
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
 
     const spawnSpy = jest
       .spyOn(cp, "spawn")
