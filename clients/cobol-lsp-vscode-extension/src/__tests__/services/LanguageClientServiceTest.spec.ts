@@ -263,12 +263,7 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_ID,
       SERVER_DESC,
       {
-        args: [
-          "-Dline.separator=\r\n",
-          "-Xmx768M",
-          "-jar",
-          serverPath,
-        ],
+        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath],
         command: "java",
         options: { detached: false },
       },

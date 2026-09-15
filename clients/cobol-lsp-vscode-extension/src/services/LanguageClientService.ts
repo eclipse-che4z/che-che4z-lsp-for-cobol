@@ -265,10 +265,7 @@ export class LanguageClientService {
     if (this.isNativeBuildEnabled) {
       return this.executableService.getNativeLanguageClient();
     }
-    const args = [
-      "-Dline.separator=\r\n",
-      "-Xmx768M",
-    ];
+    const args = ["-Dline.separator=\r\n", "-Xmx768M"];
     if (this.xshareOffSupported) {
       args.push("-Xshare:off");
     }
