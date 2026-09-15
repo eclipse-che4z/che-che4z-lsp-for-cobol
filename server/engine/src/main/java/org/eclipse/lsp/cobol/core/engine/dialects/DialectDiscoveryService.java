@@ -23,7 +23,7 @@ import org.eclipse.lsp.cobol.common.message.MessageService;
 /** Discover cobol dialects registered in the system */
 public interface DialectDiscoveryService extends DialectExecuteCommandCapabilityService {
   /**
-   * Load cobol dialects
+   * Load cobol dialects. Used for test only which doesnt go through client dialect registration
    *
    * @param copybookService a copybook service
    * @param messageService a message service

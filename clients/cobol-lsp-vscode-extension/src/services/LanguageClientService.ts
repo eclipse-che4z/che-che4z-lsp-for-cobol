@@ -48,7 +48,6 @@ const extensionId = "BroadcomMFD.cobol-language-support";
 
 export class LanguageClientService {
   private executablePath: string;
-  private dialectsPath: string;
   private languageClient: LanguageClient | undefined;
   private handlers: Array<(languageClient: LanguageClient) => void> = [];
   private isNativeBuildEnabled: boolean = false;
@@ -70,7 +69,6 @@ export class LanguageClientService {
     this.executableService = new NativeExecutableService(
       join(ext.extensionPath, "server"),
     );
-    this.dialectsPath = join(ext.extensionPath, "server", "jar", "dialects");
   }
 
   public enableNativeBuild() {
@@ -267,11 +265,7 @@ export class LanguageClientService {
     if (this.isNativeBuildEnabled) {
       return this.executableService.getNativeLanguageClient();
     }
-    const args = [
-      "-Dline.separator=\r\n",
-      `-Ddialect.path=${this.dialectsPath}`,
-      "-Xmx768M",
-    ];
+    const args = ["-Dline.separator=\r\n", "-Xmx768M"];
     if (this.xshareOffSupported) {
       args.push("-Xshare:off");
     }
