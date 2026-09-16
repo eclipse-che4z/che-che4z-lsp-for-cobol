@@ -43,7 +43,6 @@ export interface IdmsCopybookDescriptor {
   statement: Locality;
   levelRange: vscode.Range | undefined;
   level: number;
-  insert: boolean;
 }
 
 type CopyIdmsStatementCtx =
@@ -79,7 +78,6 @@ export function createIdmsCopybookDescriptor(
     statement: { uri: programDocumentUri, range: constructRange(ctx) },
     levelRange,
     level,
-    insert: false,
   };
 }
 

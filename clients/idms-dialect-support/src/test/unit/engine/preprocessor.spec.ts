@@ -245,7 +245,7 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
-  it("inserts the predefined subschema copybook into working-storage", async () => {
+  it("inserts the predefined subschema copybook after a multiline working-storage header", async () => {
     const context = createContext("file:///program.cbl");
     const copybookContext = createContext("file:///SUBSCHEMA-DESCRIPTION.cpy");
     context.resolveCopybook.mockResolvedValue({
@@ -254,24 +254,25 @@ describe("IdmsPreprocessor", () => {
       text: "       01 SUBSCHEMA-FIELD PIC X.",
     });
     const text = [
+      "       IDMS-CONTROL SECTION.",
+      "       PROTOCOL.",
+      "       IDMS-RECORDS WITHIN WORKING-STORAGE SECTION.",
       "       DATA DIVISION.",
       "       SCHEMA SECTION.",
       "       DB EMPSS01 WITHIN EMPSCHM.",
-      "       WORKING-STORAGE SECTION.",
+      "       WORKING-STORAGE",
+      "       SECTION.",
+      "       01 USER-FIELD PIC X.",
     ].join("\n");
 
     await preprocessor.execute(context, text);
 
     expect(context.resolveCopybook).toHaveBeenCalledWith(
       "SUBSCHEMA-DESCRIPTION",
-      expectRange(3, 31, 3, 31),
-      expectRange(3, 7, 3, 30),
+      expectRange(8, 0, 8, 0),
+      expectRange(6, 7, 7, 14),
     );
-    expect(copybookContext.insert).toHaveBeenCalledWith(
-      0,
-      "\n",
-      "file:///SUBSCHEMA-DESCRIPTION.cpy",
-    );
+    expect(copybookContext.insert).not.toHaveBeenCalled();
   });
 
   it("inserts the predefined maps copybook into working-storage", async () => {
@@ -287,20 +288,17 @@ describe("IdmsPreprocessor", () => {
       "       MAP SECTION.",
       "       MAP TEST-MAP.",
       "       WORKING-STORAGE SECTION.",
+      "       01 USER-FIELD PIC X.",
     ].join("\n");
 
     await preprocessor.execute(context, text);
 
     expect(context.resolveCopybook).toHaveBeenCalledWith(
       "MAPS",
-      expectRange(3, 31, 3, 31),
+      expectRange(4, 0, 4, 0),
       expectRange(3, 7, 3, 30),
     );
-    expect(copybookContext.insert).toHaveBeenCalledWith(
-      0,
-      "\n",
-      "file:///MAPS.cpy",
-    );
+    expect(copybookContext.insert).not.toHaveBeenCalled();
   });
 
   it("uses linkage placement for a predefined copybook", async () => {
@@ -319,13 +317,14 @@ describe("IdmsPreprocessor", () => {
       "       SCHEMA SECTION.",
       "       DB EMPSS01 WITHIN EMPSCHM.",
       "       LINKAGE SECTION.",
+      "       01 LINKAGE-FIELD PIC X.",
     ].join("\n");
 
     await preprocessor.execute(context, text);
 
     expect(context.resolveCopybook).toHaveBeenCalledWith(
       "SUBSCHEMA-DESCRIPTION",
-      expectRange(6, 23, 6, 23),
+      expectRange(7, 0, 7, 0),
       expectRange(6, 7, 6, 22),
     );
   });
@@ -348,11 +347,11 @@ describe("IdmsPreprocessor", () => {
     expect(context.replace).toHaveBeenNthCalledWith(
       1,
       expectRange(0, 7, 2, 27),
-      `${" ".repeat(21)}\n${" ".repeat(16)}\n${" ".repeat(27)}`,
+      " ",
     );
   });
 
-  it("blanks IDMS sections while preserving their layout", async () => {
+  it("replaces IDMS sections with a space", async () => {
     const context = createContext("file:///program.cbl");
     const text = [
       "       DATA DIVISION.",
@@ -362,9 +361,6 @@ describe("IdmsPreprocessor", () => {
 
     await preprocessor.execute(context, text);
 
-    expect(context.replace).toHaveBeenCalledWith(
-      expectRange(1, 7, 2, 33),
-      `${" ".repeat(15)}\n${" ".repeat(33)}`,
-    );
+    expect(context.replace).toHaveBeenCalledWith(expectRange(1, 7, 2, 33), " ");
   });
 });

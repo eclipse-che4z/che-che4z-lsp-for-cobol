@@ -70,8 +70,7 @@ export class IdmsPreprocessor {
     const copybookVisitor = new IdmsDialectVisitor(documentUri);
     const copybooks = copybookVisitor.visit(tree) ?? [];
     copybooks.push(...copybookVisitor.collectPredefinedCopybooks(text));
-    const transformations =
-      new IdmsTransformationVisitor(text).visit(tree) ?? [];
+    const transformations = new IdmsTransformationVisitor().visit(tree) ?? [];
     const errors = [
       ...errorListeners.lexer.errors,
       ...errorListeners.parser.errors,
