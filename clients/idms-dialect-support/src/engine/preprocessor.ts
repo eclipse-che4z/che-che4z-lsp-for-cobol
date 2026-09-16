@@ -12,9 +12,26 @@
  *   Broadcom - initial API and implementation
  */
 import * as vscode from "vscode";
+import * as antlr from "antlr4ng";
 import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
+import { IdmsLexer } from "../generated/IdmsLexer";
+import { IdmsParser } from "../generated/IdmsParser";
 import { MessageService } from "./services/MessageService";
 import { IdmsCopybookPreprocessor } from "./copybooks";
+import { IdmsCopybookDescriptor, ParseError } from "./model";
+import {
+  CollectingErrorListener,
+  IdmsDialectVisitor,
+  IdmsTransformation,
+  IdmsTransformationVisitor,
+} from "./parsing";
+import { addParsingErrors } from "./util";
+
+interface ProgramAnalysis {
+  copybooks: IdmsCopybookDescriptor[];
+  transformations: IdmsTransformation[];
+  errors: ParseError[];
+}
 
 export class IdmsPreprocessor {
   constructor(
@@ -26,10 +43,61 @@ export class IdmsPreprocessor {
     context: IDocumentProcessingContext,
     text: string,
   ): Promise<void> {
+    const analysis = this.analyzeProgram(
+      text,
+      context.getDocumentUri().toString(),
+    );
+    addParsingErrors(context, analysis.errors);
+
+    for (const transformation of analysis.transformations) {
+      context.replace(transformation.range, transformation.text);
+    }
+
     const copybookPreprocessor = new IdmsCopybookPreprocessor(
       this.outputChannel,
       this.messageService,
     );
-    await copybookPreprocessor.execute(context, text);
+    await copybookPreprocessor.execute(context, analysis.copybooks);
+  }
+
+  private analyzeProgram(text: string, documentUri: string): ProgramAnalysis {
+    const lexer = new IdmsLexer(antlr.CharStream.fromString(text));
+    const parser = new IdmsParser(new antlr.CommonTokenStream(lexer));
+    parser.setMessageService(this.messageService);
+
+    const errorListeners = this.configureErrorListeners(lexer, parser);
+    const tree = parser.startRule();
+    const copybookVisitor = new IdmsDialectVisitor(documentUri);
+    const copybooks = copybookVisitor.visit(tree) ?? [];
+    copybooks.push(...copybookVisitor.collectPredefinedCopybooks(text));
+    const transformations =
+      new IdmsTransformationVisitor(text).visit(tree) ?? [];
+    const errors = [
+      ...errorListeners.lexer.errors,
+      ...errorListeners.parser.errors,
+    ];
+
+    this.outputChannel.appendLine(
+      `IDMS parsing completed with ${errors.length} error(s)`,
+    );
+    return { copybooks, transformations, errors };
+  }
+
+  private configureErrorListeners(
+    lexer: IdmsLexer,
+    parser: IdmsParser,
+  ): {
+    lexer: CollectingErrorListener;
+    parser: CollectingErrorListener;
+  } {
+    lexer.removeErrorListeners();
+    parser.removeErrorListeners();
+
+    const lexerErrors = new CollectingErrorListener();
+    const parserErrors = new CollectingErrorListener();
+    lexer.addErrorListener(lexerErrors);
+    parser.addErrorListener(parserErrors);
+
+    return { lexer: lexerErrors, parser: parserErrors };
   }
 }

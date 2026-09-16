@@ -167,4 +167,242 @@ suite("Copybook Test Suite", function () {
       vscode.DiagnosticSeverity.Error,
     );
   });
+
+  test("Resolve copybook and its variables properly constructed (case 2)", async () => {
+    const editor = await helper.showDocument("Idms008.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook and its variables properly constructed (case 3)", async () => {
+    const editor = await helper.showDocument("Idms009.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook and its variables properly constructed (case 4)", async () => {
+    const editor = await helper.showDocument("Idms010.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook and its variables properly constructed (case 5)", async () => {
+    const editor = await helper.showDocument("Idms011.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook and its variables properly constructed (case 6)", async () => {
+    const editor = await helper.showDocument("Idms012.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook in FILE SECTION", async () => {
+    const editor = await helper.showDocument("Idms013.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(18, 19), pos(18, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook and its variables properly constructed (case 7)", async () => {
+    const editor = await helper.showDocument("Idms014.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(10, 19), pos(10, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve SUBSCHEMA-NAMES copybook with section only", async () => {
+    const editor = await helper.showDocument("Idms015.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(5, 19), pos(5, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook with comments", async () => {
+    const editor = await helper.showDocument("Idms016.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook required cleanup", async () => {
+    const editor = await helper.showDocument("Idms017.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook with variable levels adjustment", async () => {
+    const editor = await helper.showDocument("Idms018.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(12, 19), pos(12, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook after concat", async () => {
+    const editor = await helper.showDocument("Idms019.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(15, 19), pos(15, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook with COBOL (case 1)", async () => {
+    const editor = await helper.showDocument("Idms020.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(5, 19), pos(5, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
+
+  test("Resolve copybook with COBOL (case 2)", async () => {
+    const editor = await helper.showDocument("Idms021.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(13, 19), pos(13, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+  });
 });
