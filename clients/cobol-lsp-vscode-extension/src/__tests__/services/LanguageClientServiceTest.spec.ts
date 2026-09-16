@@ -178,7 +178,6 @@ describe("LanguageClientService positive scenario", () => {
       .fn()
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
     const mockProcess = mockSpawnProcess(
       "",
       `java version "17.0.2" 2022-01-18 LTS
@@ -196,7 +195,6 @@ describe("LanguageClientService positive scenario", () => {
       {
         args: [
           "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-Xshare:off",
           "-jar",
@@ -221,7 +219,6 @@ describe("LanguageClientService positive scenario", () => {
       .fn()
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
 
     const spawnSpy = jest
       .spyOn(cp, "spawn")
@@ -264,13 +261,7 @@ describe("LanguageClientService positive scenario", () => {
       SERVER_ID,
       SERVER_DESC,
       {
-        args: [
-          "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
-          "-Xmx768M",
-          "-jar",
-          serverPath,
-        ],
+        args: ["-Dline.separator=\r\n", "-Xmx768M", "-jar", serverPath],
         command: "java",
         options: { detached: false },
       },
@@ -290,7 +281,6 @@ describe("LanguageClientService positive scenario", () => {
       .fn()
       .mockReturnValue(Promise.resolve());
     const serverPath = join("/test", "server", "jar", "server.jar");
-    const expectedDialectPath = join("/test", "server", "jar", "dialects");
     SettingsService.getJavaHome = jest.fn().mockReturnValue("/usr/");
     const mockProcess = mockSpawnProcess(
       "",
@@ -310,7 +300,6 @@ describe("LanguageClientService positive scenario", () => {
       {
         args: [
           "-Dline.separator=\r\n",
-          `-Ddialect.path=${expectedDialectPath}`,
           "-Xmx768M",
           "-Xshare:off",
           "-jar",
