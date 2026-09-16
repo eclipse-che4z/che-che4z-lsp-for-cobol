@@ -45,6 +45,16 @@ export interface IdmsCopybookDescriptor {
   level: number;
 }
 
+export class StatementDescriptor {
+  public constructor(
+    public readonly range: vscode.Range,
+    public readonly statementRange: vscode.Range,
+    public readonly type: "STATEMENT" | "VARIABLE" | "VARIABLE_USAGE",
+    public readonly children: StatementDescriptor[],
+    public readonly filler: string = BLANK_STATEMENT,
+  ) {}
+}
+
 type CopyIdmsStatementCtx =
   | CopyIdmsStatementContextInCopybook
   | CopyIdmsStatementContextInProgram;

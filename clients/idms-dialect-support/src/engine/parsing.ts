@@ -22,6 +22,7 @@ import {
 } from "antlr4ng";
 import { IdmsParserVisitor } from "../generated/IdmsParserVisitor";
 import {
+  IdmsStatementsContext,
   CopyIdmsStatementContext as ProgramCopyIdmsStatementContext,
   IdmsRecordLocationParagraphContext,
   IdmsSectionsContext,
@@ -37,8 +38,11 @@ import {
   DataDescriptionEntryFormat3Context,
 } from "../generated/IdmsCopyParser";
 import {
+  BLANK_STATEMENT,
   IdmsCopybookDescriptor,
   ParseError,
+  SPACE_VALUE,
+  StatementDescriptor,
   createIdmsCopybookDescriptor,
 } from "./model";
 import { constructRange, constructRangeFromTokens } from "./util";
@@ -105,11 +109,6 @@ export type IdmsCopybookEntry =
       kind: "COPYBOOK";
       descriptor: IdmsCopybookDescriptor;
     };
-
-export interface IdmsTransformation {
-  range: vscode.Range;
-  text: string;
-}
 
 const DEFAULT_RECORD_PLACEMENT = "WORKING-STORAGE";
 const SUBSCHEMA_COPYBOOK = "SUBSCHEMA-DESCRIPTION";
@@ -261,20 +260,41 @@ export class IdmsDialectVisitor extends IdmsParserVisitor<
 
 /** Collects text transformations required before COBOL parsing. */
 export class IdmsTransformationVisitor extends IdmsParserVisitor<
-  IdmsTransformation[]
+  StatementDescriptor[]
 > {
-  visitIdmsSections = (ctx: IdmsSectionsContext): IdmsTransformation[] => {
+  visitIdmsSections = (ctx: IdmsSectionsContext): StatementDescriptor[] => {
     const start = ctx.start?.start;
     const stop = ctx.stop?.stop;
     if (start === undefined || stop === undefined || stop < start) {
       return [];
     }
 
+    const range = constructRange(ctx);
     return [
-      {
-        range: constructRange(ctx),
-        text: " ",
-      },
+      new StatementDescriptor(
+        range,
+        range,
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        SPACE_VALUE,
+      ),
+    ];
+  };
+
+  visitIdmsStatements = (ctx: IdmsStatementsContext): StatementDescriptor[] => {
+    if (ctx.imperativeStatementCall()) {
+      return [];
+    }
+
+    const range = constructRange(ctx);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        BLANK_STATEMENT,
+      ),
     ];
   };
 

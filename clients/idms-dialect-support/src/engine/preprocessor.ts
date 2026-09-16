@@ -18,18 +18,21 @@ import { IdmsLexer } from "../generated/IdmsLexer";
 import { IdmsParser } from "../generated/IdmsParser";
 import { MessageService } from "./services/MessageService";
 import { IdmsCopybookPreprocessor } from "./copybooks";
-import { IdmsCopybookDescriptor, ParseError } from "./model";
+import {
+  IdmsCopybookDescriptor,
+  ParseError,
+  StatementDescriptor,
+} from "./model";
 import {
   CollectingErrorListener,
   IdmsDialectVisitor,
-  IdmsTransformation,
   IdmsTransformationVisitor,
 } from "./parsing";
 import { addParsingErrors } from "./util";
 
 interface ProgramAnalysis {
   copybooks: IdmsCopybookDescriptor[];
-  transformations: IdmsTransformation[];
+  statements: StatementDescriptor[];
   errors: ParseError[];
 }
 
@@ -49,9 +52,7 @@ export class IdmsPreprocessor {
     );
     addParsingErrors(context, analysis.errors);
 
-    for (const transformation of analysis.transformations) {
-      context.replace(transformation.range, transformation.text);
-    }
+    this.processStatements(analysis.statements, context);
 
     const copybookPreprocessor = new IdmsCopybookPreprocessor(
       this.outputChannel,
@@ -70,7 +71,7 @@ export class IdmsPreprocessor {
     const copybookVisitor = new IdmsDialectVisitor(documentUri);
     const copybooks = copybookVisitor.visit(tree) ?? [];
     copybooks.push(...copybookVisitor.collectPredefinedCopybooks(text));
-    const transformations = new IdmsTransformationVisitor().visit(tree) ?? [];
+    const statements = new IdmsTransformationVisitor().visit(tree) ?? [];
     const errors = [
       ...errorListeners.lexer.errors,
       ...errorListeners.parser.errors,
@@ -79,7 +80,16 @@ export class IdmsPreprocessor {
     this.outputChannel.appendLine(
       `IDMS parsing completed with ${errors.length} error(s)`,
     );
-    return { copybooks, transformations, errors };
+    return { copybooks, statements, errors };
+  }
+
+  private processStatements(
+    descriptors: StatementDescriptor[],
+    context: IDocumentProcessingContext,
+  ): void {
+    for (const descriptor of descriptors) {
+      context.replace(descriptor.statementRange, descriptor.filler);
+    }
   }
 
   private configureErrorListeners(

@@ -363,4 +363,26 @@ describe("IdmsPreprocessor", () => {
 
     expect(context.replace).toHaveBeenCalledWith(expectRange(1, 7, 2, 33), " ");
   });
+
+  it("replaces a simple IDMS statement with CONTINUE", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(context, "       READY.");
+
+    expect(context.replace).toHaveBeenCalledWith(
+      expectRange(0, 7, 0, 12),
+      "CONTINUE",
+    );
+  });
+
+  it("leaves statements with an imperative call for special processing", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(
+      context,
+      "       READY\n       ON ANY-STATUS GOBACK.",
+    );
+
+    expect(context.replace).not.toHaveBeenCalled();
+  });
 });
