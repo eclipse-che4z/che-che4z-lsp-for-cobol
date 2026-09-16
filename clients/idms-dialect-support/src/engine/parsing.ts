@@ -168,70 +168,70 @@ export class IdmsDialectVisitor extends IdmsParserVisitor<
       return [];
     }
 
-    const sectionPattern = new RegExp(`${this.recordsPlacement} +SECTION`, "i");
-    const lines = text.split(/\r?\n/);
-    for (let line = 0; line < lines.length; line++) {
-      const match = sectionPattern.exec(lines[line]);
-      if (!match) {
-        continue;
-      }
-
-      const descriptors: IdmsCopybookDescriptor[] = [];
-      if (this.schemaSectionPresent) {
-        descriptors.push(
-          this.createPredefinedDescriptor(
-            SUBSCHEMA_COPYBOOK,
-            line,
-            lines[line].length,
-            match.index,
-            match.index + match[0].length,
-          ),
-        );
-      }
-      if (this.mapSectionPresent) {
-        descriptors.push(
-          this.createPredefinedDescriptor(
-            MAPS_COPYBOOK,
-            line,
-            lines[line].length,
-            match.index,
-            match.index + match[0].length,
-          ),
-        );
-      }
-      return descriptors;
+    const sectionPattern = new RegExp(
+      `${this.recordsPlacement}\\s+SECTION`,
+      "gi",
+    );
+    let match = sectionPattern.exec(text);
+    while (match && !this.isSectionHeader(text, match.index)) {
+      match = sectionPattern.exec(text);
     }
-    return [];
+    if (!match) {
+      return [];
+    }
+
+    const usageStart = this.positionAt(text, match.index);
+    const usageEnd = this.positionAt(text, match.index + match[0].length);
+    const descriptors: IdmsCopybookDescriptor[] = [];
+    if (this.schemaSectionPresent) {
+      descriptors.push(
+        this.createPredefinedDescriptor(
+          SUBSCHEMA_COPYBOOK,
+          usageStart,
+          usageEnd,
+        ),
+      );
+    }
+    if (this.mapSectionPresent) {
+      descriptors.push(
+        this.createPredefinedDescriptor(MAPS_COPYBOOK, usageStart, usageEnd),
+      );
+    }
+    return descriptors;
   }
 
   protected aggregateResult = concatResults;
 
   private createPredefinedDescriptor(
     name: string,
-    line: number,
-    insertionCharacter: number,
-    usageStart: number,
-    usageEnd: number,
+    usageStart: vscode.Position,
+    usageEnd: vscode.Position,
   ): IdmsCopybookDescriptor {
     return {
       name,
       usage: {
         uri: this.documentUri,
-        range: new vscode.Range(line, usageStart, line, usageEnd),
+        range: new vscode.Range(usageStart, usageEnd),
       },
       statement: {
         uri: this.documentUri,
-        range: new vscode.Range(
-          line,
-          insertionCharacter,
-          line,
-          insertionCharacter,
-        ),
+        range: new vscode.Range(usageEnd.line + 1, 0, usageEnd.line + 1, 0),
       },
       levelRange: undefined,
       level: 0,
-      insert: true,
     };
+  }
+
+  private positionAt(text: string, offset: number): vscode.Position {
+    const lines = text.slice(0, offset).split(/\r?\n/);
+    return new vscode.Position(lines.length - 1, lines.at(-1)?.length ?? 0);
+  }
+
+  private isSectionHeader(text: string, offset: number): boolean {
+    const lineStart = text.lastIndexOf("\n", offset - 1) + 1;
+    const prefix = text.slice(lineStart, offset);
+    const areaAPrefix = prefix.length >= 7 ? prefix.slice(7) : prefix;
+    return areaAPrefix.trim().length === 0;
   }
 }
 
@@ -239,10 +239,6 @@ export class IdmsDialectVisitor extends IdmsParserVisitor<
 export class IdmsTransformationVisitor extends IdmsParserVisitor<
   IdmsTransformation[]
 > {
-  public constructor(private readonly text: string) {
-    super();
-  }
-
   visitIdmsSections = (ctx: IdmsSectionsContext): IdmsTransformation[] => {
     const start = ctx.start?.start;
     const stop = ctx.stop?.stop;
@@ -253,7 +249,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
     return [
       {
         range: constructRange(ctx),
-        text: this.text.slice(start, stop + 1).replace(/[^ \n]/g, " "),
+        text: " ",
       },
     ];
   };
