@@ -180,21 +180,20 @@ export class IdmsDialectVisitor extends IdmsParserVisitor<
       return [];
     }
 
-    const usageStart = this.positionAt(text, match.index);
-    const usageEnd = this.positionAt(text, match.index + match[0].length);
+    const usageRange = this.rangeAt(
+      text,
+      match.index,
+      match.index + match[0].length,
+    );
     const descriptors: IdmsCopybookDescriptor[] = [];
     if (this.schemaSectionPresent) {
       descriptors.push(
-        this.createPredefinedDescriptor(
-          SUBSCHEMA_COPYBOOK,
-          usageStart,
-          usageEnd,
-        ),
+        this.createPredefinedDescriptor(SUBSCHEMA_COPYBOOK, usageRange),
       );
     }
     if (this.mapSectionPresent) {
       descriptors.push(
-        this.createPredefinedDescriptor(MAPS_COPYBOOK, usageStart, usageEnd),
+        this.createPredefinedDescriptor(MAPS_COPYBOOK, usageRange),
       );
     }
     return descriptors;
@@ -204,27 +203,52 @@ export class IdmsDialectVisitor extends IdmsParserVisitor<
 
   private createPredefinedDescriptor(
     name: string,
-    usageStart: vscode.Position,
-    usageEnd: vscode.Position,
+    usageRange: vscode.Range,
   ): IdmsCopybookDescriptor {
     return {
       name,
       usage: {
         uri: this.documentUri,
-        range: new vscode.Range(usageStart, usageEnd),
+        range: usageRange,
       },
       statement: {
         uri: this.documentUri,
-        range: new vscode.Range(usageEnd.line + 1, 0, usageEnd.line + 1, 0),
+        range: new vscode.Range(
+          usageRange.end.line + 1,
+          0,
+          usageRange.end.line + 1,
+          0,
+        ),
       },
       levelRange: undefined,
       level: 0,
     };
   }
 
-  private positionAt(text: string, offset: number): vscode.Position {
-    const lines = text.slice(0, offset).split(/\r?\n/);
-    return new vscode.Position(lines.length - 1, lines.at(-1)?.length ?? 0);
+  private rangeAt(
+    text: string,
+    startOffset: number,
+    endOffset: number,
+  ): vscode.Range {
+    let line = 0;
+    let character = 0;
+    let start: vscode.Position | undefined;
+
+    for (let offset = 0; offset < endOffset; offset++) {
+      if (offset === startOffset) {
+        start = new vscode.Position(line, character);
+      }
+
+      if (text[offset] === "\n") {
+        line++;
+        character = 0;
+      } else if (text[offset] !== "\r" || text[offset + 1] !== "\n") {
+        character++;
+      }
+    }
+
+    const end = new vscode.Position(line, character);
+    return new vscode.Range(start ?? end, end);
   }
 
   private isSectionHeader(text: string, offset: number): boolean {
