@@ -14,8 +14,6 @@
 import * as vscode from "vscode";
 import * as antlr from "antlr4ng";
 import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
-import { IdmsLexer } from "../generated/IdmsLexer";
-import { IdmsParser } from "../generated/IdmsParser";
 import { IdmsCopyLexer } from "../generated/IdmsCopyLexer";
 import { IdmsCopyParser } from "../generated/IdmsCopyParser";
 import { IdmsCopybookDescriptor, ParseError } from "./model";
@@ -23,7 +21,6 @@ import {
   CollectingErrorListener,
   IdmsCopybookEntry,
   IdmsCopyVisitor,
-  IdmsDialectVisitor,
 } from "./parsing";
 import { addParsingErrors } from "./util";
 import { MessageService } from "./services/MessageService";
@@ -48,7 +45,7 @@ interface ParsingResult<T> {
   errors: ParseError[];
 }
 
-/** Resolves explicit COPY IDMS statements and adjusts copybook data levels. */
+/** Resolves explicit and predefined IDMS copybooks and adjusts their data levels. */
 export class IdmsCopybookPreprocessor {
   public constructor(
     private readonly outputChannel: vscode.OutputChannel,
@@ -57,36 +54,12 @@ export class IdmsCopybookPreprocessor {
 
   public async execute(
     context: IDocumentProcessingContext,
-    text: string,
+    descriptors: IdmsCopybookDescriptor[],
   ): Promise<void> {
-    const { result: descriptors, errors } = this.analyzeProgram(
-      text,
-      context.getDocumentUri().toString(),
-    );
-    addParsingErrors(context, errors);
-
     for (const descriptor of descriptors) {
       const variables = await this.processCopybook(context, descriptor, []);
       this.applyLevelReplacements(variables);
     }
-  }
-
-  private analyzeProgram(
-    text: string,
-    documentUri: string,
-  ): ParsingResult<IdmsCopybookDescriptor[]> {
-    const lexer = new IdmsLexer(antlr.CharStream.fromString(text));
-    const parser = new IdmsParser(new antlr.CommonTokenStream(lexer));
-    parser.setMessageService(this.messageService);
-
-    const errorListeners = this.configureErrorListeners(lexer, parser);
-    const descriptors = new IdmsDialectVisitor(documentUri).visit(
-      parser.startRule(),
-    );
-    const errors = this.collectParsingErrors(errorListeners);
-
-    this.logParsingResult(errors);
-    return { result: descriptors ?? [], errors };
   }
 
   private analyzeCopybook(
@@ -108,8 +81,8 @@ export class IdmsCopybookPreprocessor {
   }
 
   private configureErrorListeners(
-    lexer: IdmsLexer | IdmsCopyLexer,
-    parser: IdmsParser | IdmsCopyParser,
+    lexer: IdmsCopyLexer,
+    parser: IdmsCopyParser,
   ): {
     lexer: CollectingErrorListener;
     parser: CollectingErrorListener;
@@ -169,6 +142,10 @@ export class IdmsCopybookPreprocessor {
     this.outputChannel.appendLine(
       `Resolved IDMS copybook '${name}' at ${copybook.uri.toString()}`,
     );
+
+    if (descriptor.insert) {
+      copybook.context.insert(0, "\n", copybook.uri.toString());
+    }
 
     const { result: entries, errors } = this.analyzeCopybook(
       copybook.text,

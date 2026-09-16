@@ -31,11 +31,13 @@ function createContext(uri: string) {
   return {
     resolveCopybook: jest.fn(),
     replace: jest.fn(),
+    insert: jest.fn(),
     addDiagnostic: jest.fn(),
     getDocumentUri: jest.fn().mockReturnValue(vscode.Uri.parse(uri)),
   } as unknown as IDocumentProcessingContext & {
     resolveCopybook: jest.Mock;
     replace: jest.Mock;
+    insert: jest.Mock;
     addDiagnostic: jest.Mock;
   };
 }
@@ -240,6 +242,129 @@ describe("IdmsPreprocessor", () => {
     expect(copybookContext.replace).toHaveBeenCalledWith(
       expectRange(0, 7, 0, 25),
       "",
+    );
+  });
+
+  it("inserts the predefined subschema copybook into working-storage", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///SUBSCHEMA-DESCRIPTION.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///SUBSCHEMA-DESCRIPTION.cpy"),
+      text: "       01 SUBSCHEMA-FIELD PIC X.",
+    });
+    const text = [
+      "       DATA DIVISION.",
+      "       SCHEMA SECTION.",
+      "       DB EMPSS01 WITHIN EMPSCHM.",
+      "       WORKING-STORAGE SECTION.",
+    ].join("\n");
+
+    await preprocessor.execute(context, text);
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "SUBSCHEMA-DESCRIPTION",
+      expectRange(3, 31, 3, 31),
+      expectRange(3, 7, 3, 30),
+    );
+    expect(copybookContext.insert).toHaveBeenCalledWith(
+      0,
+      "\n",
+      "file:///SUBSCHEMA-DESCRIPTION.cpy",
+    );
+  });
+
+  it("inserts the predefined maps copybook into working-storage", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///MAPS.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MAPS.cpy"),
+      text: "       01 MAP-FIELD PIC X.",
+    });
+    const text = [
+      "       DATA DIVISION.",
+      "       MAP SECTION.",
+      "       MAP TEST-MAP.",
+      "       WORKING-STORAGE SECTION.",
+    ].join("\n");
+
+    await preprocessor.execute(context, text);
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "MAPS",
+      expectRange(3, 31, 3, 31),
+      expectRange(3, 7, 3, 30),
+    );
+    expect(copybookContext.insert).toHaveBeenCalledWith(
+      0,
+      "\n",
+      "file:///MAPS.cpy",
+    );
+  });
+
+  it("uses linkage placement for a predefined copybook", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///SUBSCHEMA-DESCRIPTION.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///SUBSCHEMA-DESCRIPTION.cpy"),
+      text: "       01 SUBSCHEMA-FIELD PIC X.",
+    });
+    const text = [
+      "       IDMS-CONTROL SECTION.",
+      "       PROTOCOL.",
+      "       IDMS-RECORDS WITHIN LINKAGE.",
+      "       DATA DIVISION.",
+      "       SCHEMA SECTION.",
+      "       DB EMPSS01 WITHIN EMPSCHM.",
+      "       LINKAGE SECTION.",
+    ].join("\n");
+
+    await preprocessor.execute(context, text);
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "SUBSCHEMA-DESCRIPTION",
+      expectRange(6, 23, 6, 23),
+      expectRange(6, 7, 6, 22),
+    );
+  });
+
+  it("does not insert predefined copybooks for manual records", async () => {
+    const context = createContext("file:///program.cbl");
+    const text = [
+      "       IDMS-CONTROL SECTION.",
+      "       PROTOCOL.",
+      "       IDMS-RECORDS MANUAL.",
+      "       DATA DIVISION.",
+      "       SCHEMA SECTION.",
+      "       DB EMPSS01 WITHIN EMPSCHM.",
+      "       WORKING-STORAGE SECTION.",
+    ].join("\n");
+
+    await preprocessor.execute(context, text);
+
+    expect(context.resolveCopybook).not.toHaveBeenCalled();
+    expect(context.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 2, 27),
+      `${" ".repeat(21)}\n${" ".repeat(16)}\n${" ".repeat(27)}`,
+    );
+  });
+
+  it("blanks IDMS sections while preserving their layout", async () => {
+    const context = createContext("file:///program.cbl");
+    const text = [
+      "       DATA DIVISION.",
+      "       SCHEMA SECTION.",
+      "       DB EMPSS01 WITHIN EMPSCHM.",
+    ].join("\n");
+
+    await preprocessor.execute(context, text);
+
+    expect(context.replace).toHaveBeenCalledWith(
+      expectRange(1, 7, 2, 33),
+      `${" ".repeat(15)}\n${" ".repeat(33)}`,
     );
   });
 });
