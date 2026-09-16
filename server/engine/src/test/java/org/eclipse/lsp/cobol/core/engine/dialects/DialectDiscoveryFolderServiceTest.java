@@ -59,11 +59,10 @@ class DialectDiscoveryFolderServiceTest {
 
   @Test
   void testReplaceClassLoader_closesPreviousLoaderForSameJar() throws Exception {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
 
     URI jarUri = URI.create("file:///dialect-test.jar");
     URLClassLoader firstLoader = spy(new URLClassLoader(new URL[0]));
@@ -80,11 +79,10 @@ class DialectDiscoveryFolderServiceTest {
 
   @Test
   void testReplaceClassLoader_doesNotCloseLoaderForDifferentJar() throws Exception {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
 
     URLClassLoader firstLoader = spy(new URLClassLoader(new URL[0]));
     URLClassLoader secondLoader = new URLClassLoader(new URL[0]);
