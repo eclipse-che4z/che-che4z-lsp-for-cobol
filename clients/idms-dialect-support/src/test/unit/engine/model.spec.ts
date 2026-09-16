@@ -141,7 +141,6 @@ describe("createIdmsCopybookDescriptor", () => {
     expect(descriptor.name).toBe("'MYCOPY'");
     expect(descriptor.usage.uri).toBe(documentUri);
     expect(descriptor.statement.uri).toBe(documentUri);
-    expect(descriptor.insert).toBe(false);
   });
 
   it("should resolve the name from a cobol word when no literal is present", () => {

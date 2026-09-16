@@ -143,10 +143,6 @@ export class IdmsCopybookPreprocessor {
       `Resolved IDMS copybook '${name}' at ${copybook.uri.toString()}`,
     );
 
-    if (descriptor.insert) {
-      copybook.context.insert(0, "\n", copybook.uri.toString());
-    }
-
     const { result: entries, errors } = this.analyzeCopybook(
       copybook.text,
       copybook.uri.toString(),
