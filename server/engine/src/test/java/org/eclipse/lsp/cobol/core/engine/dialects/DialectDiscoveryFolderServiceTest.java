@@ -15,10 +15,8 @@
 package org.eclipse.lsp.cobol.core.engine.dialects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -35,42 +33,12 @@ import org.junit.jupiter.api.Test;
 /** Test for DialectDiscoveryFolderService */
 class DialectDiscoveryFolderServiceTest {
   @Test
-  void testLoadDialects() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
+  void testLoadDialects_noImplicitDiscovery() {
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
-    when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList =
-        service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
-    assertEquals(0, dialectList.size());
-  }
-
-  @Test
-  void testLoadDialects_working_folder_failed() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
-    Communications communications = mock(ServerCommunications.class);
-    CodeActions actions = mock(CodeActions.class);
-    when(workingFolderService.getWorkingFolder()).thenThrow(new RuntimeException());
-
-    DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
-    List<CobolDialect> dialectList =
-        service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
-    assertEquals(0, dialectList.size());
-  }
-
-  @Test
-  void testLoadDialects_get_filenames_failed() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
-    Communications communications = mock(ServerCommunications.class);
-    CodeActions actions = mock(CodeActions.class);
-    when(workingFolderService.getFilenames(any())).thenThrow(new RuntimeException());
-
-    DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
     List<CobolDialect> dialectList =
         service.loadDialects(mock(CopybookService.class), mock(MessageService.class));
     assertEquals(0, dialectList.size());
@@ -78,13 +46,11 @@ class DialectDiscoveryFolderServiceTest {
 
   @Test
   void testLoadDialects_specifiedPath() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
-    when(workingFolderService.getFilenames(any())).thenReturn(ImmutableList.of("dialect-test.jar"));
 
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
     List<CobolDialect> dialectList =
         service.loadDialects(
             URI.create(""), mock(CopybookService.class), mock(MessageService.class));
@@ -129,33 +95,30 @@ class DialectDiscoveryFolderServiceTest {
 
   @Test
   void testRegisterExecuteCommandCapabilities() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
     service.registerExecuteCommandCapabilities(Collections.emptyList(), "test");
     verify(communications).registerExecuteCommandCapability(Collections.emptyList(), "test");
   }
 
   @Test
   void testUnRegisterExecuteCommandCapabilities() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
     service.unregisterExecuteCommandCapabilities("test");
     verify(communications).unregisterExecuteCommandCapability("test");
   }
 
   @Test
   void testRegisterDialectCodeActionProviders() {
-    WorkingFolderService workingFolderService = mock(WorkingFolderService.class);
     Communications communications = mock(ServerCommunications.class);
     CodeActions actions = mock(CodeActions.class);
     DialectDiscoveryFolderService service =
-        new DialectDiscoveryFolderService(workingFolderService, communications, actions);
+        new DialectDiscoveryFolderService(communications, actions);
     service.registerDialectCodeActionProviders(Collections.emptyList());
     verify(actions).registerNewProviders(Collections.emptyList());
   }
