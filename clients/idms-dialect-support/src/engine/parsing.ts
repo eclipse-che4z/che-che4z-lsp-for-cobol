@@ -21,7 +21,13 @@ import {
   TerminalNode,
 } from "antlr4ng";
 import { IdmsParserVisitor } from "../generated/IdmsParserVisitor";
-import { CopyIdmsStatementContext as ProgramCopyIdmsStatementContext } from "../generated/IdmsParser";
+import {
+  CopyIdmsStatementContext as ProgramCopyIdmsStatementContext,
+  IdmsRecordLocationParagraphContext,
+  IdmsSectionsContext,
+  MapSectionContext,
+  SchemaSectionContext,
+} from "../generated/IdmsParser";
 import { IdmsCopyParserVisitor } from "../generated/IdmsCopyParserVisitor";
 import {
   CopyIdmsStatementContext as CopybookCopyIdmsStatementContext,
@@ -35,7 +41,7 @@ import {
   ParseError,
   createIdmsCopybookDescriptor,
 } from "./model";
-import { constructRangeFromTokens } from "./util";
+import { constructRange, constructRangeFromTokens } from "./util";
 
 export class CollectingErrorListener extends BaseErrorListener {
   public readonly errors: ParseError[] = [];
@@ -100,10 +106,24 @@ export type IdmsCopybookEntry =
       descriptor: IdmsCopybookDescriptor;
     };
 
-/** Collects explicit COPY IDMS statements from a COBOL program. */
+export interface IdmsTransformation {
+  range: vscode.Range;
+  text: string;
+}
+
+const DEFAULT_RECORD_PLACEMENT = "WORKING-STORAGE";
+const SUBSCHEMA_COPYBOOK = "SUBSCHEMA-DESCRIPTION";
+const MAPS_COPYBOOK = "MAPS";
+
+/** Collects explicit and predefined IDMS copybooks from a COBOL program. */
 export class IdmsDialectVisitor extends IdmsParserVisitor<
   IdmsCopybookDescriptor[]
 > {
+  private recordsManual = false;
+  private recordsPlacement = DEFAULT_RECORD_PLACEMENT;
+  private schemaSectionPresent = false;
+  private mapSectionPresent = false;
+
   public constructor(private readonly documentUri: string) {
     super();
   }
@@ -113,6 +133,130 @@ export class IdmsDialectVisitor extends IdmsParserVisitor<
   ): IdmsCopybookDescriptor[] => [
     createIdmsCopybookDescriptor(ctx, this.documentUri),
   ];
+
+  visitIdmsRecordLocationParagraph = (
+    ctx: IdmsRecordLocationParagraphContext,
+  ): IdmsCopybookDescriptor[] => {
+    const withinClause = ctx.withinClause();
+    if (withinClause.MANUAL()) {
+      this.recordsManual = true;
+    } else {
+      const withinEntry = withinClause.withinEntry();
+      if (withinEntry?.LINKAGE()) {
+        this.recordsPlacement = "LINKAGE";
+      } else if (withinEntry?.WORKING_STORAGE()) {
+        this.recordsPlacement = DEFAULT_RECORD_PLACEMENT;
+      }
+    }
+    return [];
+  };
+
+  visitSchemaSection = (
+    _ctx: SchemaSectionContext,
+  ): IdmsCopybookDescriptor[] => {
+    this.schemaSectionPresent = true;
+    return [];
+  };
+
+  visitMapSection = (_ctx: MapSectionContext): IdmsCopybookDescriptor[] => {
+    this.mapSectionPresent = true;
+    return [];
+  };
+
+  public collectPredefinedCopybooks(text: string): IdmsCopybookDescriptor[] {
+    if (this.recordsManual) {
+      return [];
+    }
+
+    const sectionPattern = new RegExp(`${this.recordsPlacement} +SECTION`, "i");
+    const lines = text.split(/\r?\n/);
+    for (let line = 0; line < lines.length; line++) {
+      const match = sectionPattern.exec(lines[line]);
+      if (!match) {
+        continue;
+      }
+
+      const descriptors: IdmsCopybookDescriptor[] = [];
+      if (this.schemaSectionPresent) {
+        descriptors.push(
+          this.createPredefinedDescriptor(
+            SUBSCHEMA_COPYBOOK,
+            line,
+            lines[line].length,
+            match.index,
+            match.index + match[0].length,
+          ),
+        );
+      }
+      if (this.mapSectionPresent) {
+        descriptors.push(
+          this.createPredefinedDescriptor(
+            MAPS_COPYBOOK,
+            line,
+            lines[line].length,
+            match.index,
+            match.index + match[0].length,
+          ),
+        );
+      }
+      return descriptors;
+    }
+    return [];
+  }
+
+  protected aggregateResult = concatResults;
+
+  private createPredefinedDescriptor(
+    name: string,
+    line: number,
+    insertionCharacter: number,
+    usageStart: number,
+    usageEnd: number,
+  ): IdmsCopybookDescriptor {
+    return {
+      name,
+      usage: {
+        uri: this.documentUri,
+        range: new vscode.Range(line, usageStart, line, usageEnd),
+      },
+      statement: {
+        uri: this.documentUri,
+        range: new vscode.Range(
+          line,
+          insertionCharacter,
+          line,
+          insertionCharacter,
+        ),
+      },
+      levelRange: undefined,
+      level: 0,
+      insert: true,
+    };
+  }
+}
+
+/** Collects text transformations required before COBOL parsing. */
+export class IdmsTransformationVisitor extends IdmsParserVisitor<
+  IdmsTransformation[]
+> {
+  public constructor(private readonly text: string) {
+    super();
+  }
+
+  visitIdmsSections = (ctx: IdmsSectionsContext): IdmsTransformation[] => {
+    const start = ctx.start?.start;
+    const stop = ctx.stop?.stop;
+    if (start === undefined || stop === undefined || stop < start) {
+      return [];
+    }
+
+    return [
+      {
+        range: constructRange(ctx),
+        text: this.text.slice(start, stop + 1).replace(/[^ \n]/g, " "),
+      },
+    ];
+  };
 
   protected aggregateResult = concatResults;
 }
