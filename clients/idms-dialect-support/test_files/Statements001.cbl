@@ -1,5 +1,7 @@
       * Java usecases:
-      * https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/tree/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases
+      * https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/tree
+      */development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol
+      */dialects/idms/usecases
       * TestAbendCode, TestAccept, TestAttachTaskCode, TestBind,
       * TestChangePriority, TestCheckTerminal, TestCommit, TestDelete,
       * TestEnd, TestEndpage, TestFinish, TestIdmsAcceptDbStatements,
