@@ -169,22 +169,59 @@ public class ExtendedDocument {
    *
    * @param range - range of text to replace
    * @param statementRange - a statement range within the text range
-   * @param statementMap - a map of token names and its ranges from the original text
+   * @param statementMap - a map of token names and its values and locations from the original text
    * @param replacementMap - a new text replacement map
    * @return a HashMap of mapped tokens
    */
-  public Map<String, TextMapReplacer.Token> replace(
-      Range range, Range statementRange, Map<String, Range> statementMap, String replacementMap) {
+  public Map<String, Token> replace(
+      Range range, Range statementRange, Map<String, Token> statementMap, String replacementMap) {
     Range updatedRange = updateRangeDueToChanges(range);
     Range updatedStatementRange = updateRangeDueToChanges(statementRange);
-    Map<String, Range> updatedStatementMap =
-        statementMap.entrySet().stream()
-            .collect(
-                Collectors.toMap(Map.Entry::getKey, e -> updateRangeDueToChanges(e.getValue())));
 
     dirty = true;
     return currentText.replace(
-        updatedRange, updatedStatementRange, updatedStatementMap, replacementMap);
+        updatedRange,
+        updatedStatementRange,
+        updateStatementMapDueToChanges(statementMap),
+        replacementMap);
+  }
+
+  private Map<String, Token> updateStatementMapDueToChanges(Map<String, Token> statementMap) {
+    return statementMap.entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                e -> {
+                  if (e.getValue().getOriginalLocation().getUri().equals(this.getUri())) {
+                    e.getValue()
+                        .getOriginalLocation()
+                        .setRange(
+                            updateRangeDueToChanges(e.getValue().getOriginalLocation().getRange()));
+                  }
+                  return e.getValue();
+                }));
+  }
+
+  /**
+   * Inserts a new block of text at the given line, built from a replacement map, preserving
+   * original locations for substituted tokens
+   *
+   * @param line - a line number to insert
+   * @param statementRange - a range in the original text this text logically originates from
+   * @param statementMap - a map of token names and its values and locations from the original text
+   * @param replacementMap - a new text replacement map
+   * @return a HashMap of mapped tokens
+   */
+  public Map<String, Token> insert(
+      int line, Range statementRange, Map<String, Token> statementMap, String replacementMap) {
+    int updatedLine = updateLineDueToChanges(line);
+    Range updatedStatementRange = updateRangeDueToChanges(statementRange);
+    dirty = true;
+    return currentText.insertWithMap(
+        updatedLine,
+        updatedStatementRange,
+        updateStatementMapDueToChanges(statementMap),
+        replacementMap);
   }
 
   public void delete(int lineNumber) {

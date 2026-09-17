@@ -11,6 +11,15 @@
  * Contributors:
  *   Broadcom - initial API and implementation
  */
+import { URI, Utils } from "vscode-uri";
+
+export const Uri = URI;
+Object.assign(Uri, Utils);
+
+export class Location {
+  constructor(public uri: URI, public range: Range) {}
+}
+
 export class Range {
   constructor(public start: Position, public end: Position) {}
 }

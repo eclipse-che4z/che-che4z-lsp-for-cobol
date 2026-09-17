@@ -49,6 +49,15 @@ public class CodeActions {
   }
 
   /**
+   * Unregisters previously registered code action providers
+   *
+   * @param providers list of {@link CodeActionProvider}
+   */
+  public void unregisterProviders(List<CodeActionProvider> providers) {
+    this.providers.removeAll(providers);
+  }
+
+  /**
    * Collect a list of either commands or code actions according to the given params. May return an
    * empty list if the diagnostics cannot be processed with the existing providers.
    *
