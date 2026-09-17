@@ -29,13 +29,9 @@ allCicsRule: cics_send | cics_receive | cics_add | cics_address | cics_allocate 
                        cics_soapfault | cics_spoolclose | cics_spoolopen | cics_spoolread | cics_spoolwrite | cics_start |
                        cics_startbr | cics_startbrowse | cics_suspend | cics_syncpoint | cics_test | cics_transform | cics_unlock |
                        cics_update | cics_verify | cics_wait | cics_waitcics | cics_web | cics_write | cics_writeq | cics_wsacontext |
-                       cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | allExciRules | allSPRules
+                       cics_wsaepr | cics_xctl | cics_converse | cics_abend | cics_acquire | allSPRules
                       ;
 
-// exci rules
-allExciRules: cics_exci_link | cics_exci_delete | cics_exci_delete_container | cics_exci_endbrowse_container |
-              cics_exci_get_container | cics_exci_get_next_container | cics_exci_move_container |
-              cics_exci_put_container | cics_exci_query_channel | cics_exci_startbrowse_container ;
 
 allSPRules: cics_acquire_terminal | cics_disable | cics_discard | cics_enable | cics_extract_system_programming | cics_inquire_system_programming | cics_create | cics_perform | cics_resync_entryname | cics_collect_statistics | cics_csd;
 
@@ -285,10 +281,10 @@ cics_delete_group_one:  (cics_file_name | TOKEN cics_data_area  | cics_keylength
                          ((SYSID | RIDFLD | NUMREC) cics_data_area) | NOSUSPEND | RBA | RRN | cics_handle_response)+;
 
 // CICS Delete Group 2 (Activity, Channel, Event, Timer)
-cics_delete_group_two:  ((ACTIVITY | CHANNEL | EVENT | TIMER) cics_data_value | cics_handle_response)+;
+cics_delete_group_two:  ((ACTIVITY | CHANNEL | EVENT | TIMER) cics_data_value | RETCODE cics_data_area | cics_handle_response)+;
 
 // CICS Delete Group 3 (Container (BTS), Container (Channel))
-cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
+cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL) cics_data_value | RETCODE cics_data_area | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
 
 // CICS Delete Group 4 (Counter, Dcounter)
 cics_delete_group_four:  (cics_counter_dcounter | POOL cics_name | NOSUSPEND | cics_handle_response)+;
@@ -344,7 +340,7 @@ cics_enable_program: ((PROGRAM | ENTRYNAME | EXIT | GALENGTH | GAENTRYNAME | TAL
 cics_endbr: ENDBR cics_endbr_opts;
 cics_endbr_opts: ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)+;
 cics_endbrowse: ENDBROWSE cics_endbrowse_opts;
-cics_endbrowse_opts: (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | (BROWSETOKEN | RETCODE) cics_data_value | cics_handle_response)+;
+cics_endbrowse_opts: (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | BROWSETOKEN  cics_data_value | RETCODE cics_data_area  | cics_handle_response)+;
 
 /** ENQ */
 cics_enq: ENQ cics_enq_opts;
@@ -404,7 +400,7 @@ cics_gds_opts: ~(END_EXEC|EOF|DOT)*;
 cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
 cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
                     SET cics_ref | NODATA  | cics_handle_response)*;
-cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID) cics_data_area |
+cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID | RETCODE) cics_data_area |
                     SET cics_ref | NODATA | CONVERTST cics_cvda | cics_handle_response)*;
 cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_data_area | (INCREMENT | COMPAREMIN | COMPAREMAX) cics_data_value |
                   WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
@@ -421,7 +417,7 @@ cics_getmain64_body: (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvd
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
 cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process | cics_getnext_timer);
 cics_getnext_activity: (BROWSETOKEN cics_data_value | (ACTIVITY | ACTIVITYID | LEVEL) cics_data_area | cics_handle_response)+;
-cics_getnext_container: (CONTAINER cics_data_area | BROWSETOKEN cics_data_value | cics_handle_response)+;
+cics_getnext_container: ((CONTAINER | BROWSETOKEN) cics_data_value | RETCODE cics_data_area | cics_handle_response)+;
 cics_getnext_event: (BROWSETOKEN cics_data_value | (EVENT | COMPOSITE | TIMER) cics_data_area | (EVENTTYPE | FIRESTATUS | PREDICATE) cics_cvda | cics_handle_response)+;
 cics_getnext_process: (BROWSETOKEN cics_data_value | (PROCESS | ACTIVITYID) cics_data_area | cics_handle_response)+;
 cics_getnext_timer: ((TIMER | ACTIVITYID) cics_data_value | (EVENT | ABSTIME | BROWSETOKEN) cics_data_area | STATUS cics_cvda | cics_handle_response)+;
@@ -594,60 +590,10 @@ cics_issue_common: ((DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_d
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
-cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL) cics_name | (COMMAREA | INPUTMSG) cics_data_area |
-                (LENGTH | DATALENGTH | INPUTMSGLEN) cics_data_value | SYNCONRETURN | cics_handle_response)*;
+cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL | APPLID) cics_name | (COMMAREA | INPUTMSG | RETCODE) cics_data_area |
+                (LENGTH | DATALENGTH | INPUTMSGLEN ) cics_data_value | SYNCONRETURN | cics_handle_response)*;
 cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)*;
 cics_link_activity: (ACQACTIVITY | (ACTIVITY | INPUTEVENT) cics_data_value | cics_handle_response)*;
-
-/** EXCI LINK, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-link-command-exci*/
-cics_exci_link: LINK cics_link_program_exci;
-cics_link_commarea_exci: COMMAREA cics_data_area (LENGTH cics_data_value)? (DATALENGTH cics_data_value)?;
-cics_link_channel_exci: CHANNEL cics_name;
-cics_link_program_exci: PROGRAM cics_name
-                     (
-                        cics_link_commarea_exci
-                        | cics_link_channel_exci
-                        | APPLID cics_data_area
-                        | TRANSID cics_name
-                        | RETCODE cics_data_area
-                        | SYNCONRETURN
-                        | cics_handle_response
-                     )+;
-
-/** EXCI DELETE, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-delete-channel-command-exci*/
-cics_exci_delete: DELETE CHANNEL cics_data_value RETCODE cics_data_area;
-
-/** EXCI DELETE CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-delete-container-command-exci*/
-cics_exci_delete_container: DELETE CONTAINER cics_data_value CHANNEL cics_data_value RETCODE cics_data_area;
-
-/** EXCI ENDBROWSE, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-endbrowse-container-command-exci*/
-cics_exci_endbrowse_container: ENDBROWSE CONTAINER BROWSETOKEN cics_data_value RETCODE cics_data_area;
-
-/** EXCI GET CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-get-container-command-exci*/
-cics_exci_get_container: GET CONTAINER cics_data_value CHANNEL cics_data_value (exci_data_area | cics_exci_ref | (NODATA FLENGTH cics_data_value))
-                            ((INTOCCSID cics_data_value)
-                            | (INTOCODEPAGE cics_data_value)
-                            | (CONVERTST cics_cvda (CCSID cics_data_area)?))?
-                            RETCODE cics_data_area;
-exci_data_area: INTO cics_data_area (FLENGTH cics_data_area (BYTEOFFSET cics_data_area)?)?;
-cics_exci_ref: SET cics_ref FLENGTH cics_data_area (BYTEOFFSET cics_data_area)?;
-
-/** EXCI GETNEXT CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-getnext-container-command-exci*/
-cics_exci_get_next_container: GETNEXT CONTAINER cics_data_area BROWSETOKEN cics_data_value RETCODE cics_data_area;
-
-/** EXCI CICS MOVE CONTAINER< ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-move-container-command-exci*/
-cics_exci_move_container: MOVE CONTAINER cics_data_value AS cics_data_value CHANNEL cics_data_value TOCHANNEL cics_data_value RETCODE cics_data_area;
-
-/** EXCI CICS PUT CONTAINER, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-put-container-command-exci */
-cics_exci_put_container: PUT CONTAINER cics_data_value CHANNEL cics_data_value FROM cics_data_area (FLENGTH cics_data_value)?
-                        (BIT | DATATYPE cics_cvda | CHAR)? (FROMCCSID cics_data_value | FROMCODEPAGE cics_data_value)? APPEND?
-                        RETCODE cics_data_area;
-
-/** EXCI QUERY CHANNEL, ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-query-channel-command-exci*/
-cics_exci_query_channel: QUERY CHANNEL cics_data_value CONTAINERCNT cics_data_area RETCODE cics_data_area;
-
-/** EXCI STARTBROWSE CONTAINER (EXCI), ref: https://www.ibm.com/docs/en/cics-ts/6.1?topic=interface-exec-cics-startbrowse-container-command-exci */
-cics_exci_startbrowse_container: STARTBROWSE CONTAINER CHANNEL cics_data_value BROWSETOKEN cics_data_area RETCODE cics_data_area;
 
 /** LOAD */
 cics_load: LOAD cics_load_options;
@@ -659,7 +605,7 @@ cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_
 
 /** MOVE CONTAINER (both) */
 cics_move: MOVE cics_move_body;
-cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | FROMPROCESS |
+cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | RETCODE cics_data_area | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
 /** PERFORM System Commands */
@@ -707,11 +653,11 @@ cics_push: PUSH cics_handle_response? HANDLE cics_handle_response?;
 /** PUT CONTAINER (both of them): */
 cics_put_container: (PUT cics_put_container_bts | (PUT|PUT64) cics_put_container_channel);
 cics_put_container_bts: ((ACQACTIVITY | PROCESS | ACQPROCESS) | (ACTIVITY | CONTAINER | FLENGTH) cics_data_value | FROM cics_data_area | cics_handle_response)+;
-cics_put_container_channel: ((BIT | CHAR | APPEND | PREPEND) | (CHANNEL | CONTAINER | FLENGTH | FROMCCSID | FROMCODEPAGE) cics_data_value | FROM cics_data_area | DATATYPE cics_cvda | cics_handle_response)+;
+cics_put_container_channel: ((BIT | CHAR | APPEND | PREPEND) | (CHANNEL | CONTAINER | FLENGTH | FROMCCSID | FROMCODEPAGE ) cics_data_value | (FROM | RETCODE) cics_data_area | DATATYPE cics_cvda | cics_handle_response)+;
 
 /** QUERY CHANNEL / COUNTER / DCOUNTER / SECURITY */
 cics_query: QUERY (cics_query_channel | cics_query_counter | cics_query_security);
-cics_query_channel: (CHANNEL cics_data_value | CONTAINERCNT cics_data_area | cics_handle_response)+;
+cics_query_channel: (CHANNEL cics_data_value | (CONTAINERCNT | RETCODE) cics_data_area | cics_handle_response)+;
 cics_query_counter: (cics_counter_dcounter | POOL cics_name | (VALUE | MINIMUM | MAXIMUM) cics_data_area | NOSUSPEND | cics_handle_response)+;
 cics_query_security: (SECURITY | (RESTYPE | RESCLASS | RESIDLENGTH | RESID | USERID) cics_data_value |
                      (LOGMESSAGE | READ | UPDATE | CONTROL |ALTER) cics_cvda | cics_handle_response)+;
@@ -959,7 +905,7 @@ cics_startbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_a
 
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS / TIMER */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_body);
-cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER) | (ACTIVITYID | PROCESSTYPE | CHANNEL) cics_data_value | cics_startbrowse_processWithValue_subrule | BROWSETOKEN cics_data_area | cics_handle_response)+;
+cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER) | (ACTIVITYID | PROCESSTYPE | CHANNEL) cics_data_value | cics_startbrowse_processWithValue_subrule | (BROWSETOKEN | RETCODE) cics_data_area | cics_handle_response)+;
 cics_startbrowse_processWithValue_subrule: PROCESS cics_data_value;
 
 /** SUSPEND (both) */
