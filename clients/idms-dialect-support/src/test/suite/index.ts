@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Broadcom.
+ * Copyright (c) 2026 Broadcom.
  * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
  *
  * This program and the accompanying materials are made
@@ -12,9 +12,9 @@
  *   Broadcom - initial API and implementation
  */
 
-import * as path from "path";
-import * as Mocha from "mocha";
-import * as glob from "glob";
+import * as path from "node:path";
+import Mocha from "mocha";
+import glob from "glob";
 
 export function run(): Promise<void> {
   // Create the mocha test
