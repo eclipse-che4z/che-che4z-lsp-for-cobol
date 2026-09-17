@@ -177,27 +177,6 @@ class CICSVisitor extends CICSParserBaseVisitor<List<Node>> {
   }
 
   @Override
-  public List<Node> visitAllExciRules(CICSParser.AllExciRulesContext ctx) {
-    // TODO: uncomment and adjust below when we decide to support this feature based on compiler
-    // directive
-    //    boolean isExciModeEnabled = context
-    //            .getConfig()
-    //            .getCompilerOptions()
-    //            .stream()
-    //            .anyMatch(str -> str.equalsIgnoreCase("EXCI"));
-    //    if (!isExciModeEnabled) {
-    //      Locality tokenLocality = getTokenLocality(ctx.start);
-    //      errors.add(SyntaxError.syntaxError()
-    //              .errorSource(ErrorSource.PARSING)
-    //              .location(tokenLocality.toOriginalLocation())
-    //              .suggestion(messageService.getMessage("cics.exci.errormessage"))
-    //              .severity(ErrorSeverity.WARNING)
-    //              .build());
-    //    }
-    return visitChildren(ctx);
-  }
-
-  @Override
   public List<Node> visitCicsDfhValue(CICSParser.CicsDfhValueContext ctx) {
     addReplacementContext(ctx);
     return visitChildren(ctx);

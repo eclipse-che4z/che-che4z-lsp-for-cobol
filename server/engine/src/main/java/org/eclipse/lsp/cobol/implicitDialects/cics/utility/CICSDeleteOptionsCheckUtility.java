@@ -56,6 +56,7 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
           put(CICSLexer.PROCESS, ErrorSeverity.WARNING);
           put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 

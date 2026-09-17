@@ -48,6 +48,8 @@ public class CICSLinkOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.INPUTEVENT, ErrorSeverity.ERROR);
           put(CICSLexer.ACTIVITY, ErrorSeverity.ERROR);
           put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
+          put(CICSLexer.APPLID, ErrorSeverity.ERROR);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 
