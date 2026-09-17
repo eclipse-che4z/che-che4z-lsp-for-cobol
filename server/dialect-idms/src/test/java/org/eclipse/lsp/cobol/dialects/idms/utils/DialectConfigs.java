@@ -36,8 +36,8 @@ public class DialectConfigs {
         SqlProcessing.ENABLED,
         SqlDecimalComma.DISABLED,
         ImmutableList.of(
-            new DialectRegistryItem("DaCo", 1, null, "", ""),
-            new DialectRegistryItem("IDMS", 1, null, "", "")),
+            new DialectRegistryItem("DaCo", 1, null, "", "", null),
+            new DialectRegistryItem("IDMS", 1, null, "", "", null)),
         ImmutableMap.of());
   }
 }

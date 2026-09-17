@@ -17,10 +17,10 @@ import { type CopyStatementParser, MainExtensionId } from "./common";
 
 let v2Api: V2Api | undefined = undefined;
 
-
 export type Token = {
   name: string;
-  range: vscode.Range;
+  value?: string;
+  location: vscode.Location;
 };
 
 export type Item = {
@@ -79,6 +79,7 @@ export const getV2Api = async (extensionId: string): Promise<V2Api | Error> => {
               name: dialect.name,
               description: dialect.description,
               snippets: dialect.snippets,
+              keywords: dialect.keywords,
               isCopyStatement: dialect.isCopyStatement,
             },
             handler,
@@ -135,6 +136,7 @@ export interface __ExtensionV2DialectDetail {
   name: string;
   description: string;
   snippets: vscode.Uri;
+  keywords?: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 }
 
@@ -149,16 +151,18 @@ export interface V2DialectDetail {
   name: string;
   description: string;
   snippets: vscode.Uri;
+  keywords?: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 }
 
 export type V2StartProcessingHandler = (
   context: IDocumentProcessingContext,
-  programUri: vscode.Uri,
   text: string,
 ) => Promise<void>;
 
 export interface IDocumentProcessingContext {
+  getProgramUri(): vscode.Uri;
+  getDocumentUri(): vscode.Uri;
   resolveCopybook(
     copybookName: string,
     statementRange: vscode.Range,
@@ -174,6 +178,13 @@ export interface IDocumentProcessingContext {
   replace(range: vscode.Range, text: string): void;
   replaceWithMap(
     range: vscode.Range,
+    statementRange: vscode.Range,
+    tokenItems: Item[],
+    replacementMap: string,
+  ): void;
+  insert(line: number, text: string, source: string): void;
+  insertWithMap(
+    line: number,
     statementRange: vscode.Range,
     tokenItems: Item[],
     replacementMap: string,

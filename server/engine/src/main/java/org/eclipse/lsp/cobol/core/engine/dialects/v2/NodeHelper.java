@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import org.eclipse.lsp.cobol.common.mapping.TextMapReplacer;
+import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -34,10 +34,7 @@ class NodeHelper {
   private static final String PROCEDURE = "PROCEDURE";
 
   public Optional<List<Node>> createNodesIfNeeded(
-      String type,
-      List<TextMapReplacer.Token> mappedTokenList,
-      String documentUri,
-      String copybookId) {
+      String type, List<Token> mappedTokenList, String documentUri, String copybookId) {
     if (mappedTokenList.isEmpty()) {
       return Optional.empty();
     }
@@ -54,7 +51,7 @@ class NodeHelper {
   }
 
   private List<Node> createVariableNode(
-      List<TextMapReplacer.Token> mappedTokenList, String documentUri, String copybookId) {
+      List<Token> mappedTokenList, String documentUri, String copybookId) {
     Node parentNode =
         new QualifiedReferenceNode(
             Locality.builder()
@@ -63,7 +60,7 @@ class NodeHelper {
                 .range(calculateRange(mappedTokenList))
                 .build());
 
-    for (TextMapReplacer.Token token : mappedTokenList) {
+    for (Token token : mappedTokenList) {
       parentNode.addChild(
           new VariableUsageNode(
               token.getValue(),
@@ -77,7 +74,7 @@ class NodeHelper {
   }
 
   private List<Node> createProcedureNode(
-      List<TextMapReplacer.Token> mappedTokenList, String documentUri, String copybookId) {
+      List<Token> mappedTokenList, String documentUri, String copybookId) {
     String procedureName = mappedTokenList.get(0).getValue();
     String ofSection = null;
     List<Node> result = new ArrayList<>();
@@ -98,7 +95,7 @@ class NodeHelper {
     return result;
   }
 
-  private Range calculateRange(List<TextMapReplacer.Token> tokens) {
+  private Range calculateRange(List<Token> tokens) {
     if (tokens.isEmpty()) {
       return null;
     }
