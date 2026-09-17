@@ -1,0 +1,4 @@
+       01  ROOT.
+           03 AREA-XDY.
+             05 PROTO-XDY.
+               07 PR1-XDY PIC 9(9).

@@ -1,0 +1,3 @@
+       01  AREA-XAA.
+           03 TBLNAM-XAA.
+             05 VAR-BAA PIC X(6).

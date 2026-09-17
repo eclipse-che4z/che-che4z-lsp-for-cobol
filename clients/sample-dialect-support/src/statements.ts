@@ -76,13 +76,20 @@ function rangeForParam(line: number, param: ExtractedParam): vscode.Range {
 }
 
 function createItemFromParams(
+  docuemntUri: vscode.Uri,
   line: number,
   params: ExtractedParam[],
   indexes: number[],
   type?: "VARIABLE" | "PROCEDURE",
 ): Item {
   const tokens: Token[] = indexes.map((i) => {
-    return { name: params[i].name, range: rangeForParam(line, params[i]) };
+    return {
+      name: params[i].name,
+      location: new vscode.Location(
+        docuemntUri,
+        rangeForParam(line, params[i]),
+      ),
+    };
   });
   return {
     tokens: tokens,
@@ -149,11 +156,11 @@ function applyProcessStatementResult(
   const items: Item[] = [];
 
   items.push(
-    createItemFromParams(line, result.params, [0, 1]), // VAR1 OF GR1
-    createItemFromParams(line, result.params, [2, 3]), // VAR2 OF GR2
-    createItemFromParams(line, result.params, [5, 4]), // PAR1 OF SEC1
-    createItemFromParams(line, result.params, [6, 7]), // PAR2 OF SEC2
-    createItemFromParams(line, result.params, [8]), // PROC
+    createItemFromParams(context.getDocumentUri(), line, result.params, [0, 1]), // VAR1 OF GR1
+    createItemFromParams(context.getDocumentUri(), line, result.params, [2, 3]), // VAR2 OF GR2
+    createItemFromParams(context.getDocumentUri(), line, result.params, [5, 4]), // PAR1 OF SEC1
+    createItemFromParams(context.getDocumentUri(), line, result.params, [6, 7]), // PAR2 OF SEC2
+    createItemFromParams(context.getDocumentUri(), line, result.params, [8]), // PROC
   );
 
   const replacementMap =
@@ -279,7 +286,13 @@ function applyFixStateStatementResult(
   const items: Item[] = [];
 
   items.push(
-    createItemFromParams(line, result.params, [0, 1], "VARIABLE"), // VAR1 OF GR1
+    createItemFromParams(
+      context.getDocumentUri(),
+      line,
+      result.params,
+      [0, 1],
+      "VARIABLE",
+    ), // VAR1 OF GR1
   );
 
   const replacementMap = "";
@@ -302,7 +315,13 @@ function applyAltStateStatementResult(
   const items: Item[] = [];
 
   items.push(
-    createItemFromParams(line, result.params, [0, 1], "PROCEDURE"), // PAR1 OF SEC1
+    createItemFromParams(
+      context.getDocumentUri(),
+      line,
+      result.params,
+      [0, 1],
+      "PROCEDURE",
+    ), // PAR1 OF SEC1
   );
 
   const replacementMap = "";

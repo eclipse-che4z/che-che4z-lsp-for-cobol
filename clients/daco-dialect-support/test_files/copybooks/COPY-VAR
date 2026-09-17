@@ -1,0 +1,7 @@
+     1 01  PAMRGL-XRL.                                                  12345678
+      * Commented line
+123456     03 PAMVKPBDR-PRL            PIC S9(9)V9(2)          COMP-3       31
+    14                                             VALUE ZERO.              31
+    15     03 PAMVKPPRC-PRL            PIC S9(3)V9(2)          COMP-3       37
+    15                                             VALUE ZERO.              37
+    16     03 BGRINDKST-XRL            PIC X       VALUE SPACE.             40
