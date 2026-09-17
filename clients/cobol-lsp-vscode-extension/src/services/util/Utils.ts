@@ -143,6 +143,22 @@ export function isTarPath(input: string) {
   return input.toUpperCase().startsWith(TAR_PREFIX);
 }
 
+// Requires at least 2 characters before ":" so a Windows drive letter
+// ("C:\foo" or "C:/foo", always exactly one letter) is never mistaken for a
+// URI scheme. No "//" is required after ":" since schemes with no
+// authority (e.g. "zowe-uss:/profile/path") are valid and expected here.
+const schemeQualifiedPathRegex = /^[a-zA-Z][a-zA-Z0-9+.-]+:\//;
+
+/**
+ * Checks if a passed local copybook path is a scheme-qualified URI (e.g.
+ * "zowe-uss:/profile/path") rather than a plain local filesystem path.
+ * @param input The string to process
+ * @returns a boolean indicating if the specified path is scheme-qualified
+ */
+export function isSchemeQualifiedPath(input: string) {
+  return schemeQualifiedPathRegex.test(input);
+}
+
 /**
  * Extracts the text between 'tar:' and '::' and the text after '::'
  * from a structured string.

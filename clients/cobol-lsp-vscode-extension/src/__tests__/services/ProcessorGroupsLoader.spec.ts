@@ -21,6 +21,7 @@ import {
 import { DEFAULT_DIALECT } from "../../constants";
 import { DatasetLib } from "../../services/copybookLibs/DatasetLib";
 import LocalPathLib from "../../services/copybookLibs/LocalPathLib";
+import VirtualPathLib from "../../services/copybookLibs/VirtualPathLib";
 import {
   LibsDefinitions,
   readSettingConfig,
@@ -51,6 +52,25 @@ describe("ProcessorGroupsLoader", () => {
       it("generates workspace processor group with local path first", () => {
         const result = readSettingConfig(DEFAULT_DIALECT);
         expect(result.libs![0]).toEqual(new LocalPathLib("copybooks"));
+      });
+    });
+
+    describe("a scheme-qualified paths-local entry produces a VirtualPathLib", () => {
+      beforeEach(() => {
+        getConfigurationResult["paths-local"] = [
+          "copybooks",
+          "zowe-uss:/profile/path",
+        ];
+        getConfigurationResult["paths-dsn"] = [];
+        getConfigurationResult["paths-uss"] = [];
+      });
+
+      it("keeps array order across LocalPathLib and VirtualPathLib entries", () => {
+        const result = readSettingConfig(DEFAULT_DIALECT);
+        expect(result.libs![0]).toEqual(new LocalPathLib("copybooks"));
+        expect(result.libs![1]).toEqual(
+          new VirtualPathLib("zowe-uss:/profile/path"),
+        );
       });
     });
 

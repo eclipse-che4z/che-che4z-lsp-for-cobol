@@ -385,4 +385,16 @@ describe("Local copybook library", () => {
       });
     });
   });
+
+  describe("create", () => {
+    it("claims a plain local path", () => {
+      expect(LocalPathLib.create("local/copybooks")).toBeInstanceOf(
+        LocalPathLib,
+      );
+    });
+
+    it("does not claim a scheme-qualified path, leaving it for VirtualPathLib", () => {
+      expect(LocalPathLib.create("zowe-uss:/profile/path")).toBeUndefined();
+    });
+  });
 });
