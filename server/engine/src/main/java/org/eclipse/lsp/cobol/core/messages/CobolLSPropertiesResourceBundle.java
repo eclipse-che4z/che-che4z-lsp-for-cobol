@@ -60,11 +60,18 @@ public class CobolLSPropertiesResourceBundle extends ResourceBundle {
   private Properties load(DialectRegistryItem dialectRegistryItem, Locale locale)
       throws IOException {
     Properties properties = new Properties();
+    URI jarUri = dialectRegistryItem.getUri();
+    if (jarUri == null) {
+      // Java-agnostic (v2) dialects have no jar, so there is no bundled resource file to load.
+      LOG.debug(
+          "No dialect jar URI for {}, skipping jar resource bundle", dialectRegistryItem.getName());
+      return properties;
+    }
     try {
       List<String> resourceName = toSuspectedBundleNames(locale);
       Collections.reverse(resourceName);
-      LOG.debug("URI for dialect jar:" + dialectRegistryItem.getUri());
-      loadDialectResources(properties, resourceName, dialectRegistryItem.getUri());
+      LOG.debug("URI for dialect jar:" + jarUri);
+      loadDialectResources(properties, resourceName, jarUri);
     } catch (Exception e) {
       LOG.error("Error loading resources", e);
     }

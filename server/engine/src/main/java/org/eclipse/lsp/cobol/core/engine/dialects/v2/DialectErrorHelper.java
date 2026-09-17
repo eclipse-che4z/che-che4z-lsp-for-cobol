@@ -14,7 +14,7 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 
-import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.ERROR;
+import static org.eclipse.lsp.cobol.common.error.ErrorSeverity.*;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -26,10 +26,7 @@ import org.eclipse.lsp.cobol.common.error.SyntaxError;
 import org.eclipse.lsp.cobol.common.mapping.OriginalLocation;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.Locality;
-import org.eclipse.lsp4j.DiagnosticRelatedInformation;
-import org.eclipse.lsp4j.Location;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.*;
 
 /** Dialect Error Helper class */
 @UtilityClass
@@ -51,18 +48,32 @@ class DialectErrorHelper {
         .build();
   }
 
-  public SyntaxError dialectError(
+  public SyntaxError dialectDiagnostic(
       Locality locality,
       String message,
       ErrorCode errorCode,
-      List<DiagnosticRelatedInformation> relatedInformations) {
+      List<DiagnosticRelatedInformation> relatedInformations,
+      DiagnosticSeverity severity) {
     return SyntaxError.syntaxError()
         .errorSource(ErrorSource.DIALECT)
         .location(locality.toOriginalLocation())
-        .severity(ERROR)
+        .severity(toErrorSeverity(severity))
         .suggestion(message)
         .errorCode(errorCode)
         .relatedInformation(relatedInformations)
         .build();
+  }
+
+  private ErrorSeverity toErrorSeverity(DiagnosticSeverity severity) {
+    switch (severity) {
+      case Warning:
+        return WARNING;
+      case Information:
+        return INFO;
+      case Hint:
+        return HINT;
+      default:
+        return ERROR;
+    }
   }
 }
