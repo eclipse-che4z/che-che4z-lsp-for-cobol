@@ -21,9 +21,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /** Resolve settings based on processor groups configuration */
 @Getter
+@Slf4j
 public class ProcessorGroupsResolver {
   private static final Gson GSON = new Gson();
 
@@ -40,19 +42,36 @@ public class ProcessorGroupsResolver {
    *
    * @param srcPath path to the COBOL source code.
    * @param workspacePath path to workspace.
+   * @param allowExternalLibs whether to honor "libs" entries that resolve outside the workspace.
    * @return list of copybooks paths.
    */
-  public List<Path> resolveCopybooksPaths(Path srcPath, Path workspacePath) {
+  public List<Path> resolveCopybooksPaths(
+      Path srcPath, Path workspacePath, boolean allowExternalLibs) {
     Optional<Program> first =
         programList.stream().filter(p -> match(p, srcPath, workspacePath)).findFirst();
+    Path normalizedWorkspacePath = workspacePath.toAbsolutePath().normalize();
     return first
         .map(
             program ->
                 findProcessorGroup(program.getProcessorGroup()).getLibs().stream()
                     .map(Paths::get)
-                    .map(p -> p.isAbsolute() ? p : workspacePath.resolve(p))
+                    .map(p -> (p.isAbsolute() ? p : workspacePath.resolve(p)))
+                    .map(p -> p.toAbsolutePath().normalize())
+                    .filter(p -> allowExternalLibs || isWithinWorkspace(p, normalizedWorkspacePath))
                     .collect(Collectors.toList()))
         .orElse(Collections.emptyList());
+  }
+
+  private boolean isWithinWorkspace(Path libPath, Path normalizedWorkspacePath) {
+    if (!libPath.startsWith(normalizedWorkspacePath)) {
+      LOG.warn(
+          "Copybook search path '{}' from proc_grps.json is outside the workspace '{}' and is "
+              + "ignored. Pass --allow-external-libs to honor libs entries outside the workspace.",
+          libPath,
+          normalizedWorkspacePath);
+      return false;
+    }
+    return true;
   }
 
   /**

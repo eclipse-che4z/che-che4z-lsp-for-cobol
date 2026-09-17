@@ -24,9 +24,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp4j.*;
 
+@Slf4j
 @Singleton
 public class CliClientProvider implements Provider<CobolLanguageClient> {
   private final CliClient client = new CliClient();
@@ -86,8 +88,13 @@ public class CliClientProvider implements Provider<CobolLanguageClient> {
           // relative paths are resolved against the CLI process's current working directory.
           Path cpyFolder =
               spPath.isAbsolute() ? spPath : Paths.get("").toAbsolutePath().resolve(spPath);
-          Path cpy = cpyFolder.resolve(copybookFileName);
+          Path cpy = cpyFolder.resolve(copybookFileName).normalize();
 
+          Path relativePath = cpyFolder.relativize(cpy);
+          if (relativePath.startsWith("..")) {
+            LOG.warn("{} is ignored for copybook resolution", cpy);
+            continue;
+          }
           if (Files.exists(cpy)) {
             String value = cpy.toUri().toString();
             return CompletableFuture.completedFuture(value);
