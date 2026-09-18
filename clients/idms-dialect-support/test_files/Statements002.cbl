@@ -15,6 +15,7 @@
        01 WS-B PIC X(80).
        01 WS-C PIC X(80).
        01 WS-LENGTH PIC 9(4) COMP.
+       01 EMPMAP PIC X.
        PROCEDURE DIVISION.
            BIND RUN-UNIT
                FOR WS-A

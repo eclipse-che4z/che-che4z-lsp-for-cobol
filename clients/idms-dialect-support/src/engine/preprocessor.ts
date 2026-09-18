@@ -28,6 +28,7 @@ import {
   IdmsDialectVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
+import * as statementPreprocessor from "./statementsts";
 import { addParsingErrors } from "./util";
 
 interface ProgramAnalysis {
@@ -52,13 +53,12 @@ export class IdmsPreprocessor {
     );
     addParsingErrors(context, analysis.errors);
 
-    this.processStatements(analysis.statements, context);
-
     const copybookPreprocessor = new IdmsCopybookPreprocessor(
       this.outputChannel,
       this.messageService,
     );
     await copybookPreprocessor.execute(context, analysis.copybooks);
+    statementPreprocessor.processStatement(context, analysis.statements);
   }
 
   private analyzeProgram(text: string, documentUri: string): ProgramAnalysis {
@@ -81,15 +81,6 @@ export class IdmsPreprocessor {
       `IDMS parsing completed with ${errors.length} error(s)`,
     );
     return { copybooks, statements, errors };
-  }
-
-  private processStatements(
-    descriptors: StatementDescriptor[],
-    context: IDocumentProcessingContext,
-  ): void {
-    for (const descriptor of descriptors) {
-      context.replace(descriptor.statementRange, descriptor.filler);
-    }
   }
 
   private configureErrorListeners(
