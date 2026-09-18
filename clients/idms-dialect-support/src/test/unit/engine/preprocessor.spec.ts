@@ -454,21 +454,31 @@ describe("IdmsPreprocessor", () => {
   });
 
   it("processes an imperative call nested in STORE options", async () => {
-    const context = createContext("file:///program.cbl");
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
 
     await preprocessor.execute(
       context,
       "       STORE SOME-LR\n       ON LR-NOT-FOUND CONTINUE END-IF.",
     );
 
-    expect(context.replace).toHaveBeenCalledTimes(2);
-    expect(context.replace).toHaveBeenNthCalledWith(
-      1,
-      expectRange(0, 7, 1, 7),
-      " ",
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 7, 1, 7));
+    expect(statementRange).toEqual(expectRange(0, 7, 1, 7));
+    expect(filler).toBe(" ");
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe("VARIABLE");
+    expect(items[0].tokens).toHaveLength(1);
+    expect(items[0].tokens[0].name).toBe("VAR_0_USG_0");
+    expect(items[0].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 13, 0, 20),
     );
-    expect(context.replace).toHaveBeenNthCalledWith(
-      2,
+
+    expect(context.replace).toHaveBeenCalledTimes(1);
+    expect(context.replace).toHaveBeenCalledWith(
       expectRange(1, 7, 1, 22),
       "IF 1 + 1 = 2",
     );
