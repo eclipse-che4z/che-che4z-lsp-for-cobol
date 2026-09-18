@@ -24,65 +24,63 @@ import { StatementDescriptor } from "./model";
  * preserving variable usages so that the underlying COBOL parser can still
  * resolve them.
  */
-export class IdmsStatementsPrerocessor {
-  public execute(
-    context: IDocumentProcessingContext,
-    descriptors: StatementDescriptor[],
-  ): void {
-    for (const descriptor of descriptors) {
-      const items = this.traverseChildren(
-        context.getDocumentUri(),
-        descriptor.children,
+export function execute(
+  context: IDocumentProcessingContext,
+  descriptors: StatementDescriptor[],
+): void {
+  for (const descriptor of descriptors) {
+    const items = traverseChildren(
+      context.getDocumentUri(),
+      descriptor.children,
+    );
+    if (items.length > 0) {
+      context.replaceWithMap(
+        descriptor.range,
+        descriptor.statementRange,
+        items,
+        descriptor.filler,
       );
-      if (items.length > 0) {
-        context.replaceWithMap(
-          descriptor.range,
-          descriptor.statementRange,
-          items,
-          descriptor.filler,
-        );
-      } else {
-        context.replace(descriptor.statementRange, descriptor.filler);
-      }
+    } else {
+      context.replace(descriptor.statementRange, descriptor.filler);
+    }
+  }
+}
+
+function traverseChildren(
+  documentUri: vscode.Uri,
+  children: StatementDescriptor[],
+): Item[] {
+  const items: Item[] = [];
+  let index = 0;
+
+  for (const child of children) {
+    if (child.type === "VARIABLE") {
+      const tokens: Token[] = [];
+      const name = `VAR_${index++}`;
+      createTokens(documentUri, tokens, name, child.children);
+      items.push({ type: "VARIABLE", tokens });
     }
   }
 
-  private traverseChildren(
-    documentUri: vscode.Uri,
-    children: StatementDescriptor[],
-  ): Item[] {
-    const items: Item[] = [];
-    let index = 0;
+  return items;
+}
 
-    for (const child of children) {
-      if (child.type === "VARIABLE") {
-        const tokens: Token[] = [];
-        const name = `VAR_${index++}`;
-        this.createTokens(documentUri, tokens, name, child.children);
-        items.push({ type: "VARIABLE", tokens });
-      }
-    }
+function createTokens(
+  documentUri: vscode.Uri,
+  tokens: Token[],
+  name: string,
+  children: StatementDescriptor[],
+): void {
+  let index = 0;
 
-    return items;
-  }
-
-  private createTokens(
-    documentUri: vscode.Uri,
-    tokens: Token[],
-    name: string,
-    children: StatementDescriptor[],
-  ): void {
-    let index = 0;
-
-    for (const child of children) {
-      if (child.type === "VARIABLE_USAGE") {
-        const tokenName = `${name}_USG_${index++}`;
-        tokens.push({
-          name: tokenName,
-          location: new vscode.Location(documentUri, child.statementRange),
-        });
-        this.createTokens(documentUri, tokens, tokenName, child.children);
-      }
+  for (const child of children) {
+    if (child.type === "VARIABLE_USAGE") {
+      const tokenName = `${name}_USG_${index++}`;
+      tokens.push({
+        name: tokenName,
+        location: new vscode.Location(documentUri, child.statementRange),
+      });
+      createTokens(documentUri, tokens, tokenName, child.children);
     }
   }
 }

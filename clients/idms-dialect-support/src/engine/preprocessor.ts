@@ -28,7 +28,7 @@ import {
   IdmsDialectVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
-import { IdmsStatementsPrerocessor } from "./statementsts";
+import * as statementPreprocessor from "./statementsts";
 import { addParsingErrors } from "./util";
 
 interface ProgramAnalysis {
@@ -38,8 +38,6 @@ interface ProgramAnalysis {
 }
 
 export class IdmsPreprocessor {
-  private readonly statementPreprocessor = new IdmsStatementsPrerocessor();
-
   constructor(
     private readonly outputChannel: vscode.OutputChannel,
     private readonly messageService: MessageService,
@@ -60,7 +58,7 @@ export class IdmsPreprocessor {
       this.messageService,
     );
     await copybookPreprocessor.execute(context, analysis.copybooks);
-    this.statementPreprocessor.execute(context, analysis.statements);
+    statementPreprocessor.execute(context, analysis.statements);
   }
 
   private analyzeProgram(text: string, documentUri: string): ProgramAnalysis {

@@ -158,19 +158,16 @@ export async function checkDefinition(
   position: vscode.Position,
   expectedLine: number,
 ) {
-  await checkLocations("vscode.executeDefinitionProvider", editor, position, [
-    expectedLine,
-  ]);
+  await checkLocations(editor, position, [expectedLine]);
 }
 
 async function checkLocations(
-  provider: "vscode.executeDefinitionProvider",
   editor: vscode.TextEditor,
   position: vscode.Position,
   expectedLines: number[],
 ) {
   const locations = await vscode.commands.executeCommand<vscode.Location[]>(
-    provider,
+    "vscode.executeDefinitionProvider",
     editor.document.uri,
     position,
   );

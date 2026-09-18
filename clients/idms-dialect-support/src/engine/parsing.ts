@@ -320,16 +320,6 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   visitIdms_db_entity_name = (
     ctx: Idms_db_entity_nameContext,
   ): StatementDescriptor[] => {
-    const parent = ctx.parent;
-    if (
-      (parent instanceof ModifyStatementContext &&
-        parent.eraseStoreModifyLrStatementsOptions()) ||
-      (parent instanceof StoreStatementContext &&
-        parent.eraseStoreModifyLrStatementsOptions())
-    ) {
-      return this.visitChildren(ctx) ?? [];
-    }
-
     return this.createVariableDescriptor(ctx);
   };
 

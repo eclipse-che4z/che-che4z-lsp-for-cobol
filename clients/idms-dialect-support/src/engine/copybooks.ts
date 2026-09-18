@@ -29,7 +29,7 @@ import {
   IdmsCopyVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
-import { IdmsStatementsPrerocessor } from "./statementsts";
+import * as statementProcessor from "./statementsts";
 import { addParsingErrors } from "./util";
 import { MessageService } from "./services/MessageService";
 
@@ -55,8 +55,6 @@ interface ParsingResult<T> {
 
 /** Resolves explicit and predefined IDMS copybooks and adjusts their data levels. */
 export class IdmsCopybookPreprocessor {
-  private readonly statementProcessor = new IdmsStatementsPrerocessor();
-
   public constructor(
     private readonly outputChannel: vscode.OutputChannel,
     private readonly messageService: MessageService,
@@ -183,7 +181,7 @@ export class IdmsCopybookPreprocessor {
 
     const statementAnalysis = this.analyzeCopybookStatements(copybook.text);
     addParsingErrors(copybook.context, statementAnalysis.errors);
-    this.statementProcessor.execute(copybook.context, statementAnalysis.result);
+    statementProcessor.execute(copybook.context, statementAnalysis.result);
 
     const variables: ResolvedVariableLevel[] = [];
     const nestedStack = [...copybookStack, normalizedName];
