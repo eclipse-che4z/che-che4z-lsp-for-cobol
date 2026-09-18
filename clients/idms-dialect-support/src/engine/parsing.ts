@@ -25,18 +25,17 @@ import { IdmsParserVisitor } from "../generated/IdmsParserVisitor";
 import {
   IdmsStatementsContext,
   CopyIdmsStatementContext as ProgramCopyIdmsStatementContext,
-  EraseStatementContext,
   Idms_db_entity_nameContext,
+  IdmsIfConditionContext,
+  IdmsIfStatementContext,
   Idms_map_nameContext,
   Idms_procedure_nameContext,
   IdmsRecordLocationParagraphContext,
   IdmsSectionsContext,
   ImperativeStatementCallContext,
   MapSectionContext,
-  ModifyStatementContext,
   QualifiedDataNameContext,
   SchemaSectionContext,
-  StoreStatementContext,
   VariableUsageNameContext,
 } from "../generated/IdmsParser";
 import { IdmsCopyParserVisitor } from "../generated/IdmsCopyParserVisitor";
@@ -123,6 +122,8 @@ export type IdmsCopybookEntry =
 const DEFAULT_RECORD_PLACEMENT = "WORKING-STORAGE";
 const SUBSCHEMA_COPYBOOK = "SUBSCHEMA-DESCRIPTION";
 const MAPS_COPYBOOK = "MAPS";
+const DIALECT_CONDITION_REPLACEMENT = "TRUE";
+const DIALECT_IF_REPLACEMENT = "_IF_ ";
 const IMPERATIVE_STATEMENT_REPLACEMENT = "IF 1 + 1 = 2";
 
 /** Collects explicit and predefined IDMS copybooks from a COBOL program. */
@@ -309,6 +310,36 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
         "STATEMENT",
         this.visitChildren(ctx) ?? [],
         BLANK_STATEMENT,
+      ),
+    ];
+  };
+
+  visitIdmsIfStatement = (
+    ctx: IdmsIfStatementContext,
+  ): StatementDescriptor[] => {
+    const range = constructRange(ctx);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        DIALECT_IF_REPLACEMENT,
+      ),
+    ];
+  };
+
+  visitIdmsIfCondition = (
+    ctx: IdmsIfConditionContext,
+  ): StatementDescriptor[] => {
+    const range = constructRange(ctx);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        DIALECT_CONDITION_REPLACEMENT,
       ),
     ];
   };
