@@ -147,7 +147,7 @@ export function isTarPath(input: string) {
 // ("C:\foo" or "C:/foo", always exactly one letter) is never mistaken for a
 // URI scheme. No "//" is required after ":" since schemes with no
 // authority (e.g. "zowe-uss:/profile/path") are valid and expected here.
-const schemeQualifiedPathRegex = /^[a-zA-Z][a-zA-Z0-9+.-]+:\//;
+const uriLikeRegex = /^[a-zA-Z][a-zA-Z0-9+.-]+:\//;
 
 /**
  * Checks if a passed local copybook path is a scheme-qualified URI (e.g.
@@ -155,8 +155,8 @@ const schemeQualifiedPathRegex = /^[a-zA-Z][a-zA-Z0-9+.-]+:\//;
  * @param input The string to process
  * @returns a boolean indicating if the specified path is scheme-qualified
  */
-export function isSchemeQualifiedPath(input: string) {
-  return schemeQualifiedPathRegex.test(input);
+export function looksLikeUri(input: string) {
+  return uriLikeRegex.test(input);
 }
 
 /**

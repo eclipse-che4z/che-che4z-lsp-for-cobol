@@ -12,29 +12,29 @@
  *   Broadcom - initial API and implementation
  */
 
-import { hasMember, isSchemeQualifiedPath } from "../../../services/util/Utils";
+import { hasMember, looksLikeUri } from "../../../services/util/Utils";
 
 describe("Utils", () => {
   describe("isSchemeQualifiedPath", () => {
     test("recognizes a scheme with no authority", () => {
-      expect(isSchemeQualifiedPath("zowe-uss:/profile/path")).toEqual(true);
+      expect(looksLikeUri("zowe-uss:/profile/path")).toEqual(true);
     });
 
     test("recognizes a scheme with an authority", () => {
-      expect(isSchemeQualifiedPath("file:///local/path")).toEqual(true);
+      expect(looksLikeUri("file:///local/path")).toEqual(true);
     });
 
     test("does not mistake a Windows drive letter for a scheme", () => {
-      expect(isSchemeQualifiedPath("C:/local/path")).toEqual(false);
-      expect(isSchemeQualifiedPath("C:\\local\\path")).toEqual(false);
+      expect(looksLikeUri("C:/local/path")).toEqual(false);
+      expect(looksLikeUri("C:\\local\\path")).toEqual(false);
     });
 
     test("does not mistake an absolute POSIX path for a scheme", () => {
-      expect(isSchemeQualifiedPath("/local/path")).toEqual(false);
+      expect(looksLikeUri("/local/path")).toEqual(false);
     });
 
     test("does not mistake a relative path for a scheme", () => {
-      expect(isSchemeQualifiedPath("copybooks")).toEqual(false);
+      expect(looksLikeUri("copybooks")).toEqual(false);
     });
   });
 

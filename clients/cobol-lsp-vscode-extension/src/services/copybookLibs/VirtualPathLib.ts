@@ -16,7 +16,7 @@ import { VirtualFilesystemResourceService } from "../VirtualFilesystemResourceSe
 import { LibDefinition } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
-import { isSchemeQualifiedPath } from "../util/Utils";
+import { looksLikeUri } from "../util/Utils";
 import { outputChannel } from "../util/OutputChannel";
 import CopybookLib from "./CopybookLib";
 import * as vscode from "vscode";
@@ -31,10 +31,10 @@ export const virtualCopybooks = new VirtualFilesystemResourceService();
  * glob segments are supported.
  */
 export default class VirtualPathLib implements CopybookLib {
-  constructor(private path: string) {}
+  constructor(private uri: string) {}
 
   static create(config: LibDefinition) {
-    if (typeof config === "string" && isSchemeQualifiedPath(config)) {
+    if (typeof config === "string" && looksLikeUri(config)) {
       return new VirtualPathLib(config);
     }
   }
@@ -42,7 +42,7 @@ export default class VirtualPathLib implements CopybookLib {
   private getUri(documentUri: vscode.Uri): vscode.Uri | undefined {
     const variables = getVariablesFromUri(documentUri, false);
     const evaluatedPath = SettingsService.evaluateVariables(
-      this.path,
+      this.uri,
       variables,
     );
 

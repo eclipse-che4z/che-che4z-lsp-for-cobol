@@ -16,7 +16,7 @@ import { LocalFilesystemResourceService } from "../LocalFilesystemResourceServic
 import { LibDefinition } from "../ProcessorGroupsLoader";
 import { SettingsService } from "../Settings";
 import { getVariablesFromUri } from "../util/FSUtils";
-import { isSchemeQualifiedPath } from "../util/Utils";
+import { looksLikeUri } from "../util/Utils";
 import { outputChannel } from "../util/OutputChannel";
 import CopybookLib from "./CopybookLib";
 import * as vscode from "vscode";
@@ -27,7 +27,7 @@ export default class LocalPathLib implements CopybookLib {
   constructor(private path: string) {}
 
   static create(config: LibDefinition) {
-    if (typeof config === "string" && !isSchemeQualifiedPath(config)) {
+    if (typeof config === "string" && !looksLikeUri(config)) {
       return new LocalPathLib(config);
     }
   }
