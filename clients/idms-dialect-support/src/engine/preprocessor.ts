@@ -58,7 +58,7 @@ export class IdmsPreprocessor {
       this.messageService,
     );
     await copybookPreprocessor.execute(context, analysis.copybooks);
-    statementPreprocessor.execute(context, analysis.statements);
+    statementPreprocessor.processStatement(context, analysis.statements);
   }
 
   private analyzeProgram(text: string, documentUri: string): ProgramAnalysis {

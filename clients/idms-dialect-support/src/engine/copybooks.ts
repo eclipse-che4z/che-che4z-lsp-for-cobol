@@ -181,7 +181,10 @@ export class IdmsCopybookPreprocessor {
 
     const statementAnalysis = this.analyzeCopybookStatements(copybook.text);
     addParsingErrors(copybook.context, statementAnalysis.errors);
-    statementProcessor.execute(copybook.context, statementAnalysis.result);
+    statementProcessor.processStatement(
+      copybook.context,
+      statementAnalysis.result,
+    );
 
     const variables: ResolvedVariableLevel[] = [];
     const nestedStack = [...copybookStack, normalizedName];
