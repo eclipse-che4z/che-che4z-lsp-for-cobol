@@ -15,7 +15,7 @@
 import { hasMember, looksLikeUri } from "../../../services/util/Utils";
 
 describe("Utils", () => {
-  describe("isSchemeQualifiedPath", () => {
+  describe("looksLikeUri", () => {
     test("recognizes a scheme with no authority", () => {
       expect(looksLikeUri("zowe-uss:/profile/path")).toEqual(true);
     });

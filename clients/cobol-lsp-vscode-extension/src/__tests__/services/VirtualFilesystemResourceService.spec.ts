@@ -87,6 +87,21 @@ describe("VirtualFilesystemResourceService test", () => {
       expect(resultsFirstCall).toEqual(resultsSecondCall);
     });
 
+    it("reuses a single in-flight request for concurrent calls to the same path", async () => {
+      readDirectoryResult["/test/path"] = [["COPYBOOK.CPY", FileType.File]];
+
+      const service = new VirtualFilesystemResourceService();
+      const localPath = Uri.parse("zowe-uss:/test/path");
+
+      const [resultsFirstCall, resultsSecondCall] = await Promise.all([
+        service.listDirectory(localPath, [".CPY", ""]),
+        service.listDirectory(localPath, [".CPY", ""]),
+      ]);
+
+      expect(readDirectorySpy).toHaveBeenCalledTimes(1);
+      expect(resultsFirstCall).toEqual(resultsSecondCall);
+    });
+
     it("calls readDirectory again after the directory content changed", async () => {
       let onCreateCallback: () => void = () => undefined;
       const fileWatcherMock = {

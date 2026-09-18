@@ -14,15 +14,11 @@
 
 import * as vscode from "vscode";
 import { getVariablesFromUri } from "./util/FSUtils";
+import { Memoize } from "./util/Memoize";
 
 interface ResourceCacheItem {
   filename: string;
   uri: vscode.Uri;
-}
-
-interface ResourceDirectory {
-  resources: ResourceCacheItem[];
-  fileWatcher: vscode.FileSystemWatcher;
 }
 
 function sanitizeExtensions(extensions: string[]) {
@@ -53,22 +49,61 @@ function generateCacheKey(directoryUri: vscode.Uri, extensions: string[]) {
  * directory.
  */
 export class VirtualFilesystemResourceService {
-  private folderContentCache: Record<string, ResourceDirectory> = {};
+  private fileWatchers = new Map<string, vscode.FileSystemWatcher>();
 
-  private invalidateCachedPath(cacheKey: string) {
-    return () => {
-      if (this.folderContentCache[cacheKey]) {
-        this.folderContentCache[cacheKey].fileWatcher.dispose();
-        delete this.folderContentCache[cacheKey];
-      }
-    };
+  private directoryCache = new Memoize<
+    [directoryUri: vscode.Uri, sanitizedExtensions: string[]],
+    ResourceCacheItem[]
+  >(
+    async (directoryUri, sanitizedExtensions) => {
+      const entries = await vscode.workspace.fs.readDirectory(directoryUri);
+
+      const resources: ResourceCacheItem[] = [];
+      entries.forEach(([name, type]) => {
+        if ((type & vscode.FileType.File) === 0) {
+          return;
+        }
+        const resourceUri = vscode.Uri.joinPath(directoryUri, name);
+        const { filename, extension } = getVariablesFromUri(resourceUri);
+        if (sanitizedExtensions.includes(extension.toUpperCase())) {
+          resources.push({
+            filename: filename.toUpperCase(),
+            uri: resourceUri,
+          });
+        }
+      });
+
+      return resources;
+    },
+    undefined,
+    (directoryUri, sanitizedExtensions) =>
+      generateCacheKey(directoryUri, sanitizedExtensions),
+  );
+
+  private ensureWatcher(
+    directoryUri: vscode.Uri,
+    sanitizedExtensions: string[],
+    cacheKey: string,
+  ) {
+    if (this.fileWatchers.has(cacheKey)) {
+      return;
+    }
+    const fileWatcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(directoryUri, "*"),
+    );
+    const invalidate = () =>
+      this.directoryCache.invalidateCache(directoryUri, sanitizedExtensions);
+    fileWatcher.onDidCreate(invalidate);
+    fileWatcher.onDidDelete(invalidate);
+    this.fileWatchers.set(cacheKey, fileWatcher);
   }
 
   public clearCache() {
-    Object.values(this.folderContentCache).forEach((v) => {
-      v.fileWatcher.dispose();
+    this.fileWatchers.forEach((watcher) => {
+      watcher.dispose();
     });
-    this.folderContentCache = {};
+    this.fileWatchers.clear();
+    this.directoryCache.clearCache();
   }
 
   public async listDirectory(
@@ -76,38 +111,14 @@ export class VirtualFilesystemResourceService {
     allowedExtensions: string[],
   ): Promise<ResourceCacheItem[]> {
     const sanitizedExtensions = sanitizeExtensions(allowedExtensions);
-
     const cacheKey = generateCacheKey(directoryUri, sanitizedExtensions);
-    if (typeof this.folderContentCache[cacheKey] !== "undefined") {
-      return this.folderContentCache[cacheKey].resources;
-    }
 
-    const entries = await vscode.workspace.fs.readDirectory(directoryUri);
+    this.ensureWatcher(directoryUri, sanitizedExtensions, cacheKey);
 
-    const resources: ResourceCacheItem[] = [];
-    entries.forEach(([name, type]) => {
-      if ((type & vscode.FileType.File) === 0) {
-        return;
-      }
-      const resourceUri = vscode.Uri.joinPath(directoryUri, name);
-      const { filename, extension } = getVariablesFromUri(resourceUri);
-      if (sanitizedExtensions.includes(extension.toUpperCase())) {
-        resources.push({ filename: filename.toUpperCase(), uri: resourceUri });
-      }
-    });
-
-    const fileWatcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(directoryUri, "*"),
+    return (
+      (await this.directoryCache.execute(directoryUri, sanitizedExtensions)) ??
+      []
     );
-    fileWatcher.onDidCreate(this.invalidateCachedPath(cacheKey));
-    fileWatcher.onDidDelete(this.invalidateCachedPath(cacheKey));
-
-    this.folderContentCache[cacheKey] = {
-      resources,
-      fileWatcher,
-    };
-
-    return resources;
   }
 
   public async searchDirectory(

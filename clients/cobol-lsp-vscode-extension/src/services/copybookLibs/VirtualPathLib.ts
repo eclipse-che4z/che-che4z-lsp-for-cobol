@@ -72,19 +72,11 @@ export default class VirtualPathLib implements CopybookLib {
       dialect,
     );
 
-    try {
-      return await virtualCopybooks.searchDirectory(
-        uri,
-        copybookName,
-        allowedExtensions ?? [],
-      );
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      outputChannel.error(
-        `Unable to resolve copybook "${copybookName}": ${message}`,
-      );
-      return undefined;
-    }
+    return await virtualCopybooks.searchDirectory(
+      uri,
+      copybookName,
+      allowedExtensions ?? [],
+    );
   }
 
   async listCopybooks(
@@ -101,17 +93,10 @@ export default class VirtualPathLib implements CopybookLib {
       dialect,
     );
 
-    try {
-      const files = await virtualCopybooks.listDirectory(
-        uri,
-        allowedExtensions ?? [],
-      );
-      return files.map((copybook) => copybook.filename);
-    } catch (e) {
-      outputChannel.error(
-        `Unable to load copybooks completions: ${JSON.stringify(e)}`,
-      );
-      return [];
-    }
+    const files = await virtualCopybooks.listDirectory(
+      uri,
+      allowedExtensions ?? [],
+    );
+    return files.map((copybook) => copybook.filename);
   }
 }
