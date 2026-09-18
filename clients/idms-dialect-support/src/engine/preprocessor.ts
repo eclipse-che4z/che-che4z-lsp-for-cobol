@@ -28,7 +28,7 @@ import {
   IdmsDialectVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
-import * as statementPreprocessor from "./statementsts";
+import { processStatements } from "./statementsts";
 import { addParsingErrors } from "./util";
 
 interface ProgramAnalysis {
@@ -58,7 +58,7 @@ export class IdmsPreprocessor {
       this.messageService,
     );
     await copybookPreprocessor.execute(context, analysis.copybooks);
-    statementPreprocessor.processStatement(context, analysis.statements);
+    processStatements(context, analysis.statements);
   }
 
   private analyzeProgram(text: string, documentUri: string): ProgramAnalysis {

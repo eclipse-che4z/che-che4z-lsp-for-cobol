@@ -24,7 +24,7 @@ import { StatementDescriptor } from "./model";
  * preserving variable usages so that the underlying COBOL parser can still
  * resolve them.
  */
-export function processStatement(
+export function processStatements(
   context: IDocumentProcessingContext,
   descriptors: StatementDescriptor[],
 ): void {
