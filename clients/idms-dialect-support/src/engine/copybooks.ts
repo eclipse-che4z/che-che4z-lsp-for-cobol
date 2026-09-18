@@ -16,12 +16,20 @@ import * as antlr from "antlr4ng";
 import { IDocumentProcessingContext } from "@code4z/cobol-dialect-api";
 import { IdmsCopyLexer } from "../generated/IdmsCopyLexer";
 import { IdmsCopyParser } from "../generated/IdmsCopyParser";
-import { IdmsCopybookDescriptor, ParseError } from "./model";
+import { IdmsLexer } from "../generated/IdmsLexer";
+import { IdmsParser } from "../generated/IdmsParser";
+import {
+  IdmsCopybookDescriptor,
+  ParseError,
+  StatementDescriptor,
+} from "./model";
 import {
   CollectingErrorListener,
   IdmsCopybookEntry,
   IdmsCopyVisitor,
+  IdmsTransformationVisitor,
 } from "./parsing";
+import { IdmsStatementsPrerocessor } from "./statementsts";
 import { addParsingErrors } from "./util";
 import { MessageService } from "./services/MessageService";
 
@@ -47,6 +55,8 @@ interface ParsingResult<T> {
 
 /** Resolves explicit and predefined IDMS copybooks and adjusts their data levels. */
 export class IdmsCopybookPreprocessor {
+  private readonly statementProcessor = new IdmsStatementsPrerocessor();
+
   public constructor(
     private readonly outputChannel: vscode.OutputChannel,
     private readonly messageService: MessageService,
@@ -80,9 +90,31 @@ export class IdmsCopybookPreprocessor {
     return { result: entries ?? [], errors };
   }
 
-  private configureErrorListeners(
-    lexer: IdmsCopyLexer,
-    parser: IdmsCopyParser,
+  private analyzeCopybookStatements(
+    text: string,
+  ): ParsingResult<StatementDescriptor[]> {
+    const lexer = new IdmsLexer(
+      antlr.CharStream.fromString(this.cleanCopybook(text)),
+    );
+    const parser = new IdmsParser(new antlr.CommonTokenStream(lexer));
+    parser.setMessageService(this.messageService);
+
+    const errorListeners = this.configureErrorListeners(lexer, parser);
+    const statements = new IdmsTransformationVisitor().visit(
+      parser.startRule(),
+    );
+    const errors = this.collectParsingErrors(errorListeners);
+
+    this.logParsingResult(errors);
+    return { result: statements ?? [], errors };
+  }
+
+  private configureErrorListeners<
+    TLexer extends antlr.Lexer,
+    TParser extends antlr.Parser,
+  >(
+    lexer: TLexer,
+    parser: TParser,
   ): {
     lexer: CollectingErrorListener;
     parser: CollectingErrorListener;
@@ -148,6 +180,10 @@ export class IdmsCopybookPreprocessor {
       copybook.uri.toString(),
     );
     addParsingErrors(copybook.context, errors);
+
+    const statementAnalysis = this.analyzeCopybookStatements(copybook.text);
+    addParsingErrors(copybook.context, statementAnalysis.errors);
+    this.statementProcessor.execute(copybook.context, statementAnalysis.result);
 
     const variables: ResolvedVariableLevel[] = [];
     const nestedStack = [...copybookStack, normalizedName];

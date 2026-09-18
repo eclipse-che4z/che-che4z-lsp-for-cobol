@@ -31,12 +31,14 @@ function createContext(uri: string) {
   return {
     resolveCopybook: jest.fn(),
     replace: jest.fn(),
+    replaceWithMap: jest.fn(),
     insert: jest.fn(),
     addDiagnostic: jest.fn(),
     getDocumentUri: jest.fn().mockReturnValue(vscode.Uri.parse(uri)),
   } as unknown as IDocumentProcessingContext & {
     resolveCopybook: jest.Mock;
     replace: jest.Mock;
+    replaceWithMap: jest.Mock;
     insert: jest.Mock;
     addDiagnostic: jest.Mock;
   };
@@ -375,14 +377,132 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
-  it("leaves statements with an imperative call for special processing", async () => {
+  it("preserves variable usages from an IDMS statement", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+
+    await preprocessor.execute(
+      context,
+      "       SEND MESSAGE TO USER ID WS-A FROM WS-B LENGTH 1.",
+    );
+
+    expect(context.replace).not.toHaveBeenCalled();
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 7, 0, 54));
+    expect(statementRange).toEqual(expectRange(0, 7, 0, 54));
+    expect(filler).toBe("CONTINUE");
+    expect(items).toHaveLength(2);
+    expect(items[0].type).toBe("VARIABLE");
+    expect(items[0].tokens).toHaveLength(1);
+    expect(items[0].tokens[0].name).toBe("VAR_0_USG_0");
+    expect(items[0].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 31, 0, 35),
+    );
+    expect(items[1].type).toBe("VARIABLE");
+    expect(items[1].tokens).toHaveLength(1);
+    expect(items[1].tokens[0].name).toBe("VAR_1_USG_0");
+    expect(items[1].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[1].tokens[0].location.range).toEqual(
+      expectRange(0, 41, 0, 45),
+    );
+  });
+
+  it("replaces a multiline imperative statement with an always-true IF", async () => {
     const context = createContext("file:///program.cbl");
 
     await preprocessor.execute(
       context,
-      "       READY\n       ON ANY-STATUS GOBACK.",
+      "       READY\n       ON ANY-STATUS GOBACK END-IF.",
     );
 
-    expect(context.replace).not.toHaveBeenCalled();
+    expect(context.replace).toHaveBeenCalledTimes(2);
+    expect(context.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 1, 7),
+      " ",
+    );
+    expect(context.replace).toHaveBeenNthCalledWith(
+      2,
+      expectRange(1, 7, 1, 20),
+      "IF 1 + 1 = 2",
+    );
+  });
+
+  it("preserves NEXT SENTENCE after an imperative statement", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(
+      context,
+      "       ABEND CODE '1234' ON ANY-STATUS NEXT SENTENCE.",
+    );
+
+    expect(context.replace).toHaveBeenCalledTimes(2);
+    expect(context.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 0, 25),
+      " ",
+    );
+    expect(context.replace).toHaveBeenNthCalledWith(
+      2,
+      expectRange(0, 25, 0, 38),
+      "IF 1 + 1 = 2",
+    );
+  });
+
+  it("processes an imperative call nested in STORE options", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(
+      context,
+      "       STORE SOME-LR\n       ON LR-NOT-FOUND CONTINUE END-IF.",
+    );
+
+    expect(context.replace).toHaveBeenCalledTimes(2);
+    expect(context.replace).toHaveBeenNthCalledWith(
+      1,
+      expectRange(0, 7, 1, 7),
+      " ",
+    );
+    expect(context.replace).toHaveBeenNthCalledWith(
+      2,
+      expectRange(1, 7, 1, 22),
+      "IF 1 + 1 = 2",
+    );
+  });
+
+  it("does not treat ON inside an IDMS statement as an imperative call", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(
+      context,
+      "       SET ABEND EXIT ON PROGRAM 'PROG'.",
+    );
+
+    expect(context.replace).toHaveBeenCalledTimes(1);
+    expect(context.replace).toHaveBeenCalledWith(
+      expectRange(0, 7, 0, 39),
+      "CONTINUE",
+    );
+  });
+
+  it("replaces an IDMS statement found inside a resolved copybook", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///MYCOPY.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MYCOPY.cpy"),
+      text: "       READY.",
+    });
+
+    await preprocessor.execute(context, "       COPY IDMS MYCOPY.");
+
+    expect(copybookContext.replace).toHaveBeenCalledWith(
+      expectRange(0, 7, 0, 12),
+      "CONTINUE",
+    );
   });
 });

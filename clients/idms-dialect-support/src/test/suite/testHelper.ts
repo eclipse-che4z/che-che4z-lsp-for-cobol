@@ -152,3 +152,40 @@ export function checkDiagnostic(
     `Expected '${message}' not found at range ${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`,
   );
 }
+
+export async function checkDefinition(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLine: number,
+) {
+  await checkLocations("vscode.executeDefinitionProvider", editor, position, [
+    expectedLine,
+  ]);
+}
+
+async function checkLocations(
+  provider: "vscode.executeDefinitionProvider",
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLines: number[],
+) {
+  const locations = await vscode.commands.executeCommand<vscode.Location[]>(
+    provider,
+    editor.document.uri,
+    position,
+  );
+
+  assert.ok(locations);
+
+  const currentDocumentName = basename(editor.document.uri.path);
+  const expected = expectedLines.map((line) => ({
+    line,
+    documentName: currentDocumentName,
+  }));
+  const actual = locations.map((location) => ({
+    line: location.range.start.line,
+    documentName: basename(location.uri.path),
+  }));
+
+  assert.deepStrictEqual(actual, expected);
+}

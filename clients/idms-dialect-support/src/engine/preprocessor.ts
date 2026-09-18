@@ -28,6 +28,7 @@ import {
   IdmsDialectVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
+import { IdmsStatementsPrerocessor } from "./statementsts";
 import { addParsingErrors } from "./util";
 
 interface ProgramAnalysis {
@@ -37,6 +38,8 @@ interface ProgramAnalysis {
 }
 
 export class IdmsPreprocessor {
+  private readonly statementPreprocessor = new IdmsStatementsPrerocessor();
+
   constructor(
     private readonly outputChannel: vscode.OutputChannel,
     private readonly messageService: MessageService,
@@ -52,13 +55,12 @@ export class IdmsPreprocessor {
     );
     addParsingErrors(context, analysis.errors);
 
-    this.processStatements(analysis.statements, context);
-
     const copybookPreprocessor = new IdmsCopybookPreprocessor(
       this.outputChannel,
       this.messageService,
     );
     await copybookPreprocessor.execute(context, analysis.copybooks);
+    this.statementPreprocessor.execute(context, analysis.statements);
   }
 
   private analyzeProgram(text: string, documentUri: string): ProgramAnalysis {
@@ -81,15 +83,6 @@ export class IdmsPreprocessor {
       `IDMS parsing completed with ${errors.length} error(s)`,
     );
     return { copybooks, statements, errors };
-  }
-
-  private processStatements(
-    descriptors: StatementDescriptor[],
-    context: IDocumentProcessingContext,
-  ): void {
-    for (const descriptor of descriptors) {
-      context.replace(descriptor.statementRange, descriptor.filler);
-    }
   }
 
   private configureErrorListeners(
