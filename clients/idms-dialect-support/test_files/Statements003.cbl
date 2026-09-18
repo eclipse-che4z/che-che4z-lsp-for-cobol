@@ -12,6 +12,12 @@
        01 WS-FLAG PIC 9 VALUE 1.
        01 WS-ABEND-CODE PIC X(4) VALUE '1234'.
        01 WS-A PIC X.
+       01 AREA-A PIC X.
+       01 AREA-B PIC X.
+       01 AREA-C PIC X.
+       01 AREA-D PIC X.
+       01 EMPLOYEE PIC X.
+       01 EMPMAP PIC X.
        PROCEDURE DIVISION.
            BIND RUN-UNIT.
            READY AREA-A USAGE-MODE IS RETRIEVAL

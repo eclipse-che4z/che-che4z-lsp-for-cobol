@@ -19,15 +19,25 @@ import {
   Recognizer,
   ATNSimulator,
   TerminalNode,
+  ParserRuleContext,
 } from "antlr4ng";
 import { IdmsParserVisitor } from "../generated/IdmsParserVisitor";
 import {
   IdmsStatementsContext,
   CopyIdmsStatementContext as ProgramCopyIdmsStatementContext,
+  EraseStatementContext,
+  Idms_db_entity_nameContext,
+  Idms_map_nameContext,
+  Idms_procedure_nameContext,
   IdmsRecordLocationParagraphContext,
   IdmsSectionsContext,
+  ImperativeStatementCallContext,
   MapSectionContext,
+  ModifyStatementContext,
+  QualifiedDataNameContext,
   SchemaSectionContext,
+  StoreStatementContext,
+  VariableUsageNameContext,
 } from "../generated/IdmsParser";
 import { IdmsCopyParserVisitor } from "../generated/IdmsCopyParserVisitor";
 import {
@@ -113,6 +123,7 @@ export type IdmsCopybookEntry =
 const DEFAULT_RECORD_PLACEMENT = "WORKING-STORAGE";
 const SUBSCHEMA_COPYBOOK = "SUBSCHEMA-DESCRIPTION";
 const MAPS_COPYBOOK = "MAPS";
+const IMPERATIVE_STATEMENT_REPLACEMENT = "IF 1 + 1 = 2";
 
 /** Collects explicit and predefined IDMS copybooks from a COBOL program. */
 export class IdmsDialectVisitor extends IdmsParserVisitor<
@@ -282,8 +293,12 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   };
 
   visitIdmsStatements = (ctx: IdmsStatementsContext): StatementDescriptor[] => {
-    if (ctx.imperativeStatementCall()) {
-      return [];
+    const imperativeStatement = this.findImperativeStatement(ctx);
+    if (imperativeStatement) {
+      return this.createImperativeStatementDescriptors(
+        ctx,
+        imperativeStatement,
+      );
     }
 
     const range = constructRange(ctx);
@@ -297,6 +312,109 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       ),
     ];
   };
+
+  visitQualifiedDataName = (
+    ctx: QualifiedDataNameContext,
+  ): StatementDescriptor[] => this.createVariableDescriptor(ctx);
+
+  visitIdms_db_entity_name = (
+    ctx: Idms_db_entity_nameContext,
+  ): StatementDescriptor[] => {
+    return this.createVariableDescriptor(ctx);
+  };
+
+  visitIdms_procedure_name = (
+    ctx: Idms_procedure_nameContext,
+  ): StatementDescriptor[] => this.createVariableDescriptor(ctx);
+
+  visitIdms_map_name = (ctx: Idms_map_nameContext): StatementDescriptor[] =>
+    this.createVariableDescriptor(ctx);
+
+  visitVariableUsageName = (
+    ctx: VariableUsageNameContext,
+  ): StatementDescriptor[] => {
+    const range = constructRange(ctx);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "VARIABLE_USAGE",
+        this.visitChildren(ctx) ?? [],
+      ),
+    ];
+  };
+
+  private findImperativeStatement(
+    ctx: IdmsStatementsContext,
+  ): ImperativeStatementCallContext | null {
+    const statement = ctx.idmsStmtsOptTermOn();
+    return (
+      ctx.imperativeStatementCall() ??
+      statement
+        .eraseStatement()
+        ?.eraseStoreModifyLrStatementsOptions()
+        ?.imperativeStatementCall() ??
+      statement
+        .modifyStatement()
+        ?.eraseStoreModifyLrStatementsOptions()
+        ?.imperativeStatementCall() ??
+      statement
+        .storeStatement()
+        ?.eraseStoreModifyLrStatementsOptions()
+        ?.imperativeStatementCall() ??
+      null
+    );
+  }
+
+  private createImperativeStatementDescriptors(
+    ctx: IdmsStatementsContext,
+    imperativeStatement: ImperativeStatementCallContext,
+  ): StatementDescriptor[] {
+    const statementStart = ctx.start;
+    const imperativeStart = imperativeStatement.start;
+    if (!statementStart || !imperativeStart) {
+      return [];
+    }
+
+    const statementRange = new vscode.Range(
+      statementStart.line - 1,
+      statementStart.column,
+      imperativeStart.line - 1,
+      imperativeStart.column,
+    );
+    const imperativeRange = constructRange(imperativeStatement);
+
+    return [
+      new StatementDescriptor(
+        statementRange,
+        statementRange,
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        SPACE_VALUE,
+      ),
+      new StatementDescriptor(
+        imperativeRange,
+        imperativeRange,
+        "STATEMENT",
+        [],
+        IMPERATIVE_STATEMENT_REPLACEMENT,
+      ),
+    ];
+  }
+
+  private createVariableDescriptor(
+    ctx: ParserRuleContext,
+  ): StatementDescriptor[] {
+    const range = constructRange(ctx);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "VARIABLE",
+        this.visitChildren(ctx) ?? [],
+      ),
+    ];
+  }
 
   protected aggregateResult = concatResults;
 }

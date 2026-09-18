@@ -25,6 +25,10 @@
        WORKING-STORAGE SECTION.
        01 WS-A PIC X(80).
        01 WS-B PIC X(80).
+       01 AREA-A PIC X.
+       01 EMPLOYEE PIC X.
+       01 EMP-SET PIC X.
+       01 EMPMAP PIC X.
        PROCEDURE DIVISION.
            ABEND CODE '1234'.
            ATTACH TASK CODE 'TASK'.
