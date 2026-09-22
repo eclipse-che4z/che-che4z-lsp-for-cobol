@@ -29,7 +29,7 @@ import {
   IdmsCopyVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
-import * as statementProcessor from "./statementsts";
+import { processStatements } from "./statementsts";
 import { addParsingErrors } from "./util";
 import { MessageService } from "./services/MessageService";
 
@@ -181,10 +181,7 @@ export class IdmsCopybookPreprocessor {
 
     const statementAnalysis = this.analyzeCopybookStatements(copybook.text);
     addParsingErrors(copybook.context, statementAnalysis.errors);
-    statementProcessor.processStatement(
-      copybook.context,
-      statementAnalysis.result,
-    );
+    processStatements(copybook.context, statementAnalysis.result);
 
     const variables: ResolvedVariableLevel[] = [];
     const nestedStack = [...copybookStack, normalizedName];
