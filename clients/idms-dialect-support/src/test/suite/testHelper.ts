@@ -153,7 +153,7 @@ export function checkDiagnostic(
   );
 }
 
-export type ExpectedLocation = number | { line: number; documentName?: string };
+export type ExpectedLocation = number | { line: number; documentName: string };
 
 export function inDocument(
   documentName: string,
