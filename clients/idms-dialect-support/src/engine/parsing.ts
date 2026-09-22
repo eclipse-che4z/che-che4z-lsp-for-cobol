@@ -25,6 +25,7 @@ import { IdmsParserVisitor } from "../generated/IdmsParserVisitor";
 import {
   IdmsStatementsContext,
   CopyIdmsStatementContext as ProgramCopyIdmsStatementContext,
+  EraseStoreModifyLrStatementsOptionsContext,
   Idms_db_entity_nameContext,
   IdmsIfConditionContext,
   IdmsIfStatementContext,
@@ -34,6 +35,7 @@ import {
   IdmsSectionsContext,
   ImperativeStatementCallContext,
   MapSectionContext,
+  ObtainLRStatementContext,
   QualifiedDataNameContext,
   SchemaSectionContext,
   VariableUsageNameContext,
@@ -294,25 +296,16 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   };
 
   visitIdmsStatements = (ctx: IdmsStatementsContext): StatementDescriptor[] => {
-    const imperativeStatement = this.findImperativeStatement(ctx);
-    if (imperativeStatement) {
-      return this.createImperativeStatementDescriptors(
-        ctx,
-        imperativeStatement,
-      );
-    }
-
-    const range = constructRange(ctx);
-    return [
-      new StatementDescriptor(
-        range,
-        range,
-        "STATEMENT",
-        this.visitChildren(ctx) ?? [],
-        BLANK_STATEMENT,
-      ),
-    ];
+    return this.createStatementDescriptors(
+      ctx,
+      this.findImperativeStatement(ctx),
+    );
   };
+
+  visitObtainLRStatement = (
+    ctx: ObtainLRStatementContext,
+  ): StatementDescriptor[] =>
+    this.createStatementDescriptors(ctx, ctx.imperativeStatementCall());
 
   visitIdmsIfStatement = (
     ctx: IdmsIfStatementContext,
@@ -351,8 +344,24 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   visitIdms_db_entity_name = (
     ctx: Idms_db_entity_nameContext,
   ): StatementDescriptor[] => {
+    if (this.hasExplicitLogicalRecordOptions(ctx)) {
+      return [];
+    }
+
     return this.createVariableDescriptor(ctx);
   };
+
+  private hasExplicitLogicalRecordOptions(
+    ctx: Idms_db_entity_nameContext,
+  ): boolean {
+    const options = ctx.parent?.getRuleContext(
+      0,
+      EraseStoreModifyLrStatementsOptionsContext,
+    );
+    // ON alone is also valid for a regular record statement and is parsed by
+    // this rule, while FROM and WHERE unambiguously identify the LR form.
+    return Boolean(options?.FROM() || options?.WHERE());
+  }
 
   visitIdms_procedure_name = (
     ctx: Idms_procedure_nameContext,
@@ -397,8 +406,31 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
     );
   }
 
+  private createStatementDescriptors(
+    ctx: ParserRuleContext,
+    imperativeStatement: ImperativeStatementCallContext | null,
+  ): StatementDescriptor[] {
+    if (imperativeStatement) {
+      return this.createImperativeStatementDescriptors(
+        ctx,
+        imperativeStatement,
+      );
+    }
+
+    const range = constructRange(ctx);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        BLANK_STATEMENT,
+      ),
+    ];
+  }
+
   private createImperativeStatementDescriptors(
-    ctx: IdmsStatementsContext,
+    ctx: ParserRuleContext,
     imperativeStatement: ImperativeStatementCallContext,
   ): StatementDescriptor[] {
     const statementStart = ctx.start;

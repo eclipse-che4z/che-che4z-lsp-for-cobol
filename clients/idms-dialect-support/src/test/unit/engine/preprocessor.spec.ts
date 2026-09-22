@@ -471,6 +471,96 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
+  it("replaces an OBTAIN LR statement", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(
+      context,
+      "       OBTAIN NEXT EMP-JOB-LR\n" +
+        "       WHERE DEPT-ID-410 EQ DEPT-ID-0410 OF LR.",
+    );
+
+    expect(context.replaceWithMap).not.toHaveBeenCalled();
+    expect(context.replace).toHaveBeenCalledTimes(1);
+    expect(context.replace).toHaveBeenCalledWith(
+      expectRange(0, 7, 1, 46),
+      "CONTINUE",
+    );
+  });
+
+  it("preserves the INTO variable in an imperative OBTAIN LR statement", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+
+    await preprocessor.execute(
+      context,
+      "       OBTAIN NEXT EMP-JOB-LR INTO WS-LR\n" +
+        "       WHERE DATA EQ OTHER-DATA\n" +
+        "       ON LR-NOT-FOUND MOVE 'Y' TO RESULT END-IF.",
+    );
+
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 7, 2, 7));
+    expect(statementRange).toEqual(expectRange(0, 7, 2, 7));
+    expect(filler).toBe(" ");
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe("VARIABLE");
+    expect(items[0].tokens).toHaveLength(1);
+    expect(items[0].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 35, 0, 40),
+    );
+
+    expect(context.replace).toHaveBeenCalledTimes(1);
+    expect(context.replace).toHaveBeenCalledWith(
+      expectRange(2, 7, 2, 22),
+      "IF 1 + 1 = 2",
+    );
+  });
+
+  it.each(["ERASE", "MODIFY", "STORE"])(
+    "does not map the logical record name in %s LR",
+    async (statement) => {
+      const context = createContext("file:///program.cbl");
+      const source = `       ${statement} SOME-LR WHERE DATA EQ OTHER-DATA.`;
+
+      await preprocessor.execute(context, source);
+
+      expect(context.replaceWithMap).not.toHaveBeenCalled();
+      expect(context.replace).toHaveBeenCalledTimes(1);
+      expect(context.replace).toHaveBeenCalledWith(
+        expectRange(0, 7, 0, source.indexOf(".")),
+        "CONTINUE",
+      );
+    },
+  );
+
+  it("maps the FROM variable but not the logical record name", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+
+    await preprocessor.execute(
+      context,
+      "       ERASE SOME-LR FROM WS-LR WHERE DATA EQ OTHER-DATA.",
+    );
+
+    expect(context.replace).not.toHaveBeenCalled();
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 7, 0, 56));
+    expect(statementRange).toEqual(expectRange(0, 7, 0, 56));
+    expect(filler).toBe("CONTINUE");
+    expect(items).toHaveLength(1);
+    expect(items[0].tokens).toHaveLength(1);
+    expect(items[0].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 26, 0, 31),
+    );
+  });
+
   it("replaces a multiline imperative statement with an always-true IF", async () => {
     const context = createContext("file:///program.cbl");
 
@@ -541,6 +631,39 @@ describe("IdmsPreprocessor", () => {
     expect(context.replace).toHaveBeenCalledWith(
       expectRange(1, 7, 1, 22),
       "IF 1 + 1 = 2",
+    );
+  });
+
+  it("processes OBTAIN LR with an IDMS LR copybook", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+    const copybookContext = createContext("file:///MYCOPY.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MYCOPY.cpy"),
+      text: "       01 WS-LR PIC X.",
+    });
+
+    await preprocessor.execute(
+      context,
+      "       COPY IDMS LR MYCOPY.\n" +
+        "       OBTAIN NEXT EMP-JOB-LR INTO WS-LR.",
+    );
+
+    expect(context.resolveCopybook).toHaveBeenCalledWith(
+      "MYCOPY",
+      expectRange(0, 7, 0, 27),
+      expectRange(0, 20, 0, 26),
+    );
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(1, 7, 1, 40));
+    expect(statementRange).toEqual(expectRange(1, 7, 1, 40));
+    expect(filler).toBe("CONTINUE");
+    expect(items).toHaveLength(1);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(1, 35, 1, 40),
     );
   });
 
