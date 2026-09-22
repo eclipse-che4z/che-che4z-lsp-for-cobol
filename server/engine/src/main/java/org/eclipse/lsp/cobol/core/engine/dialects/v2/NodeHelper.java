@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.mapping.Token;
@@ -24,7 +25,11 @@ import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CodeBlockUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variable.QualifiedReferenceNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableDefinitionNameNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
+import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
+import org.eclipse.lsp.cobol.lsp.jrpc.ReplacementToken;
+import org.eclipse.lsp.cobol.lsp.jrpc.ReplacementTokens;
 import org.eclipse.lsp4j.Range;
 
 /** Utility class that creates nodes based on token group type */
@@ -32,6 +37,7 @@ import org.eclipse.lsp4j.Range;
 class NodeHelper {
   private static final String VARIABLE = "VARIABLE";
   private static final String PROCEDURE = "PROCEDURE";
+  private static final String VARIABLE_DEFINITION = "VARIABLE_DEFINITION";
 
   public Optional<List<Node>> createNodesIfNeeded(
       String type, List<Token> mappedTokenList, String documentUri, String copybookId) {
@@ -48,6 +54,63 @@ class NodeHelper {
       return Optional.of(createProcedureNode(mappedTokenList, documentUri, copybookId));
     }
     return Optional.empty();
+  }
+
+  public Optional<List<Node>> createNodesIfNeeded(
+      ReplacementTokens tokenItem,
+      List<Token> mappedTokenList,
+      String documentUri,
+      String copybookId,
+      Map<Locality, DialectVariableNode> definitions) {
+    if (VARIABLE_DEFINITION.equals(tokenItem.getType())) {
+      return createVariableDefinitionNodes(
+          tokenItem.getTokens(), mappedTokenList, documentUri, copybookId, definitions);
+    }
+    return createNodesIfNeeded(tokenItem.getType(), mappedTokenList, documentUri, copybookId);
+  }
+
+  private Optional<List<Node>> createVariableDefinitionNodes(
+      ReplacementToken[] sourceTokens,
+      List<Token> mappedTokens,
+      String documentUri,
+      String copybookId,
+      Map<Locality, DialectVariableNode> definitions) {
+    if (mappedTokens.isEmpty() || mappedTokens.size() != sourceTokens.length) {
+      return Optional.empty();
+    }
+
+    DialectVariableNode child = null;
+    for (int index = 0; index < mappedTokens.size(); index++) {
+      Token mappedToken = mappedTokens.get(index);
+      ReplacementToken sourceToken = sourceTokens[index];
+      if (mappedToken == null) {
+        return Optional.empty();
+      }
+
+      Locality locality =
+          Locality.builder()
+              .uri(documentUri)
+              .copybookId(copybookId)
+              .range(mappedToken.getOriginalLocation().getRange())
+              .build();
+      DialectVariableNode definition = definitions.get(locality);
+      if (definition == null) {
+        String displayText =
+            sourceToken.getDisplayText() == null
+                ? mappedToken.getValue()
+                : sourceToken.getDisplayText();
+        definition = new DialectVariableNode(locality, mappedToken.getValue(), displayText);
+        definition.addChild(new VariableDefinitionNameNode(locality, mappedToken.getValue()));
+        definitions.put(locality, definition);
+      }
+
+      if (child != null && child.getParent() != definition) {
+        definition.addChild(child);
+      }
+      child = definition;
+    }
+
+    return Optional.of(ImmutableList.of(child));
   }
 
   private List<Node> createVariableNode(

@@ -24,4 +24,5 @@ public class ReplacementToken {
   @NonNull String name;
   String value;
   @NonNull Location location;
+  String displayText;
 }

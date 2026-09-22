@@ -34,6 +34,7 @@ import {
   IdmsRecordLocationParagraphContext,
   IdmsSectionsContext,
   ImperativeStatementCallContext,
+  MapClauseContext,
   MapSectionContext,
   ObtainLRStatementContext,
   QualifiedDataNameContext,
@@ -291,6 +292,25 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
         "STATEMENT",
         this.visitChildren(ctx) ?? [],
         SPACE_VALUE,
+      ),
+    ];
+  };
+
+  visitMapClause = (ctx: MapClauseContext): StatementDescriptor[] => {
+    const mapName = ctx.idms_map_name_definition()?.dataName();
+    if (!mapName) {
+      return this.visitChildren(ctx) ?? [];
+    }
+
+    const range = constructRange(mapName);
+    return [
+      new StatementDescriptor(
+        range,
+        range,
+        "VARIABLE_DEFINITION",
+        [],
+        BLANK_STATEMENT,
+        `MAP ${mapName.getText().toUpperCase()}.`,
       ),
     ];
   };

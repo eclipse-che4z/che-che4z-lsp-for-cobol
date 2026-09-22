@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -203,6 +204,7 @@ public class DialectProcessingService {
     }
 
     ArrayList<Node> result = new ArrayList<>();
+    Map<Locality, DialectVariableNode> definitions = new HashMap<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
       Map<String, Token> mappedTokens =
           document.replace(
@@ -212,7 +214,12 @@ public class DialectProcessingService {
               normalizeReplacementMap(replacementMap.getReplacementMap()));
 
       addMappedNodes(
-          replacementMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
+          replacementMap.getTokenItems(),
+          mappedTokens,
+          document.getUri(),
+          copybookId,
+          definitions,
+          result);
     }
 
     for (DocumentInsertionMap insertionMap : insertionMaps) {
@@ -224,9 +231,14 @@ public class DialectProcessingService {
               normalizeReplacementMap(insertionMap.getReplacementMap()));
 
       addMappedNodes(
-          insertionMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
+          insertionMap.getTokenItems(),
+          mappedTokens,
+          document.getUri(),
+          copybookId,
+          definitions,
+          result);
     }
-    return result;
+    return normalizeDefinitionRoots(result);
   }
 
   private static Map<String, Token> buildStatementMap(ReplacementTokens[] tokenItems) {
@@ -246,15 +258,27 @@ public class DialectProcessingService {
       Map<String, Token> mappedTokens,
       String uri,
       String copybookId,
+      Map<Locality, DialectVariableNode> definitions,
       List<Node> result) {
     for (ReplacementTokens tokens : tokenItems) {
       List<Token> mappedTokenList =
           Arrays.stream(tokens.getTokens())
               .map(t -> mappedTokens.get(t.getName()))
               .collect(Collectors.toList());
-      NodeHelper.createNodesIfNeeded(tokens.getType(), mappedTokenList, uri, copybookId)
+      NodeHelper.createNodesIfNeeded(tokens, mappedTokenList, uri, copybookId, definitions)
           .ifPresent(result::addAll);
     }
+  }
+
+  private static ArrayList<Node> normalizeDefinitionRoots(List<Node> nodes) {
+    Set<Node> uniqueNodes = Collections.newSetFromMap(new IdentityHashMap<>());
+    return nodes.stream()
+        .filter(uniqueNodes::add)
+        .filter(
+            node ->
+                !(node instanceof DialectVariableNode
+                    && node.getParent() instanceof DialectVariableNode))
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static String normalizeReplacementMap(String replacementMap) {

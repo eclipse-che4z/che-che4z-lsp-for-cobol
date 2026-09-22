@@ -366,6 +366,55 @@ describe("IdmsPreprocessor", () => {
     expect(context.replace).toHaveBeenCalledWith(expectRange(1, 7, 2, 33), " ");
   });
 
+  it("preserves MAP definitions while replacing the MAP section", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+    const text = [
+      "       DATA DIVISION.",
+      "       MAP SECTION.",
+      "       MAP ABCDE.",
+      "       MAP",
+      "         SECOND VERSION 2 TYPE STANDARD.",
+      "       WORKING-STORAGE SECTION.",
+    ].join("\n");
+
+    await preprocessor.execute(context, text);
+
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(1, 7, 4, 40));
+    expect(statementRange).toEqual(expectRange(1, 7, 4, 40));
+    expect(filler).toBe(" ");
+    expect(items).toHaveLength(2);
+    expect(items[0]).toEqual({
+      type: "VARIABLE_DEFINITION",
+      tokens: [
+        expect.objectContaining({
+          name: "VAR_DEF_0",
+          displayText: "MAP ABCDE.",
+          location: expect.objectContaining({
+            range: expectRange(2, 11, 2, 16),
+          }),
+        }),
+      ],
+    });
+    expect(items[1]).toEqual({
+      type: "VARIABLE_DEFINITION",
+      tokens: [
+        expect.objectContaining({
+          name: "VAR_DEF_1",
+          displayText: "MAP SECOND.",
+          location: expect.objectContaining({
+            range: expectRange(4, 9, 4, 15),
+          }),
+        }),
+      ],
+    });
+    expect(items[0].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[1].tokens[0].location.uri.toString()).toBe(documentUri);
+  });
+
   it("replaces a simple IDMS statement with CONTINUE", async () => {
     const context = createContext("file:///program.cbl");
 

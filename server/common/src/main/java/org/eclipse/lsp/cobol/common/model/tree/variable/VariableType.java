@@ -32,6 +32,7 @@ public enum VariableType {
   RENAME_ITEM("variables.renameItem"),
   TABLE_DATA_NAME("variables.tableDataName"),
   MAP_NAME("variables.mapName"),
+  DIALECT_VARIABLE("variables.dialectVariable"),
   FD("variable.fdSd"),
   SD("variable.fdSd");
 

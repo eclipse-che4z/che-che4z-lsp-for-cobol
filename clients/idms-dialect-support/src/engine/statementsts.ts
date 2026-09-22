@@ -16,6 +16,7 @@ import {
   IDocumentProcessingContext,
   Item,
   Token,
+  VariableDefinitionToken,
 } from "@code4z/cobol-dialect-api";
 import { StatementDescriptor } from "./model";
 
@@ -59,6 +60,16 @@ function traverseChildren(
       const name = `VAR_${index++}`;
       createTokens(documentUri, tokens, name, child.children);
       items.push({ type: "VARIABLE", tokens });
+    } else if (
+      child.type === "VARIABLE_DEFINITION" &&
+      child.displayText !== undefined
+    ) {
+      const token: VariableDefinitionToken = {
+        name: `VAR_DEF_${index++}`,
+        location: new vscode.Location(documentUri, child.statementRange),
+        displayText: child.displayText,
+      };
+      items.push({ type: "VARIABLE_DEFINITION", tokens: [token] });
     }
   }
 

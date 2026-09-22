@@ -23,10 +23,19 @@ export type Token = {
   location: vscode.Location;
 };
 
-export type Item = {
-  tokens: Token[];
-  type?: "VARIABLE" | "PROCEDURE";
+export type VariableDefinitionToken = Token & {
+  displayText: string;
 };
+
+export type Item =
+  | {
+      tokens: Token[];
+      type?: "VARIABLE" | "PROCEDURE";
+    }
+  | {
+      tokens: VariableDefinitionToken[];
+      type: "VARIABLE_DEFINITION";
+    };
 
 /**
  * Code for missing copybook diagnostics
