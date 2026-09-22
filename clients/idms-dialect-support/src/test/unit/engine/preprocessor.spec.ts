@@ -438,7 +438,7 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
-  it("replaces INQUIRE MAP IF with a dialect IF", async () => {
+  it("replaces INQUIRE MAP IF with a IF TRUE", async () => {
     const documentUri = "file:///program.cbl";
     const context = createContext(documentUri);
 
@@ -454,7 +454,7 @@ describe("IdmsPreprocessor", () => {
       context.replaceWithMap.mock.calls[0];
     expect(range).toEqual(expectRange(0, 7, 0, 57));
     expect(statementRange).toEqual(expectRange(0, 7, 0, 57));
-    expect(filler).toBe("_IF_ ");
+    expect(filler).toBe("IF TRUE ");
     expect(items).toHaveLength(2);
     expect(items[0].type).toBe("VARIABLE");
     expect(items[0].tokens).toHaveLength(1);
