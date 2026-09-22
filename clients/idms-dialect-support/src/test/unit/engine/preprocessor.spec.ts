@@ -411,6 +411,66 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
+  it("replaces an IDMS IF condition with a dialect condition", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+
+    await preprocessor.execute(
+      context,
+      "       IF NOT IX-EMP MEMBER DISPLAY 'X' ELSE DISPLAY 'Y' END-IF.",
+    );
+
+    expect(context.replace).not.toHaveBeenCalled();
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 10, 0, 27));
+    expect(statementRange).toEqual(expectRange(0, 10, 0, 27));
+    expect(filler).toBe("TRUE");
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe("VARIABLE");
+    expect(items[0].tokens).toHaveLength(1);
+    expect(items[0].tokens[0].name).toBe("VAR_0_USG_0");
+    expect(items[0].tokens[0].location.uri.toString()).toBe(documentUri);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 14, 0, 20),
+    );
+  });
+
+  it("replaces INQUIRE MAP IF with a IF TRUE", async () => {
+    const documentUri = "file:///program.cbl";
+    const context = createContext(documentUri);
+
+    await preprocessor.execute(
+      context,
+      "       INQUIRE MAP EMPMAP IF CURSOR AT DFLD MFLD2 OF MAP1 THEN DISPLAY 'CURSOR'.",
+    );
+
+    expect(context.replace).not.toHaveBeenCalled();
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+
+    const [range, statementRange, items, filler] =
+      context.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 7, 0, 57));
+    expect(statementRange).toEqual(expectRange(0, 7, 0, 57));
+    expect(filler).toBe("IF TRUE ");
+    expect(items).toHaveLength(2);
+    expect(items[0].type).toBe("VARIABLE");
+    expect(items[0].tokens).toHaveLength(1);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 19, 0, 25),
+    );
+    expect(items[1].type).toBe("VARIABLE");
+    expect(items[1].tokens).toHaveLength(2);
+    expect(items[1].tokens[0].location.range).toEqual(
+      expectRange(0, 44, 0, 49),
+    );
+    expect(items[1].tokens[1].location.range).toEqual(
+      expectRange(0, 53, 0, 57),
+    );
+  });
+
   it("replaces a multiline imperative statement with an always-true IF", async () => {
     const context = createContext("file:///program.cbl");
 
@@ -513,6 +573,32 @@ describe("IdmsPreprocessor", () => {
     expect(copybookContext.replace).toHaveBeenCalledWith(
       expectRange(0, 7, 0, 12),
       "CONTINUE",
+    );
+  });
+
+  it("replaces an IDMS condition found inside a resolved copybook", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookUri = "file:///MYCOPY.cpy";
+    const copybookContext = createContext(copybookUri);
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse(copybookUri),
+      text: "       IF EMPLOYEE EMPTY DISPLAY 'EMPTY'.",
+    });
+
+    await preprocessor.execute(context, "       COPY IDMS MYCOPY.");
+
+    expect(copybookContext.replace).not.toHaveBeenCalled();
+    expect(copybookContext.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [range, statementRange, items, filler] =
+      copybookContext.replaceWithMap.mock.calls[0];
+    expect(range).toEqual(expectRange(0, 10, 0, 24));
+    expect(statementRange).toEqual(expectRange(0, 10, 0, 24));
+    expect(filler).toBe("TRUE");
+    expect(items).toHaveLength(1);
+    expect(items[0].tokens[0].location.uri.toString()).toBe(copybookUri);
+    expect(items[0].tokens[0].location.range).toEqual(
+      expectRange(0, 10, 0, 18),
     );
   });
 });
