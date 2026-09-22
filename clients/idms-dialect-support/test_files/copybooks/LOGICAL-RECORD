@@ -1,0 +1,2 @@
+       01 LR-AREA.
+          05 LR-VALUE PIC X(20).

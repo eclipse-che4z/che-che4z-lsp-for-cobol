@@ -153,10 +153,19 @@ export function checkDiagnostic(
   );
 }
 
+export type ExpectedLocation = number | { line: number; documentName?: string };
+
+export function inDocument(
+  documentName: string,
+  line: number,
+): ExpectedLocation {
+  return { line, documentName };
+}
+
 export async function checkDefinition(
   editor: vscode.TextEditor,
   position: vscode.Position,
-  expectedLine: number,
+  expectedLine: ExpectedLocation,
 ) {
   await checkLocations(editor, position, [expectedLine]);
 }
@@ -164,7 +173,7 @@ export async function checkDefinition(
 async function checkLocations(
   editor: vscode.TextEditor,
   position: vscode.Position,
-  expectedLines: number[],
+  expectedLines: ExpectedLocation[],
 ) {
   const locations = await vscode.commands.executeCommand<vscode.Location[]>(
     "vscode.executeDefinitionProvider",
@@ -175,10 +184,14 @@ async function checkLocations(
   assert.ok(locations);
 
   const currentDocumentName = basename(editor.document.uri.path);
-  const expected = expectedLines.map((line) => ({
-    line,
-    documentName: currentDocumentName,
-  }));
+  const expected = expectedLines.map((expectedLocation) =>
+    typeof expectedLocation === "number"
+      ? { line: expectedLocation, documentName: currentDocumentName }
+      : {
+          line: expectedLocation.line,
+          documentName: expectedLocation.documentName ?? currentDocumentName,
+        },
+  );
   const actual = locations.map((location) => ({
     line: location.range.start.line,
     documentName: basename(location.uri.path),
