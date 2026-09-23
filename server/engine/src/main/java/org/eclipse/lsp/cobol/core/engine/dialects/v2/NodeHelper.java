@@ -72,17 +72,10 @@ class NodeHelper {
       String documentUri,
       String copybookId,
       Map<Locality, DialectVariableNode> definitions) {
-    if (mappedTokens.size() != sourceTokens.length) {
-      return Optional.empty();
-    }
-
     DialectVariableNode child = null;
     for (int index = 0; index < mappedTokens.size(); index++) {
       Token mappedToken = mappedTokens.get(index);
       ReplacementToken sourceToken = sourceTokens[index];
-      if (mappedToken == null) {
-        return Optional.empty();
-      }
 
       Locality locality =
           Locality.builder()
