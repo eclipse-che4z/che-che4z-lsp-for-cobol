@@ -40,9 +40,19 @@ class NodeHelper {
   private static final String DIALECT_VARIABLE_DEFINITION = "DIALECT_VARIABLE_DEFINITION";
 
   public Optional<List<Node>> createNodesIfNeeded(
-      String type, List<Token> mappedTokenList, String documentUri, String copybookId) {
+      ReplacementTokens tokenItem,
+      List<Token> mappedTokenList,
+      String documentUri,
+      String copybookId,
+      Map<Locality, DialectVariableNode> definitions) {
     if (mappedTokenList.isEmpty()) {
       return Optional.empty();
+    }
+
+    String type = tokenItem.getType();
+    if (DIALECT_VARIABLE_DEFINITION.equals(type)) {
+      return createVariableDefinitionNodes(
+          tokenItem.getTokens(), mappedTokenList, documentUri, copybookId, definitions);
     }
     if (VARIABLE.equals(type)) {
       return Optional.of(createVariableNode(mappedTokenList, documentUri, copybookId));
@@ -56,26 +66,13 @@ class NodeHelper {
     return Optional.empty();
   }
 
-  public Optional<List<Node>> createNodesIfNeeded(
-      ReplacementTokens tokenItem,
-      List<Token> mappedTokenList,
-      String documentUri,
-      String copybookId,
-      Map<Locality, DialectVariableNode> definitions) {
-    if (DIALECT_VARIABLE_DEFINITION.equals(tokenItem.getType())) {
-      return createVariableDefinitionNodes(
-          tokenItem.getTokens(), mappedTokenList, documentUri, copybookId, definitions);
-    }
-    return createNodesIfNeeded(tokenItem.getType(), mappedTokenList, documentUri, copybookId);
-  }
-
   private Optional<List<Node>> createVariableDefinitionNodes(
       ReplacementToken[] sourceTokens,
       List<Token> mappedTokens,
       String documentUri,
       String copybookId,
       Map<Locality, DialectVariableNode> definitions) {
-    if (mappedTokens.isEmpty() || mappedTokens.size() != sourceTokens.length) {
+    if (mappedTokens.size() != sourceTokens.length) {
       return Optional.empty();
     }
 
