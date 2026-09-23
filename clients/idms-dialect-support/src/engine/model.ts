@@ -53,17 +53,17 @@ interface StatementDescriptorBase {
 
 export type StatementDescriptor =
   | (StatementDescriptorBase & {
-      readonly type: "STATEMENT";
+      readonly type: "DIALECT_STATEMENT";
       readonly filler: string;
     })
   | (StatementDescriptorBase & {
       readonly type: "VARIABLE";
     })
   | (StatementDescriptorBase & {
-      readonly type: "VARIABLE_USAGE";
+      readonly type: "DIALECT_VARIABLE_USAGE";
     })
   | (StatementDescriptorBase & {
-      readonly type: "VARIABLE_DEFINITION";
+      readonly type: "DIALECT_VARIABLE_DEFINITION";
       readonly displayText: string;
     });
 

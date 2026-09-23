@@ -30,7 +30,7 @@ export function processStatements(
   descriptors: StatementDescriptor[],
 ): void {
   for (const descriptor of descriptors) {
-    if (descriptor.type !== "STATEMENT") {
+    if (descriptor.type !== "DIALECT_STATEMENT") {
       continue;
     }
 
@@ -64,13 +64,13 @@ function traverseChildren(
       const name = `VAR_${index++}`;
       createTokens(documentUri, tokens, name, child.children);
       items.push({ type: "VARIABLE", tokens });
-    } else if (child.type === "VARIABLE_DEFINITION") {
+    } else if (child.type === "DIALECT_VARIABLE_DEFINITION") {
       const token: VariableDefinitionToken = {
         name: `VAR_DEF_${index++}`,
         location: new vscode.Location(documentUri, child.statementRange),
         displayText: child.displayText,
       };
-      items.push({ type: "VARIABLE_DEFINITION", tokens: [token] });
+      items.push({ type: "DIALECT_VARIABLE_DEFINITION", tokens: [token] });
     }
   }
 
@@ -86,7 +86,7 @@ function createTokens(
   let index = 0;
 
   for (const child of children) {
-    if (child.type === "VARIABLE_USAGE") {
+    if (child.type === "DIALECT_VARIABLE_USAGE") {
       const tokenName = `${name}_USG_${index++}`;
       tokens.push({
         name: tokenName,

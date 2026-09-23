@@ -58,7 +58,7 @@ type TokenPayload = {
 
 type ItemPayload = {
   tokens: TokenPayload[];
-  type?: "VARIABLE" | "PROCEDURE" | "VARIABLE_DEFINITION";
+  type?: "VARIABLE" | "PROCEDURE" | "DIALECT_VARIABLE_DEFINITION";
 };
 
 type DocumentReplacementMapPayload = {

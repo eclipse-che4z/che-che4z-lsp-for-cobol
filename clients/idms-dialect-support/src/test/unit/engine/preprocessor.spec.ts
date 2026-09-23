@@ -388,7 +388,7 @@ describe("IdmsPreprocessor", () => {
     expect(filler).toBe(" ");
     expect(items).toHaveLength(2);
     expect(items[0]).toEqual({
-      type: "VARIABLE_DEFINITION",
+      type: "DIALECT_VARIABLE_DEFINITION",
       tokens: [
         expect.objectContaining({
           name: "VAR_DEF_0",
@@ -400,7 +400,7 @@ describe("IdmsPreprocessor", () => {
       ],
     });
     expect(items[1]).toEqual({
-      type: "VARIABLE_DEFINITION",
+      type: "DIALECT_VARIABLE_DEFINITION",
       tokens: [
         expect.objectContaining({
           name: "VAR_DEF_1",

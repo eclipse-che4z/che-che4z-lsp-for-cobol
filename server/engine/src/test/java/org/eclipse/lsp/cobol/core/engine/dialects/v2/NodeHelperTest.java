@@ -120,7 +120,7 @@ class NodeHelperTest {
   }
 
   private static ReplacementTokens item(ReplacementToken... tokens) {
-    return new ReplacementTokens(tokens, "VARIABLE_DEFINITION");
+    return new ReplacementTokens(tokens, "DIALECT_VARIABLE_DEFINITION");
   }
 
   private static List<Node> createNodes(

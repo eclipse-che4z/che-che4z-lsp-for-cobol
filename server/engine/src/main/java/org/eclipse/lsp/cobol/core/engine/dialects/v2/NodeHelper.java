@@ -37,7 +37,7 @@ import org.eclipse.lsp4j.Range;
 class NodeHelper {
   private static final String VARIABLE = "VARIABLE";
   private static final String PROCEDURE = "PROCEDURE";
-  private static final String VARIABLE_DEFINITION = "VARIABLE_DEFINITION";
+  private static final String DIALECT_VARIABLE_DEFINITION = "DIALECT_VARIABLE_DEFINITION";
 
   public Optional<List<Node>> createNodesIfNeeded(
       String type, List<Token> mappedTokenList, String documentUri, String copybookId) {
@@ -62,7 +62,7 @@ class NodeHelper {
       String documentUri,
       String copybookId,
       Map<Locality, DialectVariableNode> definitions) {
-    if (VARIABLE_DEFINITION.equals(tokenItem.getType())) {
+    if (DIALECT_VARIABLE_DEFINITION.equals(tokenItem.getType())) {
       return createVariableDefinitionNodes(
           tokenItem.getTokens(), mappedTokenList, documentUri, copybookId, definitions);
     }

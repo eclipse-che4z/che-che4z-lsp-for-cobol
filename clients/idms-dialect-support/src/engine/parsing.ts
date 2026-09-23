@@ -289,7 +289,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range,
         statementRange: range,
-        type: "STATEMENT",
+        type: "DIALECT_STATEMENT",
         children: this.visitChildren(ctx) ?? [],
         filler: SPACE_VALUE,
       },
@@ -307,7 +307,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range,
         statementRange: range,
-        type: "VARIABLE_DEFINITION",
+        type: "DIALECT_VARIABLE_DEFINITION",
         children: [],
         displayText: `MAP ${mapName.getText().toUpperCase()}.`,
       },
@@ -334,7 +334,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range,
         statementRange: range,
-        type: "STATEMENT",
+        type: "DIALECT_STATEMENT",
         children: this.visitChildren(ctx) ?? [],
         filler: DIALECT_IF_REPLACEMENT,
       },
@@ -349,7 +349,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range,
         statementRange: range,
-        type: "STATEMENT",
+        type: "DIALECT_STATEMENT",
         children: this.visitChildren(ctx) ?? [],
         filler: DIALECT_CONDITION_REPLACEMENT,
       },
@@ -397,7 +397,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range,
         statementRange: range,
-        type: "VARIABLE_USAGE",
+        type: "DIALECT_VARIABLE_USAGE",
         children: this.visitChildren(ctx) ?? [],
       },
     ];
@@ -441,7 +441,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range,
         statementRange: range,
-        type: "STATEMENT",
+        type: "DIALECT_STATEMENT",
         children: this.visitChildren(ctx) ?? [],
         filler: BLANK_STATEMENT,
       },
@@ -470,14 +470,14 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       {
         range: statementRange,
         statementRange,
-        type: "STATEMENT",
+        type: "DIALECT_STATEMENT",
         children: this.visitChildren(ctx) ?? [],
         filler: SPACE_VALUE,
       },
       {
         range: imperativeRange,
         statementRange: imperativeRange,
-        type: "STATEMENT",
+        type: "DIALECT_STATEMENT",
         children: [],
         filler: IMPERATIVE_STATEMENT_REPLACEMENT,
       },

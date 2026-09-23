@@ -34,7 +34,7 @@ export type Item =
     }
   | {
       tokens: VariableDefinitionToken[];
-      type: "VARIABLE_DEFINITION";
+      type: "DIALECT_VARIABLE_DEFINITION";
     };
 
 /**
