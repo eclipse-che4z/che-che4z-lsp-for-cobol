@@ -30,6 +30,10 @@ export function processStatements(
   descriptors: StatementDescriptor[],
 ): void {
   for (const descriptor of descriptors) {
+    if (descriptor.type !== "STATEMENT") {
+      continue;
+    }
+
     const items = traverseChildren(
       context.getDocumentUri(),
       descriptor.children,
@@ -60,10 +64,7 @@ function traverseChildren(
       const name = `VAR_${index++}`;
       createTokens(documentUri, tokens, name, child.children);
       items.push({ type: "VARIABLE", tokens });
-    } else if (
-      child.type === "VARIABLE_DEFINITION" &&
-      child.displayText !== undefined
-    ) {
+    } else if (child.type === "VARIABLE_DEFINITION") {
       const token: VariableDefinitionToken = {
         name: `VAR_DEF_${index++}`,
         location: new vscode.Location(documentUri, child.statementRange),

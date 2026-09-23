@@ -286,13 +286,13 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
 
     const range = constructRange(ctx);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "STATEMENT",
-        this.visitChildren(ctx) ?? [],
-        SPACE_VALUE,
-      ),
+        statementRange: range,
+        type: "STATEMENT",
+        children: this.visitChildren(ctx) ?? [],
+        filler: SPACE_VALUE,
+      },
     ];
   };
 
@@ -304,14 +304,13 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
 
     const range = constructRange(mapName);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "VARIABLE_DEFINITION",
-        [],
-        BLANK_STATEMENT,
-        `MAP ${mapName.getText().toUpperCase()}.`,
-      ),
+        statementRange: range,
+        type: "VARIABLE_DEFINITION",
+        children: [],
+        displayText: `MAP ${mapName.getText().toUpperCase()}.`,
+      },
     ];
   };
 
@@ -332,13 +331,13 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   ): StatementDescriptor[] => {
     const range = constructRange(ctx);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "STATEMENT",
-        this.visitChildren(ctx) ?? [],
-        DIALECT_IF_REPLACEMENT,
-      ),
+        statementRange: range,
+        type: "STATEMENT",
+        children: this.visitChildren(ctx) ?? [],
+        filler: DIALECT_IF_REPLACEMENT,
+      },
     ];
   };
 
@@ -347,13 +346,13 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   ): StatementDescriptor[] => {
     const range = constructRange(ctx);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "STATEMENT",
-        this.visitChildren(ctx) ?? [],
-        DIALECT_CONDITION_REPLACEMENT,
-      ),
+        statementRange: range,
+        type: "STATEMENT",
+        children: this.visitChildren(ctx) ?? [],
+        filler: DIALECT_CONDITION_REPLACEMENT,
+      },
     ];
   };
 
@@ -395,12 +394,12 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   ): StatementDescriptor[] => {
     const range = constructRange(ctx);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "VARIABLE_USAGE",
-        this.visitChildren(ctx) ?? [],
-      ),
+        statementRange: range,
+        type: "VARIABLE_USAGE",
+        children: this.visitChildren(ctx) ?? [],
+      },
     ];
   };
 
@@ -439,13 +438,13 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
 
     const range = constructRange(ctx);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "STATEMENT",
-        this.visitChildren(ctx) ?? [],
-        BLANK_STATEMENT,
-      ),
+        statementRange: range,
+        type: "STATEMENT",
+        children: this.visitChildren(ctx) ?? [],
+        filler: BLANK_STATEMENT,
+      },
     ];
   }
 
@@ -468,20 +467,20 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
     const imperativeRange = constructRange(imperativeStatement);
 
     return [
-      new StatementDescriptor(
+      {
+        range: statementRange,
         statementRange,
-        statementRange,
-        "STATEMENT",
-        this.visitChildren(ctx) ?? [],
-        SPACE_VALUE,
-      ),
-      new StatementDescriptor(
-        imperativeRange,
-        imperativeRange,
-        "STATEMENT",
-        [],
-        IMPERATIVE_STATEMENT_REPLACEMENT,
-      ),
+        type: "STATEMENT",
+        children: this.visitChildren(ctx) ?? [],
+        filler: SPACE_VALUE,
+      },
+      {
+        range: imperativeRange,
+        statementRange: imperativeRange,
+        type: "STATEMENT",
+        children: [],
+        filler: IMPERATIVE_STATEMENT_REPLACEMENT,
+      },
     ];
   }
 
@@ -490,12 +489,12 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
   ): StatementDescriptor[] {
     const range = constructRange(ctx);
     return [
-      new StatementDescriptor(
+      {
         range,
-        range,
-        "VARIABLE",
-        this.visitChildren(ctx) ?? [],
-      ),
+        statementRange: range,
+        type: "VARIABLE",
+        children: this.visitChildren(ctx) ?? [],
+      },
     ];
   }
 

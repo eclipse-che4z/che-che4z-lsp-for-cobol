@@ -45,20 +45,27 @@ export interface IdmsCopybookDescriptor {
   level: number;
 }
 
-export class StatementDescriptor {
-  public constructor(
-    public readonly range: vscode.Range,
-    public readonly statementRange: vscode.Range,
-    public readonly type:
-      | "STATEMENT"
-      | "VARIABLE"
-      | "VARIABLE_USAGE"
-      | "VARIABLE_DEFINITION",
-    public readonly children: StatementDescriptor[],
-    public readonly filler: string = BLANK_STATEMENT,
-    public readonly displayText?: string,
-  ) {}
+interface StatementDescriptorBase {
+  readonly range: vscode.Range;
+  readonly statementRange: vscode.Range;
+  readonly children: StatementDescriptor[];
 }
+
+export type StatementDescriptor =
+  | (StatementDescriptorBase & {
+      readonly type: "STATEMENT";
+      readonly filler: string;
+    })
+  | (StatementDescriptorBase & {
+      readonly type: "VARIABLE";
+    })
+  | (StatementDescriptorBase & {
+      readonly type: "VARIABLE_USAGE";
+    })
+  | (StatementDescriptorBase & {
+      readonly type: "VARIABLE_DEFINITION";
+      readonly displayText: string;
+    });
 
 type CopyIdmsStatementCtx =
   | CopyIdmsStatementContextInCopybook
