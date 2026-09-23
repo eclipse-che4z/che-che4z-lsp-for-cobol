@@ -29,7 +29,6 @@ import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.*;
 import org.eclipse.lsp.cobol.common.model.tree.variable.*;
 import org.eclipse.lsp.cobol.common.model.tree.variables.ConditionDataNameNode;
-import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.RenameItemNode;
 import org.eclipse.lsp.cobol.common.pipeline.Stage;
@@ -296,12 +295,13 @@ public class TransformTreeStage
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
-    ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulator));
+    ctx.register(t, SectionNode.class, new SectionNodeProcessor());
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
-    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulator));
+    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess());
     ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
     ctx.register(t, ProcedureDivisionReturningNode.class, new ProcedureDivisionReturningProcess());
-    ctx.register(t, DialectVariableNode.class, new DialectVariableNodeProcessor(symbolAccumulator));
+    // Parent processors convert definitions before their VariableNode children are visited.
+    ctx.register(t, VariableNode.class, new VariableNodeProcessor(symbolAccumulator));
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;

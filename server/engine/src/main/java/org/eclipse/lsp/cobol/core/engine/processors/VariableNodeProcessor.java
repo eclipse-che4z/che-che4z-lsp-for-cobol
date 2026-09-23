@@ -14,28 +14,23 @@
  */
 package org.eclipse.lsp.cobol.core.engine.processors;
 
-import org.eclipse.lsp.cobol.common.model.NodeType;
-import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
 import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
-/** Registers variable definitions supplied by an external dialect. */
-public class DialectVariableNodeProcessor implements Processor<DialectVariableNode> {
+/** Registers each variable definition as it is visited in the transformed tree. */
+public class VariableNodeProcessor implements Processor<VariableNode> {
   private final SymbolAccumulator symbolAccumulator;
 
-  public DialectVariableNodeProcessor(SymbolAccumulator symbolAccumulator) {
+  public VariableNodeProcessor(SymbolAccumulator symbolAccumulator) {
     this.symbolAccumulator = symbolAccumulator;
   }
 
   @Override
-  public void accept(DialectVariableNode node, ProcessingContext ctx) {
-    if (ctx.getCurrentProgramNode() != null && !isRegisteredBySectionProcessor(node)) {
+  public void accept(VariableNode node, ProcessingContext ctx) {
+    if (ctx.getCurrentProgramNode() != null) {
       symbolAccumulator.addVariableDefinition(ctx.getCurrentProgramNode(), node);
     }
-  }
-
-  private static boolean isRegisteredBySectionProcessor(DialectVariableNode node) {
-    return node.getNearestParentByType(NodeType.SECTION).isPresent();
   }
 }
