@@ -30,9 +30,12 @@ public class DialectVariableNodeProcessor implements Processor<DialectVariableNo
 
   @Override
   public void accept(DialectVariableNode node, ProcessingContext ctx) {
-    if (ctx.getCurrentProgramNode() != null
-        && !node.getNearestParentByType(NodeType.SECTION).isPresent()) {
+    if (ctx.getCurrentProgramNode() != null && !isRegisteredBySectionProcessor(node)) {
       symbolAccumulator.addVariableDefinition(ctx.getCurrentProgramNode(), node);
     }
+  }
+
+  private static boolean isRegisteredBySectionProcessor(DialectVariableNode node) {
+    return node.getNearestParentByType(NodeType.SECTION).isPresent();
   }
 }
