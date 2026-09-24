@@ -193,7 +193,7 @@ public class DialectProcessingService {
         .orElse(null);
   }
 
-  private static ArrayList<Node> applyReplacements(
+  static ArrayList<Node> applyReplacements(
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
@@ -238,6 +238,9 @@ public class DialectProcessingService {
           definitions,
           result);
     }
+    // Different leaf-to-root paths can return the same root definition.
+    Set<Node> uniqueRoots = Collections.newSetFromMap(new IdentityHashMap<>());
+    result.removeIf(node -> !uniqueRoots.add(node));
     return result;
   }
 
