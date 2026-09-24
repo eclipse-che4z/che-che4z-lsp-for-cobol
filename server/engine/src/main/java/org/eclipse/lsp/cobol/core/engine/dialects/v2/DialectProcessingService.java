@@ -238,7 +238,7 @@ public class DialectProcessingService {
           definitions,
           result);
     }
-    return normalizeDefinitionRoots(result);
+    return result;
   }
 
   private static Map<String, Token> buildStatementMap(ReplacementTokens[] tokenItems) {
@@ -268,17 +268,6 @@ public class DialectProcessingService {
       NodeHelper.createNodesIfNeeded(tokens, mappedTokenList, uri, copybookId, definitions)
           .ifPresent(result::addAll);
     }
-  }
-
-  private static ArrayList<Node> normalizeDefinitionRoots(List<Node> nodes) {
-    Set<Node> uniqueNodes = Collections.newSetFromMap(new IdentityHashMap<>());
-    return nodes.stream()
-        .filter(uniqueNodes::add)
-        .filter(
-            node ->
-                !(node instanceof DialectVariableNode
-                    && node.getParent() instanceof DialectVariableNode))
-        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static String normalizeReplacementMap(String replacementMap) {
