@@ -25,6 +25,8 @@ export type Token = {
 
 export type VariableDefinitionToken = Token & {
   displayText: string;
+  /** Optional COBOL level. Token order determines the definition hierarchy. */
+  level?: number;
 };
 
 export type Item =

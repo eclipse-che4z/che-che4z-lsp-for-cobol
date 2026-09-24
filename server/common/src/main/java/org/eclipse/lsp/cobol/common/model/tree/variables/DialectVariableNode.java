@@ -27,10 +27,16 @@ import org.eclipse.lsp.cobol.common.model.tree.variable.VariableType;
 @EqualsAndHashCode(callSuper = true)
 public class DialectVariableNode extends VariableNode {
   private final String displayText;
+  private final Integer level;
 
-  public DialectVariableNode(Locality locality, String name, String displayText) {
+  public DialectVariableNode(Locality locality, String name, String displayText, Integer level) {
     super(locality, name, VariableType.DIALECT_VARIABLE, false);
     this.displayText = displayText;
+    this.level = level;
+  }
+
+  public DialectVariableNode(Locality locality, String name, String displayText) {
+    this(locality, name, displayText, null);
   }
 
   @Override

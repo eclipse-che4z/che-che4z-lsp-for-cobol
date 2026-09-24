@@ -54,6 +54,7 @@ type TokenPayload = {
   value?: string;
   location: LocationPayload;
   displayText?: string;
+  level?: number;
 };
 
 type ItemPayload = {
@@ -493,6 +494,10 @@ function serializeToken(token: Token | VariableDefinitionToken): TokenPayload {
     value: token.value,
     location: serializeLocation(token.location),
     displayText: "displayText" in token ? token.displayText : undefined,
+    level:
+      "level" in token && typeof token.level === "number"
+        ? token.level
+        : undefined,
   };
 }
 

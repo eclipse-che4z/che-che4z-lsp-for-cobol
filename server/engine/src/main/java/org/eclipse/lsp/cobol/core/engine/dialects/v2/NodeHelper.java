@@ -89,7 +89,9 @@ class NodeHelper {
             sourceToken.getDisplayText() == null
                 ? mappedToken.getValue()
                 : sourceToken.getDisplayText();
-        definition = new DialectVariableNode(locality, mappedToken.getValue(), displayText);
+        definition =
+            new DialectVariableNode(
+                locality, mappedToken.getValue(), displayText, sourceToken.getLevel());
         definition.addChild(new VariableDefinitionNameNode(locality, mappedToken.getValue()));
         definitions.put(locality, definition);
       }

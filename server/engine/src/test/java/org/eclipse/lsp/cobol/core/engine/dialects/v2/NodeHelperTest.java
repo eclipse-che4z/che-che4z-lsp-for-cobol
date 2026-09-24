@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE;
 import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.google.common.collect.ImmutableList;
@@ -51,6 +52,7 @@ class NodeHelperTest {
     DialectVariableNode definition = (DialectVariableNode) nodes.get(0);
     assertEquals("ABCDE", definition.getName());
     assertEquals("MAP ABCDE.", definition.getDisplayText());
+    assertNull(definition.getLevel());
     assertEquals(COPYBOOK_ID, definition.getLocality().getCopybookId());
     assertEquals(1, definition.getChildren().size());
     assertEquals(VARIABLE_DEFINITION_NAME, definition.getChildren().get(0).getNodeType());
@@ -63,8 +65,8 @@ class NodeHelperTest {
     Location parentLocation = location(4, 19, 25);
     ReplacementTokens item =
         item(
-            new ReplacementToken("CHILD", null, childLocation, "CHILD DISPLAY"),
-            new ReplacementToken("PARENT", null, parentLocation, "PARENT DISPLAY"));
+            new ReplacementToken("CHILD", null, childLocation, "CHILD DISPLAY", 5),
+            new ReplacementToken("PARENT", null, parentLocation, "PARENT DISPLAY", 1));
 
     List<Node> nodes =
         createNodes(
@@ -82,8 +84,10 @@ class NodeHelperTest {
             .orElseThrow(AssertionError::new);
     assertEquals("PARENT", parent.getName());
     assertEquals("PARENT DISPLAY", parent.getDisplayText());
+    assertEquals(1, parent.getLevel());
     assertEquals("CHILD", child.getName());
     assertEquals("CHILD DISPLAY", child.getDisplayText());
+    assertEquals(5, child.getLevel());
     assertSame(parent, child.getParent());
   }
 
