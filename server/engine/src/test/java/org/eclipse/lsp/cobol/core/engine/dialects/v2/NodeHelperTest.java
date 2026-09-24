@@ -123,6 +123,51 @@ class NodeHelperTest {
     assertEquals(2, firstParent.getChildren().stream().filter(Node.hasType(VARIABLE)).count());
   }
 
+  @Test
+  void doesNotDuplicateSharedAncestorAcrossLeafPaths() {
+    Location groupLocation = location(6, 20, 25);
+    Location rootLocation = location(6, 29, 33);
+    Map<Locality, DialectVariableNode> definitions = new HashMap<>();
+
+    DialectVariableNode firstRoot =
+        (DialectVariableNode)
+            createNodes(
+                    item(
+                        new ReplacementToken("FIELD-A", null, location(6, 10, 17), "FIELD-A"),
+                        new ReplacementToken("GROUP", null, groupLocation, "GROUP"),
+                        new ReplacementToken("ROOT", null, rootLocation, "ROOT")),
+                    ImmutableList.of(
+                        new Token("FIELD-A", location(6, 10, 17)),
+                        new Token("GROUP", groupLocation),
+                        new Token("ROOT", rootLocation)),
+                    definitions)
+                .get(0);
+    DialectVariableNode secondRoot =
+        (DialectVariableNode)
+            createNodes(
+                    item(
+                        new ReplacementToken("FIELD-B", null, location(7, 10, 17), "FIELD-B"),
+                        new ReplacementToken("GROUP", null, groupLocation, "GROUP"),
+                        new ReplacementToken("ROOT", null, rootLocation, "ROOT")),
+                    ImmutableList.of(
+                        new Token("FIELD-B", location(7, 10, 17)),
+                        new Token("GROUP", groupLocation),
+                        new Token("ROOT", rootLocation)),
+                    definitions)
+                .get(0);
+
+    assertSame(firstRoot, secondRoot);
+    assertEquals(1, firstRoot.getChildren().stream().filter(Node.hasType(VARIABLE)).count());
+    DialectVariableNode group =
+        firstRoot.getChildren().stream()
+            .filter(Node.hasType(VARIABLE))
+            .map(DialectVariableNode.class::cast)
+            .findFirst()
+            .orElseThrow(AssertionError::new);
+    assertSame(firstRoot, group.getParent());
+    assertEquals(2, group.getChildren().stream().filter(Node.hasType(VARIABLE)).count());
+  }
+
   private static ReplacementTokens item(ReplacementToken... tokens) {
     return new ReplacementTokens(tokens, "DIALECT_VARIABLE_DEFINITION");
   }
