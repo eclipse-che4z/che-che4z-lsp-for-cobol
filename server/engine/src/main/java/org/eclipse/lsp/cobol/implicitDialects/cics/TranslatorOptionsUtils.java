@@ -33,6 +33,16 @@ public final class TranslatorOptionsUtils {
 
   private static final Map<Integer, Pattern> CBL_LINES = new ConcurrentHashMap<>();
 
+  private static Pattern generateDirectivesPattern(int seq) {
+    if (seq > 0)
+      return Pattern.compile(
+          "^(?<prefix>(?:\\d.{" + (seq - 1) + "}\\s+|\\s*)(CBL|PROCESS)\\s+)(?<cbl>.*)$",
+          Pattern.CASE_INSENSITIVE);
+    else
+      return Pattern.compile(
+          "^(?<prefix>\\s+(CBL|PROCESS)\\s+)(?<cbl>.*)$", Pattern.CASE_INSENSITIVE);
+  }
+
   /**
    * Extract CICS translator options from CBL lines
    *
@@ -47,11 +57,7 @@ public final class TranslatorOptionsUtils {
     CobolProgramLayout layout = context.getLayout();
     final Pattern cblLine =
         CBL_LINES.computeIfAbsent(
-            layout.getSequenceLength(),
-            x ->
-                Pattern.compile(
-                    "^(?<prefix>(?:\\d.{" + (x - 1) + "}\\s+|\\s*)(CBL|PROCESS)\\s+)(?<cbl>.*)$",
-                    Pattern.CASE_INSENSITIVE));
+            layout.getSequenceLength(), TranslatorOptionsUtils::generateDirectivesPattern);
     for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
       String line = lines[lineNumber];
       if (line.trim().length() <= layout.getAriaAStart()) {
