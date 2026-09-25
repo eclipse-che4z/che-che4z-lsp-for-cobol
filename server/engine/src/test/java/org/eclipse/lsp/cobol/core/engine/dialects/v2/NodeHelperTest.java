@@ -95,9 +95,7 @@ class NodeHelperTest {
   }
 
   private static List<Node> createNodes(
-      ReplacementTokens item,
-      List<Token> mappedTokens,
-      Set<Locality> definitions) {
+      ReplacementTokens item, List<Token> mappedTokens, Set<Locality> definitions) {
     return NodeHelper.createNodesIfNeeded(item, mappedTokens, URI, COPYBOOK_ID, definitions)
         .orElseGet(ArrayList::new);
   }
