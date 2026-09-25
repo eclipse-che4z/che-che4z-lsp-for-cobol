@@ -23,10 +23,22 @@ export type Token = {
   location: vscode.Location;
 };
 
-export type Item = {
-  tokens: Token[];
-  type?: "VARIABLE" | "PROCEDURE";
+export type VariableDefinitionToken = Token & {
+  displayText: string;
+  /** Optional COBOL level of this standalone definition. */
+  level?: number;
 };
+
+export type Item =
+  | {
+      tokens: Token[];
+      type?: "VARIABLE" | "PROCEDURE";
+    }
+  | {
+      /** A standalone definition; hierarchical relationships are not supported yet. */
+      tokens: [VariableDefinitionToken];
+      type: "DIALECT_VARIABLE_DEFINITION";
+    };
 
 /**
  * Code for missing copybook diagnostics
