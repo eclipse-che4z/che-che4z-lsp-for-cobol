@@ -34,6 +34,43 @@ suite("Copybook Test Suite", function () {
     await helper.closeAllEditors();
   });
 
+  async function openWithoutIdmsErrors(fileName: string) {
+    const editor = await helper.showDocument(fileName);
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.deepStrictEqual(
+      diagnostics.map((diagnostic) => diagnostic.message),
+      ["Variable NOT-EXISTING is not defined"],
+    );
+    return editor;
+  }
+
+  function positionOf(editor: vscode.TextEditor, text: string, last = false) {
+    const source = editor.document.getText();
+    const offset = last ? source.lastIndexOf(text) : source.indexOf(text);
+    assert.ok(offset >= 0, `${text} not found in ${editor.document.fileName}`);
+    return editor.document.positionAt(offset);
+  }
+
+  async function checkHoverContains(
+    editor: vscode.TextEditor,
+    position: vscode.Position,
+    expected: RegExp,
+  ) {
+    const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+      "vscode.executeHoverProvider",
+      editor.document.uri,
+      position,
+    );
+    const text = (hovers ?? [])
+      .flatMap((hover) => hover.contents)
+      .map((content) => (typeof content === "string" ? content : content.value))
+      .join("\n");
+    assert.match(text, expected);
+  }
+
   test("Error inside the copybook", async () => {
     const editor = await helper.showDocument("Idms001.cbl");
     const diagnostics = await helper.waitForDiagnosticCount(
@@ -47,6 +84,18 @@ suite("Copybook Test Suite", function () {
       diagnostics,
       "Errors inside the copybook",
       range(pos(8, 7), pos(8, 28)),
+      vscode.DiagnosticSeverity.Error,
+    );
+
+    const copyEditor = await helper.showDocument("copybooks/COPY001");
+    const copyDiagnostics = await helper.waitForDiagnosticCount(
+      copyEditor.document.uri,
+      1,
+    );
+    helper.checkDiagnostic(
+      copyDiagnostics,
+      'A "PICTURE" or "USAGE INDEX" clause was not found for elementary item LDQLAB',
+      range(pos(0, 11), pos(0, 17)),
       vscode.DiagnosticSeverity.Error,
     );
   });
@@ -149,6 +198,17 @@ suite("Copybook Test Suite", function () {
       range(pos(12, 19), pos(12, 31)),
       vscode.DiagnosticSeverity.Error,
     );
+
+    const nodeUsage = editor.document.getText().indexOf("NODE OF SUBNODE");
+    assert.ok(nodeUsage >= 0);
+    const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
+      "vscode.executeDefinitionProvider",
+      editor.document.uri,
+      editor.document.positionAt(nodeUsage),
+    );
+    assert.strictEqual(definitions?.length, 1);
+    assert.ok(definitions[0].uri.path.endsWith("/regularCopybooks/COPY006"));
+    assert.strictEqual(definitions[0].range.start.line, 0);
   });
 
   test("Resolve nested copybook and its variables properly constructed (case 2)", async () => {
@@ -404,5 +464,131 @@ suite("Copybook Test Suite", function () {
       range(pos(13, 19), pos(13, 31)),
       vscode.DiagnosticSeverity.Error,
     );
+  });
+
+  test("ordinary and IDMS copybooks with the same name stay distinct", async () => {
+    const editor = await openWithoutIdmsErrors("MixedCopybooks.cbl");
+    for (const [name, directory] of [
+      ["PROGRAM-STATUS", "regularCopybooks"],
+      ["PROGRAM-NAME", "copybooks"],
+    ]) {
+      const locations = await vscode.commands.executeCommand<vscode.Location[]>(
+        "vscode.executeDefinitionProvider",
+        editor.document.uri,
+        positionOf(editor, `DISPLAY ${name}`).translate(0, "DISPLAY ".length),
+      );
+      assert.strictEqual(locations?.length, 1);
+      assert.ok(
+        locations[0].uri.path.endsWith(`/${directory}/CBOOK`),
+        `${name} resolved to ${locations[0].uri.path}`,
+      );
+    }
+  });
+
+  test("multiple and nested IDMS copybooks keep their variable definitions", async () => {
+    const editor = await openWithoutIdmsErrors("CopyVariables.cbl");
+    await helper.checkDefinition(
+      editor,
+      positionOf(editor, "VAR2.", true),
+      helper.inDocument("CV-PARENT", 1),
+    );
+    await helper.checkDefinition(
+      editor,
+      positionOf(editor, "PROGRAM-NAME.", true),
+      helper.inDocument("CV-PROGRAM", 1),
+    );
+    await helper.checkDefinition(
+      editor,
+      positionOf(editor, "MRB WITHIN"),
+      positionOf(editor, "01 MRB.").line,
+    );
+  });
+
+  test("special level 88 remains a condition-name in an IDMS copybook", async () => {
+    const editor = await openWithoutIdmsErrors("Level88.cbl");
+    const usage = positionOf(editor, "VAR3.", true);
+    await helper.checkDefinition(
+      editor,
+      usage,
+      helper.inDocument("LV88-COPY", 2),
+    );
+    await checkHoverContains(editor, usage, /\b88\s+VAR3\b/);
+  });
+
+  test("level above 49 remains unchanged and reports a warning", async () => {
+    const editor = await openWithoutIdmsErrors("Level48.cbl");
+    const usage = positionOf(editor, "VAR3.", true);
+    await helper.checkDefinition(
+      editor,
+      usage,
+      helper.inDocument("LV48-COPY", 2),
+    );
+    await checkHoverContains(editor, usage, /\b48\s+VAR3\b/);
+
+    const copyEditor = await helper.showDocument("copybooks/LV48-COPY");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      copyEditor.document.uri,
+      1,
+    );
+    assert.strictEqual(
+      diagnostics[0].severity,
+      vscode.DiagnosticSeverity.Warning,
+    );
+    assert.strictEqual(
+      diagnostics[0].message,
+      "IDMS level not adjusted. 50 (2 + 48) exceeds maximum level adjustment of 49",
+    );
+    assert.strictEqual(diagnostics[0].relatedInformation?.length, 1);
+    assert.strictEqual(
+      diagnostics[0].relatedInformation?.[0].location.uri.toString(),
+      editor.document.uri.toString(),
+    );
+  });
+
+  for (const fileName of [
+    "ControlWorking.cbl",
+    "ControlLinkage.cbl",
+    "ControlIncrement.cbl",
+    "ControlProtocol.cbl",
+  ]) {
+    test(`${fileName} inserts the predefined copybook`, async () => {
+      const editor = await openWithoutIdmsErrors(fileName);
+      await helper.checkDefinition(
+        editor,
+        positionOf(editor, "DISPLAY EMPLOYEE").translate(0, "DISPLAY ".length),
+        helper.inDocument("SUBSCHEMA-DESCRIPTION", 0),
+      );
+    });
+  }
+
+  test("missing predefined SUBSCHEMA-NAMES reports its own name", async () => {
+    const configuration = vscode.workspace.getConfiguration(
+      "cobol-lsp.cpy-manager.idms",
+    );
+    const originalPaths = configuration.get<string[]>("paths-local");
+    await configuration.update(
+      "paths-local",
+      [],
+      vscode.ConfigurationTarget.Workspace,
+    );
+    try {
+      const editor = await helper.showDocument("MissingSubschema.cbl");
+      const diagnostics = await helper.waitForDiagnosticCount(
+        editor.document.uri,
+        1,
+      );
+      const usage = positionOf(editor, "SUBSCHEMA-NAMES.");
+      helper.checkDiagnostic(
+        diagnostics,
+        "SUBSCHEMA-NAMES: Copybook not found",
+        new vscode.Range(usage, usage.translate(0, "SUBSCHEMA-NAMES".length)),
+      );
+    } finally {
+      await configuration.update(
+        "paths-local",
+        originalPaths,
+        vscode.ConfigurationTarget.Workspace,
+      );
+    }
   });
 });

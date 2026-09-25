@@ -13,6 +13,7 @@
  */
 
 import * as assert from "node:assert";
+import * as vscode from "vscode";
 import * as helper from "./testHelper";
 
 suite("IDMS statements Test Suite", function () {
@@ -31,6 +32,39 @@ suite("IDMS statements Test Suite", function () {
     this.timeout(helper.TEST_TIMEOUT);
     await helper.closeAllEditors();
   });
+
+  async function openWithoutIdmsErrors(fileName: string) {
+    const editor = await helper.showDocument(fileName);
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.deepStrictEqual(
+      diagnostics.map((diagnostic) => diagnostic.message),
+      ["Variable NOT-EXISTING is not defined"],
+    );
+    return editor;
+  }
+
+  function positionOf(editor: vscode.TextEditor, text: string, last = false) {
+    const source = editor.document.getText();
+    const offset = last ? source.lastIndexOf(text) : source.indexOf(text);
+    assert.ok(offset >= 0, `${text} not found in ${editor.document.fileName}`);
+    return editor.document.positionAt(offset);
+  }
+
+  async function checkLocalVariableDefinitions(
+    editor: vscode.TextEditor,
+    names: readonly string[],
+  ) {
+    for (const name of names) {
+      await helper.checkDefinition(
+        editor,
+        positionOf(editor, name, true),
+        positionOf(editor, name).line,
+      );
+    }
+  }
 
   async function assertStatementsAreProcessed(fileName: string) {
     const editor = await helper.showDocument(fileName);
@@ -137,4 +171,66 @@ suite("IDMS statements Test Suite", function () {
       await assertVariableDefinitions(fileName, variableNames);
     });
   }
+
+  test("SNAP TITLE preserves all variable references", async () => {
+    const editor = await openWithoutIdmsErrors("SnapTitle.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WK_TITLE",
+      "WK1",
+      "WK2",
+      "WK3",
+      "WK4",
+    ]);
+  });
+
+  test("GET and DELETE variants preserve clause variables", async () => {
+    const editor = await openWithoutIdmsErrors("GetDelete.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WS-AREA1",
+      "WS-AREA2",
+      "WS-LENGTH",
+      "WS-ID",
+    ]);
+  });
+
+  test("WRITE LINE, LOG and PRINTER preserve clause variables", async () => {
+    const editor = await openWithoutIdmsErrors("Write.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WS-A",
+      "WS-B",
+      "WS-C",
+      "WS-LENGTH",
+      "WS-HEADER",
+      "WS-MESSAGE",
+      "WS-REPLY",
+    ]);
+  });
+
+  test("SET TIMER and WAIT variants preserve clause variables", async () => {
+    const editor = await openWithoutIdmsErrors("Timer.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WS-EVENT",
+      "WS-TIMER",
+      "WS-AREA",
+    ]);
+  });
+
+  test("semicolons preserve COBOL and IDMS references", async () => {
+    const editor = await openWithoutIdmsErrors("Semicolons.cbl");
+    await helper.checkDefinition(
+      editor,
+      positionOf(editor, "MC FOR DFLD"),
+      positionOf(editor, "MAP MC.").line,
+    );
+    await helper.checkDefinition(
+      editor,
+      positionOf(editor, "WRITE-HEADER;"),
+      positionOf(editor, "WRITE-HEADER.").line,
+    );
+    await helper.checkDefinition(
+      editor,
+      positionOf(editor, "LINE-SPACING\n", true),
+      positionOf(editor, "01 LINE-SPACING").line,
+    );
+  });
 });

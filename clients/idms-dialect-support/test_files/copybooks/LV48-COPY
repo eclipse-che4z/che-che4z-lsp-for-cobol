@@ -1,0 +1,4 @@
+       01 VAR1.
+          03 VAR2.
+          48 VAR3 PIC X(8) VALUE '0000'.
+      * Java: TestCopyIdmsVariablesForNotAllowedLevels.java

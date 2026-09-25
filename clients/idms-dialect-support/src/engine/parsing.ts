@@ -398,6 +398,7 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
         range,
         statementRange: range,
         type: "DIALECT_VARIABLE_USAGE",
+        value: ctx.getText().toUpperCase(),
         children: this.visitChildren(ctx) ?? [],
       },
     ];
