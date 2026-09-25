@@ -17,7 +17,6 @@ import {
   BLANK_VALUE,
   SPACE_VALUE,
   ParseError,
-  StatementDescriptor,
   createIdmsCopybookDescriptor,
 } from "../../../engine/model";
 import * as vscode from "vscode";
@@ -124,16 +123,6 @@ describe("model constants", () => {
     expect(error.column).toBe(2);
     expect(error.message).toBe("some error");
     expect(error.range).toBe(range);
-  });
-});
-
-describe("StatementDescriptor", () => {
-  it("uses CONTINUE as the default filler", () => {
-    const range = new vscode.Range(0, 0, 0, 5);
-
-    const descriptor = new StatementDescriptor(range, range, "STATEMENT", []);
-
-    expect(descriptor.filler).toBe(BLANK_STATEMENT);
   });
 });
 

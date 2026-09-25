@@ -170,6 +170,25 @@ export async function checkDefinition(
   await checkLocations(editor, position, [expectedLine]);
 }
 
+export async function checkHoverText(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedText: string,
+) {
+  const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+    "vscode.executeHoverProvider",
+    editor.document.uri,
+    position,
+  );
+
+  const actualHoverText = hovers
+    .flatMap((hover) => hover.contents)
+    .map((content) => (typeof content === "string" ? content : content.value))
+    .join("\n");
+
+  assert.strictEqual(actualHoverText, expectedText);
+}
+
 async function checkLocations(
   editor: vscode.TextEditor,
   position: vscode.Position,
