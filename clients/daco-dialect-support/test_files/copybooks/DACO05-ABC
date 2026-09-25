@@ -1,0 +1,8 @@
+1           05 BHTRGL-X PIC X.
+2           05 CHILD PIC X.
+3           05 BHT-XAB PIC X.
+3           05 BHT-3iz PIC X.
+4           05 FILLER PIC x(10).
+5           05 PIC 9.
+6           05 B PIC 9.
+7           05 BHTRGL-XA PIC X.

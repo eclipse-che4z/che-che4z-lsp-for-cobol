@@ -25,6 +25,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
+  const keywords = vscode.Uri.joinPath(extensionUri, "keywords.txt");
   const outputChannel = vscode.window.createOutputChannel(
     "SAMPLE Dialect Support",
   );
@@ -40,6 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
       name: DIALECT_NAME,
       description: "SAMPLE dialect support",
       snippets,
+      keywords,
       isCopyStatement: (statement: string) => {
         const regex = /^.*\bCOPY\s+SAMPLE(?:\s+"?'?)(\S+)?$/i;
         const match = statement.match(regex);
@@ -49,17 +51,8 @@ export async function activate(context: vscode.ExtensionContext) {
         return { isCopy: true, prefix: match[1] };
       },
     },
-    async (
-      context: IDocumentProcessingContext,
-      programUri: vscode.Uri,
-      text: string,
-    ) => {
-      return await handleProcessDialect(
-        context,
-        programUri,
-        text,
-        outputChannel,
-      );
+    async (context: IDocumentProcessingContext, text: string) => {
+      return await handleProcessDialect(context, text, outputChannel);
     },
   );
 
@@ -72,16 +65,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 async function handleProcessDialect(
   context: IDocumentProcessingContext,
-  programUri: vscode.Uri,
   text: string,
   outputChannel: vscode.OutputChannel,
 ): Promise<void> {
-  await processDocument(context, programUri, text, outputChannel);
+  await processDocument(context, text, outputChannel);
 }
 
 async function processDocument(
   context: IDocumentProcessingContext,
-  documentUri: vscode.Uri,
   text: string,
   outputChannel: vscode.OutputChannel,
   documentParam?: string,
@@ -89,16 +80,18 @@ async function processDocument(
   const startDate = new Date();
   const lines = text.split("\n");
   outputChannel.appendLine(
-    `Start processing document ${documentUri.toString()}, line count: ${
-      lines.length
-    }`,
+    `Start processing document ${context
+      .getDocumentUri()
+      .toString()}, line count: ${lines.length}`,
   );
   for (let i = 0; i < lines.length; i++) {
     await processDocumentLine(context, i, lines, outputChannel, documentParam);
   }
   const endDate = new Date();
   outputChannel.appendLine(
-    `Finish processing document ${documentUri.toString()}. Processing time: ${
+    `Finish processing document ${context
+      .getDocumentUri()
+      .toString()}. Processing time: ${
       endDate.getTime() - startDate.getTime()
     } mills.`,
   );
@@ -159,7 +152,6 @@ async function processDocumentLine(
     if (copybookModel) {
       await processDocument(
         copybookModel.context,
-        copybookModel.uri,
         copybookModel.text,
         outputChannel,
         copybookParam,

@@ -142,7 +142,35 @@ describe("Tests dialect util methods", () => {
         name: "abc",
         description: "desc",
         snippets: vscode.Uri.file("file"),
+        keywords: vscode.Uri.file("keywords-file"),
       }),
     ).toBeTruthy();
+  });
+
+  it("test isV2RuntimeDialectDetail if supplied dialect has no keywords", () => {
+    vscode.Uri.parse = jest.fn().mockReturnValue(true);
+    expect(
+      isV2RuntimeDialectDetail({
+        name: "abc",
+        description: "desc",
+        snippets: vscode.Uri.file("file"),
+      }),
+    ).toBeTruthy();
+    expect(
+      isV2RuntimeDialectDetail({
+        name: "abc",
+        description: "desc",
+        snippets: vscode.Uri.file("file"),
+        keywords: undefined,
+      }),
+    ).toBeTruthy();
+    expect(
+      isV2RuntimeDialectDetail({
+        name: "abc",
+        description: "desc",
+        snippets: vscode.Uri.file("file"),
+        keywords: "not-an-object",
+      }),
+    ).toBeFalsy();
   });
 });

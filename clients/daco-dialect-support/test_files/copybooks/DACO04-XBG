@@ -1,0 +1,6 @@
+1           09 BHTRGL-X.
+2             11 BHTRGLVLG-X.
+3               13 FABLYN-X.
+4                 15 FABLYNPOSEEN-X PIC X.
+5                 15 LYNKOD-X PIC X(2).
+6               13 BHTORSKOD-X PIC X(2).
