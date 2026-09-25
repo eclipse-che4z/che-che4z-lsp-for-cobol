@@ -90,6 +90,7 @@ function createTokens(
       const tokenName = `${name}_USG_${index++}`;
       tokens.push({
         name: tokenName,
+        value: child.value,
         location: new vscode.Location(documentUri, child.statementRange),
       });
       createTokens(documentUri, tokens, tokenName, child.children);

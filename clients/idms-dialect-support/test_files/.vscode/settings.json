@@ -4,7 +4,7 @@
   "cobol-lsp.cpy-manager.paths-local": [
     ".copybooks/zowe-profile-1/DATA.SET.PATH1",
     ".copybooks/zowe-profile-1/DATA.SET.PATH2",
-    "copybooks"
+    "regularCopybooks"
   ],
   "cobol-lsp.cpy-manager.paths-dsn": [],
   "editor.snippetSuggestions": "top",

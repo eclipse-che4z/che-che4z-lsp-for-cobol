@@ -1,0 +1,3 @@
+       01 WORK-VARIABLES.
+          05 PROGRAM-NAME PIC X(20) VALUE SPACES.
+      * Java: TestMixedCopybookNavigation.java

@@ -1,0 +1,3 @@
+       01 VAR1.
+          03 VAR2 PIC X(8) VALUE SPACE.
+      * Java: TestCopyIdmsVariables.java
