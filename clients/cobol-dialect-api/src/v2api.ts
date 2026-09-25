@@ -25,7 +25,7 @@ export type Token = {
 
 export type VariableDefinitionToken = Token & {
   displayText: string;
-  /** Optional COBOL level. Token order determines the definition hierarchy. */
+  /** Optional COBOL level of this standalone definition. */
   level?: number;
 };
 
@@ -35,7 +35,8 @@ export type Item =
       type?: "VARIABLE" | "PROCEDURE";
     }
   | {
-      tokens: VariableDefinitionToken[];
+      /** A standalone definition; hierarchical relationships are not supported yet. */
+      tokens: [VariableDefinitionToken];
       type: "DIALECT_VARIABLE_DEFINITION";
     };
 

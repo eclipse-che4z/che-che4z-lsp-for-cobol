@@ -33,7 +33,6 @@ import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.CopyNode;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
-import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
 import org.eclipse.lsp.cobol.lsp.jrpc.*;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Location;
@@ -204,7 +203,7 @@ public class DialectProcessingService {
     }
 
     ArrayList<Node> result = new ArrayList<>();
-    Map<Locality, DialectVariableNode> definitions = new HashMap<>();
+    Set<Locality> definitions = new HashSet<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
       Map<String, Token> mappedTokens =
           document.replace(
@@ -238,9 +237,6 @@ public class DialectProcessingService {
           definitions,
           result);
     }
-    // Different leaf-to-root paths can return the same root definition.
-    Set<Node> uniqueRoots = Collections.newSetFromMap(new IdentityHashMap<>());
-    result.removeIf(node -> !uniqueRoots.add(node));
     return result;
   }
 
@@ -261,7 +257,7 @@ public class DialectProcessingService {
       Map<String, Token> mappedTokens,
       String uri,
       String copybookId,
-      Map<Locality, DialectVariableNode> definitions,
+      Set<Locality> definitions,
       List<Node> result) {
     for (ReplacementTokens tokens : tokenItems) {
       List<Token> mappedTokenList =

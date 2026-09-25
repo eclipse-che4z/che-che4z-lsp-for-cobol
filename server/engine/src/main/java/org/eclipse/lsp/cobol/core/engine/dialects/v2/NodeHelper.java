@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
@@ -44,14 +44,14 @@ class NodeHelper {
       List<Token> mappedTokenList,
       String documentUri,
       String copybookId,
-      Map<Locality, DialectVariableNode> definitions) {
+      Set<Locality> definitions) {
     if (mappedTokenList.isEmpty()) {
       return Optional.empty();
     }
 
     String type = tokenItem.getType();
     if (DIALECT_VARIABLE_DEFINITION.equals(type)) {
-      return createVariableDefinitionNodes(
+      return createVariableDefinitionNode(
           tokenItem.getTokens(), mappedTokenList, documentUri, copybookId, definitions);
     }
     if (VARIABLE.equals(type)) {
@@ -66,43 +66,37 @@ class NodeHelper {
     return Optional.empty();
   }
 
-  private Optional<List<Node>> createVariableDefinitionNodes(
+  private Optional<List<Node>> createVariableDefinitionNode(
       ReplacementToken[] sourceTokens,
       List<Token> mappedTokens,
       String documentUri,
       String copybookId,
-      Map<Locality, DialectVariableNode> definitions) {
-    DialectVariableNode child = null;
-    for (int index = 0; index < mappedTokens.size(); index++) {
-      Token mappedToken = mappedTokens.get(index);
-      ReplacementToken sourceToken = sourceTokens[index];
-
-      Locality locality =
-          Locality.builder()
-              .uri(documentUri)
-              .copybookId(copybookId)
-              .range(mappedToken.getOriginalLocation().getRange())
-              .build();
-      DialectVariableNode definition = definitions.get(locality);
-      if (definition == null) {
-        String displayText =
-            sourceToken.getDisplayText() == null
-                ? mappedToken.getValue()
-                : sourceToken.getDisplayText();
-        definition =
-            new DialectVariableNode(
-                locality, mappedToken.getValue(), displayText, sourceToken.getLevel());
-        definition.addChild(new VariableDefinitionNameNode(locality, mappedToken.getValue()));
-        definitions.put(locality, definition);
-      }
-
-      if (child != null && child.getParent() != definition) {
-        definition.addChild(child);
-      }
-      child = definition;
+      Set<Locality> definitions) {
+    if (sourceTokens.length != 1 || mappedTokens.size() != 1 || mappedTokens.get(0) == null) {
+      return Optional.empty();
     }
 
-    return Optional.of(ImmutableList.of(child));
+    Token mappedToken = mappedTokens.get(0);
+    ReplacementToken sourceToken = sourceTokens[0];
+    Locality locality =
+        Locality.builder()
+            .uri(documentUri)
+            .copybookId(copybookId)
+            .range(mappedToken.getOriginalLocation().getRange())
+            .build();
+    if (!definitions.add(locality)) {
+      return Optional.empty();
+    }
+
+    String displayText =
+        sourceToken.getDisplayText() == null
+            ? mappedToken.getValue()
+            : sourceToken.getDisplayText();
+    DialectVariableNode definition =
+        new DialectVariableNode(
+            locality, mappedToken.getValue(), displayText, sourceToken.getLevel());
+    definition.addChild(new VariableDefinitionNameNode(locality, mappedToken.getValue()));
+    return Optional.of(ImmutableList.of(definition));
   }
 
   private List<Node> createVariableNode(

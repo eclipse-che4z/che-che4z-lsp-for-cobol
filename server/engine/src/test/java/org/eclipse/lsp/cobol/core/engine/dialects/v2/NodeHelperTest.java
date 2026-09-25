@@ -14,17 +14,15 @@
  */
 package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 
-import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE;
 import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
@@ -47,7 +45,7 @@ class NodeHelperTest {
     ReplacementTokens item = item(new ReplacementToken("MAP", null, location, "MAP ABCDE."));
 
     List<Node> nodes =
-        createNodes(item, ImmutableList.of(new Token("ABCDE", location)), new HashMap<>());
+        createNodes(item, ImmutableList.of(new Token("ABCDE", location)), new HashSet<>());
 
     DialectVariableNode definition = (DialectVariableNode) nodes.get(0);
     assertEquals("ABCDE", definition.getName());
@@ -60,7 +58,7 @@ class NodeHelperTest {
   }
 
   @Test
-  void createsQualifiedDefinitionFromChildToParentTokens() {
+  void rejectsMultipleDefinitionTokens() {
     Location childLocation = location(4, 10, 15);
     Location parentLocation = location(4, 19, 25);
     ReplacementTokens item =
@@ -68,104 +66,28 @@ class NodeHelperTest {
             new ReplacementToken("CHILD", null, childLocation, "CHILD DISPLAY", 5),
             new ReplacementToken("PARENT", null, parentLocation, "PARENT DISPLAY", 1));
 
+    Set<Locality> definitions = new HashSet<>();
     List<Node> nodes =
         createNodes(
             item,
             ImmutableList.of(
                 new Token("CHILD", childLocation), new Token("PARENT", parentLocation)),
-            new HashMap<>());
+            definitions);
 
-    DialectVariableNode parent = (DialectVariableNode) nodes.get(0);
-    DialectVariableNode child =
-        parent.getChildren().stream()
-            .filter(Node.hasType(VARIABLE))
-            .map(DialectVariableNode.class::cast)
-            .findFirst()
-            .orElseThrow(AssertionError::new);
-    assertEquals("PARENT", parent.getName());
-    assertEquals("PARENT DISPLAY", parent.getDisplayText());
-    assertEquals(1, parent.getLevel());
-    assertEquals("CHILD", child.getName());
-    assertEquals("CHILD DISPLAY", child.getDisplayText());
-    assertEquals(5, child.getLevel());
-    assertSame(parent, child.getParent());
+    assertEquals(0, nodes.size());
+    assertEquals(0, definitions.size());
   }
 
   @Test
-  void reusesAParentDefinitionAcrossItems() {
-    Location parentLocation = location(6, 20, 26);
-    Map<Locality, DialectVariableNode> definitions = new HashMap<>();
+  void rejectsDuplicateDefinitionLocation() {
+    Location location = location(6, 20, 26);
+    ReplacementTokens item = item(new ReplacementToken("MAP", null, location, "MAP ABCDE."));
+    List<Token> mappedTokens = ImmutableList.of(new Token("ABCDE", location));
+    Set<Locality> definitions = new HashSet<>();
 
-    DialectVariableNode firstParent =
-        (DialectVariableNode)
-            createNodes(
-                    item(
-                        new ReplacementToken("FIRST", null, location(6, 10, 15), "FIRST"),
-                        new ReplacementToken("PARENT", null, parentLocation, "PARENT")),
-                    ImmutableList.of(
-                        new Token("FIRST", location(6, 10, 15)),
-                        new Token("PARENT", parentLocation)),
-                    definitions)
-                .get(0);
-    DialectVariableNode secondParent =
-        (DialectVariableNode)
-            createNodes(
-                    item(
-                        new ReplacementToken("SECOND", null, location(7, 10, 16), "SECOND"),
-                        new ReplacementToken("PARENT", null, parentLocation, "PARENT")),
-                    ImmutableList.of(
-                        new Token("SECOND", location(7, 10, 16)),
-                        new Token("PARENT", parentLocation)),
-                    definitions)
-                .get(0);
-
-    assertSame(firstParent, secondParent);
-    assertEquals(2, firstParent.getChildren().stream().filter(Node.hasType(VARIABLE)).count());
-  }
-
-  @Test
-  void doesNotDuplicateSharedAncestorAcrossLeafPaths() {
-    Location groupLocation = location(6, 20, 25);
-    Location rootLocation = location(6, 29, 33);
-    Map<Locality, DialectVariableNode> definitions = new HashMap<>();
-
-    DialectVariableNode firstRoot =
-        (DialectVariableNode)
-            createNodes(
-                    item(
-                        new ReplacementToken("FIELD-A", null, location(6, 10, 17), "FIELD-A"),
-                        new ReplacementToken("GROUP", null, groupLocation, "GROUP"),
-                        new ReplacementToken("ROOT", null, rootLocation, "ROOT")),
-                    ImmutableList.of(
-                        new Token("FIELD-A", location(6, 10, 17)),
-                        new Token("GROUP", groupLocation),
-                        new Token("ROOT", rootLocation)),
-                    definitions)
-                .get(0);
-    DialectVariableNode secondRoot =
-        (DialectVariableNode)
-            createNodes(
-                    item(
-                        new ReplacementToken("FIELD-B", null, location(7, 10, 17), "FIELD-B"),
-                        new ReplacementToken("GROUP", null, groupLocation, "GROUP"),
-                        new ReplacementToken("ROOT", null, rootLocation, "ROOT")),
-                    ImmutableList.of(
-                        new Token("FIELD-B", location(7, 10, 17)),
-                        new Token("GROUP", groupLocation),
-                        new Token("ROOT", rootLocation)),
-                    definitions)
-                .get(0);
-
-    assertSame(firstRoot, secondRoot);
-    assertEquals(1, firstRoot.getChildren().stream().filter(Node.hasType(VARIABLE)).count());
-    DialectVariableNode group =
-        firstRoot.getChildren().stream()
-            .filter(Node.hasType(VARIABLE))
-            .map(DialectVariableNode.class::cast)
-            .findFirst()
-            .orElseThrow(AssertionError::new);
-    assertSame(firstRoot, group.getParent());
-    assertEquals(2, group.getChildren().stream().filter(Node.hasType(VARIABLE)).count());
+    assertEquals(1, createNodes(item, mappedTokens, definitions).size());
+    assertEquals(0, createNodes(item, mappedTokens, definitions).size());
+    assertEquals(1, definitions.size());
   }
 
   private static ReplacementTokens item(ReplacementToken... tokens) {
@@ -175,7 +97,7 @@ class NodeHelperTest {
   private static List<Node> createNodes(
       ReplacementTokens item,
       List<Token> mappedTokens,
-      Map<Locality, DialectVariableNode> definitions) {
+      Set<Locality> definitions) {
     return NodeHelper.createNodesIfNeeded(item, mappedTokens, URI, COPYBOOK_ID, definitions)
         .orElseGet(ArrayList::new);
   }

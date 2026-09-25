@@ -15,10 +15,9 @@
 package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import org.eclipse.lsp.cobol.common.mapping.ExtendedDocument;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
 import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
@@ -37,24 +36,28 @@ class DialectProcessingServiceTest {
   private static final String URI = "file:///program.cbl";
 
   @Test
-  void returnsOneRootForBranchingDefinitionPaths() {
-    String source = "DEFINE TREE ROOT > PARENT > LEAF-A, LEAF-B.";
+  void createsStandaloneDefinitionsAndRejectsDuplicateLocations() {
+    String source = "DEFINE MAP FIRST, SECOND.";
     Range statementRange = new Range(new Position(0, 0), new Position(0, source.length()));
-    Location rootLocation = location(source, "ROOT");
-    Location parentLocation = location(source, "PARENT");
-    ReplacementToken root = token("ROOT", rootLocation, 1);
-    ReplacementToken parent = token("PARENT", parentLocation, 5);
-    ReplacementTokens firstPath =
+    Location firstLocation = location(source, "FIRST");
+    ReplacementTokens firstDefinition =
         new ReplacementTokens(
-            new ReplacementToken[] {token("LEAF_A", location(source, "LEAF-A"), 10), parent, root},
+            new ReplacementToken[] {token("FIRST", firstLocation, 1)},
             "DIALECT_VARIABLE_DEFINITION");
-    ReplacementTokens secondPath =
+    ReplacementTokens duplicateDefinition =
         new ReplacementTokens(
-            new ReplacementToken[] {token("LEAF_B", location(source, "LEAF-B"), 10), parent, root},
+            new ReplacementToken[] {token("FIRST_DUPLICATE", firstLocation, 1)},
+            "DIALECT_VARIABLE_DEFINITION");
+    ReplacementTokens secondDefinition =
+        new ReplacementTokens(
+            new ReplacementToken[] {token("SECOND", location(source, "SECOND"), 1)},
             "DIALECT_VARIABLE_DEFINITION");
     DocumentReplacementMap replacement =
         new DocumentReplacementMap(
-            statementRange, statementRange, new ReplacementTokens[] {firstPath, secondPath}, " ");
+            statementRange,
+            statementRange,
+            new ReplacementTokens[] {firstDefinition, duplicateDefinition, secondDefinition},
+            " ");
     ExtendedDocument document = new ExtendedDocument(source, URI);
     List<Node> nodes =
         DialectProcessingService.applyReplacements(
@@ -64,17 +67,13 @@ class DialectProcessingServiceTest {
             new DocumentInsertionMap[0],
             null);
 
-    assertEquals(1, nodes.size());
-    DialectVariableNode rootNode = (DialectVariableNode) nodes.get(0);
-    assertEquals("ROOT", rootNode.getName());
-    DialectVariableNode parentNode = variableChildren(rootNode).get(0);
-    assertEquals("PARENT", parentNode.getName());
-    assertSame(rootNode, parentNode.getParent());
-    List<DialectVariableNode> leaves = variableChildren(parentNode);
-    assertEquals(2, leaves.size());
-    assertEquals("LEAF-A", leaves.get(0).getName());
-    assertEquals("LEAF-B", leaves.get(1).getName());
-    leaves.forEach(leaf -> assertSame(parentNode, leaf.getParent()));
+    assertEquals(2, nodes.size());
+    DialectVariableNode firstNode = (DialectVariableNode) nodes.get(0);
+    DialectVariableNode secondNode = (DialectVariableNode) nodes.get(1);
+    assertEquals("FIRST", firstNode.getName());
+    assertEquals("SECOND", secondNode.getName());
+    assertNull(firstNode.getParent());
+    assertNull(secondNode.getParent());
   }
 
   private static ReplacementToken token(String name, Location location, int level) {
@@ -85,12 +84,5 @@ class DialectProcessingServiceTest {
     int start = source.indexOf(name);
     return new Location(
         URI, new Range(new Position(0, start), new Position(0, start + name.length())));
-  }
-
-  private static List<DialectVariableNode> variableChildren(DialectVariableNode parent) {
-    return parent.getChildren().stream()
-        .filter(DialectVariableNode.class::isInstance)
-        .map(DialectVariableNode.class::cast)
-        .collect(Collectors.toList());
   }
 }
