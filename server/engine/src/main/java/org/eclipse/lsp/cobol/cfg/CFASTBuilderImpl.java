@@ -25,6 +25,7 @@ import org.eclipse.lsp.cobol.common.model.tree.*;
 import org.eclipse.lsp.cobol.common.model.tree.statements.StatementNode;
 import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.variables.DivisionType;
+import org.eclipse.lsp.cobol.common.utils.ImplicitCodeUtils;
 import org.eclipse.lsp.cobol.core.model.extendedapi.*;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsHandleNode;
 import org.eclipse.lsp.cobol.implicitDialects.cics.nodes.ExecCicsNode;
@@ -289,7 +290,12 @@ public class CFASTBuilderImpl implements CFASTBuilder {
   }
 
   private String cutSnippet(Node node) {
-    CobolDocumentModel doc = documentModelService.get(node.getLocality().getUri());
+    String uri = node.getLocality().getUri();
+    if (ImplicitCodeUtils.isImplicit(uri)) {
+      // Dialect-generated code (e.g. DaCo predefined sections) has no backing document.
+      return "";
+    }
+    CobolDocumentModel doc = documentModelService.get(uri);
     if (doc == null) {
       LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
       return "<snippet creation error>";
