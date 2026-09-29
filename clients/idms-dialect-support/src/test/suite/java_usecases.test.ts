@@ -30,7 +30,12 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(7, 22), 4); // ID1
     });
 
-    // ABEND_CODE_CODE_LITERAL: no Java-marked reference or distinct editor result to assert.
+    test("ABEND_CODE_CODE_LITERAL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestAbendCode_ABEND_CODE_CODE_LITERAL.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestAccept.java
@@ -63,7 +68,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(16, 35), 11); // SCREENSIZE_WK
     });
 
-    // ACCEPT_TRANSACTION_STATISTICS_NO_OPTIONAL_CLAUSES: no Java-marked reference or distinct editor result to assert.
+    test("ACCEPT_TRANSACTION_STATISTICS_NO_OPTIONAL_CLAUSES", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestAccept_ACCEPT_TRANSACTION_STATISTICS_NO_OPTIONAL_CLAUSES.cbl",
+      );
+    });
+
     test("ACCEPT_TRANSACTION_STATISTICS_INTO_VARIABLE", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestAccept_ACCEPT_TRANSACTION_STATISTICS_INTO_VARIABLE.cbl",
@@ -71,13 +82,30 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(16, 46), 7); // ABC
     });
 
-    // ACCEPT_TRANSACTION_STATISTICS_LENGTH: no Java-marked reference or distinct editor result to assert.
-    // ACCEPT_TRANSACTION_STATISTICS_LENGTH_ON: no Java-marked reference or distinct editor result to assert.
+    test("ACCEPT_TRANSACTION_STATISTICS_LENGTH", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestAccept_ACCEPT_TRANSACTION_STATISTICS_LENGTH.cbl",
+      );
+    });
+
+    test("ACCEPT_TRANSACTION_STATISTICS_LENGTH_ON", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestAccept_ACCEPT_TRANSACTION_STATISTICS_LENGTH_ON.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestAttachTaskCode.java
   suite("TestAttachTaskCode", function () {
-    // ATTACH_TASK_CODE_CODE_LITERAL: no Java-marked reference or distinct editor result to assert.
+    test("ATTACH_TASK_CODE_CODE_LITERAL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_CODE_LITERAL.cbl",
+      );
+    });
+
     test("ATTACH_TASK_CODE_CODE_VARIABLE", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_CODE_VARIABLE.cbl",
@@ -94,7 +122,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(11, 48), 8); // WK_PRIORITY
     });
 
-    // ATTACH_TASK_CODE_PRIORITY_LITERAL: no Java-marked reference or distinct editor result to assert.
+    test("ATTACH_TASK_CODE_PRIORITY_LITERAL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_PRIORITY_LITERAL.cbl",
+      );
+    });
+
     test("ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL", async () => {
       const editor = await helper.showDocument(
         "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL.cbl",
@@ -136,7 +170,11 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestBind.java
   suite("TestBind", function () {
-    // BIND_TASK: no Java-marked reference or distinct editor result to assert.
+    test("BIND_TASK", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestBind_BIND_TASK.cbl");
+    });
+
     test("BIND_TASK_NODENAME_VARIABLE", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestBind_BIND_TASK_NODENAME_VARIABLE.cbl",
@@ -145,9 +183,26 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(10, 30), 7); // WK_NODENAME
     });
 
-    // BIND_TASK_NODENAME_LITERAL: no Java-marked reference or distinct editor result to assert.
-    // BIND_TRANSACTION_STATISTICS: no Java-marked reference or distinct editor result to assert.
-    // BIND_TRANSACTION_STATISTICS_ON: no Java-marked reference or distinct editor result to assert.
+    test("BIND_TASK_NODENAME_LITERAL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestBind_BIND_TASK_NODENAME_LITERAL.cbl",
+      );
+    });
+
+    test("BIND_TRANSACTION_STATISTICS", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestBind_BIND_TRANSACTION_STATISTICS.cbl",
+      );
+    });
+
+    test("BIND_TRANSACTION_STATISTICS_ON", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestBind_BIND_TRANSACTION_STATISTICS_ON.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestChangePriority.java
@@ -160,7 +215,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(10, 31), 7); // WK_PRIORITY
     });
 
-    // CHANGE_PRIORITY_TO_LITERAL: no Java-marked reference or distinct editor result to assert.
+    test("CHANGE_PRIORITY_TO_LITERAL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestChangePriority_CHANGE_PRIORITY_TO_LITERAL.cbl",
+      );
+    });
+
     test("CHANGE_PRIORITY_TO_LITERAL_INVALID", async () => {
       const editor = await helper.showDocument(
         "usecase/TestChangePriority_CHANGE_PRIORITY_TO_LITERAL_INVALID.cbl",
@@ -247,10 +308,29 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestCommit.java
   suite("TestCommit", function () {
-    // COMMIT_TASK_ALL: no Java-marked reference or distinct editor result to assert.
-    // COMMIT_TASK: no Java-marked reference or distinct editor result to assert.
-    // COMMIT_ALL: no Java-marked reference or distinct editor result to assert.
-    // COMMIT_ALL_ON: no Java-marked reference or distinct editor result to assert.
+    test("COMMIT_TASK_ALL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestCommit_COMMIT_TASK_ALL.cbl",
+      );
+    });
+
+    test("COMMIT_TASK", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestCommit_COMMIT_TASK.cbl");
+    });
+
+    test("COMMIT_ALL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestCommit_COMMIT_ALL.cbl");
+    });
+
+    test("COMMIT_ALL_ON", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestCommit_COMMIT_ALL_ON.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestDelete.java
@@ -396,8 +476,16 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestEnd.java
   suite("TestEnd", function () {
-    // END_LINE: no Java-marked reference or distinct editor result to assert.
-    // END_TRANSACTION: no Java-marked reference or distinct editor result to assert.
+    test("END_LINE", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestEnd_END_LINE.cbl");
+    });
+
+    test("END_TRANSACTION", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestEnd_END_TRANSACTION.cbl");
+    });
+
     test("END_TRANSACTION_WITH_ALL_VARIABLES", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestEnd_END_TRANSACTION_WITH_ALL_VARIABLES.cbl",
@@ -420,16 +508,44 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestEndpage.java
   suite("TestEndpage", function () {
-    // ENDPAGE: no Java-marked reference or distinct editor result to assert.
-    // ENDPAGE_SESSION: no Java-marked reference or distinct editor result to assert.
-    // ENDPAGE_SESSION_ON: no Java-marked reference or distinct editor result to assert.
+    test("ENDPAGE", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestEndpage_ENDPAGE.cbl");
+    });
+
+    test("ENDPAGE_SESSION", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestEndpage_ENDPAGE_SESSION.cbl",
+      );
+    });
+
+    test("ENDPAGE_SESSION_ON", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestEndpage_ENDPAGE_SESSION_ON.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestFinish.java
   suite("TestFinish", function () {
-    // FINISH_TASK: no Java-marked reference or distinct editor result to assert.
-    // FINISH: no Java-marked reference or distinct editor result to assert.
-    // FINISH_TASK_ON: no Java-marked reference or distinct editor result to assert.
+    test("FINISH_TASK", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestFinish_FINISH_TASK.cbl");
+    });
+
+    test("FINISH", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors("usecase/TestFinish_FINISH.cbl");
+    });
+
+    test("FINISH_TASK_ON", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestFinish_FINISH_TASK_ON.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsAcceptDbStatements.java
@@ -593,7 +709,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsBindStatement.java
   suite("TestIdmsBindStatement", function () {
-    // BIND1: no Java-marked reference or distinct editor result to assert.
+    test("BIND1", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsBindStatement_BIND1.cbl",
+      );
+    });
+
     test("BIND2", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsBindStatement_BIND2.cbl",
@@ -602,7 +724,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(14, 45), 8); // DC1
     });
 
-    // BIND3: no Java-marked reference or distinct editor result to assert.
+    test("BIND3", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsBindStatement_BIND3.cbl",
+      );
+    });
+
     test("BIND4", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsBindStatement_BIND4.cbl",
@@ -730,7 +858,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsDcStatement.java
   suite("TestIdmsDcStatement", function () {
-    // DC_RETURN: no Java-marked reference or distinct editor result to assert.
+    test("DC_RETURN", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsDcStatement_DC_RETURN.cbl",
+      );
+    });
+
     test("DC_RETURN_TIMEOUT_INTERVAL_WITH_ALL", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsDcStatement_DC_RETURN_TIMEOUT_INTERVAL_WITH_ALL.cbl",
@@ -810,7 +944,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsDequeueStatement.java
   suite("TestIdmsDequeueStatement", function () {
-    // DEQUEUE_ALL: no Java-marked reference or distinct editor result to assert.
+    test("DEQUEUE_ALL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsDequeueStatement_DEQUEUE_ALL.cbl",
+      );
+    });
+
     test("DEQUEUE_NAME_LENGTH_VARB", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsDequeueStatement_DEQUEUE_NAME_LENGTH_VARB.cbl",
@@ -853,7 +993,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsEnqueueStatement.java
   suite("TestIdmsEnqueueStatement", function () {
-    // ENQUEUE: no Java-marked reference or distinct editor result to assert.
+    test("ENQUEUE", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsEnqueueStatement_ENQUEUE.cbl",
+      );
+    });
+
     test("ENQUEUE_NAME_CLAUSE_VARIABLE", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsEnqueueStatement_ENQUEUE_NAME_CLAUSE_VARIABLE.cbl",
@@ -1083,7 +1229,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsFreeStatement.java
   suite("TestIdmsFreeStatement", function () {
-    // FREE_STORAGE_1: no Java-marked reference or distinct editor result to assert.
+    test("FREE_STORAGE_1", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsFreeStatement_FREE_STORAGE_1.cbl",
+      );
+    });
+
     test("FREE_STORAGE_2", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsFreeStatement_FREE_STORAGE_2.cbl",
@@ -1210,7 +1362,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(19, 30), 10); // WK_LENGTH
     });
 
-    // GET_TIME: no Java-marked reference or distinct editor result to assert.
+    test("GET_TIME", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsGetStatement_GET_TIME.cbl",
+      );
+    });
+
     test("GET_TIME_ALL_PARMS", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsGetStatement_GET_TIME_ALL_PARMS.cbl",
@@ -1357,8 +1515,20 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(12, 41), 10); // DEPT-EMP
     });
 
-    // KEEP3: no Java-marked reference or distinct editor result to assert.
-    // KEEP_LONGTERM_RELEASE: no Java-marked reference or distinct editor result to assert.
+    test("KEEP3", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsKeepStatement_KEEP3.cbl",
+      );
+    });
+
+    test("KEEP_LONGTERM_RELEASE", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsKeepStatement_KEEP_LONGTERM_RELEASE.cbl",
+      );
+    });
+
     test("KEEP_LONGTERM_TEST", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsKeepStatement_KEEP_LONGTERM_TEST.cbl",
@@ -1715,7 +1885,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(13, 23), 7); // WK_ECB
     });
 
-    // POST_ECBID_LITERAL: no Java-marked reference or distinct editor result to assert.
+    test("POST_ECBID_LITERAL", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsPostStatement_POST_ECBID_LITERAL.cbl",
+      );
+    });
+
     test("POST_ECBID_VARB", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsPostStatement_POST_ECBID_VARB.cbl",
@@ -1889,7 +2065,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsReadyStatement.java
   suite("TestIdmsReadyStatement", function () {
-    // READ1: no Java-marked reference or distinct editor result to assert.
+    test("READ1", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsReadyStatement_READ1.cbl",
+      );
+    });
+
     test("READ2", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsReadyStatement_READ2.cbl",
@@ -2014,11 +2196,40 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsRollbackStatement.java
   suite("TestIdmsRollbackStatement", function () {
-    // ROLL1: no Java-marked reference or distinct editor result to assert.
-    // ROLL2: no Java-marked reference or distinct editor result to assert.
-    // ROLL3: no Java-marked reference or distinct editor result to assert.
-    // ROLL4: no Java-marked reference or distinct editor result to assert.
-    // ROLL4_ON: no Java-marked reference or distinct editor result to assert.
+    test("ROLL1", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsRollbackStatement_ROLL1.cbl",
+      );
+    });
+
+    test("ROLL2", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsRollbackStatement_ROLL2.cbl",
+      );
+    });
+
+    test("ROLL3", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsRollbackStatement_ROLL3.cbl",
+      );
+    });
+
+    test("ROLL4", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsRollbackStatement_ROLL4.cbl",
+      );
+    });
+
+    test("ROLL4_ON", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsRollbackStatement_ROLL4_ON.cbl",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsSections.java
@@ -2063,7 +2274,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsSetStatement.java
   suite("TestIdmsSetStatement", function () {
-    // SET_ABEND_LIT: no Java-marked reference or distinct editor result to assert.
+    test("SET_ABEND_LIT", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSetStatement_SET_ABEND_LIT.cbl",
+      );
+    });
+
     test("SET_ABEND_VARB", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsSetStatement_SET_ABEND_VARB.cbl",
@@ -2072,7 +2289,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(18, 37), 7); // WK_PROG
     });
 
-    // SET_TIMER_WAIT_LIT: no Java-marked reference or distinct editor result to assert.
+    test("SET_TIMER_WAIT_LIT", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSetStatement_SET_TIMER_WAIT_LIT.cbl",
+      );
+    });
+
     test("SET_TIMER_WAIT_VARB", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsSetStatement_SET_TIMER_WAIT_VARB.cbl",
@@ -2081,7 +2304,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(18, 35), 8); // WK_INT
     });
 
-    // SET_TIMER_POST: no Java-marked reference or distinct editor result to assert.
+    test("SET_TIMER_POST", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSetStatement_SET_TIMER_POST.cbl",
+      );
+    });
+
     test("SET_TIMER_POST_ALL_CLAUSES", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsSetStatement_SET_TIMER_POST_ALL_CLAUSES.cbl",
@@ -2148,7 +2377,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsSnapStatement.java
   suite("TestIdmsSnapStatement", function () {
-    // SNAP: no Java-marked reference or distinct editor result to assert.
+    test("SNAP", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSnapStatement_SNAP.cbl",
+      );
+    });
+
     test("SNAP_ALL_PARMS_VARB", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsSnapStatement_SNAP_ALL_PARMS_VARB.cbl",
@@ -2225,9 +2460,27 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsTransferStatement.java
   suite("TestIdmsTransferStatement", function () {
-    // TRANSFER: no Java-marked reference or distinct editor result to assert.
-    // TRANSFER_PARMS: no Java-marked reference or distinct editor result to assert.
-    // TRANSFER_PARMS2: no Java-marked reference or distinct editor result to assert.
+    test("TRANSFER", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsTransferStatement_TRANSFER.cbl",
+      );
+    });
+
+    test("TRANSFER_PARMS", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsTransferStatement_TRANSFER_PARMS.cbl",
+      );
+    });
+
+    test("TRANSFER_PARMS2", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsTransferStatement_TRANSFER_PARMS2.cbl",
+      );
+    });
+
     test("TRANSFER_USING_PARMS", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsTransferStatement_TRANSFER_USING_PARMS.cbl",
@@ -2266,7 +2519,13 @@ suite("Java IDMS usecases", function () {
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsWaitStatement.java
   suite("TestIdmsWaitStatement", function () {
-    // WAIT_1: no Java-marked reference or distinct editor result to assert.
+    test("WAIT_1", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsWaitStatement_WAIT_1.cbl",
+      );
+    });
+
     test("WAIT_2", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsWaitStatement_WAIT_2.cbl",
@@ -2291,7 +2550,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(17, 48), 12); // WK_ECB2
     });
 
-    // WAIT_5: no Java-marked reference or distinct editor result to assert.
+    test("WAIT_5", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsWaitStatement_WAIT_5.cbl",
+      );
+    });
+
     test("WAIT_6", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsWaitStatement_WAIT_6.cbl",
@@ -2370,7 +2635,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(24, 23), 11); // WK2
     });
 
-    // WRITE_LOG_1: no Java-marked reference or distinct editor result to assert.
+    test("WRITE_LOG_1", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsWriteClause_WRITE_LOG_1.cbl",
+      );
+    });
+
     test("WRITE_LOG_2", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsWriteClause_WRITE_LOG_2.cbl",
@@ -2411,7 +2682,13 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(22, 59), 11); // WK2
     });
 
-    // WRITE_PRINTER_3: no Java-marked reference or distinct editor result to assert.
+    test("WRITE_PRINTER_3", async () => {
+      // TODO: Add a statement-specific editor assertion when one is available.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsWriteClause_WRITE_PRINTER_3.cbl",
+      );
+    });
+
     test("WRITE_PRINTER_4", async () => {
       const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsWriteClause_WRITE_PRINTER_4.cbl",

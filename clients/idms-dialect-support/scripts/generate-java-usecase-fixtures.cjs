@@ -285,6 +285,18 @@ function renderTests(entries) {
       lines.push("  });", "");
       continue;
     }
+    if (entry.status === "smoke") {
+      lines.push(
+        `  test(${title}, async () => {`,
+        "    // TODO: Add a statement-specific editor assertion when one is available.",
+        `    await helper.openWithoutIdmsErrors(${JSON.stringify(
+          entry.file,
+        )});`,
+        "  });",
+        "",
+      );
+      continue;
+    }
     if (entry.status === "deferred" || entry.status === "knownGap") {
       lines.push(`  // TODO: ${entry.reason}.`);
       for (const usage of entry.omittedUsages || []) {
@@ -298,12 +310,6 @@ function renderTests(entries) {
     if (entry.status === "dedicated") {
       lines.push(
         `  // ${entry.variant}: covered by the dedicated ${entry.file} integration test.`,
-      );
-      continue;
-    }
-    if (entry.status === "notApplicable") {
-      lines.push(
-        `  // ${entry.variant}: no Java-marked reference or distinct editor result to assert.`,
       );
       continue;
     }
@@ -412,13 +418,26 @@ for (const javaFile of fs
         return [{ ...usage, definitionLine: definition.line }];
       });
     if (usages.length === 0) {
+      if (!omittedUsages.length) {
+        const file = `${javaClass}_${variant.name}.cbl`;
+        fs.mkdirSync(outputDirectory, { recursive: true });
+        fs.writeFileSync(
+          path.join(outputDirectory, file),
+          fixtureText(cleaned.text, javaFile),
+        );
+        entries.push({
+          ...item,
+          status: "smoke",
+          file: `usecase/${file}`,
+        });
+        continue;
+      }
       entries.push({
         ...item,
-        status: omittedUsages.length ? "knownGap" : "notApplicable",
-        reason: omittedUsages.length
-          ? "Its only Java-marked references are not yet navigable in the TypeScript port"
-          : "Literal/option-only parser permutation with no Java-marked reference or expected diagnostic; no distinct editor result to assert",
-        ...(omittedUsages.length ? { omittedUsages } : {}),
+        status: "knownGap",
+        reason:
+          "Its only Java-marked references are not yet navigable in the TypeScript port",
+        omittedUsages,
       });
       continue;
     }
