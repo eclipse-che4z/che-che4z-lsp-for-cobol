@@ -3,9 +3,9 @@
 Run `node scripts/generate-java-usecase-fixtures.cjs` from
 `clients/idms-dialect-support` to regenerate the COBOL fixtures and
 `src/test/suite/java_usecases.test.ts`. The generated TypeScript file contains
-one explicit, non-parameterized test per covered Java variant, with direct
-definition-navigation or diagnostic assertions. Each fixture links to its
-original Java usecase.
+one explicit, non-parameterized test per covered Java variant, grouped in a
+suite for its Java class, with direct definition-navigation or diagnostic
+assertions. Each fixture links to its original Java usecase.
 
 All 335 Java `@ParameterizedTest` variants are accounted for:
 

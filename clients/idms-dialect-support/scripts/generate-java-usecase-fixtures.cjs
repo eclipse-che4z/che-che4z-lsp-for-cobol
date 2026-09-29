@@ -224,10 +224,15 @@ function renderTests(entries) {
   let currentClass;
   for (const entry of entries) {
     if (entry.javaClass !== currentClass) {
+      if (currentClass) lines.push("  });");
       currentClass = entry.javaClass;
-      lines.push("", `  // ${entry.javaClass}: ${entry.javaUsecase}`);
+      lines.push(
+        "",
+        `  // Java usecase: ${entry.javaUsecase}`,
+        `  suite(${JSON.stringify(entry.javaClass)}, function () {`,
+      );
     }
-    const title = JSON.stringify(`${entry.javaClass}: ${entry.variant}`);
+    const title = JSON.stringify(entry.variant);
     if (entry.status === "integration") {
       lines.push(
         `  test(${title}, async () => {`,
@@ -304,6 +309,7 @@ function renderTests(entries) {
     }
     throw new Error(`Unknown coverage status: ${entry.status}`);
   }
+  if (currentClass) lines.push("  });");
   lines.push("});", "");
   return lines.join("\n");
 }
