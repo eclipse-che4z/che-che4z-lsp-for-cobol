@@ -43,6 +43,17 @@ export function pos(line: number, character: number): vscode.Position {
   return new vscode.Position(line, character);
 }
 
+export function positionOf(
+  editor: vscode.TextEditor,
+  text: string,
+  last = false,
+): vscode.Position {
+  const source = editor.document.getText();
+  const offset = last ? source.lastIndexOf(text) : source.indexOf(text);
+  assert.ok(offset >= 0, `${text} not found in ${editor.document.fileName}`);
+  return editor.document.positionAt(offset);
+}
+
 export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
   return new vscode.Range(p0, p1);
 }
@@ -74,6 +85,16 @@ export async function showDocument(workspace_file: string) {
     preview: false,
   });
 
+  return editor;
+}
+
+export async function openWithoutIdmsErrors(fileName: string) {
+  const editor = await showDocument(fileName);
+  const diagnostics = await waitForDiagnosticCount(editor.document.uri, 1);
+  assert.deepStrictEqual(
+    diagnostics.map((diagnostic) => diagnostic.message),
+    ["Variable NOT-EXISTING is not defined"],
+  );
   return editor;
 }
 

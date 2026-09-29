@@ -34,26 +34,6 @@ suite("Copybook Test Suite", function () {
     await helper.closeAllEditors();
   });
 
-  async function openWithoutIdmsErrors(fileName: string) {
-    const editor = await helper.showDocument(fileName);
-    const diagnostics = await helper.waitForDiagnosticCount(
-      editor.document.uri,
-      1,
-    );
-    assert.deepStrictEqual(
-      diagnostics.map((diagnostic) => diagnostic.message),
-      ["Variable NOT-EXISTING is not defined"],
-    );
-    return editor;
-  }
-
-  function positionOf(editor: vscode.TextEditor, text: string, last = false) {
-    const source = editor.document.getText();
-    const offset = last ? source.lastIndexOf(text) : source.indexOf(text);
-    assert.ok(offset >= 0, `${text} not found in ${editor.document.fileName}`);
-    return editor.document.positionAt(offset);
-  }
-
   async function checkHoverContains(
     editor: vscode.TextEditor,
     position: vscode.Position,
@@ -467,7 +447,7 @@ suite("Copybook Test Suite", function () {
   });
 
   test("ordinary and IDMS copybooks with the same name stay distinct", async () => {
-    const editor = await openWithoutIdmsErrors("MixedCopybooks.cbl");
+    const editor = await helper.openWithoutIdmsErrors("MixedCopybooks.cbl");
     for (const [name, directory] of [
       ["PROGRAM-STATUS", "regularCopybooks"],
       ["PROGRAM-NAME", "copybooks"],
@@ -475,7 +455,9 @@ suite("Copybook Test Suite", function () {
       const locations = await vscode.commands.executeCommand<vscode.Location[]>(
         "vscode.executeDefinitionProvider",
         editor.document.uri,
-        positionOf(editor, `DISPLAY ${name}`).translate(0, "DISPLAY ".length),
+        helper
+          .positionOf(editor, `DISPLAY ${name}`)
+          .translate(0, "DISPLAY ".length),
       );
       assert.strictEqual(locations?.length, 1);
       assert.ok(
@@ -486,27 +468,27 @@ suite("Copybook Test Suite", function () {
   });
 
   test("multiple and nested IDMS copybooks keep their variable definitions", async () => {
-    const editor = await openWithoutIdmsErrors("CopyVariables.cbl");
+    const editor = await helper.openWithoutIdmsErrors("CopyVariables.cbl");
     await helper.checkDefinition(
       editor,
-      positionOf(editor, "VAR2.", true),
+      helper.positionOf(editor, "VAR2.", true),
       helper.inDocument("CV-PARENT", 1),
     );
     await helper.checkDefinition(
       editor,
-      positionOf(editor, "PROGRAM-NAME.", true),
+      helper.positionOf(editor, "PROGRAM-NAME.", true),
       helper.inDocument("CV-PROGRAM", 1),
     );
     await helper.checkDefinition(
       editor,
-      positionOf(editor, "MRB WITHIN"),
-      positionOf(editor, "01 MRB.").line,
+      helper.positionOf(editor, "MRB WITHIN"),
+      helper.positionOf(editor, "01 MRB.").line,
     );
   });
 
   test("special level 88 remains a condition-name in an IDMS copybook", async () => {
-    const editor = await openWithoutIdmsErrors("Level88.cbl");
-    const usage = positionOf(editor, "VAR3.", true);
+    const editor = await helper.openWithoutIdmsErrors("Level88.cbl");
+    const usage = helper.positionOf(editor, "VAR3.", true);
     await helper.checkDefinition(
       editor,
       usage,
@@ -516,8 +498,8 @@ suite("Copybook Test Suite", function () {
   });
 
   test("level above 49 remains unchanged and reports a warning", async () => {
-    const editor = await openWithoutIdmsErrors("Level48.cbl");
-    const usage = positionOf(editor, "VAR3.", true);
+    const editor = await helper.openWithoutIdmsErrors("Level48.cbl");
+    const usage = helper.positionOf(editor, "VAR3.", true);
     await helper.checkDefinition(
       editor,
       usage,
@@ -552,10 +534,12 @@ suite("Copybook Test Suite", function () {
     "ControlProtocol.cbl",
   ]) {
     test(`${fileName} inserts the predefined copybook`, async () => {
-      const editor = await openWithoutIdmsErrors(fileName);
+      const editor = await helper.openWithoutIdmsErrors(fileName);
       await helper.checkDefinition(
         editor,
-        positionOf(editor, "DISPLAY EMPLOYEE").translate(0, "DISPLAY ".length),
+        helper
+          .positionOf(editor, "DISPLAY EMPLOYEE")
+          .translate(0, "DISPLAY ".length),
         helper.inDocument("SUBSCHEMA-DESCRIPTION", 0),
       );
     });
@@ -577,7 +561,7 @@ suite("Copybook Test Suite", function () {
         editor.document.uri,
         1,
       );
-      const usage = positionOf(editor, "SUBSCHEMA-NAMES.");
+      const usage = helper.positionOf(editor, "SUBSCHEMA-NAMES.");
       helper.checkDiagnostic(
         diagnostics,
         "SUBSCHEMA-NAMES: Copybook not found",
