@@ -13,6 +13,7 @@
  */
 
 import * as assert from "node:assert";
+import * as vscode from "vscode";
 import * as helper from "./testHelper";
 
 suite("IDMS statements Test Suite", function () {
@@ -31,6 +32,19 @@ suite("IDMS statements Test Suite", function () {
     this.timeout(helper.TEST_TIMEOUT);
     await helper.closeAllEditors();
   });
+
+  async function checkLocalVariableDefinitions(
+    editor: vscode.TextEditor,
+    names: readonly string[],
+  ) {
+    for (const name of names) {
+      await helper.checkDefinition(
+        editor,
+        helper.positionOf(editor, name, true),
+        helper.positionOf(editor, name).line,
+      );
+    }
+  }
 
   async function assertStatementsAreProcessed(fileName: string) {
     const editor = await helper.showDocument(fileName);
@@ -137,4 +151,66 @@ suite("IDMS statements Test Suite", function () {
       await assertVariableDefinitions(fileName, variableNames);
     });
   }
+
+  test("SNAP TITLE preserves all variable references", async () => {
+    const editor = await helper.openWithoutIdmsErrors("SnapTitle.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WK_TITLE",
+      "WK1",
+      "WK2",
+      "WK3",
+      "WK4",
+    ]);
+  });
+
+  test("GET and DELETE variants preserve clause variables", async () => {
+    const editor = await helper.openWithoutIdmsErrors("GetDelete.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WS-AREA1",
+      "WS-AREA2",
+      "WS-LENGTH",
+      "WS-ID",
+    ]);
+  });
+
+  test("WRITE LINE, LOG and PRINTER preserve clause variables", async () => {
+    const editor = await helper.openWithoutIdmsErrors("Write.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WS-A",
+      "WS-B",
+      "WS-C",
+      "WS-LENGTH",
+      "WS-HEADER",
+      "WS-MESSAGE",
+      "WS-REPLY",
+    ]);
+  });
+
+  test("SET TIMER and WAIT variants preserve clause variables", async () => {
+    const editor = await helper.openWithoutIdmsErrors("Timer.cbl");
+    await checkLocalVariableDefinitions(editor, [
+      "WS-EVENT",
+      "WS-TIMER",
+      "WS-AREA",
+    ]);
+  });
+
+  test("semicolons preserve COBOL and IDMS references", async () => {
+    const editor = await helper.openWithoutIdmsErrors("Semicolons.cbl");
+    await helper.checkDefinition(
+      editor,
+      helper.positionOf(editor, "MC FOR DFLD"),
+      helper.positionOf(editor, "MAP MC.").line,
+    );
+    await helper.checkDefinition(
+      editor,
+      helper.positionOf(editor, "WRITE-HEADER;"),
+      helper.positionOf(editor, "WRITE-HEADER.").line,
+    );
+    await helper.checkDefinition(
+      editor,
+      helper.positionOf(editor, "LINE-SPACING\n", true),
+      helper.positionOf(editor, "01 LINE-SPACING").line,
+    );
+  });
 });

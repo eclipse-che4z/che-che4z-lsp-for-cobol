@@ -61,6 +61,7 @@ export type StatementDescriptor =
     })
   | (StatementDescriptorBase & {
       readonly type: "DIALECT_VARIABLE_USAGE";
+      readonly value: string;
     })
   | (StatementDescriptorBase & {
       readonly type: "DIALECT_VARIABLE_DEFINITION";

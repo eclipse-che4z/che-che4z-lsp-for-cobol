@@ -460,6 +460,19 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
+  it("normalizes a lowercase dialect variable for COBOL symbol lookup", async () => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(
+      context,
+      "       ACCEPT DB1 FROM abc-proc PROCEDURE.",
+    );
+
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [, , items] = context.replaceWithMap.mock.calls[0];
+    expect(items[1].tokens[0].value).toBe("ABC-PROC");
+  });
+
   it("replaces an IDMS IF condition with a dialect condition", async () => {
     const documentUri = "file:///program.cbl";
     const context = createContext(documentUri);
