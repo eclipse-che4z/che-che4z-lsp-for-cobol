@@ -2348,13 +2348,19 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(21, 39), 11); // WK_AREA1
     });
 
-    // TODO: Its only Java-marked references are not yet navigable in the TypeScript port.
-    // ANY-ERROR-STATUS at 18:16: ON path-status references are not mapped by the TypeScript dialect yet.
-    test.skip("SET_ABEND_ON");
+    test("SET_ABEND_ON", async () => {
+      // TODO: Assert definition of ANY-ERROR-STATUS at 18:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSetStatement_SET_ABEND_ON.cbl",
+      );
+    });
 
-    // TODO: Its only Java-marked references are not yet navigable in the TypeScript port.
-    // ANY-ERROR-STATUS at 18:16: ON path-status references are not mapped by the TypeScript dialect yet.
-    test.skip("SET_ABEND_ON_1");
+    test("SET_ABEND_ON_1", async () => {
+      // TODO: Assert definition of ANY-ERROR-STATUS at 18:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSetStatement_SET_ABEND_ON_1.cbl",
+      );
+    });
 
     test("SET_TIMER_ON", async () => {
       const editor = await helper.openWithoutIdmsErrors(

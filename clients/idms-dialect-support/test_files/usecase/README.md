@@ -10,17 +10,15 @@ assertions. Each fixture links to its original Java usecase.
 All 335 Java `@ParameterizedTest` variants are accounted for:
 
 - 260 definition-navigation tests and 4 diagnostic tests;
-- 50 smoke tests that assert the exact diagnostic set while a TODO notes the
-  lack of a statement-specific editor assertion;
+- 52 smoke tests that assert the exact diagnostic set; 2 of these retain TODOs
+  for `ON` references without definition navigation;
 - 7 variants covered by dedicated integration fixtures;
-- 12 diagnostics deferred to the IDMS-specific diagnostics story;
-- 2 variants whose only marked reference is not yet navigable.
+- 12 diagnostics deferred to the IDMS-specific diagnostics story.
 
-Deferred and unsupported variants appear as skipped tests with an explanatory
-TODO. Variants covered elsewhere are listed in comments next to their Java
-class. Another 35 marked references in
-otherwise covered tests have TODOs: 31 `ON` path-status names and 4 `INDEXED
-BY` index names.
+Deferred diagnostic variants appear as skipped tests with an explanatory TODO.
+Variants covered elsewhere are listed in comments next to their Java class.
+Across navigation and smoke tests, 35 marked references still have TODOs: 31
+`ON` path-status names and 4 `INDEXED BY` index names.
 
 The `NOT-EXISTING` sentinel confirms that analysis completed; it is never
 the only assertion of a navigation test. The `ABEND CODE` and lowercase

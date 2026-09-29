@@ -286,9 +286,19 @@ function renderTests(entries) {
       continue;
     }
     if (entry.status === "smoke") {
+      lines.push(`  test(${title}, async () => {`);
+      if (entry.omittedUsages?.length) {
+        for (const usage of entry.omittedUsages) {
+          lines.push(
+            `    // TODO: Assert definition of ${usage.name} at ${usage.line}:${usage.character}. ${usage.reason}.`,
+          );
+        }
+      } else {
+        lines.push(
+          "    // TODO: Add a statement-specific editor assertion when one is available.",
+        );
+      }
       lines.push(
-        `  test(${title}, async () => {`,
-        "    // TODO: Add a statement-specific editor assertion when one is available.",
         `    await helper.openWithoutIdmsErrors(${JSON.stringify(
           entry.file,
         )});`,
@@ -297,7 +307,7 @@ function renderTests(entries) {
       );
       continue;
     }
-    if (entry.status === "deferred" || entry.status === "knownGap") {
+    if (entry.status === "deferred") {
       lines.push(`  // TODO: ${entry.reason}.`);
       for (const usage of entry.omittedUsages || []) {
         lines.push(
@@ -418,26 +428,17 @@ for (const javaFile of fs
         return [{ ...usage, definitionLine: definition.line }];
       });
     if (usages.length === 0) {
-      if (!omittedUsages.length) {
-        const file = `${javaClass}_${variant.name}.cbl`;
-        fs.mkdirSync(outputDirectory, { recursive: true });
-        fs.writeFileSync(
-          path.join(outputDirectory, file),
-          fixtureText(cleaned.text, javaFile),
-        );
-        entries.push({
-          ...item,
-          status: "smoke",
-          file: `usecase/${file}`,
-        });
-        continue;
-      }
+      const file = `${javaClass}_${variant.name}.cbl`;
+      fs.mkdirSync(outputDirectory, { recursive: true });
+      fs.writeFileSync(
+        path.join(outputDirectory, file),
+        fixtureText(cleaned.text, javaFile),
+      );
       entries.push({
         ...item,
-        status: "knownGap",
-        reason:
-          "Its only Java-marked references are not yet navigable in the TypeScript port",
-        omittedUsages,
+        status: "smoke",
+        file: `usecase/${file}`,
+        ...(omittedUsages.length ? { omittedUsages } : {}),
       });
       continue;
     }
