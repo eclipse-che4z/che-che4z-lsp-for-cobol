@@ -119,6 +119,37 @@ export async function waitForDiagnosticCount(
   return diagnostics;
 }
 
+export async function waitForDiagnosticMessages(
+  uri: vscode.Uri,
+  messages: readonly string[],
+  timeout: number = 10000,
+): Promise<vscode.Diagnostic[]> {
+  const expectedCounts = new Map<string, number>();
+  for (const message of messages) {
+    expectedCounts.set(message, (expectedCounts.get(message) ?? 0) + 1);
+  }
+
+  let diagnostics: vscode.Diagnostic[] = [];
+  await waitFor(
+    () => {
+      diagnostics = vscode.languages.getDiagnostics(uri);
+      const actualCounts = new Map<string, number>();
+      for (const diagnostic of diagnostics) {
+        actualCounts.set(
+          diagnostic.message,
+          (actualCounts.get(diagnostic.message) ?? 0) + 1,
+        );
+      }
+      return [...expectedCounts].every(
+        ([message, count]) => (actualCounts.get(message) ?? 0) >= count,
+      );
+    },
+    timeout,
+    "diagnostics (" + basename(uri.path) + ")",
+  );
+  return diagnostics;
+}
+
 export async function waitFor(
   doneFunc: () => boolean | Promise<boolean>,
   timeout: number = 50000,
