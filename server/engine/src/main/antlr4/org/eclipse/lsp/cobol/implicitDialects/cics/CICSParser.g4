@@ -281,10 +281,10 @@ cics_delete_group_one:  (cics_file_name | TOKEN cics_data_area  | cics_keylength
                          ((SYSID | RIDFLD | NUMREC) cics_data_area) | NOSUSPEND | RBA | RRN | cics_handle_response)+;
 
 // CICS Delete Group 2 (Activity, Channel, Event, Timer)
-cics_delete_group_two:  ((ACTIVITY | CHANNEL | EVENT | TIMER) cics_data_value | RETCODE cics_data_area | cics_handle_response)+;
+cics_delete_group_two:  ((ACTIVITY | CHANNEL | EVENT | TIMER) cics_data_value | RETCODE /* EXCI ONLY */ cics_data_area | cics_handle_response)+;
 
 // CICS Delete Group 3 (Container (BTS), Container (Channel))
-cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL) cics_data_value | RETCODE cics_data_area | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
+cics_delete_group_three:  ((CONTAINER | ACTIVITY | CHANNEL) cics_data_value | RETCODE /* EXCI ONLY */ cics_data_area | ACQACTIVITY | PROCESS | ACQPROCESS | cics_handle_response)+;
 
 // CICS Delete Group 4 (Counter, Dcounter)
 cics_delete_group_four:  (cics_counter_dcounter | POOL cics_name | NOSUSPEND | cics_handle_response)+;
@@ -340,7 +340,7 @@ cics_enable_program: ((PROGRAM | ENTRYNAME | EXIT | GALENGTH | GAENTRYNAME | TAL
 cics_endbr: ENDBR cics_endbr_opts;
 cics_endbr_opts: ((FILE | DATASET) cics_name | REQID cics_data_value | SYSID cics_data_area | cics_handle_response)+;
 cics_endbrowse: ENDBROWSE cics_endbrowse_opts;
-cics_endbrowse_opts: (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | BROWSETOKEN  cics_data_value | RETCODE cics_data_area  | cics_handle_response)+;
+cics_endbrowse_opts: (ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER | BROWSETOKEN  cics_data_value | RETCODE /* EXCI ONLY */ cics_data_area  | cics_handle_response)+;
 
 /** ENQ */
 cics_enq: ENQ cics_enq_opts;
@@ -400,7 +400,7 @@ cics_gds_opts: ~(END_EXEC|EOF|DOT)*;
 cics_get: (GET (cics_get_container_bts | cics_get_counter_dcounter)) | (GET|GET64) cics_get_container_channel;
 cics_get_container_bts: ((CONTAINER | ACTIVITY) cics_data_value | ACQACTIVITY | PROCESS | ACQPROCESS | (INTO | FLENGTH) cics_data_area |
                     SET cics_ref | NODATA  | cics_handle_response)*;
-cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID | RETCODE) cics_data_area |
+cics_get_container_channel: ((CONTAINER | CHANNEL | BYTEOFFSET | INTOCCSID | INTOCODEPAGE) cics_data_value | (INTO | FLENGTH | CCSID | RETCODE /* EXCI ONLY */) cics_data_area |
                     SET cics_ref | NODATA | CONVERTST cics_cvda | cics_handle_response)*;
 cics_get_counter_dcounter: ((COUNTER | DCOUNTER | POOL) cics_name | VALUE cics_data_area | (INCREMENT | COMPAREMIN | COMPAREMAX) cics_data_value |
                   WRAP | NOSUSPEND | REDUCE | cics_handle_response)*;
@@ -417,7 +417,7 @@ cics_getmain64_body: (SET cics_ref | FLENGTH cics_data_value | LOCATION cics_cvd
 /** GETNEXT ACTIVITY / CONTAINER / EVENT / PROCESS */
 cics_getnext: GETNEXT (cics_getnext_activity | cics_getnext_container | cics_getnext_event | cics_getnext_process | cics_getnext_timer);
 cics_getnext_activity: (BROWSETOKEN cics_data_value | (ACTIVITY | ACTIVITYID | LEVEL) cics_data_area | cics_handle_response)+;
-cics_getnext_container: ((CONTAINER | BROWSETOKEN) cics_data_value | RETCODE cics_data_area | cics_handle_response)+;
+cics_getnext_container: ((CONTAINER | BROWSETOKEN) cics_data_value | RETCODE /* EXCI ONLY */ cics_data_area | cics_handle_response)+;
 cics_getnext_event: (BROWSETOKEN cics_data_value | (EVENT | COMPOSITE | TIMER) cics_data_area | (EVENTTYPE | FIRESTATUS | PREDICATE) cics_cvda | cics_handle_response)+;
 cics_getnext_process: (BROWSETOKEN cics_data_value | (PROCESS | ACTIVITYID) cics_data_area | cics_handle_response)+;
 cics_getnext_timer: ((TIMER | ACTIVITYID) cics_data_value | (EVENT | ABSTIME | BROWSETOKEN) cics_data_area | STATUS cics_cvda | cics_handle_response)+;
@@ -590,8 +590,8 @@ cics_issue_common: ((DESTID | DESTIDLENG | VOLUME | VOLUMELENG | SUBADDR) cics_d
 
 /** LINK / LINK ACQPROCESS / LINK ACTIVITY: */
 cics_link: LINK (cics_link_program | cics_link_acqprocess | cics_link_activity);
-cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL | APPLID) cics_name | (COMMAREA | INPUTMSG | RETCODE) cics_data_area |
-                (LENGTH | DATALENGTH | INPUTMSGLEN ) cics_data_value | SYNCONRETURN | cics_handle_response)*;
+cics_link_program: ((PROGRAM | SYSID | TRANSID | CHANNEL | APPLID /* EXCI ONLY */) cics_name | (COMMAREA | INPUTMSG | RETCODE /* EXCI ONLY */) cics_data_area |
+                (LENGTH | DATALENGTH | INPUTMSGLEN) cics_data_value | SYNCONRETURN | cics_handle_response)*;
 cics_link_acqprocess: (ACQPROCESS | INPUTEVENT cics_data_value | cics_handle_response)*;
 cics_link_activity: (ACQACTIVITY | (ACTIVITY | INPUTEVENT) cics_data_value | cics_handle_response)*;
 
@@ -605,7 +605,7 @@ cics_monitor_options: (POINT cics_data_value | (DATA1 | DATA2 | ENTRYNAME) cics_
 
 /** MOVE CONTAINER (both) */
 cics_move: MOVE cics_move_body;
-cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | RETCODE cics_data_area | FROMPROCESS |
+cics_move_body: ((CONTAINER | FROMACTIVITY | TOACTIVITY | AS | CHANNEL | TOCHANNEL) cics_data_value | RETCODE /* EXCI ONLY */ cics_data_area | FROMPROCESS |
            TOPROCESS | cics_handle_response)+;
 
 /** PERFORM System Commands */
@@ -653,7 +653,7 @@ cics_push: PUSH cics_handle_response? HANDLE cics_handle_response?;
 /** PUT CONTAINER (both of them): */
 cics_put_container: (PUT cics_put_container_bts | (PUT|PUT64) cics_put_container_channel);
 cics_put_container_bts: ((ACQACTIVITY | PROCESS | ACQPROCESS) | (ACTIVITY | CONTAINER | FLENGTH) cics_data_value | FROM cics_data_area | cics_handle_response)+;
-cics_put_container_channel: ((BIT | CHAR | APPEND | PREPEND) | (CHANNEL | CONTAINER | FLENGTH | FROMCCSID | FROMCODEPAGE ) cics_data_value | (FROM | RETCODE) cics_data_area | DATATYPE cics_cvda | cics_handle_response)+;
+cics_put_container_channel: ((BIT | CHAR | APPEND | PREPEND) | (CHANNEL | CONTAINER | FLENGTH | FROMCCSID | FROMCODEPAGE ) cics_data_value | (FROM | RETCODE /* EXCI ONLY */) cics_data_area | DATATYPE cics_cvda | cics_handle_response)+;
 
 /** QUERY CHANNEL / COUNTER / DCOUNTER / SECURITY */
 cics_query: QUERY (cics_query_channel | cics_query_counter | cics_query_security);
@@ -905,7 +905,7 @@ cics_startbr_options: ((FILE | DATASET) cics_name | (RIDFLD | SYSID) cics_data_a
 
 /** STARTBROWSE ACTIVITY / CONTAINER / EVENT / PROCESS / TIMER */
 cics_startbrowse: STARTBROWSE (cics_startbrowse_body);
-cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER) | (ACTIVITYID | PROCESSTYPE | CHANNEL) cics_data_value | cics_startbrowse_processWithValue_subrule | (BROWSETOKEN | RETCODE) cics_data_area | cics_handle_response)+;
+cics_startbrowse_body: ((ACTIVITY | CONTAINER | EVENT | PROCESS | TIMER) | (ACTIVITYID | PROCESSTYPE | CHANNEL) cics_data_value | cics_startbrowse_processWithValue_subrule | (BROWSETOKEN | RETCODE /* EXCI ONLY */) cics_data_area | cics_handle_response)+;
 cics_startbrowse_processWithValue_subrule: PROCESS cics_data_value;
 
 /** SUSPEND (both) */
