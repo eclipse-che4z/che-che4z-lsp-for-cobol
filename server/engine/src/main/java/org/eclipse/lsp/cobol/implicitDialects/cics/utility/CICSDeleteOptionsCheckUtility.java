@@ -128,7 +128,7 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkDeleteGroupThree(CICSParser.Cics_delete_group_threeContext ctx) {
-    if (ctx.RETCODE().isEmpty()) {
+    if (ctx.RETCODE().isEmpty()) { // TODO: Missing validation for EXCI DELETE CHANNEL
       checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
     }
     checkHasMutuallyExclusiveOptions(
