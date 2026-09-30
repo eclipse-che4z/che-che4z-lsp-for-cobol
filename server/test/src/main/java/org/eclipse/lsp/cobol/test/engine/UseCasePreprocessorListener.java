@@ -235,21 +235,32 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
   @Override
   public void exitParagraphStatement(ParagraphStatementContext ctx) {
     pop();
-    ParagraphUsageContext p = ctx.paragraphUsage();
+    ParagraphUsageStatementContext p = ctx.paragraphUsageStatement();
     if (p != null) {
-      SectionUsageContext su = ctx.sectionUsage();
+      SectionUsageStatementContext su = ctx.sectionUsageStatement();
       String section =
           su != null
-              ? getReplacementText(su.word().identifier().getText(), su.word().replacement()).get(0)
+              ? getReplacementText(
+                      su.sectionUsage().word().identifier().getText(),
+                      su.sectionUsage().word().replacement())
+                  .get(0)
               : currentSectionName;
 
       ProcedureId procedureId =
           new ProcedureId(
               section,
-              getReplacementText(p.word().getText(), p.word().replacement()).get(0).toUpperCase());
-      String text = p.word().identifier().getText();
-      Range range = retrieveRange(ctx, text.length());
-      updateOutputDocument(text, ctx, p.word().replacement(), ctx.diagnostic(), range);
+              getReplacementText(
+                      p.paragraphUsage().word().getText(), p.paragraphUsage().word().replacement())
+                  .get(0)
+                  .toUpperCase());
+      String text = p.paragraphUsage().word().identifier().getText();
+      Range range = retrieveRange(p, text.length());
+      updateOutputDocument(
+          text,
+          ctx,
+          p.paragraphUsage().word().replacement(),
+          ctx.paragraphUsageStatement().diagnostic(),
+          range);
       Location loc = new Location(documentUri, range);
 
       if (su != null)
@@ -262,12 +273,19 @@ class UseCasePreprocessorListener extends UseCasePreprocessorBaseListener {
         // TODO produce reference to section
         write(getHiddenText(tokens.getHiddenTokensToLeft(su.start.getTokenIndex(), HIDDEN)));
         write(ctx.INOF().getText());
-        updateOutputDocument(
-            su.word().identifier().getText(),
-            su,
-            su.word().replacement(),
-            ctx.diagnostic(),
-            retrieveRange(ctx, su.word().identifier().getText().length()));
+        processProcedureToken(
+            su.sectionUsage().word().identifier().getText(),
+            ctx.sectionUsageStatement(),
+            su.sectionUsage().word().replacement(),
+            procedureUsages,
+            ctx.sectionUsageStatement().diagnostic(),
+            new ProcedureId(
+                getReplacementText(
+                        su.sectionUsage().word().identifier().getText(),
+                        su.sectionUsage().word().replacement())
+                    .get(0)
+                    .toUpperCase(),
+                null));
       }
     }
     ParagraphDefinitionContext value = ctx.paragraphDefinition();

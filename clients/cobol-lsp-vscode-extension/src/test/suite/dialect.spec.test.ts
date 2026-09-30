@@ -34,7 +34,7 @@ suite("Integration Test Suite: Dialect specific tests", function () {
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
 
     helper.printAllDiagnostics(diagnostics);
-    assert.strictEqual(diagnostics.length, 4);
+    assert.strictEqual(diagnostics.length, 5);
 
     checkDiagnostic(
       diagnostics,
@@ -53,6 +53,16 @@ suite("Integration Test Suite: Dialect specific tests", function () {
       28,
       25,
       30,
+      "COBOL Language Support (parsing)",
+    );
+
+    checkDiagnostic(
+      diagnostics,
+      "The following section is not defined: S1",
+      25,
+      40,
+      25,
+      42,
       "COBOL Language Support (parsing)",
     );
 
