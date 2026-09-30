@@ -133,16 +133,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some((item) => item.message === "Variable 1XX is not defined"),
-        10000,
-        "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Variable 1XX is not defined"],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Variable 1XX is not defined",
         new vscode.Range(10, 48, 10, 51),
       );
@@ -152,16 +148,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL_ON.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some((item) => item.message === "Variable 1XX is not defined"),
-        10000,
-        "usecase/TestAttachTaskCode_ATTACH_TASK_CODE_PRIORITY_INVALID_LITERAL_ON.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Variable 1XX is not defined"],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Variable 1XX is not defined",
         new vscode.Range(10, 48, 10, 51),
       );
@@ -226,16 +218,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestChangePriority_CHANGE_PRIORITY_TO_LITERAL_INVALID.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some((item) => item.message === "Variable 1X3 is not defined"),
-        10000,
-        "usecase/TestChangePriority_CHANGE_PRIORITY_TO_LITERAL_INVALID.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Variable 1X3 is not defined"],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Variable 1X3 is not defined",
         new vscode.Range(9, 30, 9, 33),
       );
@@ -245,16 +233,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestChangePriority_CHANGE_PRIORITY_TO_LITERAL_INVALID_ON.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some((item) => item.message === "Variable 1X3 is not defined"),
-        10000,
-        "usecase/TestChangePriority_CHANGE_PRIORITY_TO_LITERAL_INVALID_ON.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Variable 1X3 is not defined"],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Variable 1X3 is not defined",
         new vscode.Range(9, 30, 9, 33),
       );
@@ -805,20 +789,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsBindStatement_BIND13.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for procedure name.",
-            ),
-        10000,
-        "usecase/TestIdmsBindStatement_BIND13.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 8 bytes allowed for procedure name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for procedure name.",
         new vscode.Range(14, 30, 14, 44),
         vscode.DiagnosticSeverity.Error,
@@ -830,20 +806,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsBindStatement_BIND13_ON.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for procedure name.",
-            ),
-        10000,
-        "usecase/TestIdmsBindStatement_BIND13_ON.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 8 bytes allowed for procedure name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for procedure name.",
         new vscode.Range(14, 30, 14, 44),
         vscode.DiagnosticSeverity.Error,
@@ -898,20 +866,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsControlSectionAll_IDMSCS_WITH_SSN_LEN_ERROR.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "The length 17 is not allowed. Allowed values are 16, 18.",
-            ),
-        10000,
-        "usecase/TestIdmsControlSectionAll_IDMSCS_WITH_SSN_LEN_ERROR.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["The length 17 is not allowed. Allowed values are 16, 18."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "The length 17 is not allowed. Allowed values are 16, 18.",
         new vscode.Range(5, 38, 5, 40),
         vscode.DiagnosticSeverity.Error,
@@ -1651,58 +1611,30 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for table name.",
-            ),
-        10000,
-        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        [
+          "Max length limit of 8 bytes allowed for table name.",
+          "Max length limit of 8 bytes allowed for node name.",
+          "Max length limit of 8 bytes allowed for dictionary name.",
+        ],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for table name.",
         new vscode.Range(14, 22, 14, 33),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for node name.",
-            ),
-        10000,
-        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
-      );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for node name.",
         new vscode.Range(15, 11, 15, 23),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for dictionary name.",
-            ),
-        10000,
-        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
-      );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for dictionary name.",
         new vscode.Range(15, 33, 15, 45),
         vscode.DiagnosticSeverity.Error,
@@ -1714,58 +1646,30 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for table name.",
-            ),
-        10000,
-        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        [
+          "Max length limit of 8 bytes allowed for table name.",
+          "Max length limit of 8 bytes allowed for node name.",
+          "Max length limit of 8 bytes allowed for dictionary name.",
+        ],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for table name.",
         new vscode.Range(14, 22, 14, 33),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for node name.",
-            ),
-        10000,
-        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
-      );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for node name.",
         new vscode.Range(15, 11, 15, 23),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for dictionary name.",
-            ),
-        10000,
-        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
-      );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for dictionary name.",
         new vscode.Range(15, 33, 15, 45),
         vscode.DiagnosticSeverity.Error,
@@ -2297,20 +2201,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsReadyStatement_READ7.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 16 bytes allowed for db entity name.",
-            ),
-        10000,
-        "usecase/TestIdmsReadyStatement_READ7.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 16 bytes allowed for db entity name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 16 bytes allowed for db entity name.",
         new vscode.Range(13, 17, 13, 34),
         vscode.DiagnosticSeverity.Error,
@@ -2322,20 +2218,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsReadyStatement_READ7_ON.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 16 bytes allowed for db entity name.",
-            ),
-        10000,
-        "usecase/TestIdmsReadyStatement_READ7_ON.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 16 bytes allowed for db entity name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 16 bytes allowed for db entity name.",
         new vscode.Range(13, 17, 13, 34),
         vscode.DiagnosticSeverity.Error,
@@ -2476,58 +2364,30 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for subschema name.",
-            ),
-        10000,
-        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        [
+          "Max length limit of 8 bytes allowed for subschema name.",
+          "Max length limit of 8 bytes allowed for schema name.",
+          "Max length limit of 8 bytes allowed for map name.",
+        ],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for subschema name.",
         new vscode.Range(5, 15, 5, 24),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for schema name.",
-            ),
-        10000,
-        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
-      );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for schema name.",
         new vscode.Range(5, 32, 5, 41),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for map name.",
-            ),
-        10000,
-        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
-      );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for map name.",
         new vscode.Range(8, 12, 8, 23),
         vscode.DiagnosticSeverity.Error,
@@ -2754,20 +2614,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsStartpageStatement_TST4.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for map name.",
-            ),
-        10000,
-        "usecase/TestIdmsStartpageStatement_TST4.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 8 bytes allowed for map name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for map name.",
         new vscode.Range(10, 29, 10, 42),
         vscode.DiagnosticSeverity.Error,
@@ -2779,20 +2631,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsStartpageStatement_TST4_ON.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for map name.",
-            ),
-        10000,
-        "usecase/TestIdmsStartpageStatement_TST4_ON.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 8 bytes allowed for map name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for map name.",
         new vscode.Range(10, 29, 10, 42),
         vscode.DiagnosticSeverity.Error,
@@ -2860,20 +2704,12 @@ suite("Java IDMS usecases", function () {
       const editor = await helper.showDocument(
         "usecase/TestIdmsTransferStatement_TRANSFER_PGM_TOO_LONG_ERROR.cbl",
       );
-      await helper.waitFor(
-        () =>
-          vscode.languages
-            .getDiagnostics(editor.document.uri)
-            .some(
-              (item) =>
-                item.message ===
-                "Max length limit of 8 bytes allowed for program name.",
-            ),
-        10000,
-        "usecase/TestIdmsTransferStatement_TRANSFER_PGM_TOO_LONG_ERROR.cbl",
+      const diagnostics = await helper.waitForDiagnosticMessages(
+        editor.document.uri,
+        ["Max length limit of 8 bytes allowed for program name."],
       );
       helper.checkDiagnostic(
-        vscode.languages.getDiagnostics(editor.document.uri),
+        diagnostics,
         "Max length limit of 8 bytes allowed for program name.",
         new vscode.Range(14, 31, 14, 43),
         vscode.DiagnosticSeverity.Error,

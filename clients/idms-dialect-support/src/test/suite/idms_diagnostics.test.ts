@@ -26,19 +26,9 @@ suite("IDMS-specific diagnostics", function () {
     await helper.showDocument("IdmsDiagnosticsCopybook.cbl");
     await helper.showDocument("copybooks/IDMS-DIAGNOSTICS-COPY");
     const copybookUri = await helper.getUri("copybooks/IDMS-DIAGNOSTICS-COPY");
-    await helper.waitFor(
-      () =>
-        vscode.languages
-          .getDiagnostics(copybookUri)
-          .some(
-            (diagnostic) =>
-              diagnostic.message ===
-              "Max length limit of 8 bytes allowed for program name.",
-          ),
-      10000,
-      "IDMS copybook diagnostic",
-    );
-    const diagnostics = vscode.languages.getDiagnostics(copybookUri);
+    const diagnostics = await helper.waitForDiagnosticMessages(copybookUri, [
+      "Max length limit of 8 bytes allowed for program name.",
+    ]);
     helper.checkDiagnostic(
       diagnostics,
       "Max length limit of 8 bytes allowed for program name.",
@@ -57,17 +47,13 @@ suite("IDMS-specific diagnostics", function () {
   test("rejects a three-digit SUBSCHEMA-NAMES LENGTH", async () => {
     const editor = await helper.showDocument("IdmsLength116.cbl");
     const message = "The length 116 is not allowed. Allowed values are 16, 18.";
-    await helper.waitFor(
-      () =>
-        vscode.languages
-          .getDiagnostics(editor.document.uri)
-          .some((diagnostic) => diagnostic.message === message),
-      10000,
-      "three-digit SUBSCHEMA-NAMES LENGTH diagnostic",
+    const diagnostics = await helper.waitForDiagnosticMessages(
+      editor.document.uri,
+      [message],
     );
     const start = helper.positionOf(editor, "116", true);
     helper.checkDiagnostic(
-      vscode.languages.getDiagnostics(editor.document.uri),
+      diagnostics,
       message,
       new vscode.Range(start, start.translate(0, 3)),
       vscode.DiagnosticSeverity.Error,

@@ -288,18 +288,18 @@ function renderTests(entries) {
         `    const editor = await helper.showDocument(${JSON.stringify(
           entry.file,
         )});`,
+        "    const diagnostics = await helper.waitForDiagnosticMessages(",
+        "      editor.document.uri,",
+        "      [",
       );
       for (const diagnostic of entry.diagnostics) {
+        lines.push(`        ${JSON.stringify(diagnostic.message)},`);
+      }
+      lines.push("      ],", "    );");
+      for (const diagnostic of entry.diagnostics) {
         lines.push(
-          "    await helper.waitFor(",
-          `      () => vscode.languages.getDiagnostics(editor.document.uri).some((item) => item.message === ${JSON.stringify(
-            diagnostic.message,
-          )}),`,
-          "      10000,",
-          `      ${JSON.stringify(entry.file)},`,
-          "    );",
           "    helper.checkDiagnostic(",
-          "      vscode.languages.getDiagnostics(editor.document.uri),",
+          "      diagnostics,",
           `      ${JSON.stringify(diagnostic.message)},`,
           `      new vscode.Range(${diagnostic.line}, ${
             diagnostic.character
