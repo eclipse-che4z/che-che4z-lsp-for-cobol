@@ -58,6 +58,8 @@ export type StatementDescriptor =
     })
   | (StatementDescriptorBase & {
       readonly type: "VARIABLE";
+      /** Path statuses may be implicit, but declared ones remain navigable. */
+      readonly optional?: boolean;
     })
   | (StatementDescriptorBase & {
       readonly type: "DIALECT_VARIABLE_USAGE";

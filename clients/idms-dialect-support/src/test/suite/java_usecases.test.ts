@@ -426,7 +426,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestDelete_DELETE_QUEUE_ON.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(7, 20), 12); // SCRATCH
-      // TODO: Assert ANY-ERROR-STATUS at 27:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(27, 14), 24); // ANY-ERROR-STATUS
     });
 
     test("DELETE_SCRATCH_ON", async () => {
@@ -437,7 +437,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(26, 34), 16); // WK_AREAID
       await helper.checkDefinition(editor, new vscode.Position(26, 54), 17); // WK_RECORDID_1
       await helper.checkDefinition(editor, new vscode.Position(27, 35), 18); // WK_RECORDID_2
-      // TODO: Assert ANY-ERROR-STATUS at 28:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(28, 16), 24); // ANY-ERROR-STATUS
     });
 
     test("DELETE_TABLE_ON", async () => {
@@ -446,7 +446,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(7, 20), 12); // SCRATCH
       await helper.checkDefinition(editor, new vscode.Position(26, 29), 19); // WK1
-      // TODO: Assert ANY-ERROR-STATUS at 27:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(27, 16), 24); // ANY-ERROR-STATUS
     });
 
     test("DELETE_QUEUE_NO_ID_ON", async () => {
@@ -607,7 +607,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsAcceptDbStatements_TST10.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 10); // DB1
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
 
     test("TST20", async () => {
@@ -616,7 +616,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 10); // DB1
       await helper.checkDefinition(editor, new vscode.Position(19, 27), 17); // ABC-PROC
-      // TODO: Assert ANY-ERROR-STATUS at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 7); // ANY-ERROR-STATUS
     });
 
     test("TST30", async () => {
@@ -624,7 +624,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsAcceptDbStatements_TST30.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 12); // EMP-LOC
-      // TODO: Assert ANY-STATUS at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 6); // ANY-STATUS
     });
 
     test("TST40", async () => {
@@ -632,7 +632,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsAcceptDbStatements_TST40.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 11); // DC1
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
 
     test("TST50", async () => {
@@ -641,7 +641,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 11); // DC1
       await helper.checkDefinition(editor, new vscode.Position(19, 52), 10); // DB1
-      // TODO: Assert ANY-ERROR-STATUS at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 7); // ANY-ERROR-STATUS
     });
 
     test("TST60", async () => {
@@ -650,7 +650,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 13); // DB-KEY1
       await helper.checkDefinition(editor, new vscode.Position(19, 31), 15); // DEPT-EMPL
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
 
     test("TST70", async () => {
@@ -658,7 +658,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsAcceptDbStatements_TST70.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 13); // DB-KEY1
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
 
     test("TST80", async () => {
@@ -667,7 +667,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 13); // DB-KEY1
       await helper.checkDefinition(editor, new vscode.Position(19, 31), 15); // DEPT-EMPL
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
 
     test("TST90", async () => {
@@ -677,7 +677,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 13); // DB-KEY1
       await helper.checkDefinition(editor, new vscode.Position(19, 31), 16); // EMP_AREA
       await helper.checkDefinition(editor, new vscode.Position(19, 64), 10); // DB1
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
 
     test("TST90_ON", async () => {
@@ -687,7 +687,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(19, 18), 13); // DB-KEY1
       await helper.checkDefinition(editor, new vscode.Position(19, 31), 16); // EMP_AREA
       await helper.checkDefinition(editor, new vscode.Position(19, 64), 10); // DB1
-      // TODO: Assert DB-REC-NOT-FOUND at 20:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(20, 14), 9); // DB-REC-NOT-FOUND
     });
   });
 
@@ -836,7 +836,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(12, 22), 9); // EMPLOYEE
       await helper.checkDefinition(editor, new vscode.Position(12, 36), 10); // OFFICE-EMPLOYEE
-      // TODO: Assert DB-REC-NOT-FOUND at 13:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(13, 14), 8); // DB-REC-NOT-FOUND
     });
 
     test("CONN1", async () => {
@@ -1240,7 +1240,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(17, 23), 9); // EMPLOYEE
       await helper.checkDefinition(editor, new vscode.Position(17, 39), 10); // DEPT-EMPLOYEE
-      // TODO: Assert DB-END-OF-SET at 17:56. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(17, 56), 8); // DB-END-OF-SET
     });
 
     test("FIND18_ON", async () => {
@@ -1249,7 +1249,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(17, 23), 9); // EMPLOYEE
       await helper.checkDefinition(editor, new vscode.Position(17, 39), 10); // DEPT-EMPLOYEE
-      // TODO: Assert DB-END-OF-SET at 17:56. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(17, 56), 8); // DB-END-OF-SET
     });
   });
 
@@ -1497,10 +1497,10 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(20, 23), 15); // EMPMAP
       await helper.checkDefinition(editor, new vscode.Position(20, 42), 18); // MAP-FLD
+      await helper.checkDefinition(editor, new vscode.Position(20, 50), 17); // S1
       await helper.checkDefinition(editor, new vscode.Position(21, 35), 9); // MFLD2
       await helper.checkDefinition(editor, new vscode.Position(21, 44), 8); // MAP1
       await helper.checkDefinition(editor, new vscode.Position(22, 35), 18); // MAP-FLD
-      // TODO: Assert S1 at 20:50. INDEXED BY names are not navigable through dialect mapping yet.
     });
 
     test("TST8", async () => {
@@ -1509,10 +1509,10 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(20, 23), 15); // EMPMAP
       await helper.checkDefinition(editor, new vscode.Position(20, 38), 18); // MAP-FLD
+      await helper.checkDefinition(editor, new vscode.Position(20, 46), 17); // S1
       await helper.checkDefinition(editor, new vscode.Position(21, 35), 9); // MFLD2
       await helper.checkDefinition(editor, new vscode.Position(21, 44), 8); // MAP1
       await helper.checkDefinition(editor, new vscode.Position(22, 36), 18); // MAP-FLD
-      // TODO: Assert S1 at 20:46. INDEXED BY names are not navigable through dialect mapping yet.
     });
 
     test("TST2_ON", async () => {
@@ -1947,10 +1947,10 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(20, 22), 7); // EMPMAP
       await helper.checkDefinition(editor, new vscode.Position(20, 42), 18); // MAP-FLD
+      await helper.checkDefinition(editor, new vscode.Position(20, 50), 17); // S1
       await helper.checkDefinition(editor, new vscode.Position(21, 35), 12); // MFLD2
       await helper.checkDefinition(editor, new vscode.Position(21, 44), 11); // MAP1
       await helper.checkDefinition(editor, new vscode.Position(22, 35), 18); // MAP-FLD
-      // TODO: Assert S1 at 20:50. INDEXED BY names are not navigable through dialect mapping yet.
     });
 
     test("TST9_ON", async () => {
@@ -1959,10 +1959,10 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(20, 22), 7); // EMPMAP
       await helper.checkDefinition(editor, new vscode.Position(20, 42), 18); // MAP-FLD
+      await helper.checkDefinition(editor, new vscode.Position(20, 50), 17); // S1
       await helper.checkDefinition(editor, new vscode.Position(21, 35), 12); // MFLD2
       await helper.checkDefinition(editor, new vscode.Position(21, 44), 11); // MAP1
       await helper.checkDefinition(editor, new vscode.Position(22, 35), 18); // MAP-FLD
-      // TODO: Assert S1 at 20:50. INDEXED BY names are not navigable through dialect mapping yet.
     });
   });
 
@@ -2133,7 +2133,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(16, 25), 7); // WK_1
       await helper.checkDefinition(editor, new vscode.Position(16, 41), 10); // WK_LENGTH
       await helper.checkDefinition(editor, new vscode.Position(17, 17), 8); // WK_2
-      // TODO: Assert ANY-ERROR-STATUS at 17:25. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(17, 25), 12); // ANY-ERROR-STATUS
     });
 
     test("READ_LINE_ON", async () => {
@@ -2141,7 +2141,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsReadStatement_READ_LINE_ON.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(14, 36), 7); // WK_1
-      // TODO: Assert ANY-ERROR-STATUS at 15:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 16), 12); // ANY-ERROR-STATUS
     });
 
     test("READ_LINE_ON_END_IF", async () => {
@@ -2149,7 +2149,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsReadStatement_READ_LINE_ON_END_IF.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(14, 36), 7); // WK_1
-      // TODO: Assert ANY-ERROR-STATUS at 15:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 16), 12); // ANY-ERROR-STATUS
     });
   });
 
@@ -2286,7 +2286,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(14, 18), 4); // EMPDBK
       await helper.checkDefinition(editor, new vscode.Position(14, 30), 6); // IX-EMP
       await helper.checkDefinition(editor, new vscode.Position(14, 43), 7); // INDEX-KEY
-      // TODO: Assert DB-REC-NOT-FOUND at 15:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 14), 12); // DB-REC-NOT-FOUND
     });
 
     test("TST7", async () => {
@@ -2297,7 +2297,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(14, 30), 6); // IX-EMP
       await helper.checkDefinition(editor, new vscode.Position(14, 43), 7); // INDEX-KEY
       await helper.checkDefinition(editor, new vscode.Position(14, 62), 10); // EMPL-KEY
-      // TODO: Assert DB-REC-NOT-FOUND at 15:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 14), 12); // DB-REC-NOT-FOUND
     });
 
     test("TST7_ON", async () => {
@@ -2308,7 +2308,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(14, 30), 6); // IX-EMP
       await helper.checkDefinition(editor, new vscode.Position(14, 43), 7); // INDEX-KEY
       await helper.checkDefinition(editor, new vscode.Position(14, 62), 10); // EMPL-KEY
-      // TODO: Assert DB-REC-NOT-FOUND at 15:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 14), 12); // DB-REC-NOT-FOUND
     });
   });
 
@@ -2502,17 +2502,17 @@ suite("Java IDMS usecases", function () {
     });
 
     test("SET_ABEND_ON", async () => {
-      // TODO: Assert definition of ANY-ERROR-STATUS at 18:16. ON path-status references are not mapped by the TypeScript dialect yet.
-      await helper.openWithoutIdmsErrors(
+      const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsSetStatement_SET_ABEND_ON.cbl",
       );
+      await helper.checkDefinition(editor, new vscode.Position(18, 16), 15); // ANY-ERROR-STATUS
     });
 
     test("SET_ABEND_ON_1", async () => {
-      // TODO: Assert definition of ANY-ERROR-STATUS at 18:16. ON path-status references are not mapped by the TypeScript dialect yet.
-      await helper.openWithoutIdmsErrors(
+      const editor = await helper.openWithoutIdmsErrors(
         "usecase/TestIdmsSetStatement_SET_ABEND_ON_1.cbl",
       );
+      await helper.checkDefinition(editor, new vscode.Position(18, 16), 15); // ANY-ERROR-STATUS
     });
 
     test("SET_TIMER_ON", async () => {
@@ -2521,7 +2521,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(17, 44), 9); // WK_EVENT
       await helper.checkDefinition(editor, new vscode.Position(17, 62), 10); // WK_TIMER
-      // TODO: Assert ANY-ERROR-STATUS at 18:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(18, 16), 15); // ANY-ERROR-STATUS
     });
 
     test("SET_TIMER_ON_END_IF", async () => {
@@ -2530,7 +2530,7 @@ suite("Java IDMS usecases", function () {
       );
       await helper.checkDefinition(editor, new vscode.Position(17, 44), 9); // WK_EVENT
       await helper.checkDefinition(editor, new vscode.Position(17, 62), 10); // WK_TIMER
-      // TODO: Assert ANY-ERROR-STATUS at 18:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(18, 16), 15); // ANY-ERROR-STATUS
     });
   });
 
@@ -2689,7 +2689,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsTransferStatement_TRANSFER_ON.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(14, 56), 8); // WK1
-      // TODO: Assert ANY-ERROR-STATUS at 15:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 16), 12); // ANY-ERROR-STATUS
     });
 
     test("TRANSFER_ON_END_IF", async () => {
@@ -2697,7 +2697,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsTransferStatement_TRANSFER_ON_END_IF.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(14, 56), 8); // WK1
-      // TODO: Assert ANY-ERROR-STATUS at 15:16. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(15, 16), 12); // ANY-ERROR-STATUS
     });
 
     test("TRANSFER_PGM_TOO_LONG_ERROR", async () => {
@@ -2997,7 +2997,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsWriteClause_WRITE_JOURNAL_ON_1.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(22, 43), 10); // WK1
-      // TODO: Assert ANY-ERROR-STATUS at 23:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(23, 14), 20); // ANY-ERROR-STATUS
     });
 
     test("WRITE_THEN_READ_ON_1", async () => {
@@ -3008,7 +3008,7 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(23, 14), 11); // WK2
       await helper.checkDefinition(editor, new vscode.Position(24, 16), 12); // WK3
       await helper.checkDefinition(editor, new vscode.Position(24, 47), 13); // WK4
-      // TODO: Assert ANY-ERROR-STATUS at 25:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(25, 14), 20); // ANY-ERROR-STATUS
     });
 
     test("WRITE_JOURNAL_ON_1_END_IF", async () => {
@@ -3016,7 +3016,7 @@ suite("Java IDMS usecases", function () {
         "usecase/TestIdmsWriteClause_WRITE_JOURNAL_ON_1_END_IF.cbl",
       );
       await helper.checkDefinition(editor, new vscode.Position(22, 43), 10); // WK1
-      // TODO: Assert ANY-ERROR-STATUS at 23:14. ON path-status references are not mapped by the TypeScript dialect yet.
+      await helper.checkDefinition(editor, new vscode.Position(23, 14), 20); // ANY-ERROR-STATUS
     });
   });
 });

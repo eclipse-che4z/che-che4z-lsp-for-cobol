@@ -37,6 +37,7 @@ import {
   MapClauseContext,
   MapSectionContext,
   ObtainLRStatementContext,
+  PathStatusContext,
   QualifiedDataNameContext,
   SchemaSectionContext,
   VariableUsageNameContext,
@@ -404,6 +405,28 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
     ];
   };
 
+  visitPathStatus = (ctx: PathStatusContext): StatementDescriptor[] => {
+    const word = ctx.cobolWord();
+    const range = constructRange(word);
+    return [
+      {
+        range,
+        statementRange: range,
+        type: "VARIABLE",
+        optional: true,
+        children: [
+          {
+            range,
+            statementRange: range,
+            type: "DIALECT_VARIABLE_USAGE",
+            value: word.getText().toUpperCase(),
+            children: [],
+          },
+        ],
+      },
+    ];
+  };
+
   private findImperativeStatement(
     ctx: IdmsStatementsContext,
   ): ImperativeStatementCallContext | null {
@@ -466,20 +489,34 @@ export class IdmsTransformationVisitor extends IdmsParserVisitor<
       imperativeStart.column,
     );
     const imperativeRange = constructRange(imperativeStatement);
+    const children = this.visitChildren(ctx) ?? [];
+    const beforeImperative: StatementDescriptor[] = [];
+    const inImperative: StatementDescriptor[] = [];
+    for (const child of children) {
+      if (
+        child.range.start.line < imperativeRange.start.line ||
+        (child.range.start.line === imperativeRange.start.line &&
+          child.range.start.character < imperativeRange.start.character)
+      ) {
+        beforeImperative.push(child);
+      } else {
+        inImperative.push(child);
+      }
+    }
 
     return [
       {
         range: statementRange,
         statementRange,
         type: "DIALECT_STATEMENT",
-        children: this.visitChildren(ctx) ?? [],
+        children: beforeImperative,
         filler: SPACE_VALUE,
       },
       {
         range: imperativeRange,
         statementRange: imperativeRange,
         type: "DIALECT_STATEMENT",
-        children: [],
+        children: inImperative,
         filler: IMPERATIVE_STATEMENT_REPLACEMENT,
       },
     ];

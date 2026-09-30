@@ -274,11 +274,6 @@ function renderTests(entries) {
           `    await helper.checkDefinition(editor, new vscode.Position(${usage.line}, ${usage.character}), ${usage.definitionLine}); // ${usage.name}`,
         );
       }
-      for (const usage of entry.omittedUsages || []) {
-        lines.push(
-          `    // TODO: Assert ${usage.name} at ${usage.line}:${usage.character}. ${usage.reason}.`,
-        );
-      }
       lines.push("  });", "");
       continue;
     }
@@ -320,17 +315,9 @@ function renderTests(entries) {
     }
     if (entry.status === "smoke") {
       lines.push(`  test(${title}, async () => {`);
-      if (entry.omittedUsages?.length) {
-        for (const usage of entry.omittedUsages) {
-          lines.push(
-            `    // TODO: Assert definition of ${usage.name} at ${usage.line}:${usage.character}. ${usage.reason}.`,
-          );
-        }
-      } else {
-        lines.push(
-          "    // TODO: Add a statement-specific editor assertion when one is available.",
-        );
-      }
+      lines.push(
+        "    // TODO: Add a statement-specific editor assertion when one is available.",
+      );
       lines.push(
         `    await helper.openWithoutIdmsErrors(${JSON.stringify(
           entry.file,
@@ -456,31 +443,12 @@ for (const javaFile of fs
       values.push(definition);
       definitions.set(definition.name, values);
     }
-    const lines = cleaned.text.split("\n");
-    const omittedUsages = [];
     const usages = cleaned.usages
       .filter((usage) => definitions.get(usage.name)?.length === 1)
-      .flatMap((usage) => {
-        const definition = definitions.get(usage.name)[0];
-        const prefix = lines[usage.line].slice(0, usage.character);
-        if (/\bON\s+$/i.test(prefix)) {
-          omittedUsages.push({
-            ...usage,
-            reason:
-              "ON path-status references are not mapped by the TypeScript dialect yet",
-          });
-          return [];
-        }
-        if (/\bINDEXED\s+BY\b/i.test(lines[definition.line])) {
-          omittedUsages.push({
-            ...usage,
-            reason:
-              "INDEXED BY names are not navigable through dialect mapping yet",
-          });
-          return [];
-        }
-        return [{ ...usage, definitionLine: definition.line }];
-      });
+      .map((usage) => ({
+        ...usage,
+        definitionLine: definitions.get(usage.name)[0].line,
+      }));
     if (usages.length === 0) {
       const file = `${javaClass}_${variant.name}.cbl`;
       fs.mkdirSync(outputDirectory, { recursive: true });
@@ -492,7 +460,6 @@ for (const javaFile of fs
         ...item,
         status: "smoke",
         file: `usecase/${file}`,
-        ...(omittedUsages.length ? { omittedUsages } : {}),
       });
       continue;
     }
@@ -511,7 +478,6 @@ for (const javaFile of fs
       file: `usecase/${file}`,
       usages,
       ...(!expectSentinel ? { expectSentinel: false } : {}),
-      ...(omittedUsages.length ? { omittedUsages } : {}),
     });
   }
 }

@@ -691,7 +691,7 @@ describe("IdmsPreprocessor", () => {
         "       ON LR-NOT-FOUND MOVE 'Y' TO RESULT END-IF.",
     );
 
-    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(2);
     const [range, statementRange, items, filler] =
       context.replaceWithMap.mock.calls[0];
     expect(range).toEqual(expectRange(0, 7, 2, 7));
@@ -705,9 +705,10 @@ describe("IdmsPreprocessor", () => {
       expectRange(0, 35, 0, 40),
     );
 
-    expect(context.replace).toHaveBeenCalledTimes(1);
-    expect(context.replace).toHaveBeenCalledWith(
+    expect(context.replaceWithMap).toHaveBeenCalledWith(
       expectRange(2, 7, 2, 22),
+      expectRange(2, 7, 2, 22),
+      [expect.objectContaining({ type: "OPTIONAL_VARIABLE" })],
       "IF 1 + 1 = 2",
     );
   });
@@ -761,15 +762,23 @@ describe("IdmsPreprocessor", () => {
       "       READY\n       ON ANY-STATUS GOBACK END-IF.",
     );
 
-    expect(context.replace).toHaveBeenCalledTimes(2);
-    expect(context.replace).toHaveBeenNthCalledWith(
-      1,
-      expectRange(0, 7, 1, 7),
-      " ",
-    );
-    expect(context.replace).toHaveBeenNthCalledWith(
-      2,
+    expect(context.replace).toHaveBeenCalledWith(expectRange(0, 7, 1, 7), " ");
+    expect(context.replaceWithMap).toHaveBeenCalledWith(
       expectRange(1, 7, 1, 20),
+      expectRange(1, 7, 1, 20),
+      [
+        expect.objectContaining({
+          type: "OPTIONAL_VARIABLE",
+          tokens: [
+            expect.objectContaining({
+              value: "ANY-STATUS",
+              location: expect.objectContaining({
+                range: expectRange(1, 10, 1, 20),
+              }),
+            }),
+          ],
+        }),
+      ],
       "IF 1 + 1 = 2",
     );
   });
@@ -782,15 +791,11 @@ describe("IdmsPreprocessor", () => {
       "       ABEND CODE '1234' ON ANY-STATUS NEXT SENTENCE.",
     );
 
-    expect(context.replace).toHaveBeenCalledTimes(2);
-    expect(context.replace).toHaveBeenNthCalledWith(
-      1,
-      expectRange(0, 7, 0, 25),
-      " ",
-    );
-    expect(context.replace).toHaveBeenNthCalledWith(
-      2,
+    expect(context.replace).toHaveBeenCalledWith(expectRange(0, 7, 0, 25), " ");
+    expect(context.replaceWithMap).toHaveBeenCalledWith(
       expectRange(0, 25, 0, 38),
+      expectRange(0, 25, 0, 38),
+      [expect.objectContaining({ type: "OPTIONAL_VARIABLE" })],
       "IF 1 + 1 = 2",
     );
   });
@@ -804,7 +809,7 @@ describe("IdmsPreprocessor", () => {
       "       STORE SOME-LR\n       ON LR-NOT-FOUND CONTINUE END-IF.",
     );
 
-    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(2);
     const [range, statementRange, items, filler] =
       context.replaceWithMap.mock.calls[0];
     expect(range).toEqual(expectRange(0, 7, 1, 7));
@@ -819,11 +824,49 @@ describe("IdmsPreprocessor", () => {
       expectRange(0, 13, 0, 20),
     );
 
-    expect(context.replace).toHaveBeenCalledTimes(1);
-    expect(context.replace).toHaveBeenCalledWith(
+    expect(context.replaceWithMap).toHaveBeenCalledWith(
       expectRange(1, 7, 1, 22),
+      expectRange(1, 7, 1, 22),
+      [expect.objectContaining({ type: "OPTIONAL_VARIABLE" })],
       "IF 1 + 1 = 2",
     );
+  });
+
+  it.each([
+    "INQUIRE MAP EMPMAP IF ALL DFLD MAP-FLD(S1) EDIT IS ERROR THEN DISPLAY 'ERROR'.",
+    "MODIFY MAP EMPMAP FOR ALL DFLD MAP-FLD(S1) RIGHT JUSTIFY ATTRIBUTES DETECT DARK.",
+  ])("maps a subscript as a separate variable in %s", async (statement) => {
+    const context = createContext("file:///program.cbl");
+
+    await preprocessor.execute(context, `       ${statement}`);
+
+    expect(context.replaceWithMap).toHaveBeenCalledTimes(1);
+    const [, , items] = context.replaceWithMap.mock.calls[0];
+    const variables = items.filter(
+      (item: { type: string }) => item.type === "VARIABLE",
+    );
+    const field = variables.find((item: { tokens: { value: string }[] }) =>
+      item.tokens.some((token) => token.value === "MAP-FLD"),
+    );
+    const subscript = variables.find((item: { tokens: { value: string }[] }) =>
+      item.tokens.some((token) => token.value === "S1"),
+    );
+    expect(field).toBeDefined();
+    expect(subscript).toBeDefined();
+    expect(field).not.toBe(subscript);
+    expect(subscript.tokens).toEqual([
+      expect.objectContaining({
+        value: "S1",
+        location: expect.objectContaining({
+          range: expectRange(
+            0,
+            7 + statement.indexOf("S1"),
+            0,
+            9 + statement.indexOf("S1"),
+          ),
+        }),
+      }),
+    ]);
   });
 
   it("processes OBTAIN LR with an IDMS LR copybook", async () => {

@@ -16,7 +16,9 @@ package org.eclipse.lsp.cobol.core.engine.dialects.v2;
 
 import static org.eclipse.lsp.cobol.common.model.NodeType.VARIABLE_DEFINITION_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.Set;
 import org.eclipse.lsp.cobol.common.mapping.Token;
 import org.eclipse.lsp.cobol.common.model.Locality;
 import org.eclipse.lsp.cobol.common.model.tree.Node;
+import org.eclipse.lsp.cobol.common.model.tree.variable.VariableUsageNode;
 import org.eclipse.lsp.cobol.common.model.tree.variables.DialectVariableNode;
 import org.eclipse.lsp.cobol.lsp.jrpc.ReplacementToken;
 import org.eclipse.lsp.cobol.lsp.jrpc.ReplacementTokens;
@@ -88,6 +91,36 @@ class NodeHelperTest {
     assertEquals(1, createNodes(item, mappedTokens, definitions).size());
     assertEquals(0, createNodes(item, mappedTokens, definitions).size());
     assertEquals(1, definitions.size());
+  }
+
+  @Test
+  void createsOptionalVariableUsageWithoutMandatoryDefinition() {
+    Location location = location(8, 15, 31);
+    ReplacementToken token = new ReplacementToken("STATUS", null, location, null);
+    List<Token> mapped = ImmutableList.of(new Token("ANY-ERROR-STATUS", location));
+
+    VariableUsageNode optional =
+        (VariableUsageNode)
+            createNodes(
+                    new ReplacementTokens(new ReplacementToken[] {token}, "OPTIONAL_VARIABLE"),
+                    mapped,
+                    new HashSet<>())
+                .get(0)
+                .getChildren()
+                .get(0);
+    VariableUsageNode required =
+        (VariableUsageNode)
+            createNodes(
+                    new ReplacementTokens(new ReplacementToken[] {token}, "VARIABLE"),
+                    mapped,
+                    new HashSet<>())
+                .get(0)
+                .getChildren()
+                .get(0);
+
+    assertEquals("ANY-ERROR-STATUS", optional.getName());
+    assertFalse(optional.isDefinitionMandatory());
+    assertTrue(required.isDefinitionMandatory());
   }
 
   private static ReplacementTokens item(ReplacementToken... tokens) {

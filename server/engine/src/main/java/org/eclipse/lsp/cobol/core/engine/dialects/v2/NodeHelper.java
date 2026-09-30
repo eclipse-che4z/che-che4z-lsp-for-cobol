@@ -36,6 +36,7 @@ import org.eclipse.lsp4j.Range;
 @UtilityClass
 class NodeHelper {
   private static final String VARIABLE = "VARIABLE";
+  private static final String OPTIONAL_VARIABLE = "OPTIONAL_VARIABLE";
   private static final String PROCEDURE = "PROCEDURE";
   private static final String DIALECT_VARIABLE_DEFINITION = "DIALECT_VARIABLE_DEFINITION";
 
@@ -54,8 +55,10 @@ class NodeHelper {
       return createVariableDefinitionNode(
           tokenItem.getTokens(), mappedTokenList, documentUri, copybookId, definitions);
     }
-    if (VARIABLE.equals(type)) {
-      return Optional.of(createVariableNode(mappedTokenList, documentUri, copybookId));
+    if (VARIABLE.equals(type) || OPTIONAL_VARIABLE.equals(type)) {
+      return Optional.of(
+          createVariableNode(
+              mappedTokenList, documentUri, copybookId, !OPTIONAL_VARIABLE.equals(type)));
     }
     if (PROCEDURE.equals(type)) {
       if (mappedTokenList.size() > 2) {
@@ -100,7 +103,10 @@ class NodeHelper {
   }
 
   private List<Node> createVariableNode(
-      List<Token> mappedTokenList, String documentUri, String copybookId) {
+      List<Token> mappedTokenList,
+      String documentUri,
+      String copybookId,
+      boolean isDefinitionMandatory) {
     Node parentNode =
         new QualifiedReferenceNode(
             Locality.builder()
@@ -117,7 +123,8 @@ class NodeHelper {
                   .uri(documentUri)
                   .copybookId(copybookId)
                   .range(token.getOriginalLocation().getRange())
-                  .build()));
+                  .build(),
+              isDefinitionMandatory));
     }
     return ImmutableList.of(parentNode);
   }

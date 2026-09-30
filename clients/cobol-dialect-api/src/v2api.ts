@@ -32,7 +32,8 @@ export type VariableDefinitionToken = Token & {
 export type Item =
   | {
       tokens: Token[];
-      type?: "VARIABLE" | "PROCEDURE";
+      /** OPTIONAL_VARIABLE resolves declared names without reporting missing ones. */
+      type?: "VARIABLE" | "OPTIONAL_VARIABLE" | "PROCEDURE";
     }
   | {
       /** A standalone definition; hierarchical relationships are not supported yet. */

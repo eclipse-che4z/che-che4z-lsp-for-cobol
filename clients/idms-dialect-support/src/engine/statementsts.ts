@@ -58,21 +58,30 @@ function traverseChildren(
   const items: Item[] = [];
   let index = 0;
 
-  for (const child of children) {
-    if (child.type === "VARIABLE") {
-      const tokens: Token[] = [];
-      const name = `VAR_${index++}`;
-      createTokens(documentUri, tokens, name, child.children);
-      items.push({ type: "VARIABLE", tokens });
-    } else if (child.type === "DIALECT_VARIABLE_DEFINITION") {
-      const token: VariableDefinitionToken = {
-        name: `VAR_DEF_${index++}`,
-        location: new vscode.Location(documentUri, child.statementRange),
-        displayText: child.displayText,
-      };
-      items.push({ type: "DIALECT_VARIABLE_DEFINITION", tokens: [token] });
+  const visit = (descriptors: StatementDescriptor[]): void => {
+    for (const child of descriptors) {
+      if (child.type === "VARIABLE") {
+        const tokens: Token[] = [];
+        const name = `VAR_${index++}`;
+        createTokens(documentUri, tokens, name, child.children);
+        items.push({
+          type: child.optional ? "OPTIONAL_VARIABLE" : "VARIABLE",
+          tokens,
+        });
+        // Subscripts are variables inside a qualified data name, not qualifiers
+        // of the outer name. Keep them as separate mapped references.
+        visit(child.children);
+      } else if (child.type === "DIALECT_VARIABLE_DEFINITION") {
+        const token: VariableDefinitionToken = {
+          name: `VAR_DEF_${index++}`,
+          location: new vscode.Location(documentUri, child.statementRange),
+          displayText: child.displayText,
+        };
+        items.push({ type: "DIALECT_VARIABLE_DEFINITION", tokens: [token] });
+      }
     }
-  }
+  };
+  visit(children);
 
   return items;
 }
