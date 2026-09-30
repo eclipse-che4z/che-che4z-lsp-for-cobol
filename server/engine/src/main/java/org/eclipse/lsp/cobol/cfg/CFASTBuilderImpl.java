@@ -290,13 +290,13 @@ public class CFASTBuilderImpl implements CFASTBuilder {
   }
 
   private String cutSnippet(Node node) {
-    String uri = node.getLocality().getUri();
-    if (ImplicitCodeUtils.isImplicit(uri)) {
-      // Dialect-generated code (e.g. DaCo predefined sections) has no backing document.
-      return "";
-    }
+    final String uri = node.getLocality().getUri();
     CobolDocumentModel doc = documentModelService.get(uri);
     if (doc == null) {
+      if (ImplicitCodeUtils.isImplicit(uri)) {
+        // Dialect-generated code (e.g. DaCo predefined sections) has no backing document.
+        return "";
+      }
       LOG.error("cutSnippet failed: " + node.getLocality().getUri() + " not found.");
       return "<snippet creation error>";
     }
