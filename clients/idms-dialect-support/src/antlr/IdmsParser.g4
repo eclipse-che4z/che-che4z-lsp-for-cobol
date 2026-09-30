@@ -127,7 +127,8 @@ levelsClause
    ;
 
 ss_names_length
-    : {this.validateSubSchemaNameLength(this.inputStream?.LT(1)?.text ?? "");} LEVEL_NUMBER
+    // Non-level integers must also reach semantic validation (for example, 116).
+    : {this.validateSubSchemaNameLength(this.inputStream?.LT(1)?.text ?? "");} (LEVEL_NUMBER | INTEGERLITERAL)
     ;
 
 // statements

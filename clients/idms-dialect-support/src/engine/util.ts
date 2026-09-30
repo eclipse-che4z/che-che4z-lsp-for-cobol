@@ -27,6 +27,7 @@ export function addParsingErrors(
       severity: vscode.DiagnosticSeverity.Error,
       message: error.message,
       range: error.range,
+      source: "COBOL Language Support (dialect)",
     });
   });
 }

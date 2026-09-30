@@ -801,11 +801,55 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(14, 25), 10); // EMPLOYEE
     });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("BIND13");
+    test("BIND13", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsBindStatement_BIND13.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for procedure name.",
+            ),
+        10000,
+        "usecase/TestIdmsBindStatement_BIND13.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for procedure name.",
+        new vscode.Range(14, 30, 14, 44),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("BIND13_ON");
+    test("BIND13_ON", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsBindStatement_BIND13_ON.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for procedure name.",
+            ),
+        10000,
+        "usecase/TestIdmsBindStatement_BIND13_ON.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for procedure name.",
+        new vscode.Range(14, 30, 14, 44),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsConDisconnectStatement.java
@@ -850,8 +894,30 @@ suite("Java IDMS usecases", function () {
     // IDMSCS_WITH_ALL_CLAUSES_PUNCT: covered by the dedicated ControlLinkage.cbl integration test.
     // IDMSCS_WITH_SSN_IDMSREC: covered by the dedicated ControlIncrement.cbl integration test.
     // IDMSCS_WITH_ONLY_PROTOCOL: covered by the dedicated ControlProtocol.cbl integration test.
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("IDMSCS_WITH_SSN_LEN_ERROR");
+    test("IDMSCS_WITH_SSN_LEN_ERROR", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsControlSectionAll_IDMSCS_WITH_SSN_LEN_ERROR.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "The length 17 is not allowed. Allowed values are 16, 18.",
+            ),
+        10000,
+        "usecase/TestIdmsControlSectionAll_IDMSCS_WITH_SSN_LEN_ERROR.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "The length 17 is not allowed. Allowed values are 16, 18.",
+        new vscode.Range(5, 38, 5, 40),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
 
     // IDMSCS_MANUAL: covered by the dedicated MixedCopybooks.cbl integration test.
   });
@@ -1581,11 +1647,131 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(17, 44), 10); // WK_LOAD
     });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("LOAD_LITERALS_ERROR");
+    test("LOAD_LITERALS_ERROR", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for table name.",
+            ),
+        10000,
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for table name.",
+        new vscode.Range(14, 22, 14, 33),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for node name.",
+            ),
+        10000,
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for node name.",
+        new vscode.Range(15, 11, 15, 23),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for dictionary name.",
+            ),
+        10000,
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for dictionary name.",
+        new vscode.Range(15, 33, 15, 45),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("LOAD_LITERALS_ERROR_ON");
+    test("LOAD_LITERALS_ERROR_ON", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for table name.",
+            ),
+        10000,
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for table name.",
+        new vscode.Range(14, 22, 14, 33),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for node name.",
+            ),
+        10000,
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for node name.",
+        new vscode.Range(15, 11, 15, 23),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for dictionary name.",
+            ),
+        10000,
+        "usecase/TestIdmsLoadStatement_LOAD_LITERALS_ERROR_ON.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for dictionary name.",
+        new vscode.Range(15, 33, 15, 45),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsMapInStatement.java
@@ -2107,11 +2293,55 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(13, 17), 9); // EMP-AREA
     });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("READ7");
+    test("READ7", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsReadyStatement_READ7.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 16 bytes allowed for db entity name.",
+            ),
+        10000,
+        "usecase/TestIdmsReadyStatement_READ7.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 16 bytes allowed for db entity name.",
+        new vscode.Range(13, 17, 13, 34),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("READ7_ON");
+    test("READ7_ON", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsReadyStatement_READ7_ON.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 16 bytes allowed for db entity name.",
+            ),
+        10000,
+        "usecase/TestIdmsReadyStatement_READ7_ON.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 16 bytes allowed for db entity name.",
+        new vscode.Range(13, 17, 13, 34),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsReturnStatement.java
@@ -2235,12 +2465,75 @@ suite("Java IDMS usecases", function () {
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsSections.java
   suite("TestIdmsSections", function () {
     // IDMSSS_WITH_ALL_CLAUSES: covered by the dedicated ControlWorking.cbl integration test.
-    // TODO: Subschema name exceeds eight characters; covered by the IDMS-specific diagnostics story.
-    test.skip("IDMSSS_NO_CS_NO_VERSION");
+    test("IDMSSS_NO_CS_NO_VERSION", async () => {
+      await helper.openWithoutIdmsErrors(
+        "usecase/TestIdmsSections_IDMSSS_NO_CS_NO_VERSION.cbl",
+      );
+    });
 
     // IDMSMS_WITH_ALL_CLAUSES: covered by the dedicated MapDefinition002.cbl integration test.
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("IDMSMS_WITH_ALL_CLAUSES_ERRORS");
+    test("IDMSMS_WITH_ALL_CLAUSES_ERRORS", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for subschema name.",
+            ),
+        10000,
+        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for subschema name.",
+        new vscode.Range(5, 15, 5, 24),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for schema name.",
+            ),
+        10000,
+        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for schema name.",
+        new vscode.Range(5, 32, 5, 41),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for map name.",
+            ),
+        10000,
+        "usecase/TestIdmsSections_IDMSMS_WITH_ALL_CLAUSES_ERRORS.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for map name.",
+        new vscode.Range(8, 12, 8, 23),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsSendStatement.java
@@ -2457,11 +2750,55 @@ suite("Java IDMS usecases", function () {
       await helper.checkDefinition(editor, new vscode.Position(10, 29), 7); // EMPMAP
     });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("TST4");
+    test("TST4", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsStartpageStatement_TST4.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for map name.",
+            ),
+        10000,
+        "usecase/TestIdmsStartpageStatement_TST4.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for map name.",
+        new vscode.Range(10, 29, 10, 42),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("TST4_ON");
+    test("TST4_ON", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsStartpageStatement_TST4_ON.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for map name.",
+            ),
+        10000,
+        "usecase/TestIdmsStartpageStatement_TST4_ON.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for map name.",
+        new vscode.Range(10, 29, 10, 42),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsTransferStatement.java
@@ -2519,8 +2856,30 @@ suite("Java IDMS usecases", function () {
       // TODO: Assert ANY-ERROR-STATUS at 15:16. ON path-status references are not mapped by the TypeScript dialect yet.
     });
 
-    // TODO: Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story.
-    test.skip("TRANSFER_PGM_TOO_LONG_ERROR");
+    test("TRANSFER_PGM_TOO_LONG_ERROR", async () => {
+      const editor = await helper.showDocument(
+        "usecase/TestIdmsTransferStatement_TRANSFER_PGM_TOO_LONG_ERROR.cbl",
+      );
+      await helper.waitFor(
+        () =>
+          vscode.languages
+            .getDiagnostics(editor.document.uri)
+            .some(
+              (item) =>
+                item.message ===
+                "Max length limit of 8 bytes allowed for program name.",
+            ),
+        10000,
+        "usecase/TestIdmsTransferStatement_TRANSFER_PGM_TOO_LONG_ERROR.cbl",
+      );
+      helper.checkDiagnostic(
+        vscode.languages.getDiagnostics(editor.document.uri),
+        "Max length limit of 8 bytes allowed for program name.",
+        new vscode.Range(14, 31, 14, 43),
+        vscode.DiagnosticSeverity.Error,
+        "COBOL Language Support (dialect)",
+      );
+    });
   });
 
   // Java usecase: https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/server/dialect-idms/src/test/java/org/eclipse/lsp/cobol/dialects/idms/usecases/TestIdmsWaitStatement.java

@@ -33,6 +33,33 @@ const genericUndefinedVariableDiagnostics = new Set([
   "TestAttachTaskCode",
   "TestChangePriority",
 ]);
+const idmsDiagnosticTypes = {
+  TestIdmsBindStatement: { 1: "procedure name" },
+  TestIdmsLoadStatement: {
+    1: "table name",
+    2: "node name",
+    3: "dictionary name",
+  },
+  TestIdmsReadyStatement: { 1: "db entity name" },
+  TestIdmsSections: {
+    1: "subschema name",
+    2: "schema name",
+    3: "map name",
+  },
+  TestIdmsStartpageStatement: { 1: "map name" },
+  TestIdmsTransferStatement: { 1: "program name" },
+};
+
+function idmsDiagnosticMessage(javaClass, diagnostic) {
+  if (javaClass === "TestIdmsControlSectionAll") {
+    return `The length ${diagnostic.name} is not allowed. Allowed values are 16, 18.`;
+  }
+  const type = idmsDiagnosticTypes[javaClass]?.[diagnostic.id];
+  if (!type)
+    throw new Error(`Unknown IDMS diagnostic ${javaClass}/${diagnostic.id}`);
+  const length = type === "db entity name" ? 16 : 8;
+  return `Max length limit of ${length} bytes allowed for ${type}.`;
+}
 
 function readExpression(source, start) {
   let quoted = false;
@@ -279,6 +306,12 @@ function renderTests(entries) {
           }, ${diagnostic.line}, ${
             diagnostic.character + diagnostic.name.length
           }),`,
+          ...(entry.idmsSpecific
+            ? [
+                "      vscode.DiagnosticSeverity.Error,",
+                '      "COBOL Language Support (dialect)",',
+              ]
+            : []),
           "    );",
         );
       }
@@ -307,14 +340,15 @@ function renderTests(entries) {
       );
       continue;
     }
-    if (entry.status === "deferred") {
-      lines.push(`  // TODO: ${entry.reason}.`);
-      for (const usage of entry.omittedUsages || []) {
-        lines.push(
-          `  // ${usage.name} at ${usage.line}:${usage.character}: ${usage.reason}.`,
-        );
-      }
-      lines.push(`  test.skip(${title});`, "");
+    if (entry.status === "valid") {
+      lines.push(
+        `  test(${title}, async () => {`,
+        `    await helper.openWithoutIdmsErrors(${JSON.stringify(
+          entry.file,
+        )});`,
+        "  });",
+        "",
+      );
       continue;
     }
     if (entry.status === "dedicated") {
@@ -365,22 +399,42 @@ for (const javaFile of fs
         });
         continue;
       }
+      const file = `${javaClass}_${variant.name}.cbl`;
+      fs.mkdirSync(outputDirectory, { recursive: true });
+      fs.writeFileSync(
+        path.join(outputDirectory, file),
+        fixtureText(
+          cleaned.text,
+          javaFile,
+          cleaned.text.includes("PROCEDURE DIVISION."),
+        ),
+      );
       entries.push({
         ...item,
-        status: "deferred",
-        reason:
-          "Name-length or SUBSCHEMA-NAMES LENGTH diagnostic; covered by the IDMS-specific diagnostics story",
+        status: "diagnostic",
+        idmsSpecific: true,
+        file: `usecase/${file}`,
+        diagnostics: cleaned.diagnostics.map((diagnostic) => ({
+          ...diagnostic,
+          message: idmsDiagnosticMessage(javaClass, diagnostic),
+        })),
       });
       continue;
     }
     if (!cleaned.text.includes("PROCEDURE DIVISION.")) {
       const key = `${javaClass}/${variant.name}`;
       if (key === "TestIdmsSections/IDMSSS_NO_CS_NO_VERSION") {
+        // EMPSS012 is exactly eight characters, not an invalid name.
+        const file = `${javaClass}_${variant.name}.cbl`;
+        fs.mkdirSync(outputDirectory, { recursive: true });
+        fs.writeFileSync(
+          path.join(outputDirectory, file),
+          fixtureText(cleaned.text + "        PROCEDURE DIVISION.\n", javaFile),
+        );
         entries.push({
           ...item,
-          status: "deferred",
-          reason:
-            "Subschema name exceeds eight characters; covered by the IDMS-specific diagnostics story",
+          status: "valid",
+          file: `usecase/${file}`,
         });
         continue;
       }

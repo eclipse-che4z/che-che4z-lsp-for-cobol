@@ -34,7 +34,7 @@ export abstract class MessageServiceParser extends Parser {
   }
 
   public notifyError(template: string, ...parameters: string[]) {
-    const message = this.getMessageService().get(template, parameters);
+    const message = this.getMessageService().get(template, ...parameters);
     super.notifyErrorListeners(message, this.getCurrentToken(), null);
   }
 
@@ -45,7 +45,7 @@ export abstract class MessageServiceParser extends Parser {
   }
 
   protected validateSubSchemaNameLength(input: string) {
-    if (input != null && !input.match("16|18")) {
+    if (input != null && !/^(16|18)$/.test(input)) {
       this.notifyError("cobolParser.subSchemaNameLength", input);
     }
   }

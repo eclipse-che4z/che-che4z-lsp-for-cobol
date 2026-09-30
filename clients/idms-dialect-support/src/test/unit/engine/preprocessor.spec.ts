@@ -25,6 +25,9 @@ const messages = {
   "IdmsDialect.maxAdjustmentExceed":
     "IDMS level not adjusted. {0} ({1} + {2}) exceeds maximum level adjustment of 49",
   "copybook.not_found": "{0}: Copybook not found",
+  "parsers.maxLength": "Max length limit of {0} bytes allowed for {1}.",
+  "cobolParser.subSchemaNameLength":
+    "The length {0} is not allowed. Allowed values are 16, 18.",
 };
 
 function createContext(uri: string) {
@@ -72,6 +75,133 @@ describe("IdmsPreprocessor", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     preprocessor = new IdmsPreprocessor(outputChannel, messageService);
+  });
+
+  it.each([
+    [
+      "SCHEMA SECTION. DB EMPSS012X WITHIN EMPSCHM.",
+      "EMPSS012X",
+      "subschema name",
+      8,
+    ],
+    [
+      "SCHEMA SECTION. DB EMPSS01 WITHIN EMPSCHMXX.",
+      "EMPSCHMXX",
+      "schema name",
+      8,
+    ],
+    ["MAP SECTION. MAP MAPTOOLONG TYPE STANDARD.", "MAPTOOLONG", "map name", 8],
+    [
+      "BIND PROCEDURE FOR ABCPROCTOOLONG TO DB1.",
+      "ABCPROCTOOLONG",
+      "procedure name",
+      8,
+    ],
+    [
+      "LOAD TABLE 'TSTTABLXX' INTO A TO B DICTNODE 'TSTNODE' DICTNAME 'TSTDICT' LOADLIB 'TSTLOAD' NOWAIT.",
+      "'TSTTABLXX'",
+      "table name",
+      8,
+    ],
+    [
+      "LOAD TABLE 'TSTTABL' INTO A TO B DICTNODE 'TSTNODEXXX' DICTNAME 'TSTDICT' LOADLIB 'TSTLOAD' NOWAIT.",
+      "'TSTNODEXXX'",
+      "node name",
+      8,
+    ],
+    [
+      "LOAD TABLE 'TSTTABL' INTO A TO B DICTNODE 'TSTNODE' DICTNAME 'TSTDICTXXX' LOADLIB 'TSTLOAD' NOWAIT.",
+      "'TSTDICTXXX'",
+      "dictionary name",
+      8,
+    ],
+    [
+      "TRANSFER CONTROL TO 'TSTPROGXXX' XCTL.",
+      "'TSTPROGXXX'",
+      "program name",
+      8,
+    ],
+    [
+      "READY EMP-AREA-TOO-LONG USAGE-MODE EXCLUSIVE UPDATE.",
+      "EMP-AREA-TOO-LONG",
+      "db entity name",
+      16,
+    ],
+  ])("reports an overlong %s", async (text, name, kind, limit) => {
+    const context = createContext("file:///program.cbl");
+    await preprocessor.execute(context, text);
+
+    expect(context.addDiagnostic).toHaveBeenCalledWith({
+      severity: vscode.DiagnosticSeverity.Error,
+      message: `Max length limit of ${limit} bytes allowed for ${kind}.`,
+      range: expectRange(
+        0,
+        text.indexOf(name),
+        0,
+        text.indexOf(name) + name.length,
+      ),
+      source: "COBOL Language Support (dialect)",
+    });
+  });
+
+  it.each([
+    "SCHEMA SECTION. DB EMPSS012 WITHIN EMPSCHM1.",
+    "MAP SECTION. MAP MAPNAME8 TYPE STANDARD.",
+    "BIND PROCEDURE FOR PROCNAME TO DB1.",
+    "LOAD TABLE 'TSTTABL8' INTO A TO B DICTNODE 'TSTNODE8' DICTNAME 'TSTDICT8' LOADLIB 'TSTLOAD' NOWAIT.",
+    "TRANSFER CONTROL TO 'TSTPROG8' XCTL.",
+    "READY ABCDEFGHIJKLMNOP USAGE-MODE EXCLUSIVE UPDATE.",
+  ])("accepts valid IDMS names in %s", async (text) => {
+    const context = createContext("file:///program.cbl");
+    await preprocessor.execute(context, text);
+
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+  });
+
+  it.each(["17", "116"])(
+    "reports invalid SUBSCHEMA-NAMES LENGTH %s on its value",
+    async (length) => {
+      const context = createContext("file:///program.cbl");
+      const text = `IDMS-CONTROL SECTION. PROTOCOL. SUBSCHEMA-NAMES LENGTH ${length}`;
+      await preprocessor.execute(context, text);
+
+      expect(context.addDiagnostic).toHaveBeenCalledWith({
+        severity: vscode.DiagnosticSeverity.Error,
+        message: `The length ${length} is not allowed. Allowed values are 16, 18.`,
+        range: expectRange(0, text.length - length.length, 0, text.length),
+        source: "COBOL Language Support (dialect)",
+      });
+    },
+  );
+
+  it.each(["16", "18"])("accepts SUBSCHEMA-NAMES LENGTH %s", async (length) => {
+    const context = createContext("file:///program.cbl");
+    await preprocessor.execute(
+      context,
+      `IDMS-CONTROL SECTION. PROTOCOL. SUBSCHEMA-NAMES LENGTH ${length}`,
+    );
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+  });
+
+  it("reports IDMS diagnostics in the resolved copybook context", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///MYCOPY.cpy");
+    const text =
+      "       01 W PIC X.\n           TRANSFER CONTROL TO 'TSTPROGXXX' XCTL.";
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///MYCOPY.cpy"),
+      text,
+    });
+
+    await preprocessor.execute(context, "       COPY IDMS MYCOPY.");
+
+    expect(copybookContext.addDiagnostic).toHaveBeenCalledWith({
+      severity: vscode.DiagnosticSeverity.Error,
+      message: "Max length limit of 8 bytes allowed for program name.",
+      range: expectRange(1, 31, 1, 43),
+      source: "COBOL Language Support (dialect)",
+    });
   });
 
   it("resolves an explicit COPY IDMS and adjusts its levels", async () => {
