@@ -78,6 +78,7 @@ describe("addParsingErrors", () => {
       severity: vscode.DiagnosticSeverity.Error,
       message: "bad token",
       range,
+      source: "COBOL Language Support (dialect)",
     });
   });
 

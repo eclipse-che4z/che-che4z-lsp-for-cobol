@@ -162,13 +162,15 @@ export function checkDiagnostic(
   message: string,
   range: vscode.Range,
   severity: vscode.DiagnosticSeverity = vscode.DiagnosticSeverity.Error,
+  source?: string,
 ) {
   assert.ok(
     diagnostics.some(
       (d) =>
         d.message === message &&
         d.range.isEqual(range) &&
-        d.severity == severity,
+        d.severity == severity &&
+        (source === undefined || d.source === source),
     ),
     `Expected '${message}' not found at range ${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`,
   );
