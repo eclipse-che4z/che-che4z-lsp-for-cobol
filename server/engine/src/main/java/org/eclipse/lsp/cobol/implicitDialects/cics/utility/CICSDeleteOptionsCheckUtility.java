@@ -128,7 +128,9 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkDeleteGroupThree(CICSParser.Cics_delete_group_threeContext ctx) {
-    checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    if (ctx.RETCODE().isEmpty()) {
+      checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    }
     checkHasMutuallyExclusiveOptions(
         "ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS or CHANNEL",
         ctx.ACTIVITY(),
