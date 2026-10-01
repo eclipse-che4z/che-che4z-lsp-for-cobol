@@ -528,6 +528,18 @@
           ],
           "description": "Unused variable diagnostic severity",
           "default": "NONE"
+        },
+        "cobol-lsp.unreachable-code-severity": {
+          "type": "string",
+          "enum": [
+            "ERROR",
+            "WARNING",
+            "INFO",
+            "HINT",
+            "NONE"
+          ],
+          "description": "unreachable code diagnostic severity",
+          "default": "NONE"
         }
       }
     },
