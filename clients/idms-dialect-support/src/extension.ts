@@ -108,6 +108,7 @@ async function v2Api(context: vscode.ExtensionContext) {
   const extensionId = context.extension.id;
   const extensionUri = context.extensionUri;
   const snippets = vscode.Uri.joinPath(extensionUri, "snippets.json");
+  const keywords = vscode.Uri.joinPath(extensionUri, "keywords.txt");
   const v2Api = await getV2Api(extensionId);
   if (v2Api instanceof Error) {
     vscode.window.showErrorMessage(v2Api.toString());
@@ -120,6 +121,7 @@ async function v2Api(context: vscode.ExtensionContext) {
       name: DIALECT_NAME,
       description: DESCRIPTION,
       snippets,
+      keywords,
       isCopyStatement,
     },
     async (processingContext: IDocumentProcessingContext, text: string) => {
