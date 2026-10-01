@@ -30,6 +30,7 @@
 !dist/extension.js.map
 # ** dialect snippets
 !snippets.json
+!keywords.txt
 # ** dialect implementation
 !server/jar/dialect-idms.jar
 # * include coloring syntax
