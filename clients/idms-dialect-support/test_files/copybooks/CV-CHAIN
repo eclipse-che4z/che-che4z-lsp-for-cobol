@@ -1,0 +1,3 @@
+       01 FILLER PIC X(0).
+       01 COPY IDMS CV-PROGRAM.
+      * Java: TestCopyIdmsVariables.java

@@ -1,0 +1,4 @@
+       01  SKILL.
+         02  SKILL-ID-0455           PIC 9(4).
+         02  SKILL-NAME-0455         PIC X(12).
+         02  SKILL-DESCRIPTION-0455  PIC X(60).
