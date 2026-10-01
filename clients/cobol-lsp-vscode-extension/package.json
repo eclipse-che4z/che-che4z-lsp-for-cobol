@@ -538,7 +538,7 @@
             "HINT",
             "NONE"
           ],
-          "description": "unreachable code diagnostic severity",
+          "description": "Unreachable code diagnostic severity",
           "default": "NONE"
         }
       }
