@@ -15,13 +15,13 @@
 package org.eclipse.lsp.cobol.lsp.events.notifications;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.lsp.LspNotification;
+import org.eclipse.lsp.cobol.lsp.LspSyncNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.workspace.DidChangeWatchedFilesHandler;
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
 
 /** 'workspace/didChangeWatchedFiles' server event */
 @Slf4j
-public class DidChangeWatchedFilesNotification implements LspNotification {
+public class DidChangeWatchedFilesNotification implements LspSyncNotification {
   private final DidChangeWatchedFilesParams params;
   private final DidChangeWatchedFilesHandler handler;
 
