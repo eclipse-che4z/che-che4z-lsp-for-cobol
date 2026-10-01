@@ -29,6 +29,7 @@ public class FoldingQuery implements LspQuery<List<FoldingRange>> {
   private final String uri;
   private final FoldingRangeRequestParams params;
   private final FoldingRangeHandler foldingRangeHandler;
+  private List<LspEventCancelCondition> cancelConditions;
 
   public FoldingQuery(FoldingRangeRequestParams params, FoldingRangeHandler foldingRangeHandler) {
     this.uri = params.getTextDocument().getUri();
@@ -44,7 +45,10 @@ public class FoldingQuery implements LspQuery<List<FoldingRange>> {
 
   @Override
   public List<LspEventCancelCondition> getCancelConditions() {
-    return foldingRangeHandler.getCancelConditions(uri);
+    if (cancelConditions == null) {
+      cancelConditions = foldingRangeHandler.getCancelConditions(uri);
+    }
+    return cancelConditions;
   }
 
   @Override
