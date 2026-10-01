@@ -224,6 +224,38 @@ export async function checkDefinition(
   await checkLocations(editor, position, [expectedLine]);
 }
 
+export async function checkSymbolActions(
+  editor: vscode.TextEditor,
+  symbol: string,
+) {
+  const declaration = positionOf(editor, symbol);
+  const usage = positionOf(editor, symbol, true);
+  assert.ok(!declaration.isEqual(usage), `${symbol} needs a separate usage`);
+  await checkDefinition(editor, usage, declaration.line);
+
+  const references = await vscode.commands.executeCommand<vscode.Location[]>(
+    "vscode.executeReferenceProvider",
+    editor.document.uri,
+    usage,
+    { includeDeclaration: true },
+  );
+  assert.ok(
+    references?.some((reference) => reference.range.contains(declaration)),
+  );
+  assert.ok(references.some((reference) => reference.range.contains(usage)));
+
+  const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+    "vscode.executeHoverProvider",
+    editor.document.uri,
+    usage,
+  );
+  const hoverText = hovers
+    ?.flatMap((hover) => hover.contents)
+    .map((content) => (typeof content === "string" ? content : content.value))
+    .join("\n");
+  assert.ok(hoverText?.includes(symbol), `No hover for ${symbol}`);
+}
+
 export async function checkHoverText(
   editor: vscode.TextEditor,
   position: vscode.Position,
