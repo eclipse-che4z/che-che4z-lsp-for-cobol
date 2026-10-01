@@ -1,0 +1,306 @@
+/*
+ * Copyright (c) 2026 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom - initial API and implementation
+ */
+import * as assert from "node:assert";
+import * as vscode from "vscode";
+
+export const TEST_TIMEOUT = 150000;
+export const LANGUAGE_ID = "cobol";
+
+export async function activate() {
+  // The extensionId is `publisher.name` from package.json
+  const cobol = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support",
+  );
+  if (cobol && !cobol.isActive) {
+    await cobol.activate();
+  }
+  const idms = vscode.extensions.getExtension(
+    "BroadcomMFD.cobol-language-support-for-idms",
+  );
+  if (idms && !idms.isActive) {
+    await idms.activate();
+  }
+}
+
+export function getWorkspace(): vscode.WorkspaceFolder {
+  if (vscode.workspace.workspaceFolders)
+    return vscode.workspace.workspaceFolders[0];
+  throw new Error("Workspace not found");
+}
+
+export function pos(line: number, character: number): vscode.Position {
+  return new vscode.Position(line, character);
+}
+
+export function positionOf(
+  editor: vscode.TextEditor,
+  text: string,
+  last = false,
+): vscode.Position {
+  const source = editor.document.getText();
+  const offset = last ? source.lastIndexOf(text) : source.indexOf(text);
+  assert.ok(offset >= 0, `${text} not found in ${editor.document.fileName}`);
+  return editor.document.positionAt(offset);
+}
+
+export function range(p0: vscode.Position, p1: vscode.Position): vscode.Range {
+  return new vscode.Range(p0, p1);
+}
+
+const plaintext = "plaintext";
+
+export async function closeAllEditors() {
+  await vscode.commands.executeCommand("workbench.action.files.revert");
+  await vscode.commands.executeCommand("workbench.action.closeAllEditors");
+  await Promise.all(
+    vscode.workspace.textDocuments
+      .filter((d) => !d.isClosed && d.languageId != plaintext)
+      .map((d) => vscode.languages.setTextDocumentLanguage(d, plaintext)),
+  );
+}
+
+export async function getUri(workspace_file: string): Promise<vscode.Uri> {
+  const files = await vscode.workspace.findFiles(workspace_file);
+  assert.ok(files?.[0], `Cannot find file ${workspace_file}`);
+  return files[0];
+}
+
+export async function showDocument(workspace_file: string) {
+  const file = await getUri(workspace_file);
+  // open and show the file
+  const document = await vscode.workspace.openTextDocument(file);
+  await vscode.languages.setTextDocumentLanguage(document, "cobol");
+  const editor = await vscode.window.showTextDocument(document, {
+    preview: false,
+  });
+
+  return editor;
+}
+
+export async function openWithoutIdmsErrors(fileName: string) {
+  const editor = await showDocument(fileName);
+  const diagnostics = await waitForDiagnosticCount(editor.document.uri, 1);
+  assert.deepStrictEqual(
+    diagnostics.map((diagnostic) => diagnostic.message),
+    ["Variable NOT-EXISTING is not defined"],
+  );
+  return editor;
+}
+
+function basename(s: string) {
+  return /[^\\/]*$/.exec(s)![0];
+}
+
+export async function waitForDiagnosticCount(
+  uri: vscode.Uri,
+  count: number,
+  timeout: number = 50000,
+) {
+  let diagnostics: vscode.Diagnostic[] = [];
+  await waitFor(
+    () => {
+      diagnostics = vscode.languages.getDiagnostics(uri);
+      return diagnostics.length === count;
+    },
+    timeout,
+    "diagnostics (" + basename(uri.path) + ")",
+  );
+  return diagnostics;
+}
+
+export async function waitForDiagnosticMessages(
+  uri: vscode.Uri,
+  messages: readonly string[],
+  timeout: number = 10000,
+): Promise<vscode.Diagnostic[]> {
+  const expectedCounts = new Map<string, number>();
+  for (const message of messages) {
+    expectedCounts.set(message, (expectedCounts.get(message) ?? 0) + 1);
+  }
+
+  let diagnostics: vscode.Diagnostic[] = [];
+  await waitFor(
+    () => {
+      diagnostics = vscode.languages.getDiagnostics(uri);
+      const actualCounts = new Map<string, number>();
+      for (const diagnostic of diagnostics) {
+        actualCounts.set(
+          diagnostic.message,
+          (actualCounts.get(diagnostic.message) ?? 0) + 1,
+        );
+      }
+      return [...expectedCounts].every(
+        ([message, count]) => (actualCounts.get(message) ?? 0) >= count,
+      );
+    },
+    timeout,
+    "diagnostics (" + basename(uri.path) + ")",
+  );
+  return diagnostics;
+}
+
+export async function waitFor(
+  doneFunc: () => boolean | Promise<boolean>,
+  timeout: number = 50000,
+  label: string = "",
+) {
+  const startTime = Date.now();
+  while (!(await Promise.resolve(doneFunc()))) {
+    await sleep(100);
+    if (Date.now() - startTime > timeout) {
+      console.trace((label ? label : "") + "timeout!");
+      throw Error("Timeout");
+    }
+  }
+}
+
+export function sleep(ms: number): Promise<unknown> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+export function printAllDiagnostics(diagnostics: vscode.Diagnostic[]) {
+  console.log("Diagnostics:");
+  diagnostics.forEach((d) =>
+    console.log(
+      d.message +
+        " " +
+        d.range.start.line +
+        "." +
+        d.range.start.character +
+        "_" +
+        d.range.end.line +
+        "." +
+        d.range.end.character,
+    ),
+  );
+}
+
+export function checkDiagnostic(
+  diagnostics: vscode.Diagnostic[],
+  message: string,
+  range: vscode.Range,
+  severity: vscode.DiagnosticSeverity = vscode.DiagnosticSeverity.Error,
+  source?: string,
+) {
+  assert.ok(
+    diagnostics.some(
+      (d) =>
+        d.message === message &&
+        d.range.isEqual(range) &&
+        d.severity == severity &&
+        (source === undefined || d.source === source),
+    ),
+    `Expected '${message}' not found at range ${range.start.line}:${range.start.character}-${range.end.line}:${range.end.character}`,
+  );
+}
+
+export type ExpectedLocation = number | { line: number; documentName: string };
+
+export function inDocument(
+  documentName: string,
+  line: number,
+): ExpectedLocation {
+  return { line, documentName };
+}
+
+export async function checkDefinition(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLine: ExpectedLocation,
+) {
+  await checkLocations(editor, position, [expectedLine]);
+}
+
+export async function checkSymbolActions(
+  editor: vscode.TextEditor,
+  symbol: string,
+) {
+  const declaration = positionOf(editor, symbol);
+  const usage = positionOf(editor, symbol, true);
+  assert.ok(!declaration.isEqual(usage), `${symbol} needs a separate usage`);
+  await checkDefinition(editor, usage, declaration.line);
+
+  const references = await vscode.commands.executeCommand<vscode.Location[]>(
+    "vscode.executeReferenceProvider",
+    editor.document.uri,
+    usage,
+    { includeDeclaration: true },
+  );
+  assert.ok(
+    references?.some((reference) => reference.range.contains(declaration)),
+  );
+  assert.ok(references.some((reference) => reference.range.contains(usage)));
+
+  const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+    "vscode.executeHoverProvider",
+    editor.document.uri,
+    usage,
+  );
+  const hoverText = hovers
+    ?.flatMap((hover) => hover.contents)
+    .map((content) => (typeof content === "string" ? content : content.value))
+    .join("\n");
+  assert.ok(hoverText?.includes(symbol), `No hover for ${symbol}`);
+}
+
+export async function checkHoverText(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedText: string,
+) {
+  const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+    "vscode.executeHoverProvider",
+    editor.document.uri,
+    position,
+  );
+
+  const actualHoverText = hovers
+    .flatMap((hover) => hover.contents)
+    .map((content) => (typeof content === "string" ? content : content.value))
+    .join("\n");
+
+  assert.strictEqual(actualHoverText, expectedText);
+}
+
+async function checkLocations(
+  editor: vscode.TextEditor,
+  position: vscode.Position,
+  expectedLines: ExpectedLocation[],
+) {
+  const locations = await vscode.commands.executeCommand<vscode.Location[]>(
+    "vscode.executeDefinitionProvider",
+    editor.document.uri,
+    position,
+  );
+
+  assert.ok(locations);
+
+  const currentDocumentName = basename(editor.document.uri.path);
+  const expected = expectedLines.map((expectedLocation) =>
+    typeof expectedLocation === "number"
+      ? { line: expectedLocation, documentName: currentDocumentName }
+      : {
+          line: expectedLocation.line,
+          documentName: expectedLocation.documentName ?? currentDocumentName,
+        },
+  );
+  const actual = locations.map((location) => ({
+    line: location.range.start.line,
+    documentName: basename(location.uri.path),
+  }));
+
+  assert.deepStrictEqual(actual, expected);
+}
