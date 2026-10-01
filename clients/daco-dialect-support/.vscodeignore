@@ -29,6 +29,7 @@
 !dist/**/*
 # ** dialect snippets
 !snippets.json
+!keywords.txt
 # ** dialect implementation
 !server/jar/dialect-daco.jar
 # * include coloring syntax
