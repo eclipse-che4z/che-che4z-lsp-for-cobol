@@ -95,11 +95,14 @@ public class SymbolAccumulator implements VariableAccumulator {
     List<CodeBlockReference> resolved = resolveProcedureId(usageNode, symbolTable);
 
     if (resolved.isEmpty()) {
+      String messageKey =
+          usageNode.isSectionUsage()
+              ? "semantics.sectionNotDefined"
+              : "semantics.paragraphNotDefined";
       return Optional.of(
           SyntaxError.syntaxError()
               .errorSource(ErrorSource.PARSING)
-              .messageTemplate(
-                  MessageTemplate.of("semantics.paragraphNotDefined", usageNode.getName()))
+              .messageTemplate(MessageTemplate.of(messageKey, usageNode.getName()))
               .severity(ErrorSeverity.ERROR)
               .location(usageNode.getLocality().toOriginalLocation())
               .build());
@@ -126,7 +129,10 @@ public class SymbolAccumulator implements VariableAccumulator {
   private List<CodeBlockReference> resolveProcedureId(
       CodeBlockUsageNode usageNode, SymbolTable symbolTable) {
     Map<ProcedureId, CodeBlockReference> procedures = symbolTable.getProcedures();
-    ProcedureId paragraphId = new ProcedureId(usageNode.getOfSection(), usageNode.getName());
+    ProcedureId paragraphId =
+        usageNode.isSectionUsage()
+            ? new ProcedureId(usageNode.getName(), null)
+            : new ProcedureId(usageNode.getOfSection(), usageNode.getName());
     if (procedures.containsKey(paragraphId)) {
       return Collections.singletonList(procedures.get(paragraphId));
     }

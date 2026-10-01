@@ -59,7 +59,7 @@ public class UnusedVariableCheck implements Processor<RootNode> {
               syms.getVariablesStream()
                   .filter(VariableNode.class::isInstance)
                   .map(VariableNode.class::cast)
-                  .filter(varNode -> varNode.getUsages().isEmpty())
+                  .filter(varNode -> !varNode.getUsages().findAny().isPresent())
                   .filter(
                       varNode -> varNode.getLocality().getUri().equals(r.getLocality().getUri()))
                   .filter(UnusedVariableCheck::shouldReport)

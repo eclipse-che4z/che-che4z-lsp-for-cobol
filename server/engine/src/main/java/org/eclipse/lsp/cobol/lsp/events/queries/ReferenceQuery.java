@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.events.queries;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.ReferencesHandler;
@@ -49,5 +50,10 @@ public class ReferenceQuery implements LspQuery<List<? extends Location>> {
   @Override
   public List<? extends Location> query() throws ExecutionException, InterruptedException {
     return this.referencesHandler.references(params);
+  }
+
+  @Override
+  public List<LspEventCancelCondition> getCancelConditions() {
+    return referencesHandler.getCancelConditions(params);
   }
 }

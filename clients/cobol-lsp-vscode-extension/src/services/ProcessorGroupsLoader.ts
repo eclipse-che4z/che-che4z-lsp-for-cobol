@@ -18,6 +18,7 @@ import { isLeft } from "fp-ts/Either";
 import { TextDecoder } from "util";
 import { asArray, extractTarPath, hasMember, isTarPath } from "./util/Utils";
 import LocalPathLib from "./copybookLibs/LocalPathLib";
+import VirtualPathLib from "./copybookLibs/VirtualPathLib";
 import { UssPathLib } from "./copybookLibs/UssPathLib";
 import { DatasetLib } from "./copybookLibs/DatasetLib";
 import { externalApis } from "./ExternalAPIsService";
@@ -180,6 +181,7 @@ export type ProcessorGroupsDefinition = t.TypeOf<typeof ProcessorGroupsModel>;
 
 export type CopybookLibTypes =
   | typeof LocalPathLib
+  | typeof VirtualPathLib
   | typeof DatasetLib
   | typeof UssPathLib
   | typeof EndevorElementLib
@@ -318,7 +320,7 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
     name: "VSCodeSettingProcessorGroup",
     libs: transformLibs(
       [...directoryPaths, ...dsns, ...usss],
-      [LocalPathLib, DatasetLib, UssPathLib, TarCopybookLib],
+      [LocalPathLib, VirtualPathLib, DatasetLib, UssPathLib, TarCopybookLib],
       [],
     ),
   };
@@ -353,6 +355,7 @@ async function readProcessorGroupsFile(
     return decoded.right.pgroups.map(
       transformProcessorGroup([
         LocalPathLib,
+        VirtualPathLib,
         DatasetLib,
         UssPathLib,
         EndevorElementLib,

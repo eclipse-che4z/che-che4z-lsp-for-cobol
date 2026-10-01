@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.common.model.tree;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,13 +34,20 @@ import org.eclipse.lsp4j.Location;
 public class CodeBlockUsageNode extends Node implements DefinedAndUsedStructure {
   private final String name;
   private final String ofSection;
+  private final boolean sectionUsage;
   @Setter private List<Location> definitions = ImmutableList.of();
   @Setter private List<Location> usages = ImmutableList.of();
 
   public CodeBlockUsageNode(Locality location, String name, String ofSection) {
+    this(location, name, ofSection, false);
+  }
+
+  public CodeBlockUsageNode(
+      Locality location, String name, String ofSection, boolean sectionUsage) {
     super(location, NodeType.CODE_BLOCK_USAGE);
     this.name = name;
     this.ofSection = ofSection;
+    this.sectionUsage = sectionUsage;
   }
 
   @Override
@@ -48,7 +56,7 @@ public class CodeBlockUsageNode extends Node implements DefinedAndUsedStructure 
   }
 
   @Override
-  public List<Location> getUsages() {
-    return usages;
+  public Stream<Location> getUsages() {
+    return usages.stream();
   }
 }

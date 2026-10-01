@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.events.queries;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.HoverHandler;
@@ -48,5 +49,10 @@ public class HoverLspQuery implements LspQuery<Hover> {
   @Override
   public Hover query() throws ExecutionException, InterruptedException {
     return hoverHandler.hover(params);
+  }
+
+  @Override
+  public List<LspEventCancelCondition> getCancelConditions() {
+    return hoverHandler.getCancelConditions(params);
   }
 }

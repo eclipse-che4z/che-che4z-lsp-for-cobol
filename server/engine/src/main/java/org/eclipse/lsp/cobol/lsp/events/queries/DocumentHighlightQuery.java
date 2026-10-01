@@ -16,6 +16,7 @@ package org.eclipse.lsp.cobol.lsp.events.queries;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DocumentHighlightHandler;
@@ -48,5 +49,10 @@ public class DocumentHighlightQuery implements LspQuery<List<? extends DocumentH
   @Override
   public List<? extends DocumentHighlight> query() {
     return this.documentHighlightHandler.documentHighlight(params);
+  }
+
+  @Override
+  public List<LspEventCancelCondition> getCancelConditions() {
+    return documentHighlightHandler.getCancelConditions(params);
   }
 }

@@ -42,16 +42,11 @@ import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 @Singleton
 public class DialectDiscoveryFolderService implements DialectDiscoveryService {
 
-  private final WorkingFolderService workingFolderService;
   private final Communications communications;
   private final CodeActions actions;
 
   @Inject
-  public DialectDiscoveryFolderService(
-      WorkingFolderService workingFolderService,
-      Communications communications,
-      CodeActions actions) {
-    this.workingFolderService = workingFolderService;
+  public DialectDiscoveryFolderService(Communications communications, CodeActions actions) {
     this.communications = communications;
     this.actions = actions;
   }
@@ -63,14 +58,9 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
    * @param messageService a message service
    * @return a list of loaded dialects
    */
+  @Override
   public List<CobolDialect> loadDialects(
       CopybookService copybookService, MessageService messageService) {
-    try {
-      URI workdir = workingFolderService.getWorkingFolder();
-      return loadDialectFromWorkingFolder(workdir, copybookService, messageService);
-    } catch (Exception e) {
-      warningCannotLoadDialects(e.getMessage());
-    }
     return ImmutableList.of();
   }
 
@@ -93,39 +83,8 @@ public class DialectDiscoveryFolderService implements DialectDiscoveryService {
     return ImmutableList.of();
   }
 
-  private List<CobolDialect> loadDialectFromWorkingFolder(
-      URI workdir, CopybookService copybookService, MessageService messageService) {
-    try {
-      return workingFolderService.getFilenames(workdir).stream()
-          .filter(filename -> filename.startsWith("dialect-"))
-          .filter(filename -> filename.endsWith(".jar"))
-          .flatMap(
-              filename ->
-                  createDialects(workdir, filename, copybookService, messageService).stream())
-          .collect(Collectors.toList());
-    } catch (Exception e) {
-      warningCannotLoadDialects(e.getMessage());
-    }
-    return ImmutableList.of();
-  }
-
   private void warningCannotLoadDialects(String message) {
     LOG.warn("Cannot load dialects: {}", message);
-  }
-
-  private List<CobolDialect> createDialects(
-      URI currentUri,
-      String filename,
-      CopybookService copybookService,
-      MessageService messageService) {
-    URI uri;
-    try {
-      uri = new URI(currentUri + filename);
-    } catch (URISyntaxException e) {
-      LOG.warn("Cannot create dialect {}: {}", currentUri + filename, e.getMessage());
-      return ImmutableList.of();
-    }
-    return createDialectsFromJar(uri, copybookService, messageService);
   }
 
   private List<CobolDialect> createDialectsFromJar(

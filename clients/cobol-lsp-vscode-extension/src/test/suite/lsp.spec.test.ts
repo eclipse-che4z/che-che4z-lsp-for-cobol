@@ -902,6 +902,40 @@ _NOTE: multiple versions exist due to replac(e/ing) or multiple use of same copy
     );
     assert.strictEqual(locations.length, 1);
   });
+
+  test("TC416632 - Go to definition for a section", async () => {
+    const editor = await helper.showDocument("SECTION.CBL");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.strictEqual(diagnostics.length, 1);
+
+    const definitions = await vscode.commands.executeCommand<
+      vscode.Location[] | vscode.LocationLink[]
+    >(
+      "vscode.executeDefinitionProvider",
+      editor.document.uri,
+      new vscode.Position(17, 24),
+    );
+    assert.strictEqual(definitions.length, 1);
+  });
+
+  test("TC416633 - Find references of a section", async () => {
+    const editor = await helper.showDocument("SECTION.CBL");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    assert.strictEqual(diagnostics.length, 1);
+
+    const references = await vscode.commands.executeCommand<vscode.Location[]>(
+      "vscode.executeReferenceProvider",
+      editor.document.uri,
+      new vscode.Position(17, 24),
+    );
+    assert.strictEqual(references.length, 2);
+  });
 });
 
 function normalizeLineEndings(str: string) {

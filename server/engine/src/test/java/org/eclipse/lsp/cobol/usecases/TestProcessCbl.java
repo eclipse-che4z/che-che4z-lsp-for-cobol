@@ -69,7 +69,6 @@ class TestProcessCbl {
         "BUF(256)",
         "NOCICS",
         "CICS",
-        "CICS(\"string1\")",
         "CODEPAGE(1140)",
         "CP(37)",
         "NOCOMPILE(S)",

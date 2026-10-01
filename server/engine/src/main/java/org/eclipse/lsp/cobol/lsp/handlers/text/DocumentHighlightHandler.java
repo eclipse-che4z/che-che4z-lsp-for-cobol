@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.lsp.handlers.text;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import java.util.List;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -53,6 +54,19 @@ public class DocumentHighlightHandler {
       DocumentHighlightParams documentHighlightParams) {
     return ImmutableList.of(
         asyncAnalysisService.createDependencyOn(
+            documentHighlightParams.getTextDocument().getUri()));
+  }
+
+  /**
+   * Cancel condition for the documentHighlight event: cancel if the document was closed.
+   *
+   * @param documentHighlightParams DocumentHighlightParams.
+   * @return list of {@link LspEventCancelCondition}
+   */
+  public List<LspEventCancelCondition> getCancelConditions(
+      DocumentHighlightParams documentHighlightParams) {
+    return ImmutableList.of(
+        asyncAnalysisService.createCancelConditionOnClose(
             documentHighlightParams.getTextDocument().getUri()));
   }
 

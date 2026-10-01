@@ -79,10 +79,7 @@ public class ElementOccurrences implements Occurrences {
       return Collections.emptyList();
     }
     List<Location> references =
-        element.stream()
-            .map(DefinedAndUsedStructure::getUsages)
-            .flatMap(List::stream)
-            .collect(Collectors.toList());
+        element.stream().flatMap(DefinedAndUsedStructure::getUsages).collect(Collectors.toList());
     if (refCtx.isIncludeDeclaration()) {
       references.addAll(
           element.stream()
@@ -101,7 +98,7 @@ public class ElementOccurrences implements Occurrences {
         .stream()
         .map(
             context ->
-                Streams.concat(context.getUsages().stream(), context.getDefinitions().stream())
+                Streams.concat(context.getUsages(), context.getDefinitions().stream())
                     .filter(byUri(position))
                     .map(toDocumentHighlight())
                     .collect(Collectors.toList()))

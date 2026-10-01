@@ -494,7 +494,9 @@ public class UseCaseEngine {
 
   private Map<String, List<Location>> extractVariableUsages(AnalysisResult result) {
     return extractVariables(
-        result, variable -> !variable.getUsages().isEmpty(), DefinedAndUsedStructure::getUsages);
+        result,
+        variable -> variable.getUsages().findAny().isPresent(),
+        definedAndUsedStructure -> definedAndUsedStructure.getUsages().collect(toList()));
   }
 
   private Map<String, List<Location>> extractVariables(
@@ -561,8 +563,8 @@ public class UseCaseEngine {
     return extract(
         result,
         nodeType,
-        DefinedAndUsedStructure::getUsages,
-        context -> !context.getUsages().isEmpty());
+        definedAndUsedStructure -> definedAndUsedStructure.getUsages().collect(toList()),
+        context -> context.getUsages().findAny().isPresent());
   }
 
   private Map<String, List<Location>> extract(

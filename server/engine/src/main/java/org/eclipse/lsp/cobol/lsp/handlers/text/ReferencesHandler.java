@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.lsp.cobol.lsp.LspEventCancelCondition;
 import org.eclipse.lsp.cobol.lsp.LspEventDependency;
 import org.eclipse.lsp.cobol.lsp.LspQuery;
 import org.eclipse.lsp.cobol.lsp.analysis.AsyncAnalysisService;
@@ -83,5 +84,16 @@ public class ReferencesHandler {
   public List<LspEventDependency> getReferenceDependency(ReferenceParams params) {
     return ImmutableList.of(
         asyncAnalysisService.createDependencyOn(params.getTextDocument().getUri()));
+  }
+
+  /**
+   * Cancel condition for the references event: cancel if the document was closed.
+   *
+   * @param params LSP ReferenceParams object.
+   * @return list of {@link LspEventCancelCondition}
+   */
+  public List<LspEventCancelCondition> getCancelConditions(ReferenceParams params) {
+    return ImmutableList.of(
+        asyncAnalysisService.createCancelConditionOnClose(params.getTextDocument().getUri()));
   }
 }

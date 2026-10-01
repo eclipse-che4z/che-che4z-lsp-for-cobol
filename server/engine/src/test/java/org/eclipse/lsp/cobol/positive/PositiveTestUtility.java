@@ -255,7 +255,7 @@ public class PositiveTestUtility {
     foundVariableNodeInLSP.ifPresent(
         node -> {
           List<Range> usagesFromEngine =
-              node.getUsages().stream().map(Location::getRange).collect(Collectors.toList());
+              node.getUsages().map(Location::getRange).collect(Collectors.toList());
 
           List<Range> unmatchedReferences =
               snap.getReferencesLocation().stream()
@@ -307,7 +307,7 @@ public class PositiveTestUtility {
     foundVariableNodeInLSP.ifPresent(
         node -> {
           List<Object> usagesFromEngine =
-              node.getUsages().stream()
+              node.getUsages()
                   .flatMap(
                       usage -> {
                         if (usage.getUri().contains(fileName)) {
@@ -341,8 +341,7 @@ public class PositiveTestUtility {
           String updateFlag = ofNullable(getProperty("UpdateSnapListing")).orElse("false");
           if (!updateFlag.equals("false")) {
             Range location = foundVariableNodeInLSP.get().getLocality().getRange();
-            List<Range> collect =
-                node.getUsages().stream().map(Location::getRange).collect(toList());
+            List<Range> collect = node.getUsages().map(Location::getRange).collect(toList());
             snap.setReferencesLocation(collect);
             snap.setDefinitionLocation(location);
           }

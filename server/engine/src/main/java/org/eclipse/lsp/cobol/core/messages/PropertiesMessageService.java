@@ -23,7 +23,6 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +34,6 @@ import org.eclipse.lsp.cobol.common.DialectRegistryItem;
 import org.eclipse.lsp.cobol.common.message.LocaleStore;
 import org.eclipse.lsp.cobol.common.message.MessageService;
 import org.eclipse.lsp.cobol.common.message.MessageTemplate;
-import org.eclipse.lsp.cobol.core.engine.dialects.WorkingFolderService;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.settings.ConfigHelper;
 import org.eclipse.lsp.cobol.service.settings.SettingsService;
@@ -52,7 +50,6 @@ public class PropertiesMessageService implements MessageService {
   private final LocaleStore localeStore;
   private CobolLSPropertiesResourceBundle resourceBundle;
   private final SettingsService settingsService;
-  private final WorkingFolderService workingFolderService;
   private final Provider<CobolLanguageClient> clientProvider;
 
   @Inject
@@ -60,12 +57,10 @@ public class PropertiesMessageService implements MessageService {
       @Named("resourceFileLocation") String baseName,
       LocaleStore localeStore,
       SettingsService settingsService,
-      WorkingFolderService workingFolderService,
       Provider<CobolLanguageClient> clientProvider) {
     this.baseName = baseName;
     this.localeStore = localeStore;
     this.settingsService = settingsService;
-    this.workingFolderService = workingFolderService;
     this.clientProvider = clientProvider;
     resourceBundle =
         new CobolLSPropertiesResourceBundle(baseName, localeStore.getApplicationLocale());
@@ -123,7 +118,6 @@ public class PropertiesMessageService implements MessageService {
                           List<DialectRegistryItem> dialectRegistryItems =
                               ConfigHelper.parseDialectRegistry(registry);
                           handleRegisteredDialects(dialects, dialectRegistryItems);
-                          handleImplicitDialects(dialects, dialectRegistryItems);
                         }));
   }
 
@@ -132,27 +126,6 @@ public class PropertiesMessageService implements MessageService {
     dialectRegistryItems.stream()
         .filter(registeredDialects -> dialects.contains(registeredDialects.getName()))
         .forEach(this::updateResourceBundle);
-  }
-
-  private void handleImplicitDialects(
-      List<String> dialects, List<DialectRegistryItem> dialectRegistryItems) {
-    if (dialectRegistryItems.isEmpty()) {
-      dialects.forEach(this::updateResourceBundle);
-    }
-  }
-
-  private void updateResourceBundle(String dialect) {
-    updateResourceBundle(
-        new DialectRegistryItem(
-            dialect,
-            1,
-            createImplicitDialectUri(dialect),
-            "implicit found dialects",
-            "implicit-dialects"));
-  }
-
-  private URI createImplicitDialectUri(String dialect) {
-    return URI.create(this.workingFolderService.getWorkingFolder() + "dialect-" + dialect + ".jar");
   }
 
   private void updateResourceBundle(DialectRegistryItem dialectRegistryItem) {
