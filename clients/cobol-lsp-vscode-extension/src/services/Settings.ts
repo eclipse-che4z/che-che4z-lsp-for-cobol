@@ -208,7 +208,7 @@ export class SettingsService {
   >([
     [NONE, undefined],
     ["ERROR", vscode.DiagnosticSeverity.Error],
-    ["WARN", vscode.DiagnosticSeverity.Warning],
+    ["WARNING", vscode.DiagnosticSeverity.Warning],
     ["INFO", vscode.DiagnosticSeverity.Information],
     ["HINT", vscode.DiagnosticSeverity.Hint],
   ]);
