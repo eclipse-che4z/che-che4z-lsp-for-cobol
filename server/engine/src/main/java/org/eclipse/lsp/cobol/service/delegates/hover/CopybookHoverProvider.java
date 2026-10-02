@@ -24,6 +24,7 @@ import org.eclipse.lsp.cobol.common.utils.RangeUtils;
 import org.eclipse.lsp.cobol.lsp.SourceUnitGraph;
 import org.eclipse.lsp.cobol.service.CobolDocumentModel;
 import org.eclipse.lsp4j.Hover;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 
@@ -52,6 +53,13 @@ public class CopybookHoverProvider implements HoverProvider {
         .flatMap(root -> RangeUtils.findNodeByPosition(root, uri, hoverPosition))
         .filter(CopyNode.class::isInstance)
         .map(CopyNode.class::cast)
+        .filter(
+            node -> {
+              Location nameLocation = node.getNameLocation();
+              return uri.equals(nameLocation.getUri())
+                  && !RangeUtils.isBefore(hoverPosition, nameLocation.getRange().getStart())
+                  && RangeUtils.isBefore(hoverPosition, nameLocation.getRange().getEnd());
+            })
         .filter(node -> node.getUri() != null)
         .filter(n -> !n.getUri().equals(uri))
         .map(documentGraph::getCopyNodeContent)

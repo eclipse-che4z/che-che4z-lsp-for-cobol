@@ -34,21 +34,27 @@ suite("Copybook Test Suite", function () {
     await helper.closeAllEditors();
   });
 
-  async function checkHoverContains(
+  async function getHoverText(
     editor: vscode.TextEditor,
     position: vscode.Position,
-    expected: RegExp,
   ) {
     const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
       "vscode.executeHoverProvider",
       editor.document.uri,
       position,
     );
-    const text = (hovers ?? [])
+    return (hovers ?? [])
       .flatMap((hover) => hover.contents)
       .map((content) => (typeof content === "string" ? content : content.value))
       .join("\n");
-    assert.match(text, expected);
+  }
+
+  async function checkHoverContains(
+    editor: vscode.TextEditor,
+    position: vscode.Position,
+    expected: RegExp,
+  ) {
+    assert.match(await getHoverText(editor, position), expected);
   }
 
   test("Error inside the copybook", async () => {
@@ -465,6 +471,33 @@ suite("Copybook Test Suite", function () {
         `${name} resolved to ${locations[0].uri.path}`,
       );
     }
+  });
+
+  test("shows IDMS copybook content only on its name", async () => {
+    const editor = await helper.openWithoutIdmsErrors("MixedCopybooks.cbl");
+    const statement = helper.positionOf(editor, "COPY IDMS CBOOK");
+
+    for (const [token, offset] of [
+      ["COPY", 1],
+      ["IDMS", "COPY ".length + 1],
+    ] as const) {
+      const hoverText = await getHoverText(
+        editor,
+        statement.translate(0, offset),
+      );
+      assert.doesNotMatch(
+        hoverText,
+        /WORK-VARIABLES/,
+        `${token} must not show the IDMS copybook content`,
+      );
+    }
+
+    const nameHover = await getHoverText(
+      editor,
+      statement.translate(0, "COPY IDMS ".length + 1),
+    );
+    assert.match(nameHover, /WORK-VARIABLES/);
+    assert.match(nameHover, /PROGRAM-NAME/);
   });
 
   test("multiple and nested IDMS copybooks keep their variable definitions", async () => {
