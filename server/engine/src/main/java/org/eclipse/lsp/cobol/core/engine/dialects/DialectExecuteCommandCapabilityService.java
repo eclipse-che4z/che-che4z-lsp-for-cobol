@@ -41,4 +41,11 @@ public interface DialectExecuteCommandCapabilityService {
    * @param providers list of {@link CodeActionProvider}
    */
   void registerDialectCodeActionProviders(List<CodeActionProvider> providers);
+
+  /**
+   * Unregisters custom code action providers from dialects
+   *
+   * @param providers list of {@link CodeActionProvider}
+   */
+  void unregisterDialectCodeActionProviders(List<CodeActionProvider> providers);
 }

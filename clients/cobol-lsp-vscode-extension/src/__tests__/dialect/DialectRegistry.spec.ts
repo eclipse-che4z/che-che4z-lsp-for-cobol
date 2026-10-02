@@ -59,7 +59,8 @@ describe("DialectRegistry test", () => {
 
   it("retrieve dialects from the registry for v2 version", () => {
     const snippets = Uri.parse("file:/snippetPath");
-    DialectRegistry.registerV2("id", "dialect", "desc", snippets);
+    const keywords = Uri.parse("file:/keywordsPath");
+    DialectRegistry.registerV2("id", "dialect", "desc", snippets, keywords);
     const result = DialectRegistry.getDialects();
 
     expect(result.length).toBe(1);
@@ -68,5 +69,20 @@ describe("DialectRegistry test", () => {
     expect(result[0].extensionId).toBe("id");
     expect(result[0].protocolVersion).toBe(2);
     expect(result[0].snippetUri.fsPath).toContain("snippetPath");
+    if (result[0].protocolVersion === 2) {
+      expect(result[0].keywordsUri?.fsPath).toContain("keywordsPath");
+    }
+  });
+
+  it("retrieve dialects from the registry for v2 version without keywords", () => {
+    const snippets = Uri.parse("file:/snippetPath");
+    DialectRegistry.registerV2("id", "dialect", "desc", snippets);
+    const result = DialectRegistry.getDialects();
+
+    expect(result.length).toBe(1);
+    expect(result[0].protocolVersion).toBe(2);
+    if (result[0].protocolVersion === 2) {
+      expect(result[0].keywordsUri).toBeUndefined();
+    }
   });
 });

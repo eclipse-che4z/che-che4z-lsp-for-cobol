@@ -16,6 +16,10 @@ package org.eclipse.lsp.cobol.common.utils;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.*;
+import java.net.URI;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -35,14 +39,8 @@ public class KeywordsUtils {
    * @return key/value keywords with descriptions map
    */
   public Map<String, String> getKeywords(ClassLoader classLoader, String fileName) {
-    Properties props = new Properties();
     try (InputStream stream = classLoader.getResourceAsStream(fileName)) {
-      props.load(stream);
-      return props.entrySet().stream()
-          .collect(
-              Collectors.toMap(
-                  entry -> entry.getKey().toString(),
-                  entry -> processDescription(entry.getValue().toString())));
+      return readKeywords(stream);
     } catch (NullPointerException | IOException e) {
       LOG.error("Unable to load the Keywords file {}: {}", fileName, e.getMessage());
     }
@@ -58,6 +56,34 @@ public class KeywordsUtils {
   public Map<String, String> getKeywords(String fileName) {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     return getKeywords(classLoader, fileName);
+  }
+
+  /**
+   * Reads keywords from a file URI.
+   *
+   * @param uri the keywords file URI, or null if no keywords are provided
+   * @return key/value keywords with descriptions map, or an empty map if the file cannot be loaded
+   */
+  public Map<String, String> getKeywords(URI uri) {
+    if (uri == null) {
+      return ImmutableMap.of();
+    }
+    try (InputStream stream = Files.newInputStream(Paths.get(uri))) {
+      return readKeywords(stream);
+    } catch (IOException | IllegalArgumentException | FileSystemNotFoundException e) {
+      LOG.error("Unable to load the Keywords file {}: {}", uri, e.getMessage());
+    }
+    return ImmutableMap.of();
+  }
+
+  private Map<String, String> readKeywords(InputStream stream) throws IOException {
+    Properties props = new Properties();
+    props.load(stream);
+    return props.entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                entry -> entry.getKey().toString(),
+                entry -> processDescription(entry.getValue().toString())));
   }
 
   /**
