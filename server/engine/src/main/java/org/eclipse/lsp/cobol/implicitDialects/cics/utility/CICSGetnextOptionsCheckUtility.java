@@ -47,6 +47,7 @@ public class CICSGetnextOptionsCheckUtility extends CICSOptionsCheckBaseUtility 
           put(CICSLexer.FIRESTATUS, ErrorSeverity.ERROR);
           put(CICSLexer.PREDICATE, ErrorSeverity.ERROR);
           put(CICSLexer.STATUS, ErrorSeverity.ERROR);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 

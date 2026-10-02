@@ -54,6 +54,7 @@ public class CICSQueryOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.CONTROL, ErrorSeverity.ERROR);
           put(CICSLexer.ALTER, ErrorSeverity.ERROR);
           put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 
