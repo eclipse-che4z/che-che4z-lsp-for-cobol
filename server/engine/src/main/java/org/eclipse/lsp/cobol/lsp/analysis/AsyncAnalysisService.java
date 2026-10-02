@@ -20,6 +20,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
@@ -368,9 +369,15 @@ public class AsyncAnalysisService implements AnalysisStateNotifier {
    * @return LspEventCancelCondition object
    */
   public LspEventCancelCondition createCancelConditionOnClose(String uri) {
+    // The query may arrive before didOpen is processed due to isCopybook call, so only cancel once
+    // the document seen to be opened and then closed.
+    AtomicBoolean wasOpened = new AtomicBoolean(false);
     return () -> {
-      CobolDocumentModel doc = documentModelService.get(uri);
-      return doc == null;
+      if (documentModelService.get(uri) != null) {
+        wasOpened.set(true);
+        return false;
+      }
+      return wasOpened.get();
     };
   }
 

@@ -32,6 +32,7 @@ public class DocumentSymbolQuery
   private final DocumentSymbolHandler documentSymbolHandler;
   final CompletableFuture<List<Either<SymbolInformation, DocumentSymbol>>> result;
   private final DocumentSymbolParams params;
+  private List<LspEventCancelCondition> cancelConditions;
 
   public DocumentSymbolQuery(
       DocumentSymbolParams params, DocumentSymbolHandler documentSymbolHandler) {
@@ -53,7 +54,10 @@ public class DocumentSymbolQuery
 
   @Override
   public List<LspEventCancelCondition> getCancelConditions() {
-    return documentSymbolHandler.getCancelDependencies(params);
+    if (cancelConditions == null) {
+      cancelConditions = documentSymbolHandler.getCancelDependencies(params);
+    }
+    return cancelConditions;
   }
 
   @Override
