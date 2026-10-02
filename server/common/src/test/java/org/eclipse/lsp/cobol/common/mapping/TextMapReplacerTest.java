@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,8 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_statementMap_empty_token() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap = ImmutableMap.of("", createRange());
+    Map<String, Token> statementMap =
+        ImmutableMap.of("", new Token(new Location(extendedText.getUri(), createRange())));
 
     Exception exception =
         assertThrowsExactly(
@@ -55,8 +57,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_brace_opened_twice_1() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -72,8 +78,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_brace_opened_twice_2() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -89,8 +99,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_brace_closed_before_opened() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -106,8 +120,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_leave_brace_opened() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -124,8 +142,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_token_not_found() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -141,8 +163,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_allow_duplicate_separator() {
     ExtendedText extendedText = new ExtendedText("TOKEN in the extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     TextMapReplacer.execute(
         extendedText, createRange(), createRange(), statementMap, "{TOKEN|BBB|CCC}");
@@ -152,8 +178,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_misplaced_separator_1() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -169,8 +199,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_misplaced_separator_2() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -186,8 +220,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_empty_token() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -203,8 +241,12 @@ class TextMapReplacerTest {
   @Test
   void testValidateParameters_replacementMap_dangling_escape_character() {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap =
-        ImmutableMap.of("TOKEN", new Range(new Position(0, 0), new Position(0, 8)));
+    Map<String, Token> statementMap =
+        ImmutableMap.of(
+            "TOKEN",
+            new Token(
+                new Location(
+                    extendedText.getUri(), new Range(new Position(0, 0), new Position(0, 8)))));
 
     Exception exception =
         assertThrowsExactly(
@@ -292,7 +334,8 @@ class TextMapReplacerTest {
 
   private void testValidateRange(Range statementRange, Range tokenRange, String message) {
     ExtendedText extendedText = new ExtendedText("Extended text document", "uri");
-    Map<String, Range> statementMap = ImmutableMap.of("TOKEN", tokenRange);
+    Map<String, Token> statementMap =
+        ImmutableMap.of("TOKEN", new Token(new Location(extendedText.getUri(), tokenRange)));
 
     Exception exception =
         assertThrowsExactly(
