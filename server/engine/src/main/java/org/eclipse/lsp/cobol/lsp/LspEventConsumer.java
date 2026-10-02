@@ -43,6 +43,10 @@ public class LspEventConsumer {
    * @param event
    */
   private void handle(LspEvent event) {
+    if (event instanceof LspSyncNotification) {
+      ((LspSyncNotification) event).execute();
+      return;
+    }
     if (event instanceof LspNotification) {
       CompletableFuture.runAsync(((LspNotification) event)::execute, notificationThreadExecutor);
       return;

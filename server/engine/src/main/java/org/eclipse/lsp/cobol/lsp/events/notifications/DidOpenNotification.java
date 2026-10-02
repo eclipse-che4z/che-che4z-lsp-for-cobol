@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.events.notifications;
 
-import org.eclipse.lsp.cobol.lsp.LspNotification;
+import org.eclipse.lsp.cobol.lsp.LspSyncNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DidOpenHandler;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 
 /** textDocument/didOpen language server event */
-public class DidOpenNotification implements LspNotification {
+public class DidOpenNotification implements LspSyncNotification {
   private final DidOpenTextDocumentParams params;
   private final DidOpenHandler didOpenHandler;
 
