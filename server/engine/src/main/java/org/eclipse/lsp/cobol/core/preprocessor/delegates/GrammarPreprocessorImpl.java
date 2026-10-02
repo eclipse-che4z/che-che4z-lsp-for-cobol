@@ -18,10 +18,12 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -52,6 +54,7 @@ import org.eclipse.lsp.cobol.core.semantics.CopybooksRepository;
  * returns an extended document with all the available copybooks included, with their definitions
  * and usages specified, as well as related errors.
  */
+@Slf4j
 public class GrammarPreprocessorImpl implements GrammarPreprocessor {
   private final GrammarPreprocessorListenerFactory listenerFactory;
   private final ReplacePreprocessorFactory replacingFactory;
@@ -112,6 +115,7 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
     if (context.getCopybookProcessingMode().analyze) {
       prefetchCopybooks(start, listener.getPrefetcher());
     }
+    ThreadInterruptionUtil.checkThreadInterrupted();
 
     ParseTreeWalker walker = new ParseTreeWalker();
     walker.walk(listener, start);
@@ -142,12 +146,15 @@ public class GrammarPreprocessorImpl implements GrammarPreprocessor {
         },
         start);
     copybooks.removeIf(Objects::isNull);
-    CompletableFuture.allOf(copybooks.toArray(new CompletableFuture[copybooks.size()])).join();
-    try {
-      for (CompletableFuture<Runnable> r : copybooks) {
-        r.get().run();
+    for (CompletableFuture<Runnable> future : copybooks) {
+      try {
+        future.get().run();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        return;
+      } catch (CancellationException | ExecutionException e) {
+        LOG.warn("Failed to prefetch a copybook", e);
       }
-    } catch (InterruptedException | ExecutionException e) {
     }
   }
 
