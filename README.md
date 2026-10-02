@@ -35,7 +35,7 @@ Double-byte character sets and the DBCS compiler option are not supported.
 
 ## Configure Server Runtime
 
-If you have Java on your workstation, COBOL Language Support uses the Java binaries in the PATH variable to execute. To use a different installation of Java, open the COBOL Language Support extension settings and specify the path in the **Java Home** setting.
+If you have Java on your workstation, COBOL Language Support uses the Java binaries in the PATH variable to execute. To use a different installation of Java, open the COBOL Language Support extension settings and specify the path in the **Java Home** setting. This setting can only be configured globally or in the user settings, not in the workspace settings.
 
 If you do not have Java on your workstation, COBOL Language Support uses the native binary (engine.exe) to execute. If your environment does not allow engine.exe to execute, contact your system administrator to add an exception for engine.exe.
 
