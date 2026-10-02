@@ -69,7 +69,7 @@ suite("Copybook Test Suite", function () {
     helper.checkDiagnostic(
       diagnostics,
       "Errors inside the copybook",
-      range(pos(8, 7), pos(8, 28)),
+      range(pos(8, 20), pos(8, 27)),
       vscode.DiagnosticSeverity.Error,
     );
 
@@ -132,7 +132,7 @@ suite("Copybook Test Suite", function () {
     helper.checkDiagnostic(
       diagnostics,
       "Errors inside the copybook",
-      range(pos(9, 11), pos(9, 32)),
+      range(pos(9, 24), pos(9, 31)),
       vscode.DiagnosticSeverity.Error,
     );
 
