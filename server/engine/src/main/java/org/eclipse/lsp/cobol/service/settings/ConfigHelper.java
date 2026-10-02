@@ -72,8 +72,23 @@ public class ConfigHelper {
                   return null;
                 }
               }
+
+              URI keywords = null;
+              if (o.getKeywords() != null) {
+                try {
+                  keywords = new URI(o.getKeywords());
+                } catch (Exception e) {
+                  LOG.warn("Dialect {} does not have keywords provided", o.getName());
+                }
+              }
+
               return new DialectRegistryItem(
-                  o.getName(), o.getProtocolVersion(), uri, o.getDescription(), o.getExtensionId());
+                  o.getName(),
+                  o.getProtocolVersion(),
+                  uri,
+                  o.getDescription(),
+                  o.getExtensionId(),
+                  keywords);
             })
         .filter(Objects::nonNull)
         .collect(toList());
