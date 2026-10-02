@@ -24,4 +24,5 @@ public class DialectItemDTO {
   String description;
   String extensionId;
   String uri;
+  String keywords;
 }
