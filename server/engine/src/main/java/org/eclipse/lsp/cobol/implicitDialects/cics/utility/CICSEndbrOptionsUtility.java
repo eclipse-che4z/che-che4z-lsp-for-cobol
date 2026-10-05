@@ -40,6 +40,7 @@ public class CICSEndbrOptionsUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.DATASET, ErrorSeverity.ERROR);
           put(CICSLexer.REQID, ErrorSeverity.ERROR);
           put(CICSLexer.SYSID, ErrorSeverity.ERROR);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 

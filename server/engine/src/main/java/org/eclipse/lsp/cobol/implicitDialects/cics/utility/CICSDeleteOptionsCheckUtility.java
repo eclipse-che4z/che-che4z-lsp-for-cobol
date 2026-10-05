@@ -56,6 +56,7 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.ACQACTIVITY, ErrorSeverity.WARNING);
           put(CICSLexer.PROCESS, ErrorSeverity.WARNING);
           put(CICSLexer.ACQPROCESS, ErrorSeverity.WARNING);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 
@@ -127,7 +128,9 @@ public class CICSDeleteOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
 
   @SuppressWarnings("unchecked")
   private void checkDeleteGroupThree(CICSParser.Cics_delete_group_threeContext ctx) {
-    checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    if (ctx.RETCODE().isEmpty()) { // TODO: Missing validation for EXCI DELETE CHANNEL
+      checkHasMandatoryOptions(ctx.CONTAINER(), ctx, "CONTAINER");
+    }
     checkHasMutuallyExclusiveOptions(
         "ACTIVITY or ACQACTIVITY or PROCESS or ACQPROCESS or CHANNEL",
         ctx.ACTIVITY(),

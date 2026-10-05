@@ -43,6 +43,7 @@ public class CICSMoveOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.TOPROCESS, ErrorSeverity.WARNING);
           put(CICSLexer.TOACTIVITY, ErrorSeverity.ERROR);
           put(CICSLexer.TOCHANNEL, ErrorSeverity.ERROR);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 

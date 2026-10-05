@@ -58,6 +58,7 @@ public class CICSGetOptionsCheckUtility extends CICSOptionsCheckBaseUtility {
           put(CICSLexer.REDUCE, ErrorSeverity.WARNING);
           put(CICSLexer.WRAP, ErrorSeverity.WARNING);
           put(CICSLexer.NOSUSPEND, ErrorSeverity.WARNING);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 

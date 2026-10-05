@@ -44,6 +44,7 @@ public class CICSStartbrowseOptionsCheckUtility extends CICSOptionsCheckBaseUtil
           put(CICSLexer.CHANNEL, ErrorSeverity.ERROR);
           put(CICSLexer.EVENT, ErrorSeverity.ERROR);
           put(CICSLexer.TIMER, ErrorSeverity.WARNING);
+          put(CICSLexer.RETCODE, ErrorSeverity.ERROR);
         }
       };
 
