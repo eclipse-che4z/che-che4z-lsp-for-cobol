@@ -69,7 +69,6 @@ class CobolTextDocumentServiceTest {
   @Mock protected Set<HoverProvider> hoverProvider;
   @Mock protected SourceUnitGraph documentGraph;
   @Mock LspMessageBroker lspMessageBroker;
-  @Mock private SourceUnitGraph sourceUnitGraph;
   @Mock private Provider<CobolLanguageClient> clientProvider;
 
   private CobolTextDocumentService service;
@@ -87,7 +86,7 @@ class CobolTextDocumentServiceTest {
         new AsyncAnalysisService(
             mock(TrueDialectService.class),
             documentModelService,
-            sourceUnitGraph,
+            documentGraph,
             analysisService,
             copybookService,
             subroutineService,
