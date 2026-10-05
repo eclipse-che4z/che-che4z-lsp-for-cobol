@@ -50,7 +50,7 @@ async function main() {
       process.exit(2);
     }
     console.log(`Found ${testFolders.length} test folder(s) under ${path.resolve(root)}`);
-    const vscodeExecutablePath = await downloadAndUnzipVSCode("insiders");
+    const vscodeExecutablePath = await downloadAndUnzipVSCode('stable');
 
     // every test folder is a workspace of its own, with its own .cobolplugin configuration
     const failed: string[] = [];

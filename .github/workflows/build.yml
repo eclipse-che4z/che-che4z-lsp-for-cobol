@@ -273,13 +273,6 @@ jobs:
           path: |
             cobol-language-support-*.vsix
             !cobol-language-support-for-*.vsix
-      - name: Cache VS Code for positive tests
-        uses: actions/cache@v4
-        with:
-          path: tests/positive-vscode-tests/.vscode-test
-          key: vscode-test-positive-${{ runner.os }}-${{ hashFiles('tests/positive-vscode-tests/package-lock.json') }}
-          restore-keys: |
-            vscode-test-positive-${{ runner.os }}-
       - name: Run positive tests
         working-directory: tests/positive-vscode-tests
         env:
