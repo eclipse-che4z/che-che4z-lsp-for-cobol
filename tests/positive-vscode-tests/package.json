@@ -1,0 +1,23 @@
+{
+  "name": "cobol-positive-vscode-tests",
+  "description": "Runs the COBOL Language Support extension in VS Code over user provided folders and checks the analysis results",
+  "version": "1.0.0",
+  "private": true,
+  "license": "EPL-2.0",
+  "author": "Broadcom",
+  "scripts": {
+    "build": "tsc -p ./",
+    "test": "npm run build && node ./out/runTest.js",
+    "test:only": "node ./out/runTest.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.9.0",
+    "@types/vscode": "1.82",
+    "@vscode/test-electron": "^3.1.0",
+    "glob": "11.0.0",
+    "minimatch": "^10.0.1",
+    "mocha": "^10.8.2",
+    "typescript": "^5.6.3"
+  }
+}

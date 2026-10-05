@@ -33,6 +33,7 @@ import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
+import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisResultHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -65,14 +66,10 @@ class CobolTextDocumentServiceTest {
   @Mock protected Communications communications;
   @Mock protected Occurrences occurrences;
   @Mock protected Formations formations;
-  @Mock private SourceUnitGraph sourceUnitGraph;
-
   @Mock protected Set<HoverProvider> hoverProvider;
-
   @Mock protected SourceUnitGraph documentGraph;
-
   @Mock LspMessageBroker lspMessageBroker;
-
+  @Mock private SourceUnitGraph sourceUnitGraph;
   @Mock private Provider<CobolLanguageClient> clientProvider;
 
   private CobolTextDocumentService service;
@@ -107,6 +104,7 @@ class CobolTextDocumentServiceTest {
     AnalysisHandler analysisHandler =
         new AnalysisHandler(
             asyncAnalysisService, analysisService, builder, communications, documentModelService);
+    AnalysisResultHandler analysisResultHandler = new AnalysisResultHandler(documentModelService, asyncAnalysisService, communications);
 
     DidOpenHandler didOpenHandler =
         new DidOpenHandler(asyncAnalysisService, mock(SourceUnitGraph.class));
@@ -138,6 +136,7 @@ class CobolTextDocumentServiceTest {
             completionHandler,
             codeActionHandler,
             analysisHandler,
+            analysisResultHandler,
             formattingHandler,
             didOpenHandler,
             didCloseHandler,

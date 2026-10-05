@@ -234,6 +234,12 @@ export namespace window {
     });
   export const showQuickPick = showQuickPickMock;
 }
+export enum ExtensionMode {
+  Production = 1,
+  Development = 2,
+  Test = 3,
+}
+
 export enum StatusBarAlignment {
   Right,
 }

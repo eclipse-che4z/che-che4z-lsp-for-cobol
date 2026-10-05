@@ -96,6 +96,26 @@ describe("check exposed API's by the COBOL LS extension", () => {
     expect(ext).toHaveProperty("analysis");
     expect(await ext.analysis("test", "text")).toBe(expectedGraph);
   });
+
+  test("analysisResult API is exposed only in test mode", async () => {
+    const expectedResult = { diagnostics: {}, programs: [] };
+    jest
+      .spyOn(LanguageClientService.prototype, "retrieveAnalysisResult")
+      .mockResolvedValue(expectedResult);
+
+    const production = await activate({
+      ...context,
+      extensionMode: vscode.ExtensionMode.Production,
+    });
+    expect(production).not.toHaveProperty("analysisResult");
+
+    const test = (await activate({
+      ...context,
+      extensionMode: vscode.ExtensionMode.Test,
+    })) as unknown as { analysisResult(uri: string): Promise<unknown> };
+    expect(test).toHaveProperty("analysisResult");
+    expect(await test.analysisResult("test")).toBe(expectedResult);
+  });
 });
 
 describe("Check plugin extension for cobol fails.", () => {

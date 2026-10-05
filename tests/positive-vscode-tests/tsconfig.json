@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "types": ["node", "mocha"],
+    "target": "ES2020",
+    "lib": ["es2020"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "outDir": "out",
+    "sourceMap": true
+  },
+  "exclude": ["node_modules", ".vscode-test", "out"]
+}

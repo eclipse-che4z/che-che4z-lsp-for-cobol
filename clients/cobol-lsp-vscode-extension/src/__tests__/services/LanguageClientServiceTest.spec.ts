@@ -173,6 +173,18 @@ describe("LanguageClientService positive scenario", () => {
     ).toBe(expectedResult);
   });
 
+  test("Test LanguageClientService retrieve analysis result passes", async () => {
+    const expectedResult = { diagnostics: {}, programs: [] };
+    const sendRequest = jest.fn().mockResolvedValue(expectedResult);
+    LanguageClient.prototype.sendRequest = sendRequest;
+    expect(await languageClientService.retrieveAnalysisResult("test")).toBe(
+      expectedResult,
+    );
+    expect(sendRequest).toHaveBeenCalledWith("extended/analysisResult", {
+      uri: "test",
+    });
+  });
+
   test("Test LanguageClientService starts language client", async () => {
     LanguageClient.prototype.start = jest
       .fn()

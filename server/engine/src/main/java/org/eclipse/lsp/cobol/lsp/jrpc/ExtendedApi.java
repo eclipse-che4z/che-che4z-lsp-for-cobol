@@ -19,6 +19,7 @@ import com.google.gson.JsonObject;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
+import org.eclipse.lsp.cobol.core.model.extendedapi.analysisresult.AnalysisResultDto;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment;
 
@@ -33,4 +34,13 @@ public interface ExtendedApi {
    */
   @JsonRequest
   CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json);
+
+  /**
+   * Retrieve the last analysis result of a document
+   *
+   * @param json object with the document uri
+   * @return Future object with retrieved analysis result
+   */
+  @JsonRequest
+  CompletableFuture<AnalysisResultDto> analysisResult(@NonNull JsonObject json);
 }
