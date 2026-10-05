@@ -1,0 +1,31 @@
+# Programs whose snapshot is not compared (known engine differences, same list as the former Java PositiveTest)
+# Errors are still checked.
+DB1054.2.cbl
+EXEC84.2.cbl
+IF1054.2.cbl
+IF1194.2.cbl
+IF1234.2.cbl
+IF1274.2.cbl
+IF1284.2.cbl
+IF1294.2.cbl
+IX1114.2.cbl
+IX2104.2.cbl
+IX2124.2.cbl
+IX2144.2.cbl
+IX2154.2.cbl
+IX2184.2.cbl
+NC1354.2.cbl
+NC2024.2.cbl
+NC2054.2.cbl
+NC2074.2.cbl
+NC2084.2.cbl
+NC2094.2.cbl
+NC2144.2.cbl
+NC2154.2.cbl
+NC2194.2.cbl
+NC2224.2.cbl
+NC2504.2.cbl
+NC2524.2.cbl
+NC2534.2.cbl
+SM1064.2.cbl
+SM1074.2.cbl

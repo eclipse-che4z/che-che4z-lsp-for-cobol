@@ -19,7 +19,7 @@ This project runs the COBOL Language Support extension inside a real VS Code ins
 - The analysis has no errors.
 - If a snapshot exists, the definitions and references found by the language server match it.
 
-It is the client-side counterpart of the engine's `PositiveTest`, with no test data or configuration built into the engine.
+It replaced the engine's Java `PositiveTest`: it runs through the real extension and language server, so it also covers the LSP integration, and its test data and configuration live outside the engine.
 
 ## Input layout
 
@@ -76,5 +76,5 @@ Before the first program is opened, the suite activates the dialect extensions, 
 
 The runner `src/runTest.ts` finds the test folders and starts VS Code for each one. Inside VS Code, `src/suite/positive.test.ts` opens every program and calls the `analysisResult(uri)` API exported by the COBOL extension. That API sends the `extended/analysisResult` request, and the server answers with the programs, variables, procedures, copybooks and diagnostics of the last analysis. The results are checked by:
 
-- `src/lib/assertions.ts`: a port of `PositiveTestUtility` and `PositiveTest.assertNoError`;
+- `src/lib/assertions.ts`: the comparison with the snapshot and the no-errors check (ported from the former engine `PositiveTest`);
 - `src/lib/snapshot.ts`: a port of `SnapshotReader`.

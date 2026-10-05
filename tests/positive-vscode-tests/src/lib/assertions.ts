@@ -12,8 +12,9 @@
  *   Broadcom - initial API and implementation
  */
 
-// Port of PositiveTestUtility and PositiveTest.assertNoError from
-// server/engine/src/test/java/org/eclipse/lsp/cobol/positive
+// Comparison of the analysis result with the snapshot and the no-errors check. Ported from the
+// former engine tests PositiveTest and PositiveTestUtility (see the git history of
+// server/engine/src/test/java/org/eclipse/lsp/cobol/positive).
 
 import {
   AnalysisResultDto,
