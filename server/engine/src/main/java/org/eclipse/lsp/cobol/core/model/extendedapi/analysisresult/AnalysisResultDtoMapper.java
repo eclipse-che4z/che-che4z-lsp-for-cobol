@@ -85,9 +85,7 @@ public class AnalysisResultDtoMapper {
             .getDepthFirstStream()
             .filter(node -> node.getNodeType() == NodeType.COPY)
             .map(CopyNode.class::cast)
-            .map(
-                node ->
-                    new CopyDto(node.getName(), node.getUri(), node.getLocality().getRange()))
+            .map(node -> new CopyDto(node.getName(), node.getUri(), node.getLocality().getRange()))
             .collect(toList());
     return new ProgramDto(program.getProgramName(), variables, procedures, copybooks);
   }

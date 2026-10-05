@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.lsp;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -51,8 +50,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
  */
 @Slf4j
 @Singleton
-public class CobolTextDocumentService
-    implements TextDocumentService, ExtendedApi {
+public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
   private final LspMessageBroker lspMessageBroker;
   private final CompletionHandler completionHandler;
   private final CodeActionHandler codeActionHandler;

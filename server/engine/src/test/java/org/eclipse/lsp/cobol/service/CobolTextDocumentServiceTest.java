@@ -104,7 +104,8 @@ class CobolTextDocumentServiceTest {
     AnalysisHandler analysisHandler =
         new AnalysisHandler(
             asyncAnalysisService, analysisService, builder, communications, documentModelService);
-    AnalysisResultHandler analysisResultHandler = new AnalysisResultHandler(documentModelService, asyncAnalysisService, communications);
+    AnalysisResultHandler analysisResultHandler =
+        new AnalysisResultHandler(documentModelService, asyncAnalysisService, communications);
 
     DidOpenHandler didOpenHandler =
         new DidOpenHandler(asyncAnalysisService, mock(SourceUnitGraph.class));
