@@ -177,7 +177,7 @@ jobs:
           path: server/engine/target/server.jar
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Build Cobol Analysis Package Library
         working-directory: clients/analysis
         run: |
