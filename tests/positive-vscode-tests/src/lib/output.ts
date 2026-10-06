@@ -13,19 +13,7 @@
  */
 
 import { Writable } from "stream";
-
-/**
- * Lines written by the test suite are tagged, so that the runner can drop the console noise of
- * VS Code itself (workbench, agent host, product.json checks, ...) and keep only the test results.
- */
-export const OUTPUT_MARKER = "@@positive-tests@@ ";
-
-export function tag(text: string): string {
-  return text
-    .split(/\r?\n/)
-    .map((line) => OUTPUT_MARKER + line)
-    .join("\n");
-}
+import { OUTPUT_MARKER } from "../suite";
 
 /** Stream printing only tagged lines (without the marker) */
 export function filteredOutput(target: NodeJS.WriteStream): Writable {

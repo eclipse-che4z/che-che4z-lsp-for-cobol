@@ -16,16 +16,23 @@ import * as path from "path";
 import * as Mocha from "mocha";
 import { glob } from "glob";
 import { format } from "util";
-import { tag } from "../lib/output";
 
-// route the reporter output through tagged lines, see lib/output.ts
-const reporterBase = Mocha.reporters.Base as unknown as {
-  consoleLog: (...args: unknown[]) => void;
-};
-reporterBase.consoleLog = (...args: unknown[]) => console.log(tag(format(...args)));
+export const OUTPUT_MARKER = "@@positive-tests@@ ";
+
+class TaggedSpecReporter extends Mocha.reporters.Spec {
+  constructor(runner: Mocha.Runner, options?: Mocha.MochaOptions) {
+    (Mocha.reporters.Base as unknown as { consoleLog: (...args: unknown[]) => void }).consoleLog = (
+      ...args: unknown[]
+    ) => console.log(format(...args)
+    .split(/\r?\n/)
+    .map((line) => OUTPUT_MARKER + line)
+    .join("\n"));
+    super(runner, options);
+  }
+}
 
 export async function run(): Promise<void> {
-  const mocha = new Mocha({ ui: "tdd", color: true });
+  const mocha = new Mocha({ ui: "tdd", color: true, reporter: TaggedSpecReporter });
   const files = await glob("**/*.test.js", { cwd: __dirname });
   files.forEach((file) => mocha.addFile(path.resolve(__dirname, file)));
 
