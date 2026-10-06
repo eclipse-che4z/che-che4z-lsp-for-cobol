@@ -71,7 +71,11 @@ dataSection
    ;
 
 dataDescriptionEntry
-   : copyMaid | variableEntry | variableEntrySpecificLevel | .+?
+   : copyMaid | variableEntry | variableEntrySpecificLevel | otherDialectCopy
+   ;
+
+otherDialectCopy
+   : LEVEL_NUMBER COPY ~(MAID | DOT_FS) (~DOT_FS)* DOT_FS
    ;
 
 copyMaid
