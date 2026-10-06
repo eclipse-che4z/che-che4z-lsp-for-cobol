@@ -88,7 +88,10 @@ public class LangServerBootstrap {
   }
 
   private void start(
-      @NonNull String[] args, @NonNull LanguageServer server, @NonNull ExtendedApi extendedApi, @NonNull ClientProvider provider)
+      @NonNull String[] args,
+      @NonNull LanguageServer server,
+      @NonNull ExtendedApi extendedApi,
+      @NonNull ClientProvider provider)
       throws InterruptedException, ExecutionException {
     logger.info(String.format("Java version: %s", System.getProperty("java.version")));
     try {
@@ -101,10 +104,13 @@ public class LangServerBootstrap {
 
   @SuppressWarnings("squid:S106")
   private void launchServerWithPipes(
-      @NonNull LanguageServer server, @NonNull ExtendedApi extendedApi, @NonNull ClientProvider provider)
+      @NonNull LanguageServer server,
+      @NonNull ExtendedApi extendedApi,
+      @NonNull ClientProvider provider)
       throws InterruptedException, ExecutionException {
     logger.info("Language server started using pipe communication");
-    Launcher<CobolLanguageClient> launcher = createServerLauncher(server, extendedApi, System.in, System.out);
+    Launcher<CobolLanguageClient> launcher =
+        createServerLauncher(server, extendedApi, System.in, System.out);
     provider.setClient(launcher.getRemoteProxy());
     // suspend the main thread on listening
     launcher.startListening().get();
@@ -115,7 +121,10 @@ public class LangServerBootstrap {
   }
 
   static Launcher<CobolLanguageClient> createServerLauncher(
-      @NonNull LanguageServer server,  @NonNull ExtendedApi extendedApi, @NonNull InputStream in, @NonNull OutputStream out) {
+      @NonNull LanguageServer server,
+      @NonNull ExtendedApi extendedApi,
+      @NonNull InputStream in,
+      @NonNull OutputStream out) {
     ThreadFactory tf =
         new ThreadFactory() {
           private int counter = 0;

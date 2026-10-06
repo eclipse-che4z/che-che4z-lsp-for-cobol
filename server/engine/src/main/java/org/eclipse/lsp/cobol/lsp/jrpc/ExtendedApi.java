@@ -43,5 +43,6 @@ public interface ExtendedApi {
    * @return Future object with retrieved analysis result
    */
   @JsonRequest
-  CompletableFuture<AnalysisResultDto> analysisResult(@NonNull TextDocumentIdentifier textDocumentIdentifier);
+  CompletableFuture<AnalysisResultDto> analysisResult(
+      @NonNull TextDocumentIdentifier textDocumentIdentifier);
 }

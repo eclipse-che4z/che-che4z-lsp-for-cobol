@@ -15,11 +15,9 @@
 package org.eclipse.lsp.cobol.lsp.jrpc;
 
 import com.google.gson.JsonObject;
-
-import java.util.concurrent.CompletableFuture;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
@@ -29,9 +27,7 @@ import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisResultHandler;
 import org.eclipse.lsp4j.TextDocumentIdentifier;
 
-/**
- * Extended services
- */
+/** Extended services */
 @Slf4j
 @Singleton
 public class ExtendedApiService implements ExtendedApi {

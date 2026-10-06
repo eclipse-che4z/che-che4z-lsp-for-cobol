@@ -17,8 +17,8 @@ package org.eclipse.lsp.cobol;
 
 import static com.google.inject.Key.get;
 import static com.google.inject.name.Names.named;
-import static org.junit.jupiter.api.Assertions.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Injector;
@@ -101,8 +101,8 @@ class LangServerBootstrapTest {
   }
 
   /**
-   * Requests of both the language server and the extended API must be routed to their services,
-   * and the parameters must be converted to the types declared by the services.
+   * Requests of both the language server and the extended API must be routed to their services, and
+   * the parameters must be converted to the types declared by the services.
    */
   @Test
   void serverLauncherRoutesRequests() throws Exception {
