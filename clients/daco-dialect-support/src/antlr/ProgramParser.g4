@@ -71,7 +71,7 @@ dataSection
    ;
 
 dataDescriptionEntry
-   : copyMaid | variableEntry | variableEntrySpecificLevel
+   : copyMaid | variableEntry | variableEntrySpecificLevel | .+?
    ;
 
 copyMaid

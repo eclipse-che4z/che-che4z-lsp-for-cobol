@@ -178,6 +178,18 @@ describe("DaCoPreprocessor test", () => {
     );
   });
 
+  it("should skip another dialect's COPY statement in the data division", async () => {
+    await preprocessor.execute(
+      context,
+      HEADER_0 +
+        "          01  COPY IDMS SUBSCHEMA-NAMES.\n" +
+        "          PROCEDURE DIVISION.\n" +
+        "              DISPLAY ABC.\n",
+    );
+
+    expect(context.addDiagnostic).not.toHaveBeenCalled();
+  });
+
   it("should parse READ TRANSACTION", async () => {
     await preprocessor.execute(
       context,
