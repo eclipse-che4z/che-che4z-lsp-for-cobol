@@ -14,7 +14,7 @@
 
 import * as path from "path";
 import * as Mocha from "mocha";
-import { glob } from "glob";
+import { glob } from "fs/promises";
 import { format } from "util";
 
 export const OUTPUT_MARKER = "@@positive-tests@@ ";
@@ -33,8 +33,9 @@ class TaggedSpecReporter extends Mocha.reporters.Spec {
 
 export async function run(): Promise<void> {
   const mocha = new Mocha({ ui: "tdd", color: true, reporter: TaggedSpecReporter });
-  const files = await glob("**/*.test.js", { cwd: __dirname });
-  files.forEach((file) => mocha.addFile(path.resolve(__dirname, file)));
+  for await (const file of glob("**/*.test.js", { cwd: __dirname })) {
+    mocha.addFile(path.resolve(__dirname, file));
+  }
 
   await new Promise((resolve, reject) => {
     mocha.run((failures) => {
