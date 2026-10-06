@@ -233,6 +233,22 @@ suite("Copybook Test Suite", function () {
     );
   });
 
+  test("Tolerates another dialect's COPY statement in the data division", async () => {
+    const editor = await helper.showDocument("DaCo109.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+
+    assert.ok(
+      !diagnostics.some((d) => d.message.includes("missing MAID")),
+      "DaCo must not choke on a foreign dialect's COPY statement in the data division",
+    );
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(10, 19), pos(10, 31)),
+    );
+  });
+
   test("Skip copybook from the PROCEDURE DIVISION without final dot sucessfully", async () => {
     const editor = await helper.showDocument("DaCo90.cbl");
     const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
