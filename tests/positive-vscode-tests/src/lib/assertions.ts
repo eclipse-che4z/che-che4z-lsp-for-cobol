@@ -164,41 +164,22 @@ function checkProcedure(
 }
 
 /**
- * Check that there are no errors reported for the document itself.
+ * Check that no errors are reported in any file of the analysis result.
  *
  * @returns failure message or undefined if there are no errors
  */
-export function checkNoErrors(
-  result: AnalysisResultDto,
-  documentUri: string,
-  fileName: string,
-): string | undefined {
-  const errors = findDiagnostics(result, documentUri).filter(
-    (d) => d.severity === ERROR_SEVERITY,
-  );
-  if (errors.length === 0) {
-    return undefined;
+export function checkNoErrors(result: AnalysisResultDto, fileName: string): string | undefined {
+  let message = "";
+  for (const [uri, diagnostics] of Object.entries(result.diagnostics || {})) {
+    for (const d of diagnostics) {
+      if (d.severity === ERROR_SEVERITY) {
+        message +=
+          `${uri} ${d.range.start.line + 1}:${d.range.start.character} - ` +
+          `${d.range.end.line + 1}:${d.range.end.character} : ${d.message}\r\n`;
+      }
+    }
   }
-  let message = `${fileName} contains syntax errors:\r\n`;
-  for (const d of errors) {
-    message +=
-      `${d.range.start.line + 1}:${d.range.start.character} - ` +
-      `${d.range.end.line + 1}:${d.range.end.character} : ${d.message}\r\n`;
-  }
-  return message;
-}
-
-function findDiagnostics(result: AnalysisResultDto, documentUri: string): Diagnostic[] {
-  const expected = normalizeUri(documentUri);
-  const key = Object.keys(result.diagnostics || {}).find(
-    (k) => normalizeUri(k) === expected,
-  );
-  return key ? result.diagnostics[key] : [];
-}
-
-function normalizeUri(uri: string): string {
-  // VS Code encodes ':' of windows drive letters and lower-cases them, the server may not
-  return decode(uri).replace(/^file:\/+/, "file:///").toLowerCase();
+  return message ? `${fileName} contains syntax errors:\r\n${message}` : undefined;
 }
 
 function decode(uri: string): string {

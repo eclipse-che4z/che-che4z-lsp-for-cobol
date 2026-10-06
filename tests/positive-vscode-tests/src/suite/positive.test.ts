@@ -65,7 +65,7 @@ suite(`Positive tests: ${path.basename(testFolder)}`, function () {
 
       const snapshot = program.snapshot ? readSnapshot(program.snapshot) : emptySnapshot();
       const failures = checkSnapshot(result, snapshot, program.fileName);
-      const errors = checkNoErrors(result, uri, program.fileName);
+      const errors = checkNoErrors(result, program.fileName);
       if (errors) {
         failures.push(errors);
       }
