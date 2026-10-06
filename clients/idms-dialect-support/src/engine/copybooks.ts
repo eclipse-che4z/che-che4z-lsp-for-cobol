@@ -40,6 +40,7 @@ const SIX_SPACES = "      ";
 const EIGHT_SPACES = "        ";
 const HIGHEST_LEVEL_FOR_ADJUSTMENT = 49;
 const SPECIAL_LEVELS = new Set([66, 77, 88]);
+const COMMENT_INDICATORS = new Set(["*", "/"]);
 
 interface ResolvedVariableLevel {
   context: IDocumentProcessingContext;
@@ -297,13 +298,19 @@ export class IdmsCopybookPreprocessor {
   private cleanCopybook(text: string): string {
     return text
       .split(/\r?\n/)
-      .map(
-        (line) =>
+      .map((line) => {
+        const programText = line.slice(
+          SEQUENCE_NUMBER_AREA_END,
+          PROGRAM_TEXT_END,
+        );
+        const isCommentLine = COMMENT_INDICATORS.has(programText.charAt(0));
+        return (
           SIX_SPACES.slice(0, line.length) +
-          line.slice(SEQUENCE_NUMBER_AREA_END, PROGRAM_TEXT_END) +
+          (isCommentLine ? " ".repeat(programText.length) : programText) +
           EIGHT_SPACES.slice(0, Math.max(0, line.length - PROGRAM_TEXT_END)) +
-          line.slice(IDENTIFICATION_AREA_END),
-      )
+          line.slice(IDENTIFICATION_AREA_END)
+        );
+      })
       .join("\n");
   }
 

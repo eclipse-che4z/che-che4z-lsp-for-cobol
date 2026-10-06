@@ -152,6 +152,30 @@ suite("Copybook Test Suite", function () {
     );
   });
 
+  test("Comment echoing a COPY IDMS statement is not treated as a nested copybook", async () => {
+    const editor = await helper.showDocument("Idms022.cbl");
+    const diagnostics = await helper.waitForDiagnosticCount(
+      editor.document.uri,
+      1,
+    );
+    helper.printAllDiagnostics(diagnostics);
+    assert.strictEqual(diagnostics.length, 1);
+
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(11, 19), pos(11, 31)),
+      vscode.DiagnosticSeverity.Error,
+    );
+
+    const copyEditor = await helper.showDocument("copybooks/COPY022");
+    const copyDiagnostics = await helper.waitForDiagnosticCount(
+      copyEditor.document.uri,
+      0,
+    );
+    assert.strictEqual(copyDiagnostics.length, 0);
+  });
+
   test("Resolve nested copybook and its variables properly constructed (case 1)", async () => {
     const editor = await helper.showDocument("Idms005.cbl");
     const diagnostics = await helper.waitForDiagnosticCount(

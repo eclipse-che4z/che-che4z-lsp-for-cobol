@@ -377,6 +377,24 @@ describe("IdmsPreprocessor", () => {
     );
   });
 
+  it("does not treat IDMS syntax inside a copybook comment line as a statement", async () => {
+    const context = createContext("file:///program.cbl");
+    const copybookContext = createContext("file:///SOMENAME.cpy");
+    context.resolveCopybook.mockResolvedValue({
+      context: copybookContext,
+      uri: vscode.Uri.parse("file:///SOMENAME.cpy"),
+      text: [
+        "**ZWI**    * ZW-SSC: 01  COPY IDMS SOMENAME.",
+        "       01  SOMENAME            PIC X(8)    VALUE 'X'.",
+      ].join("\n"),
+    });
+
+    await preprocessor.execute(context, "       01  COPY IDMS SOMENAME.");
+
+    expect(copybookContext.resolveCopybook).not.toHaveBeenCalled();
+    expect(copybookContext.addDiagnostic).not.toHaveBeenCalled();
+  });
+
   it("inserts the predefined subschema copybook after a multiline working-storage header", async () => {
     const context = createContext("file:///program.cbl");
     const copybookContext = createContext("file:///SUBSCHEMA-DESCRIPTION.cpy");
