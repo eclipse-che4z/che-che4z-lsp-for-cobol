@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.google.gson.JsonObject;
 import com.google.inject.Provider;
 import java.util.Set;
 import org.eclipse.lsp.cobol.cfg.CFASTBuilder;
@@ -32,8 +31,6 @@ import org.eclipse.lsp.cobol.lsp.events.queries.CompletionQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.DefinitionQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.DocumentHighlightQuery;
 import org.eclipse.lsp.cobol.lsp.events.queries.FormattingQuery;
-import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
-import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisResultHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
 import org.eclipse.lsp.cobol.service.delegates.actions.CodeActions;
@@ -100,11 +97,6 @@ class CobolTextDocumentServiceTest {
         new FormattingHandler(documentModelService, formations, asyncAnalysisService);
 
     CodeActionHandler codeActionHandler = new CodeActionHandler(actions);
-    AnalysisHandler analysisHandler =
-        new AnalysisHandler(
-            asyncAnalysisService, analysisService, builder, communications, documentModelService);
-    AnalysisResultHandler analysisResultHandler =
-        new AnalysisResultHandler(documentModelService, asyncAnalysisService, communications);
 
     DidOpenHandler didOpenHandler =
         new DidOpenHandler(asyncAnalysisService, mock(SourceUnitGraph.class));
@@ -135,8 +127,6 @@ class CobolTextDocumentServiceTest {
             lspMessageBroker,
             completionHandler,
             codeActionHandler,
-            analysisHandler,
-            analysisResultHandler,
             formattingHandler,
             didOpenHandler,
             didCloseHandler,
@@ -152,15 +142,6 @@ class CobolTextDocumentServiceTest {
   @AfterEach
   void tearDown() throws InterruptedException {
     lspMessageBroker.stop();
-  }
-
-  @Test
-  void testAnalysis() {
-    JsonObject json = new JsonObject();
-    json.addProperty("uri", "");
-
-    service.analysis(json);
-    Mockito.verify(lspMessageBroker, times(1)).query(any());
   }
 
   @Test

@@ -36,6 +36,8 @@ import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryFolderService;
 import org.eclipse.lsp.cobol.core.engine.dialects.DialectDiscoveryService;
 import org.eclipse.lsp.cobol.lsp.*;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
+import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApiService;
 import org.eclipse.lsp.cobol.service.CobolLSPServerStateService;
 import org.eclipse.lsp.cobol.service.SubroutineServiceImpl;
 import org.eclipse.lsp.cobol.service.WatcherService;
@@ -95,6 +97,7 @@ public class ServiceModule extends AbstractModule {
         .annotatedWith(Names.named("combinedStrategy"))
         .to(CopybookIdentificationCombinedStrategy.class);
     bind(TextDocumentService.class).to(CobolTextDocumentService.class);
+    bind(ExtendedApi.class).to(ExtendedApiService.class);
     bind(DialectDiscoveryService.class).to(DialectDiscoveryFolderService.class);
 
     bindFormations();
