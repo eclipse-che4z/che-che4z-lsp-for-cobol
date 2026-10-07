@@ -384,7 +384,7 @@ describe("IdmsPreprocessor", () => {
       context: copybookContext,
       uri: vscode.Uri.parse("file:///SOMENAME.cpy"),
       text: [
-        "**ZWI**    * ZW-SSC: 01  COPY IDMS SOMENAME.",
+        "**AAA**    *COMMENT: 01  COPY IDMS SOMENAME.",
         "       01  SOMENAME            PIC X(8)    VALUE 'X'.",
       ].join("\n"),
     });
