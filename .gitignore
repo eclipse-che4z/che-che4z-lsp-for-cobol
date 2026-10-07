@@ -144,3 +144,4 @@ clients/cobol-lsp-vscode-extension/test-report.xml
 /server/.run
 /clients/sample-dialect-support/.vscode
 /clients/daco-dialect-support/test-report.xml
+/clients/idms-dialect-support/test-report.xml

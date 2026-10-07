@@ -23,16 +23,9 @@ import org.eclipse.lsp.cobol.common.message.MessageTemplate;
 import org.eclipse.lsp.cobol.common.model.tree.variables.FileDescriptionNode;
 import org.eclipse.lsp.cobol.common.processor.ProcessingContext;
 import org.eclipse.lsp.cobol.common.processor.Processor;
-import org.eclipse.lsp.cobol.core.engine.symbols.SymbolAccumulator;
 
 /** FileDescriptionNode processor */
 public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
-  private final SymbolAccumulator symbolAccumulator;
-
-  public FileDescriptionProcess(SymbolAccumulator symbolAccumulator) {
-    this.symbolAccumulator = symbolAccumulator;
-  }
-
   @Override
   public void accept(FileDescriptionNode node, ProcessingContext ctx) {
     if (StringUtils.isBlank(node.getFileControlClause())) {
@@ -42,6 +35,5 @@ public class FileDescriptionProcess implements Processor<FileDescriptionNode> {
       ctx.getErrors().add(error);
     }
     ctx.getErrors().addAll(SectionNodeProcessorHelper.processNodeWithVariableDefinitions(node));
-    symbolAccumulator.registerVariablesInProgram(node);
   }
 }

@@ -17,6 +17,7 @@ import type {
   IDocumentProcessingContext,
   Item,
   Token,
+  VariableDefinitionToken,
   V2StartProcessingHandler,
 } from "@code4z/cobol-dialect-api";
 import { LanguageClientService } from "../services/LanguageClientService";
@@ -50,12 +51,19 @@ type DocumentReplacementPayload = {
 
 type TokenPayload = {
   name: string;
+  value?: string;
   location: LocationPayload;
+  displayText?: string;
+  level?: number;
 };
 
 type ItemPayload = {
   tokens: TokenPayload[];
-  type?: "VARIABLE" | "PROCEDURE";
+  type?:
+    | "VARIABLE"
+    | "OPTIONAL_VARIABLE"
+    | "PROCEDURE"
+    | "DIALECT_VARIABLE_DEFINITION";
 };
 
 type DocumentReplacementMapPayload = {
@@ -485,11 +493,16 @@ function serializeItem(item: Item) {
   };
 }
 
-function serializeToken(token: Token) {
+function serializeToken(token: Token | VariableDefinitionToken): TokenPayload {
   return {
     name: token.name,
     value: token.value,
     location: serializeLocation(token.location),
+    displayText: "displayText" in token ? token.displayText : undefined,
+    level:
+      "level" in token && typeof token.level === "number"
+        ? token.level
+        : undefined,
   };
 }
 
