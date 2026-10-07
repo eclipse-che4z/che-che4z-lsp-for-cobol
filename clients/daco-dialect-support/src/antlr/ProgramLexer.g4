@@ -18,6 +18,9 @@ channels{COMMENTS}
 import TechnicalLexer;
 
 WORKING_STORAGE : W O R K I N G MINUSCHAR S T O R A G E;
+FILE : F I L E;
+FD : F D;
+SD : S D;
 SECTION : S E C T I O N;
 LINKAGE : L I N K A G E;
 PROCEDURE : P R O C E D U R E;

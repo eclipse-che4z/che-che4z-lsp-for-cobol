@@ -62,16 +62,21 @@ skipUntilDataDivision
    ;
 
 skipUntilFirstSection
-   : (~(WORKING_STORAGE | LINKAGE))*
+   : (~(FILE | WORKING_STORAGE | LINKAGE))*
    ;
 
 dataSection
-   : WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
+   : FILE SECTION DOT_FS dataDescriptionEntry*
+   | WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
    | LINKAGE SECTION DOT_FS dataDescriptionEntry*
    ;
 
 dataDescriptionEntry
-   : copyMaid | variableEntry | variableEntrySpecificLevel | otherDialectCopy
+   : copyMaid | variableEntry | variableEntrySpecificLevel | otherDialectCopy | skipFileDescriptor
+   ;
+
+skipFileDescriptor
+   : (FD | SD) (~DOT_FS)* DOT_FS
    ;
 
 otherDialectCopy

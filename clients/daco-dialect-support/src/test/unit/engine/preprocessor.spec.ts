@@ -190,6 +190,53 @@ describe("DaCoPreprocessor test", () => {
     expect(context.addDiagnostic).not.toHaveBeenCalled();
   });
 
+  it("should process MAID in file and working-storage sections around foreign COPY", async () => {
+    const sourceContext = {
+      ...context,
+      resolveCopybook: jest.fn().mockResolvedValue({
+        context: copybookContext,
+        uri: Uri.parse("file:///copybook.cbl"),
+        text: "         01 ABC PIC 9.",
+      }),
+      addDiagnostic: jest.fn(),
+    };
+
+    await preprocessor.execute(
+      sourceContext,
+      [
+        "        IDENTIFICATION DIVISION.",
+        "          PROGRAM-ID. PARTEST.",
+        "          DATA DIVISION.",
+        "          FILE SECTION.",
+        "          FD INPUT-FILE.",
+        "          01 INPUT-RECORD PIC X(8).",
+        "          03 COPY MAID FILELAY OTP.",
+        "          SD SORT-FILE.",
+        "          01 SORT-RECORD PIC X(8).",
+        "          WORKING-STORAGE SECTION.",
+        "          01 COPY IDMS SUBSCHEMA-NAMES.",
+        "          01 COPY MAID NAME OTP.",
+        "          PROCEDURE DIVISION.",
+        "              DISPLAY ABC.",
+      ].join("\n"),
+    );
+
+    expect(sourceContext.addDiagnostic).not.toHaveBeenCalled();
+    expect(sourceContext.resolveCopybook).toHaveBeenCalledTimes(2);
+    expect(sourceContext.resolveCopybook).toHaveBeenNthCalledWith(
+      1,
+      "FILELAY_OTP",
+      expect.anything(),
+      expect.anything(),
+    );
+    expect(sourceContext.resolveCopybook).toHaveBeenNthCalledWith(
+      2,
+      "NAME_OTP",
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it("should parse READ TRANSACTION", async () => {
     await preprocessor.execute(
       context,
