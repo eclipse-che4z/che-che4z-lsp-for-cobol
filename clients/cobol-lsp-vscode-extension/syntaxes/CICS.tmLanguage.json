@@ -1,6 +1,9 @@
 {
   "scopeName": "meta.embedded.block.cics",
-  "injectionSelector": ["R:cics.embedded.code", "L:string.quoted.cics.cobol"],
+  "injectionSelector": [
+    "R:cics.embedded.code - string.quoted.single.cobol - string.quoted.double.cobol",
+    "L:string.quoted.cics.cobol"
+  ],
   "patterns": [
     {
       "include": "#cics-injection"
@@ -14,12 +17,6 @@
         },
         {
           "include": "#number-constant"
-        },
-        {
-          "include": "#string-quoted-constant"
-        },
-        {
-          "include": "#string-double-quoted-constant"
         },
         {
           "include": "#comment-cics-source"
@@ -36,16 +33,6 @@
     "number-constant": {
       "match": "(?<![\\+\\-\\w])(\\+|\\-)?\\d+(\\.\\d+)?([Ee](\\-|\\+)\\d+)?(?![\\-\\w])",
       "name": "constant.numeric.integer"
-    },
-    "string-quoted-constant": {
-      "begin": "'",
-      "end": "'|$",
-      "name": "string.quoted.single.cics"
-    },
-    "string-double-quoted-constant": {
-      "begin": "\"",
-      "end": "\"|$",
-      "name": "string.quoted.double.cics"
     },
     "comment-cics-source": {
       "match": "^(.{6})(\\/.*|\\*.*)$",

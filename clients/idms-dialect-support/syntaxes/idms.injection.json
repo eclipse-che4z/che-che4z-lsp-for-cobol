@@ -1,6 +1,6 @@
 {
     "scopeName": "idms.injection",
-    "injectionSelector": "L:source.cobol",
+    "injectionSelector": "L:source.cobol - string.quoted.single.cobol - string.quoted.double.cobol",
     "patterns": [
         {
             "include": "#idms-keywords"
