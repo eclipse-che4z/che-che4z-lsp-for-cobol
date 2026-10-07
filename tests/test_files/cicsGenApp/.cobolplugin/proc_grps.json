@@ -1,0 +1,11 @@
+{
+    "pgroups": [
+        {
+            "name": "aws",
+            "copybook-extensions": ["", ".cpy", ".CPY", ".copy", ".COPY"],
+            "libs": [
+                "copybooks"
+            ]
+        }
+    ]
+}

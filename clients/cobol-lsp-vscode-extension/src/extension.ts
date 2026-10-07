@@ -87,6 +87,11 @@ interface __AnalysisApi {
   getControlFlowAnalysis(documentUri: string): Promise<AnalysisResult>;
 }
 
+// Exported only when the extension runs from an extension test. Used by tests/positive-vscode-tests.
+interface __TestApi {
+  analysisResult(uri: string): Promise<unknown>;
+}
+
 const API_VERSION: string = "1.0.1";
 
 export async function activate(
@@ -174,8 +179,8 @@ export async function activate(
 
   await languageClientService.start(context);
 
-  // 'export' public api-surface
-  return {
+  // public api
+  const api = {
     v1: {
       async registerDialect(extensionId: string, dialect: unknown) {
         if (
@@ -231,6 +236,15 @@ export async function activate(
       return analysisService.getAnalysis(documentUri);
     },
   };
+  if (context.extensionMode !== vscode.ExtensionMode.Test) {
+    return api;
+  }
+  const testApi: __TestApi = {
+    analysisResult(uri: string) {
+      return languageClientService.retrieveAnalysisResult(uri);
+    },
+  };
+  return Object.assign(api, testApi);
 }
 
 async function createExtensionFolder(context: vscode.ExtensionContext) {

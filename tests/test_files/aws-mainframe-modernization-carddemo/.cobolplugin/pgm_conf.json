@@ -1,0 +1,6 @@
+{
+    "pgms": [{
+        "pgroup": "aws",
+        "program": "positive/*"
+    }]
+}

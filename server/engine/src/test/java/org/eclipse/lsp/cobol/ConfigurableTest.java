@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestInstance;
  * <p>1. guice DI mechanism for test classes. For usage refer {@link ClientServerIntegrationTest}
  *
  * <p>2. Text registry for actual cobol files for test classes. For usage refer {@link
- * org.eclipse.lsp.cobol.positive.PositiveTest}
+ * org.eclipse.lsp.cobol.positive.FileBasedTest}
  *
  * <p>3. CustomThreadPoolExecutor for test classes.
  */

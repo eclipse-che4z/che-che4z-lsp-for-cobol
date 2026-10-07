@@ -138,7 +138,7 @@ jobs:
           cache: 'maven'
       - name: Generate assisted configuration for GraalVM native build
         working-directory: server
-        run: mvn -e -B -Pnative -DskipNativeTests -Dagent=true -Dtest=\!PositiveTest -Dsurefire.failIfNoSpecifiedTests=false test
+        run: mvn -e -B -Pnative -DskipNativeTests -Dagent=true test
       - name: Upload native build configuration
         uses: actions/upload-artifact@v4
         with:
@@ -177,7 +177,7 @@ jobs:
           path: server/engine/target/server.jar
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Build Cobol Analysis Package Library
         working-directory: clients/analysis
         run: |
@@ -273,6 +273,13 @@ jobs:
           path: |
             cobol-language-support-*.vsix
             !cobol-language-support-for-*.vsix
+      - name: Run positive tests
+        working-directory: tests/positive-vscode-tests
+        env:
+          POSITIVE_TESTS_FILTER: 'Cobol85PositiveTestsSuite|carddemo|cicsGenApp'
+        run: |
+          npm ci
+          xvfb-run -a npm test -- ../test_files
       - name: Run COBOL LS extension integration tests
         working-directory: clients/cobol-lsp-vscode-extension
         run: |

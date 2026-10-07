@@ -14,21 +14,16 @@
  */
 package org.eclipse.lsp.cobol.lsp;
 
-import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.lsp.cobol.core.model.extendedapi.ExtendedApiResult;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidChangeNotification;
 import org.eclipse.lsp.cobol.lsp.events.notifications.DidOpenNotification;
 import org.eclipse.lsp.cobol.lsp.events.queries.CodeActionQuery;
-import org.eclipse.lsp.cobol.lsp.handlers.extended.AnalysisHandler;
 import org.eclipse.lsp.cobol.lsp.handlers.text.*;
-import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.delegates.communications.Communications;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
@@ -46,11 +41,10 @@ import org.eclipse.lsp4j.services.TextDocumentService;
  */
 @Slf4j
 @Singleton
-public class CobolTextDocumentService implements TextDocumentService, ExtendedApi {
+public class CobolTextDocumentService implements TextDocumentService {
   private final LspMessageBroker lspMessageBroker;
   private final CompletionHandler completionHandler;
   private final CodeActionHandler codeActionHandler;
-  private final AnalysisHandler analysisHandler;
   private final FormattingHandler formattingHandler;
   private final DidOpenHandler didOpenHandler;
   private final DidCloseHandler didCloseHandler;
@@ -67,7 +61,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
       LspMessageBroker lspMessageBroker,
       CompletionHandler completionHandler,
       CodeActionHandler codeActionHandler,
-      AnalysisHandler analysisHandler,
       FormattingHandler formattingHandler,
       DidOpenHandler didOpenHandler,
       DidCloseHandler didCloseHandler,
@@ -81,7 +74,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
     this.lspMessageBroker = lspMessageBroker;
     this.completionHandler = completionHandler;
     this.codeActionHandler = codeActionHandler;
-    this.analysisHandler = analysisHandler;
     this.formattingHandler = formattingHandler;
     this.didOpenHandler = didOpenHandler;
     this.didCloseHandler = didCloseHandler;
@@ -150,11 +142,6 @@ public class CobolTextDocumentService implements TextDocumentService, ExtendedAp
   @Override
   public void didSave(DidSaveTextDocumentParams params) {
     LOG.info("Document saved...");
-  }
-
-  @Override
-  public CompletableFuture<ExtendedApiResult> analysis(@NonNull JsonObject json) {
-    return lspMessageBroker.query(analysisHandler.createEvent(json));
   }
 
   @Override

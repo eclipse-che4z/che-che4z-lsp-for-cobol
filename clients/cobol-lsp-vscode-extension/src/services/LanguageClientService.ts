@@ -123,6 +123,11 @@ export class LanguageClientService {
     return languageClient.sendRequest("extended/analysis", params);
   }
 
+  public async retrieveAnalysisResult(uri: string) {
+    const languageClient = this.getLanguageClient();
+    return languageClient.sendRequest("extended/analysisResult", { uri });
+  }
+
   public invalidateConfiguration = async () => {
     const languageClient = this.getLanguageClient();
     await languageClient.sendNotification(

@@ -19,6 +19,7 @@ import com.google.inject.Injector;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -29,6 +30,7 @@ import org.eclipse.lsp.cobol.domain.modules.DatabusModule;
 import org.eclipse.lsp.cobol.domain.modules.EngineModule;
 import org.eclipse.lsp.cobol.domain.modules.ServiceModule;
 import org.eclipse.lsp.cobol.lsp.jrpc.CobolLanguageClient;
+import org.eclipse.lsp.cobol.lsp.jrpc.ExtendedApi;
 import org.eclipse.lsp.cobol.service.providers.ClientProvider;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
@@ -66,9 +68,10 @@ public class LangServerBootstrap {
     LangServerBootstrap langServerBootstrap = new LangServerBootstrap();
     Injector injector = LangServerBootstrap.initCtx();
     LanguageServer server = injector.getInstance(LanguageServer.class);
+    ExtendedApi extendedApi = injector.getInstance(ExtendedApi.class);
     ClientProvider provider = injector.getInstance(ClientProvider.class);
 
-    langServerBootstrap.start(args, server, provider);
+    langServerBootstrap.start(args, server, extendedApi, provider);
 
     System.exit(0);
   }
@@ -85,11 +88,14 @@ public class LangServerBootstrap {
   }
 
   private void start(
-      @NonNull String[] args, @NonNull LanguageServer server, @NonNull ClientProvider provider)
+      @NonNull String[] args,
+      @NonNull LanguageServer server,
+      @NonNull ExtendedApi extendedApi,
+      @NonNull ClientProvider provider)
       throws InterruptedException, ExecutionException {
     logger.info(String.format("Java version: %s", System.getProperty("java.version")));
     try {
-      launchServerWithPipes(server, provider);
+      launchServerWithPipes(server, extendedApi, provider);
     } catch (ExecutionException e) {
       logger.error("An error occurred while starting a language server", e);
       throw e;
@@ -98,10 +104,13 @@ public class LangServerBootstrap {
 
   @SuppressWarnings("squid:S106")
   private void launchServerWithPipes(
-      @NonNull LanguageServer server, @NonNull ClientProvider provider)
+      @NonNull LanguageServer server,
+      @NonNull ExtendedApi extendedApi,
+      @NonNull ClientProvider provider)
       throws InterruptedException, ExecutionException {
     logger.info("Language server started using pipe communication");
-    Launcher<CobolLanguageClient> launcher = createServerLauncher(server, System.in, System.out);
+    Launcher<CobolLanguageClient> launcher =
+        createServerLauncher(server, extendedApi, System.in, System.out);
     provider.setClient(launcher.getRemoteProxy());
     // suspend the main thread on listening
     launcher.startListening().get();
@@ -112,7 +121,10 @@ public class LangServerBootstrap {
   }
 
   static Launcher<CobolLanguageClient> createServerLauncher(
-      @NonNull LanguageServer server, @NonNull InputStream in, @NonNull OutputStream out) {
+      @NonNull LanguageServer server,
+      @NonNull ExtendedApi extendedApi,
+      @NonNull InputStream in,
+      @NonNull OutputStream out) {
     ThreadFactory tf =
         new ThreadFactory() {
           private int counter = 0;
@@ -122,7 +134,8 @@ public class LangServerBootstrap {
           }
         };
     return new LSPLauncher.Builder<CobolLanguageClient>()
-        .setLocalService(server)
+        .setLocalServices(Arrays.asList(server, extendedApi))
+        .setClassLoader(LangServerBootstrap.class.getClassLoader())
         .setExecutorService(Executors.newCachedThreadPool(tf))
         .setRemoteInterface(CobolLanguageClient.class)
         .setInput(in)
