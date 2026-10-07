@@ -1,0 +1,14 @@
+       IDENTIFICATION DIVISION. 
+       PROGRAM-ID. test1. 
+       ENVIRONMENT DIVISION.
+       IDMS-CONTROL SECTION.
+           PROTOCOL. MODE ABC.
+           IDMS-RECORDS MANUAL
+       DATA DIVISION. 
+       WORKING-STORAGE SECTION.
+       01 AREA-XW4.
+027100         07 LSTPRY-XW3.                                             D04FF3
+027200           09 LSTPRY-EW3         PIC ZZ.ZZZ.ZZZ,ZZ-.                D04FF3
+       LINKAGE SECTION.
+       PROCEDURE DIVISION.
+           DISPLAY NOT_EXISTING.
