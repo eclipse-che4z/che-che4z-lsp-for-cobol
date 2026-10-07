@@ -24,12 +24,14 @@
 !README.md
 !CHANGELOG.md
 !resources/logo.png
+!resources/en.json
 !package.json
 # * bundled extension code
 !dist/extension.js
 !dist/extension.js.map
 # ** dialect snippets
 !snippets.json
+!keywords.txt
 # ** dialect implementation
 !server/jar/dialect-idms.jar
 # * include coloring syntax
