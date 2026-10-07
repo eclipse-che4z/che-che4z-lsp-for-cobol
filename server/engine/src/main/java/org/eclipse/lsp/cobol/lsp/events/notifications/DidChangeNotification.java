@@ -14,12 +14,12 @@
  */
 package org.eclipse.lsp.cobol.lsp.events.notifications;
 
-import org.eclipse.lsp.cobol.lsp.LspNotification;
+import org.eclipse.lsp.cobol.lsp.LspSyncNotification;
 import org.eclipse.lsp.cobol.lsp.handlers.text.DidChangeHandler;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 
 /** textDocument/didChange language server event */
-public class DidChangeNotification implements LspNotification {
+public class DidChangeNotification implements LspSyncNotification {
   private final DidChangeTextDocumentParams params;
   private final DidChangeHandler didChangeHandler;
 
