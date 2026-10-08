@@ -69,7 +69,8 @@ public class CobolDialectV2 implements CobolDialect {
     try {
       dialectNodes = future.get();
     } catch (Exception e) {
-      LOG.warn("Dialect {} was stopped due to internal error {}", this.getName(), e.getMessage());
+      LOG.error(
+          "Dialect {} failed while processing {}", getName(), context.getProgramDocumentUri(), e);
       errorList.add(DialectErrorHelper.processingError(context, getName()));
     }
     return new ResultWithErrors<>(new DialectOutcome(dialectNodes, context), errorList);

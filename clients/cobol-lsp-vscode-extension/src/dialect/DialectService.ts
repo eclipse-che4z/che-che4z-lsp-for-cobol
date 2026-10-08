@@ -277,16 +277,18 @@ export class DialectService {
 
           try {
             await handler(context, text);
-          } catch (e) {
+            const result = this.serializeResults(programUri, context);
             this.outputChannel?.appendLine(
-              `Dialect ${dialectName} processing fails. Cause: ${JSON.stringify(e)}`,
+              `Dialect ${dialectName} analysis finished`,
+            );
+          } catch (e) {
+            const details =
+              e instanceof Error ? (e.stack ?? e.message) : String(e);
+            this.outputChannel?.appendLine(
+              `Dialect ${dialectName} processing failed: ${details}`,
             );
             throw e;
           }
-
-          const result = this.serializeResults(programUri, context);
-
-          return result;
         } else {
           this.outputChannel?.appendLine(
             `Handler for the dialect ${dialectName} was not found, dialect processing ignored`,

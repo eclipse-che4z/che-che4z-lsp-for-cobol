@@ -12,7 +12,11 @@
  *   Broadcom - initial API and implementation
  */
 import * as vscode from "vscode";
-import { IDocumentProcessingContext, Item } from "@code4z/cobol-dialect-api";
+import {
+  IDocumentProcessingContext,
+  Item,
+  Token,
+} from "@code4z/cobol-dialect-api";
 import { extractSuffix, updateVariableName } from "./util";
 import {
   CopyFromVariableDescriptor,
@@ -123,9 +127,33 @@ function generateReplacementAndInsertTexts(
         .padStart(2, "0")}`;
 
       const variableTokenName = `TokenVariable${tokenNumber}`;
-      const optionsTokenName = `TokenOptions${tokenNumber}`;
+      // The server maps each token to one source line, even when the options span several lines.
+      const optionLines = options.split(/\r?\n/);
+      const sourceLines = definition.options.split(/\r?\n/);
+      const optionTokens: Token[] = optionLines.map((line, index) => {
+        const sourceLineIndex = Math.min(index, sourceLines.length - 1);
+        const sourceLine = definition.optionsRange.start.line + sourceLineIndex;
+        const sourceColumn =
+          sourceLineIndex === 0 ? definition.optionsRange.start.character : 0;
+        return {
+          name: `TokenOptions${tokenNumber}_${index}`,
+          value: line,
+          location: new vscode.Location(
+            definition.uri,
+            new vscode.Range(
+              sourceLine,
+              sourceColumn,
+              sourceLine,
+              sourceColumn + sourceLines[sourceLineIndex].length,
+            ),
+          ),
+        };
+      });
+      const optionMap = optionTokens
+        .map((token) => `{${token.name}}`)
+        .join("\n");
 
-      insert += `         {${levelTokenName}} {${variableTokenName}} {${optionsTokenName}}.\n`;
+      insert += `         {${levelTokenName}} {${variableTokenName}} ${optionMap}.\n`;
       items.push(
         {
           tokens: [
@@ -151,18 +179,7 @@ function generateReplacementAndInsertTexts(
             },
           ],
         },
-        {
-          tokens: [
-            {
-              name: optionsTokenName,
-              value: options,
-              location: new vscode.Location(
-                definition.uri,
-                definition.optionsRange,
-              ),
-            },
-          ],
-        },
+        { tokens: optionTokens },
       );
     }
   }

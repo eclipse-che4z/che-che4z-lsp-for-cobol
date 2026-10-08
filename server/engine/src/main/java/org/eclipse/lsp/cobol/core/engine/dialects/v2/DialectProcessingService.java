@@ -89,7 +89,8 @@ public class DialectProcessingService {
           null,
           context.getProgramDocumentUri());
     } catch (Exception e) {
-      LOG.warn("Dialect {} was stopped due to internal error {}", dialectName, e.getMessage());
+      LOG.error(
+          "Dialect {} failed while processing {}", dialectName, context.getProgramDocumentUri(), e);
       errorList.add(DialectErrorHelper.processingError(context, dialectName));
     }
     return ImmutableList.of();
