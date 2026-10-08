@@ -281,6 +281,7 @@ export class DialectService {
             this.outputChannel?.appendLine(
               `Dialect ${dialectName} analysis finished`,
             );
+            return result;
           } catch (e) {
             const details =
               e instanceof Error ? (e.stack ?? e.message) : String(e);
