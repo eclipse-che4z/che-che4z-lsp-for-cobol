@@ -13,8 +13,6 @@
  */
 
 import { Uri, DiagnosticSeverity } from "vscode";
-import { readFileSync } from "node:fs";
-import { Item } from "@code4z/cobol-dialect-api";
 import { DaCoPreprocessor } from "../../../engine/preprocessor";
 import { createMessageService } from "./utils";
 import { SettingsService } from "../../../engine/services/settings";
@@ -280,34 +278,6 @@ describe("DaCoPreprocessor test", () => {
     );
     expect(context.addDiagnostic).not.toHaveBeenCalled();
     expect(context.replace).toHaveBeenCalled();
-  });
-
-  it("should map multiline COPY-FROM options one line at a time", async () => {
-    const source = readFileSync("test_files/DaCo110.cbl", "utf8").replace(
-      /^\d{6}/gm,
-      "      ",
-    );
-
-    await preprocessor.execute(context, source);
-
-    expect(context.addDiagnostic).not.toHaveBeenCalled();
-    expect(context.insertWithMap).toHaveBeenCalledTimes(1);
-    const [, , items, insertion] = context.insertWithMap.mock.calls[0];
-    const tokens = (items as Item[]).flatMap((item) => item.tokens);
-    const options = tokens.filter((token) =>
-      token.name.startsWith("TokenOptions"),
-    );
-
-    expect(options).toHaveLength(3);
-    expect(options[1].value).toBe("PIC S9(7)V9(2)");
-    expect(options[2].value.trim()).toBe("VALUE ZERO  COMP");
-    expect(insertion).toContain(`{${options[1].name}}\n{${options[2].name}}`);
-    for (const token of tokens) {
-      expect(token.location.range.start.line).toBe(
-        token.location.range.end.line,
-      );
-      expect(token.value).not.toContain("\n");
-    }
   });
 
   it("should report an error for COPY-FROM statement with invalid source suffix", async () => {

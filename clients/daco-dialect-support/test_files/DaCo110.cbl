@@ -10,3 +10,6 @@
 009100         07 ROWABC-XW4                       OCCURS 2500.
 009900           09 ABCDEF-BW4      PIC S9(7)V9(2)
 010000                                             VALUE ZERO  COMP.
+011000 PROCEDURE DIVISION.
+012000     DISPLAY ABCDEF-BW3.
+013000     DISPLAY NOT_EXISTING.

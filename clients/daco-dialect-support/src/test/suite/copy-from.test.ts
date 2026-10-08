@@ -219,4 +219,18 @@ suite("COPY-FROM statement Test Suite", function () {
       range(pos(38, 19), pos(38, 31)),
     );
   });
+
+  test("Process COPY-FROM with multiline options", async () => {
+    const editor = await helper.showDocument("DaCo110.cbl");
+    const diagnostics = await helper.waitForDiagnostics(editor.document.uri);
+    helper.printAllDiagnostics(diagnostics);
+
+    assert.strictEqual(diagnostics.length, 1);
+    helper.checkDiagnostic(
+      diagnostics,
+      "Variable NOT_EXISTING is not defined",
+      range(pos(14, 19), pos(14, 31)),
+    );
+    await helper.checkDefinition(editor, pos(13, 24), 10);
+  });
 });
