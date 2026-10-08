@@ -24,6 +24,11 @@ cd server
 mvn clean package --no-transfer-progress -Dmaven.test.skip
 cd -
 
+# Clear jars
+rm -f clients/daco-dialect-support/server/jar/dialect-daco.jar
+rm -f clients/daco-dialect-support/server/jar/dialect-idms.jar
+
+
 # Copy jars
 cp server/dialect-daco/target/dialect-daco.jar clients/daco-dialect-support/server/jar
 cp server/dialect-idms/target/dialect-idms.jar clients/idms-dialect-support/server/jar

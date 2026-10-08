@@ -217,6 +217,7 @@ export async function activate(
             name: dialect.name,
             description: dialect.description,
             snippets: dialect.snippets,
+            keywords: dialect.keywords,
             isCopyStatement: dialect.isCopyStatement,
           },
           handler,
@@ -298,7 +299,11 @@ function attachEventHandlers(
       name: d.name,
       description: d.description,
       extensionId: d.extensionId,
-      ...(d.protocolVersion === 1 ? { uri: d.uri.toString() } : {}),
+      ...(d.protocolVersion === 1
+        ? { uri: d.uri.toString() }
+        : {
+            keywords: d.keywordsUri?.toString(),
+          }),
     })),
   );
 }
@@ -360,6 +365,7 @@ export interface DialectDetailV2 {
   name: string;
   description: string;
   snippets: vscode.Uri;
+  keywords?: vscode.Uri;
   isCopyStatement?: CopyStatementParser;
 }
 
@@ -375,13 +381,13 @@ const registerNewDialectV1 = async (
   try {
     await vscode.workspace.fs.stat(dialect.jar);
   } catch (_error) {
-    return Error(`Dialect jar file ${dialect.jar.fsPath} does not exist`);
+    return new Error(`Dialect jar file ${dialect.jar.fsPath} does not exist`);
   }
 
   try {
     await vscode.workspace.fs.stat(dialect.snippets);
   } catch (_error) {
-    return Error(
+    return new Error(
       `Dialect snippets file ${dialect.snippets.fsPath} does not exist`,
     );
   }
@@ -419,7 +425,7 @@ const registerNewDialectV2 = async (
   try {
     await vscode.workspace.fs.stat(dialect.snippets);
   } catch (_error) {
-    return Error(
+    return new Error(
       `Dialect snippets file ${dialect.snippets.toString()} does not exist`,
     );
   }
@@ -428,6 +434,7 @@ const registerNewDialectV2 = async (
     dialect.name,
     dialect.description,
     dialect.snippets,
+    dialect.keywords,
     dialect.isCopyStatement,
   );
   dialectService.registerStartHandler(dialect.name, handler);
