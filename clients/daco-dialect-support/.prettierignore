@@ -18,3 +18,8 @@ out
 *.md
 # Ignore npm package lock
 package-lock.json
+# Ignore Antlr generated files
+src/generated
+src/antlr/gen
+.vscode-test
+dist

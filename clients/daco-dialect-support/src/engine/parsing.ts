@@ -1,0 +1,489 @@
+/*
+ * Copyright (c) 2026 Broadcom.
+ * The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Broadcom - initial API and implementation
+ */
+import * as vscode from "vscode";
+import {
+  BaseErrorListener,
+  RecognitionException,
+  Token,
+  Recognizer,
+  ATNSimulator,
+} from "antlr4ng";
+import { ProgramParserVisitor } from "../generated/ProgramParserVisitor";
+import {
+  CopyMaidContext,
+  DataDivisionContext,
+  ProcedureDivisionContext,
+  ProcedureSectionContext,
+  SkipCopyMaidContext,
+  VariableEntryContext,
+  DataSectionContext,
+} from "../generated/ProgramParser";
+import { CopybookContentParserVisitor } from "../generated/CopybookContentParserVisitor";
+
+import {
+  DataDescriptionEntryFormat1Context,
+  DataRedefinesClauseContext,
+} from "../generated/CopybookContentParser";
+import { StatementsParserVisitor } from "../generated/StatementsParserVisitor";
+import {
+  DacoSectionsContext,
+  DacoStatementsContext,
+  QualifiedDataNameContext,
+  VariableUsageNameContext,
+  WriteReportStatementWithNameContext,
+} from "../generated/StatementsParser";
+import { MessageService } from "./services/MessageService";
+import {
+  BLANK_STATEMENT,
+  BLANK_VALUE,
+  CopybookDescriptor,
+  CopybookDescriptorPD,
+  DiagnosticMessage,
+  ParseError,
+  ProgramInfo,
+  SPACE_VALUE,
+  StatementDescriptor,
+  VariableDescriptor,
+} from "./model";
+import {
+  constructRange,
+  constructRangeFromTokens,
+  createOptionsStr,
+  tryParseInt,
+} from "./util";
+
+export class CollectingErrorListener extends BaseErrorListener {
+  public readonly errors: ParseError[] = [];
+
+  syntaxError<S extends Token, T extends ATNSimulator>(
+    _recognizer: Recognizer<T>,
+    offendingSymbol: S | null,
+    line: number,
+    charPositionInLine: number,
+    msg: string,
+    _e: RecognitionException | null,
+  ): void {
+    this.errors.push({
+      line,
+      column: charPositionInLine,
+      message: msg,
+      range: this.getRangeForSyntaxError(
+        offendingSymbol,
+        line,
+        charPositionInLine,
+      ),
+    });
+  }
+
+  private getRangeForSyntaxError(
+    offendingSymbol: Token | null,
+    line: number,
+    charPositionInLine: number,
+  ) {
+    const tokenLength = offendingSymbol
+      ? offendingSymbol.stop - offendingSymbol.start + 1
+      : 0;
+    return new vscode.Range(
+      line - 1,
+      charPositionInLine,
+      line - 1,
+      charPositionInLine + tokenLength,
+    );
+  }
+}
+
+function concatResults<T>(r1: T[] | null, r2: T[] | null): T[] {
+  return [...(r1 ?? []), ...(r2 ?? [])];
+}
+
+export class NameResolver {
+  private readonly nameStack: {
+    level: number;
+    name: string;
+    range: vscode.Range;
+  }[] = [];
+  private lastLevel: number = 0;
+
+  public getParentName(
+    level: number,
+  ): { name: string; range: vscode.Range } | undefined {
+    for (let i = this.nameStack.length - 1; i >= 0; i--) {
+      if (this.nameStack[i].level < level) {
+        return { name: this.nameStack[i].name, range: this.nameStack[i].range };
+      }
+    }
+    return undefined;
+  }
+
+  public pushName(level: number, name: string, range: vscode.Range) {
+    if (this.lastLevel < level) {
+      this.nameStack.push({ level, name, range });
+      this.lastLevel = level;
+    } else {
+      // Pop all names with level greater than or equal to the current level
+      while (
+        this.nameStack.length > 0 &&
+        (this.nameStack.at(-1)?.level ?? 0) >= level
+      ) {
+        this.nameStack.pop();
+      }
+      this.nameStack.push({ level, name, range });
+      this.lastLevel = level;
+    }
+  }
+}
+
+type CopyFromOptions =
+  | { kind: "COPY_FROM"; suffix: string }
+  | { kind: "REGULAR_OPTIONS"; options: string };
+
+export class ProgramVisitor extends ProgramParserVisitor<CopybookDescriptor[]> {
+  private readonly parentNameResolver: NameResolver = new NameResolver();
+  public readonly programInfo: ProgramInfo = new ProgramInfo();
+
+  public constructor(
+    private readonly messageService: MessageService,
+    private readonly documentUri: vscode.Uri,
+  ) {
+    super();
+  }
+
+  private parseCopyFromOptions(options: string): CopyFromOptions {
+    const trimmed = options.trim();
+
+    const match = /^COPY-FROM\s+([A-Z0-9]+)$/i.exec(trimmed);
+
+    if (!match) {
+      return {
+        kind: "REGULAR_OPTIONS",
+        options,
+      };
+    }
+
+    const suffix = match[1].toUpperCase();
+
+    if (!/^[A-Z0-9]{2}$/.test(suffix)) {
+      const message = this.messageService.get(
+        "validation.copy_from_suffix",
+        suffix,
+      );
+      throw new Error(message);
+    }
+
+    return {
+      kind: "COPY_FROM",
+      suffix,
+    };
+  }
+
+  visitCopyMaid = (ctx: CopyMaidContext): CopybookDescriptor[] => {
+    const layoutId = ctx.layoutId();
+    if (!layoutId) {
+      return super.visitChildren(ctx) ?? [];
+    }
+
+    const layoutUsage = ctx.layoutUsage();
+    const name = layoutId.getText();
+    const suffix = layoutUsage?.getText();
+
+    const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
+    const statementRange = constructRange(ctx);
+    const nameRange = constructRange(layoutId);
+
+    const parentInfo = this.parentNameResolver.getParentName(level);
+    const descriptor = new CopybookDescriptor(
+      statementRange,
+      nameRange,
+      level,
+      name,
+      suffix,
+      layoutUsage ? constructRange(layoutUsage) : undefined,
+      parentInfo?.name,
+      parentInfo?.range,
+    );
+    this.programInfo.accumulator.addCopybookPlaceholder(descriptor);
+
+    return [descriptor, ...(super.visitChildren(ctx) ?? [])];
+  };
+
+  visitVariableEntry = (ctx: VariableEntryContext): CopybookDescriptor[] => {
+    const newName = ctx._identifier?.text?.toUpperCase();
+    const level = Number.parseInt(ctx.LEVEL_NUMBER()?.getText() ?? "0", 10);
+
+    if (newName) {
+      const nameRange = constructRangeFromTokens(
+        ctx._identifier,
+        ctx._identifier,
+      );
+
+      this.parentNameResolver.pushName(level, newName, nameRange);
+
+      const optionsText = createOptionsStr(ctx.variableOptionEntry());
+      const parsed = this.parseCopyFromOptions(optionsText);
+
+      if (parsed.kind === "COPY_FROM") {
+        const copyFromRange = constructRange(ctx.variableOptionEntry());
+        this.programInfo.accumulator.add({
+          levelRange: constructRangeFromTokens(
+            ctx.LEVEL_NUMBER().getSymbol(),
+            ctx.LEVEL_NUMBER().getSymbol(),
+          ),
+          level: level,
+          copyFromRange: copyFromRange,
+          nameRange: nameRange,
+          name: newName,
+          suffix: parsed.suffix,
+          type: "COPY-FROM",
+        });
+      } else {
+        this.programInfo.accumulator.add({
+          levelRange: constructRangeFromTokens(
+            ctx.LEVEL_NUMBER().getSymbol(),
+            ctx.LEVEL_NUMBER().getSymbol(),
+          ),
+          level: level,
+          nameRange: nameRange,
+          name: newName,
+          type: "DEFINITION",
+          options: optionsText,
+          optionsRange: constructRange(ctx.variableOptionEntry()),
+          uri: this.documentUri,
+        });
+      }
+    }
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitSkipCopyMaid = (ctx: SkipCopyMaidContext): CopybookDescriptor[] => {
+    return [new CopybookDescriptorPD(constructRange(ctx))];
+  };
+
+  visitProcedureSection = (
+    ctx: ProcedureSectionContext,
+  ): CopybookDescriptor[] => {
+    this.programInfo.sections.push(ctx.sectionName().getText().toUpperCase());
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitProcedureDivision = (
+    ctx: ProcedureDivisionContext,
+  ): CopybookDescriptor[] => {
+    this.programInfo.procedureDivisionNameStart = ctx.PROCEDURE().symbol.line;
+    this.programInfo.procedureDivisionNameEnd = ctx.DOT_FS().symbol.line;
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitDataDivision = (ctx: DataDivisionContext): CopybookDescriptor[] => {
+    this.programInfo.dataDivisionExists = true;
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  visitDataSection = (ctx: DataSectionContext): CopybookDescriptor[] => {
+    if (ctx.WORKING_STORAGE()) {
+      this.programInfo.workingStorageNameEnd = ctx.DOT_FS()?.getSymbol()?.line;
+    }
+    if (ctx.LINKAGE()) {
+      this.programInfo.linkageSectionNameEnd = ctx.DOT_FS()?.getSymbol()?.line;
+    }
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  protected aggregateResult = concatResults;
+}
+
+export class CopybookContentVisitor extends CopybookContentParserVisitor<
+  VariableDescriptor[]
+> {
+  constructor(private readonly documentUri: vscode.Uri) {
+    super();
+  }
+
+  visitDataDescriptionEntryFormat1? = (
+    ctx: DataDescriptionEntryFormat1Context,
+  ): VariableDescriptor[] => {
+    const levelRange = constructRange(ctx.levelNumber());
+    const level = Number.parseInt(ctx.levelNumber().getText());
+    const entryName = ctx.entryName();
+    const name = entryName?.getText() ?? "";
+
+    if (name === "" || !entryName) {
+      return super.visitChildren(ctx) ?? [];
+    }
+    const nameRange = constructRange(entryName);
+
+    return [
+      {
+        levelRange: levelRange,
+        level: level,
+        nameRange: nameRange,
+        name: name,
+        type: "DEFINITION",
+        options: createOptionsStr(ctx.variableOptionEntry()),
+        optionsRange: constructRange(ctx.variableOptionEntry()),
+        uri: this.documentUri,
+      },
+      ...(super.visitChildren(ctx) ?? []),
+    ];
+  };
+
+  visitDataRedefinesClause? = (
+    ctx: DataRedefinesClauseContext,
+  ): VariableDescriptor[] => {
+    const redefinitionName = ctx.dataName();
+
+    if (redefinitionName) {
+      const nameRange = constructRange(redefinitionName);
+      return [
+        {
+          nameRange: nameRange,
+          name: redefinitionName.getText(),
+          type: "REDEFINITION",
+        },
+        ...(super.visitChildren(ctx) ?? []),
+      ];
+    }
+    return super.visitChildren(ctx) ?? [];
+  };
+
+  protected aggregateResult = concatResults;
+}
+
+export class StatementsVisitor extends StatementsParserVisitor<
+  StatementDescriptor[]
+> {
+  public diagnostics: vscode.Diagnostic[] = [];
+  public constructor(private readonly messageService: MessageService) {
+    super();
+  }
+
+  visitDacoSections? = (ctx: DacoSectionsContext): StatementDescriptor[] => {
+    const statements: StatementDescriptor[] = [];
+    statements.push(
+      new StatementDescriptor(
+        constructRange(ctx),
+        constructRange(ctx),
+        "STATEMENT",
+        this.visitChildren(ctx) ?? [],
+        [],
+        SPACE_VALUE,
+      ),
+    );
+    return statements;
+  };
+
+  visitDacoStatements?: (ctx: DacoStatementsContext) => StatementDescriptor[] =
+    (ctx: DacoStatementsContext): StatementDescriptor[] => {
+      const statements: StatementDescriptor[] = [];
+
+      const dfldRcu = ctx.dfldRcu();
+      const onSymbol = dfldRcu?.ON()?.symbol;
+      const rcuSymbol = dfldRcu?.RCU()?.symbol;
+      const isSortTable = ctx.tableDMLStatement()?.sortTableStatement();
+
+      if (onSymbol && rcuSymbol) {
+        const range = constructRangeFromTokens(onSymbol, rcuSymbol);
+        statements.push(
+          new StatementDescriptor(
+            range,
+            range,
+            "STATEMENT",
+            [],
+            [],
+            SPACE_VALUE,
+          ),
+        );
+      } else {
+        const diagnostics: DiagnosticMessage[] = [];
+        if (isSortTable) {
+          diagnostics.push({
+            severity: vscode.DiagnosticSeverity.Warning,
+            template: "parsers.deprecated",
+          });
+        }
+
+        statements.push(
+          new StatementDescriptor(
+            constructRange(ctx),
+            constructRange(ctx),
+            "STATEMENT",
+            this.visitChildren(ctx) ?? [],
+            diagnostics,
+            this.getFiller(ctx),
+          ),
+        );
+      }
+      return statements;
+    };
+
+  private getFiller(ctx: DacoStatementsContext): string {
+    if (ctx.ifRowCondition()) {
+      return BLANK_VALUE;
+    }
+    if (ctx.execStatement()) {
+      return SPACE_VALUE;
+    }
+    return BLANK_STATEMENT;
+  }
+
+  visitQualifiedDataName?: (
+    ctx: QualifiedDataNameContext,
+  ) => StatementDescriptor[] = (
+    ctx: QualifiedDataNameContext,
+  ): StatementDescriptor[] => {
+    return [
+      new StatementDescriptor(
+        constructRange(ctx),
+        constructRange(ctx),
+        "VARIABLE",
+        this.visitChildren(ctx) ?? [],
+      ),
+    ];
+  };
+
+  visitVariableUsageName?: (
+    ctx: VariableUsageNameContext,
+  ) => StatementDescriptor[] = (
+    ctx: VariableUsageNameContext,
+  ): StatementDescriptor[] => {
+    return [
+      new StatementDescriptor(
+        constructRange(ctx),
+        constructRange(ctx),
+        "VARIABLE_USAGE",
+        this.visitChildren(ctx) ?? [],
+      ),
+    ];
+  };
+
+  visitWriteReportStatementWithName?: (
+    ctx: WriteReportStatementWithNameContext,
+  ) => StatementDescriptor[] = (
+    ctx: WriteReportStatementWithNameContext,
+  ): StatementDescriptor[] => {
+    if (ctx._lengthToken) {
+      const length = tryParseInt(ctx._lengthToken.getText());
+
+      if (length !== undefined && !(length >= 80 && length <= 200)) {
+        this.diagnostics.push({
+          severity: vscode.DiagnosticSeverity.Warning,
+          message: this.messageService.get("parsers.intRangeValue", 80, 200),
+          range: constructRange(ctx._lengthToken),
+        });
+      }
+    }
+    return this.visitChildren(ctx) ?? [];
+  };
+
+  protected aggregateResult = concatResults;
+}

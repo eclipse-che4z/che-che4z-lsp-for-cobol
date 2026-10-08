@@ -86,4 +86,19 @@ describe("DialectService test", () => {
     dialectHandler("DIALECT", "URI", "TEXT");
     expect(processDialect).toBeTruthy();
   });
+
+  test("Test DialectService logs the stack of a failed dialect handler", async () => {
+    const service = new DialectService(
+      languageClientService,
+      undefined,
+      outputChannel,
+    );
+    const error = new Error("processing failed");
+    service.registerStartHandler("DIALECT", () => Promise.reject(error));
+
+    await expect(dialectHandler("DIALECT", "URI", "TEXT")).rejects.toBe(error);
+    expect(outputChannel.appendLine).toHaveBeenCalledWith(
+      expect.stringContaining(error.stack ?? error.message),
+    );
+  });
 });
