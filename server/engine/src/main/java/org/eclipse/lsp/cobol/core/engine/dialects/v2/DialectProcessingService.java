@@ -129,16 +129,15 @@ public class DialectProcessingService {
 
       addErrors(errorList, copybook, copybookId, copybookInfo.getDiagnostics());
 
-      Location statementLocation =
-          document.mapLocation(copybookInfo.getStatementLocation().getRange());
+      Location nameLocation = document.mapLocation(copybookInfo.getNameLocation().getRange());
       CopyNode copyNode =
           new CopyNode(
               Locality.builder()
-                  .uri(statementLocation.getUri())
+                  .uri(nameLocation.getUri())
                   .copybookId(parentCopybookId)
-                  .range(statementLocation.getRange())
+                  .range(nameLocation.getRange())
                   .build(),
-              document.mapLocation(copybookInfo.getNameLocation().getRange()),
+              nameLocation,
               copybookInfo.getCopybookName(),
               dialectName,
               copybookInfo.getUri());
@@ -193,7 +192,7 @@ public class DialectProcessingService {
         .orElse(null);
   }
 
-  private static ArrayList<Node> applyReplacements(
+  static ArrayList<Node> applyReplacements(
       ExtendedDocument document,
       DocumentReplacement[] replacements,
       DocumentReplacementMap[] replacementMaps,
@@ -204,6 +203,7 @@ public class DialectProcessingService {
     }
 
     ArrayList<Node> result = new ArrayList<>();
+    Set<Locality> definitions = new HashSet<>();
     for (DocumentReplacementMap replacementMap : replacementMaps) {
       Map<String, Token> mappedTokens =
           document.replace(
@@ -213,7 +213,12 @@ public class DialectProcessingService {
               normalizeReplacementMap(replacementMap.getReplacementMap()));
 
       addMappedNodes(
-          replacementMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
+          replacementMap.getTokenItems(),
+          mappedTokens,
+          document.getUri(),
+          copybookId,
+          definitions,
+          result);
     }
 
     for (DocumentInsertionMap insertionMap : insertionMaps) {
@@ -225,7 +230,12 @@ public class DialectProcessingService {
               normalizeReplacementMap(insertionMap.getReplacementMap()));
 
       addMappedNodes(
-          insertionMap.getTokenItems(), mappedTokens, document.getUri(), copybookId, result);
+          insertionMap.getTokenItems(),
+          mappedTokens,
+          document.getUri(),
+          copybookId,
+          definitions,
+          result);
     }
     return result;
   }
@@ -247,13 +257,14 @@ public class DialectProcessingService {
       Map<String, Token> mappedTokens,
       String uri,
       String copybookId,
+      Set<Locality> definitions,
       List<Node> result) {
     for (ReplacementTokens tokens : tokenItems) {
       List<Token> mappedTokenList =
           Arrays.stream(tokens.getTokens())
               .map(t -> mappedTokens.get(t.getName()))
               .collect(Collectors.toList());
-      NodeHelper.createNodesIfNeeded(tokens.getType(), mappedTokenList, uri, copybookId)
+      NodeHelper.createNodesIfNeeded(tokens, mappedTokenList, uri, copybookId, definitions)
           .ifPresent(result::addAll);
     }
   }
