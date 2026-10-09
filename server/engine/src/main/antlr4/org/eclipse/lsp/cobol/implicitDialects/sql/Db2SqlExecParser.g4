@@ -1338,7 +1338,7 @@ dbs_lead_function: LEAD dbs_lag_lead_expression;
 dbs_partitioning_expression: dbs_expression;
 dbs_window_partition_clause: PARTITION BY dbs_partitioning_expression (dbs_comma_separator dbs_partitioning_expression)*
 ;
-dbs_sort_key_expression: dbs_column_name (dbs_expression_operator dbs_column_name)* | INTEGERLITERAL;
+dbs_sort_key_expression: INTEGERLITERAL | dbs_expression (dbs_expression_operator dbs_expression)*;
 dbs_window_each_order_clause: dbs_sort_key_expression (ASC (NULLS LAST)? | ASC NULLS FIRST | DESC (NULLS FIRST)? | DESC NULLS LAST )?;
 
 dbs_window_order_clause: ORDER BY dbs_window_each_order_clause (dbs_comma_separator dbs_window_each_order_clause)*;
