@@ -34,8 +34,30 @@ class TestSqlOrderByFunction {
           + "                   ORDER BY UPPER(COL2) ASC\n"
           + "           END-EXEC.";
 
+  private static final String TEXT_IN_WORKING_STORAGE =
+      "       IDENTIFICATION DIVISION.\n"
+          + "       PROGRAM-ID. SQLCRSR.\n"
+          + "\n"
+          + "       DATA DIVISION.\n"
+          + "       WORKING-STORAGE SECTION.\n"
+          + "           EXEC SQL\n"
+          + "               DECLARE C1 CURSOR FOR\n"
+          + "               SELECT COL1\n"
+          + "                    ,COL2\n"
+          + "               FROM TABLE1\n"
+          + "               ORDER BY UPPER(COL2) ASC\n"
+          + "           END-EXEC.\n"
+          + "\n"
+          + "       PROCEDURE DIVISION.\n"
+          + "           STOP RUN.";
+
   @Test
   void test() {
     UseCaseEngine.runTest(TEXT, ImmutableList.of(), ImmutableMap.of());
+  }
+
+  @Test
+  void testInWorkingStorage() {
+    UseCaseEngine.runTest(TEXT_IN_WORKING_STORAGE, ImmutableList.of(), ImmutableMap.of());
   }
 }
