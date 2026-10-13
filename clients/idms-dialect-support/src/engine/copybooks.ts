@@ -29,7 +29,7 @@ import {
   IdmsCopyVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
-import { processStatements } from "./statementsts";
+import { processStatements } from "./statements";
 import { addParsingErrors } from "./util";
 import { MessageService } from "./services/MessageService";
 
