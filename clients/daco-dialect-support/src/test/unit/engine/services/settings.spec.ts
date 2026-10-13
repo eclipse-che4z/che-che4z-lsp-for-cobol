@@ -27,7 +27,7 @@ describe("SettingsService test suite", () => {
     const version = SettingsService.getApiVersion();
 
     expect(version).toBe("legacy");
-    expect(vscode.window.showErrorMessage).toHaveBeenCalled();
+    expect(vscode.window.showWarningMessage).toHaveBeenCalled();
   });
 
   it("should treat 'new' as 'new'", () => {
@@ -36,7 +36,7 @@ describe("SettingsService test suite", () => {
     const version = SettingsService.getApiVersion();
 
     expect(version).toBe("new");
-    expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+    expect(vscode.window.showWarningMessage).not.toHaveBeenCalled();
   });
 
   it("should treat 'legacy' as 'legacy'", () => {
@@ -47,7 +47,7 @@ describe("SettingsService test suite", () => {
     const version = SettingsService.getApiVersion();
 
     expect(version).toBe("legacy");
-    expect(vscode.window.showErrorMessage).not.toHaveBeenCalled();
+    expect(vscode.window.showWarningMessage).not.toHaveBeenCalled();
   });
 
   it("should return uppercase predefined sections", () => {

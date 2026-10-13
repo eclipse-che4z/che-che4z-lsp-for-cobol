@@ -45,7 +45,7 @@ export class SettingsService {
     }
 
     if (version !== "legacy") {
-      vscode.window.showErrorMessage(
+      vscode.window.showWarningMessage(
         `Invalid API version: '${version}'. Expected 'legacy' or 'new'. Switched to 'legacy'`,
       );
     }
