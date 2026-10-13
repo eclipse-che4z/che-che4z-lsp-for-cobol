@@ -28,7 +28,7 @@ import {
   IdmsDialectVisitor,
   IdmsTransformationVisitor,
 } from "./parsing";
-import { processStatements } from "./statementsts";
+import { processStatements } from "./statements";
 import { addParsingErrors } from "./util";
 
 interface ProgramAnalysis {
