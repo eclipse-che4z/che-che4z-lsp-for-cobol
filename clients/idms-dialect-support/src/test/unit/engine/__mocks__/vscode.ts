@@ -24,6 +24,7 @@ export const workspace = {
 
 export const window = {
   showErrorMessage: jest.fn(),
+  showWarningMessage: jest.fn(),
 };
 
 export class Position {
