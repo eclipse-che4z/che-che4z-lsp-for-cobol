@@ -27,9 +27,11 @@ import { filteredOutput } from "./lib/output";
 
 async function main() {
   try {
-    const root = process.argv[2] || process.env.POSITIVE_TESTS_ROOT;
+    const args = process.argv.slice(2);
+    const runNewDialectAPI = args.includes("--runNewDialectAPI");
+    const root = args.find((arg) => !arg.startsWith("--")) || process.env.POSITIVE_TESTS_ROOT;
     if (!root) {
-      console.error("Usage: npm test -- <tests root folder>");
+      console.error("Usage: npm test -- <tests root folder> [--runNewDialectAPI]");
       process.exit(2);
     }
 
@@ -58,6 +60,7 @@ async function main() {
       console.log(`\n=== ${folder}`);
       const userDir = fs.mkdtempSync(path.join(os.tmpdir(), "cobol-positive"));
       writeUserSettings(userDir);
+      const restoreWorkspaceSettings = runNewDialectAPI ? writeWorkspaceSettings(folder) : undefined;
       const launchArgs = [
         folder,
         "--disable-extensions",
@@ -85,6 +88,7 @@ async function main() {
         failed.push(folder);
       } finally {
         fs.rmSync(userDir, { recursive: true, force: true });
+        restoreWorkspaceSettings?.();
       }
     }
 
@@ -110,6 +114,29 @@ function writeUserSettings(userDir: string) {
     path.join(userDir, "User", "settings.json"),
     JSON.stringify(settings, null, 2),
   );
+}
+
+function writeWorkspaceSettings(folder: string): () => void {
+  const vscodeDir = path.join(folder, ".vscode");
+  const settingsPath = path.join(vscodeDir, "settings.json");
+  const hadDir = fs.existsSync(vscodeDir);
+  const original = fs.existsSync(settingsPath) ? fs.readFileSync(settingsPath) : undefined;
+  fs.mkdirSync(vscodeDir, { recursive: true });
+  fs.writeFileSync(
+    settingsPath,
+    JSON.stringify(
+      {
+        "cobol-lsp.idms.dialect.api.version": "new",
+        "cobol-lsp.daco.dialect.api.version": "new",
+      },
+      null,
+      2,
+    ),
+  );
+  return () => {
+    if (original) fs.writeFileSync(settingsPath, original);
+    else fs.rmSync(hadDir ? settingsPath : vscodeDir, { recursive: true, force: true });
+  };
 }
 
 void main();
