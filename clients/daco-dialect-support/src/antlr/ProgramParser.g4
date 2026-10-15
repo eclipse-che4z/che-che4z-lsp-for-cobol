@@ -27,7 +27,7 @@ startRule
    ;
 
 dataDivision
-   : DATA_DIVISION DOT_FS skipUntilFirstSection dataSection*
+   : DATA_DIVISION DOT_FS dataSection*
    ;
 
 procedureDivision
@@ -61,14 +61,20 @@ skipUntilDataDivision
    : (~(DATA_DIVISION | PROCEDURE))*
    ;
 
-skipUntilFirstSection
-   : (~(FILE | WORKING_STORAGE | LINKAGE))*
-   ;
-
 dataSection
    : FILE SECTION DOT_FS dataDescriptionEntry*
    | WORKING_STORAGE SECTION DOT_FS dataDescriptionEntry*
    | LINKAGE SECTION DOT_FS dataDescriptionEntry*
+   | otherDialectSection
+   ;
+
+// Sections owned by other dialects (e.g. IDMS SCHEMA SECTION, MAP SECTION) can appear anywhere
+otherDialectSection
+   : sectionName SECTION DOT_FS skipUntilNextSection
+   ;
+
+skipUntilNextSection
+   : .*?
    ;
 
 dataDescriptionEntry
