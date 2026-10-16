@@ -29,6 +29,8 @@ DATA_DIVISION: D A T A [ \t\r\n]+ D I V I S I O N;
 
 COPY                 : C O P Y ;
 MAID                 : M A I D ;
+EXEC                 : E X E C ;
+END_EXEC             : E N D MINUSCHAR E X E C ;
 PICTURE              : P I C T U R E -> pushMode(PICTURECLAUSE);
 PIC                  : P I C  -> pushMode(PICTURECLAUSE);
 

@@ -1,0 +1,11 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SQL-INCLUDE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+           EXEC SQL
+               INCLUDE PRODUCTS
+               INCLUDE PARTS
+           END-EXEC
+       PROCEDURE DIVISION.
+           DISPLAY NOT-EXISTING.
+           STOP RUN.

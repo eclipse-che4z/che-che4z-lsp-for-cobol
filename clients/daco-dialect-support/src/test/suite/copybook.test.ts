@@ -327,4 +327,46 @@ suite("Copybook Test Suite", function () {
       vscode.DiagnosticSeverity.Warning,
     );
   });
+
+  test("ordinary COPY between fields works with DaCo and IDMS v2", async () => {
+    const editor = await helper.showDocument("DaCo112.cbl");
+    const expectedMessage = "Variable NOT-EXISTING is not defined";
+    let diagnostics: vscode.Diagnostic[] = [];
+    await helper.waitFor(() => {
+      diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      return diagnostics.some(
+        (diagnostic) => diagnostic.message === expectedMessage,
+      );
+    }, helper.TEST_TIMEOUT);
+
+    assert.deepStrictEqual(
+      diagnostics.map((diagnostic) => diagnostic.message),
+      [expectedMessage],
+    );
+
+    const usageOffset = editor.document.getText().lastIndexOf("WS-FIELD");
+    assert.ok(usageOffset >= 0);
+    await helper.checkDefinition(
+      editor,
+      editor.document.positionAt(usageOffset),
+      helper.inDocument("COPY1", 0),
+    );
+  });
+
+  test("EXEC SQL INCLUDE without a period works with DaCo and IDMS v2", async () => {
+    const editor = await helper.showDocument("DaCo113.cbl");
+    const expectedMessage = "Variable NOT-EXISTING is not defined";
+    let diagnostics: vscode.Diagnostic[] = [];
+    await helper.waitFor(() => {
+      diagnostics = vscode.languages.getDiagnostics(editor.document.uri);
+      return diagnostics.some(
+        (diagnostic) => diagnostic.message === expectedMessage,
+      );
+    }, helper.TEST_TIMEOUT);
+
+    assert.deepStrictEqual(
+      diagnostics.map((diagnostic) => diagnostic.message),
+      [expectedMessage],
+    );
+  });
 });

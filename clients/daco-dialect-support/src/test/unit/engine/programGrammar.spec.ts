@@ -124,4 +124,48 @@ describe("program grammar: data division sections", () => {
     expect(knownSection).toBeDefined();
     expect(knownSection!.dataDescriptionEntry()).toHaveLength(2);
   });
+
+  it("stops EXEC blocks at END-EXEC even without a period", () => {
+    const { tree, errors } = parse(
+      [
+        "       DATA DIVISION.",
+        "       WORKING-STORAGE SECTION.",
+        "           EXEC SQL",
+        "               INCLUDE PRODUCTS",
+        "               INCLUDE PARTS",
+        "           END-EXEC",
+        "           COPY COPY1.",
+        "       PROCEDURE DIVISION.",
+        "           STOP RUN.",
+      ].join("\n"),
+    );
+
+    expect(errors).toEqual([]);
+    const entries = tree
+      .dataDivision()!
+      .dataSection()[0]
+      .dataDescriptionEntry();
+    expect(entries).toHaveLength(2);
+    expect(entries[0].skipExecBlock()).not.toBeNull();
+    expect(entries[1].otherDialectCopy()).not.toBeNull();
+    expect(tree.procedureDivision()).not.toBeNull();
+  });
+
+  it("recognizes PROCEDURE DIVISION immediately after END-EXEC without a period", () => {
+    const { tree, errors } = parse(
+      [
+        "       DATA DIVISION.",
+        "       WORKING-STORAGE SECTION.",
+        "           EXEC SQL INCLUDE PRODUCTS END-EXEC",
+        "       PROCEDURE DIVISION.",
+        "           STOP RUN.",
+      ].join("\n"),
+    );
+
+    expect(errors).toEqual([]);
+    expect(
+      tree.dataDivision()!.dataSection()[0].dataDescriptionEntry(),
+    ).toHaveLength(1);
+    expect(tree.procedureDivision()).not.toBeNull();
+  });
 });
