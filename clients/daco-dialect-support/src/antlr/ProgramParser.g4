@@ -96,13 +96,13 @@ skipExecBlock
    ;
 
 // Leave data entries owned by COBOL or another dialect to their own parser.
+// Do not consume a following <name> SECTION header as a data entry.
 // Stop at the next period so subsequent MAID entries can still be collected.
 unknownDataEntry
-   : {this.inputStream?.LT(2)?.text?.toUpperCase() !== "SECTION"}?
-     ~(LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
+   : ~(LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
        | PROCEDURE | DATA_DIVISION | FILE | WORKING_STORAGE | LINKAGE
        | COPY | EXEC | FD | SD | DOT_FS)
-     (~DOT_FS)* DOT_FS
+     (~(SECTION | DOT_FS) (~DOT_FS)*)? DOT_FS
    ;
 
 copyMaid
