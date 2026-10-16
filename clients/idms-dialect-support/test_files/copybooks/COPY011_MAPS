@@ -1,0 +1,2 @@
+       01  MRB-ABCMAP.
+            03  MRB-ABCMAP-ID          PIC X(8).
