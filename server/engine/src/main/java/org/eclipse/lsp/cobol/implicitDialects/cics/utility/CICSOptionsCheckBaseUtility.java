@@ -524,6 +524,7 @@ public abstract class CICSOptionsCheckBaseUtility {
               checkResponseHandlers((CICSParser.Cics_handle_responseContext) child);
             if (!CICSParser.Cics_data_areaContext.class.isAssignableFrom(child.getClass())
                 && !CICSParser.Cics_nameContext.class.isAssignableFrom(child.getClass())
+                && !CICSParser.Cics_refContext.class.isAssignableFrom(child.getClass())
                 && !CICSParser.Cics_data_valueContext.class.isAssignableFrom(child.getClass())) {
               getAllTokenChildren((ParserRuleContext) child, children, validateResponseHandler);
             }
