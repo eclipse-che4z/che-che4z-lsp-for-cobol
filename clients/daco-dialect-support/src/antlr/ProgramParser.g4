@@ -78,7 +78,7 @@ skipUntilNextSection
    ;
 
 dataDescriptionEntry
-   : copyMaid | variableEntry | variableEntrySpecificLevel | otherDialectCopy | skipFileDescriptor
+   : copyMaid | variableEntry | variableEntrySpecificLevel | otherDialectCopy | skipFileDescriptor | skipExecBlock | unknownDataEntry
    ;
 
 skipFileDescriptor
@@ -86,7 +86,23 @@ skipFileDescriptor
    ;
 
 otherDialectCopy
-   : LEVEL_NUMBER COPY ~(MAID | DOT_FS) (~DOT_FS)* DOT_FS
+   : LEVEL_NUMBER? COPY ~(MAID | DOT_FS) (~DOT_FS)* DOT_FS
+   ;
+
+// Embedded statements can end without a period. Resume parsing at END-EXEC
+// so a following COPY, data entry, or section is not consumed with the block.
+skipExecBlock
+   : EXEC (~END_EXEC)* END_EXEC DOT_FS?
+   ;
+
+// Leave data entries owned by COBOL or another dialect to their own parser.
+// Stop at the next period so subsequent MAID entries can still be collected.
+unknownDataEntry
+   : {this.inputStream?.LT(2)?.text?.toUpperCase() !== "SECTION"}?
+     ~(LEVEL_NUMBER | LEVEL_NUMBER_66 | LEVEL_NUMBER_77 | LEVEL_NUMBER_88
+       | PROCEDURE | DATA_DIVISION | FILE | WORKING_STORAGE | LINKAGE
+       | COPY | EXEC | FD | SD | DOT_FS)
+     (~DOT_FS)* DOT_FS
    ;
 
 copyMaid

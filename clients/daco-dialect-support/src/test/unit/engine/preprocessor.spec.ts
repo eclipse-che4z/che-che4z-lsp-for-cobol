@@ -190,6 +190,39 @@ describe("DaCoPreprocessor test", () => {
     expect(context.addDiagnostic).not.toHaveBeenCalled();
   });
 
+  it("skips foreign data entries and keeps processing later MAID entries", async () => {
+    const sourceContext = {
+      ...context,
+      resolveCopybook: jest.fn().mockResolvedValue({
+        context: copybookContext,
+        uri: Uri.parse("file:///copybook.cbl"),
+        text: "         01 ABC PIC 9.",
+      }),
+      addDiagnostic: jest.fn(),
+    };
+
+    await preprocessor.execute(
+      sourceContext,
+      HEADER_0 +
+        "          01 GROUP-ITEM.\n" +
+        "          03 BEFORE-VALUE PIC X.\n" +
+        "             COPY COPY1.\n" +
+        "             OTHER-DIALECT OPTION.\n" +
+        "          03 AFTER-VALUE PIC X.\n" +
+        "          03 COPY MAID NAME OTP.\n" +
+        "          PROCEDURE DIVISION.\n" +
+        "              DISPLAY ABC.\n",
+    );
+
+    expect(sourceContext.addDiagnostic).not.toHaveBeenCalled();
+    expect(sourceContext.resolveCopybook).toHaveBeenCalledTimes(1);
+    expect(sourceContext.resolveCopybook).toHaveBeenCalledWith(
+      "NAME_OTP",
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it("should process MAID in file and working-storage sections around foreign COPY", async () => {
     const sourceContext = {
       ...context,
