@@ -1,0 +1,2 @@
+      * AAA: 01  COPY IDMS COPY022.
+       01  COPY022-FIELD           PIC X(8)    VALUE 'X'.

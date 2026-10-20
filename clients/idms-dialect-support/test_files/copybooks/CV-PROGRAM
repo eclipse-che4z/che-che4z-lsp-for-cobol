@@ -1,0 +1,3 @@
+       01 SUBSCHEMA-CTRL.
+          03 PROGRAM-NAME PIC X(8) VALUE SPACE.
+      * Java: TestCopyIdmsVariables.java
