@@ -868,11 +868,11 @@ suite("Java IDMS usecases", function () {
       );
       const diagnostics = await helper.waitForDiagnosticMessages(
         editor.document.uri,
-        ["The length 17 is not allowed. Allowed values are 16, 18."],
+        ["Subschema name length must be 16 or 18 characters"],
       );
       helper.checkDiagnostic(
         diagnostics,
-        "The length 17 is not allowed. Allowed values are 16, 18.",
+        "Subschema name length must be 16 or 18 characters",
         new vscode.Range(5, 38, 5, 40),
         vscode.DiagnosticSeverity.Error,
         "COBOL Language Support (dialect)",

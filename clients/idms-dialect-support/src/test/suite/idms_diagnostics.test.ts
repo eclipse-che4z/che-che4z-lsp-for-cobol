@@ -46,7 +46,7 @@ suite("IDMS-specific diagnostics", function () {
 
   test("rejects a three-digit SUBSCHEMA-NAMES LENGTH", async () => {
     const editor = await helper.showDocument("IdmsLength116.cbl");
-    const message = "The length 116 is not allowed. Allowed values are 16, 18.";
+    const message = "Subschema name length must be 16 or 18 characters";
     const diagnostics = await helper.waitForDiagnosticMessages(
       editor.document.uri,
       [message],
