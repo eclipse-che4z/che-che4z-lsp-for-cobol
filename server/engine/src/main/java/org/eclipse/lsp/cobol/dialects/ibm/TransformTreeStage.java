@@ -295,11 +295,13 @@ public class TransformTreeStage
     // Phase TRANSFORMATION
     ProcessingPhase t = ProcessingPhase.TRANSFORMATION;
     ctx.register(t, ProgramIdNode.class, new ProgramIdProcess());
-    ctx.register(t, SectionNode.class, new SectionNodeProcessor(symbolAccumulator));
+    ctx.register(t, SectionNode.class, new SectionNodeProcessor());
     ctx.register(t, FileEntryNode.class, new FileEntryProcess());
-    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess(symbolAccumulator));
+    ctx.register(t, FileDescriptionNode.class, new FileDescriptionProcess());
     ctx.register(t, RootNode.class, new RootNodeUpdateCopyNodesByPositionInTree());
     ctx.register(t, ProcedureDivisionReturningNode.class, new ProcedureDivisionReturningProcess());
+    // Parent processors convert definitions before their VariableNode children are visited.
+    ctx.register(t, VariableNode.class, new VariableNodeProcessor(symbolAccumulator));
 
     // Phase DEFINITION
     ProcessingPhase d = ProcessingPhase.DEFINITION;
