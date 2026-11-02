@@ -517,7 +517,6 @@ public class TestCicsSendStatement {
     CICSTestUtils.noErrorTest(SEND_MAP_FREEKB_ALARM_VALID);
   }
 
-
   @Test
   void testSendMapFormfeedPrintValid() {
     CICSTestUtils.noErrorTest(SEND_MAP_FORMFEED_PRINT_VALID);
