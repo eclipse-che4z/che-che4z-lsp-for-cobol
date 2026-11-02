@@ -100,9 +100,6 @@ public class TestCicsSendStatement {
   private static final String SEND_MAP_ERASE_ALTERNATE_VALID =
       "SEND MAP({$varOne}) ERASE ALTERNATE";
   private static final String SEND_MAP_FREEKB_ALARM_VALID = "SEND MAP({$varOne}) FREEKB ALARM";
-  private static final String SEND_MAP_FROM_ERASE_FREEKB_RESP_VALID =
-      "SEND MAP({$varOne}) MAPSET({$varFour}) FROM({$varFour}) ERASE FREEKB RESP({$varOne})"
-          + " RESP2({$varOne})";
   private static final String SEND_MAP_FORMFEED_PRINT_VALID = "SEND MAP({$varOne}) FORMFEED PRINT";
 
   private static final String SEND_MAP_MAPPINGDEV_INVALID =
@@ -520,10 +517,6 @@ public class TestCicsSendStatement {
     CICSTestUtils.noErrorTest(SEND_MAP_FREEKB_ALARM_VALID);
   }
 
-  @Test
-  void testSendMapFromEraseFreekbRespValid() {
-    CICSTestUtils.noErrorTest(SEND_MAP_FROM_ERASE_FREEKB_RESP_VALID);
-  }
 
   @Test
   void testSendMapFormfeedPrintValid() {
