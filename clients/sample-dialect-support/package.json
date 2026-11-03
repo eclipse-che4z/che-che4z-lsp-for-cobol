@@ -92,6 +92,11 @@
   "extensionDependencies": [
     "BroadcomMFD.cobol-language-support"
   ],
+  "overrides": {
+    "@playwright/browser-chromium": "^1.63.0",
+    "playwright": "^1.63.0",
+    "playwright-core": "^1.63.0"
+  },
   "dependencies": {
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api"
   }
