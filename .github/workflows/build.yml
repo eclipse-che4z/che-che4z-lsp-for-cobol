@@ -92,6 +92,8 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
           cache: 'maven'
+      - name: eh?
+        run: java -version
       - uses: axel-op/googlejavaformat-action@v4
         with:
           args: "-i"
