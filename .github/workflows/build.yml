@@ -87,6 +87,11 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
       - uses: axel-op/googlejavaformat-action@v4
         with:
           args: "-i"
