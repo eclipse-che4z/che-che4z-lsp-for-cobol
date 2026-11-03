@@ -87,6 +87,11 @@ jobs:
     runs-on: ubuntu-latest 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
       - uses: axel-op/googlejavaformat-action@v4
         with:
           args: "-i"
@@ -116,7 +121,7 @@ jobs:
       - name: Install dependencies for Sample dialect
         working-directory: clients/sample-dialect-support
         run: NODE_ENV=production npm ci
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: clients-for-bd-scan
           path: clients/**
@@ -164,7 +169,7 @@ jobs:
         working-directory: server
         run: mvn -e -B -Pnative -DskipNativeTests -Dagent=true test
       - name: Upload native build configuration
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: native-build-configuration
@@ -177,7 +182,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '11'
@@ -189,13 +194,13 @@ jobs:
         working-directory: server
         run: mvn clean verify --no-transfer-progress
       - name: Upload performance data
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: test-perfomance-data
           path: server/engine/target/perf.csv
       - name: Upload jar files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jar
           path: server/engine/target/server.jar
@@ -208,7 +213,7 @@ jobs:
           npm ci
           npm run compile
       - name: Upload Cobol Analysis Package Library
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: analysis_lib
           path: clients/analysis/*
@@ -218,7 +223,7 @@ jobs:
           npm ci
           npm run compile
       - name: Upload cobol dialect API library
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lib
           path: clients/cobol-dialect-api/lib/*    
@@ -284,25 +289,25 @@ jobs:
           npm run package -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Upload IDMS vsix
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: vsix-idms-dialect
           path: 'cobol-language-support-for-idms*.vsix'
       - name: Upload DaCo vsix
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: vsix-daco-dialect
           path: 'cobol-language-support-for-daco*.vsix'
       - name: Upload Sample Dialect vsix
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: vsix-sample-dialect
           path: 'cobol-language-support-for-sample-dialect*.vsix'
       - name: Upload COBOL LS default vsix
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: vsix-cobol-ls-default
@@ -368,7 +373,7 @@ jobs:
           npm run package:web -- --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
       - name: Upload Web vsix
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: vsix-cobol-language-support-web
@@ -437,7 +442,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         if: matrix.os == 'windows-latest'
       - name: Retrieve native build configurations
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: native-build-configuration
           path: native-build-configuration
@@ -466,7 +471,7 @@ jobs:
         run: mvn -e -B -Plinux-native -DskipTests clean package
       - name: Prepare windows artifacts
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: staging-${{ env.target }}
           path: |
@@ -476,7 +481,7 @@ jobs:
           if-no-files-found: error
       - name: Prepare non-windows artifacts
         if: matrix.os != 'windows-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: staging-${{ env.target }}
           path: server/engine/target/engine
@@ -488,10 +493,10 @@ jobs:
     needs: [buildPlatformIndependedPart]
     steps:
       - name: Download JAR
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: jar
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '8'
@@ -529,12 +534,12 @@ jobs:
         run: echo "target=linux-${{ matrix.arch }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Retrieve native build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: staging-${{ env.target }}
           path: staging/${{ env.target }}
       - name: Retrieve server jars
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: jar
           path: jar
@@ -565,12 +570,12 @@ jobs:
         with:
           node-version: 20
       - name: Download VS Code Analysis package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: analysis_lib
           path: clients/analysis
       - name: Download VS Code extension dialect API
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: lib
           path: clients/cobol-dialect-api
@@ -589,13 +594,13 @@ jobs:
         run: |
           npm run package  -- --target ${{ env.target }} --baseContentUrl "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/"
           cp *.vsix ../../.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           if-no-files-found: warn
           name: vsix-cobol-language-support-${{ env.target }}
           path: 'cobol-language-support*.vsix'
       - name: Retrieve idms dialect
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: vsix-idms-dialect
           path: dialects-idms
@@ -605,7 +610,7 @@ jobs:
           unzip -j dialects-idms/*.vsix extension/server/jar/dialect-idms.jar -d clients/idms-dialect-support/server/jar
         shell: bash
       - name: Retrieve daco dialect
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: vsix-daco-dialect
           path: dialects-daco
@@ -615,7 +620,7 @@ jobs:
           unzip -j dialects-daco/*.vsix extension/server/jar/dialect-daco.jar -d clients/daco-dialect-support/server/jar
         shell: bash
       - name: Retrieve Sample dialect
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: vsix-sample-dialect
           path: dialects-sample
