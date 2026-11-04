@@ -176,7 +176,11 @@ const ProcessorGroupsModel = t.type({
   pgroups: t.array(ProcessorGroupModel),
 });
 
-type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
+export const ExternalConfigurationResponseModel = t.type({
+  configuration: ProcessorGroupModel,
+});
+
+export type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
 export type ProcessorGroupsDefinition = t.TypeOf<typeof ProcessorGroupsModel>;
 
 export type CopybookLibTypes =
@@ -352,16 +356,7 @@ async function readProcessorGroupsFile(
       );
     }
 
-    return decoded.right.pgroups.map(
-      transformProcessorGroup([
-        LocalPathLib,
-        VirtualPathLib,
-        DatasetLib,
-        UssPathLib,
-        EndevorElementLib,
-        TarCopybookLib,
-      ]),
-    );
+    return decoded.right.pgroups.map(transformWorkspaceProcessorGroup);
   } catch (e) {
     if (
       e instanceof Error &&
@@ -390,6 +385,19 @@ const transformProcessorGroup =
 
     return result;
   };
+
+export function transformWorkspaceProcessorGroup(
+  input: ProcessorGroupDefinition,
+): ProcessorGroup {
+  return transformProcessorGroup([
+    LocalPathLib,
+    VirtualPathLib,
+    DatasetLib,
+    UssPathLib,
+    EndevorElementLib,
+    TarCopybookLib,
+  ])(input);
+}
 
 const renamePreprocessors = (pg: ProcessorGroup): ProcessorGroup => {
   if (pg.preprocessors) {
