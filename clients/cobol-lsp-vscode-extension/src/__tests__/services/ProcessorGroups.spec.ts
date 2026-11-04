@@ -39,6 +39,8 @@ import {
 import * as vscode from "vscode";
 import * as E4ECopybookService from "../../services/copybook/E4ECopybookService";
 import { E4E, E4EExternalConfigurationResponse } from "../../type/e4eApi";
+import { externalConfigurationProvider } from "../../services/ExternalConfigurationProvider";
+import type { ConfigurationProviderRegistration } from "../../type/externalConfigurationApi";
 
 const WORKSPACE_PATH = "/tests/processor-groups";
 const WORKSPACE_URI = Uri.file(WORKSPACE_PATH);
@@ -420,5 +422,61 @@ describe("Processor groups configuration provides lib path in Windows", () => {
       DEFAULT_DIALECT,
     );
     expect(result).toStrictEqual([new LocalPathLib("/back")]);
+  });
+});
+
+describe("External configuration provider", () => {
+  let registration: ConfigurationProviderRegistration | undefined;
+
+  const register = (handler: jest.Mock) => {
+    registration = externalConfigurationProvider.addHandler(
+      "test.provider",
+      handler,
+    );
+    return handler;
+  };
+
+  beforeEach(() => {
+    isEndevorElementResult = false;
+  });
+
+  afterEach(() => {
+    registration?.dispose();
+    registration = undefined;
+  });
+
+  it("takes precedence over pgm_conf.json", async () => {
+    register(
+      jest.fn().mockReturnValue({
+        configuration: {
+          name: "EXTERNAL",
+          libs: ["/external"],
+          preprocessor: ["IDMS"],
+        },
+      }),
+    );
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "extDAF.cob");
+
+    expect((await loadProcessorGroup(document)).name).toEqual("EXTERNAL");
+    expect(
+      await loadProcessorGroupCopybooksLibs(document, DEFAULT_DIALECT),
+    ).toStrictEqual([new LocalPathLib("/external")]);
+    expect(
+      await loadProcessorGroupDialectConfig({ scopeUri: document }, []),
+    ).toStrictEqual(["IDMS"]);
+  });
+
+  it("falls back to workspace configuration when the provider does not handle the document", async () => {
+    register(jest.fn().mockReturnValue(null));
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "extNullDAF.cob");
+
+    expect((await loadProcessorGroup(document)).name).toEqual("DAF");
+  });
+
+  it("falls back to workspace configuration when the provider fails", async () => {
+    register(jest.fn().mockRejectedValue(new Error("provider failure")));
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "extFailDAF.cob");
+
+    expect((await loadProcessorGroup(document)).name).toEqual("DAF");
   });
 });
