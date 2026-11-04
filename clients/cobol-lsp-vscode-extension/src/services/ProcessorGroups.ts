@@ -29,6 +29,7 @@ import {
 import { DEFAULT_DIALECT } from "../constants";
 import { getVariablesFromUri } from "./util/FSUtils";
 import { clearDiagnostics } from "./ExternalAPIsService";
+import { externalConfigurationProvider } from "./ExternalConfigurationProvider";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -130,6 +131,11 @@ export async function loadProcessorGroup(
   documentUri: Uri,
   dialect = DEFAULT_DIALECT,
 ) {
+  const externalConfig =
+    await externalConfigurationProvider.resolve(documentUri);
+  if (externalConfig) {
+    return externalConfig;
+  }
   let workspaceConfig = await readEndevorConfig(documentUri);
 
   if (!workspaceConfig) {
