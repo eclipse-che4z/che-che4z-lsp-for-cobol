@@ -18,7 +18,7 @@ jest.mock("node:os", () => ({
   }),
 }));
 
-import TelemetryReporter from "@vscode/extension-telemetry";
+import { TelemetryReporter } from "@vscode/extension-telemetry";
 
 import * as path from "path";
 import { TelemetryEventMeasurements } from "../../../services/reporter/model";
