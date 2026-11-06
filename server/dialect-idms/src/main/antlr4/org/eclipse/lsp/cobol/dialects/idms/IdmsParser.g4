@@ -16,7 +16,12 @@ parser grammar IdmsParser;
 options {tokenVocab = IdmsLexer;  superClass = MessageServiceParser;}
 
 startRule: .*? idmsRules* EOF;
-idmsRules: (idmsStatements | obtainLRStatement | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
+idmsRules: (execBlock | idmsStatements | obtainLRStatement | idmsSections | idmsIfStatement | ifStatement | copyIdmsStatement) .*?;
+
+// EXEC blocks (CICS, SQL) are handled by other dialects, skip them
+execBlock
+    : EXEC .*? (END_EXEC | EOF)
+    ;
 
 idmsSections
    : idmsControlSection | schemaSection | mapSection
