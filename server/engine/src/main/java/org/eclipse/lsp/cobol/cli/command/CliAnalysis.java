@@ -302,7 +302,7 @@ public class CliAnalysis implements Callable<Integer> {
   private void createTemporaryFileFromInput() {
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     try {
-      inputConfig.src = File.createTempFile("cobol-analysis-temp", ".cbl");
+      inputConfig.src = Files.createTempFile("cobol-analysis-temp", ".cbl").toFile();
       StringBuilder input = new StringBuilder();
       String temp;
       while ((temp = bufferedReader.readLine()) != null) {
