@@ -14,7 +14,7 @@
 
 import * as vscode from "vscode";
 import { TelemetryEvent, TelemetryEventMeasurements } from "./model";
-import TelemetryReporter from "@vscode/extension-telemetry";
+import { TelemetryReporter } from "@vscode/extension-telemetry";
 
 let reporter: TelemetryReporter | undefined;
 

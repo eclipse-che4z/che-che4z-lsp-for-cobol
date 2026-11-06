@@ -12,12 +12,7 @@
  *   Broadcom - initial API and implementation
  */
 
-import {
-  E4E,
-  e4eResponse,
-  EndevorElement,
-  EndevorMember,
-} from "../type/e4eApi.d";
+import { E4E, e4eResponse } from "../type/e4eApi.d";
 
 export const e4eMock: E4E = {
   getConfiguration: jest.fn().mockReturnValue({
@@ -82,7 +77,7 @@ export const e4eResponseEndevorFirst: e4eResponse = {
       dataset: "dataset",
       member: "copybook",
     },
-  } as { [key: string]: EndevorElement | EndevorMember },
+  },
 };
 export const e4eResponseDatasetFirst: e4eResponse = {
   profile: { instance: "instance", profile: "profile" },
@@ -102,7 +97,7 @@ export const e4eResponseDatasetFirst: e4eResponse = {
       element: "copybook",
       fingerprint: "fingerprint",
     },
-  } as { [key: string]: EndevorElement | EndevorMember },
+  },
 };
 
 export const e4eMockInvalidProfile: E4E = {
