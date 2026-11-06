@@ -391,7 +391,7 @@ jobs:
             container: alpine:3.17
           - os: macos-15-intel
             arch: x64
-          - os: macos-14
+          - os: macos-15
             arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [generateNativeConfig, build-info]
@@ -517,7 +517,7 @@ jobs:
             container: alpine:3.17
           - os: macos-15-intel
             arch: x64
-          - os: macos-14
+          - os: macos-15
             arch: arm64
     runs-on: ${{ matrix.os }}
     needs: [buildNative,buildPlatformIndependedPart]
