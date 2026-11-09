@@ -20,7 +20,6 @@ import { loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
   clearWorkspaceConfigCache,
   ProcessorGroupProperties,
-  readEndevorConfig,
   readWorkspaceConfig,
   ProcessorGroup,
   WorkspaceConfig,
@@ -136,13 +135,10 @@ export async function loadProcessorGroup(
   if (externalConfig) {
     return externalConfig;
   }
-  let workspaceConfig = await readEndevorConfig(documentUri);
-
-  if (!workspaceConfig) {
-    const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
-    if (workspaceUri) {
-      workspaceConfig = await readWorkspaceConfig(workspaceUri);
-    }
+  let workspaceConfig: WorkspaceConfig | undefined;
+  const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
+  if (workspaceUri) {
+    workspaceConfig = await readWorkspaceConfig(workspaceUri);
   }
 
   if (workspaceConfig) {

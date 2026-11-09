@@ -82,6 +82,7 @@ import { createSampleConfiguration } from "./commands/CreateSampleConfiguration"
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
 import { TarCopybookFileSystemProvider } from "./provider/TarCopybookFileSystemProvider";
 import { getTarCached } from "./services/util/TarUtil";
+import { e4eConfigurationHandler } from "./services/copybook/E4EConfigurationHandler";
 import { externalConfigurationProvider } from "./services/ExternalConfigurationProvider";
 import type {
   ExternalConfigurationApi,
@@ -161,6 +162,13 @@ export async function activate(
     tarCache,
   );
   context.subscriptions.push(externalApis);
+
+  const e4eRegistration = externalConfigurationProvider.addHandler(
+    "BroadcomMFD.explorer-for-endevor",
+    e4eConfigurationHandler,
+  );
+  externalApis.onE4EAppeared = () => e4eRegistration.invalidate();
+  context.subscriptions.push(e4eRegistration);
 
   const analysisService = new ControlFlowAnalysisService(
     outputChannel,

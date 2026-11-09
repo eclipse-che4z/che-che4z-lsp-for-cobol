@@ -28,6 +28,9 @@ import { EndevorElementLib } from "../../services/copybookLibs/EndevorElementLib
 import LocalPathLib from "../../services/copybookLibs/LocalPathLib";
 import { UssPathLib } from "../../services/copybookLibs/UssPathLib";
 import { initializeExternalAPIs } from "../../services/ExternalAPIsService";
+import { externalConfigurationProvider } from "../../services/ExternalConfigurationProvider";
+import { e4eConfigurationHandler } from "../../services/copybook/E4EConfigurationHandler";
+import type { ConfigurationProviderRegistration } from "../../type/externalConfigurationApi";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,
@@ -39,8 +42,6 @@ import {
 import * as vscode from "vscode";
 import * as E4ECopybookService from "../../services/copybook/E4ECopybookService";
 import { E4E, E4EExternalConfigurationResponse } from "../../type/e4eApi";
-import { externalConfigurationProvider } from "../../services/ExternalConfigurationProvider";
-import type { ConfigurationProviderRegistration } from "../../type/externalConfigurationApi";
 
 const WORKSPACE_PATH = "/tests/processor-groups";
 const WORKSPACE_URI = Uri.file(WORKSPACE_PATH);
@@ -59,6 +60,7 @@ jest.mock("path", (): unknown => {
 
 let isEndevorElementResult = false;
 let e4eConfigurationResult: E4EExternalConfigurationResponse | Error;
+let e4eRegistration: ConfigurationProviderRegistration;
 let e4eMock: E4E;
 
 beforeEach(async () => {
@@ -174,6 +176,14 @@ beforeEach(async () => {
     .spyOn(E4ECopybookService, "getE4EAPI")
     .mockResolvedValue({ api: e4eMock });
   await initializeExternalAPIs(Uri.file("/storage"));
+  e4eRegistration = externalConfigurationProvider.addHandler(
+    "e4e",
+    e4eConfigurationHandler,
+  );
+});
+
+afterEach(() => {
+  e4eRegistration.dispose();
 });
 
 describe("Processor groups", () => {
