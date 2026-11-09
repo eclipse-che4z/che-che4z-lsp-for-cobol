@@ -3922,7 +3922,16 @@
     "allPublicConstructors": true
   },
   {
-    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentReplacementMap",
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentInsertion",
+    "unsafeAllocated": true,
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.eclipse.lsp.cobol.lsp.jrpc.DocumentInsertionMap",
+    "unsafeAllocated": true,
     "allDeclaredFields": true,
     "queryAllDeclaredMethods": true,
     "queryAllDeclaredConstructors": true,
