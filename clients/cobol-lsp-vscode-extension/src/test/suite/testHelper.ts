@@ -441,4 +441,4 @@ export async function getHoverContent(
 }
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
-export const asMutable = <T>(value: T): Mutable<T> => value as Mutable<T>;
+export const asMutable = <T>(value: T): Mutable<T> => value;

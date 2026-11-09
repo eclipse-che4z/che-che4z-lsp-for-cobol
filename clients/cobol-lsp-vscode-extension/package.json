@@ -613,7 +613,7 @@
   "dependencies": {
     "@code4z/analysis": "file:../analysis",
     "@code4z/cobol-dialect-api": "file:../cobol-dialect-api",
-    "@vscode/extension-telemetry": "^0.9.8",
+    "@vscode/extension-telemetry": "1.5.2",
     "io-ts": "2.2.21",
     "tar-stream": "^3.1.7",
     "vscode-languageclient": "^9.0.1"
