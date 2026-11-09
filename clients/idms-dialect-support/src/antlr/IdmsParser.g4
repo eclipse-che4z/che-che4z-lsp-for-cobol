@@ -25,7 +25,7 @@ idmsRules: (execBlock | idmsStatements | obtainLRStatement | idmsSections | idms
 
 // EXEC blocks (CICS, SQL) are handled by other dialects, skip them
 execBlock
-    : EXEC .*? (END_EXEC | EOF)
+    : EXEC (~END_EXEC)* (END_EXEC | EOF)
     ;
 
 idmsSections
