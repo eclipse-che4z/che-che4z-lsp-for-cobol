@@ -21,6 +21,8 @@ import type {
 import {
   ExternalConfigurationResponseModel,
   ProcessorGroup,
+  CopybookLibTypes,
+  transformProcessorGroup,
   transformWorkspaceProcessorGroup,
 } from "./ProcessorGroupsLoader";
 import { Memoize } from "./util/Memoize";
@@ -33,6 +35,7 @@ const CHANGE_NOTIFICATION_DELAY = 250;
 type Registration = {
   extensionId: string; // just helps in better logging. Can be removed
   handler: ExternalConfigurationProviderHandler;
+  libTypes?: CopybookLibTypes[]; // overrides the default lib types used to build libs
 };
 
 export class ExternalConfigurationProvider {
@@ -48,8 +51,9 @@ export class ExternalConfigurationProvider {
   public addHandler(
     extensionId: string,
     handler: ExternalConfigurationProviderHandler,
+    libTypes?: CopybookLibTypes[],
   ): ConfigurationProviderRegistration {
-    const registration: Registration = { extensionId, handler };
+    const registration: Registration = { extensionId, handler, libTypes };
     this.registrations.push(registration);
     outputChannel.info(
       `External configuration provider registered by ${extensionId}`,
@@ -96,7 +100,7 @@ export class ExternalConfigurationProvider {
   private async queryProviders(
     documentUri: Uri,
   ): Promise<ProcessorGroup | undefined> {
-    for (const { extensionId, handler } of [...this.registrations]) {
+    for (const { extensionId, handler, libTypes } of [...this.registrations]) {
       let response: unknown;
       try {
         response = await handler(documentUri);
@@ -128,7 +132,9 @@ export class ExternalConfigurationProvider {
         ["configuration", "external-configuration"],
         `Configuration provided by ${extensionId}`,
       );
-      return transformWorkspaceProcessorGroup(decoded.right.configuration);
+      return libTypes
+        ? transformProcessorGroup(libTypes)(decoded.right.configuration)
+        : transformWorkspaceProcessorGroup(decoded.right.configuration);
     }
   }
 

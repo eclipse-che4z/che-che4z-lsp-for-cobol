@@ -17,7 +17,18 @@ import type {
   ExternalConfigurationProviderHandler,
   ExternalPreprocessorDefinition,
 } from "../../type/externalConfigurationApi";
+import { EndevorElementLib } from "../copybookLibs/EndevorElementLib";
+import { EndevorMemberLib } from "../copybookLibs/EndevorMemberLib";
+import type { CopybookLibTypes } from "../ProcessorGroupsLoader";
 import { asArray } from "../util/Utils";
+
+/**
+ * Lib types for E4E configs: dataset libs must resolve as Endevor members, not z/OSMF datasets.
+ */
+export const E4E_LIB_TYPES: CopybookLibTypes[] = [
+  EndevorElementLib,
+  EndevorMemberLib,
+];
 
 /**
  * Provides configuration of Endevor elements by Explorer for Endevor.

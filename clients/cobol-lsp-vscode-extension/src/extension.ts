@@ -82,7 +82,10 @@ import { createSampleConfiguration } from "./commands/CreateSampleConfiguration"
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
 import { TarCopybookFileSystemProvider } from "./provider/TarCopybookFileSystemProvider";
 import { getTarCached } from "./services/util/TarUtil";
-import { e4eConfigurationHandler } from "./services/copybook/E4EConfigurationHandler";
+import {
+  e4eConfigurationHandler,
+  E4E_LIB_TYPES,
+} from "./services/copybook/E4EConfigurationHandler";
 import { externalConfigurationProvider } from "./services/ExternalConfigurationProvider";
 import type {
   ExternalConfigurationApi,
@@ -166,6 +169,7 @@ export async function activate(
   const e4eRegistration = externalConfigurationProvider.addHandler(
     "BroadcomMFD.explorer-for-endevor",
     e4eConfigurationHandler,
+    E4E_LIB_TYPES,
   );
   externalApis.onE4EAppeared = () => e4eRegistration.invalidate();
   context.subscriptions.push(e4eRegistration);

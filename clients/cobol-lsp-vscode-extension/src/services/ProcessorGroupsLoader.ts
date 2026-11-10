@@ -320,7 +320,7 @@ async function readProcessorGroupsFile(
   }
 }
 
-const transformProcessorGroup =
+export const transformProcessorGroup =
   (libTypes: CopybookLibTypes[]) =>
   (input: ProcessorGroupDefinition): ProcessorGroup => {
     const libs = transformLibs(input.libs, libTypes, []);
