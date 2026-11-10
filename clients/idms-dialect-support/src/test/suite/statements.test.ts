@@ -213,4 +213,8 @@ suite("IDMS statements Test Suite", function () {
       helper.positionOf(editor, "01 LINE-SPACING").line,
     );
   });
+
+  test("Process IDMS statements with CICS preproccessor", async () => {
+    await assertStatementsAreProcessed("IdmsCicsSendMap.cbl");
+  });
 });
