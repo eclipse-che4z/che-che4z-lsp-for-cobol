@@ -39,13 +39,14 @@ export const e4eConfigurationHandler: ExternalConfigurationProviderHandler =
     const preprocessor: ExternalPreprocessorDefinition[] | undefined =
       processorGroup.preprocessor
         ? asArray(processorGroup.preprocessor).map((p) => ({
+            ...p,
             name: translatePreprocessorName(p.name),
           }))
         : undefined;
 
     return {
       configuration: {
-        name: processorGroup.name,
+        ...processorGroup,
         libs: [...processorGroup.libs],
         ...(preprocessor && { preprocessor }),
       },
