@@ -36,7 +36,7 @@ export const e4eConfigurationHandler: ExternalConfigurationProviderHandler =
     );
     if (!processorGroup) return;
 
-    const preprocessor: ExternalPreprocessorDefinition[] | undefined =
+    const preprocessors: ExternalPreprocessorDefinition[] | undefined =
       processorGroup.preprocessor
         ? asArray(processorGroup.preprocessor).map((p) => ({
             ...p,
@@ -48,7 +48,7 @@ export const e4eConfigurationHandler: ExternalConfigurationProviderHandler =
       configuration: {
         ...processorGroup,
         libs: [...processorGroup.libs],
-        ...(preprocessor && { preprocessor }),
+        ...(preprocessors && { preprocessor: preprocessors }),
       },
     };
   };
