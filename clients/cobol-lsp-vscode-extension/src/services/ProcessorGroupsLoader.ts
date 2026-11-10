@@ -334,6 +334,9 @@ const transformProcessorGroup =
       "target-sql-backend": input["target-sql-backend"],
     };
 
+    outputChannel.debug(
+      `Transformed processor group ${result.name}: ${JSON.stringify(result)}`,
+    );
     return result;
   };
 
