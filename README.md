@@ -2,7 +2,6 @@
 
 [![Build Status](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/actions/workflows/build.yml/badge.svg)](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/actions/workflows/build.yml)
 [![GitHub issues](https://img.shields.io/github/issues-raw/eclipse/che-che4z-lsp-for-cobol)](https://github.com/eclipse/che-che4z-lsp-for-cobol/issues)
-[![slack](https://img.shields.io/badge/chat-on%20Slack-blue)](https://join.slack.com/t/che4z/shared_invite/zt-22b0064vn-nBh~Fs9Fl47Prp5ItWOLWw)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eclipse-che4z_che-che4z-lsp-for-cobol&metric=alert_status)](https://sonarcloud.io/dashboard?id=eclipse-che4z_che-che4z-lsp-for-cobol)
 
 </div>
@@ -448,61 +447,6 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
     ]
 }
 ```
-
-### External Configuration Providers
-
-Other VS Code extensions can provide processor groups for programs, for example from a source code management system, by registering an external configuration provider. Processor groups provided by an external configuration provider take priority over the workspace configuration.
-
-COBOL Language Support uses the first available configuration in the following order:
-
-1. External configuration providers, in the order in which they are registered
-2. Explorer for Endevor, for programs opened from Endevor
-3. Bridge for Git configuration (`.bridge.json`)
-4. `pgm_conf.json` and `proc_grps.json`
-5. The extension settings
-
-A provider is a function that receives the URI of a program and returns one of the following values:
-
-- **{ configuration: { ... } }**
-    - A processor group, in the same format as an element of `proc_grps.json`.
-- **null** or **undefined**
-    - The provider does not handle the program. The next provider or the workspace configuration is used.
-
-If a provider throws an error or returns an invalid configuration, the error is written to the COBOL Language Support output channel and the next configuration in the order is used.
-
-Register a provider using the API that is returned by the COBOL Language Support extension. Specify your extension ID as the first parameter to identify your provider in the logs:
-
-```typescript
-const cobol = vscode.extensions.getExtension("BroadcomMFD.cobol-language-support");
-const api = await cobol?.activate();
-if (typeof api?.registerExternalConfigurationProvider === "function") {
-    const registration = api.registerExternalConfigurationProvider(
-        context.extension.id,
-        (uri: vscode.Uri) => {
-            if (!isMyProgram(uri)) {
-                return null;
-            }
-            return {
-                configuration: {
-                    name: "MYGROUP",
-                    libs: ["/local/copybooks", { dataset: "HLQ.COPYLIB" }],
-                    "compiler-options": ["QUALIFY(EXTEND)"],
-                },
-            };
-        },
-    );
-    context.subscriptions.push(registration);
-}
-```
-
-The configuration returned for a program is reused until the program is closed or the configuration is invalidated. The object returned by `registerExternalConfigurationProvider` has the following methods:
-
-- **invalidate(uri?)**
-    - Discards the configuration provided for the specified program, or for all programs if you do not specify a URI, and reanalyzes the opened programs. Call this method when your configuration changes.
-- **dispose()**
-    - Unregisters the provider.
-
-The type definitions of the API are available in [externalConfigurationApi.d.ts](https://github.com/eclipse-che4z/che-che4z-lsp-for-cobol/blob/development/clients/cobol-lsp-vscode-extension/src/type/externalConfigurationApi.d.ts).
 
 ## Troubleshooting
 
