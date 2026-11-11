@@ -96,7 +96,13 @@ Before you write your COBOL code from scratch, search the snippet library for us
 
 You can also insert a code snippet by typing the name of the snippet in your code and clicking on the autocomplete text.
 
-The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder. To access your user snippets file, press **F1** to open the command pallette, and run the command **Snippets: Configure Snippets**.
+The COBOL Language Support extension also supports user snippets. Add your custom snippets to the `COBOL.json` file in your user snippets folder. To access your user snippets file, press **F1** to open the command pallet, and run the command **Snippets: Configure Snippets**.
+
+### Set Case for Formatting
+
+To format your code in upper or lower case, edit the **Cobol-lsp: Formatting** setting, and then right-click within the editor window and select **Format Document**. The document is formatted in the selected case.
+
+If you set **Cobol-lsp: Formatting** to **None**, no changes to case are made when you use the Format Document command.
 
 ## Language Server Settings
 
@@ -143,7 +149,7 @@ Dialect add-ons are available to add support for specific language analysis in y
 Dialect add-ons must be enabled in the COBOL Language Support extension settings. To enable dialect add-ons that you install, complete the following tasks:
 
 1. Ensure that you meet the Java prerequisite described in the add-on readme. 
-2. Set **Cobol-lsp: serverRuntime** to **JAVA** in the your extension settings.
+2. Set **Cobol-lsp: serverRuntime** to **JAVA** in your extension settings.
 3. Add the dialect to the **Cobol-lsp: dialects** array in your workspace extension settings, or to the `preprocessor` parameter in a processor group. For more information, see [Processor Groups](#processor-groups).
 
 COBOL Language Support processes dialects in the order you list them in the **Cobol-lsp: dialects** setting or within the `preprocessor` parameter of a processor group. If you list dialects in the wrong order, some pieces of code might be incorrectly processed using the wrong dialect parser and marked as errors. 
@@ -370,7 +376,7 @@ The program configuration file, `pgm_conf.json`, links programs to processor gro
 {
     "pgms": [
         { "program": "PROGRAM1", "pgroup": "GROUP1" },
-        { "program": "PROGRAM2", "pgroup": "GROUP2" },
+        { "program": "PROGRAM2", "pgroup": "GROUP2" }
     ]
 }
 ```
@@ -380,7 +386,7 @@ Each element contains the following parameters:
 - **"program":** (string)
     - Specify a program name. This field can be wildcarded.
 - **"pgroup":** (string)
-    - Specify the name of a procecssor group that is defined in `proc_grps.json`.
+    - Specify the name of a processor group that is defined in `proc_grps.json`.
    
 ### Example Processor Group Configuration
 
@@ -443,7 +449,7 @@ Using the example `pgm_conf.json` file above, the following `proc_grps.json` exa
                             "dataset": "HLQ.DSN.COBCOPY",
                             "profile": "prof1"
                         }
-                ],
+                ]
         }
     ]
 }
