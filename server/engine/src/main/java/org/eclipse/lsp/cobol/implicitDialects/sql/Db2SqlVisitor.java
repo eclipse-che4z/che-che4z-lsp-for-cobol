@@ -61,7 +61,7 @@ class Db2SqlVisitor extends Db2SqlParserBaseVisitor<List<Node>> {
   private final CopybookService copybookService;
   private final boolean isSqlProcessingEnabled;
   private static final Pattern DOUBLE_DASH_SQL_COMMENT =
-      Pattern.compile("--\\s[^\\r\\n]*", Pattern.MULTILINE);
+      Pattern.compile("--(?:[ \\t][^\\r\\n]*)?", Pattern.MULTILINE);
 
   @Getter private final List<SyntaxError> errors = new LinkedList<>();
 
