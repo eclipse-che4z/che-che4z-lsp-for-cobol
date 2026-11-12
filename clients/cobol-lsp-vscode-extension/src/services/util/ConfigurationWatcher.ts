@@ -22,6 +22,7 @@ import { SettingsService } from "../Settings";
 import { telemetryEvent } from "../reporter";
 import { clearDiagnostics } from "../ExternalAPIsService";
 import { clearWorkspaceConfigCache } from "../ProcessorGroupsLoader";
+import { externalConfigurationProvider } from "../ExternalConfigurationProvider";
 
 export class ConfigurationWatcher {
   private static async restartVsCode() {
@@ -63,6 +64,7 @@ export class ConfigurationWatcher {
         )
       ) {
         clearWorkspaceConfigCache();
+        externalConfigurationProvider.invalidate();
       }
       clearDiagnostics();
     });

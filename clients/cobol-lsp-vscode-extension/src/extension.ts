@@ -36,6 +36,7 @@ import {
 } from "./constants";
 import type { ExternalAPIsService } from "./services/ExternalAPIsService";
 import {
+  clearDiagnostics,
   deleteDiagnostics,
   initializeExternalAPIs,
 } from "./services/ExternalAPIsService";
@@ -81,6 +82,15 @@ import { createSampleConfiguration } from "./commands/CreateSampleConfiguration"
 import { RENUM_LEFT, RENUM_RIGHT, RenumHandler } from "./commands/RenumCommand";
 import { TarCopybookFileSystemProvider } from "./provider/TarCopybookFileSystemProvider";
 import { getTarCached } from "./services/util/TarUtil";
+import {
+  e4eConfigurationHandler,
+  E4E_LIB_TYPES,
+} from "./services/copybook/E4EConfigurationHandler";
+import { externalConfigurationProvider } from "./services/ExternalConfigurationProvider";
+import type {
+  ExternalConfigurationApi,
+  ExternalConfigurationProviderHandler,
+} from "./type/externalConfigurationApi";
 
 interface __AnalysisApi {
   analysis(uri: string, text: string, pos?: vscode.Position): Promise<unknown>;
@@ -96,7 +106,7 @@ const API_VERSION: string = "1.0.1";
 
 export async function activate(
   context: vscode.ExtensionContext,
-): Promise<__ExtensionApi & __AnalysisApi> {
+): Promise<__ExtensionApi & __AnalysisApi & ExternalConfigurationApi> {
   await initTelemetry(context);
   telemetryEvent(
     "log",
@@ -135,6 +145,13 @@ export async function activate(
     },
   });
 
+  context.subscriptions.push(
+    externalConfigurationProvider.onDidChange(async () => {
+      clearDiagnostics();
+      await languageClientService.invalidateConfiguration();
+    }),
+  );
+
   const zoweCache = await makeZoweCache(
     vscode.Uri.joinPath(context.globalStorageUri, ZOWE_FSP_CACHE),
     languageClientService.invalidateConfiguration,
@@ -148,6 +165,14 @@ export async function activate(
     tarCache,
   );
   context.subscriptions.push(externalApis);
+
+  const e4eRegistration = externalConfigurationProvider.addHandler(
+    "BroadcomMFD.explorer-for-endevor",
+    e4eConfigurationHandler,
+    E4E_LIB_TYPES,
+  );
+  externalApis.onE4EAppeared = () => e4eRegistration.invalidate();
+  context.subscriptions.push(e4eRegistration);
 
   const analysisService = new ControlFlowAnalysisService(
     outputChannel,
@@ -235,6 +260,15 @@ export async function activate(
     },
     getControlFlowAnalysis(documentUri: string) {
       return analysisService.getAnalysis(documentUri);
+    },
+    registerExternalConfigurationProvider(
+      extensionId: string,
+      handler: ExternalConfigurationProviderHandler,
+    ) {
+      if (typeof extensionId !== "string" || typeof handler !== "function") {
+        throw Error("Invalid `extensionId` or `handler` argument");
+      }
+      return externalConfigurationProvider.addHandler(extensionId, handler);
     },
   };
   if (context.extensionMode !== vscode.ExtensionMode.Test) {
@@ -646,6 +680,7 @@ function registerEvents(
     vscode.workspace.onDidCloseTextDocument((document) => {
       void analysisService.invalidate(document.uri.toString(), true);
       invalidateConfig(document.uri);
+      externalConfigurationProvider.invalidateCache(document.uri);
       deleteDiagnostics(document.uri);
     }),
   );
