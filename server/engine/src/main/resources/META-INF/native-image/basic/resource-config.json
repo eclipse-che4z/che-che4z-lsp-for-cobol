@@ -20,13 +20,13 @@
         "pattern":"\\Qlogback.xml\\E"
       },
       {
-        "pattern":"\\Q/SpecialTokenHandling.properties\\E"
+        "pattern":"\\QSpecialTokenHandling.properties\\E"
       },
       {
-        "pattern":"\\Q/LanguageKeywords.txt\\E"
+        "pattern":"\\QLanguageKeywords.txt\\E"
       },
       {
-        "pattern":"\\Q/LanguageKeywords_sql.txt\\E"
+        "pattern":"\\QLanguageKeywords_sql.txt\\E"
       }
     ]},
   "bundles":[{

@@ -17,6 +17,7 @@ package org.eclipse.lsp.cobol.core.visitor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,12 +28,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KeywordSuggestions {
 
-  @Getter private Set<String> suggestions;
+  @Getter private Set<String> suggestions = Collections.emptySet();
 
   KeywordSuggestions() {
     Properties props = new Properties();
     try (InputStream keywords =
         KeywordSuggestions.class.getResourceAsStream("/LanguageKeywords.txt")) {
+      if (keywords == null) {
+        LOG.error("Cannot load keyword file LanguageKeywords.txt");
+        return;
+      }
       props.load(keywords);
       suggestions =
           props.stringPropertyNames().stream().map(String::toUpperCase).collect(Collectors.toSet());
