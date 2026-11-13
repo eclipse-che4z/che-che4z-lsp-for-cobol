@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~ Copyright (c) 2026 Broadcom.
+~
+~ The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+~
+~ This program and the accompanying materials are made
+~ available under the terms of the Eclipse Public License 2.0
+~ which is available at https://www.eclipse.org/legal/epl-2.0/
+~
+~ SPDX-License-Identifier: EPL-2.0
+~
+~ Contributors:
+~ Broadcom - initial API and implementation
+~
+-->
+<!-- Based on https://maven.apache.org/plugins-archives/maven-assembly-plugin-3.2.0/descriptor-refs.html#jar-with-dependencies. -->
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <id>jar-with-dependencies</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <unpack>true</unpack>
+            <unpackOptions>
+                <excludes>
+                    <exclude>META-INF/maven/**</exclude>
+                </excludes>
+            </unpackOptions>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+</assembly>
