@@ -22,7 +22,8 @@ export class WindowsLanguageClient implements NativeLanguageClient {
 
   constructor(serverPath: string) {
     this.executablePath = join(serverPath, "native");
-    this.command = `engine.exe`;
+    // Absolute path so resolution never depends on the spawn cwd or PATH.
+    this.command = join(this.executablePath, "engine.exe");
   }
 
   public getServer(): Executable {

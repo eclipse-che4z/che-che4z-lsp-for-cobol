@@ -268,6 +268,10 @@ export class LanguageClientService {
 
   private createServerOptions(jarPath: string) {
     if (this.isNativeBuildEnabled) {
+      this.outputChannel.appendLine("*** native server is enabled ***");
+      this.outputChannel.appendLine(
+        `native executable path: ${this.executableService.serverPath}`,
+      );
       return this.executableService.getNativeLanguageClient();
     }
     const args = ["-Dline.separator=\r\n", "-Xmx768M"];

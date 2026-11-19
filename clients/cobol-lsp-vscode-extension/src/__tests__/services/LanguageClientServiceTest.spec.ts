@@ -371,7 +371,7 @@ describe("LanguageClientService positive scenario", () => {
     );
     const executable =
       languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable?.command).toBe("engine.exe");
+    expect(executable?.command).toBe(join("C:\\test", "native", "engine.exe"));
     expect(executable?.options?.cwd).toBe(join("C:\\test", "native"));
   });
 
@@ -383,7 +383,7 @@ describe("LanguageClientService positive scenario", () => {
     );
     const executable =
       languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable?.command).toBe("./server-linux");
+    expect(executable?.command).toBe(join("/test", "native", "server-linux"));
     expect(executable?.options?.cwd).toBe(join("/test", "native"));
   });
 
@@ -395,7 +395,7 @@ describe("LanguageClientService positive scenario", () => {
     );
     const executable =
       languageClientService["executableService"].getNativeLanguageClient();
-    expect(executable?.command).toBe("./server-mac");
+    expect(executable?.command).toBe(join("/test", "native", "server-mac"));
     expect(executable?.options?.cwd).toBe(join("/test", "native"));
   });
 
