@@ -17,6 +17,7 @@ import { LinuxlanguageClient } from "./linuxlanguageClient";
 import { MacosLanguageClient } from "./macosLanguageClient";
 import { NativeLanguageClient } from "./nativelanguageClientInterface";
 import { WindowsLanguageClient } from "./windowsLanguageClient";
+import { outputChannel } from "../util/OutputChannel";
 
 export class NativeExecutableService {
   public constructor(public serverPath: string) {}
@@ -37,7 +38,11 @@ export class NativeExecutableService {
         break;
     }
     if (client) {
-      return client.getServer();
+      const server = client.getServer();
+      outputChannel.info(
+        `Native server executable: os: ${os.type()} ${server.command} (cwd: ${server.options?.cwd})`,
+      );
+      return server;
     }
   }
 }
