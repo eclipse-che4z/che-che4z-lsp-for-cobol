@@ -22,7 +22,8 @@ export class LinuxlanguageClient implements NativeLanguageClient {
 
   constructor(serverPath: string) {
     this.executablePath = join(serverPath, "native");
-    this.command = `./server-linux`;
+    // Absolute path so resolution never depends on the spawn cwd or PATH.
+    this.command = join(this.executablePath, "server-linux");
   }
 
   public getServer(): Executable {
