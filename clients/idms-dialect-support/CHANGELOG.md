@@ -2,6 +2,11 @@
 
 All notable changes to the "COBOL Language Support for IDMS" extension are documented in this file.
 
+## 1.0.9 (2026-11-19)
+
+- Omit parsing EXEC blocks in IDMS
+- Java-agnostic IDMS dialect implementation
+
 ## 1.0.8 (2026-05-26)
 
 - Readme update
