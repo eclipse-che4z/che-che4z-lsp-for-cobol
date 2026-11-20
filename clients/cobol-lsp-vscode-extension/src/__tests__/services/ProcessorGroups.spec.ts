@@ -28,6 +28,9 @@ import { EndevorElementLib } from "../../services/copybookLibs/EndevorElementLib
 import LocalPathLib from "../../services/copybookLibs/LocalPathLib";
 import { UssPathLib } from "../../services/copybookLibs/UssPathLib";
 import { initializeExternalAPIs } from "../../services/ExternalAPIsService";
+import { externalConfigurationProvider } from "../../services/ExternalConfigurationProvider";
+import { e4eConfigurationHandler } from "../../services/copybook/E4EConfigurationHandler";
+import type { ConfigurationProviderRegistration } from "../../type/externalConfigurationApi";
 import {
   loadProcessorGroupCompileOptionsConfig,
   loadProcessorGroupCopybookExtensionsConfig,
@@ -57,6 +60,7 @@ jest.mock("path", (): unknown => {
 
 let isEndevorElementResult = false;
 let e4eConfigurationResult: E4EExternalConfigurationResponse | Error;
+let e4eRegistration: ConfigurationProviderRegistration;
 let e4eMock: E4E;
 
 beforeEach(async () => {
@@ -172,6 +176,14 @@ beforeEach(async () => {
     .spyOn(E4ECopybookService, "getE4EAPI")
     .mockResolvedValue({ api: e4eMock });
   await initializeExternalAPIs(Uri.file("/storage"));
+  e4eRegistration = externalConfigurationProvider.addHandler(
+    "e4e",
+    e4eConfigurationHandler,
+  );
+});
+
+afterEach(() => {
+  e4eRegistration.dispose();
 });
 
 describe("Processor groups", () => {
@@ -420,5 +432,61 @@ describe("Processor groups configuration provides lib path in Windows", () => {
       DEFAULT_DIALECT,
     );
     expect(result).toStrictEqual([new LocalPathLib("/back")]);
+  });
+});
+
+describe("External configuration provider", () => {
+  let registration: ConfigurationProviderRegistration | undefined;
+
+  const register = (handler: jest.Mock) => {
+    registration = externalConfigurationProvider.addHandler(
+      "test.provider",
+      handler,
+    );
+    return handler;
+  };
+
+  beforeEach(() => {
+    isEndevorElementResult = false;
+  });
+
+  afterEach(() => {
+    registration?.dispose();
+    registration = undefined;
+  });
+
+  it("takes precedence over pgm_conf.json", async () => {
+    register(
+      jest.fn().mockReturnValue({
+        configuration: {
+          name: "EXTERNAL",
+          libs: ["/external"],
+          preprocessor: ["IDMS"],
+        },
+      }),
+    );
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "extDAF.cob");
+
+    expect((await loadProcessorGroup(document)).name).toEqual("EXTERNAL");
+    expect(
+      await loadProcessorGroupCopybooksLibs(document, DEFAULT_DIALECT),
+    ).toStrictEqual([new LocalPathLib("/external")]);
+    expect(
+      await loadProcessorGroupDialectConfig({ scopeUri: document }, []),
+    ).toStrictEqual(["IDMS"]);
+  });
+
+  it("falls back to workspace configuration when the provider does not handle the document", async () => {
+    register(jest.fn().mockReturnValue(null));
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "extNullDAF.cob");
+
+    expect((await loadProcessorGroup(document)).name).toEqual("DAF");
+  });
+
+  it("falls back to workspace configuration when the provider fails", async () => {
+    register(jest.fn().mockRejectedValue(new Error("provider failure")));
+    const document = vscode.Uri.joinPath(WORKSPACE_URI, "extFailDAF.cob");
+
+    expect((await loadProcessorGroup(document)).name).toEqual("DAF");
   });
 });

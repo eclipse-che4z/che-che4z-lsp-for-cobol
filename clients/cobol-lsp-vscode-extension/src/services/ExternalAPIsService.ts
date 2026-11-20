@@ -103,6 +103,8 @@ class ExternalAPIsService implements vscode.Disposable {
   binaryDownloader?: CopybookBinaryDownloader;
   tarCache?: Memoize<[tarFileUri: vscode.Uri], TarContent[]>;
   toDispose: vscode.Disposable[] = [];
+  /** Called when E4E API becomes available after the initialization */
+  onE4EAppeared?: () => unknown;
 
   constructor(
     private storagePath: vscode.Uri,
@@ -150,6 +152,7 @@ class ExternalAPIsService implements vscode.Disposable {
       this.e4eApi,
     );
     diagnosticCollection.clear();
+    this.onE4EAppeared?.();
   }
 
   public explorerAppeared(api: IApiRegisterClient) {

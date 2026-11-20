@@ -20,7 +20,6 @@ import { loadBridgeJsonContent } from "./BridgeForGitLoader";
 import {
   clearWorkspaceConfigCache,
   ProcessorGroupProperties,
-  readEndevorConfig,
   readWorkspaceConfig,
   ProcessorGroup,
   WorkspaceConfig,
@@ -29,6 +28,7 @@ import {
 import { DEFAULT_DIALECT } from "../constants";
 import { getVariablesFromUri } from "./util/FSUtils";
 import { clearDiagnostics } from "./ExternalAPIsService";
+import { externalConfigurationProvider } from "./ExternalConfigurationProvider";
 
 export async function loadProcessorGroupCopybooksLibs(
   documentUri: Uri,
@@ -130,13 +130,15 @@ export async function loadProcessorGroup(
   documentUri: Uri,
   dialect = DEFAULT_DIALECT,
 ) {
-  let workspaceConfig = await readEndevorConfig(documentUri);
-
-  if (!workspaceConfig) {
-    const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
-    if (workspaceUri) {
-      workspaceConfig = await readWorkspaceConfig(workspaceUri);
-    }
+  const externalConfig =
+    await externalConfigurationProvider.resolve(documentUri);
+  if (externalConfig) {
+    return externalConfig;
+  }
+  let workspaceConfig: WorkspaceConfig | undefined;
+  const workspaceUri = workspace.getWorkspaceFolder(documentUri)?.uri;
+  if (workspaceUri) {
+    workspaceConfig = await readWorkspaceConfig(workspaceUri);
   }
 
   if (workspaceConfig) {

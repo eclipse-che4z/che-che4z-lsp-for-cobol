@@ -21,7 +21,6 @@ import LocalPathLib from "./copybookLibs/LocalPathLib";
 import VirtualPathLib from "./copybookLibs/VirtualPathLib";
 import { UssPathLib } from "./copybookLibs/UssPathLib";
 import { DatasetLib } from "./copybookLibs/DatasetLib";
-import { externalApis } from "./ExternalAPIsService";
 import { EndevorElementLib } from "./copybookLibs/EndevorElementLib";
 import { EndevorMemberLib } from "./copybookLibs/EndevorMemberLib";
 import CopybookLib from "./copybookLibs/CopybookLib";
@@ -176,7 +175,11 @@ const ProcessorGroupsModel = t.type({
   pgroups: t.array(ProcessorGroupModel),
 });
 
-type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
+export const ExternalConfigurationResponseModel = t.type({
+  configuration: ProcessorGroupModel,
+});
+
+export type ProcessorGroupDefinition = t.TypeOf<typeof ProcessorGroupModel>;
 export type ProcessorGroupsDefinition = t.TypeOf<typeof ProcessorGroupsModel>;
 
 export type CopybookLibTypes =
@@ -187,52 +190,6 @@ export type CopybookLibTypes =
   | typeof EndevorElementLib
   | typeof EndevorMemberLib
   | typeof TarCopybookLib;
-
-const readEndevorConfigCached = new Memoize(
-  async function (documentUri: Uri): Promise<WorkspaceConfig | undefined> {
-    if (!externalApis.handleAsEndevorElement(documentUri.toString())) {
-      return;
-    }
-
-    const workspaceConfig: WorkspaceConfig = {
-      processorGroups: {},
-      programs: [],
-    };
-
-    const endevorData =
-      await externalApis.e4eDownloader?.getEndevorProcessorGroupConfig(
-        documentUri,
-      );
-    if (endevorData) {
-      const processorGroups = endevorData.pgroups
-        .map(transformProcessorGroup([EndevorElementLib, EndevorMemberLib]))
-        .map(renamePreprocessors);
-
-      processorGroups.forEach((pg) => {
-        workspaceConfig.processorGroups[pg.name] = pg;
-      });
-
-      const processorGroupName = endevorData.pgms[0].pgroup;
-      const processorGroup = processorGroups.find(
-        (pg) => pg.name === processorGroupName,
-      );
-      if (processorGroup) {
-        const programs: ProgramConfig[] = [
-          {
-            program: workspace.asRelativePath(documentUri),
-            processorGroup,
-          },
-        ];
-        workspaceConfig.programs = programs;
-      }
-    }
-
-    return workspaceConfig;
-  },
-  undefined,
-  workspace.asRelativePath,
-);
-export const readEndevorConfig = readEndevorConfigCached.execute;
 
 const readWorkspaceConfigCached = new Memoize(
   async function (workspaceUri: Uri): Promise<WorkspaceConfig | undefined> {
@@ -328,12 +285,10 @@ export function readSettingConfig(dialectType: string): ProcessorGroup {
 
 export function invalidateConfig(documentUri: Uri) {
   readWorkspaceConfigCached.invalidateCache(documentUri);
-  readEndevorConfigCached.invalidateCache(documentUri);
 }
 
 export function clearWorkspaceConfigCache() {
   readWorkspaceConfigCached.clearCache();
-  readEndevorConfigCached.clearCache();
 }
 
 async function readProcessorGroupsFile(
@@ -352,16 +307,7 @@ async function readProcessorGroupsFile(
       );
     }
 
-    return decoded.right.pgroups.map(
-      transformProcessorGroup([
-        LocalPathLib,
-        VirtualPathLib,
-        DatasetLib,
-        UssPathLib,
-        EndevorElementLib,
-        TarCopybookLib,
-      ]),
-    );
+    return decoded.right.pgroups.map(transformWorkspaceProcessorGroup);
   } catch (e) {
     if (
       e instanceof Error &&
@@ -374,7 +320,7 @@ async function readProcessorGroupsFile(
   }
 }
 
-const transformProcessorGroup =
+export const transformProcessorGroup =
   (libTypes: CopybookLibTypes[]) =>
   (input: ProcessorGroupDefinition): ProcessorGroup => {
     const libs = transformLibs(input.libs, libTypes, []);
@@ -388,19 +334,27 @@ const transformProcessorGroup =
       "target-sql-backend": input["target-sql-backend"],
     };
 
+    outputChannel.debug(
+      `Transformed processor group ${result.name}: ${JSON.stringify(result)}`,
+    );
     return result;
   };
 
-const renamePreprocessors = (pg: ProcessorGroup): ProcessorGroup => {
-  if (pg.preprocessors) {
-    pg.preprocessors = pg.preprocessors.map((p) => ({
-      ...p,
-      name: translatePreprocessor[p.name?.toUpperCase()] ?? p.name,
-    }));
-  }
+export function transformWorkspaceProcessorGroup(
+  input: ProcessorGroupDefinition,
+): ProcessorGroup {
+  return transformProcessorGroup([
+    LocalPathLib,
+    VirtualPathLib,
+    DatasetLib,
+    UssPathLib,
+    EndevorElementLib,
+    TarCopybookLib,
+  ])(input);
+}
 
-  return pg;
-};
+export const translatePreprocessorName = (name: string): string =>
+  translatePreprocessor[name?.toUpperCase()] ?? name;
 
 export function transformLibs(
   libDefinitions: LibsDefinitions | undefined,

@@ -26,10 +26,11 @@ import {
   LibsDefinitions,
   readSettingConfig,
   readWorkspaceConfig,
-  readEndevorConfig,
   transformLibs,
 } from "../../services/ProcessorGroupsLoader";
 import * as vscode from "vscode";
+import { e4eConfigurationHandler } from "../../services/copybook/E4EConfigurationHandler";
+import type { ExternalConfigurationResponse } from "../../type/externalConfigurationApi";
 import { outputChannel } from "../../services/util/OutputChannel";
 import {
   externalApis,
@@ -258,16 +259,15 @@ describe("ProcessorGroupsLoader", () => {
         .spyOn(externalApis.e4eDownloader, "getEndevorProcessorGroupConfig")
         .mockResolvedValue(mockConfigResponse);
 
-      const result = await readEndevorConfig(
+      mockConfigResponse.pgms[0].pgroup = "DATASET";
+      const result = await e4eConfigurationHandler(
         vscode.Uri.joinPath(WORKSPACE_URI, "TEST.cob"),
       );
       expect(result).not.toBeUndefined();
 
-      const preprocessors = result?.processorGroups["DATASET"]?.preprocessors;
-      expect(preprocessors).not.toBeUndefined();
-      expect(preprocessors?.length).toBe(2);
-      expect(preprocessors?.[0].name).toBe("PREPROC1");
-      expect(preprocessors?.[1].name).toBe("SQL");
+      const preprocessors = (result as ExternalConfigurationResponse)
+        .configuration.preprocessor;
+      expect(preprocessors).toEqual([{ name: "PREPROC1" }, { name: "SQL" }]);
     });
   });
 });
