@@ -109,11 +109,9 @@ local.properties
 # ANTLR plugin
 .antlr
 /server/engine/gen
-/server/dialect-idms/gen
-/server/dialect-daco/gen
-/server/test/gen
 /server/parser/gen
 .antlr/
+gen/
 
 # TeXlipse plugin
 .texlipse
