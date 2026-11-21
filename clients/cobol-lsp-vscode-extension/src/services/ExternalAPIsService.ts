@@ -152,6 +152,27 @@ class ExternalAPIsService implements vscode.Disposable {
     diagnosticCollection.clear();
   }
 
+  private registerProfileChangeHandlers(api: IApiRegisterClient) {
+    let pending: ReturnType<typeof setTimeout> | undefined = undefined;
+    const handler = (profile: IProfileLoaded | number) => {
+      outputChannel.appendLine(
+        typeof profile === "object"
+          ? `Zowe profile ${profile.name} updated`
+          : `Zowe profiles updated`,
+      );
+      this.clearCache();
+      const callback = this.configurationInvalidation;
+      if (!callback) return;
+      if (pending) clearTimeout(pending);
+      pending = setTimeout(() => {
+        pending = undefined;
+        callback();
+      }, 1000);
+    };
+    api.onProfileUpdated?.(handler);
+    api.onProfilesUpdate?.(handler);
+  }
+
   public explorerAppeared(api: IApiRegisterClient) {
     const ussService = new CopybookDownloaderForUss();
     const dsnService = new CopybookDownloaderForDsn();
@@ -159,15 +180,7 @@ class ExternalAPIsService implements vscode.Disposable {
     this.dsnService = dsnService;
     this.binaryDownloader = new CopybookBinaryDownloader(this.storagePath, api);
     diagnosticCollection.clear();
-    if (api.onProfileUpdated) {
-      api.onProfileUpdated((profile: IProfileLoaded) => {
-        outputChannel.appendLine(`Zowe profile ${profile.name} updated`);
-        this.clearCache();
-        if (this.configurationInvalidation) {
-          this.configurationInvalidation();
-        }
-      });
-    }
+    this.registerProfileChangeHandlers(api);
     const ussWatcher = makeCreateDeleteWatcher("zowe-uss");
     const dsWatcher = makeCreateDeleteWatcher("zowe-ds");
     this.toDispose.push(
