@@ -13,6 +13,7 @@ export const isV1RuntimeDialectDetail = (
     return false;
   if (
     "isCopyStatement" in dialect &&
+    dialect.isCopyStatement !== undefined &&
     typeof dialect.isCopyStatement !== "function"
   )
     return false;
@@ -43,6 +44,7 @@ export const isV2RuntimeDialectDetail = (
     return false;
   if (
     "isCopyStatement" in dialect &&
+    dialect.isCopyStatement !== undefined &&
     typeof dialect.isCopyStatement !== "function"
   )
     return false;
